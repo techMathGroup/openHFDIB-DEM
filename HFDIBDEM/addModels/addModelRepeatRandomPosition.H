@@ -167,7 +167,8 @@ namespace Foam
         );
 		void initializeCellZone();
 		void updateCellZoneBoundBox();
-        void initializeBoundBox();
+        void initializeBoundBox();        
+        void recreateBoundBox();
 		labelList getBBoxCellsByOctTree
         (
             label cellToCheck,

@@ -38,7 +38,8 @@ addModelOnce::addModelOnce
 (
     const dictionary& addModelDict,
     const word        stlName,
-    const Foam::dynamicFvMesh& mesh
+    const Foam::dynamicFvMesh& mesh,
+    const bool startTime0
 )
 :
 addModelDict_(addModelDict),
@@ -47,6 +48,8 @@ stlName_(stlName),
 bodyAdded_(false),
 mesh_(mesh)
 {
+    if(!startTime0)
+        bodyAdded_ = true;
 }
 
 addModelOnce::~addModelOnce()

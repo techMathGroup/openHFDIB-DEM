@@ -336,7 +336,12 @@ triSurface addModelRepeatRandomPosition::addBody
     pointField bodyPoints(bodySurfMesh.points());
     
     // get its center of mass
-    vector CoM = gSum(bodyPoints/bodyPoints.size());
+    vector CoM(vector::zero);
+    forAll(bodyPoints,point)
+    {
+        CoM += bodyPoints[point];
+    }    
+    CoM/= bodyPoints.size();
     Info << "-- addModelMessage-- " << "original STL-based CoM: " << CoM << endl;
     
     // move the body to the center of the bounding box
@@ -518,6 +523,40 @@ void addModelRepeatRandomPosition::initializeBoundBox()
     cellZoneBounds_ = boundBox(minBound_,maxBound_);
 }
 //---------------------------------------------------------------------------//
+void addModelRepeatRandomPosition::recreateBoundBox()
+{    
+    octreeField_ = Field<label>(mesh_.nCells(), 0);
+    cellsInBoundBox_[Pstream::myProcNo()].clear();
+    List<DynamicLabelList> bBoxCells(Pstream::nProcs());
+    
+    bool isInsideBB(false);
+    labelList nextToCheck(1,0);
+    label iterCount(0);label iterMax(mesh_.nCells());
+    while ((nextToCheck.size() > 0 or not isInsideBB) and iterCount < iterMax)
+    {
+        iterCount++;        
+        DynamicLabelList auxToCheck;
+        
+        forAll (nextToCheck,cellToCheck)
+        {
+            auxToCheck.append(
+                getBBoxCellsByOctTree(
+                    nextToCheck[cellToCheck],
+                    isInsideBB,
+                    minBound_,maxBound_,bBoxCells
+                )
+            );
+        }
+        nextToCheck = auxToCheck;
+    }    
+    
+    cellsInBoundBox_[Pstream::myProcNo()] = bBoxCells[Pstream::myProcNo()];
+    
+    Info << "-- addModelMessage-- " << "recreated boundBox size " << cellsInBoundBox_[Pstream::myProcNo()].size() << endl;
+    
+    cellZoneBounds_ = boundBox(minBound_,maxBound_);
+}
+//---------------------------------------------------------------------------//
 labelList addModelRepeatRandomPosition::getBBoxCellsByOctTree
 (
     label cellToCheck,
@@ -571,6 +610,7 @@ scalar addModelRepeatRandomPosition::checkLambdaFraction(const volScalarField& b
 		lambdaIntegrate[Pstream::myProcNo()] += mesh_.V()[cell]*body[cell];
 		volumeIntegrate[Pstream::myProcNo()] += mesh_.V()[cell];
 	}
+	
 	lambdaFraction = gSum(lambdaIntegrate)/gSum(volumeIntegrate);
 	Info << "-- addModelMessage-- " << "lambda fraction in controlled region: " << lambdaFraction<< endl;
 	return lambdaFraction;
@@ -701,6 +741,7 @@ vector addModelRepeatRandomPosition::returnRandomPosition
             forAll (bSMeshPts,pointI)
             {
                 bool isSurfPtInsideMesh = searchEng.isInside(bSMeshPts[pointI]);
+                reduce(isSurfPtInsideMesh, orOp<bool>());
                 if (not isSurfPtInsideMesh)
                 {
                     Info << "-- addModelMessage-- " << "move resulted in invalid position" << endl;

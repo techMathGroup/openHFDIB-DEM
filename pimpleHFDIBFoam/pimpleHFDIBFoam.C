@@ -114,6 +114,8 @@ Changelog:
 
 #include "triSurfaceMesh.H"  // for fd read from stl file
 
+#include "clockTime.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -144,6 +146,10 @@ int main(int argc, char *argv[])
     
     bool isFirstTime(true);
     openHFDIBDEM  HFDIBDEM(mesh);
+    
+    clockTime timer;
+    List<double> times;
+    times.setSize(7);
 
     while (runTime.run())
     {
@@ -153,6 +159,7 @@ int main(int argc, char *argv[])
 
         #include "setDeltaT.H"
         
+        word startTime(runTime.timeName());
         
         runTime++;
         
@@ -162,9 +169,9 @@ int main(int argc, char *argv[])
         {
             Info << "\nInitializing HFDIBDEM\n" << endl;            
             
-            HFDIBDEM.initialize(lambda,U,refineF,maxRefinementLevel); 
+            HFDIBDEM.initialize(lambda,U,refineF,maxRefinementLevel,startTime); 
             
-            if (maxRefinementLevel > 0)
+            if (maxRefinementLevel > 0 && startTime == "0")
             {
                 #include "initialMeshRefinementV2.H"
             }
@@ -174,9 +181,10 @@ int main(int argc, char *argv[])
         }
         // Note (MI): initialize before starting the time loop
         
+        times[0] = timer.timeIncrement();
+        
         HFDIBDEM.preUpdateBodies(lambda,f);
-        
-        
+                
         surface = lambda;
         forAll (Ui,cellI)
         {
@@ -193,6 +201,8 @@ int main(int argc, char *argv[])
         
         surface.correctBoundaryConditions();
         Ui.correctBoundaryConditions();
+        
+        times[1] = timer.timeIncrement();
         
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
@@ -260,21 +270,29 @@ int main(int argc, char *argv[])
             }
         }
         
+        times[2] = timer.timeIncrement();
+        
         Info << "trying to update HFDIBDEM" << endl;
         CoNum = HFDIBDEM.postUpdateBodies(lambda,f);//uses updated f to recomptute V_el, omega_ and Axis_
+        
+        times[3] = timer.timeIncrement();
         
         //~ HFDIBDEM.addRemoveBodies(lambda);
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
         //~ #include "limitDeltaTForDEM.H"
-        
+        times[4] = timer.timeIncrement();
         //~ #include "refreshCourantNo.H"
 
         //~ #include "setDeltaT.H"
         
         HFDIBDEM.moveBodies(lambda,refineF);
         
+        times[5] = timer.timeIncrement();
+        
         HFDIBDEM.correctContact(lambda,refineF);
         Info << "updated HFDIBDEM" << endl;
+        
+        times[6] = timer.timeIncrement();
 
 
         runTime.write();
@@ -283,6 +301,8 @@ int main(int argc, char *argv[])
         {
             HFDIBDEM.writeBodySurfMeshes();
         }
+        
+        Info << "Timer: 0: " << times[0] << " 1: " << times[1] << " 2: " << times[2] << " 3: " << times[3] << " 4: " << times[4] << " 5: " << times[5] << " 6: " << times[6] << endl;
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"

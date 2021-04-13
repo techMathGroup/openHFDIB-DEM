@@ -128,7 +128,8 @@ namespace Foam
         (
             const dictionary& addModelDict,
             const word        stlName,
-            const Foam::dynamicFvMesh& mesh
+            const Foam::dynamicFvMesh& mesh,
+            const bool startTime0
         );
         
         // Destructors -------------------------------------------------

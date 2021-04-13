@@ -121,6 +121,11 @@ namespace Foam
     //how many times rocompute M0_ because of refinement
     label recomputeM0_;
     
+    //Store gradient
+    vectorField surfNorm_;
+    
+    vector geometricD_;//geometric directions
+    
     //solve body-wall contact
     //~ void solveWallContact(const DynamicLabelList& wallContactLst);
     // Note (MI): moved to immersedBody class by MS (as it should be there)
@@ -178,7 +183,7 @@ namespace Foam
     ~openHFDIBDEM();
     
     //~ void initialize(volScalarField& body);
-    void initialize(volScalarField& body,volVectorField& U,volScalarField& refineF,label recomputeM0);
+    void initialize(volScalarField& body,volVectorField& U,volScalarField& refineF,label recomputeM0, word runTime);
     
     void preUpdateBodies
     (
@@ -265,6 +270,14 @@ namespace Foam
         vector normalVector,
         vector contactCenter,
         label owner
+    );
+    
+    void restartSimulation
+    (
+        volScalarField& body,
+        volScalarField& refineF,
+        word runTime,
+        word prevLogPath
     );
 
  };

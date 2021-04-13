@@ -83,6 +83,14 @@ adhWN_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("adhN"))),
 minDEMloops_(readScalar(HFDIBDEMDict_.lookup("minDEMloops"))),
 minDEMtimeStep_(readScalar(HFDIBDEMDict_.lookup("minDEMtimeStep")))
 {
+    if (HFDIBDEMDict_.found("geometricD"))
+    {
+        geometricD_ = HFDIBDEMDict_.lookup("geometricD");
+    }
+    else
+    {
+        geometricD_ = mesh_.geometricD();
+    }
 }
 openHFDIBDEM::openHFDIBDEM(const Foam::dynamicFvMesh& mesh, const Foam::wordList stlNames )
 :
@@ -119,6 +127,14 @@ adhWN_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("adhN"))),
 minDEMloops_(readScalar(HFDIBDEMDict_.lookup("minDEMloops"))),
 minDEMtimeStep_(readScalar(HFDIBDEMDict_.lookup("minDEMtimeStep")))
 {
+    if (HFDIBDEMDict_.found("geometricD"))
+    {
+        geometricD_ = HFDIBDEMDict_.lookup("geometricD");
+    }
+    else
+    {
+        geometricD_ = mesh_.geometricD();
+    }
 }
 //---------------------------------------------------------------------------//
 openHFDIBDEM::~openHFDIBDEM()
@@ -152,22 +168,29 @@ void openHFDIBDEM::initialize
     volScalarField& body,
     volVectorField& U,
     volScalarField& refineF,
-    label recomputeM0
+    label recomputeM0,
+    word runTime
 )
 {
     // get data from HFDIBDEMDict
     wordList stlNames( HFDIBDEMDict_.lookup("stlNames") );
     HFDIBinterpDict_ = HFDIBDEMDict_.subDict("interpolationSchemes");
     
+    bool startTime0(runTime == "0");
+    
     // initialize addModels
     addModels_.setSize(stlNames_.size());
-    #include "initializeAddModels.H"
-    
-    recomputeM0_ = recomputeM0;
-    
-    // register IBs as needed
     immersedBodies_.setSize(0);                                         //on the fly creation
     refineF *= 0;
+    recomputeM0_ = recomputeM0;
+    
+    if(!startTime0)
+    {
+        restartSimulation(body, refineF, runTime,"pimpleHFDIBFoam_Prev");
+    }
+    
+    #include "initializeAddModels.H"
+
     forAll (addModels_,modelI)
     {
         word stlName(stlNames_[modelI]);
@@ -204,7 +227,8 @@ void openHFDIBDEM::initialize
                         HFDIBDEMDict_,
                         transportProperties_,
                         addIBPos,
-                        recomputeM0_
+                        recomputeM0_,
+                        geometricD_
                     )
                 );
                 immersedBodies_[addIBPos].createImmersedBody(body,refineF);
@@ -224,6 +248,14 @@ void openHFDIBDEM::initialize
             }
         }
     }
+    
+    const dimensionedScalar deltaN
+    (
+        "deltaN",
+        1e-8/pow(average(mesh_.V()), 1.0/3.0)
+    );
+    surfNorm_ = -fvc::grad(body);
+    surfNorm_ /= (mag(surfNorm_)+deltaN.value());
     
     // Initialize list for neighbour list method based on number of IBs
     boundValueNeighbourList_.setSize(3);
@@ -373,6 +405,14 @@ void openHFDIBDEM::recreateBodies
             }
         }
     }
+    
+    const dimensionedScalar deltaN
+    (
+        "deltaN",
+        1e-8/pow(average(mesh_.V()), 1.0/3.0)
+    );
+    surfNorm_ = -fvc::grad(body);
+    surfNorm_ /= (mag(surfNorm_)+deltaN.value());
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::interpolateIB( volVectorField & V
@@ -392,7 +432,7 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
         if (immersedBodies_[bodyId].getIsActive())
         {
             //Update imposed field according to body
-            immersedBodies_[bodyId].updateVectorField(Vs, V.name(),body);
+            immersedBodies_[bodyId].updateVectorField(Vs, V.name(),body, surfNorm_);
             
             if(immersedBodies_[bodyId].getUseInterpolation())
             {            
@@ -1138,7 +1178,11 @@ void openHFDIBDEM::solvePrtContact(openHFDIBDEM::prtPrtContactInfo contactInfo, 
     scalar cGammat(cBody.getGammat());  //tangential viscosity
     scalar cmu(cBody.getmu());          //firction coef
     scalar cadhN(cBody.getadhN());      //adhesive force
+    scalar cadhEqui(cBody.getadhEqui());//adhesive force
     scalar cM(cBody.getM());            //mass
+    scalar cRhoS(cBody.getRhoS().value());      //viscosity
+    vector cAxis(cBody.getAxis());      //Axis
+    scalar cOmega(cBody.getOmega());    //Omega
 
     immersedBody& tBody(immersedBodies_[contactInfo.prtsInContact_.second()]);
     
@@ -1150,7 +1194,11 @@ void openHFDIBDEM::solvePrtContact(openHFDIBDEM::prtPrtContactInfo contactInfo, 
     scalar tGammat(tBody.getGammat());  //tangential viscosity
     scalar tmu(tBody.getmu());          //firction coef
     scalar tadhN(tBody.getadhN());      //adhesive force
+    scalar tadhEqui(tBody.getadhEqui());//adhesive force
     scalar tM(tBody.getM());            //mass
+    scalar tRhoS(tBody.getRhoS().value());      //viscosity    
+    vector tAxis(tBody.getAxis());      //Axis
+    scalar tOmega(tBody.getOmega());    //Omega
     
     
     vector  FN(vector::zero);//placeholder for normal force
@@ -1170,7 +1218,11 @@ void openHFDIBDEM::solvePrtContact(openHFDIBDEM::prtPrtContactInfo contactInfo, 
     
     // compute normal to movement and relative velocity
     vector nVec(contactInfo.contactNormal_);
-    scalar Vn(-(cVel - tVel) & nVec);
+    vector cplanarVec       =  cLVec- cAxis*((cLVec)&cAxis);
+    vector cVeli(-(cplanarVec^cAxis)*cOmega + cVel);
+    vector tplanarVec       =  tLVec- tAxis*((tLVec)&tAxis);
+    vector tVeli(-(tplanarVec^tAxis)*tOmega + tVel);
+    scalar Vn(-(cVeli - tVeli) & nVec);
     
     scalar Lc(4*mag(cLVec)*mag(tLVec)/(mag(cLVec)+mag(tLVec)));
     
@@ -1180,9 +1232,17 @@ void openHFDIBDEM::solvePrtContact(openHFDIBDEM::prtPrtContactInfo contactInfo, 
     FN = (aKN*contactInfo.contactVolume_/(Lc+SMALL) + aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(contactInfo.contactArea_ * Vn))*nVec;
     
     // compute adhesive force
-    vector FA(aadhN*contactInfo.contactArea_*nVec);
-    
-    FN -= FA;
+    scalar FAc(aadhN*contactInfo.contactArea_);
+    scalar FAeq(min(aKN*((cadhEqui*cM)/(cRhoS + SMALL))/(Lc+SMALL), aKN*((tadhEqui*tM)/(tRhoS + SMALL))/(Lc+SMALL)));
+    scalar partMul(max(contactInfo.contactVolume_ * cRhoS / (cM+SMALL) / cadhEqui, contactInfo.contactVolume_ * tRhoS / (tM+SMALL) / tadhEqui));
+    if(partMul > 1)
+    {
+        partMul = 1;
+    }
+    vector FA((FAeq * partMul  + FAc * (1-partMul)) * nVec);
+    Info << "FN: " << FN << endl;
+    Info << "FA: " << FA << endl;
+    Info << "FAeq: " << FAeq << endl;
     
     vector cFtLast(vector::zero);
     vector tFtLast(vector::zero);
@@ -1220,14 +1280,16 @@ void openHFDIBDEM::solvePrtContact(openHFDIBDEM::prtPrtContactInfo contactInfo, 
     //Scale projected Ft to have same magnitude as FtLast
     vector FtLastr(mag(FtLast) * (FtLastP/(mag(FtLastP)+SMALL)));
     // Compute relative tangential velocity
-    vector Vt((cVel - tVel) - ((cVel - tVel) & nVec) * nVec);
+    vector Vt((cVeli - tVeli) - ((cVeli - tVeli) & nVec) * nVec);
     //Compute tangential force
     Ft = (FtLastr - aKt*Vt*deltaT - aGammat*Vt);
     
     if (mag(Ft) > amu * mag(FN))
     {
         Ft *= amu * mag(FN) / mag(Ft);
-    }
+    }    
+    
+    FN -= FA;
     
     // add the computed force to the affected bodies
     vector cTN(cLVec ^  FN);
@@ -1425,6 +1487,8 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                     break;
                 }
             }
+                        
+            reduce(contactIsOk, orOp<bool>()); 
             
             //Move or return particles
             forAll (ibToResolve,ib)
@@ -1538,9 +1602,10 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
             {
                 immersedBodies_[ibContactList_[0]].solveWallContact(kWN_, gammaWN_, kWt_, gammaWt_, muW_, adhWN_, deltaTime*step);
             }
-
             
             bool contactIsOk(immersedBodies_[ibContactList_[0]].checkContactMovement(deltaTime*step));
+            
+            reduce(contactIsOk, orOp<bool>()); 
 
             if (contactIsOk || step == minDEMtimeStep_)
             {
@@ -1593,7 +1658,6 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                     doubleMinStep = true;
                 }
             }
-            
             if (pos + step > 1)
                 step = 1 - pos;
             
@@ -1611,6 +1675,14 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
             }
         }
     }
+    
+    const dimensionedScalar deltaN
+    (
+        "deltaN",
+        1e-8/pow(average(mesh_.V()), 1.0/3.0)
+    );
+    surfNorm_ = -fvc::grad(body);
+    surfNorm_ /= (mag(surfNorm_)+deltaN.value());
 }
 //---------------------------------------------------------------------------//
 // void openHFDIBDEM::correctContact(volScalarField& body)
@@ -1985,7 +2057,8 @@ void openHFDIBDEM::addRemoveBodies
                         HFDIBDEMDict_,
                         transportProperties_,
                         addIBPos,
-                        recomputeM0_
+                        recomputeM0_,
+                        geometricD_
                     )
                 );
                 
@@ -1997,6 +2070,7 @@ void openHFDIBDEM::addRemoveBodies
                 {
                     nBody.initSyncWithFlow(U);
                 }
+                nBody.assignFullHistory();
                 
                 // update the contact stuff
                 for (label i = 0; i < 3; i = i + 1)
@@ -2179,6 +2253,156 @@ void openHFDIBDEM::updateFSCoupling
         {
             immersedBodies_[bodyId].pimpleUpdate(body,f);
         }
+    }
+}
+//---------------------------------------------------------------------------//
+void openHFDIBDEM::restartSimulation
+(
+    volScalarField& body,
+    volScalarField& refineF,
+    word runTime,
+    word prevLogPath
+)
+{
+    word dir(runTime);
+    
+    if(exists("processor0"))
+        dir = "processor0/" + runTime;
+    
+    fileNameList files(readDir(dir));
+    string suffix(".stl");
+    wordList bodyNames;
+    DynamicVectorList vel;
+    DynamicScalarList angVel;
+    DynamicVectorList rotAxis;
+    
+    forAll(files,f)
+    {
+        if(files[f].size() >= suffix.size() && files[f].compare(files[f].size() - suffix.size(), suffix.size(), suffix) == 0)
+            bodyNames.append(files[f]);
+    }
+    
+    vel.setSize(bodyNames.size());
+    angVel.setSize(bodyNames.size());
+    rotAxis.setSize(bodyNames.size());
+    
+    IFstream fileStream(prevLogPath);
+    string line;
+    string timeString("Time = ");
+    string bodyString("-- body ");
+    string velString("  linear velocity:");
+    string angString(" angular velocity:");
+    string axisString("    rotation axis:");
+    bool inTime(false);
+    bool cont(true);
+    
+    Info << "Reading file to restart simulation" << endl;
+    
+    while(cont)
+    {
+        getline(fileStream.stdStream(),line);
+        
+        if(inTime)
+        {
+            forAll(bodyNames, nameI)
+            {
+                if(line.find(bodyString + bodyNames[nameI].substr(0,bodyNames[nameI].size() - suffix.size()) + velString) != std::string::npos)
+                {
+                    label ind1 = line.find("(");
+                    label ind2 = line.find(" ",ind1);
+                    DynamicScalarList comps;
+                    comps.append(stod(line.substr(ind1+1,ind2-ind1-1)));
+                    ind1 = ind2+1;
+                    ind2 = line.find(" ",ind1);
+                    comps.append(stod(line.substr(ind1,ind2-ind1)));
+                    ind1 = ind2+1;
+                    ind2 = line.find(")",ind1);
+                    comps.append(stod(line.substr(ind1,ind2-ind1)));
+                    vector veli(comps[0],comps[1],comps[2]);
+                    vel[nameI] = veli;
+                }
+                
+                if(line.find(bodyString + bodyNames[nameI].substr(0,bodyNames[nameI].size() - suffix.size()) + angString) != std::string::npos)
+                {
+                    label ind1 = line.find(":");
+                    label ind2 = line.find(" ",ind1);
+                    scalar angi;
+                    angi = stod(line.substr(ind1+1,ind2-ind1-1));
+                    angVel[nameI] = angi;                    
+                }
+                
+                if(line.find(bodyString + bodyNames[nameI].substr(0,bodyNames[nameI].size() - suffix.size()) + axisString) != std::string::npos)
+                {
+                    label ind1 = line.find("(");
+                    label ind2 = line.find(" ",ind1);
+                    DynamicScalarList comps;
+                    comps.append(stod(line.substr(ind1+1,ind2-ind1-1)));
+                    ind1 = ind2+1;
+                    ind2 = line.find(" ",ind1);
+                    comps.append(stod(line.substr(ind1,ind2-ind1)));
+                    ind1 = ind2+1;
+                    ind2 = line.find(")",ind1);
+                    comps.append(stod(line.substr(ind1,ind2-ind1)));
+                    vector rotAxisi(comps[0],comps[1],comps[2]);
+                    rotAxis[nameI] = rotAxisi;
+                }
+                
+                
+                if(line.find(timeString) != std::string::npos && line.find("Exec") == std::string::npos)
+                {
+                    cont = false;
+                }
+            }            
+        }
+        else
+        {
+            if(line.find(timeString + runTime) != std::string::npos)
+            {
+                Info << "File found right time" << endl;
+                inTime = true;
+            }
+        }
+    }
+    Info << "File read" << endl;
+    
+    forAll(bodyNames, nameI)
+    {
+        triSurfaceMesh bodySurfMesh
+        (
+            IOobject
+            (
+                bodyNames[nameI],
+                runTime,
+                mesh_,
+                IOobject::MUST_READ,
+                IOobject::NO_WRITE
+            )
+        );
+        triSurface triToRet(bodySurfMesh);
+        
+        label newIBSize(immersedBodies_.size()+1);
+        label addIBPos(newIBSize - 1);
+        immersedBodies_.setSize(newIBSize);
+        
+        Info << "Trying to set immersedBodies" << endl;
+        immersedBodies_.set
+        (
+            addIBPos,
+            new immersedBody
+            (
+                triToRet,
+                "SphereTest",
+                mesh_,
+                HFDIBDEMDict_,
+                transportProperties_,
+                addIBPos,
+                recomputeM0_,
+                geometricD_
+            )
+        );
+        immersedBodies_[addIBPos].createImmersedBody(body,refineF);
+        immersedBodies_[addIBPos].computeBodyCharPars();
+        immersedBodies_[addIBPos].setRestartSim(vel[nameI],angVel[nameI],rotAxis[nameI]);
     }
 }
 //---------------------------------------------------------------------------//

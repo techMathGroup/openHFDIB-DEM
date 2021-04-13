@@ -39,7 +39,8 @@ addModelOnceScatter::addModelOnceScatter
 (
     const dictionary& addModelDict,
     const word        stlName,
-    const Foam::dynamicFvMesh& mesh
+    const Foam::dynamicFvMesh& mesh,
+    const bool startTime0
 )
 :
 addModelDict_(addModelDict),
@@ -102,6 +103,10 @@ nGeometricD_(0),
 geometricD_(Vector<label>::one),
 randGen_(clock::getTime())
 {
+    if(!startTime0)
+    {
+        finishedAddition_ = true;
+    }
 	init();
 }
     

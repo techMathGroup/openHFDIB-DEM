@@ -60,7 +60,8 @@ immersedBody::immersedBody
     dictionary& HFDIBDEMDict,
     dictionary& transportProperties,
     label bodyId,
-    label recomputeM0
+    label recomputeM0,
+    vector geometricD
 )
 :
 stlName_(fileName),
@@ -135,7 +136,8 @@ dS_(0.0),
 charCellSize_(1e3),
 refineBuffers_(0),
 useInterpolation_(true),
-recomputeM0_(recomputeM0)
+recomputeM0_(recomputeM0),
+geometricD_(geometricD)
 {
     initializeIB();    
 }
@@ -148,7 +150,8 @@ immersedBody::immersedBody
     dictionary& HFDIBDEMDict,
     dictionary& transportProperties,
     label bodyId,
-    label recomputeM0
+    label recomputeM0,
+    vector geometricD
 )
 :
 stlName_(surfName),
@@ -180,6 +183,7 @@ gammaN_(readScalar(immersedDict_.lookup("gammaN"))),
 gammat_(readScalar(immersedDict_.lookup("gammat"))),
 mu_(readScalar(immersedDict_.lookup("mu"))),
 adhN_(readScalar(immersedDict_.lookup("adhN"))),
+adhEqui_(readScalar(immersedDict_.lookup("adhEqui"))),
 CoNum_(0.0),
 rhoF_(transportProperties_.lookup("rho")),
 rhoS_(immersedDict_.lookup("rho")),
@@ -226,7 +230,8 @@ dS_(0.0),
 charCellSize_(1e3),
 refineBuffers_(0),
 useInterpolation_(true),
-recomputeM0_(recomputeM0)
+recomputeM0_(recomputeM0),
+geometricD_(geometricD)
 {
     initializeIB();    
 }
@@ -398,7 +403,7 @@ void immersedBody::initializeIB()
     }
     
     Info << "Finished body initialization" << endl;
-    Info << "New bodyID: " << bodyId_ << " rhoS: " << rhoS_ << " dC: " << dC_ << endl;
+    Info << "New bodyID: " << bodyId_ << " name: " << stlName_ << " rhoS: " << rhoS_ << " dC: " << dC_ << endl;
 }
 //---------------------------------------------------------------------------//
 //Update immersed body (pre-contact)
@@ -672,40 +677,109 @@ void immersedBody::createImmersedBodyConvex
     //    bounding box, which is awfully similar to the actuall body
     //    creation MS: you can test this and modify, if you deem
     //    necessary
-        
-    const triSurface ibTemp( bodySurfMesh_);
-    triSurfaceSearch ibTriSurfSearch( ibTemp );
-    const pointField& pp = mesh_.points();
-        
-    // get the list of cell centroids
-    const pointField& cp = mesh_.C();
-    // see which cell centroids are inside the current body
-    boolList centersInside = ibTriSurfSearch.calcInside(cp);
-    boolList pointsInside = ibTriSurfSearch.calcInside(pp);
-
+    boundBox ibBound(minBoundPoint_,maxBoundPoint_);
+    boundBox meshBound(mesh_.bounds());
+    bool ibInsideMesh(false);
+    forAll(geometricD_,dir)
+    {
+        if(geometricD_[dir] == 1)
+        {
+            if(meshBound.contains(minBoundPoint_) || meshBound.contains(maxBoundPoint_))
+            {
+                ibInsideMesh = true;
+                break;
+            }
+        }
+    }
+    
     // clear old list contents
     intCells_[Pstream::myProcNo()].clear();
     surfCells_[Pstream::myProcNo()].clear();
-    
     //Find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;
     octreeField_ *= 0;
     
-    // first loop, construction of body field and identification of 
-    // the number of inside and surface cells
-    bool insideIB(false);
-    
-    if(cellToStartInCreateIB_ >= octreeField_.size())
-        cellToStartInCreateIB_ = 0;
+    if(ibInsideMesh)
+    {
+        const triSurface ibTemp( bodySurfMesh_);
+        triSurfaceSearch ibTriSurfSearch( ibTemp );
+        const pointField& pp = mesh_.points();            
+        // get the list of cell centroids
+        const pointField& cp = mesh_.C();
         
-    createImmersedBodyByOctTree(cellToStartInCreateIB_, insideIB, ibPartialVolume_, centersInside, pointsInside, body);
-    
-    cellToStartInCreateIB_ = min(intCells_[Pstream::myProcNo()]);
+        // see which cell centroids are inside the current body
+//         const boolList centersInside = ibTriSurfSearch.calcInside(cp);
+//         const boolList pointsInside = ibTriSurfSearch.calcInside(pp);
+
+        bool insideIB(false);
         
+        if(cellToStartInCreateIB_ >= octreeField_.size())
+            cellToStartInCreateIB_ = 0;
+        
+        labelList nextToCheck(1,cellToStartInCreateIB_);
+        label iterCount(0);label iterMax(mesh_.nCells());
+        labelList vertexLabels;
+        boolList vertexesInside;
+        pointField pointPos;
+        bool centerInside;
+        DynamicLabelList auxToCheck;
+        while (nextToCheck.size() > 0 and iterCount < iterMax)
+        {
+            iterCount++;        
+            auxToCheck.clear();
+            
+            forAll (nextToCheck,cellToCheck)
+            {
+                if (octreeField_[nextToCheck[cellToCheck]] == 0)
+                {
+                    octreeField_[nextToCheck[cellToCheck]] = 1;
+                    
+                    vertexLabels = mesh_.cellPoints()[nextToCheck[cellToCheck]];
+                    pointPos = filterField(pp,vertexLabels);
+                    bool cellInsideBB(false);
+                    forAll(pointPos,pos)
+                    {
+                        if(ibBound.contains(pointPos[pos]))
+                        {
+                            cellInsideBB = true;
+                            break;
+                        }
+                    }
+                    
+                    if(cellInsideBB)
+                    {
+//                         vertexesInside = new boolList(pointsInside, vertexLabels);
+                        vertexesInside = ibTriSurfSearch.calcInside(pointPos);
+                        pointField centerPoint(1,cp[nextToCheck[cellToCheck]]);
+                        centerInside = (ibTriSurfSearch.calcInside(centerPoint))[0];
+//                         centerInside = centersInside[nextToCheck[cellToCheck]];
+                        
+                        if(std::any_of(vertexesInside.begin(),vertexesInside.end(),[](bool b){return b;}) || centerInside || !insideIB)
+                        {
+                            auxToCheck.append(
+                                createImmersedBodyByOctTree(
+                                    nextToCheck[cellToCheck],
+                                    insideIB,
+                                    ibPartialVolume_,centerInside,vertexesInside,body
+                                )
+                            );
+                        }
+                    }
+                    else if(!insideIB)
+                    {
+                        auxToCheck.append(mesh_.cellCells()[nextToCheck[cellToCheck]]);
+                    }
+                }
+            }
+            nextToCheck = auxToCheck;
+        }
+        
+    //     createImmersedBodyByOctTree(cellToStartInCreateIB_, insideIB, ibPartialVolume_, centersInside, pointsInside, body);
+        cellToStartInCreateIB_ = min(intCells_[Pstream::myProcNo()]);
+    }
     //gather partial volume from other processors
     Pstream::gatherList(ibPartialVolume_, 0);
     Pstream::scatter(ibPartialVolume_, 0);
-    
     for (label i = 0; i < ibPartialVolume_.size(); i++)
     {
         if (ibPartialVolume_[i] == max(ibPartialVolume_))
@@ -728,71 +802,72 @@ void immersedBody::createImmersedBodyConvex
     //~ calculateGeometricalProperties2(body, deltaT);
 }
 //Create immersed body info
-void immersedBody::createImmersedBodyByOctTree
+labelList immersedBody::createImmersedBodyByOctTree
 (
     label cellToCheck,
     bool& insideIB,
     DynamicLabelList& ibPartialVolumei,
-    boolList& centersInside,
-    boolList& pointsInside,
+    bool& centerInside,
+    boolList& vertexesInside,
     volScalarField& body
 )
 {
-    if (octreeField_[cellToCheck] == 0)
+    labelList retList;    
+
+    //Check if partially or completely inside
+//         const labelList& vertexLabels = mesh_.cellPoints()[cellToCheck];
+    //~ const pointField vertexPoints(pp,vertexLabels);
+//         boolList vertexesInside(pointsInside, vertexLabels);
+//         bool centerInside(centersInside[cellToCheck]);
+    scalar rVInSize(0.5/vertexesInside.size());
+    // Note: weight of a single vertex in the cell
+    
+    scalar cBody(0);
+    forAll (vertexesInside, verIn)
     {
-        octreeField_[cellToCheck] = 1;
-        //Check if partially or completely inside
-        const labelList& vertexLabels = mesh_.cellPoints()[cellToCheck];
-        //~ const pointField vertexPoints(pp,vertexLabels);
-        boolList vertexesInside(pointsInside, vertexLabels);
-        bool centerInside(centersInside[cellToCheck]);
-        scalar rVInSize(0.5/vertexesInside.size());
-        // Note: weight of a single vertex in the cell
-        
-        scalar cBody(0);
-        forAll (vertexesInside, verIn)
+        if (vertexesInside[verIn]==true)
         {
-            if (vertexesInside[verIn]==true)
-            {
-                cBody  += rVInSize; //fraction of cell covered                
-            }
-        }
-        
-        // Note: this is needed for correct definition of internal and
-        //       surface cells of the body
-        if (centerInside)//consistency with Blais 2016
-        {
-            cBody+=0.5;
-        }
-        bool cellInside(false);
-        if (cBody > thrSurf_)
-        {
-            if (cBody > (1.0-thrSurf_))
-            {
-                intCells_[Pstream::myProcNo()].append(cellToCheck);
-            }
-            else if (cBody  <= (1.0-thrSurf_))
-            {
-                surfCells_[Pstream::myProcNo()].append(cellToCheck);
-            }
-            ibPartialVolume_[Pstream::myProcNo()] += 1;
-            cellInside = true;
-            insideIB = true;
-        }
-        body[cellToCheck]+= cBody;
-        // clip the body field values
-        body[cellToCheck] = min(max(0.0,body[cellToCheck]),1.0);
-        // Note (MI): max should be useless, min is for overlaps
-       
-        if (!insideIB || cellInside)
-        {
-            labelList cellNb(mesh_.cellCells()[cellToCheck]);//list of neighbours
-            forAll (cellNb,nbCellI)
-            {
-                createImmersedBodyByOctTree(cellNb[nbCellI], insideIB, ibPartialVolumei, centersInside, pointsInside, body);
-            }
+            cBody  += rVInSize; //fraction of cell covered                
         }
     }
+    
+    // Note: this is needed for correct definition of internal and
+    //       surface cells of the body
+    if (centerInside)//consistency with Blais 2016
+    {
+        cBody+=0.5;
+    }
+    bool cellInside(false);
+    if (cBody > thrSurf_)
+    {
+        if (cBody > (1.0-thrSurf_))
+        {
+            intCells_[Pstream::myProcNo()].append(cellToCheck);
+        }
+        else if (cBody  <= (1.0-thrSurf_))
+        {
+            surfCells_[Pstream::myProcNo()].append(cellToCheck);
+        }
+        ibPartialVolume_[Pstream::myProcNo()] += 1;
+        cellInside = true;
+        insideIB = true;
+    }
+    body[cellToCheck]+= cBody;
+    // clip the body field values
+    body[cellToCheck] = min(max(0.0,body[cellToCheck]),1.0);
+    // Note (MI): max should be useless, min is for overlaps
+    
+    if (!insideIB || cellInside)
+    {
+        retList = mesh_.cellCells()[cellToCheck];
+//             labelList cellNb(mesh_.cellCells()[cellToCheck]);//list of neighbours
+//             forAll (cellNb,nbCellI)
+//             {
+//                 createImmersedBodyByOctTree(cellNb[nbCellI], insideIB, ibPartialVolumei, centersInside, pointsInside, body);
+//             }
+    }
+    
+    return retList;
 }
 //---------------------------------------------------------------------------//
 //Create immersed body for concave body
@@ -995,6 +1070,9 @@ void immersedBody::constructRefineField
 //detect contact with walls
 void immersedBody::detectWallContact(volScalarField& body)
 {
+    if((M0_-M_) < 0)
+        return;
+    
     // clear all list required for wall contact
     wallContactFaces_[Pstream::myProcNo()].clear();
     wallContactFacesHelp_.clear();
@@ -1015,33 +1093,65 @@ void immersedBody::detectWallContact(volScalarField& body)
                 facePatchId = mesh_.boundaryMesh().whichPatch(cFaces[faceI]);
                 const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchId];
                 if (cPatch.type()=="wall")
-                {                  
+                {          
+                    wallContactFaces_[Pstream::myProcNo()].append(cFaces[faceI]);
+                    switchWallContact(true);
+                    
                     // check the wall for possible contact only if it wasnt already checked
-                    if (findIndex(wallContactFacesHelp_,cFaces[faceI]) == -1)
-                    {
-                        // Append the checked face to the list to prevent cumulative checking
-                        wallContactFacesHelp_.append(cFaces[faceI]);
-                        // Estimate penetration depth for current face and if there is intersection with the surface
-                        // Append the face to contactList together with the penetration depth and estimate contactTimeRes
-                        scalar depth(getPenetrationDepth(cFaces[faceI]));
-                        if (depth > 0)
-                        {
-                            updateContactTimeRes((dC_ * maxDistInDEMloop_)/(mag(Vel_)+SMALL));
-                            switchWallContact(true);
-                            wallContactFaces_[Pstream::myProcNo()].append(cFaces[faceI]);
-                        }
-                        // Find neighbour faces that are also in contact with the IB
-                        getContactFaces(cFaces[faceI], body);
-                    }
+//                     if (findIndex(wallContactFacesHelp_,cFaces[faceI]) == -1)
+//                     {
+//                         // Append the checked face to the list to prevent cumulative checking
+//                         wallContactFacesHelp_.append(cFaces[faceI]);
+//                         wallContactFaces_[Pstream::myProcNo()].append(cFaces[faceI]);
+//                         switchWallContact(true);
+//                         // Estimate penetration depth for current face and if there is intersection with the surface
+//                         // Append the face to contactList together with the penetration depth and estimate contactTimeRes
+// //                         scalar depth(getPenetrationDepth(cFaces[faceI]));
+// //                         if (depth > 0)
+// //                         {
+// //                             updateContactTimeRes((dC_ * maxDistInDEMloop_)/(mag(Vel_)+SMALL));
+// //                             switchWallContact(true);
+// //                             wallContactFaces_[Pstream::myProcNo()].append(cFaces[faceI]);
+// //                         }
+// //                         // Find neighbour faces that are also in contact with the IB
+// //                         getContactFaces(cFaces[faceI], body);
+//                     }
                 }
             }
         }
     }
     
+    reduce(isInWallContact_, orOp<bool>());
+    
+    if(isInWallContact_)
+    {
+        forAll(intCells_[Pstream::myProcNo()],iCellI)
+        {
+            label cCell(intCells_[Pstream::myProcNo()][iCellI]);
+        
+            const labelList& cFaces = mesh_.cells()[cCell];
+            
+            forAll (cFaces,faceI)
+            {
+                if (!mesh_.isInternalFace(cFaces[faceI]))
+                {
+                    // Get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
+                    label facePatchId(-1);
+                    facePatchId = mesh_.boundaryMesh().whichPatch(cFaces[faceI]);
+                    const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchId];
+                    if (cPatch.type()=="wall")
+                    {          
+                        wallContactFaces_[Pstream::myProcNo()].append(cFaces[faceI]);
+                    }
+                }
+            }
+            }
+    }
+    
+    
     //Distribute wallContactfaces over processors
     Pstream::gatherList(wallContactFaces_, 0);
     Pstream::scatter(wallContactFaces_, 0);
-    reduce(isInWallContact_, orOp<bool>());
     
     // Note: - I go through all the surface cells.
     //       - for each surface cell I check the cell faces
@@ -1215,13 +1325,13 @@ void immersedBody::updateCoupling
      //~ T_ *=  (scalar(1)-body[cellI]);
      // Note (MI): thats what I am trying to do here
   }
-  forAll (intCells_[Pstream::myProcNo()],iCellI)
-  {
-     label cellI = intCells_[Pstream::myProcNo()][iCellI];
-
-     FV -=  f[cellI]*mesh_.V()[cellI];//viscosity?
-     TA +=  ((mesh_.C()[cellI] - CoM_)^f[cellI])*mesh_.V()[cellI];
-  }
+//   forAll (intCells_[Pstream::myProcNo()],iCellI)
+//   {
+//      label cellI = intCells_[Pstream::myProcNo()][iCellI];
+// 
+//      FV -=  f[cellI]*mesh_.V()[cellI];//viscosity?
+//      TA +=  ((mesh_.C()[cellI] - CoM_)^f[cellI])*mesh_.V()[cellI];
+//   }
   
   reduce(FV, sumOp<vector>());
   reduce(TA, sumOp<vector>()); 
@@ -2465,30 +2575,13 @@ void immersedBody::moveImmersedBody
 //---------------------------------------------------------------------------//
 //Update imposed vector field
 //~ void immersedBody::updateVectorField(volVectorField& VS, word VName)
-void immersedBody::updateVectorField(volVectorField& VS, word VName,volScalarField& body)
+void immersedBody::updateVectorField(volVectorField& VS, word VName,volScalarField& body, vectorField surfNorm)
 {
     //Check dictionary for parameters (only noSlip allowed)
     word BC = immersedDict_.subDict(VName).lookup("BC");
     
     if (BC=="noSlip")
     {
-        // stabilisation for normalisation of the interface normal
-        const dimensionedScalar deltaN
-        (
-            "deltaN",
-            1e-8/pow(average(mesh_.V()), 1.0/3.0)
-        );
-        // Note (MI): this was copied from "interfaceProperties"
-        //Create temporary unit surface normals
-        vectorField surfNorm(-fvc::grad(body));
-        surfNorm /= (mag(surfNorm)+deltaN.value());
-        // Note (MI): I am interested only in the normals to the current
-        //            body. However, I re-compute surfNorm for all the
-        //            body fields.
-        
-        
-        
-        
         //If STATICBODY set to zero
         if ( bodyOperation_==0)
         {
@@ -2692,17 +2785,17 @@ void immersedBody::computeBodyCoNumber()
         meanCoNum_ += CoNumCell;
         auxCntr    += 1;
     }
-//     forAll (intCells_[Pstream::myProcNo()],iCellI)
-//     {
-//         label cellI(intCells_[Pstream::myProcNo()][iCellI]);
-//         
-//         scalar dCell(Foam::pow(mesh_.V()[cellI],0.3333));
-//         scalar CoNumCell(VelMag*mesh_.time().deltaT().value()/dCell);
-//         
-//         CoNum_      = max(CoNum_,CoNumCell);
-//         meanCoNum_ += CoNumCell;
-//         auxCntr    += 1;
-//     }
+    forAll (intCells_[Pstream::myProcNo()],iCellI)
+    {
+        label cellI(intCells_[Pstream::myProcNo()][iCellI]);
+        
+        scalar dCell(Foam::pow(mesh_.V()[cellI],0.3333));
+        scalar CoNumCell(VelMag*mesh_.time().deltaT().value()/dCell);
+        
+        CoNum_      = max(CoNum_,CoNumCell);
+        meanCoNum_ += CoNumCell;
+        auxCntr    += 1;
+    }
     
     reduce(meanCoNum_, sumOp<scalar>());
     reduce(auxCntr, sumOp<scalar>());
@@ -2848,11 +2941,15 @@ void immersedBody::solveWallContact
         }
     }
     
+    DynamicLabelList contactCells;
+    vector cVel(vector::zero);
+    
     // loop over all faces in contact with walls
     forAll (wallContactFaces_[Pstream::myProcNo()],faceI)
-    {
+    {        
         label cFace(wallContactFaces_[Pstream::myProcNo()][faceI]);
     
+        contactCells.append(mesh_.faceOwner()[cFace]);
         // get the local wall velocity
 //             label cFacePatch(mesh_.boundaryMesh().whichPatch(cFace));
         //~ vector wVel(U.boundaryField()[cFacePatch][cFace]);
@@ -2870,10 +2967,15 @@ void immersedBody::solveWallContact
         //scale the projected vector to remain the magnitude
         vector FtLastr(mag(FtLast) * (FtLastP/(mag(FtLastP)+SMALL)));
         //Evaluate tangential velocity
-        vector Vt((Vel_-wVel) - ((Vel_-wVel) & nVec) * nVec);
+        vector planarVec       =  mesh_.Cf()[cFace] - CoM_
+                                     - Axis_*(
+                                          (mesh_.Cf()[cFace]-CoM_)&Axis_
+                                         );
+        vector cVeli(-(planarVec^Axis_)*omega_ + Vel_);
+        vector Vt((cVeli-wVel) - ((cVeli-wVel) & nVec) * nVec);
+        cVel += cVeli;
         //Compute tangential force
         Ft += (FtLastr - aKt*Vt*deltaT - aGammat*Vt);
-        
         
         // compute the position vector of the current face and add it
         // to the mean
@@ -2881,54 +2983,22 @@ void immersedBody::solveWallContact
 //         cLVec += mesh_.boundaryMesh()[cFacePatch].faceCentres()[cFace]-CoM_;mesh_.Cf()[faceInd]
         cLVec += mesh_.Cf()[cFace]-CoM_;
     }
-//     FN /= (nContactFaces+SMALL);
 
-    PstreamBuffers pBufscLVec(Pstream::commsTypes::nonBlocking);
-    PstreamBuffers pBufsnVecF(Pstream::commsTypes::nonBlocking);
-    
-    for (label proci = 0; proci < Pstream::nProcs(); proci++)
-    {
-        if (proci != Pstream::myProcNo())
-        {
-            UOPstream sendcLVec(proci, pBufscLVec);
-            sendcLVec << cLVec;
-            
-            UOPstream sendnVecF(proci, pBufsnVecF);
-            sendnVecF << nVecF;
-        }
-    }
-
-    pBufscLVec.finishedSends(1);
     
     reduce(nContactFaces, sumOp<label>());
     reduce(overallContactArea, sumOp<scalar>());
+    reduce(Ft, sumOp<vector>());
+    reduce(cVel, sumOp<vector>());
+    reduce(cLVec, sumOp<vector>());
+    reduce(nVecF, sumOp<vector>());
     
-    pBufsnVecF.finishedSends(1);
-    
-    for (label proci = 0; proci < Pstream::nProcs(); proci++)
-    {
-        if (proci != Pstream::myProcNo())
-        {
-            UIPstream recvcLVec(proci, pBufscLVec);
-            vector cLVeci(recvcLVec);
-            cLVec += cLVeci;
-            
-            UIPstream recvnVecF(proci, pBufsnVecF);
-            vector nVecFi(recvnVecF);
-            nVecF += nVecFi;
-        }
-    }
-
-
     vector wVel(vector::zero);
     cLVec /= (nContactFaces+SMALL);
+    cVel /= (nContactFaces+SMALL);
     nVecF /= (overallContactArea+SMALL);
-    scalar VnF(-(Vel_-wVel) & nVecF);
+    scalar VnF(-(cVel-wVel) & nVecF);
     Ft /= (nContactFaces+SMALL);
-    if (mag(Ft) > amu * mag(FN))
-    {
-        Ft *= amu * mag(FN) / mag(Ft);
-    }
+    Info << "Ft: " << Ft << endl;
     
     scalar intersectedVolume((M0_-M_)/(rhoS_.value() + SMALL));
     scalar Lc(4*mag(cLVec)*mag(cLVec)/(mag(cLVec)+mag(cLVec)));
@@ -2936,7 +3006,24 @@ void immersedBody::solveWallContact
     
     FN = (aKN*intersectedVolume/(Lc+SMALL) + aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(VnF*overallContactArea))*nVecF;
     
-    vector FA(aadhN*overallContactArea*nVecF);        
+    if (mag(Ft) > amu * mag(FN))
+    {
+        Ft *= amu * mag(FN) / mag(Ft);
+    }
+    Info << "Ftamu: " << Ft << endl;
+    
+    scalar FAc(aadhN*overallContactArea);  
+    scalar FAeq(aKN*((adhEqui_*M0_)/(rhoS_.value() + SMALL))/(Lc+SMALL));
+    scalar partMul((M0_-M_)/(M0_+SMALL)/adhEqui_);
+    if(partMul > 1)
+    {
+        partMul = 1;
+    }
+    vector FA((FAeq * partMul  + FAc * (1-partMul)) * nVecF);
+    Info << "FN: " << FN << endl;
+    Info << "FAeq: " << FAeq << endl;
+    Info << "FAc: " << FAc << endl;
+    Info << "FA: " << FA << endl;
     FN -= FA;
     
     // Update or add the history of tangential force
@@ -3081,7 +3168,6 @@ bool immersedBody::checkContactMovement
     //            forces used for the update
 }
 //---------------------------------------------------------------------------//
-// switch the particle off (remove it from the simulation)
 void immersedBody::assignFullHistory()
 {
     // Assigned variables for potential contact correction
@@ -3122,7 +3208,8 @@ void immersedBody::initSyncWithFlow(const volVectorField& U)
     //            be computed only ONCE for all the bodies and re-used
     
     // computation itself
-    vector meanV(vector::zero);scalar totVol(0);
+    vector meanV(vector::zero);
+    scalar totVol(0);
     vector meanC(vector::zero);
     label  cellI;
     forAll (intCells_[Pstream::myProcNo()],iCellI)
@@ -3135,8 +3222,8 @@ void immersedBody::initSyncWithFlow(const volVectorField& U)
     reduce(meanV, sumOp<vector>());
     reduce(meanC, sumOp<vector>());
     reduce(totVol, sumOp<scalar>());
-    Vel_ = meanV/totVol;
-    meanC/=totVol;
+    Vel_ = meanV/(totVol+SMALL);
+    meanC/=(totVol+SMALL);
     vector Omega(0.5*meanC);
     if(updateTorque_)
     {
@@ -3161,12 +3248,10 @@ void immersedBody::initSyncWithFlow(const volVectorField& U)
         }
         Axis_ /= mag(Axis_);
     }
-    
     // update old storage
     VelOld_     = Vel_;
     omegaOld_   = omega_;
     AxisOld_    = Axis_;
-    
     // print data:
     Info << "-- body " << bodyId_ << "initial movement variables:" << endl;
     printStats();
@@ -3198,4 +3283,11 @@ void immersedBody::checkIfInDomain(volScalarField& body)
     Info << "-- body " << bodyId_ << " current M/M0: " << M_/M0_ << endl;
     //if only 1% of the initial particle mass remains in the domain, switch it off
     if (M_/(M0_+SMALL) < 1e-2) switchActiveOff(body);
+}
+//---------------------------------------------------------------------------//
+void immersedBody::setRestartSim(vector vel, scalar angVel, vector axisRot)
+{
+    Vel_ = vel;
+    omega_ = angVel;
+    Axis_ = axisRot;
 }

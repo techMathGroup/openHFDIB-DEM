@@ -155,6 +155,9 @@ namespace Foam
         //adhesion coefficient for normal contact force
         scalar adhN_;
         
+        //adhesion coefficient for normal contact force
+        scalar adhEqui_;
+        
         //maximal body Courant number based on its linear velocity
         scalar CoNum_;
         
@@ -346,6 +349,7 @@ namespace Foam
         label  refineBuffers_;//number of refine buffers around body
         bool  useInterpolation_;//number of refine buffers around body
         label recomputeM0_;//how many times rocompute M0_ because of refinement
+        vector geometricD_;//geometric directions
         
         void initializeIB();
         
@@ -363,7 +367,8 @@ namespace Foam
             dictionary& HFDIBDEMDict,
             dictionary& transportProperties,
             label bodyId,
-            label recomputeM0
+            label recomputeM0,
+            vector geometricD
         );
         
         // - constructor working with triSurface already in RAM
@@ -375,7 +380,8 @@ namespace Foam
             dictionary& HFDIBDEMDict,
             dictionary& transportProperties,
             label bodyId,
-            label recomputeM0
+            label recomputeM0,
+            vector geometricD
         );
         
         // Destructors -------------------------------------------------
@@ -486,12 +492,12 @@ namespace Foam
             bool createHistory = false,
             scalar deltaT = -1.0
         );
-        void createImmersedBodyByOctTree
+        labelList createImmersedBodyByOctTree
         (
             label cellToCheck,
             bool& insideIB, DynamicLabelList& ibPartialVolumei,
-            boolList& centersInside,
-            boolList& pointsInside,
+            bool& centerInside,
+            boolList& vertexesInside,
             volScalarField& body
         );
         labelList getBBoxCellsByOctTree
@@ -539,7 +545,7 @@ namespace Foam
         
         const scalar& getM()    const
         {
-            return M_;
+            return M0_;
         }
         
         const dimensionedScalar& getRhoS()    const
@@ -610,6 +616,11 @@ namespace Foam
         const scalar& getadhN()   const
         {
             return adhN_;
+        }
+        
+        const scalar& getadhEqui()   const
+        {
+            return adhEqui_;
         }
         
         const scalar& getCoNum()   const
@@ -715,7 +726,8 @@ namespace Foam
         (
             volVectorField& VS,
             word VName,
-            volScalarField& body
+            volScalarField& body,
+            vectorField surfNorm
         );
         
         // detect contact with other particles
@@ -856,6 +868,7 @@ namespace Foam
             recomputeM0_--;
         }
         
+        void setRestartSim(vector vel, scalar angVel, vector axisRot);
     };
 }
 #endif
