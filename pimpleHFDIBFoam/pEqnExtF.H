@@ -14,7 +14,7 @@ if (p.needReference())
     fvc::makeRelative(phiHbyA, U);
     adjustPhi(phiHbyA, U, p);
     // enforce update of U and so on
-    HFDIBDEM.updateFSCoupling(lambda,f);
+//     HFDIBDEM.updateFSCoupling(lambda,f);
     HFDIBDEM.interpolateIB(U,Ui,lambda);
     f = surface*(UA*Ui - UEqn.H() + fvc::grad(p));
     Ui.correctBoundaryConditions();
@@ -90,7 +90,7 @@ fvc::makeRelative(phi, U);
 //Update imposed field
 UA = 1.0/rAU;
 UA.correctBoundaryConditions();
-HFDIBDEM.updateFSCoupling(lambda,f);
+// HFDIBDEM.updateFSCoupling(lambda,f);
 HFDIBDEM.interpolateIB(U,Ui,lambda);
 f = surface*(UA*Ui - UEqn.H() + fvc::grad(p) );
 // Note: This part of the code does not look so clean either. If I do

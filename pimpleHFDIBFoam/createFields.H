@@ -72,19 +72,21 @@ volVectorField f
     ),
     mesh
 );
-/*
-volVectorField UHelp
+
+Info<< "Creating field refineF\n" << endl;
+volScalarField refineF
 (
     IOobject
     (
-        "UHelp",
+        "refineF",
         runTime.timeName(),
         mesh,
         IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
-    mesh
-);*/
+    mesh,
+    dimensionedScalar("zero",dimless,0) // initialising to 0
+);
 
 
 #include "createPhi.H"

@@ -153,9 +153,16 @@ int main(int argc, char *argv[])
 
         #include "setDeltaT.H"
         
+        
+        runTime++;
+        
+        Info<< "Time = " << runTime.timeName() << nl << endl;
+        
         if (isFirstTime)
         {
-            Info << "\nInitializing HFDIBDEM\n" << endl;
+            Info << "\nInitializing HFDIBDEM\n" << endl;            
+            
+            HFDIBDEM.initialize(lambda,U,refineF,maxRefinementLevel); 
             
             if (maxRefinementLevel > 0)
             {
@@ -163,14 +170,9 @@ int main(int argc, char *argv[])
             }
             
             //~ HFDIBDEM.initialize(lambda); 
-            HFDIBDEM.initialize(lambda,U); 
             isFirstTime = false;
         }
         // Note (MI): initialize before starting the time loop
-        
-        runTime++;
-        
-        Info<< "Time = " << runTime.timeName() << nl << endl;
         
         HFDIBDEM.preUpdateBodies(lambda,f);
         
@@ -219,6 +221,26 @@ int main(int argc, char *argv[])
                     {
                         #include "meshCourantNo.H"
                     }
+                    
+                    lambda *= 0; 
+                    HFDIBDEM.recreateBodies(lambda,refineF);
+                    
+                    surface = lambda;
+                    forAll (Ui,cellI)
+                    {
+                        if (lambda[cellI]>thrSurf)
+                        {
+                            surface[cellI] =1.0;
+                        }
+                        else 
+                        {
+                            surface[cellI] =0.0;
+                            Ui[cellI] *=0;
+                        }
+                    }
+                    
+                    surface.correctBoundaryConditions();
+                    Ui.correctBoundaryConditions();
                 }
             }
             f.storePrevIter();
@@ -239,19 +261,19 @@ int main(int argc, char *argv[])
         }
         
         Info << "trying to update HFDIBDEM" << endl;
-        CoNum = HFDIBDEM.postUpdateBodies();//uses updated f to recomptute V_el, omega_ and Axis_
+        CoNum = HFDIBDEM.postUpdateBodies(lambda,f);//uses updated f to recomptute V_el, omega_ and Axis_
         
         //~ HFDIBDEM.addRemoveBodies(lambda);
-        HFDIBDEM.addRemoveBodies(lambda,U);
+        HFDIBDEM.addRemoveBodies(lambda,U,refineF);
         //~ #include "limitDeltaTForDEM.H"
         
         //~ #include "refreshCourantNo.H"
 
         //~ #include "setDeltaT.H"
         
-        HFDIBDEM.moveBodies(lambda);
+        HFDIBDEM.moveBodies(lambda,refineF);
         
-        HFDIBDEM.correctContact(lambda);
+        HFDIBDEM.correctContact(lambda,refineF);
         Info << "updated HFDIBDEM" << endl;
 
 
