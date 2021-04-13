@@ -105,6 +105,9 @@ namespace Foam
         
         bool        allActiveCellsInMesh_;
         
+        label       nGeometricD_;
+        Vector<label>      geometricD_;
+        
         Random          randGen_;
 
         protected:
@@ -152,6 +155,7 @@ namespace Foam
 		void initializeCellZone();
 		void updateCellZoneBoundBox();
         void initializeBoundBox();
+        void recreateBoundBox();
 		labelList getBBoxCellsByOctTree
         (
             label cellToCheck,
@@ -176,6 +180,9 @@ namespace Foam
         }
         
         bool getBodyAdded(){return bodyAdded_;}
+        
+        scalar returnRandomAngle();
+        vector returnRandomRotationAxis();
         
     };
 }

@@ -9,7 +9,7 @@
       |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
-    openHFDIB is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
     Everyone is permitted to copy and distribute verbatim copies of this license
     document, but changing it is not allowed.
     This version of the GNU Lesser General Public License incorporates the terms
@@ -19,6 +19,10 @@ License
     along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
 InNamspace
     Foam
+Description
+    class for immersed bodies representation.
+SourceFiles
+    immersedBodies.C
 Contributors
     Federico Municchi (2016),
     Martin Isoz (2019-*), Martin Šourek (2019-*)
@@ -55,7 +59,8 @@ immersedBody::immersedBody
     const Foam::dynamicFvMesh& mesh,
     dictionary& HFDIBDEMDict,
     dictionary& transportProperties,
-    label bodyId
+    label bodyId,
+    label recomputeM0
 )
 :
 stlName_(fileName),
@@ -127,7 +132,10 @@ totRotMatrix_(tensor::I),
 sdBasedLambda_(false),
 intSpan_(2.0),
 dS_(0.0),
-charCellSize_(1e3)
+charCellSize_(1e3),
+refineBuffers_(0),
+useInterpolation_(true),
+recomputeM0_(recomputeM0)
 {
     initializeIB();    
 }
@@ -139,7 +147,8 @@ immersedBody::immersedBody
     const Foam::dynamicFvMesh& mesh,
     dictionary& HFDIBDEMDict,
     dictionary& transportProperties,
-    label bodyId
+    label bodyId,
+    label recomputeM0
 )
 :
 stlName_(surfName),
@@ -197,6 +206,7 @@ bodySurfMesh_
 ),
 writeBodySurfMesh_(readBool(immersedDict_.lookup("writeBodySTL"))),
 owner_(false),
+velRelaxFac_(1.0),
 historyCouplingF_(vector::zero),
 historyCouplingT_(vector::zero),
 historyAxis_(vector::one/mag(vector::one)),
@@ -213,7 +223,10 @@ totRotMatrix_(tensor::I),
 sdBasedLambda_(false),
 intSpan_(2.0),
 dS_(0.0),
-charCellSize_(1e3)
+charCellSize_(1e3),
+refineBuffers_(0),
+useInterpolation_(true),
+recomputeM0_(recomputeM0)
 {
     initializeIB();    
 }
@@ -347,7 +360,19 @@ void immersedBody::initializeIB()
     {
         intSpan_ = readScalar(immersedDict_.lookup("interfaceSpan"));
     }
-    
+    if (immersedDict_.found("velRelaxFac"))
+    {
+        velRelaxFac_ = readScalar(immersedDict_.lookup("velRelaxFac"));
+    }
+    if (immersedDict_.found("refineBuffers"))
+    {
+        refineBuffers_ = readLabel(immersedDict_.lookup("refineBuffers"));
+    }
+    if (immersedDict_.found("useInterpolation"))
+    {
+        useInterpolation_ = readBool(immersedDict_.lookup("useInterpolation"));
+    }
+
     // Set sizes for parallel runs
     surfCells_.setSize(Pstream::nProcs());
     intCells_.setSize(Pstream::nProcs());
@@ -387,7 +412,7 @@ void immersedBody::preContactUpdateBodyField
 }
 //---------------------------------------------------------------------------//
 //Create immersed body info
-void immersedBody::createImmersedBody(volScalarField& body, bool createHistory, scalar deltaT)
+void immersedBody::createImmersedBody(volScalarField& body, volScalarField& refineF, bool createHistory, scalar deltaT)
 {
     if (bodyConvex_)
     {
@@ -399,6 +424,9 @@ void immersedBody::createImmersedBody(volScalarField& body, bool createHistory, 
         //~ Info << "Creating body as NOT convex" << endl;
         createImmersedBodyConcave(body, deltaT);
     }
+    
+    DynamicLabelList zeroList(surfCells_[Pstream::myProcNo()].size(), 0);
+    constructRefineField(body, refineF, surfCells_[Pstream::myProcNo()], zeroList);
     
     scalarList charCellSizeL(Pstream::nProcs(),1e4);
     forAll (surfCells_[Pstream::myProcNo()],sCellI)
@@ -618,8 +646,11 @@ void immersedBody::createImmersedBodyConcave
     Info << "body: " << bodyId_ << " owner: " << owner_ << endl;
     
     //refine body as stated in the dictionary
-    Info << "Computing interpolation points" << endl;
-    calculateInterpolationPoints(body);
+    if(useInterpolation_)
+    {
+        Info << "Computing interpolation points" << endl;
+        calculateInterpolationPoints(body);
+    }
     Info << "Computing geometrical properties" << endl;
     calculateGeometricalProperties(body);
     //~ calculateGeometricalProperties2(body, deltaT);
@@ -663,8 +694,13 @@ void immersedBody::createImmersedBodyConvex
     // first loop, construction of body field and identification of 
     // the number of inside and surface cells
     bool insideIB(false);
+    
+    if(cellToStartInCreateIB_ >= octreeField_.size())
+        cellToStartInCreateIB_ = 0;
         
     createImmersedBodyByOctTree(cellToStartInCreateIB_, insideIB, ibPartialVolume_, centersInside, pointsInside, body);
+    
+    cellToStartInCreateIB_ = min(intCells_[Pstream::myProcNo()]);
         
     //gather partial volume from other processors
     Pstream::gatherList(ibPartialVolume_, 0);
@@ -682,10 +718,11 @@ void immersedBody::createImmersedBodyConvex
     
     Info << "body: " << bodyId_ << " owner: " << owner_ << endl;
     
-    //refine body as stated in the dictionary
-    //~ refineBody(body,&ibTriSurfSearch, & pp);
-    Info << "Computing interpolation points" << endl;
-    calculateInterpolationPoints(body);
+    if(useInterpolation_)
+    {
+        Info << "Computing interpolation points" << endl;
+        calculateInterpolationPoints(body);
+    }
     Info << "Computing geometrical properties" << endl;
     calculateGeometricalProperties(body);
     //~ calculateGeometricalProperties2(body, deltaT);
@@ -733,7 +770,6 @@ void immersedBody::createImmersedBodyByOctTree
             if (cBody > (1.0-thrSurf_))
             {
                 intCells_[Pstream::myProcNo()].append(cellToCheck);
-                cellToStartInCreateIB_ = cellToCheck;
             }
             else if (cBody  <= (1.0-thrSurf_))
             {
@@ -756,6 +792,203 @@ void immersedBody::createImmersedBodyByOctTree
                 createImmersedBodyByOctTree(cellNb[nbCellI], insideIB, ibPartialVolumei, centersInside, pointsInside, body);
             }
         }
+    }
+}
+//---------------------------------------------------------------------------//
+//Create immersed body for concave body
+void immersedBody::constructRefineField
+(
+    volScalarField& body,
+    volScalarField& refineF,
+    DynamicLabelList cellsToIterate,
+    DynamicLabelList startLevel 
+)
+{
+    DynamicLabelList cellsToIterateC;
+    DynamicLabelList cellsToIterateF;
+    
+    List<DynamicLabelList> cellsToSendToProcs;
+    cellsToSendToProcs.setSize(Pstream::nProcs());
+    List<DynamicLabelList> cellsToSendToProcsLevel;
+    cellsToSendToProcsLevel.setSize(Pstream::nProcs());
+    
+    for(label i = 0; i < refineBuffers_; i++)
+    {
+        forAll(cellsToIterate, cellI)
+        {
+            if(startLevel[cellI] == i)
+                cellsToIterateC.append(cellsToIterate[cellI]);
+        }
+        
+        forAll(cellsToIterateC, cellI)
+        {
+            labelList cellFaces(mesh_.cells()[cellsToIterateC[cellI]]);
+            forAll(cellFaces, faceI)
+            {
+                if (mesh_.isInternalFace(cellFaces[faceI]))
+                {
+                    label nCell(mesh_.owner()[cellFaces[faceI]]);
+                    if(nCell == cellsToIterateC[cellI])
+                    {
+                        nCell = mesh_.neighbour()[cellFaces[faceI]];
+                    }
+                    
+                    if(refineF[nCell] == 0)
+                    {
+                        if(i > 0)
+                        {
+                            if(body[nCell] < SMALL)
+                            {
+                                refineF[nCell] = 1;
+                                cellsToIterateF.append(nCell);
+                            }
+                        }
+                        else
+                        {
+                            refineF[nCell] = 1;
+                            cellsToIterateF.append(nCell);
+                        }
+                    }
+                }
+                else
+                {
+                    label facePatchId(mesh_.boundaryMesh().whichPatch(cellFaces[faceI]));
+                    const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchId];
+                    if (cPatch.type() == "processor")
+                    {
+                        const processorPolyPatch& procPatch = refCast<const processorPolyPatch>(cPatch);
+                        if (procPatch.myProcNo() == Pstream::myProcNo())
+                        {
+                            cellsToSendToProcs[procPatch.neighbProcNo()].append(cPatch.whichFace(cellFaces[faceI]));
+                            cellsToSendToProcsLevel[procPatch.neighbProcNo()].append(i+1);
+                        }
+                        else
+                        {
+                            cellsToSendToProcs[procPatch.myProcNo()].append(cPatch.whichFace(cellFaces[faceI]));
+                            cellsToSendToProcsLevel[procPatch.myProcNo()].append(i+1);
+                        }
+                    }
+                }
+            }
+        }
+        cellsToIterateC = cellsToIterateF;
+        cellsToIterateF.clear();
+    }
+    
+    List<DynamicLabelList> facesReceivedFromProcs;
+    List<DynamicLabelList> cellsReceivedFromProcsLevel;
+    //Send points that are not on this proc to other proc
+    PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
+    
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            UOPstream send(proci, pBufs);
+            send << cellsToSendToProcs[proci];
+        }
+    }
+    pBufs.finishedSends();
+    
+    //Recieve points from other procs
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            UIPstream recv(proci, pBufs);
+            DynamicLabelList recList (recv);
+            facesReceivedFromProcs.append(recList);
+        }
+        else
+        {
+            DynamicLabelList recList;
+            facesReceivedFromProcs.append(recList);
+        }
+    }
+    
+    pBufs.clear();
+    
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            
+            UOPstream send(proci, pBufs);
+            send << cellsToSendToProcsLevel[proci];
+        }
+    }
+    
+    pBufs.finishedSends();
+    
+    //Recieve points from other procs
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            UIPstream recv(proci, pBufs);
+            DynamicLabelList recList (recv);
+            cellsReceivedFromProcsLevel.append(recList);
+        }
+        else
+        {
+            DynamicLabelList recList;
+            cellsReceivedFromProcsLevel.append(recList);
+        }
+    }
+    
+    pBufs.clear();
+    
+    
+    DynamicLabelList newCellsToIterate;
+    DynamicLabelList newCellsToIterateStartLevel;
+    
+    //Check if some point from other proc is on this processor
+    for (label otherProci = 0; otherProci < facesReceivedFromProcs.size(); otherProci++)
+    {
+        for (label faceI = 0; faceI < facesReceivedFromProcs[otherProci].size(); faceI++)
+        {
+            label cellProcI(0);
+            forAll (mesh_.boundaryMesh(), patchi)
+            {
+                const polyPatch& cPatch = mesh_.boundaryMesh()[patchi];
+                if (cPatch.type() == "processor")
+                {
+                    const processorPolyPatch& procPatch = refCast<const processorPolyPatch>(cPatch);
+                    if (procPatch.myProcNo() == Pstream::myProcNo() && procPatch.neighbProcNo() == otherProci)
+                    {
+                        cellProcI = mesh_.faceOwner()[cPatch.start() + facesReceivedFromProcs[otherProci][faceI]];
+                        if(refineF[cellProcI] == 0)
+                        {
+                            newCellsToIterate.append(cellProcI);
+                            newCellsToIterateStartLevel.append(cellsReceivedFromProcsLevel[otherProci][faceI]);
+                        }
+                        break;
+                    }
+                    else if (procPatch.myProcNo() == otherProci && procPatch.neighbProcNo() == Pstream::myProcNo())
+                    {
+                        cellProcI = mesh_.faceOwner()[cPatch.start() + facesReceivedFromProcs[otherProci][faceI]];
+                        if(refineF[cellProcI] == 0)
+                        {
+                            newCellsToIterate.append(cellProcI);
+                            newCellsToIterateStartLevel.append(cellsReceivedFromProcsLevel[otherProci][faceI]);
+                        }
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    bool contBool(false);
+    if(newCellsToIterate.size() > 0)
+    {
+        contBool = true;
+    }
+
+    reduce(contBool, orOp<bool>());
+    if(contBool)
+    {
+        constructRefineField(body, refineF, newCellsToIterate, newCellsToIterateStartLevel);
     }
 }
 //---------------------------------------------------------------------------//
@@ -918,10 +1151,15 @@ void immersedBody::preContactUpdateImmersedBody
 }
 //---------------------------------------------------------------------------//
 //Update immersed body info (post-contact, contact forces need to be included)
-void immersedBody::postContactUpdateImmersedBody()
+void immersedBody::postContactUpdateImmersedBody
+(
+    volScalarField& body,
+    volVectorField& f
+)
 {    
     //update Vel_, Axis_ and omega_
-    updateMovement();
+    updateCoupling(body,f);
+    updateMovement(VelOld_,AxisOld_,omegaOld_);
     
     //update body courant number
     computeBodyCoNumber();
@@ -951,6 +1189,12 @@ void immersedBody::updateCoupling
   vector FV(vector::zero);
   vector FG(M_*(1.0-rhoF_.value()/rhoS_.value())*g.value());
   vector TA(vector::zero);
+  
+//   Pstream::gatherList(surfCells_, 0);
+//   forAll(surfCells_, proci)
+//   {
+//       Info << "Info proc: " << proci << " Computing FV: " << surfCells_[proci] << endl;
+//   }
     
   //Calcualate viscous force and torque
   forAll (surfCells_[Pstream::myProcNo()],sCellI)
@@ -971,13 +1215,13 @@ void immersedBody::updateCoupling
      //~ T_ *=  (scalar(1)-body[cellI]);
      // Note (MI): thats what I am trying to do here
   }
-  //~ forAll (intCells_[Pstream::myProcNo()],iCellI)
-  //~ {
-     //~ label cellI = intCells_[Pstream::myProcNo()][iCellI];
+  forAll (intCells_[Pstream::myProcNo()],iCellI)
+  {
+     label cellI = intCells_[Pstream::myProcNo()][iCellI];
 
-     //~ FV -=  f[cellI]*mesh_.V()[cellI];//viscosity?
-     //~ TA +=  ((mesh_.C()[cellI] - CoM_)^f[cellI])*mesh_.V()[cellI];
-  //~ }
+     FV -=  f[cellI]*mesh_.V()[cellI];//viscosity?
+     TA +=  ((mesh_.C()[cellI] - CoM_)^f[cellI])*mesh_.V()[cellI];
+  }
   
   reduce(FV, sumOp<vector>());
   reduce(TA, sumOp<vector>()); 
@@ -1004,7 +1248,7 @@ void immersedBody::updateMovement()
 {         
     scalar deltaT = mesh_.time().deltaT().value();
     
-    updateMovementComp(deltaT,Vel_,Axis_,omega_);
+    updateMovementComp(deltaT,Vel_,Axis_,omega_,1);
     
     //~ Info << "new Vel_  : " << Vel_ << endl;
     //~ Info << "new Axis_ : " << Axis_ << endl;
@@ -1015,7 +1259,7 @@ void immersedBody::updateMovement
     scalar deltaT
 )
 {
-    updateMovementComp(deltaT,Vel_,Axis_,omega_);
+    updateMovementComp(deltaT,Vel_,Axis_,omega_,1);
     
     //~ Info << "new Vel_  : " << Vel_ << endl;
     //~ Info << "new Axis_ : " << Axis_ << endl;
@@ -1029,7 +1273,22 @@ void immersedBody::updateMovement
 )
 {
     scalar deltaT = mesh_.time().deltaT().value();
-    updateMovementComp(deltaT,Vel,Axis,omega);
+    updateMovementComp(deltaT,Vel,Axis,omega,1);
+    
+    //~ Info << "new Vel_  : " << Vel_ << endl;
+    //~ Info << "new Axis_ : " << Axis_ << endl;
+    //~ Info << "new omega_: " << omega_ << endl;
+}
+void immersedBody::updateMovement
+(
+    vector Vel,
+    vector Axis,
+    scalar omega,
+    scalar velRelaxFac
+)
+{
+    scalar deltaT = mesh_.time().deltaT().value();
+    updateMovementComp(deltaT,Vel,Axis,omega,velRelaxFac);
     
     //~ Info << "new Vel_  : " << Vel_ << endl;
     //~ Info << "new Axis_ : " << Axis_ << endl;
@@ -1043,7 +1302,22 @@ void immersedBody::updateMovement
     scalar omega
 )
 {
-    updateMovementComp(deltaT,Vel,Axis,omega);
+    updateMovementComp(deltaT,Vel,Axis,omega,1);
+    
+    //~ Info << "new Vel_  : " << Vel_ << endl;
+    //~ Info << "new Axis_ : " << Axis_ << endl;
+    //~ Info << "new omega_: " << omega_ << endl;
+}
+void immersedBody::updateMovement
+(
+    scalar deltaT,
+    vector Vel,
+    vector Axis,
+    scalar omega,
+    scalar velRelaxFac
+)
+{
+    updateMovementComp(deltaT,Vel,Axis,omega,velRelaxFac);
     
     //~ Info << "new Vel_  : " << Vel_ << endl;
     //~ Info << "new Axis_ : " << Axis_ << endl;
@@ -1054,7 +1328,8 @@ void immersedBody::updateMovementComp
     scalar deltaT,
     vector Vel,
     vector Axis,
-    scalar omega
+    scalar omega,
+    scalar velRelaxFac
 )
 {    
     //~ Info << "-- body " << bodyId_ << "!! movement update working with F_ = " << F_
@@ -1073,7 +1348,7 @@ void immersedBody::updateMovementComp
         a_  = F_/(M0_+SMALL);
         
         //Update body linear velocity
-        Vel_ = Vel + deltaT*a_;
+        Vel_ = (Vel + deltaT*a_) * velRelaxFac;
     };
     
     auto updateRotation = [&]()
@@ -1082,7 +1357,7 @@ void immersedBody::updateMovementComp
         alpha_ = inv(I_) & T_;
         
         //Update body angular velocity
-        vector Omega(Axis*omega + deltaT*alpha_);
+        vector Omega((Axis*omega + deltaT*alpha_) * velRelaxFac);
         
         //Split Omega into Axis_ and omega_
         omega_ = mag(Omega);
@@ -1120,7 +1395,7 @@ void immersedBody::updateMovementComp
     auto updateRotationFixedAxis = [&]()
     {
         //Update body angular velocity
-        vector Omega(Axis*omega + deltaT * ( inv(I_) & T_ ));
+        vector Omega((Axis*omega + deltaT * ( inv(I_) & T_ )) * velRelaxFac);
         
         //Split Omega into Axis_ and omega_
         omega_ = mag(Omega);
@@ -1229,7 +1504,7 @@ void immersedBody::calculateInterpolationPoints
     {               
         //get surface cell label
         label scell = surfCells_[Pstream::myProcNo()][cell];
-        
+            
         // estimate intDist
         scalar intDist(0);
         label cellI(scell);
@@ -1304,8 +1579,13 @@ void immersedBody::calculateInterpolationPoints
                 {
                     if (startCell.second().first() != -1)
                     {
+//                         if (body[cellI] > SMALL)
+//                             cellI = -1;
                         if (body[cellI] > SMALL)
-                            cellI = -1;
+                        {
+                            order--;
+                            continue;
+                        }
                     }
                     intPoints.append(surfPoint);
                     intCells.append(cellI);
@@ -1679,7 +1959,7 @@ Tuple2<vector,Tuple2<label,label>> immersedBody::findCellCustom
                         pointsToCheck.append(tupleToAdd);
                     }
                 }
-                else if (neighbour != startCell)
+                if (neighbour != startCell)
                 {
                     bool add(true);
                     forAll (pointsToCheck, i)
@@ -1702,8 +1982,8 @@ Tuple2<vector,Tuple2<label,label>> immersedBody::findCellCustom
             {
                 label owner(mesh_.faceOwner()[pointFaces[faceI]]);
                 vector distToFace(mesh_.Cf()[pointFaces[faceI]] - mesh_.C()[owner]);
-//                 vector sfUnit(mesh_.Sf()[pointFaces[faceI]]/mag(mesh_.Sf()[pointFaces[faceI]]));bestFace
-                vector sfUnit(mesh_.Sf()[bestFace]/mag(mesh_.Sf()[bestFace]));
+                vector sfUnit(mesh_.Sf()[pointFaces[faceI]]/mag(mesh_.Sf()[pointFaces[faceI]]));
+//                 vector sfUnit(mesh_.Sf()[bestFace]/mag(mesh_.Sf()[bestFace]));
                 vector pointToAppend(mesh_.C()[owner] + mag(distToFace)*sfUnit);
                 
                 label facePatchId(mesh_.boundaryMesh().whichPatch(pointFaces[faceI]));
@@ -2033,14 +2313,14 @@ void immersedBody::moveImmersedBody
             Foam::magSqr(transIncr) + Foam::pow(rotIncr,2.0)
         );
         
-        Pout << "current ds/charCellSize = " << dS_/(charCellSize_+SMALL) << endl;
+//         Pout << "current ds/charCellSize = " << dS_/(charCellSize_+SMALL) << endl;
         //~ if (dS_ > 5.0*charCellSize_)
         if (dS_ > 0.0*charCellSize_)
         //~ if (dS_ > 0.0*charCellSize_)
         {
             recomputeProjection_ = true;
             dS_  = 0.0;
-            Pout << "!! The body will be re-projected into the mesh" << endl;
+//             Pout << "!! The body will be re-projected into the mesh" << endl;
         }
         else
         {
@@ -2355,17 +2635,32 @@ DynamicList<scalar> immersedBody::getLocPartRad(DynamicLabelList& cellsOfInt)
 }
 //---------------------------------------------------------------------------//
 // function to move the body after the contact
-void immersedBody::postContactUpdateBodyField(volScalarField& body)
+void immersedBody::postContactUpdateBodyField(volScalarField& body, volScalarField& refineF)
 {
     // move the body due to the contact
     moveImmersedBody();
     if (recomputeProjection_)
     {
         resetBody(body);
-        createImmersedBody(body);
+        createImmersedBody(body,refineF);
         checkIfInDomain(body);
     }
     updateOldMovementVars();
+}
+//---------------------------------------------------------------------------//
+void immersedBody::recreateBodyField(volScalarField& body, volScalarField& refineF)
+{    
+    octreeField_ = Field<label>(mesh_.nCells(), 0);
+    interpolationInfo_[Pstream::myProcNo()].clear();
+    interpolationVecReqs_[Pstream::myProcNo()].clear();
+    
+    surfCells_[Pstream::myProcNo()].clear();
+    intCells_[Pstream::myProcNo()].clear();
+    ibPartialVolume_[Pstream::myProcNo()] = 0;
+    
+    createImmersedBody(body,refineF);
+    checkIfInDomain(body);
+    Info << "-- body " << bodyId_ << " Re-created" << endl;
 }
 //---------------------------------------------------------------------------//
 // function to compute maximal and mean courant number of the body
@@ -2397,23 +2692,26 @@ void immersedBody::computeBodyCoNumber()
         meanCoNum_ += CoNumCell;
         auxCntr    += 1;
     }
-    forAll (intCells_[Pstream::myProcNo()],iCellI)
-    {
-        label cellI(intCells_[Pstream::myProcNo()][iCellI]);
-        
-        scalar dCell(Foam::pow(mesh_.V()[cellI],0.3333));
-        scalar CoNumCell(VelMag*mesh_.time().deltaT().value()/dCell);
-        
-        CoNum_      = max(CoNum_,CoNumCell);
-        meanCoNum_ += CoNumCell;
-        auxCntr    += 1;
-    }
+//     forAll (intCells_[Pstream::myProcNo()],iCellI)
+//     {
+//         label cellI(intCells_[Pstream::myProcNo()][iCellI]);
+//         
+//         scalar dCell(Foam::pow(mesh_.V()[cellI],0.3333));
+//         scalar CoNumCell(VelMag*mesh_.time().deltaT().value()/dCell);
+//         
+//         CoNum_      = max(CoNum_,CoNumCell);
+//         meanCoNum_ += CoNumCell;
+//         auxCntr    += 1;
+//     }
     
     reduce(meanCoNum_, sumOp<scalar>());
     reduce(auxCntr, sumOp<scalar>());
     reduce(CoNum_, maxOp<scalar>());
     
-    meanCoNum_ /= auxCntr;
+    if(auxCntr > 0)
+    {
+        meanCoNum_ /= auxCntr;
+    }
     
     Info << "-- body " << bodyId_ << " Courant Number mean: " << meanCoNum_
          << " max: " << CoNum_ << endl;
@@ -2881,7 +3179,7 @@ void immersedBody::pimpleUpdate
 )
 {
     updateCoupling(body,f);
-    updateMovement(VelOld_,AxisOld_,omegaOld_);
+    updateMovement(VelOld_,AxisOld_,omegaOld_,velRelaxFac_);
 }
 //---------------------------------------------------------------------------//
 void immersedBody::computeBodyCharPars()

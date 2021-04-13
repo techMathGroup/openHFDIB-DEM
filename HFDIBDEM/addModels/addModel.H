@@ -106,6 +106,8 @@ namespace Foam
         {Info << "-- addModelMessage-- " << "notImplemented" << endl;return false;}
         // Note: this has to return true if addBody ends with SUCCESS,
         //       return false otherwise
+        virtual void recreateBoundBox()
+        {Info << "-- addModelMessage-- " << "notIplemented"<<endl;}
                         
     };
 }

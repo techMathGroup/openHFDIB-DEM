@@ -100,6 +100,8 @@ timeBased_(false),
 fieldBased_(false),
 fieldCurrentValue_(0),
 allActiveCellsInMesh_(true),
+nGeometricD_(0),
+geometricD_(Vector<label>::one),
 randGen_(clock::getTime())
 {
 	init();
@@ -154,6 +156,22 @@ void addModelRepeatRandomPosition::init()
 		minBound_       = (addDomainCoeffs_.lookup("minBound"));
 		maxBound_       = (addDomainCoeffs_.lookup("maxBound"));
 		boundBoxActive_ = true;
+        if (addDomainCoeffs_.found("nGeometricD"))
+        {
+            nGeometricD_ = readLabel(addDomainCoeffs_.lookup("nGeometricD"));
+        }
+        else
+        {
+            nGeometricD_ = mesh_.nGeometricD();
+        }
+        if (addDomainCoeffs_.found("geometricD"))
+        {
+            geometricD_ = addDomainCoeffs_.lookup("geometricD");
+        }
+        else
+        {
+            geometricD_ = mesh_.geometricD();
+        }
         initializeBoundBox();
         Info << "-- addModelMessage-- " << "boundBox based addition zone" << endl;
 	}
@@ -365,10 +383,10 @@ triSurface addModelRepeatRandomPosition::addBody
     //            scaling BUT CoM is approximate...
     
     // translate
-    bodyPoints = bodySurfMesh.points();
-    if (mesh_.nGeometricD() < 3)
+    bodyPoints = bodySurfMesh.points();    
+    if (nGeometricD_ < 3)
     {
-        const vector validDirs = (mesh_.geometricD() + Vector<label>::one)/2;
+        const vector validDirs = (geometricD_ + Vector<label>::one)/2;
         CoM -= cmptMultiply((vector::one - validDirs),CoM);
         CoM += cmptMultiply((vector::one - validDirs),0.5*(mesh_.bounds().max() + mesh_.bounds().min()));
     }//project CoM onto current solution plane (if needed)
@@ -630,7 +648,7 @@ vector addModelRepeatRandomPosition::returnRandomPosition
             ranVec[i] = ranNum;
         }
         
-        vector validDirs((mesh_.geometricD() + Vector<label>::one)/2);
+        vector validDirs((geometricD_ + Vector<label>::one)/2);
         ranVec = cmptMultiply(validDirs,ranVec);//translate only with respect to valid directions
         
         // ok, now I need to check if the generated vector is OK
@@ -663,7 +681,7 @@ vector addModelRepeatRandomPosition::returnRandomPosition
         if (not bodySurfBoundsContained or not allActiveCellsInMesh_)
         {
             bSMeshPts+=ranVec;
-            if (mesh_.nGeometricD() < 3)
+            if (nGeometricD_ < 3)
             {
                 bSMeshPts = cmptMultiply(validDirs,bSMeshPts);
                 bSMeshPts += cmptMultiply((vector::one - validDirs),0.5*(mesh_.bounds().max() + mesh_.bounds().min()));

@@ -113,6 +113,9 @@ namespace Foam
         
         bool        allActiveCellsInMesh_;
         
+        label       nGeometricD_;
+        Vector<label>      geometricD_;
+        
         Random          randGen_;
 
         protected:

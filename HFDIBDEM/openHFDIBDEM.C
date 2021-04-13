@@ -150,7 +150,9 @@ openHFDIBDEM::~openHFDIBDEM()
 void openHFDIBDEM::initialize
 (
     volScalarField& body,
-    volVectorField& U
+    volVectorField& U,
+    volScalarField& refineF,
+    label recomputeM0
 )
 {
     // get data from HFDIBDEMDict
@@ -161,8 +163,11 @@ void openHFDIBDEM::initialize
     addModels_.setSize(stlNames_.size());
     #include "initializeAddModels.H"
     
+    recomputeM0_ = recomputeM0;
+    
     // register IBs as needed
     immersedBodies_.setSize(0);                                         //on the fly creation
+    refineF *= 0;
     forAll (addModels_,modelI)
     {
         word stlName(stlNames_[modelI]);
@@ -198,10 +203,11 @@ void openHFDIBDEM::initialize
                         mesh_,
                         HFDIBDEMDict_,
                         transportProperties_,
-                        addIBPos
+                        addIBPos,
+                        recomputeM0_
                     )
                 );
-                immersedBodies_[addIBPos].createImmersedBody(body);
+                immersedBodies_[addIBPos].createImmersedBody(body,refineF);
                 immersedBodies_[addIBPos].computeBodyCharPars();
                 if (immersedBodies_[addIBPos].getStartSynced())
                 {
@@ -304,6 +310,8 @@ void openHFDIBDEM::preUpdateBodies
 //---------------------------------------------------------------------------//
 scalar openHFDIBDEM::postUpdateBodies
 (
+    volScalarField& body,
+    volVectorField& f
 )
 {    
     // compute max CoNum over the bodies
@@ -312,7 +320,7 @@ scalar openHFDIBDEM::postUpdateBodies
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            immersedBodies_[bodyId].postContactUpdateImmersedBody();
+            immersedBodies_[bodyId].postContactUpdateImmersedBody(body,f);
             CoNum = max(CoNum,immersedBodies_[bodyId].getCoNum());
         }
     }
@@ -321,19 +329,47 @@ scalar openHFDIBDEM::postUpdateBodies
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::moveBodies
 (
-    volScalarField& body
+    volScalarField& body,
+    volScalarField& refineF
 )
 {
+    refineF *= 0;
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
             if (findIndex(ibContactList_, bodyId) == -1)
             {
-                immersedBodies_[bodyId].postContactUpdateBodyField(body);
+                immersedBodies_[bodyId].postContactUpdateBodyField(body,refineF);
                 // print out linear and angular momentum (final)
                 //~ immersedBodies_[bodyId].printMomentum();
                 immersedBodies_[bodyId].printStats();
+            }
+        }
+    }
+}
+//---------------------------------------------------------------------------//
+void openHFDIBDEM::recreateBodies
+(
+    volScalarField& body,
+    volScalarField& refineF
+)
+{
+    refineF *= 0;
+    forAll (addModels_,modelI)
+    {
+        addModels_[modelI].recreateBoundBox();
+    }
+    
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            immersedBodies_[bodyId].recreateBodyField(body,refineF);
+            if(immersedBodies_[bodyId].getrecomputeM0() > 0)
+            {
+                immersedBodies_[bodyId].computeBodyCharPars();
+                immersedBodies_[bodyId].recomputedM0();
             }
         }
     }
@@ -358,225 +394,235 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
             //Update imposed field according to body
             immersedBodies_[bodyId].updateVectorField(Vs, V.name(),body);
             
-            //Get interpolation info a request list
-            const List<DynamicList<immersedBody::intVecRequest>>& intVecReqList = immersedBodies_[bodyId].getinterpolationVecReqs();;
-            List<DynamicList<immersedBody::interpolationInfo>>& intInfoList  = immersedBodies_[bodyId].getInterpolationInfo();
-            
-            List<DynamicPointList> intPointsToSend;
-            List<DynamicLabelList> intCellsToSend;
-            intPointsToSend.setSize(Pstream::nProcs());
-            intCellsToSend.setSize(Pstream::nProcs());
-            //Deal with all requests and ask processors for interpolation
-            //pstreamBuffers works only with list so requests are rearenged
-            for (label proci = 0; proci < Pstream::nProcs(); proci++)
-            {
-                if (proci != Pstream::myProcNo())
+            if(immersedBodies_[bodyId].getUseInterpolation())
+            {            
+                //Get interpolation info a request list
+                const List<DynamicList<immersedBody::intVecRequest>>& intVecReqList = immersedBodies_[bodyId].getinterpolationVecReqs();;
+                List<DynamicList<immersedBody::interpolationInfo>>& intInfoList  = immersedBodies_[bodyId].getInterpolationInfo();
+                
+                List<DynamicPointList> intPointsToSend;
+                List<DynamicLabelList> intCellsToSend;
+                intPointsToSend.setSize(Pstream::nProcs());
+                intCellsToSend.setSize(Pstream::nProcs());
+                //Deal with all requests and ask processors for interpolation
+                //pstreamBuffers works only with list so requests are rearenged
+                for (label proci = 0; proci < Pstream::nProcs(); proci++)
                 {
-                    for (label i = 0; i < intVecReqList[proci].size(); i++)
+                    if (proci != Pstream::myProcNo())
                     {
-                        intPointsToSend[proci].append(intVecReqList[proci][i].intPoint_);
-                        intCellsToSend[proci].append(intVecReqList[proci][i].intCell_);
+                        for (label i = 0; i < intVecReqList[proci].size(); i++)
+                        {
+                            intPointsToSend[proci].append(intVecReqList[proci][i].intPoint_);
+                            intCellsToSend[proci].append(intVecReqList[proci][i].intCell_);
+                        }
                     }
                 }
-            }
 
-            PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
-            PstreamBuffers pBufs2(Pstream::commsTypes::nonBlocking);
-    
-            for (label proci = 0; proci < Pstream::nProcs(); proci++)
-            {
-                if (proci != Pstream::myProcNo())
-                {
-                    UOPstream send(proci, pBufs);
-                    send << intPointsToSend[proci];
-                    
-                    UOPstream send2(proci, pBufs2);
-                    send2 << intCellsToSend[proci];
-                }
-            }
-
-            pBufs.finishedSends();
-            pBufs2.finishedSends();
-            
-            List<DynamicPointList> intPointsRcv;
-            intPointsRcv.setSize(Pstream::nProcs());
-            List<DynamicLabelList> intCellsRcv;
-            intCellsRcv.setSize(Pstream::nProcs());
-            
-            List<DynamicVectorList> intVecToReturn;
-            intVecToReturn.setSize(Pstream::nProcs());
-            //Receive interpolation requests from other processors
-            for (label proci = 0; proci < Pstream::nProcs(); proci++)
-            {
-                if (proci != Pstream::myProcNo())
-                {
-                    UIPstream recv(proci, pBufs);
-                    DynamicPointList recIntPoints (recv);
-                    intPointsRcv[proci].append(recIntPoints);
-                    
-                    UIPstream recv2(proci, pBufs2);
-                    DynamicLabelList recIntCells (recv2);
-                    intCellsRcv[proci].append(recIntCells);
-                }
-            }
-            //Compute interpolation for other processors
-            for (label otherProci = 0; otherProci < intPointsRcv.size(); otherProci++)
-            {
-                for (label intReqI = 0; intReqI < intPointsRcv[otherProci].size(); intReqI++)
-                {
-                    vector VP1 =  interpV->interpolate(intPointsRcv[otherProci][intReqI],
-                                                        intCellsRcv[otherProci][intReqI]
-                                                        );
-                    intVecToReturn[otherProci].append(VP1);
-                }
-            }
-
-            pBufs.clear();
-            //Send computed data back 
-            for (label proci = 0; proci < Pstream::nProcs(); proci++)
-            {
-                if (proci != Pstream::myProcNo())
-                {
-                    UOPstream send(proci, pBufs);
-                    send << intVecToReturn[proci];
-                }
-            }
-
-            pBufs.finishedSends();
-            
-            List<DynamicVectorList> intVecRcv;
-            intVecRcv.setSize(Pstream::nProcs());
-            //Receive interpolation data from other processors
-            for (label proci = 0; proci < Pstream::nProcs(); proci++)
-            {
-                if (proci != Pstream::myProcNo())
-                {
-                    UIPstream recv(proci, pBufs);
-                    DynamicVectorList recIntVec (recv);
-                    intVecRcv[proci].append(recIntVec);
-                }
-            }
-            //Assign received data
-            for (label otherProci = 0; otherProci < intVecRcv.size(); otherProci++)
-            {
-                for (label intVecI = 0; intVecI < intVecRcv[otherProci].size(); intVecI++)
-                {
-                    intInfoList[Pstream::myProcNo()][intVecReqList[otherProci][intVecI].requestLabel_].intVec_[intVecReqList[otherProci][intVecI].vecLabel_] = intVecRcv[otherProci][intVecI];
-                }
-            }
-            //Compute interpolation for cells found on this processor
-            forAll (intInfoList[Pstream::myProcNo()],infoI)
-            {
-                switch(intInfoList[Pstream::myProcNo()][infoI].order_)
-                {
-                    case 1:
-                    {
-                        if (intInfoList[Pstream::myProcNo()][infoI].procWithIntCells_[0] == Pstream::myProcNo())
-                        {
-                            vector VP1 =  interpV->interpolate(intInfoList[Pstream::myProcNo()][infoI].intPoints_[1], intInfoList[Pstream::myProcNo()][infoI].intCells_[0]
-                                                        );
-                            intInfoList[Pstream::myProcNo()][infoI].intVec_[0] = VP1;
-                        }
-                        break;
-                    }
-                    case 2:
-                    {
-                        if (intInfoList[Pstream::myProcNo()][infoI].procWithIntCells_[0] == Pstream::myProcNo())
-                        {
-                            vector VP1 =  interpV->interpolate(intInfoList[Pstream::myProcNo()][infoI].intPoints_[1], intInfoList[Pstream::myProcNo()][infoI].intCells_[0]
-                                                        );
-                            intInfoList[Pstream::myProcNo()][infoI].intVec_[0] = VP1;
-                        }
-                        
-                        if (intInfoList[Pstream::myProcNo()][infoI].procWithIntCells_[1] == Pstream::myProcNo())
-                        {
-                            vector VP2 =  interpV->interpolate(intInfoList[Pstream::myProcNo()][infoI].intPoints_[2], intInfoList[Pstream::myProcNo()][infoI].intCells_[1]
-                                                        );
-                            intInfoList[Pstream::myProcNo()][infoI].intVec_[1] = VP2;
-                        }
-                        break;
-                    }
-                }
-            }
-
-            //loop over all interpolation info
-            forAll (intInfoList[Pstream::myProcNo()],infoI)
-            {
-                label cellI = intInfoList[Pstream::myProcNo()][infoI].surfCell_;
-                //Based on order calculat Vs and assign
-                switch(intInfoList[Pstream::myProcNo()][infoI].order_)
-                {
-                    case 0:
-                    {
-                        Vs[cellI] = body[cellI]*Vs[cellI]  + (1.0-body[cellI])*V[cellI];
-                        break;
-                    }
-                    case 1:
-                    {
-                        vector VP1 = intInfoList[Pstream::myProcNo()][infoI].intVec_[0] - Vs[cellI];                        
-                        
-                        //distance between interpolation points
-                        scalar deltaR = mag(intInfoList[Pstream::myProcNo()][infoI].intPoints_[1] -intInfoList[Pstream::myProcNo()][infoI].intPoints_[0]);
-                        
-                        //cell center to surface distance
-                        scalar ds(0.0);
-                        if (immersedBodies_[bodyId].getSDBasedLambda())
-                        {
-                            scalar minMaxBody(max(min(body[cellI],1.0-SMALL),SMALL));
-                            ds = Foam::atanh(2.0*minMaxBody - 1.0)*Foam::pow(mesh_.V()[cellI],0.333);
-                            ds/= immersedBodies_[bodyId].getIntSpan();
-                        }
-                        else
-                        {
-                            ds = deltaR*(0.5-body[cellI]) ;
-                        }
-                        
-                        vector linCoeff = VP1/(deltaR+SMALL);
-                        // Note (MI): added +SMALL for robustness, effect on
-                        //            solution not tested
-                        
-                        Vs[cellI] = linCoeff*ds + Vs[cellI];
-                        break;
-                    }
-                    case 2:
-                    {
-                        vector VP1 =  intInfoList[Pstream::myProcNo()][infoI].intVec_[0] - Vs[cellI];
-                        
-                        vector VP2 =  intInfoList[Pstream::myProcNo()][infoI].intVec_[1] - Vs[cellI];
-                        
-                        
-                        //distance between interpolation points
-                        scalar deltaR1 = mag(intInfoList[Pstream::myProcNo()][infoI].intPoints_[2] -intInfoList[Pstream::myProcNo()][infoI].intPoints_[1]);
-                        scalar deltaR2 = mag(intInfoList[Pstream::myProcNo()][infoI].intPoints_[1] -intInfoList[Pstream::myProcNo()][infoI].intPoints_[0]);
-                        
-                        //cell center to surface distance
-                        scalar ds(0.0);
-                        if (immersedBodies_[bodyId].getSDBasedLambda())
-                        {
-                            scalar minMaxBody(max(min(body[cellI],1.0-SMALL),SMALL));
-                            ds = Foam::atanh(2.0*minMaxBody - 1.0)*Foam::pow(mesh_.V()[cellI],0.333);
-                            ds/= immersedBodies_[bodyId].getIntSpan();
-                        }
-                        else
-                        {
-                            ds = deltaR1*(0.5-body[cellI]) ;
-                        }
-                        
-                        vector quadCoeff = (VP2 - VP1)*deltaR1 - VP1*deltaR2;
-                        quadCoeff       /= (deltaR1*deltaR2*(deltaR1 + deltaR2)+SMALL);
-                        
-                        vector linCoeff  = (VP1-VP2)*Foam::pow(deltaR1,2.0);
-                        linCoeff        += 2.0*VP1*deltaR1*deltaR2;
-                        linCoeff        += VP1*Foam::pow(deltaR2,2.0);
-                        linCoeff        /= (deltaR1*deltaR2*(deltaR1 + deltaR2)+SMALL); 
+                PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
+                PstreamBuffers pBufs2(Pstream::commsTypes::nonBlocking);
         
-                        //~ vector quadCoeff = 1.0/(deltaR*deltaR+SMALL) * ( VP2/2.0 - VP1 );
-                        //~ vector linCoeff  = 1.0/(2.0*deltaR+SMALL) * ( 4.0*VP1 - VP2 );
-                        // Note (MI): added +SMALL for the robustness, effects
-                        //            on solution not tested
+                for (label proci = 0; proci < Pstream::nProcs(); proci++)
+                {
+                    if (proci != Pstream::myProcNo())
+                    {
+                        UOPstream send(proci, pBufs);
+                        send << intPointsToSend[proci];
                         
-                        Vs[cellI] = quadCoeff*ds*ds + linCoeff*ds + Vs[cellI];
-                        break;
+                        UOPstream send2(proci, pBufs2);
+                        send2 << intCellsToSend[proci];
+                    }
+                }
+
+                pBufs.finishedSends();
+                pBufs2.finishedSends();
+                
+                List<DynamicPointList> intPointsRcv;
+                intPointsRcv.setSize(Pstream::nProcs());
+                List<DynamicLabelList> intCellsRcv;
+                intCellsRcv.setSize(Pstream::nProcs());
+                
+                List<DynamicVectorList> intVecToReturn;
+                intVecToReturn.setSize(Pstream::nProcs());
+                //Receive interpolation requests from other processors
+                for (label proci = 0; proci < Pstream::nProcs(); proci++)
+                {
+                    if (proci != Pstream::myProcNo())
+                    {
+                        UIPstream recv(proci, pBufs);
+                        DynamicPointList recIntPoints (recv);
+                        intPointsRcv[proci].append(recIntPoints);
+                        
+                        UIPstream recv2(proci, pBufs2);
+                        DynamicLabelList recIntCells (recv2);
+                        intCellsRcv[proci].append(recIntCells);
+                    }
+                }
+                //Compute interpolation for other processors
+                for (label otherProci = 0; otherProci < intPointsRcv.size(); otherProci++)
+                {
+                    for (label intReqI = 0; intReqI < intPointsRcv[otherProci].size(); intReqI++)
+                    {
+                        vector VP1 =  interpV->interpolate(intPointsRcv[otherProci][intReqI],
+                                                            intCellsRcv[otherProci][intReqI]
+                                                            );
+                        intVecToReturn[otherProci].append(VP1);
+                    }
+                }
+
+                pBufs.clear();
+                //Send computed data back 
+                for (label proci = 0; proci < Pstream::nProcs(); proci++)
+                {
+                    if (proci != Pstream::myProcNo())
+                    {
+                        UOPstream send(proci, pBufs);
+                        send << intVecToReturn[proci];
+                    }
+                }
+
+                pBufs.finishedSends();
+                
+                List<DynamicVectorList> intVecRcv;
+                intVecRcv.setSize(Pstream::nProcs());
+                //Receive interpolation data from other processors
+                for (label proci = 0; proci < Pstream::nProcs(); proci++)
+                {
+                    if (proci != Pstream::myProcNo())
+                    {
+                        UIPstream recv(proci, pBufs);
+                        DynamicVectorList recIntVec (recv);
+                        intVecRcv[proci].append(recIntVec);
+                    }
+                }
+                //Assign received data
+                for (label otherProci = 0; otherProci < intVecRcv.size(); otherProci++)
+                {
+                    for (label intVecI = 0; intVecI < intVecRcv[otherProci].size(); intVecI++)
+                    {
+                        intInfoList[Pstream::myProcNo()][intVecReqList[otherProci][intVecI].requestLabel_].intVec_[intVecReqList[otherProci][intVecI].vecLabel_] = intVecRcv[otherProci][intVecI];
+                    }
+                }
+                //Compute interpolation for cells found on this processor
+                forAll (intInfoList[Pstream::myProcNo()],infoI)
+                {
+                    switch(intInfoList[Pstream::myProcNo()][infoI].order_)
+                    {
+                        case 1:
+                        {
+                            if (intInfoList[Pstream::myProcNo()][infoI].procWithIntCells_[0] == Pstream::myProcNo())
+                            {
+                                vector VP1 =  interpV->interpolate(intInfoList[Pstream::myProcNo()][infoI].intPoints_[1], intInfoList[Pstream::myProcNo()][infoI].intCells_[0]
+                                                            );
+                                intInfoList[Pstream::myProcNo()][infoI].intVec_[0] = VP1;
+                            }
+                            break;
+                        }
+                        case 2:
+                        {
+                            if (intInfoList[Pstream::myProcNo()][infoI].procWithIntCells_[0] == Pstream::myProcNo())
+                            {
+                                vector VP1 =  interpV->interpolate(intInfoList[Pstream::myProcNo()][infoI].intPoints_[1], intInfoList[Pstream::myProcNo()][infoI].intCells_[0]
+                                                            );
+                                intInfoList[Pstream::myProcNo()][infoI].intVec_[0] = VP1;
+                            }
+                            
+                            if (intInfoList[Pstream::myProcNo()][infoI].procWithIntCells_[1] == Pstream::myProcNo())
+                            {
+                                vector VP2 =  interpV->interpolate(intInfoList[Pstream::myProcNo()][infoI].intPoints_[2], intInfoList[Pstream::myProcNo()][infoI].intCells_[1]
+                                                            );
+                                intInfoList[Pstream::myProcNo()][infoI].intVec_[1] = VP2;
+                            }
+                            break;
+                        }
+                    }
+                }
+
+                //loop over all interpolation info
+                forAll (intInfoList[Pstream::myProcNo()],infoI)
+                {
+                    label cellI = intInfoList[Pstream::myProcNo()][infoI].surfCell_;
+                    //Based on order calculat Vs and assign
+                    switch(intInfoList[Pstream::myProcNo()][infoI].order_)
+                    {
+                        case 0:
+                        {
+                            Vs[cellI] = body[cellI]*Vs[cellI]  + (1.0-body[cellI])*V[cellI];
+                            break;
+                        }
+                        case 1:
+                        {
+                            vector VP1 = intInfoList[Pstream::myProcNo()][infoI].intVec_[0] - Vs[cellI];                        
+                            
+                            //distance between interpolation points
+                            scalar deltaR = mag(intInfoList[Pstream::myProcNo()][infoI].intPoints_[1] -intInfoList[Pstream::myProcNo()][infoI].intPoints_[0]);
+                            
+                            //cell center to surface distance
+                            scalar ds(0.0);
+                            if (immersedBodies_[bodyId].getSDBasedLambda())
+                            {
+                                scalar minMaxBody(max(min(body[cellI],1.0-SMALL),SMALL));
+                                ds = Foam::atanh(2.0*minMaxBody - 1.0)*Foam::pow(mesh_.V()[cellI],0.333);
+                                ds/= immersedBodies_[bodyId].getIntSpan();
+                            }
+                            else
+                            {
+                                ds = deltaR*(0.5-body[cellI]) ;
+                            }
+                            
+                            vector linCoeff = VP1/(deltaR+SMALL);
+                            // Note (MI): added +SMALL for robustness, effect on
+                            //            solution not tested
+                            
+                            Vs[cellI] = linCoeff*ds + Vs[cellI];
+                            break;
+                        }
+                        case 2:
+                        {
+                            vector VP1 =  intInfoList[Pstream::myProcNo()][infoI].intVec_[0] - Vs[cellI];
+                            
+                            vector VP2 =  intInfoList[Pstream::myProcNo()][infoI].intVec_[1] - Vs[cellI];
+                            
+                            
+                            //distance between interpolation points
+                            scalar deltaR1 = mag(intInfoList[Pstream::myProcNo()][infoI].intPoints_[2] -intInfoList[Pstream::myProcNo()][infoI].intPoints_[1]);
+                            scalar deltaR2 = mag(intInfoList[Pstream::myProcNo()][infoI].intPoints_[1] -intInfoList[Pstream::myProcNo()][infoI].intPoints_[0]);
+                            
+                            //cell center to surface distance
+                            scalar ds(0.0);
+                            if (immersedBodies_[bodyId].getSDBasedLambda())
+                            {
+                                scalar minMaxBody(max(min(body[cellI],1.0-SMALL),SMALL));
+                                ds = Foam::atanh(2.0*minMaxBody - 1.0)*Foam::pow(mesh_.V()[cellI],0.333);
+                                ds/= immersedBodies_[bodyId].getIntSpan();
+                            }
+                            else
+                            {
+                                if((0.5-body[cellI]) < 0)
+                                {
+                                    ds = -1*mag(mesh_.C()[cellI] - intInfoList[Pstream::myProcNo()][infoI].intPoints_[0]);
+                                }
+                                else
+                                {
+                                    ds = mag(mesh_.C()[cellI] - intInfoList[Pstream::myProcNo()][infoI].intPoints_[0]);
+                                }
+                            }
+                            
+                            vector quadCoeff = (VP2 - VP1)*deltaR1 - VP1*deltaR2;
+                            quadCoeff       /= (deltaR1*deltaR2*(deltaR1 + deltaR2)+SMALL);
+                            
+                            vector linCoeff  = (VP1-VP2)*Foam::pow(deltaR1,2.0);
+                            linCoeff        += 2.0*VP1*deltaR1*deltaR2;
+                            linCoeff        += VP1*Foam::pow(deltaR2,2.0);
+                            linCoeff        /= (deltaR1*deltaR2*(deltaR1 + deltaR2)+SMALL); 
+            
+                            //~ vector quadCoeff = 1.0/(deltaR*deltaR+SMALL) * ( VP2/2.0 - VP1 );
+                            //~ vector linCoeff  = 1.0/(2.0*deltaR+SMALL) * ( 4.0*VP1 - VP2 );
+                            // Note (MI): added +SMALL for the robustness, effects
+                            //            on solution not tested
+                            
+                            Vs[cellI] = quadCoeff*ds*ds + linCoeff*ds + Vs[cellI];
+                            break;
+                        }
                     }
                 }
             }
@@ -633,6 +679,7 @@ openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, la
     }
     
     sumReduce(contactCenter, numOfComCells);
+
     if (numOfComCells <= 0) 
     {
         returnContactInfoValue.prtsInContact_ = pairToTest;
@@ -668,17 +715,17 @@ openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, la
     
     vector normalVector(vector::zero);
     scalar contactArea(0);
-    bool case3D(true);
+    bool case3D(false);
     //Check if the case is 3D
-    vector geomDirections(mesh_.geometricD());
-    forAll (geomDirections, direction)
-    {
-        if (geomDirections[direction] == -1)
-        {
-            case3D = false;
-            break;
-        }
-    }
+//     vector geomDirections(mesh_.geometricD());
+//     forAll (geomDirections, direction)
+//     {
+//         if (geomDirections[direction] == -1)
+//         {
+//             case3D = false;
+//             break;
+//         }
+//     }
     //Use edge cells to find contact area (better precision then surfcells)
     DynamicLabelList edgeCells;
         
@@ -789,7 +836,7 @@ openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, la
         }
     }
 
-    if (intersectedVolume > SMALL && contactArea > SMALL)
+    if (intersectedVolume > 0 && contactArea > 0)
     {
         Info << "-- Particle-particle contact normal " << normalVector << endl;
         Info << "-- Particle-particle contact volume " << intersectedVolume << endl;
@@ -1247,7 +1294,7 @@ void openHFDIBDEM::writeBodySurfMeshes()
     }
 }
 //---------------------------------------------------------------------------//
-void openHFDIBDEM::correctContact(volScalarField& body)
+void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
 {
     //First detect prt contact to be sure that all Contact during CFD step will be solved during DEM inner loops
     detectPrtContact();
@@ -1330,7 +1377,7 @@ void openHFDIBDEM::correctContact(volScalarField& body)
         {
             immersedBodies_[ibToResolve[ib]].initializeVarHistory(true);
             immersedBodies_[ibToResolve[ib]].resetBody(body, false);
-            immersedBodies_[ibToResolve[ib]].createImmersedBody(body, true);
+            immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF, true);
         }
         
         //Compute motion over time. Particles are returned when bad motion occurs
@@ -1388,14 +1435,14 @@ void openHFDIBDEM::correctContact(volScalarField& body)
                     immersedBodies_[ibToResolve[ib]].updateMovement(deltaTime*step);
                     immersedBodies_[ibToResolve[ib]].resetBody(body);
                     immersedBodies_[ibToResolve[ib]].moveImmersedBody(deltaTime*step);
-                    immersedBodies_[ibToResolve[ib]].createImmersedBody(body, false, deltaTime*step);
+                    immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF, false, deltaTime*step);
                 }
                 else
                 {
                     immersedBodies_[ibToResolve[ib]].initializeVarHistory(true);
                     immersedBodies_[ibToResolve[ib]].returnPosition();
                     immersedBodies_[ibToResolve[ib]].resetBody(body, false);
-                    immersedBodies_[ibToResolve[ib]].createImmersedBody(body, true);
+                    immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF, true);
                 }                
             }
             //Change dem step. If Step is already minimal wait to avoid circulation
@@ -1474,7 +1521,7 @@ void openHFDIBDEM::correctContact(volScalarField& body)
         
         immersedBodies_[ibContactList_[0]].initializeVarHistory(true);
         immersedBodies_[ibContactList_[0]].resetBody(body, false);
-        immersedBodies_[ibContactList_[0]].createImmersedBody(body, true);
+        immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF, true);
         
         while(true)
         {             
@@ -1501,14 +1548,14 @@ void openHFDIBDEM::correctContact(volScalarField& body)
                 immersedBodies_[ibContactList_[0]].updateMovement(deltaTime*step);
                 immersedBodies_[ibContactList_[0]].resetBody(body);
                 immersedBodies_[ibContactList_[0]].moveImmersedBody(deltaTime*step);
-                immersedBodies_[ibContactList_[0]].createImmersedBody(body, false, deltaTime*step);
+                immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF, false, deltaTime*step);
             }
             else
             {
                 immersedBodies_[ibContactList_[0]].initializeVarHistory(true);
                 immersedBodies_[ibContactList_[0]].returnPosition();
                 immersedBodies_[ibContactList_[0]].resetBody(body, false);
-                immersedBodies_[ibContactList_[0]].createImmersedBody(body, true);
+                immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF, true);
             }
             
             if (doubleMinStep)
@@ -1897,7 +1944,8 @@ void openHFDIBDEM::updateNeighbourLists()
 void openHFDIBDEM::addRemoveBodies
 (
     volScalarField& body,
-    volVectorField& U
+    volVectorField& U,
+    volScalarField& refineF
 )
 {   
     forAll (addModels_,modelI)
@@ -1936,13 +1984,14 @@ void openHFDIBDEM::addRemoveBodies
                         mesh_,
                         HFDIBDEMDict_,
                         transportProperties_,
-                        addIBPos
+                        addIBPos,
+                        recomputeM0_
                     )
                 );
                 
                 // get reference for further processing
                 immersedBody& nBody(immersedBodies_[addIBPos]);
-                nBody.createImmersedBody(body);
+                nBody.createImmersedBody(body,refineF);
                 nBody.computeBodyCharPars();
                 if (nBody.getStartSynced())
                 {
@@ -2070,7 +2119,7 @@ void openHFDIBDEM::detectPrtContact()
                         
                         intersectedVolume += mesh_.V()[cSurfCells[Pstream::myProcNo()][cSCellI]] * partialVolume;
                         
-                        if (intersectedVolume > SMALL) break;
+                        if (intersectedVolume > 0) break;
                     }
                 }
 
@@ -2103,14 +2152,14 @@ void openHFDIBDEM::detectPrtContact()
                         
                         intersectedVolume += mesh_.V()[cIntCells[Pstream::myProcNo()][cSCellI]] * partialVolume;
                         
-                        if (intersectedVolume > SMALL) break;
+                        if (intersectedVolume > 0) break;
                     }
                 }
             }
             
             reduce(intersectedVolume, sumOp<scalar>());
 
-            if (intersectedVolume > SMALL)
+            if (intersectedVolume > 0)
             {                
                 prtContactIBList_.append(possibleContactNeighbourList_[possiblePair]);
             }

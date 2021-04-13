@@ -9,7 +9,7 @@
       |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
-    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
+    openHFDIB is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
     Everyone is permitted to copy and distribute verbatim copies of this license
     document, but changing it is not allowed.
     This version of the GNU Lesser General Public License incorporates the terms
@@ -19,10 +19,6 @@ License
     along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
 InNamspace
     Foam
-Description
-    class for immersed bodies representation.
-SourceFiles
-    immersedBodies.C
 Contributors
     Federico Municchi (2016),
     Martin Isoz (2019-*), Martin Šourek (2019-*)
@@ -222,6 +218,9 @@ namespace Foam
         //list to find the owner of the IB
         DynamicLabelList ibPartialVolume_;
         
+        //Relaxation factor for velocity
+        scalar velRelaxFac_;
+        
         //Update immersed body info
         void  updateImmersedBody
         ( 
@@ -344,6 +343,9 @@ namespace Foam
         scalar  intSpan_;
         scalar  dS_;//how much did the body move since last projection
         scalar  charCellSize_;//characteristic cell size over surface
+        label  refineBuffers_;//number of refine buffers around body
+        bool  useInterpolation_;//number of refine buffers around body
+        label recomputeM0_;//how many times rocompute M0_ because of refinement
         
         void initializeIB();
         
@@ -360,7 +362,8 @@ namespace Foam
             const Foam::dynamicFvMesh& mesh,
             dictionary& HFDIBDEMDict,
             dictionary& transportProperties,
-            label bodyId
+            label bodyId,
+            label recomputeM0
         );
         
         // - constructor working with triSurface already in RAM
@@ -371,7 +374,8 @@ namespace Foam
             const Foam::dynamicFvMesh& mesh,
             dictionary& HFDIBDEMDict,
             dictionary& transportProperties,
-            label bodyId
+            label bodyId,
+            label recomputeM0
         );
         
         // Destructors -------------------------------------------------
@@ -434,22 +438,39 @@ namespace Foam
         );
         void updateMovement
         (
+            scalar deltaT,
+            vector Vel,
+            vector Axis,
+            scalar omega,
+            scalar velRelaxFac
+        );
+        void updateMovement
+        (
             vector Vel,
             vector Axis,
             scalar omega
+        );
+        void updateMovement
+        (
+            vector Vel,
+            vector Axis,
+            scalar omega,
+            scalar velRelaxFac
         );
         void updateMovementComp
         (
             scalar deltaT,
             vector Vel,
             vector Axis,
-            scalar omega
+            scalar omega,
+            scalar velRelaxFac
         );
         
         //Create immersed body info
         void createImmersedBody
         (
             volScalarField& body,
+            volScalarField& refineF,
             bool createHistory = false,
             scalar deltaT = -1.0
         );
@@ -480,6 +501,13 @@ namespace Foam
             vector& bBoxMin,
             vector& bBoxMax,
             List<DynamicLabelList>& bBoxCells
+        );
+        void constructRefineField
+        (
+            volScalarField& body,
+            volScalarField& refineF,
+            DynamicLabelList cellsToIterate,
+            DynamicLabelList startLevel 
         );
         
         //Getters
@@ -678,8 +706,9 @@ namespace Foam
         );
         
         // move the body post-contact
-        void postContactUpdateBodyField(volScalarField& body);
+        void postContactUpdateBodyField(volScalarField& body, volScalarField& refineF);
         
+        void recreateBodyField(volScalarField& body, volScalarField& refineF);
         
         //Update imposed vector field
         void updateVectorField
@@ -712,7 +741,7 @@ namespace Foam
         void switchPrtContact (bool newBool){isInPrtContact_ =newBool;}
         void switchWallContact(bool newBool){isInWallContact_=newBool;}
         
-        void postContactUpdateImmersedBody();
+        void postContactUpdateImmersedBody(volScalarField& body,volVectorField& f);
         void postContactUpdateImmersedBody(scalar deltaT);
         
         // compute the mean and maximal body courant number (based on
@@ -804,6 +833,11 @@ namespace Foam
             return intSpan_;
         }
         
+        const bool& getUseInterpolation() const
+        {
+            return useInterpolation_;
+        }
+        
         void computeBodyCharPars();
         
         void checkIfInDomain(volScalarField& body);
@@ -811,6 +845,15 @@ namespace Foam
         void setRecomputeProjection(const bool newBool)
         {
             recomputeProjection_ = newBool;
+        }
+        
+        const label& getrecomputeM0() const
+        {
+            return recomputeM0_;
+        }
+        void recomputedM0()
+        {
+            recomputeM0_--;
         }
         
     };

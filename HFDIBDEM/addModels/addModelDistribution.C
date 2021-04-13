@@ -97,6 +97,8 @@ timeBased_(false),
 fieldBased_(false),
 fieldCurrentValue_(0),
 allActiveCellsInMesh_(true),
+nGeometricD_(0),
+geometricD_(Vector<label>::one),
 randGen_(clock::getTime())
 {
 	init();
@@ -145,6 +147,22 @@ void addModelDistribution::init()
 		minBound_       = (addDomainCoeffs_.lookup("minBound"));
 		maxBound_       = (addDomainCoeffs_.lookup("maxBound"));
 		boundBoxActive_ = true;
+                if (addDomainCoeffs_.found("nGeometricD"))
+        {
+            nGeometricD_ = readLabel(addDomainCoeffs_.lookup("nGeometricD"));
+        }
+        else
+        {
+            nGeometricD_ = mesh_.nGeometricD();
+        }
+        if (addDomainCoeffs_.found("geometricD"))
+        {
+            geometricD_ = addDomainCoeffs_.lookup("geometricD");
+        }
+        else
+        {
+            geometricD_ = mesh_.geometricD();
+        }
         initializeBoundBox();
         Info << "-- addModelMessage-- " << "boundBox based addition zone" << endl;
 	}
@@ -164,7 +182,17 @@ void addModelDistribution::init()
     {
         procZoneVols[Pstream::myProcNo()]+=mesh_.V()[cellsInBoundBox_[Pstream::myProcNo()][cellI]];
     }
-    scalar zoneVol(gSum(procZoneVols));
+    
+    Pstream::gatherList(procZoneVols, 0);
+    Pstream::scatter(procZoneVols, 0);
+    
+    scalar zoneVol(0);
+    forAll (procZoneVols, procI)
+    {
+        zoneVol += procZoneVols[procI];
+    }
+    
+//     scalar zoneVol(gSum(procZoneVols));
     scalar zoneBBoxVol(cellZoneBounds_.volume());
     if (zoneVol - zoneBBoxVol > 1e-5*zoneBBoxVol)
     {
@@ -256,23 +284,62 @@ triSurface addModelDistribution::addBody
     scalar partVolume(1.0/6.0*3.14*pow(stlBaseSize_ * scaleFactor.second(),3));
     
     // get the working bounding box center
-    point bBoxCenter = cellZoneBounds_.midpoint();
+    point bBoxCenter = cellZoneBounds_.midpoint();    
     pointField bodyPoints(bodySurfMesh.points());
     
     // get its center of mass
-    vector CoM = gSum(bodyPoints/bodyPoints.size());
+    vector CoM(vector::zero);
+    forAll(bodyPoints,point)
+    {
+        CoM += bodyPoints[point];
+    }    
+    CoM/= bodyPoints.size();
     Info << "-- addModelMessage-- " << "scaled STL CoM: " << CoM << endl;
+    
+    scalar rotAngle = returnRandomAngle();
+
+    vector axisOfRot = returnRandomRotationAxis();
+    
+    tensor rotMatrix(Foam::cos(rotAngle)*tensor::I);
+    
+    rotMatrix += Foam::sin(rotAngle)*tensor(
+            0.0,      -axisOfRot.z(),  axisOfRot.y(),
+            axisOfRot.z(), 0.0,       -axisOfRot.x(),
+        -axisOfRot.y(), axisOfRot.x(),  0.0
+    );
+    
+    rotMatrix += (1.0-Foam::cos(rotAngle))*(axisOfRot * axisOfRot);
+    
+    bodyPoints -= CoM;
+    bodyPoints = rotMatrix & bodyPoints;
+    bodyPoints += CoM;
+    
+    bodySurfMesh.movePoints(bodyPoints);
+    
+    CoM = vector::zero;
+    forAll(bodyPoints,point)
+    {
+        CoM += bodyPoints[point];
+    }    
+    CoM/= bodyPoints.size();
     
     // move the body to the center of the bounding box
     bodyPoints += bBoxCenter-CoM;
-    CoM         = bBoxCenter;
+//     CoM         = bBoxCenter;
     bodySurfMesh.movePoints(bodyPoints);
+    CoM = vector::zero;
+    forAll(bodyPoints,point)
+    {
+        CoM += bodyPoints[point];
+    }    
+    CoM/= bodyPoints.size();
+    Info << "-- addModelMessage-- " << "moved STL CoM: " << CoM << endl;
     
     // translate
     bodyPoints = bodySurfMesh.points();
-    if (mesh_.nGeometricD() < 3)
+    if (nGeometricD_ < 3)
     {
-        const vector validDirs = (mesh_.geometricD() + Vector<label>::one)/2;
+        const vector validDirs = (geometricD_ + Vector<label>::one)/2;
         CoM -= cmptMultiply((vector::one - validDirs),CoM);
         CoM += cmptMultiply((vector::one - validDirs),0.5*(mesh_.bounds().max() + mesh_.bounds().min()));
     }//project CoM onto current solution plane (if needed)
@@ -382,6 +449,42 @@ void addModelDistribution::initializeBoundBox()
     
     cellsInBoundBox_[Pstream::myProcNo()] = bBoxCells[Pstream::myProcNo()];
     
+    Info << "-- addModelMessage-- " << "initiliazed boundBox size " << cellsInBoundBox_[Pstream::myProcNo()].size() << endl;
+    
+    cellZoneBounds_ = boundBox(minBound_,maxBound_);
+}
+//---------------------------------------------------------------------------//
+void addModelDistribution::recreateBoundBox()
+{    
+    octreeField_ = Field<label>(mesh_.nCells(), 0);
+    cellsInBoundBox_[Pstream::myProcNo()].clear();
+    List<DynamicLabelList> bBoxCells(Pstream::nProcs());
+    
+    bool isInsideBB(false);
+    labelList nextToCheck(1,0);
+    label iterCount(0);label iterMax(mesh_.nCells());
+    while ((nextToCheck.size() > 0 or not isInsideBB) and iterCount < iterMax)
+    {
+        iterCount++;        
+        DynamicLabelList auxToCheck;
+        
+        forAll (nextToCheck,cellToCheck)
+        {
+            auxToCheck.append(
+                getBBoxCellsByOctTree(
+                    nextToCheck[cellToCheck],
+                    isInsideBB,
+                    minBound_,maxBound_,bBoxCells
+                )
+            );
+        }
+        nextToCheck = auxToCheck;
+    }    
+    
+    cellsInBoundBox_[Pstream::myProcNo()] = bBoxCells[Pstream::myProcNo()];
+    
+    Info << "-- addModelMessage-- " << "recreated boundBox size " << cellsInBoundBox_[Pstream::myProcNo()].size() << endl;
+    
     cellZoneBounds_ = boundBox(minBound_,maxBound_);
 }
 //---------------------------------------------------------------------------//
@@ -443,6 +546,28 @@ scalar addModelDistribution::checkLambdaFraction(const volScalarField& body)
 	return lambdaFraction;
 }
 //---------------------------------------------------------------------------//
+scalar addModelDistribution::returnRandomAngle()
+{
+    scalar ranNum = 2.0*randGen_.scalar01() - 1.0;
+    scalar angle  = ranNum*Foam::constant::mathematical::pi;
+	return angle;
+}
+//---------------------------------------------------------------------------//
+vector addModelDistribution::returnRandomRotationAxis()
+{
+	vector  axisOfRotation(vector::zero);
+	scalar ranNum = 0;
+    
+	for (int i=0;i<3;i++)
+	{
+		ranNum = randGen_.scalar01();
+		axisOfRotation[i] = ranNum;
+	}
+
+	axisOfRotation /=mag(axisOfRotation);
+	return axisOfRotation;
+}
+//---------------------------------------------------------------------------//
 Tuple2<label, scalar> addModelDistribution::returnScaleFactor()
 {
     DynamicScalarList  distributionDiff;
@@ -485,16 +610,16 @@ vector addModelDistribution::returnRandomPosition
     // Note (MI): an efficient check if all the active boundBox is inside
     //            mesh is an open issue at the moment
     vector ranVec(vector::zero);
+    
+    meshSearch searchEng(mesh_);
+    pointField bSMeshPts = bodySurfMesh.points();
     for (label randomVecAddCounter=0;randomVecAddCounter < 100;randomVecAddCounter++)
     {        
         Info << "-- addModelMessage-- " << "position generation attempt: " << randomVecAddCounter << endl;
-        
         // get the bodySurfMesh points
-        pointField bSMeshPts = bodySurfMesh.points();
-        
+        bSMeshPts = bodySurfMesh.points();
         // get the bodySurfMesh boundBox
         const boundBox& bodySurfBounds(bSMeshPts);
-        
         // compute the max scales to stay in active bounding box
         vector maxScales(cellZoneBounds_.max() - bodySurfBounds.max());
         maxScales -= cellZoneBounds_.min() - bodySurfBounds.min();
@@ -509,7 +634,7 @@ vector addModelDistribution::returnRandomPosition
             ranVec[i] = ranNum;
         }
         
-        vector validDirs((mesh_.geometricD() + Vector<label>::one)/2);
+        vector validDirs((geometricD_ + Vector<label>::one)/2);
         ranVec = cmptMultiply(validDirs,ranVec);//translate only with respect to valid directions
         
         // ok, now I need to check if the generated vector is OK
@@ -521,7 +646,6 @@ vector addModelDistribution::returnRandomPosition
         // -> the active boundBox is NOT fully contained in the mesh
         // if either of these conditions is met, I need to check all the
         // TRANSLATED bodySurfMesh POINTS if they ARE INSIDE the mesh
-        
         // 1. check for potential fails 1
         bool    bodySurfBoundsContained(false);
         label   containedDirs(0);
@@ -538,11 +662,10 @@ vector addModelDistribution::returnRandomPosition
         if (containedDirs == 3){bodySurfBoundsContained = true;}
         // Note (MI): potential fail 2 is prechecked during addModel
         //            initialization -> bool allActiveCellsInMesh_
-        
         if (not bodySurfBoundsContained or not allActiveCellsInMesh_)
         {
             bSMeshPts+=ranVec;
-            if (mesh_.nGeometricD() < 3)
+            if (nGeometricD_ < 3)
             {
                 bSMeshPts = cmptMultiply(validDirs,bSMeshPts);
                 bSMeshPts += cmptMultiply((vector::one - validDirs),0.5*(mesh_.bounds().max() + mesh_.bounds().min()));
@@ -558,14 +681,15 @@ vector addModelDistribution::returnRandomPosition
             {
                 Info << "-- addModelMessage-- " << "need to check if all the bodyPoints are inside mesh" << endl;
             }
-            meshSearch searchEng(mesh_);
+            
             forAll (bSMeshPts,pointI)
             {
                 bool isSurfPtInsideMesh = searchEng.isInside(bSMeshPts[pointI]);
+                reduce(isSurfPtInsideMesh, orOp<bool>());
                 if (not isSurfPtInsideMesh)
-                {
-                    Info << "-- addModelMessage-- " << "move resulted in invalid position" << endl;
-                    Info << "-- addModelMessage-- " << "discarding vector" << endl;
+                {                    
+                    Info << "-- addModelMessage-- " << "move resulted in invalid position. Point not in mesh: " << bSMeshPts[pointI] << endl;
+                    Info << "-- addModelMessage-- " << "discarding vector: " << ranVec << endl;
                     ranVec *= 0.0;
                     break;
                 }

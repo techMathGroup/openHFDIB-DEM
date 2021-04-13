@@ -118,6 +118,9 @@ namespace Foam
     //Minimal timestep in DEM inside loops
     scalar minDEMtimeStep_;
     
+    //how many times rocompute M0_ because of refinement
+    label recomputeM0_;
+    
     //solve body-wall contact
     //~ void solveWallContact(const DynamicLabelList& wallContactLst);
     // Note (MI): moved to immersedBody class by MS (as it should be there)
@@ -175,16 +178,14 @@ namespace Foam
     ~openHFDIBDEM();
     
     //~ void initialize(volScalarField& body);
-    void initialize(volScalarField& body,volVectorField& U);
+    void initialize(volScalarField& body,volVectorField& U,volScalarField& refineF,label recomputeM0);
     
     void preUpdateBodies
     (
         volScalarField& body,
         volVectorField& f
     );
-    scalar postUpdateBodies
-    (
-    );
+    scalar postUpdateBodies(volScalarField& body,volVectorField& f);
     // Note (MI): this function returns the maximal CoNum encountered
     //            between particles (wanted to maintain a stable integration)
     
@@ -194,9 +195,11 @@ namespace Foam
         volVectorField& f
     );
     
-    void moveBodies(volScalarField& body);
+    void moveBodies(volScalarField& body,volScalarField& refineF);
+    
+    void recreateBodies(volScalarField& body,volScalarField& refineF);
     // Void for DEM inner-loops
-    void correctContact(volScalarField& body);
+    void correctContact(volScalarField& body,volScalarField& refineF);
     // Detect wall contact at the end of the time step and return to original positions
     void getContactListAndReturnPositions(volScalarField& body);
     // Sort list of bounding points
@@ -228,7 +231,7 @@ namespace Foam
     
     // add or remove bodies from the simulation
     //~ void addRemoveBodies(volScalarField& body);
-    void addRemoveBodies(volScalarField& body,volVectorField& U);
+    void addRemoveBodies(volScalarField& body,volVectorField& U,volScalarField& refineF);
     
     // function to find normal vector
     vector getContactNormal
