@@ -39,7 +39,8 @@ addModelDistribution::addModelDistribution
 (
     const dictionary& addModelDict,
     const word        stlName,
-    const Foam::dynamicFvMesh& mesh
+    const Foam::dynamicFvMesh& mesh,
+    const Vector<label> geomDir
 )
 :
 addModelDict_(addModelDict),
@@ -98,7 +99,7 @@ fieldBased_(false),
 fieldCurrentValue_(0),
 allActiveCellsInMesh_(true),
 nGeometricD_(0),
-geometricD_(Vector<label>::one),
+geometricD_(geomDir),
 randGen_(clock::getTime())
 {
 	init();
@@ -213,6 +214,13 @@ void addModelDistribution::init()
 	
 	partPerAddTemp_ = partPerAdd_;
     
+	forAll (geometricD_, direction)
+    {
+        if (geometricD_[direction] == 1)
+        {
+            nGeometricD_++;
+        }
+    }
 }
 
 //---------------------------------------------------------------------------//

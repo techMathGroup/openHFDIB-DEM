@@ -40,7 +40,8 @@ addModelOnceScatter::addModelOnceScatter
     const dictionary& addModelDict,
     const word        stlName,
     const Foam::dynamicFvMesh& mesh,
-    const bool startTime0
+    const bool startTime0,
+    const Vector<label> geomDir
 )
 :
 addModelDict_(addModelDict),
@@ -100,7 +101,7 @@ fieldBased_(false),
 fieldCurrentValue_(0),
 allActiveCellsInMesh_(true),
 nGeometricD_(0),
-geometricD_(Vector<label>::one),
+geometricD_(geomDir),
 randGen_(clock::getTime())
 {
     if(!startTime0)
@@ -155,22 +156,6 @@ void addModelOnceScatter::init()
 		minBound_       = (addDomainCoeffs_.lookup("minBound"));
 		maxBound_       = (addDomainCoeffs_.lookup("maxBound"));
 		boundBoxActive_ = true;
-        if (addDomainCoeffs_.found("nGeometricD"))
-        {
-            nGeometricD_ = readLabel(addDomainCoeffs_.lookup("nGeometricD"));
-        }
-        else
-        {
-            nGeometricD_ = mesh_.nGeometricD();
-        }
-        if (addDomainCoeffs_.found("geometricD"))
-        {
-            geometricD_ = addDomainCoeffs_.lookup("geometricD");
-        }
-        else
-        {
-            geometricD_ = mesh_.geometricD();
-        }
         initializeBoundBox();
         Info << "-- addModelMessage-- " << "boundBox based addition zone" << endl;
 	}
@@ -260,6 +245,14 @@ void addModelOnceScatter::init()
     {
 		Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
 	}
+	
+	forAll (geometricD_, direction)
+    {
+        if (geometricD_[direction] == 1)
+        {
+            nGeometricD_++;
+        }
+    }
 }
 
 //---------------------------------------------------------------------------//

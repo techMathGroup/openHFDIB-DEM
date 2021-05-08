@@ -129,7 +129,8 @@ namespace Foam
             const dictionary& addModelDict,
             const word        stlName,
             const Foam::dynamicFvMesh& mesh,
-            const bool startTime0
+            const bool startTime0,
+            const Vector<label> geomDir
         );
         
         // Destructors -------------------------------------------------

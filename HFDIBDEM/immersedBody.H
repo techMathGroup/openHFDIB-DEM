@@ -350,6 +350,10 @@ namespace Foam
         bool  useInterpolation_;//number of refine buffers around body
         label recomputeM0_;//how many times rocompute M0_ because of refinement
         vector geometricD_;//geometric directions
+        bool created_;
+        bool inContactWithStatic_;
+        label timeStepsInContWStatic_;
+        label timesToSetStatic_;
         
         void initializeIB();
         
@@ -643,6 +647,11 @@ namespace Foam
             return contactTimeRes_;
         }
         
+        const int& getbodyOperation()   const
+        {
+            return bodyOperation_;
+        }
+        
         void updateContactTimeRes
         (
             scalar newContactTime
@@ -868,7 +877,14 @@ namespace Foam
             recomputeM0_--;
         }
         
-        void setRestartSim(vector vel, scalar angVel, vector axisRot);
+        void inCotactWithStatic(bool inContact)
+        {
+            inContactWithStatic_ = inContact;
+        }
+        
+        void chceckBodyOp();
+        
+        void setRestartSim(vector vel, scalar angVel, vector axisRot, bool setStatic, label timesInContact, word prevName);
     };
 }
 #endif

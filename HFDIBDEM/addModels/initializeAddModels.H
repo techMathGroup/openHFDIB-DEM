@@ -36,7 +36,8 @@
                     addModelDict,
                     stlName,
                     mesh_,
-                    startTime0
+                    startTime0,
+                    geometricD_
                 )
             );
         }
@@ -62,7 +63,8 @@
                 (
                     addModelDict,
                     stlName,
-                    mesh_
+                    mesh_,
+                    geometricD_
                 )
             );
         }
@@ -75,7 +77,8 @@
                 (
                     addModelDict,
                     stlName,
-                    mesh_
+                    mesh_,
+                    geometricD_
                 )
             );
         }

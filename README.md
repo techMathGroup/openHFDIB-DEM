@@ -8,3 +8,9 @@ Wall detection without stl findNearest
 Valgrind optimization
 	- lambda gradient computed only once when IBs moved
 	- convex createIB calcInside minimized
+Add models works with 2D non empty meshes by defining geometricD
+	- this is also important for proper contact evaluation
+	- default is set to mesh_.geometricD()
+Rotation was repaired (I guess) 
+Bodies can be switched to static after several timeSteps in contact with
+wall or other static body
