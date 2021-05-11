@@ -267,6 +267,7 @@ namespace Foam
     Tuple2<scalar,vector> get3DcontactInfo
     (
         DynamicLabelList commonCells,
+        DynamicVectorList edgePoints,
         vector normalVector,
         vector contactCenter,
         label owner

@@ -770,6 +770,7 @@ openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, la
         }
     }
     //Use edge cells to find contact area (better precision then surfcells)
+    DynamicVectorList edgePoints;
     DynamicLabelList edgeCells;
         
     scalar intersectedVolume(0);
@@ -801,6 +802,8 @@ openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, la
                 scalar rVInSize(0.5/tvertexesInside.size());
                 // Note: weiggetContactNormalht of a single vertex in the cell
                 
+                DynamicVectorList edgePointsI;
+                
                 scalar partialVolume(0);
                 forAll (tvertexesInside, verIn)
                 {
@@ -808,6 +811,7 @@ openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, la
                     {
                         partialVolume += rVInSize; //fraction of cell covered
                         partiallyInT = true;
+                        edgePointsI.append(vertexPoints[verIn]);
                     }
                 }
 
@@ -815,11 +819,20 @@ openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, la
                 {
                     partialVolume += 0.5; //fraction of cell covered
                     partiallyInT = true;
+                    for(label i = 0; i < tvertexesInside.size(); i++)
+                        edgePointsI.append(mesh_.C()[cSurfCells[Pstream::myProcNo()][cSCellI]] );
                 }
                 //Cells is edge cell when the cell is surfcell in both proccessors
                 if (partialVolume + SMALL < 1 && partiallyInT)
                 {
                     edgeCells.append(cSurfCells[Pstream::myProcNo()][cSCellI]);
+                    vector edgePoint(vector::zero);
+                    forAll(edgePointsI,pointI)
+                    {
+                        edgePoint += edgePointsI[pointI];
+                    }
+                    edgePoint /= edgePointsI.size();
+                    edgePoints.append(edgePoint);
                 }
                 
                 
@@ -866,7 +879,7 @@ openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, la
     {
         if (case3D)
         {
-            Tuple2<scalar,vector> returnTuple = get3DcontactInfo(edgeCells, normalVectorField[0], contactCenter, cBody.getOwner());
+            Tuple2<scalar,vector> returnTuple = get3DcontactInfo(edgeCells, edgePoints, normalVectorField[0], contactCenter, cBody.getOwner());
             contactArea = returnTuple.first();
             normalVector = returnTuple.second();
         }
@@ -901,7 +914,7 @@ openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, la
     }
 }
 //---------------------------------------------------------------------------//
-Tuple2<scalar,vector> openHFDIBDEM::get3DcontactInfo(DynamicLabelList commonCells, vector normalVector, vector contactCenter, label owner)
+Tuple2<scalar,vector> openHFDIBDEM::get3DcontactInfo(DynamicLabelList commonCells, DynamicVectorList edgePoints, vector normalVector, vector contactCenter, label owner)
 {      
     //Collect edge positions from all processors
     List<DynamicPointList> commCellsPositionsProc;
@@ -949,42 +962,116 @@ Tuple2<scalar,vector> openHFDIBDEM::get3DcontactInfo(DynamicLabelList commonCell
         }
     }
     
+    pBufs.clear();
+    
+    //Collect edge Points from all processors
+    List<DynamicPointList> commPointsPositionsProc;
+    commPointsPositionsProc.setSize(Pstream::nProcs());
+    DynamicPointList commPointsPositions;
+    forAll (edgePoints, cCell)
+    {
+        commPointsPositionsProc[Pstream::myProcNo()].append(edgePoints[cCell]);
+    }
+    
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            UOPstream send(proci, pBufs);
+            send << commPointsPositionsProc[Pstream::myProcNo()];
+        }
+    }
+    
+    pBufs.finishedSends();    
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            UIPstream recv(proci, pBufs);
+            DynamicPointList commPointsPositionsi (recv);
+            commPointsPositionsProc[proci].append(commPointsPositionsi);
+        }
+    }
+    
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        for (label i = 0; i < commCellsPositionsProc[proci].size(); i++)
+        {
+            commPointsPositions.append(commPointsPositionsProc[proci][i]);
+        }
+    }
+    
     scalar area(0.0);
     vector normalVec(vector::zero);
     
-    if (commCellsPositions.size() > 3)
-    {    
-        //Find best fitting plane for given positions
-        RectangularMatrix<scalar> matrix(3,commCellsPositions.size());
-        for (label i = 0; i < commCellsPositions.size(); i++)
+    if (commPointsPositions.size() >= 3)
+    {        
+        bool normOk(false);
+        vector center(vector::zero);
+        
+        forAll (commPointsPositions,cell)
         {
-            vector subPoint(commCellsPositions[i] - contactCenter);
-            
-            matrix[0][i] = subPoint[0];
-            matrix[1][i] = subPoint[1];
-            matrix[2][i] = subPoint[2];
+            center += commPointsPositions[cell];
+        }
+        center /= commPointsPositions.size();
+        
+        scalar xx(0);
+        scalar xy(0);
+        scalar xz(0);
+        scalar yy(0);
+        scalar yz(0);
+        scalar zz(0);
+                    
+        forAll (commPointsPositions,cell)
+        {
+            vector subPoint(commPointsPositions[cell] - center);
+            if(subPoint != vector::zero)
+                subPoint = subPoint/mag(subPoint);
+            xx += subPoint[0] * subPoint[0];
+            xy += subPoint[0] * subPoint[1];
+            xz += subPoint[0] * subPoint[2];
+            yy += subPoint[1] * subPoint[1];
+            yz += subPoint[1] * subPoint[2];
+            zz += subPoint[2] * subPoint[2];
         }
         
-        bool svdOk(true);
-        vector normalVec(vector::zero);
-        try{
-            SVD svd(matrix);
-            label vecInd(svd.U().n() - svd.nZeros() - 1);
-            normalVec[0] = svd.U()[0][vecInd];
-            normalVec[1] = svd.U()[1][vecInd];
-            normalVec[2] = svd.U()[2][vecInd];
-            if (mag(normalVec) < SMALL)
-                normalVec = normalVector;
-            
-            if ((normalVec & normalVector) < 0)
-                normalVec *= -1;
-        }
-        catch(...)
+        xx /= commPointsPositions.size();
+        xy /= commPointsPositions.size();
+        xz /= commPointsPositions.size();
+        yy /= commPointsPositions.size();
+        yz /= commPointsPositions.size();
+        zz /= commPointsPositions.size();
+        
+        vector weightedDir(vector::zero);
+        
+        
+        scalar detX(yy*zz-yz*yz);
+        vector axisDirX(detX,xz*yz-xy*zz,xy*yz-xz*yy);
+        scalar weightX(detX*detX);
+        if((weightedDir & axisDirX) < 0.0)
+            weightX = -weightX;
+        weightedDir += axisDirX * weightX;
+        
+        scalar detY(xx*zz-xz*xz);
+        vector axisDirY(xz*yz-xy*zz,detY,xy*xz-yz*xx);
+        scalar weightY(detY*detY);
+        if((weightedDir & axisDirY) < 0.0)
+            weightY = -weightY;
+        weightedDir += axisDirY * weightY;
+        
+        scalar detZ(xx*yy-xy*xy);
+        vector axisDirZ(xy*yz-xz*yy,xy*xz-yz*xx,detZ);
+        scalar weightZ(detZ*detZ);
+        if((weightedDir & axisDirZ) < 0.0)
+            weightZ = -weightZ;
+        weightedDir += axisDirZ * weightZ;
+        
+        if(mag(weightedDir) > SMALL)
         {
-            svdOk = false;
+            normOk = true;
+            normalVec = weightedDir/mag(weightedDir);
         }
-        reduce(svdOk, andOp<bool>());        
-        if (!svdOk)
+        if (!normOk || mag(normalVec) < 1)
             normalVec = normalVector;
 
         //Create best fitting plane
@@ -995,7 +1082,7 @@ Tuple2<scalar,vector> openHFDIBDEM::get3DcontactInfo(DynamicLabelList commonCell
             commCellsPosInPlane.append(bestFitPlane.nearestPoint(commCellsPositions[cell]));
         
         vector q1(1.0, 0.0, 0.0);
-        vector q2(1.0, 0.0, 0.0);    
+        vector q2(0.0, 1.0, 0.0);    
         if (abs(q1 & bestFitPlane.normal()) > abs(q2 & bestFitPlane.normal()))
             q1 = q2;
         
