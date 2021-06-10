@@ -1,0 +1,23 @@
+#!/bin/sh
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+rm -rf 0
+
+cp -r 0.org 0
+
+
+runApplication blockMesh
+#~ runApplication decomposePar -force
+
+application=`getApplication`
+
+runApplication $application
+
+#~ runParallel $application
+#~ 
+#~ runParallel reconstructParMesh
+#~ 
+#~ runApplication reconstructPar -newTimes
+
+
+# ----------------------------------------------------------------- end-of-file

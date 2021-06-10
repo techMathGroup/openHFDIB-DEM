@@ -16,3 +16,9 @@ Bodies can be switched to static after several timeSteps in contact with
 wall or other static body
 3D contact repaired. Get rid off SVD. Quicker and more stable. Precision not
 so bad.
+Created geomModel library
+	- Bodies are created based on geomModel defining its shape.
+		- Stl based - convex / nonConvex
+		- Shape based - sphere
+Optimization of createImmersedBody
+HFDIBDEMdict changed - see Tutorials

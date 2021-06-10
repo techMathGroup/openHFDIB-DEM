@@ -1,0 +1,6 @@
+custom modifications to openHFDIB library by Federico Municchi
+
+Changelog:
+20190102
+ -  lets try to remove the assumptions of hexahedral cells
+    (make it work with arbitrary meshes)
