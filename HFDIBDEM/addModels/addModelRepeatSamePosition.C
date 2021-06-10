@@ -37,21 +37,20 @@ using namespace Foam;
 addModelRepeatSamePosition::addModelRepeatSamePosition
 (
     const dictionary& addModelDict,
-    const word        stlName,
-    const Foam::dynamicFvMesh& mesh
+    const Foam::dynamicFvMesh& mesh,
+    geomModel* bodyGeomModel
 )
 :
+addModel(mesh),
 addModelDict_(addModelDict),
 addMode_(word(addModelDict_.lookup("addModel"))),
-stlName_(stlName),
 bodyAdded_(false),
-mesh_(mesh),
+geomModel_(bodyGeomModel),
 coeffsDict_(addModelDict_.subDict(addMode_+"Coeffs")),
 useNTimes_(readLabel(coeffsDict_.lookup("useNTimes"))),
 timeBetweenUsage_(readScalar(coeffsDict_.lookup("timeBetweenUsage"))),
 addedOnTimeLevel_(0)
-{
-}
+{}
     
 addModelRepeatSamePosition::~addModelRepeatSamePosition()
 {
@@ -81,25 +80,12 @@ bool addModelRepeatSamePosition::shouldAddBody(const volScalarField& body)
     return (tmLevelOk and useNTimes_ > 0 and addedOnTimeLevel_ == 0);
 }
 
-triSurface addModelRepeatSamePosition::addBody
+geomModel* addModelRepeatSamePosition::addBody
 (
     const   volScalarField& body
 )
-{
-    triSurfaceMesh bodySurfMesh
-    (
-        IOobject
-        (
-            stlName_ +".stl",
-            "constant",
-            "triSurface",
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::NO_WRITE
-        )
-    );
-    
-    bool canAddBodyI(canAddBody(body,bodySurfMesh));
+{    
+    bool canAddBodyI(geomModel_->canAddBody(body));
     reduce(canAddBodyI, andOp<bool>());
     
     bodyAdded_ = canAddBodyI;
@@ -108,16 +94,5 @@ triSurface addModelRepeatSamePosition::addBody
     
     Info << "-- addModelMessage-- " << "will try to use the body " << useNTimes_ << " more times" << endl;
     
-    triSurface triToRet(bodySurfMesh);
-    
-    return triToRet;
-}
-
-bool addModelRepeatSamePosition::canAddBody
-(
-    const volScalarField& body,
-    const triSurfaceMesh& bodySurfMesh
-)
-{
-    #include "canAddBodySource.H"
+    return geomModel_->getGeomModel();
 }

@@ -299,7 +299,7 @@ int main(int argc, char *argv[])
         
         if(runTime.outputTime())
         {
-            HFDIBDEM.writeBodySurfMeshes();
+            HFDIBDEM.writeBodiesInfo();
         }
         
         Info << "Timer: 0: " << times[0] << " 1: " << times[1] << " 2: " << times[2] << " 3: " << times[3] << " 4: " << times[4] << " 5: " << times[5] << " 6: " << times[6] << endl;

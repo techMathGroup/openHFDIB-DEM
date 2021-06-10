@@ -51,12 +51,10 @@ namespace Foam
         typedef DynamicList<label>  DynamicLabelList;
         const dictionary&           addModelDict_;
         word                        addMode_;
-        const word                  stlName_;
         bool                        bodyAdded_;
         bool                        finishedAddition_;
 
-        const  dynamicFvMesh&       mesh_;
-
+        autoPtr<geomModel> geomModel_;
 
         const dictionary&   coeffsDict_;
 
@@ -127,10 +125,10 @@ namespace Foam
         addModelOnceScatter
         (
             const dictionary& addModelDict,
-            const word        stlName,
             const Foam::dynamicFvMesh& mesh,
             const bool startTime0,
-            const Vector<label> geomDir
+            const Vector<label> geomDir,
+            geomModel* bodyGeomModel
         );
         
         // Destructors -------------------------------------------------
@@ -145,13 +143,7 @@ namespace Foam
         
         bool shouldAddBody(const volScalarField& body);
         
-        triSurface addBody(const volScalarField& body);
-        //OS - PlayGround ==========================================//
-		vector returnRandomPosition
-        (
-            const point CoM,
-            const triSurfaceMesh& bodySurfMesh
-        );
+        geomModel* addBody(const volScalarField& body);
 		scalar returnRandomAngle();
 		scalar returnRandomScale();
         vector returnRandomRotationAxis();
@@ -177,12 +169,6 @@ namespace Foam
             List<DynamicLabelList>& bBoxCells
         );
 		scalar checkLambdaFraction(const volScalarField& body);
-		//OS - PlayGround ==========================================//
-        bool canAddBody
-        (
-            const volScalarField& body,
-            const triSurfaceMesh& bodySurfMesh
-        );
            
         bool checkIfAdd() {return true;}
         

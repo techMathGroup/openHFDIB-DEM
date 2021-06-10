@@ -1,3 +1,9 @@
+geomModels/geomModel.C
+geomModels/stlBased/stlBased.C
+geomModels/stlBased/convexBody.C
+geomModels/stlBased/nonConvexBody.C
+geomModels/shapeBased/shapeBased.C
+geomModels/shapeBased/sphereBody.C
 addModels/addModel.C
 addModels/addModelOnce.C
 addModels/addModelOnceScatter.C

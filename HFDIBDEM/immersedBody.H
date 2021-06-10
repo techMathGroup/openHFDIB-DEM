@@ -41,27 +41,32 @@ Contributors
 #include "dynamicFvMesh.H"
 #include "triSurfaceMesh.H"
 
+#include "geomModel.H"
+#include "stlBased.H"
+#include "convexBody.H"
+#include "nonConvexBody.H"
+
 
 namespace Foam
 {   
-    // custom field filtration 
-    template<class Type>
-    Foam::tmp<Foam::Field<Type>>
-    filterField
-    (
-        const Field<Type>& field,
-        const labelList& cellIDs
-    ) 
-    {
-        if (isNull(cellIDs))
-        {
-            return field;
-        }
-        else
-        {
-            return tmp<Field<Type>>(new Field<Type>(field, cellIDs));
-        }
-    }
+//     // custom field filtration 
+//     template<class Type>
+//     Foam::tmp<Foam::Field<Type>>
+//     filterField
+//     (
+//         const Field<Type>& field,
+//         const labelList& cellIDs
+//     ) 
+//     {
+//         if (isNull(cellIDs))
+//         {
+//             return field;
+//         }
+//         else
+//         {
+//             return tmp<Field<Type>>(new Field<Type>(field, cellIDs));
+//         }
+//     }
 
     class immersedBody
     {
@@ -76,7 +81,7 @@ namespace Foam
         typedef DynamicList<point> DynamicPointList;
         
         // name of the STL to base the body on
-        word    stlName_;
+        word    bodyName_;
         
         //is the particle in contact with other particles
         bool    isInPrtContact_;
@@ -98,6 +103,10 @@ namespace Foam
         
         //Dictionary
         dictionary&             transportProperties_;
+        
+        autoPtr<geomModel> geomModel_;
+        //Precalculate cellPoints for better performace
+        List<pointField>& cellPoints_;
         
         
         //Body mass
@@ -170,14 +179,8 @@ namespace Foam
         //body density
         dimensionedScalar rhoS_;
         
-        //body convexity
-        bool    bodyConvex_;
-        
         //characteristic diameter of the body
         scalar  dC_;
-        
-        //threshold to distinguish surface cells [thrSurf_,1-thrSurf_]
-        scalar  thrSurf_;
         
         //integer to identify current body
         label   bodyId_;
@@ -198,11 +201,6 @@ namespace Foam
         point minBoundPoint_;
         point maxBoundPoint_;
         
-        //base geometry
-        triSurfaceMesh      bodySurfMesh_;
-        pointField          bodyPoints_;
-        bool                writeBodySurfMesh_;
-        
         //surface cells
         List<DynamicLabelList>  surfCells_;
         
@@ -218,9 +216,6 @@ namespace Foam
         //processor num that owns the IB
         label owner_;
         
-        //list to find the owner of the IB
-        DynamicLabelList ibPartialVolume_;
-        
         //Relaxation factor for velocity
         scalar velRelaxFac_;
         
@@ -233,19 +228,6 @@ namespace Foam
         
         //Create interpolation points
         void  calculateInterpolationPoints(volScalarField& body);
-        
-        // Void to find all neighbour faces also in contact with IB. Using OCTREE-like algorithm
-        void getContactFaces
-        (
-            label faceIndex,
-            volScalarField& body
-        );
-        
-        // Returns penetration depth for a face in contact with IB
-        scalar getPenetrationDepth
-        (
-            label faceInd
-        );
         
         //Evaluate center of mass and inertia tensor
         vector addToMAndI
@@ -280,14 +262,6 @@ namespace Foam
             volScalarField& body,
             volVectorField& f
         );
-        
-        //update old movement variables (these are stored for pimple loop)
-        void updateOldMovementVars()
-        {
-            VelOld_   = Vel_;
-            AxisOld_  = Axis_;
-            omegaOld_ = omega_;
-        }
                         
         // history variables for contact correction . They are assigned at the beggining of the main (Pimple) time step
         //Forces acting on the particle
@@ -313,9 +287,6 @@ namespace Foam
         
         //Total Rodrigues angle of the body
         vector historyTotalAngle_;
-        
-        // bodyPoints defining the surface
-        pointField  historyBodyPoints_;
         
         // time step required for a contact resolution (Ib should move maximally by the set of fraction of its dC_)
         scalar      contactTimeRes_;
@@ -372,20 +343,9 @@ namespace Foam
             dictionary& transportProperties,
             label bodyId,
             label recomputeM0,
-            vector geometricD
-        );
-        
-        // - constructor working with triSurface already in RAM
-        immersedBody
-        (
-            triSurface triSurf,
-            word    surfName,
-            const Foam::dynamicFvMesh& mesh,
-            dictionary& HFDIBDEMDict,
-            dictionary& transportProperties,
-            label bodyId,
-            label recomputeM0,
-            vector geometricD
+            vector geometricD,
+            geomModel* bodyGeomModel,
+            List<pointField>& cellPoints
         );
         
         // Destructors -------------------------------------------------
@@ -481,37 +441,15 @@ namespace Foam
         (
             volScalarField& body,
             volScalarField& refineF,
-            bool createHistory = false,
-            scalar deltaT = -1.0
+            bool synchCreation = true
         );
-        void createImmersedBodyConcave
+        
+        void synchCreateImmersedBody
         (
             volScalarField& body,
-            bool createHistory = false,
-            scalar deltaT = -1.0
+            volScalarField& refineF
         );
-        void createImmersedBodyConvex
-        (
-            volScalarField& body,
-            bool createHistory = false,
-            scalar deltaT = -1.0
-        );
-        labelList createImmersedBodyByOctTree
-        (
-            label cellToCheck,
-            bool& insideIB, DynamicLabelList& ibPartialVolumei,
-            bool& centerInside,
-            boolList& vertexesInside,
-            volScalarField& body
-        );
-        labelList getBBoxCellsByOctTree
-        (
-            label cellToCheck,
-            bool& insideBB,
-            vector& bBoxMin,
-            vector& bBoxMax,
-            List<DynamicLabelList>& bBoxCells
-        );
+
         void constructRefineField
         (
             volScalarField& body,
@@ -521,16 +459,6 @@ namespace Foam
         );
         
         //Getters
-        
-        const triSurfaceMesh& getTriSurfMesh() const
-        {
-            return bodySurfMesh_;
-        }
-        
-        const pointField& getHistoryBodyPoints() const
-        {
-            return historyBodyPoints_;
-        }
         
         const bool& checkPrtContact() const
         {
@@ -781,9 +709,6 @@ namespace Foam
         // function to compute local particle radii w.r.t. CoM_
         DynamicScalarList getLocPartRad(DynamicLabelList& cellsOfInt);
         
-        // function to write bodySurfMesh_ as STL for postprocessing
-        void writeBodySurfMesh();
-        
         // auxiliary switch to turn off/on torque update
         bool& retUpdateTorque()
         {
@@ -884,7 +809,32 @@ namespace Foam
         
         void chceckBodyOp();
         
-        void setRestartSim(vector vel, scalar angVel, vector axisRot, bool setStatic, label timesInContact, word prevName);
+        void setRestartSim(vector vel, scalar angVel, vector axisRot, bool setStatic, label timesInContact);
+        
+        geomModel& getGeomModel()
+        {
+            return geomModel_();
+        }
+        
+        void recordBodyInfo(IOdictionary& dict, word path)
+        {
+            dict.add("bodyId",bodyId_);
+            dict.add("bodyName",bodyName_);
+            dict.add("Vel",Vel_);
+            dict.add("omega",omega_);
+            dict.add("Axis",Axis_);
+            dict.add("static",bodyOperation_ == 0);
+            dict.add("timeStepsInContWStatic", timeStepsInContWStatic_);
+            geomModel_->writeBodyInfo(bodyId_,dict, path);
+        }        
+        
+        //update old movement variables (these are stored for pimple loop)
+        void updateOldMovementVars()
+        {
+            VelOld_   = Vel_;
+            AxisOld_  = Axis_;
+            omegaOld_ = omega_;
+        }
     };
 }
 #endif

@@ -41,9 +41,6 @@ Contributors
 #include "scalarMatrices.H"
 #include "OFstream.H"
 
-//~ #include "addModel.H"
-//~ #include "addModelOnce.H"
-
 #define ORDER 2
 
 using namespace Foam;
@@ -74,7 +71,7 @@ transportProperties_
         IOobject::NO_WRITE
     )
 ),
-stlNames_(HFDIBDEMDict_.lookup("stlNames")),
+bodyNames_(HFDIBDEMDict_.lookup("bodyNames")),
 kWN_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("kN"))),
 gammaWN_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("gammaN"))),
 kWt_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("kt"))),
@@ -82,7 +79,8 @@ gammaWt_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("gammat"))),
 muW_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("mu"))),
 adhWN_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("adhN"))),
 minDEMloops_(readScalar(HFDIBDEMDict_.lookup("minDEMloops"))),
-minDEMtimeStep_(readScalar(HFDIBDEMDict_.lookup("minDEMtimeStep")))
+minDEMtimeStep_(readScalar(HFDIBDEMDict_.lookup("minDEMtimeStep"))),
+recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 {
     if (HFDIBDEMDict_.found("geometricD"))
     {
@@ -92,8 +90,10 @@ minDEMtimeStep_(readScalar(HFDIBDEMDict_.lookup("minDEMtimeStep")))
     {
         geometricD_ = mesh_.geometricD();
     }
+    
+    recordOutDir_ = mesh_.time().rootPath() + "/" + mesh_.time().globalCaseName() + "/bodiesInfo";
 }
-openHFDIBDEM::openHFDIBDEM(const Foam::dynamicFvMesh& mesh, const Foam::wordList stlNames )
+openHFDIBDEM::openHFDIBDEM(const Foam::dynamicFvMesh& mesh, const Foam::wordList bodyNames )
 :
 mesh_(mesh),
 HFDIBDEMDict_
@@ -118,7 +118,7 @@ transportProperties_
         IOobject::NO_WRITE
     )
 ),
-stlNames_(stlNames),
+bodyNames_(bodyNames),
 kWN_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("kN"))),
 gammaWN_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("gammaN"))),
 kWt_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("kt"))),
@@ -126,7 +126,8 @@ gammaWt_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("gammat"))),
 muW_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("mu"))),
 adhWN_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("adhN"))),
 minDEMloops_(readScalar(HFDIBDEMDict_.lookup("minDEMloops"))),
-minDEMtimeStep_(readScalar(HFDIBDEMDict_.lookup("minDEMtimeStep")))
+minDEMtimeStep_(readScalar(HFDIBDEMDict_.lookup("minDEMtimeStep"))),
+recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 {
     if (HFDIBDEMDict_.found("geometricD"))
     {
@@ -136,6 +137,8 @@ minDEMtimeStep_(readScalar(HFDIBDEMDict_.lookup("minDEMtimeStep")))
     {
         geometricD_ = mesh_.geometricD();
     }
+    
+    recordOutDir_ = mesh_.time().rootPath() + "/" + mesh_.time().globalCaseName() + "/bodiesInfo";
 }
 //---------------------------------------------------------------------------//
 openHFDIBDEM::~openHFDIBDEM()
@@ -172,30 +175,57 @@ void openHFDIBDEM::initialize
     label recomputeM0,
     word runTime
 )
-{
+{    
     // get data from HFDIBDEMDict
-    wordList stlNames( HFDIBDEMDict_.lookup("stlNames") );
     HFDIBinterpDict_ = HFDIBDEMDict_.subDict("interpolationSchemes");
+    preCalculateCellPoints();
     
     bool startTime0(runTime == "0");
     
     // initialize addModels
-    addModels_.setSize(stlNames_.size());
+    addModels_.setSize(bodyNames_.size());
     immersedBodies_.setSize(0);                                         //on the fly creation
     refineF *= 0;
     recomputeM0_ = recomputeM0;
     
     if(!startTime0)
+    {        
+        if(!isDir(recordOutDir_))
+            mkDir(recordOutDir_);
+        else
+        {
+            fileNameList entries(readDir(recordOutDir_,fileName::DIRECTORY));
+            scalar runTimeS(stod(runTime));
+            forAll(entries,entry)
+            {
+                scalar dirTime(stod(entries[entry].name()));
+                if(dirTime > runTimeS)
+                {
+                    word pathI(recordOutDir_ + "/" + entries[entry]);
+                    rmDir(pathI);
+                }
+            }
+        }
+        
+        restartSimulation(body, refineF, runTime);
+    }
+    else
     {
-        restartSimulation(body, refineF, runTime,"log.PimpleHFDIBFoam_Restart");
+        if(!isDir(recordOutDir_))
+            mkDir(recordOutDir_);
+        else
+        {
+            rmDir(recordOutDir_);
+            mkDir(recordOutDir_);
+        }
     }
     
     #include "initializeAddModels.H"
 
     forAll (addModels_,modelI)
     {
-        word stlName(stlNames_[modelI]);
-        Info << "Creating immersed body based on: " << stlName << endl;
+        word bodyName(bodyNames_[modelI]);
+        Info << "Creating immersed body based on: " << bodyName << endl;
         
         label maxAdditions(100);
         label cAddition(0);
@@ -205,8 +235,7 @@ void openHFDIBDEM::initialize
         while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions)
         {
             Info << "addModel invoked action, trying to add new body" << endl;
-            triSurface bodySTL = addModels_[modelI].addBody(body);
-            
+            autoPtr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body));
             cAddition++;
                         
             // initialize the immersed bodies
@@ -222,14 +251,15 @@ void openHFDIBDEM::initialize
                     addIBPos,
                     new immersedBody
                     (
-                        bodySTL,
-                        stlName,
+                        bodyName,
                         mesh_,
                         HFDIBDEMDict_,
                         transportProperties_,
                         addIBPos,
                         recomputeM0_,
-                        geometricD_
+                        geometricD_,
+                        bodyGeomModel.ptr(),
+                        cellPoints_
                     )
                 );
                 immersedBodies_[addIBPos].createImmersedBody(body,refineF);
@@ -238,12 +268,12 @@ void openHFDIBDEM::initialize
                 {
                     immersedBodies_[addIBPos].initSyncWithFlow(U);
                 }
-                Info << "Body based on: " << stlName << " successfully added" << endl;
+                Info << "Body based on: " << bodyName << " successfully added" << endl;
                 cAddition = 0;
             }
             else
             {
-                Info << "Body based on: " << stlName << " should have been added but was not "
+                Info << "Body based on: " << bodyName << " should have been added but was not "
                      << "(probably overlap with an already existing body)"
                      << endl;
             }
@@ -368,7 +398,7 @@ void openHFDIBDEM::moveBodies
     volScalarField& body,
     volScalarField& refineF
 )
-{
+{    
     refineF *= 0;
     forAll (immersedBodies_,bodyId)
     {
@@ -376,9 +406,29 @@ void openHFDIBDEM::moveBodies
         {
             if (findIndex(ibContactList_, bodyId) == -1)
             {
+                immersedBodies_[bodyId].moveImmersedBody();
+            }
+        }
+    }
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            if (findIndex(ibContactList_, bodyId) == -1)
+            {
                 immersedBodies_[bodyId].postContactUpdateBodyField(body,refineF);
-                // print out linear and angular momentum (final)
-                //~ immersedBodies_[bodyId].printMomentum();
+            }
+        }
+    }
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            if (findIndex(ibContactList_, bodyId) == -1)
+            {
+                immersedBodies_[bodyId].synchCreateImmersedBody(body,refineF);
+                immersedBodies_[bodyId].checkIfInDomain(body);    
+                immersedBodies_[bodyId].updateOldMovementVars();
                 immersedBodies_[bodyId].printStats();
             }
         }
@@ -392,24 +442,32 @@ void openHFDIBDEM::recreateBodies
 )
 {
     refineF *= 0;
+    preCalculateCellPoints();
     forAll (addModels_,modelI)
     {
         addModels_[modelI].recreateBoundBox();
     }
-    
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
             immersedBodies_[bodyId].recreateBodyField(body,refineF);
+        }
+    }
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            immersedBodies_[bodyId].synchCreateImmersedBody(body,refineF);
+            immersedBodies_[bodyId].checkIfInDomain(body);
             if(immersedBodies_[bodyId].getrecomputeM0() > 0)
             {
                 immersedBodies_[bodyId].computeBodyCharPars();
                 immersedBodies_[bodyId].recomputedM0();
-            }
+            }            
+            Info << "-- body " << immersedBodies_[bodyId].getBodyId() << " Re-created" << endl;
         }
     }
-    
     const dimensionedScalar deltaN
     (
         "deltaN",
@@ -742,22 +800,22 @@ openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, la
     scalar tDC(tBody.getDC());          //characteristic diameter
     
     //Create triSurfaceSearch
-    const triSurface& tibTemp( tBody.getTriSurfMesh());
-    triSurfaceSearch tibTriSurfSearch( tibTemp );
+//     const triSurface& tibTemp( tBody.getTriSurfMesh());
+//     triSurfaceSearch tibTriSurfSearch( tibTemp );
     
     //Get nearest point on surface from contact center
-    pointIndexHit tibPointIndexHit = tibTriSurfSearch.nearest(contactCenter, vector::one * tDC);
-    List<pointIndexHit> tibPointIndexHitList(1,tibPointIndexHit);
-    vectorField normalVectorField;
+//     pointIndexHit tibPointIndexHit = tibTriSurfSearch.nearest(contactCenter, vector::one * tDC);
+//     List<pointIndexHit> tibPointIndexHitList(1,tibPointIndexHit);
+//     vectorField normalVectorField;
+//     
+//     //Get contact normal direction
+//     const triSurfaceMesh& tibTempMesh( tBody.getTriSurfMesh());
+//     tibTempMesh.getNormal(tibPointIndexHitList,normalVectorField);
+//     // MS note: This normal direction is not correct for sharp edges! 
+//     // therefore it is used only if the normal direction cannot be set
+//     // based on surfcels (there is only one such cell
     
-    //Get contact normal direction
-    const triSurfaceMesh& tibTempMesh( tBody.getTriSurfMesh());
-    tibTempMesh.getNormal(tibPointIndexHitList,normalVectorField);
-    // MS note: This normal direction is not correct for sharp edges! 
-    // therefore it is used only if the normal direction cannot be set
-    // based on surfcels (there is only one such cell
-    
-    vector normalVector(vector::zero);
+    vector normalVector(tBody.getGeomModel().getClosestNormal(contactCenter,vector::one * tDC));
     scalar contactArea(0);
     bool case3D(true);
     //Check if the case is 3D
@@ -779,12 +837,12 @@ openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, la
     {
 
         //Create triSurfaceSearch
-        const triSurface& cibTemp( cBody.getTriSurfMesh());
-        triSurfaceSearch cibTriSurfSearch( cibTemp );
+//         const triSurface& cibTemp( cBody.getTriSurfMesh());
+//         triSurfaceSearch cibTriSurfSearch( cibTemp );
         const pointField& pp = mesh_.points();
         
-        boolList tcenterInsideList = tibTriSurfSearch.calcInside( mesh_.C());
-        boolList ccenterInsideList = cibTriSurfSearch.calcInside( mesh_.C());
+        boolList tcenterInsideList = tBody.getGeomModel().pointInside( mesh_.C());
+        boolList ccenterInsideList = cBody.getGeomModel().pointInside( mesh_.C());
 
         forAll (cSurfCells[Pstream::myProcNo()],cSCellI)
         {
@@ -794,8 +852,8 @@ openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, la
             {
                 const labelList& vertexLabels = mesh_.cellPoints()[cSurfCells[Pstream::myProcNo()][cSCellI]];
                 const pointField vertexPoints(pp,vertexLabels);
-                boolList tvertexesInside = tibTriSurfSearch.calcInside( vertexPoints );
-                boolList cvertexesInside = cibTriSurfSearch.calcInside( vertexPoints );
+                boolList tvertexesInside = tBody.getGeomModel().pointInside( vertexPoints );
+                boolList cvertexesInside = cBody.getGeomModel().pointInside( vertexPoints );
                 bool tcenterInside(tcenterInsideList[cSurfCells[Pstream::myProcNo()][cSCellI]] );
                 bool ccenterInside(ccenterInsideList[cSurfCells[Pstream::myProcNo()][cSCellI]] );
                 //~ scalar rVInSize(1.0/(tvertexesInside.size()+1));// MI: WHIS IS THIS HERE?
@@ -846,8 +904,8 @@ openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, la
             {
                 const labelList& vertexLabels = mesh_.cellPoints()[cIntCells[Pstream::myProcNo()][cSCellI]];
                 const pointField vertexPoints(pp,vertexLabels);
-                boolList tvertexesInside = tibTriSurfSearch.calcInside( vertexPoints );
-                boolList cvertexesInside = cibTriSurfSearch.calcInside( vertexPoints );
+                boolList tvertexesInside = tBody.getGeomModel().pointInside( vertexPoints );
+                boolList cvertexesInside = cBody.getGeomModel().pointInside( vertexPoints );
                 bool tcenterInside(tcenterInsideList[cIntCells[Pstream::myProcNo()][cSCellI]] );
                 bool ccenterInside(ccenterInsideList[cIntCells[Pstream::myProcNo()][cSCellI]] );
                 //~ scalar rVInSize(1.0/(tvertexesInside.size()+1));
@@ -879,13 +937,13 @@ openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, la
     {
         if (case3D)
         {
-            Tuple2<scalar,vector> returnTuple = get3DcontactInfo(edgeCells, edgePoints, normalVectorField[0], contactCenter, cBody.getOwner());
+            Tuple2<scalar,vector> returnTuple = get3DcontactInfo(edgeCells, edgePoints, normalVector, contactCenter, cBody.getOwner());
             contactArea = returnTuple.first();
             normalVector = returnTuple.second();
         }
         else
         {
-            normalVector = getContactNormal(commonCells[Pstream::myProcNo()], normalVectorField[0], contactCenter);
+            normalVector = getContactNormal(commonCells[Pstream::myProcNo()], normalVector, contactCenter);
                 
             // Evaluate contact area
             contactArea = getContactArea(commonCells[Pstream::myProcNo()]);
@@ -1316,17 +1374,15 @@ void openHFDIBDEM::solvePrtContact(openHFDIBDEM::prtPrtContactInfo contactInfo, 
     vector tVeli(-(tplanarVec^tAxis)*tOmega + tVel);    
     
     scalar Vn(-(cVeli - tVeli) & nVec);
-    
     scalar Lc(4*mag(cLVec)*mag(tLVec)/(mag(cLVec)+mag(tLVec)));
     
     scalar reduceM(cM*tM/(cM+tM));
 
     // compute the normal force
     FN = (aKN*contactInfo.contactVolume_/(Lc+SMALL) + aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(contactInfo.contactArea_ * Vn))*nVec;
-    
     // compute adhesive force
-    scalar FAc(aadhN*contactInfo.contactArea_);
-    scalar FAeq(min(aKN*((cadhEqui*cM)/(cRhoS + SMALL))/(Lc+SMALL), aKN*((tadhEqui*tM)/(tRhoS + SMALL))/(Lc+SMALL)));
+    scalar FAc(aadhN*contactInfo.contactArea_);    
+    scalar FAeq(min(aKN*((cadhEqui*cM)/(cRhoS + SMALL))/(Lc+SMALL), aKN*((tadhEqui*tM)/(tRhoS + SMALL))/(Lc+SMALL)));    
     scalar partMul(max(contactInfo.contactVolume_ * cRhoS / (cM+SMALL) / (cadhEqui+SMALL), contactInfo.contactVolume_ * tRhoS / (tM+SMALL) / (tadhEqui+SMALL)));
     if(partMul > 1)
     {
@@ -1438,134 +1494,34 @@ void openHFDIBDEM::solvePrtContact(openHFDIBDEM::prtPrtContactInfo contactInfo, 
     }
 }
 //---------------------------------------------------------------------------//
-//~ void openHFDIBDEM::solveWallContact(const DynamicList<label>& wallContactLst)
-//~ {
-//~ }
-// Note (MI): moved to immersedBody class by MS (as it should be there)
-
-//---------------------------------------------------------------------------//
-void openHFDIBDEM::writeBodySurfMeshes()
+void openHFDIBDEM::writeBodiesInfo()
 {    
+    if(!recordSimulation_)
+        return;
+    
+    word curOutDir(recordOutDir_ + "/" + mesh_.time().timeName());
+    mkDir(curOutDir);
+    mkDir(curOutDir +"/stlFiles");
+    
     wordList bodyNames;
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
-        {
-            immersedBodies_[bodyId].writeBodySurfMesh();
-            bodyNames.append(std::to_string(immersedBodies_[bodyId].getBodyId()));
-        }
-    }
-    
-    word logFile("log.pimpleHFDIBFoam");
-    word runTime(mesh_.time().timeName());
-    
-    OFstream outFile(mesh_.time().timePath() + "/log.PimpleHFDIBFoam_Restart");
-    
-    IFstream fileStream(logFile);
-    string line;
-    string timeString("Time = ");
-    string bodyString("-- body ");
-    string velString("  linear velocity:");
-    string angString(" angular velocity:");
-    string axisString("    rotation axis:");
-    string setStaticString(" set as Static");
-    string timesInCntWStaticString(" timeStepsInContWStatic_: ");
-    string newBody("New bodyID: ");
-    bool inTime(false);
-    bool cont(true);
-    
-    string out;
-    
-    while(cont && getline(fileStream.stdStream(),line))
-    {
-        outFile.writeQuoted(line,false);
-        outFile << endl;
-        
-        if(line.find(timeString) != std::string::npos)
-        {
-            cont = false;
-        }
-    }
-    
-    cont = true;
-    
-    while(cont && getline(fileStream.stdStream(),line))
-    {        
-        if(inTime)
         {            
-            forAll(bodyNames, nameI)
-            {
-                if(line.find(bodyString + bodyNames[nameI] + velString) != std::string::npos)
-                {
-                    outFile.writeQuoted(line,false);
-                    outFile << endl;
-                }
+            word path(curOutDir + "/body" + std::to_string(immersedBodies_[bodyId].getBodyId()) +".info");
+            OFstream ofStream(path);            
+            IOobject outInfo
+                (
+                    path,
+                    mesh_,
+                    IOobject::NO_READ,
+                    IOobject::AUTO_WRITE
+                );
+            IOdictionary outDict(outInfo);
                 
-                if(line.find(bodyString + bodyNames[nameI] + angString) != std::string::npos)
-                {
-                    outFile.writeQuoted(line,false);
-                    outFile << endl;
-                }
-                
-                if(line.find(bodyString + bodyNames[nameI] + axisString) != std::string::npos)
-                {
-                    outFile.writeQuoted(line,false);
-                    outFile << endl;
-                }
-                
-                if(line.find(bodyString + bodyNames[nameI] + timesInCntWStaticString) != std::string::npos)
-                {
-                    outFile.writeQuoted(line,false);
-                    outFile << endl;
-                }
-                
-                if(line.find(bodyString + bodyNames[nameI] + setStaticString) != std::string::npos)
-                {
-                    outFile.writeQuoted(line,false);
-                    outFile << endl;
-                }
-                
-                if(line.find(newBody + bodyNames[nameI] + " ") != std::string::npos)
-                {
-                    outFile.writeQuoted(line,false);
-                    outFile << endl;
-                }
-            }            
-        }
-        else
-        {
-            if(line.find(timeString + runTime) != std::string::npos)
-            {
-                outFile.writeQuoted(line,false);
-                outFile << endl;
-                inTime = true;
-            }
-            
-            if(line.find(setStaticString) != std::string::npos)
-            {
-                forAll(bodyNames, nameI)
-                {
-                    if(line.find(bodyString + bodyNames[nameI] + setStaticString) != std::string::npos)
-                    {
-                        outFile.writeQuoted(line,false);
-                        outFile << endl;
-                        break;
-                    }
-                }
-            }
-            
-            if(line.find(newBody) != std::string::npos)
-            {
-                forAll(bodyNames, nameI)
-                {
-                    if(line.find(newBody + bodyNames[nameI] + " ") != std::string::npos)
-                    {
-                        outFile.writeQuoted(line,false);
-                        outFile << endl;
-                        break;
-                    }
-                }
-            }
+            outDict.writeHeader(ofStream);
+            immersedBodies_[bodyId].recordBodyInfo(outDict,curOutDir);
+            outDict.writeData(ofStream);
         }
     }
 }
@@ -1659,7 +1615,7 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
         {            
             immersedBodies_[ibToResolve[ib]].initializeVarHistory(true);
             immersedBodies_[ibToResolve[ib]].resetBody(body, false);
-            immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF, true);
+            immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF);
         }
         
         //Compute motion over time. Particles are returned when bad motion occurs
@@ -1719,14 +1675,14 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                     immersedBodies_[ibToResolve[ib]].updateMovement(deltaTime*step);
                     immersedBodies_[ibToResolve[ib]].resetBody(body);
                     immersedBodies_[ibToResolve[ib]].moveImmersedBody(deltaTime*step);
-                    immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF, false, deltaTime*step);
+                    immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF);
                 }
                 else
                 {
                     immersedBodies_[ibToResolve[ib]].initializeVarHistory(true);
                     immersedBodies_[ibToResolve[ib]].returnPosition();
                     immersedBodies_[ibToResolve[ib]].resetBody(body, false);
-                    immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF, true);
+                    immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF);
                 }                
             }
             //Change dem step. If Step is already minimal wait to avoid circulation
@@ -1804,7 +1760,7 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
         doubleMinStep2 = false;
         immersedBodies_[ibContactList_[0]].initializeVarHistory(true);
         immersedBodies_[ibContactList_[0]].resetBody(body, false);
-        immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF, true);
+        immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF);
         while(true)
         {             
             Info << " Start DEM pos: " << pos << " DEM step: " << step << endl;
@@ -1831,14 +1787,14 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                 immersedBodies_[ibContactList_[0]].updateMovement(deltaTime*step);
                 immersedBodies_[ibContactList_[0]].resetBody(body);
                 immersedBodies_[ibContactList_[0]].moveImmersedBody(deltaTime*step);
-                immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF, false, deltaTime*step);
+                immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF);
             }
             else
             {
                 immersedBodies_[ibContactList_[0]].initializeVarHistory(true);
                 immersedBodies_[ibContactList_[0]].returnPosition();
                 immersedBodies_[ibContactList_[0]].resetBody(body, false);
-                immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF, true);
+                immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF);
             }
             
             if (doubleMinStep)
@@ -2147,7 +2103,7 @@ void openHFDIBDEM::addRemoveBodies
 {   
     forAll (addModels_,modelI)
     {
-        word stlName(stlNames_[modelI]);
+        word bodyName(bodyNames_[modelI]);
         
         label maxAdditions(100);
         label cAddition(0);
@@ -2156,8 +2112,8 @@ void openHFDIBDEM::addRemoveBodies
         
         while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions)
         {
-            Info << "addModel invoked action, trying to add new body" << endl;
-            triSurface bodySTL = addModels_[modelI].addBody(body);
+            Info << "addModel invoked action, trying to add new body" << endl;            
+            autoPtr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body));
             
             cAddition++;
             
@@ -2176,14 +2132,15 @@ void openHFDIBDEM::addRemoveBodies
                     addIBPos,
                     new immersedBody
                     (
-                        bodySTL,
-                        stlName,
+                        bodyName,
                         mesh_,
                         HFDIBDEMDict_,
                         transportProperties_,
                         addIBPos,
                         recomputeM0_,
-                        geometricD_
+                        geometricD_,
+                        bodyGeomModel.ptr(),
+                        cellPoints_
                     )
                 );
                 
@@ -2279,14 +2236,14 @@ void openHFDIBDEM::detectPrtContact()
                 tBody.setRecomputeProjection(true);
 
                 //Create triSurfaceSearch
-                const triSurface& tibTemp( tBody.getTriSurfMesh());
-                triSurfaceSearch tibTriSurfSearch( tibTemp );
-                const triSurface& cibTemp( cBody.getTriSurfMesh());
-                triSurfaceSearch cibTriSurfSearch( cibTemp );
+//                 const triSurface& tibTemp( tBody.getTriSurfMesh());
+//                 triSurfaceSearch tibTriSurfSearch( tibTemp );
+//                 const triSurface& cibTemp( cBody.getTriSurfMesh());
+//                 triSurfaceSearch cibTriSurfSearch( cibTemp );
                 const pointField& pp = mesh_.points();
                 
-                boolList tcenterInsideList = tibTriSurfSearch.calcInside( mesh_.C());
-                boolList ccenterInsideList = cibTriSurfSearch.calcInside( mesh_.C());
+                boolList tcenterInsideList = tBody.getGeomModel().pointInside(mesh_.C());
+                boolList ccenterInsideList = cBody.getGeomModel().pointInside(mesh_.C());
 
                 // iterate over all surfCells and intCells to evaluate intersected volume
                 forAll (cSurfCells[Pstream::myProcNo()],cSCellI)
@@ -2295,8 +2252,8 @@ void openHFDIBDEM::detectPrtContact()
                     {                        
                         const labelList& vertexLabels = mesh_.cellPoints()[cSurfCells[Pstream::myProcNo()][cSCellI]];
                         const pointField vertexPoints(pp,vertexLabels);
-                        boolList tvertexesInside = tibTriSurfSearch.calcInside( vertexPoints );
-                        boolList cvertexesInside = cibTriSurfSearch.calcInside( vertexPoints );
+                        boolList tvertexesInside = tBody.getGeomModel().pointInside( vertexPoints );
+                        boolList cvertexesInside = cBody.getGeomModel().pointInside( vertexPoints );
                         bool tcenterInside(tcenterInsideList[cSurfCells[Pstream::myProcNo()][cSCellI]] );
                         bool ccenterInside(ccenterInsideList[cSurfCells[Pstream::myProcNo()][cSCellI]] );
                         scalar rVInSize(1.0/(tvertexesInside.size()+1));
@@ -2328,8 +2285,8 @@ void openHFDIBDEM::detectPrtContact()
                     {                        
                         const labelList& vertexLabels = mesh_.cellPoints()[cIntCells[Pstream::myProcNo()][cSCellI]];
                         const pointField vertexPoints(pp,vertexLabels);
-                        boolList tvertexesInside = tibTriSurfSearch.calcInside( vertexPoints );
-                        boolList cvertexesInside = cibTriSurfSearch.calcInside( vertexPoints );
+                        boolList tvertexesInside = tBody.getGeomModel().pointInside( vertexPoints );
+                        boolList cvertexesInside = cBody.getGeomModel().pointInside( vertexPoints );
                         bool tcenterInside(tcenterInsideList[cIntCells[Pstream::myProcNo()][cSCellI]] );
                         bool ccenterInside(ccenterInsideList[cIntCells[Pstream::myProcNo()][cSCellI]] );
                         scalar rVInSize(1.0/(tvertexesInside.size()+1));
@@ -2385,210 +2342,116 @@ void openHFDIBDEM::restartSimulation
 (
     volScalarField& body,
     volScalarField& refineF,
-    word runTime,
-    word prevLogPath
+    word runTime
 )
 {
-    word dir(runTime);
-    
-    if(exists("processor0"))
-        dir = "processor0/" + runTime;
-    
-    fileNameList files(readDir(dir));
-    string suffix(".stl");
-    wordList bodyNames;
-    wordList bodyDictNames;
-    DynamicVectorList vel;
-    DynamicScalarList angVel;
-    DynamicVectorList rotAxis;
+    word timePath(recordOutDir_+"/"+runTime);
+    fileNameList files(readDir(timePath));
+    scalar thrSurf(readScalar(HFDIBDEMDict_.lookup("surfaceThreshold")));
     
     forAll(files,f)
-    {
-        if(files[f].size() >= suffix.size() && files[f].compare(files[f].size() - suffix.size(), suffix.size(), suffix) == 0)
-            bodyNames.append(files[f]);
-    }
-    
-    vel.setSize(bodyNames.size());
-    bodyDictNames.setSize(bodyNames.size());
-    angVel.setSize(bodyNames.size());
-    rotAxis.setSize(bodyNames.size());
-    boolList setStatic(bodyNames.size(),false);
-    labelList timesInContact(bodyNames.size(),0);
-    
-    
-    string pathi(mesh_.time().path() + "/" + runTime + "/" + prevLogPath);
-    IFstream fileStream(pathi);
-    string line;
-    string timeString("Time = ");
-    string bodyString("-- body ");
-    string velString("  linear velocity:");
-    string angString(" angular velocity:");
-    string axisString("    rotation axis:");
-    string setStaticString(" set as Static");
-    string timesInCntWStaticString(" timeStepsInContWStatic_: ");
-    string newBody("New bodyID: ");
-    bool inTime(false);
-    bool cont(true);
-    
-    Info << "Reading file to restart simulation" << endl;
-    
-    while(cont && getline(fileStream.stdStream(),line))
     {        
-        if(inTime)
-        {
-            forAll(bodyNames, nameI)
-            {
-                if(line.find(bodyString + bodyNames[nameI].substr(0,bodyNames[nameI].size() - suffix.size()) + velString) != std::string::npos)
-                {
-                    label ind1 = line.find("(");
-                    label ind2 = line.find(" ",ind1);
-                    DynamicScalarList comps;
-                    comps.append(stod(line.substr(ind1+1,ind2-ind1-1)));
-                    ind1 = ind2+1;
-                    ind2 = line.find(" ",ind1);
-                    comps.append(stod(line.substr(ind1,ind2-ind1)));
-                    ind1 = ind2+1;
-                    ind2 = line.find(")",ind1);
-                    comps.append(stod(line.substr(ind1,ind2-ind1)));
-                    vector veli(comps[0],comps[1],comps[2]);
-                    vel[nameI] = veli;
-                }
-                
-                if(line.find(bodyString + bodyNames[nameI].substr(0,bodyNames[nameI].size() - suffix.size()) + angString) != std::string::npos)
-                {
-                    label ind1 = line.find(":");
-                    label ind2 = line.find(" ",ind1);
-                    scalar angi;
-                    angi = stod(line.substr(ind1+1,ind2-ind1-1));
-                    angVel[nameI] = angi;                    
-                }
-                
-                if(line.find(bodyString + bodyNames[nameI].substr(0,bodyNames[nameI].size() - suffix.size()) + axisString) != std::string::npos)
-                {
-                    label ind1 = line.find("(");
-                    label ind2 = line.find(" ",ind1);
-                    DynamicScalarList comps;
-                    comps.append(stod(line.substr(ind1+1,ind2-ind1-1)));
-                    ind1 = ind2+1;
-                    ind2 = line.find(" ",ind1);
-                    comps.append(stod(line.substr(ind1,ind2-ind1)));
-                    ind1 = ind2+1;
-                    ind2 = line.find(")",ind1);
-                    comps.append(stod(line.substr(ind1,ind2-ind1)));
-                    vector rotAxisi(comps[0],comps[1],comps[2]);
-                    rotAxis[nameI] = rotAxisi;
-                }
-                
-                if(line.find(bodyString + bodyNames[nameI].substr(0,bodyNames[nameI].size() - suffix.size()) + timesInCntWStaticString) != std::string::npos)
-                {
-                    label ind1 = line.find(":");
-                    ind1 ++;
-                    label timesInCont;
-                    timesInCont = stoi(line.substr(ind1+1,line.size()-ind1-1));
-                    timesInContact[nameI] = timesInCont;                    
-                }
-                
-                if(line.find(bodyString + bodyNames[nameI].substr(0,bodyNames[nameI].size() - suffix.size()) + setStaticString) != std::string::npos)
-                {
-                    setStatic[nameI] = true;
-                }
-                
-                if(line.find(timeString) != std::string::npos && line.find("Exec") == std::string::npos)
-                {
-                    cont = false;
-                }
-                
-                if(line.find(newBody + bodyNames[nameI].substr(0,bodyNames[nameI].size() - suffix.size()) + " ") != std::string::npos)
-                {
-                    label ind1 = line.find("name: ");
-                    ind1 += 6;                        
-                    label ind2 = line.find(" ",ind1);
-                    word dictName;
-                    dictName = line.substr(ind1,ind2-ind1);
-                    bodyDictNames[nameI] = dictName;
-                    break;
-                }
-            }            
-        }
-        else
-        {
-            if(line.find(timeString + runTime) != std::string::npos)
-            {
-                Info << "File found right time" << endl;
-                inTime = true;
-            }
-            
-            if(line.find(setStaticString) != std::string::npos)
-            {
-                forAll(bodyNames, nameI)
-                {
-                    if(line.find(bodyString + bodyNames[nameI].substr(0,bodyNames[nameI].size() - suffix.size()) + setStaticString) != std::string::npos)
-                    {
-                        setStatic[nameI] = true;
-                        break;
-                    }
-                }
-            }
-            
-            if(line.find(newBody) != std::string::npos)
-            {
-                forAll(bodyNames, nameI)
-                {
-                    if(line.find(newBody + bodyNames[nameI].substr(0,bodyNames[nameI].size() - suffix.size()) + " ") != std::string::npos)
-                    {
-                        label ind1 = line.find("name: ");
-                        ind1 += 6;                        
-                        label ind2 = line.find(" ",ind1);
-                        word dictName;
-                        dictName = line.substr(ind1,ind2-ind1);
-                        bodyDictNames[nameI] = dictName;
-                        break;
-                    }
-                }
-            }
-        }
-    }
-    Info << "File read" << endl;
-    
-    forAll(bodyNames, nameI)
-    {
-        triSurfaceMesh bodySurfMesh
+        IOdictionary bodyDict
         (
             IOobject
             (
-                bodyNames[nameI],
-                runTime,
+                timePath + "/" + files[f],
                 mesh_,
                 IOobject::MUST_READ,
                 IOobject::NO_WRITE
             )
         );
-        triSurface triToRet(bodySurfMesh);
+        
+        word bodyId(std::to_string(readLabel(bodyDict.lookup("bodyId"))));
+        word bodyName(bodyDict.lookup("bodyName"));
+        vector Vel(bodyDict.lookup("Vel"));
+        scalar omega(readScalar(bodyDict.lookup("omega")));
+        vector Axis(bodyDict.lookup("Axis"));
+        bool isStatic(readBool(bodyDict.lookup("static")));
+        label timeStepsInContWStatic(readLabel(bodyDict.lookup("timeStepsInContWStatic")));
+        
+        autoPtr<geomModel> bodyGeomModel;
+        word bodyGeom;
+        // check if the immersedDict_ contains bodyGeom
+        if (HFDIBDEMDict_.subDict(bodyName).found("bodyGeom"))
+        {  
+            word input = HFDIBDEMDict_.subDict(bodyName).lookup("bodyGeom");
+            bodyGeom = input;
+            Info << "Found bodyGeom for " << bodyName << ", the body is: " << bodyGeom << endl;
+        }
+        else
+        {
+            bodyGeom = "convex";
+            Info << "Did not find bodyGeom for " << bodyName << ", using bodyGeom: " << bodyGeom << endl;
+        }
+        
+        if(bodyGeom == "convex")
+        {
+            word stlPath(timePath + "/stlFiles/"+bodyId+".stl");
+            bodyGeomModel.set(new convexBody(mesh_,stlPath,thrSurf,geometricD_));
+        }
+        else if(bodyGeom == "nonConvex")
+        {            
+            word stlPath(timePath + "/stlFiles/"+bodyId+".stl");
+            bodyGeomModel.set(new nonConvexBody(mesh_,stlPath,thrSurf,geometricD_));
+        }
+        else if(bodyGeom == "sphere")
+        {
+            vector startPosition = bodyDict.subDict("sphere").lookup("position");
+            scalar radius = readScalar(bodyDict.subDict("sphere").lookup("radius"));
+            
+            bodyGeomModel.set(new sphereBody(mesh_,startPosition,radius,thrSurf,geometricD_));
+        }
+        else
+        {
+            word stlPath(timePath + "/stlFiles/"+bodyId+".stl");
+            Info << "bodyGeom: " << bodyGeom << " not supported, using bodyGeom nonConvex" << endl;
+            bodyGeom = "nonConvex";
+            bodyGeomModel.set(new nonConvexBody(mesh_,stlPath,thrSurf,geometricD_));
+        }
         
         label newIBSize(immersedBodies_.size()+1);
         label addIBPos(newIBSize - 1);
         immersedBodies_.setSize(newIBSize);
         
-        Info << "Trying to set immersedBodies" << endl;
-        Info << "Restarting body: " << bodyNames[nameI] << " as " << addIBPos << " dictName: " << bodyDictNames[nameI] << endl;
+        Info << "Restarting body: " << bodyId << " as " << addIBPos << " bodyName: " << bodyName << endl;
         immersedBodies_.set
         (
             addIBPos,
             new immersedBody
             (
-                triToRet,
-                bodyDictNames[nameI],
+                bodyName,
                 mesh_,
                 HFDIBDEMDict_,
                 transportProperties_,
                 addIBPos,
                 recomputeM0_,
-                geometricD_
+                geometricD_,
+                bodyGeomModel.ptr(),
+                cellPoints_
             )
         );
+        
         immersedBodies_[addIBPos].createImmersedBody(body,refineF);
         immersedBodies_[addIBPos].computeBodyCharPars();
-        immersedBodies_[addIBPos].setRestartSim(vel[nameI],angVel[nameI],rotAxis[nameI],setStatic[nameI],timesInContact[nameI],bodyNames[nameI]);
+        immersedBodies_[addIBPos].setRestartSim(Vel,omega,Axis,isStatic,timeStepsInContWStatic);
+    }
+}
+//---------------------------------------------------------------------------//
+void openHFDIBDEM::preCalculateCellPoints()
+{
+    cellPoints_.clear();
+    cellPoints_.setSize(mesh_.nCells());
+    const pointField& pp = mesh_.points(); 
+    forAll(mesh_.C(), cellI)
+    {
+        labelList vertexLabels = mesh_.cellPoints()[cellI];
+        cellPoints_[cellI] = filterField(pp,vertexLabels);
+    }
+    
+    forAll (immersedBodies_,bodyId)
+    {
+        immersedBodies_[bodyId].getGeomModel().resetHashTable();
     }
 }
 //---------------------------------------------------------------------------//

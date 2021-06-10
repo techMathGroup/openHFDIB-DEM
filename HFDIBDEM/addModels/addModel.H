@@ -44,6 +44,11 @@ Contributors
 #include "dynamicFvMesh.H"
 #include "triSurfaceMesh.H"
 
+#include "geomModel.H"
+#include "convexBody.H"
+#include "nonConvexBody.H"
+#include "sphereBody.H"
+
 namespace Foam
 {    
     class addModel
@@ -51,12 +56,17 @@ namespace Foam
     
         private:
         
-        protected:
+        protected:            
+
+        const  dynamicFvMesh&       mesh_;
         
         public:
         
         // Constructors ------------------------------------------------
-        addModel();
+        addModel(const dynamicFvMesh& mesh)
+        :
+        mesh_(mesh)
+        {}
         
         // Destructors -------------------------------------------------
         virtual ~addModel();
@@ -81,9 +91,11 @@ namespace Foam
         // Note: check current conditions in simulation and return
         //       true if a body should be added
         
-        virtual triSurface addBody(const volScalarField& body)
+        virtual geomModel* addBody(const volScalarField& body)
         {
-            Info << "-- addModelMessage-- " << "notImplemented" << endl;return triSurface();
+            Info << "-- addModelMessage-- " << "notImplemented" << endl;
+            geomModel* bodyGeomModel = new geomModel(mesh_);
+            return bodyGeomModel;
         }
         // Note: needs to provide a properly scaled/oriented/translated
         //       triSurface that will be used for IB initialization

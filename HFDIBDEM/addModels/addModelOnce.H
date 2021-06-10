@@ -50,10 +50,8 @@ namespace Foam
         private:
         const dictionary&       addModelDict_;
         word                    addMode_;
-        const word              stlName_;
         bool                    bodyAdded_;
-        
-        const  dynamicFvMesh&   mesh_;
+        autoPtr<geomModel> geomModel_;
         
         protected:
         
@@ -64,9 +62,9 @@ namespace Foam
         addModelOnce
         (
             const dictionary& addModelDict,
-            const word        stlName,
             const Foam::dynamicFvMesh& mesh,
-            const bool startTime0
+            const bool startTime0,
+            geomModel* bodyGeomModel
         );
         
         // Destructors -------------------------------------------------
@@ -80,14 +78,8 @@ namespace Foam
         //~ void init();
         
         bool shouldAddBody(const volScalarField& body){return not bodyAdded_;}
-        
-        triSurface addBody(const volScalarField& body);
-        
-        bool canAddBody
-        (
-            const volScalarField& body,
-            const triSurfaceMesh& bodySurfMesh
-        );
+
+        geomModel* addBody(const volScalarField& body);
         
         bool getBodyAdded(){return bodyAdded_;}
         

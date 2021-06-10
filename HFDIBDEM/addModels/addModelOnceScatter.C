@@ -38,18 +38,18 @@ using namespace Foam;
 addModelOnceScatter::addModelOnceScatter
 (
     const dictionary& addModelDict,
-    const word        stlName,
     const Foam::dynamicFvMesh& mesh,
     const bool startTime0,
-    const Vector<label> geomDir
+    const Vector<label> geomDir,
+    geomModel* bodyGeomModel
 )
 :
+addModel(mesh),
 addModelDict_(addModelDict),
 addMode_(word(addModelDict_.lookup("addModel"))),
-stlName_(stlName),
 bodyAdded_(false),
 finishedAddition_(false),
-mesh_(mesh),
+geomModel_(bodyGeomModel),
 
 coeffsDict_(addModelDict_.subDict(addMode_+"Coeffs")),
 
@@ -103,7 +103,7 @@ allActiveCellsInMesh_(true),
 nGeometricD_(0),
 geometricD_(geomDir),
 randGen_(clock::getTime())
-{
+{    
     if(!startTime0)
     {
         finishedAddition_ = true;
@@ -295,40 +295,14 @@ bool addModelOnceScatter::shouldAddBody(const volScalarField& body)
     
 }
 //---------------------------------------------------------------------------//
-triSurface addModelOnceScatter::addBody
+geomModel* addModelOnceScatter::addBody
 (
     const   volScalarField& body
 )
 {
+    geomModel_->resetBody();
+    
     bodyAdditionAttemptCounter_++;
-    // load the STL file
-    triSurfaceMesh bodySurfMesh
-    (
-        IOobject
-        (
-            stlName_ +".stl",
-            "constant",
-            "triSurface",
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::NO_WRITE
-        )
-    );
-    
-    
-    
-    // get the working bounding box center
-    point bBoxCenter = cellZoneBounds_.midpoint();
-    pointField bodyPoints(bodySurfMesh.points());
-    
-    // get its center of mass
-    vector CoM = gSum(bodyPoints/bodyPoints.size());
-    Info << "-- addModelMessage-- " << "original STL-based CoM: " << CoM << endl;
-    
-    // move the body to the center of the bounding box
-    bodyPoints += bBoxCenter-CoM;
-    CoM         = bBoxCenter;
-    bodySurfMesh.movePoints(bodyPoints);
     
     // rotate
     if (rotateParticles_)
@@ -340,50 +314,27 @@ triSurface addModelOnceScatter::addBody
         }
         Info << "-- addModelMessage-- " << "Will rotate by " << rotAngle << " PiRad around axis " << axisOfRot_ << endl;
         
-        tensor rotMatrix(Foam::cos(rotAngle)*tensor::I);
-		
-		rotMatrix += Foam::sin(rotAngle)*tensor(
-             0.0,      -axisOfRot_.z(),  axisOfRot_.y(),
-             axisOfRot_.z(), 0.0,       -axisOfRot_.x(),
-            -axisOfRot_.y(), axisOfRot_.x(),  0.0
-		);
-        
-        rotMatrix += (1.0-Foam::cos(rotAngle))*(axisOfRot_ * axisOfRot_);
-        
-        bodyPoints -= CoM;
-        bodyPoints = rotMatrix & bodyPoints;
-        bodyPoints += CoM;
-        
-        bodySurfMesh.movePoints(bodyPoints);
-        //~ CoM = gSum(bodySurfMesh.coordinates())/bodySurfMesh.size();
+        geomModel_->bodyRotatePoints(rotAngle,axisOfRot_);
     }
     
     // scale
     if (scaleApplication_ or scaleRandomApplication_)
     {
         if (scaleRandomApplication_){scaleStep_ = returnRandomScale();}
-        bodySurfMesh.scalePoints(scaleStep_);
-        //~ CoM = gSum(bodySurfMesh.coordinates())/bodySurfMesh.size();
+        geomModel_->bodyScalePoints(scaleStep_);
     }
     // Note (MI): there should be no change in CoM after rotation and
-    //            scaling BUT CoM is approximate...
+    //            scaling BUT CoM is approximate...  
     
-    // translate
-    bodyPoints = bodySurfMesh.points();
-    if (nGeometricD_ < 3)
-    {
-        const vector validDirs = (geometricD_ + Vector<label>::one)/2;
-        CoM -= cmptMultiply((vector::one - validDirs),CoM);
-        CoM += cmptMultiply((vector::one - validDirs),0.5*(mesh_.bounds().max() + mesh_.bounds().min()));
-    }//project CoM onto current solution plane (if needed)
+    vector CoM(geomModel_->getCoM());
+    point bBoxCenter = cellZoneBounds_.midpoint(); 
+    geomModel_->bodyMovePoints(bBoxCenter - CoM);
     
-    vector randomTrans = returnRandomPosition(CoM,bodySurfMesh);
-    bodyPoints += randomTrans;
-    
-    bodySurfMesh.movePoints(bodyPoints);
+    vector randomTrans = geomModel_->addModelReturnRandomPosition(allActiveCellsInMesh_,cellZoneBounds_,randGen_);
+    geomModel_->bodyMovePoints(randomTrans);
     
     // check if the body can be added
-    bool canAddBodyI(canAddBody(body,bodySurfMesh));
+    bool canAddBodyI(geomModel_->canAddBody(body));
     reduce(canAddBodyI, andOp<bool>());    
     bodyAdded_ = (canAddBodyI);
     
@@ -420,18 +371,7 @@ triSurface addModelOnceScatter::addBody
 		scaleCorrectionCounter_ = 0;
 	}
     
-    triSurface triToRet(bodySurfMesh);
-    
-    return triToRet;
-}
-//---------------------------------------------------------------------------//
-bool addModelOnceScatter::canAddBody
-(
-    const volScalarField& body,
-    const triSurfaceMesh& bodySurfMesh
-)
-{
-    #include "canAddBodySource.H"
+    return geomModel_->getGeomModel();
 }
 // MODEL SPECIFIC FUNCTIONS==================================================//
 //---------------------------------------------------------------------------//
@@ -586,113 +526,3 @@ vector addModelOnceScatter::returnRandomRotationAxis()
 	return axisOfRotation;
 }
 //---------------------------------------------------------------------------//
-vector addModelOnceScatter::returnRandomPosition
-(
-    const point           CoM,
-    const triSurfaceMesh& bodySurfMesh
-)
-{
-    // Note (MI): this function will always return acceptable random
-    //            position IF
-    //            -> body boundBox is completely inside active boundBox
-    //            AND
-    //            -> active boundBox is completely contained in the mesh
-    //
-    // Note (MI): the check if body boundBox is inside active boundBox
-    //            is simple and probably unecessary
-    // Note (MI): an efficient check if all the active boundBox is inside
-    //            mesh is an open issue at the moment
-    vector ranVec(vector::zero);
-    for (label randomVecAddCounter=0;randomVecAddCounter < 100;randomVecAddCounter++)
-    {        
-        Info << "-- addModelMessage-- " << "position generation attempt: " << randomVecAddCounter << endl;
-        
-        // get the bodySurfMesh points
-        pointField bSMeshPts = bodySurfMesh.points();
-        
-        // get the bodySurfMesh boundBox
-        const boundBox& bodySurfBounds(bSMeshPts);
-        
-        // compute the max scales to stay in active bounding box
-        vector maxScales(cellZoneBounds_.max() - bodySurfBounds.max());
-        maxScales -= cellZoneBounds_.min() - bodySurfBounds.min();
-        maxScales *= 0.5*0.9;//0.Y is there just to be sure 
-        
-        Info << "-- addModelMessage-- " << "acceptable movements: " << maxScales << endl;
-        
-        scalar ranNum = 0;
-        for (int i=0;i<3;i++)
-        {
-            ranNum = 2.0*maxScales[i]*randGen_.scalar01() - 1.0*maxScales[i];
-            ranVec[i] = ranNum;
-        }
-        
-        vector validDirs((geometricD_ + Vector<label>::one)/2);
-        ranVec = cmptMultiply(validDirs,ranVec);//translate only with respect to valid directions
-        
-        // ok, now I need to check if the generated vector is OK
-        // (this is the fun part of the code...)
-        // potential fail 1:
-        // -> the bodySurfMesh bounding box is NOT fully contained in
-        //    active boundBox
-        // potential fail 2:
-        // -> the active boundBox is NOT fully contained in the mesh
-        // if either of these conditions is met, I need to check all the
-        // TRANSLATED bodySurfMesh POINTS if they ARE INSIDE the mesh
-        
-        // 1. check for potential fails 1
-        bool    bodySurfBoundsContained(false);
-        label   containedDirs(0);
-        for (label i=0;i<3;i++)
-        {
-            if (validDirs[i] < SMALL){containedDirs++;}
-            else
-            {
-                bool maxCheck(cellZoneBounds_.max()[i] - bodySurfBounds.max()[i] > SMALL);
-                bool minCheck(cellZoneBounds_.min()[i] - bodySurfBounds.min()[i] < SMALL);
-                if (maxCheck and minCheck) {containedDirs++;} 
-            }
-        }
-        if (containedDirs == 3){bodySurfBoundsContained = true;}
-        // Note (MI): potential fail 2 is prechecked during addModel
-        //            initialization -> bool allActiveCellsInMesh_
-        
-        if (not bodySurfBoundsContained or not allActiveCellsInMesh_)
-        {
-            bSMeshPts+=ranVec;
-            if (nGeometricD_ < 3)
-            {
-                bSMeshPts = cmptMultiply(validDirs,bSMeshPts);
-                bSMeshPts += cmptMultiply((vector::one - validDirs),0.5*(mesh_.bounds().max() + mesh_.bounds().min()));
-            }
-            
-            if (not bodySurfBoundsContained)
-            {
-                Info << "-- addModelMessage-- " << "body boundingBox is NOT fully contained in active boundingBox" << endl;
-                Info << "-- addModelMessage-- " << "active boundingBox  : " << cellZoneBounds_ << endl;
-                Info << "-- addModelMessage-- " << "surfMesh boundingBox: " << bodySurfBounds << endl;
-            }
-            else
-            {
-                Info << "-- addModelMessage-- " << "need to check if all the bodyPoints are inside mesh" << endl;
-            }
-            meshSearch searchEng(mesh_);
-            forAll (bSMeshPts,pointI)
-            {
-                bool isSurfPtInsideMesh = searchEng.isInside(bSMeshPts[pointI]);
-                if (not isSurfPtInsideMesh)
-                {
-                    Info << "-- addModelMessage-- " << "move resulted in invalid position" << endl;
-                    Info << "-- addModelMessage-- " << "discarding vector" << endl;
-                    ranVec *= 0.0;
-                    break;
-                }
-            }
-        }
-        
-        if (mag(ranVec) > SMALL) {return ranVec;}
-        
-    }
-        
-    return ranVec;
-}

@@ -34,9 +34,6 @@ Contributors
 using namespace Foam;
 
 //---------------------------------------------------------------------------//
-addModel::addModel()
-{
-}
 addModel::~addModel()
 {
 }

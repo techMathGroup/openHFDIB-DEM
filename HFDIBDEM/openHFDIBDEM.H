@@ -83,13 +83,16 @@ namespace Foam
     dictionary              HFDIBinterpDict_;
     IOdictionary            transportProperties_;
     
-    const wordList          stlNames_;
+    const wordList          bodyNames_;
 
     //Immersed bodies objects
     PtrList<immersedBody> immersedBodies_;
     
     //addModels (how to add the baseObjects)
     PtrList<addModel> addModels_;
+    
+    //Precalculate cellPoints for better performace
+    List<pointField> cellPoints_;
     
     //Contact variables (global)
     //spring stiffness for normal contact force (walls)
@@ -155,6 +158,9 @@ namespace Foam
     DynamicScalarList prtContactArea_;
     // number of DEM loops
     DynamicScalarList numberOfDEMloops_;
+    //record simulation for start from lastTime possibility
+    bool recordSimulation_;
+    word recordOutDir_;
     // Method for iteration over list and find if the pair is present in given list
     label findIndexOfPairInNeighbourList(DynamicList<Tuple2<label, label>>& listToSearch, Tuple2<label, label> pair);
     // Update positions of bounding points
@@ -179,7 +185,7 @@ namespace Foam
     public:
     
     openHFDIBDEM(const Foam::dynamicFvMesh& mesh);
-    openHFDIBDEM(const Foam::dynamicFvMesh& mesh, const wordList stlNames);
+    openHFDIBDEM(const Foam::dynamicFvMesh& mesh, const wordList bodyNames);
     ~openHFDIBDEM();
     
     //~ void initialize(volScalarField& body);
@@ -232,7 +238,7 @@ namespace Foam
     }
     
     // save the moved STL files
-    void writeBodySurfMeshes();
+    void writeBodiesInfo();
     
     // add or remove bodies from the simulation
     //~ void addRemoveBodies(volScalarField& body);
@@ -277,9 +283,10 @@ namespace Foam
     (
         volScalarField& body,
         volScalarField& refineF,
-        word runTime,
-        word prevLogPath
+        word runTime
     );
+    
+    void preCalculateCellPoints();
 
  };
 
