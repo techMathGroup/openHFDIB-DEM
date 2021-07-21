@@ -26,4 +26,4 @@ Created contactModel library
 	-Containing namespace contactModel
 		-Gives access to functions resolving contactModel
 		-Specific functions listed in wallContact and prtPrtContact
-		-Other files contains holders for contact variables
+		-Other files contains holders for contact variables!
