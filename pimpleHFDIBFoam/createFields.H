@@ -1,3 +1,5 @@
+#include "createRDeltaT.H"
+
 Info<< "Reading field p\n" << endl;
 volScalarField p
 (
@@ -117,9 +119,9 @@ dimensionedScalar rho = dimensionedScalar(
 
 singlePhaseTransportModel laminarTransport(U, phi);
 
-autoPtr<incompressible::turbulenceModel> turbulence
+autoPtr<incompressible::momentumTransportModel> turbulence
 (
-    incompressible::turbulenceModel::New(U, phi, laminarTransport)
+    incompressible::momentumTransportModel::New(U, phi, laminarTransport)
 );
 
 
@@ -134,5 +136,3 @@ IOdictionary HFDIBDEMDict
         IOobject::NO_WRITE
     )
 );
-
-scalar thrSurf(readScalar(HFDIBDEMDict.lookup("surfaceThreshold")));

@@ -44,8 +44,10 @@ Contributors
 #include "dynamicFvMesh.H"
 #include "triSurfaceMesh.H"
 
+#include "contactType.H"
+
 namespace Foam
-{       
+{           
     // custom field filtration 
     template<class Type>
     Foam::tmp<Foam::Field<Type>>
@@ -78,6 +80,10 @@ namespace Foam
         protected:
             
         const  dynamicFvMesh&   mesh_; 
+        
+        //contact type based on geometry
+        const contactType contactType_;
+        
         //list to find the owner of the IB
         DynamicLabelList ibPartialVolume_;
         label owner_;
@@ -91,12 +97,29 @@ namespace Foam
         boundBox curMeshBounds_;
         HashTable<pointField,label,Hash<label>> lastIbPoints_;
         
+        //Body mass
+        scalar M_;
+        scalar M0_;                                                     //initial mass (at addition)
+        
+        //Location of center of mass
+        vector CoM_;
+        
+        //Moment of intertia tensor
+        symmTensor  I_;        
+        
+        //characteristic diameter of the body
+        scalar  dC_;
+        
+        //body density
+        dimensionedScalar rhoS_;
+        
         public:
         
         // Constructors ------------------------------------------------
         geomModel
         (
             const  dynamicFvMesh&   mesh,
+            contactType cType = arbShape,
             scalar  thrSurf = 1,
             Vector<label> geometricD = {1,1,1}
         );
@@ -112,17 +135,17 @@ namespace Foam
             List<DynamicLabelList>& intCells,
             List<pointField>& cellPoints
         )
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}    
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}    
         
         virtual bool canAddBody
         (
             const volScalarField& body
         )
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl; return false;} 
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return false;} 
         
         virtual geomModel* getGeomModel()
         {
-            Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;
+            Info << "-- geomModelMessage-- " << "notIplemented"<<endl;
             geomModel* bodyGeomModel = new geomModel(mesh_);
             return bodyGeomModel;            
         } 
@@ -132,49 +155,57 @@ namespace Foam
             const boundBox  cellZoneBounds,       
             Random&         randGen
         )
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl; return vector::zero;}  
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return vector::zero;}  
         
         virtual void bodyMovePoints(vector translVec)        
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;} 
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;} 
         
         virtual void bodyScalePoints(scalar scaleFac)        
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
         
         virtual void bodyRotatePoints
         (
             scalar rotAngle,
             vector axisOfRot
         )      
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
             
         virtual void resetBody()
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
         
         virtual vector getCoM()
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl; return vector::zero;}
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return vector::zero;}
         
         virtual boundBox getBounds()
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl; 
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; 
             boundBox bound;
             return bound;}
         
          virtual void recordHistory()
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
         
          virtual void returnHistory()
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
         
         virtual void synchronPos()
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
         
         virtual void writeBodyInfo(label bodyId, IOdictionary& dict, word path)
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
         
         virtual boolList pointInside(pointField pointI)
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl; return {false};}
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return {false};}
         
         virtual vector getClosestNormal(point startPoint, vector span)
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl; return vector::zero;}
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return vector::zero;}        
+                
+        virtual scalar getDC()
+        {
+            return dC_;
+        }
+        
+        contactType getcType()
+        {return contactType_;}
                 
         label getOwner()
         {    
@@ -197,6 +228,51 @@ namespace Foam
         void setSdBasedLambda(bool sdBasedLambda){sdBasedLambda_ = sdBasedLambda;}
         
         void resetHashTable(){lastIbPoints_.clear();}
+        
+        void setRhoS(dimensionedScalar rhoS){rhoS_ = rhoS;}
+        dimensionedScalar getRhoS(){return rhoS_;}
+        
+        void calculateGeometricalProperties(
+            volScalarField& body,
+            List<DynamicLabelList>& surfCells,
+            List<DynamicLabelList>& intCells
+        );
+        
+        //Evaluate center of mass and inertia tensor
+        void addToMAndI
+        (
+            volScalarField& body,
+            DynamicLabelList& labelCellLst,
+            vector& tmpCom,
+            vector CoMOld
+        );
+        
+        void computeBodyCharPars(List<DynamicLabelList>& surfCells);
+        
+        const scalar& getM0()    const
+        {
+            return M0_;
+        }
+        
+        const scalar& getM()    const
+        {
+            return M_;
+        }
+        
+        const dimensionedScalar& getRhoS()    const
+        {
+            return rhoS_;
+        }
+        
+        const vector& getCoM()  const
+        {
+            return CoM_;
+        }
+        
+        const symmTensor& getI()    const
+        {
+            return I_;
+        }        
     };
 }
 #endif

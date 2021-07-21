@@ -71,6 +71,7 @@ namespace Foam
         stlBased
         (
             mesh,
+            arbShape,
             stlPath,
             thrSurf,
             geometricD

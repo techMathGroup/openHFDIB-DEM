@@ -15,8 +15,8 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-// dynamicFvMesh   staticFvMesh;
-dynamicFvMesh   dynamicRefineFvMesh;
+dynamicFvMesh   staticFvMesh;
+// dynamicFvMesh   dynamicRefineFvMesh;
 //~ 
 //~ dynamicFvMesh   solidBodyMotionFvMesh;
 

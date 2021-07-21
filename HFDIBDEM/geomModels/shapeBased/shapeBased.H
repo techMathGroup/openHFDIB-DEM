@@ -63,6 +63,7 @@ namespace Foam
         shapeBased
         (
             const  dynamicFvMesh&   mesh,
+            contactType cType,
             scalar  thrSurf,
             Vector<label> geometricD
         );

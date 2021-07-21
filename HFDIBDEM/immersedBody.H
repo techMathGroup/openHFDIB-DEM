@@ -46,6 +46,7 @@ Contributors
 #include "convexBody.H"
 #include "nonConvexBody.H"
 
+#include "contactInfo.H"
 
 namespace Foam
 {   
@@ -83,17 +84,8 @@ namespace Foam
         // name of the STL to base the body on
         word    bodyName_;
         
-        //is the particle in contact with other particles
-        bool    isInPrtContact_;
-        
-        //is the particle in contact with wall
-        bool    isInWallContact_;
-        
         //is the particle active in the simulation
         bool    isActive_;
-        
-        //did the body move enough that it needs to be reprojected?
-        bool    recomputeProjection_;
         
         //Dictionary
         dictionary&             immersedDict_;
@@ -105,16 +97,11 @@ namespace Foam
         dictionary&             transportProperties_;
         
         autoPtr<geomModel> geomModel_;
+        
+        autoPtr<contactInfo> contactInfo_;
+        
         //Precalculate cellPoints for better performace
         List<pointField>& cellPoints_;
-        
-        
-        //Body mass
-        scalar M_;
-        scalar M0_;                                                     //initial mass (at addition)
-        
-        //Location of center of mass
-        vector CoM_;
         
         //Rotation axis
         vector Axis_;
@@ -137,35 +124,11 @@ namespace Foam
         //Total Rodrigues angle of the body
         vector totalAngle_;
         
-        //Moment of intertia tensor
-        symmTensor  I_;
-        
         //Forces acting on the particle
         vector  F_;
         
         //Total torque acting on the particle
         vector  T_;
-        
-        //spring stiffness for normal contact force
-        scalar  kN_;
-        
-        //spring stiffness for tangential contact force
-        scalar  kt_;
-        
-        //damping coefficient for normal contact force
-        scalar gammaN_;
-        
-        //damping coefficient for tangential contact force
-        scalar gammat_;
-        
-        //friction coefficient
-        scalar mu_;
-        
-        //adhesion coefficient for normal contact force
-        scalar adhN_;
-        
-        //adhesion coefficient for normal contact force
-        scalar adhEqui_;
         
         //maximal body Courant number based on its linear velocity
         scalar CoNum_;
@@ -175,12 +138,6 @@ namespace Foam
         
         //fluid density
         dimensionedScalar rhoF_;
-        
-        //body density
-        dimensionedScalar rhoS_;
-        
-        //characteristic diameter of the body
-        scalar  dC_;
         
         //integer to identify current body
         label   bodyId_;
@@ -207,12 +164,6 @@ namespace Foam
         //internal cells
         List<DynamicLabelList>  intCells_;
         
-        //faces in contact with walls
-        List<DynamicLabelList>  wallContactFaces_;
-        
-        // helper list to hold faces that were already checked for wall contact
-        DynamicLabelList wallContactFacesHelp_;
-        
         //processor num that owns the IB
         label owner_;
         
@@ -227,34 +178,7 @@ namespace Foam
         );
         
         //Create interpolation points
-        void  calculateInterpolationPoints(volScalarField& body);
-        
-        //Evaluate center of mass and inertia tensor
-        vector addToMAndI
-        (
-            volScalarField& body,
-            DynamicLabelList& labelCellLst,
-            vector tmpCom
-        );
-        
-        vector addToM
-        (
-            volScalarField& body,
-            DynamicLabelList& labelCellLst,
-            vector tmpCom
-        );
-        
-        void addToI
-        (
-            volScalarField& body,
-            DynamicLabelList& labelCellLst
-        );
-        
-        void calculateGeometricalProperties(volScalarField& body);
-        void calculateGeometricalProperties2(volScalarField& body, scalar delatT);
-        void updateCoM(volScalarField& body, scalar deltaT);
-        void updateI(volScalarField& body);
-        
+        void  calculateInterpolationPoints(volScalarField& body);        
         
         //Update Fluid-Solid fluid
         void updateCoupling
@@ -288,9 +212,6 @@ namespace Foam
         //Total Rodrigues angle of the body
         vector historyTotalAngle_;
         
-        // time step required for a contact resolution (Ib should move maximally by the set of fraction of its dC_)
-        scalar      contactTimeRes_;
-        
         //Tangential force from last timestep
         //First label -1 indicates wall other for bodyID 
         DynamicList<Tuple2<label,Tuple2<label,vector>>> historyFt_;
@@ -311,19 +232,15 @@ namespace Foam
         
         bool    startSynced_;
         
-        // just auxiliaries
         tensor  totRotMatrix_;
         bool    sdBasedLambda_;
         scalar  intSpan_;
-        scalar  dS_;//how much did the body move since last projection
         scalar  charCellSize_;//characteristic cell size over surface
         label  refineBuffers_;//number of refine buffers around body
         bool  useInterpolation_;//number of refine buffers around body
         label recomputeM0_;//how many times rocompute M0_ because of refinement
         vector geometricD_;//geometric directions
         bool created_;
-        bool inContactWithStatic_;
-        label timeStepsInContWStatic_;
         label timesToSetStatic_;
         
         void initializeIB();
@@ -460,14 +377,9 @@ namespace Foam
         
         //Getters
         
-        const bool& checkPrtContact() const
-        {
-            return isInPrtContact_;
-        }
-        
         const bool& checkWallContact() const
         {
-            return isInWallContact_;
+            return contactInfo_->checkWallContact();
         }
         
         const label& getBodyId() const
@@ -475,14 +387,19 @@ namespace Foam
             return bodyId_;
         }
         
+        const scalar& getM0()    const
+        {
+            return geomModel_->getM0();
+        }
+        
         const scalar& getM()    const
         {
-            return M0_;
+            return geomModel_->getM();
         }
         
         const dimensionedScalar& getRhoS()    const
         {
-            return rhoS_;
+            return geomModel_->getRhoS();
         }
         
         const vector& getVel()  const
@@ -492,7 +409,7 @@ namespace Foam
         
         const vector& getCoM()  const
         {
-            return CoM_;
+            return geomModel_->getCoM();
         }
         
         const scalar& getOmega()    const
@@ -517,42 +434,42 @@ namespace Foam
         
         const symmTensor& getI()    const
         {
-            return I_;
+            return geomModel_->getI();
         }
         
         const scalar& getKN()   const
         {
-            return kN_;
+            return contactInfo_->getkN();
         }
         
         const scalar& getGammaN()   const
         {
-            return gammaN_;
+            return contactInfo_->getgammaN();
         }
         
         const scalar& getKt()   const
         {
-            return kt_;
+            return contactInfo_->getkt();
         }
         
         const scalar& getGammat()   const
         {
-            return gammat_;
+            return contactInfo_->getgammat();
         }
         
         const scalar& getmu()   const
         {
-            return mu_;
+            return contactInfo_->getmu();
         }
         
         const scalar& getadhN()   const
         {
-            return adhN_;
+            return contactInfo_->getAdhN();
         }
         
         const scalar& getadhEqui()   const
         {
-            return adhEqui_;
+            return contactInfo_->getAdhEqui();
         }
         
         const scalar& getCoNum()   const
@@ -565,30 +482,14 @@ namespace Foam
             return meanCoNum_;
         }
         
-        const scalar& getDC()   const
+        scalar getDC()
         {
-            return dC_;
-        }
-        
-        const scalar& getcontactTimeRes()   const
-        {
-            return contactTimeRes_;
+            return geomModel_->getDC();
         }
         
         const int& getbodyOperation()   const
         {
             return bodyOperation_;
-        }
-        
-        void updateContactTimeRes
-        (
-            scalar newContactTime
-        )
-        {
-            if (newContactTime < contactTimeRes_)
-            {
-                contactTimeRes_ = newContactTime;
-            }
         }
         
         const DynamicList<Tuple2<label,Tuple2<label,vector>>>& getHistoryhistoryFt()   const
@@ -616,11 +517,6 @@ namespace Foam
             return intCells_;
         };
         
-        const List<DynamicLabelList>& getWallContactFaceList()    const 
-        {
-            return wallContactFaces_;
-        };
-        
         const List<DynamicList<immersedBody::intVecRequest>>& getinterpolationVecReqs() const
         {
             return interpolationVecReqs_;
@@ -646,12 +542,10 @@ namespace Foam
             return maxBoundPoint_;
         };
         
-        // pre-contact update of body field
-        void preContactUpdateBodyField
-        (
-            volScalarField& body,
-            volVectorField& f
-        );
+        const label& getTimeStepsInContWStatic() const
+        {
+            return contactInfo_->getTimeStepsInContWStatic();
+        };
         
         // move the body post-contact
         void postContactUpdateBodyField(volScalarField& body, volScalarField& refineF);
@@ -667,8 +561,8 @@ namespace Foam
             vectorField surfNorm
         );
         
-        // detect contact with other particles
-        void detectWallContact(volScalarField& body);
+        //  should we detect contact with wall
+        bool detectWallContact();
         
         // update force and torque acting on the body
         void updateFAndT
@@ -686,9 +580,7 @@ namespace Foam
             volScalarField& body,
             volVectorField& f
         );
-        
-        void switchPrtContact (bool newBool){isInPrtContact_ =newBool;}
-        void switchWallContact(bool newBool){isInWallContact_=newBool;}
+        void setWallContact(bool inContact){contactInfo_->setWallContact(inContact);;}
         
         void postContactUpdateImmersedBody(volScalarField& body,volVectorField& f);
         void postContactUpdateImmersedBody(scalar deltaT);
@@ -784,14 +676,9 @@ namespace Foam
             return useInterpolation_;
         }
         
-        void computeBodyCharPars();
+        void computeBodyCharPars(){geomModel_->computeBodyCharPars(surfCells_);}
         
         void checkIfInDomain(volScalarField& body);
-        
-        void setRecomputeProjection(const bool newBool)
-        {
-            recomputeProjection_ = newBool;
-        }
         
         const label& getrecomputeM0() const
         {
@@ -802,9 +689,9 @@ namespace Foam
             recomputeM0_--;
         }
         
-        void inCotactWithStatic(bool inContact)
+        void inContactWithStatic(bool inContact)
         {
-            inContactWithStatic_ = inContact;
+            contactInfo_->inContactWithStatic(inContact);
         }
         
         void chceckBodyOp();
@@ -816,6 +703,25 @@ namespace Foam
             return geomModel_();
         }
         
+        contactInfo& getContactInfo()
+        {
+            return contactInfo_();
+        }     
+        
+        contactVars* getContactVars()
+        {
+            contactVars* cVars = new contactVars(
+                bodyId_,
+                Vel_,
+                omega_,
+                Axis_,
+                getM0(),
+                getM(),
+                geomModel_->getRhoS()
+            );
+            return cVars;
+        }
+        
         void recordBodyInfo(IOdictionary& dict, word path)
         {
             dict.add("bodyId",bodyId_);
@@ -824,7 +730,7 @@ namespace Foam
             dict.add("omega",omega_);
             dict.add("Axis",Axis_);
             dict.add("static",bodyOperation_ == 0);
-            dict.add("timeStepsInContWStatic", timeStepsInContWStatic_);
+            dict.add("timeStepsInContWStatic", getTimeStepsInContWStatic());
             geomModel_->writeBodyInfo(bodyId_,dict, path);
         }        
         

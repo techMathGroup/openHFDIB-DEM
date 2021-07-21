@@ -37,11 +37,13 @@ using namespace Foam;
 geomModel::geomModel
 (
     const  dynamicFvMesh&   mesh,
+    contactType cType,
     scalar  thrSurf,
     Vector<label> geometricD
 )
 :
 mesh_(mesh),
+contactType_(cType),
 owner_(0),
 cellToStartInCreateIB_(0),
 thrSurf_(thrSurf),
@@ -49,10 +51,82 @@ geometricD_(geometricD),
 intSpan_(2.0),
 sdBasedLambda_(false),
 curMeshBounds_(mesh_.points(),false),
-lastIbPoints_(0)
+lastIbPoints_(0),
+M_(0.0),
+M0_(0.0),
+CoM_(vector::zero),
+I_(symmTensor::zero),
+dC_(0.0),
+rhoS_("rho",dimensionSet(1,-3,0,0,0,0,0),1.0)
 {    
     ibPartialVolume_.setSize(Pstream::nProcs()); 
 }
 geomModel::~geomModel()
 {
 }
+//---------------------------------------------------------------------------//
+void geomModel::calculateGeometricalProperties( volScalarField& body,List<DynamicLabelList>& surfCells, List<DynamicLabelList>& intCells )
+{
+    vector CoMOld  = CoM_; //Saving older positon of IB
+    M_      = scalar(0);
+    CoM_    = vector::zero;
+    I_      = symmTensor::zero;
+    vector tmpCom(vector::zero);
+    
+    addToMAndI(body,surfCells[Pstream::myProcNo()],tmpCom, CoMOld);
+    addToMAndI(body,intCells[Pstream::myProcNo()],tmpCom, CoMOld);
+    
+    //Collect from processors
+    reduce(M_, sumOp<scalar>());
+    reduce(tmpCom,  sumOp<vector>());
+    reduce(I_,  sumOp<symmTensor>());
+    
+    CoM_ = tmpCom / (M_+SMALL);
+}
+//---------------------------------------------------------------------------//
+void geomModel::addToMAndI
+(
+    volScalarField& body,
+    DynamicLabelList& labelCellLst,
+    vector& tmpCom,
+    vector CoMOld
+)
+{    
+    forAll (labelCellLst,cell)
+    {
+        label cellI  = labelCellLst[cell];
+        //AddToM_
+        M_ += body[cellI] * rhoS_.value() * mesh_.V()[cellI];
+        tmpCom  += body[cellI] * rhoS_.value() * mesh_.V()[cellI] * mesh_.C()[cellI];
+        //AddToM_
+        //AddToI_
+        scalar Mi    = body[cellI] * rhoS_.value() * mesh_.V()[cellI];
+        //~ const scalar& xLoc = mesh_.C()[cellI].x();
+        //~ const scalar& yLoc = mesh_.C()[cellI].y();
+        //~ const scalar& zLoc = mesh_.C()[cellI].z();
+        scalar xLoc = mesh_.C()[cellI].x() - CoMOld.x();//OSNote: needs to be replaced with CoMOld before calling this function CoM_ is set to vector::zero
+        scalar yLoc = mesh_.C()[cellI].y() - CoMOld.y();
+        scalar zLoc = mesh_.C()[cellI].z() - CoMOld.z();
+        // Note (MI): this is just for better code readability
+        
+        I_.xx() += Mi*(yLoc*yLoc + zLoc*zLoc);
+        I_.yy() += Mi*(xLoc*xLoc + zLoc*zLoc);
+        I_.zz() += Mi*(xLoc*xLoc + yLoc*yLoc);
+        
+        I_.xy() -= Mi*(xLoc*yLoc);
+        I_.xz() -= Mi*(xLoc*zLoc);
+        I_.yz() -= Mi*(yLoc*zLoc);
+    }
+}
+//---------------------------------------------------------------------------//
+void geomModel::computeBodyCharPars(List<DynamicLabelList>& surfCells)
+{
+    forAll (surfCells[Pstream::myProcNo()],sCellI)
+    {
+        label cellI = surfCells[Pstream::myProcNo()][sCellI];
+        dC_ = max(dC_,mag(CoM_-mesh_.C()[cellI]));
+    }
+    M0_ = M_;
+    reduce(dC_, maxOp<scalar>());
+}
+//---------------------------------------------------------------------------//

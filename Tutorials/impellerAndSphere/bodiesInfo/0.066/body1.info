@@ -1,0 +1,36 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  8
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "/hopper2/sourekm/Documents/HFDIB/Tutorials/impellerAndSphere/bodiesInfo/0.066";
+    object      body1.info;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+bodyId          1;
+
+bodyName        sphere3;
+
+Vel             ( 0.27256494 0.041936186 0 );
+
+omega           0;
+
+Axis            ( 0 0 1 );
+
+static          0;
+
+timeStepsInContWStatic 0;
+
+sphere
+{
+    position        ( 0.018992332 0.062965217 0 );
+    radius          0.006;
+}

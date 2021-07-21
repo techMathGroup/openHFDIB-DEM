@@ -110,7 +110,7 @@ neighbourPatch x1;
 frontAndBack
  {
     //~ type patch;
-  type pacth;
+  type patch;
 //     neighbourPatch periodic_y0;
 /*        transform translational;*/
 /*        separationVector (0 -0.008 0);*/

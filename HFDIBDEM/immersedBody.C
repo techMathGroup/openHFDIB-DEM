@@ -67,18 +67,12 @@ immersedBody::immersedBody
 )
 :
 bodyName_(fileName),
-isInPrtContact_(false),
-isInWallContact_(false),
 isActive_(true),
-recomputeProjection_(true),
 immersedDict_(HFDIBDEMDict.subDict(bodyName_)),
 mesh_(mesh),
 transportProperties_(transportProperties),
 geomModel_(bodyGeomModel),
 cellPoints_(cellPoints),
-M_(0.0),
-M0_(0.0),
-CoM_(vector::zero),
 Axis_(vector::one),
 AxisOld_(vector::one),
 omega_(0.0),
@@ -88,20 +82,10 @@ VelOld_(vector::zero),
 a_(vector::zero),
 alpha_(vector::zero),
 totalAngle_(vector::zero),
-I_(symmTensor::zero),
 F_(vector::zero),
 T_(vector::zero),
-kN_(readScalar(immersedDict_.lookup("kN"))),
-kt_(readScalar(immersedDict_.lookup("kt"))),
-gammaN_(readScalar(immersedDict_.lookup("gammaN"))),
-gammat_(readScalar(immersedDict_.lookup("gammat"))),
-mu_(readScalar(immersedDict_.lookup("mu"))),
-adhN_(readScalar(immersedDict_.lookup("adhN"))),
-adhEqui_(0.0),
 CoNum_(0.0),
 rhoF_(transportProperties_.lookup("rho")),
-rhoS_(immersedDict_.lookup("rho")),
-dC_(0.0),
 bodyId_(bodyId),
 updateTorque_(false),
 bodyOperation_(0),
@@ -116,21 +100,17 @@ historyVel_(vector::zero),
 historya_(vector::zero),
 historyAlpha_(vector::zero),
 historyTotalAngle_(vector::zero),
-contactTimeRes_(1),
 octreeField_(mesh_.nCells(), 0),
 cellToStartInCreateIB_(0),
 totRotMatrix_(tensor::I),
 sdBasedLambda_(false),
 intSpan_(2.0),
-dS_(0.0),
 charCellSize_(1e3),
 refineBuffers_(0),
 useInterpolation_(true),
 recomputeM0_(recomputeM0),
 geometricD_(geometricD),
 created_(false),
-inContactWithStatic_(false),
-timeStepsInContWStatic_(0),
 timesToSetStatic_(-1)
 {        
     initializeIB();    
@@ -142,178 +122,11 @@ immersedBody::~immersedBody()
 }
 //---------------------------------------------------------------------------//
 void immersedBody::initializeIB()
-{
-    Info<< "Data on immersed boundary object triSurface" << endl;
-//     bodySurfMesh_.writeStats(Info);
-    
-    if (mesh_.nGeometricD() < 3)
-    {
-        const vector validDirs = (mesh_.geometricD() + Vector<label>::one)/2;
-        Axis_ -= validDirs;
-    }
-    Axis_ /= mag(Axis_);
-    
-    // read the body operation name from immersedDict_
-    if (immersedDict_.found("staticBody"))
-    {
-        bodyOperation_ = 0;
-        Info << bodyName_ << " is a static body." << endl;
-    }
-    else if (immersedDict_.found("prescribedTransBody"))
-    {
-        bodyOperation_ = 1;
-        
-        Vel_   = immersedDict_.subDict("prescribedTransBody").lookup("velocity");
-        
-        Info << bodyName_ << " is a freely rotating body with prescribed linear velocity." << endl;
-    }
-    else if (immersedDict_.found("prescribedRotBody"))
-    {
-        bodyOperation_ = 2;
-        
-        Axis_ = immersedDict_.subDict("prescribedRotBody").lookup("axis");       
-        omega_  = readScalar(
-                    immersedDict_.subDict("prescribedRotBody").lookup("omega")
-                );
-    
-        Info << bodyName_ << " is a freely moving body with prescribed rotation." << endl;
-        
-        // Note: at the moment, the body always rotates around its center of mass
-    }
-    else if (immersedDict_.found("prescribedTransRotBody"))
-    {
-        bodyOperation_ = 3;
-        
-        Vel_   = immersedDict_.subDict("prescribedTransRotBody").lookup("velocity");
-        Axis_ = immersedDict_.subDict("prescribedTransRotBody").lookup("axis");       
-        omega_  = readScalar(
-                    immersedDict_.subDict("prescribedTransRotBody").lookup("omega")
-                );
-    
-        Info << bodyName_ << " has prescribed both movement and rotation." << endl;
-        
-        // Note: at the moment, the body always rotates around its center of mass
-    }
-    else if (immersedDict_.found("prescribedTransFixedAxisRotBody"))
-    {
-        bodyOperation_ = 4;
-        
-        Vel_   = immersedDict_.subDict("prescribedTransFixedAxisRotBody").lookup("velocity");
-        Axis_ = immersedDict_.subDict("prescribedTransFixedAxisRotBody").lookup("axis");
-        
-        Info << bodyName_ << " has prescribed movement and axis of rotation." << endl;
-        
-        // Note: at the moment, the body always rotates around its center of mass
-    }
-    else if (immersedDict_.found("fullyCoupledBody"))
-    {
-        bodyOperation_ = 5;
-        
-        Info << bodyName_ << " is fully coupled with fluid phase." << endl;
-    }
-    else
-    {
-        Info << "No body operation was found for " << bodyName_ << endl
-          << "Assuming static body.";
-    }
-    
-    // check if the immersedDict_ contains switch for updateTorque_
-    if (immersedDict_.found("updateTorque"))
-    {
-        updateTorque_ = readBool(immersedDict_.lookup("updateTorque"));
-        Info << "Found updateTorque: " << updateTorque_ << endl;
-    }
-    else
-    {
-        Info << "Did not find updateTorque, using updateTorque: " << updateTorque_ << endl;
-    }
-    
-    // do I want the IB to start as in sync with the flow?
-    if (immersedDict_.found("startSynced"))
-    {
-        startSynced_ = readBool(immersedDict_.lookup("startSynced"));
-        if (startSynced_)
-        {
-            Info << "Will try to sync the body with the flow upon creation" << endl;
-        }
-        else
-        {
-            Info << "The body will be created as static" << endl;
-        }
-    }
-    else
-    {
-        Info << "startSynced was not specified, using startSynced: " << startSynced_ << endl;
-    }
-    
-    // just auxiliaries due to MOR
-    if (immersedDict_.found("adhEqui"))
-    {
-        adhEqui_ = readScalar(immersedDict_.lookup("adhEqui"));
-    }
-    if (immersedDict_.found("sdBasedLambda"))
-    {
-        sdBasedLambda_ = readBool(immersedDict_.lookup("sdBasedLambda"));
-    }
-    if (immersedDict_.found("interfaceSpan"))
-    {
-        intSpan_ = readScalar(immersedDict_.lookup("interfaceSpan"));
-    }
-    if (immersedDict_.found("velRelaxFac"))
-    {
-        velRelaxFac_ = readScalar(immersedDict_.lookup("velRelaxFac"));
-    }
-    if (immersedDict_.found("refineBuffers"))
-    {
-        refineBuffers_ = readLabel(immersedDict_.lookup("refineBuffers"));
-    }
-    if (immersedDict_.found("useInterpolation"))
-    {
-        useInterpolation_ = readBool(immersedDict_.lookup("useInterpolation"));
-    }
-    if (immersedDict_.found("timesToSetStatic"))
-    {
-        timesToSetStatic_ = readLabel(immersedDict_.lookup("timesToSetStatic"));
-    }
-    
-    geomModel_->setIntSpan(intSpan_);
-    geomModel_->setSdBasedLambda(sdBasedLambda_);
-
-    // Set sizes for parallel runs
-    surfCells_.setSize(Pstream::nProcs());
-    intCells_.setSize(Pstream::nProcs());
-    wallContactFaces_.setSize(Pstream::nProcs());
-    interpolationInfo_.setSize(Pstream::nProcs());
-    interpolationVecReqs_.setSize(Pstream::nProcs());
-    
-    // Initialize bounding points
-    boundBox bound(geomModel_->getBounds());
-    minBoundPoint_ = bound.min();
-    maxBoundPoint_ = bound.max();    
-    
-    //Initialize list of labels for bounding points based on bodyID
-    //This list hold index of both bounding points for each dimension
-    //Thanks to this information the update of bounding points positions is more efficient
-    for (label coord = 0; coord < 3; coord = coord + 1)
-    {
-        List<label> labeli(2);
-        labeli[0] = 2 * bodyId_;
-        labeli[1] = 2 * bodyId_ + 1;
-        boundIndList_[coord] = labeli;
-    }
+{    
+    #include "initializeIB.H"
     
     Info << "Finished body initialization" << endl;
-    Info << "New bodyID: " << bodyId_ << " name: " << bodyName_ << " rhoS: " << rhoS_ << " dC: " << dC_ << endl;
-}
-//---------------------------------------------------------------------------//
-//Update immersed body (pre-contact)
-void immersedBody::preContactUpdateBodyField
-(
-    volScalarField& body,
-    volVectorField& f
-)
-{
-    preContactUpdateImmersedBody( body, f );
+    Info << "New bodyID: " << bodyId_ << " name: " << bodyName_ << " rhoS: " << geomModel_->getRhoS() << " dC: " << getDC() << endl;
 }
 //---------------------------------------------------------------------------//
 //Create immersed body info
@@ -342,7 +155,8 @@ void immersedBody::synchCreateImmersedBody(volScalarField& body, volScalarField&
             calculateInterpolationPoints(body);
         }
         Info << "Computing geometrical properties" << endl;
-        calculateGeometricalProperties(body);
+        geomModel_->calculateGeometricalProperties(body,surfCells_,intCells_);
+        Info << "-- body " << bodyId_ << " current center of mass position: " << getCoM() << endl;
         created_ = true;
     }
     
@@ -362,9 +176,6 @@ void immersedBody::synchCreateImmersedBody(volScalarField& body, volScalarField&
     
     charCellSize_ = gMax(charCellSizeL);
     Info << "Body characteristic cell size: " << charCellSize_ << endl;
-    
-    // I do NOT want to recompute the body again
-    recomputeProjection_ = false;
 }
 //---------------------------------------------------------------------------//
 //Create immersed body for concave body
@@ -564,98 +375,17 @@ void immersedBody::constructRefineField
 }
 //---------------------------------------------------------------------------//
 //detect contact with walls
-void immersedBody::detectWallContact(volScalarField& body)
+bool immersedBody::detectWallContact()
 {
-    if((M0_-M_) < 0)
-        return;
+    Info << "--// Body IB detect M0: " << getM0() << endl;
+    Info << "--// Body IB detect M: " << getM() << endl;
     
-    // clear all list required for wall contact
-    wallContactFaces_[Pstream::myProcNo()].clear();
-    wallContactFacesHelp_.clear();
-    
-    //Go through all surfCells and check if there is any surfCell whose face is a boundary face        
-    forAll (surfCells_[Pstream::myProcNo()],sCellI)
+    if((getM0()-getM()) < 0)
     {
-        label cCell(surfCells_[Pstream::myProcNo()][sCellI]);
-        
-        const labelList& cFaces = mesh_.cells()[cCell];
-        
-        forAll (cFaces,faceI)
-        {
-            if (!mesh_.isInternalFace(cFaces[faceI]))
-            {
-                // Get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
-                label facePatchId(-1);
-                facePatchId = mesh_.boundaryMesh().whichPatch(cFaces[faceI]);
-                const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchId];
-                if (cPatch.type()=="wall")
-                {          
-                    wallContactFaces_[Pstream::myProcNo()].append(cFaces[faceI]);
-                    switchWallContact(true);
-                    
-                    // check the wall for possible contact only if it wasnt already checked
-//                     if (findIndex(wallContactFacesHelp_,cFaces[faceI]) == -1)
-//                     {
-//                         // Append the checked face to the list to prevent cumulative checking
-//                         wallContactFacesHelp_.append(cFaces[faceI]);
-//                         wallContactFaces_[Pstream::myProcNo()].append(cFaces[faceI]);
-//                         switchWallContact(true);
-//                         // Estimate penetration depth for current face and if there is intersection with the surface
-//                         // Append the face to contactList together with the penetration depth and estimate contactTimeRes
-// //                         scalar depth(getPenetrationDepth(cFaces[faceI]));
-// //                         if (depth > 0)
-// //                         {
-// //                             updateContactTimeRes((dC_ * maxDistInDEMloop_)/(mag(Vel_)+SMALL));
-// //                             switchWallContact(true);
-// //                             wallContactFaces_[Pstream::myProcNo()].append(cFaces[faceI]);
-// //                         }
-// //                         // Find neighbour faces that are also in contact with the IB
-// //                         getContactFaces(cFaces[faceI], body);
-//                     }
-                }
-            }
-        }
+        contactInfo_->setWallContact(false);
+        return false;
     }
-    
-    reduce(isInWallContact_, orOp<bool>());
-    
-    if(isInWallContact_)
-    {
-        forAll(intCells_[Pstream::myProcNo()],iCellI)
-        {
-            label cCell(intCells_[Pstream::myProcNo()][iCellI]);
-        
-            const labelList& cFaces = mesh_.cells()[cCell];
-            
-            forAll (cFaces,faceI)
-            {
-                if (!mesh_.isInternalFace(cFaces[faceI]))
-                {
-                    // Get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
-                    label facePatchId(-1);
-                    facePatchId = mesh_.boundaryMesh().whichPatch(cFaces[faceI]);
-                    const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchId];
-                    if (cPatch.type()=="wall")
-                    {          
-                        wallContactFaces_[Pstream::myProcNo()].append(cFaces[faceI]);
-                    }
-                }
-            }
-        }
-        inContactWithStatic_ = true;
-    }
-    
-    
-    //Distribute wallContactfaces over processors
-    Pstream::gatherList(wallContactFaces_, 0);
-    Pstream::scatter(wallContactFaces_, 0);
-    
-    // Note: - I go through all the surface cells.
-    //       - for each surface cell I check the cell faces
-    //       - if a face is not internal, I look up the patch in which
-    //         it is
-    //       - if the face is on "wall" type patch, I check the penetration depth
-    //       - If there is intersection include it in current wall contact faces
+    return true;
 }
 //---------------------------------------------------------------------------//
 //Update immersed body info (pre-contact, ends with contact detection)
@@ -667,7 +397,7 @@ void immersedBody::preContactUpdateImmersedBody
 {
     F_*=0.0;
     T_*=0.0;
-    switchWallContact(false);
+    setWallContact(false);
     
     updateOldMovementVars();
     
@@ -682,8 +412,6 @@ void immersedBody::preContactUpdateImmersedBody
     
     // Note: at the moment, I work only with FLUIDCOUPLING body operation
     //~ updateCoupling(body,f);
-    
-    detectWallContact(body);
 }
 //---------------------------------------------------------------------------//
 //Update immersed body info (post-contact, contact forces need to be included)
@@ -700,7 +428,7 @@ void immersedBody::postContactUpdateImmersedBody
     //update body courant number
     computeBodyCoNumber();    
     
-    Info << "-- body: " << bodyId_ << " current center of mass position: " << CoM_ << endl;
+    Info << "-- body: " << bodyId_ << " current center of mass position: " << getCoM() << endl;
 }
 void immersedBody::postContactUpdateImmersedBody(scalar deltaT)
 {    
@@ -710,7 +438,7 @@ void immersedBody::postContactUpdateImmersedBody(scalar deltaT)
     //update body courant number
     computeBodyCoNumber();
     
-    Info << "-- body: " << bodyId_ << " current center of mass position: " << CoM_ << endl;
+    Info << "-- body: " << bodyId_ << " current center of mass position: " << getCoM() << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateCoupling
@@ -723,40 +451,23 @@ void immersedBody::updateCoupling
         mesh_.lookupObject<uniformDimensionedVectorField>("g");
 
   vector FV(vector::zero);
-  vector FG(M_*(1.0-rhoF_.value()/rhoS_.value())*g.value());
+  vector FG(getM()*(1.0-rhoF_.value()/geomModel_->getRhoS().value())*g.value());
   vector TA(vector::zero);
-  
-//   Pstream::gatherList(surfCells_, 0);
-//   forAll(surfCells_, proci)
-//   {
-//       Info << "Info proc: " << proci << " Computing FV: " << surfCells_[proci] << endl;
-//   }
     
   //Calcualate viscous force and torque
   forAll (surfCells_[Pstream::myProcNo()],sCellI)
   {
      label cellI = surfCells_[Pstream::myProcNo()][sCellI];
-
-     // Note (MI): what about the sign of torque?
-     //~ F_ -=  f[cellI] * mesh_.V()[cellI] * rhof.value();//viscosity?
-     //~ F_ +=  body[cellI]*mesh_.V()[cellI]*(rho_.value()-rhof.value())*g.value();//gravity/buyoancy?
-     //~ FV +=  f[cellI] * mesh_.V()[cellI] * rhoF_.value();//viscosity?
-     //~ T_ +=  ( (mesh_.C()[cellI]-CoM_) ^ f[cellI] )
-                 //~ *mesh_.V()[cellI]* rhoF_.value();
-     FV -=  f[cellI]*mesh_.V()[cellI];//viscosity?
-     //~ T_ +=  ((mesh_.C()[cellI] - CoM_)^f[cellI])*mesh_.V()[cellI];
-     TA +=  ((mesh_.C()[cellI] - CoM_)^f[cellI])*mesh_.V()[cellI];
-     // Note (MI): shouldn't this be multiplied by (1-body)?
-     //~ FV *=  (scalar(1)-body[cellI]);
-     //~ T_ *=  (scalar(1)-body[cellI]);
-     // Note (MI): thats what I am trying to do here
+     
+     FV -=  f[cellI]*mesh_.V()[cellI];
+     TA +=  ((mesh_.C()[cellI] - getCoM())^f[cellI])*mesh_.V()[cellI];
   }
   forAll (intCells_[Pstream::myProcNo()],iCellI)
   {
      label cellI = intCells_[Pstream::myProcNo()][iCellI];
 
      FV -=  f[cellI]*mesh_.V()[cellI];//viscosity?
-     TA +=  ((mesh_.C()[cellI] - CoM_)^f[cellI])*mesh_.V()[cellI];
+     TA +=  ((mesh_.C()[cellI] - getCoM())^f[cellI])*mesh_.V()[cellI];
   }
   
   reduce(FV, sumOp<vector>());
@@ -764,10 +475,6 @@ void immersedBody::updateCoupling
   
   FV *= rhoF_.value();
   TA *= rhoF_.value();
-  
-  //~ Info << "-- body " << bodyId_ << " viscous   force: " << FV << endl;
-  //~ Info << "-- body " << bodyId_ << " grav/buoy force: " << FG << endl;
-  //~ Info << "-- body " << bodyId_ << "          torque: " << T_ << endl;
   
   historyCouplingF_ = FV+FG;
   historyCouplingT_ = TA;
@@ -784,10 +491,6 @@ void immersedBody::updateMovement()
     scalar deltaT = mesh_.time().deltaT().value();
     
     updateMovementComp(deltaT,Vel_,Axis_,omega_,1);
-    
-    //~ Info << "new Vel_  : " << Vel_ << endl;
-    //~ Info << "new Axis_ : " << Axis_ << endl;
-    //~ Info << "new omega_: " << omega_ << endl;
 }
 void immersedBody::updateMovement
 (
@@ -795,10 +498,6 @@ void immersedBody::updateMovement
 )
 {
     updateMovementComp(deltaT,Vel_,Axis_,omega_,1);
-    
-    //~ Info << "new Vel_  : " << Vel_ << endl;
-    //~ Info << "new Axis_ : " << Axis_ << endl;
-    //~ Info << "new omega_: " << omega_ << endl;
 }
 void immersedBody::updateMovement
 (
@@ -809,10 +508,6 @@ void immersedBody::updateMovement
 {
     scalar deltaT = mesh_.time().deltaT().value();
     updateMovementComp(deltaT,Vel,Axis,omega,1);
-    
-    //~ Info << "new Vel_  : " << Vel_ << endl;
-    //~ Info << "new Axis_ : " << Axis_ << endl;
-    //~ Info << "new omega_: " << omega_ << endl;
 }
 void immersedBody::updateMovement
 (
@@ -824,10 +519,6 @@ void immersedBody::updateMovement
 {
     scalar deltaT = mesh_.time().deltaT().value();
     updateMovementComp(deltaT,Vel,Axis,omega,velRelaxFac);
-    
-    //~ Info << "new Vel_  : " << Vel_ << endl;
-    //~ Info << "new Axis_ : " << Axis_ << endl;
-    //~ Info << "new omega_: " << omega_ << endl;
 }
 void immersedBody::updateMovement
 (
@@ -838,10 +529,6 @@ void immersedBody::updateMovement
 )
 {
     updateMovementComp(deltaT,Vel,Axis,omega,1);
-    
-    //~ Info << "new Vel_  : " << Vel_ << endl;
-    //~ Info << "new Axis_ : " << Axis_ << endl;
-    //~ Info << "new omega_: " << omega_ << endl;
 }
 void immersedBody::updateMovement
 (
@@ -853,10 +540,6 @@ void immersedBody::updateMovement
 )
 {
     updateMovementComp(deltaT,Vel,Axis,omega,velRelaxFac);
-    
-    //~ Info << "new Vel_  : " << Vel_ << endl;
-    //~ Info << "new Axis_ : " << Axis_ << endl;
-    //~ Info << "new omega_: " << omega_ << endl;
 }
 void immersedBody::updateMovementComp
 (
@@ -866,21 +549,15 @@ void immersedBody::updateMovementComp
     scalar omega,
     scalar velRelaxFac
 )
-{    
-    //~ Info << "-- body " << bodyId_ << "!! movement update working with F_ = " << F_
-         //~ << " and with T_ = " << T_ << endl;
-    
-    //~ Info << "old Vel_  : " << Vel_ << endl;
-    //~ Info << "old Axis_ : " << Axis_ << endl;
-    //~ Info << "old omega_: " << omega_ << endl;
-    
+{        
     // auxiliary (nested) functions
     // Note: due to the different body operations, it is better to split
     //       the different parts of the movement update in separate steps
     auto updateTranslation = [&]()
     {
         //compute current acceleration (assume constant over timeStep)
-        a_  = F_/(M0_+SMALL);
+        a_  = F_/(getM0()+SMALL);        
+        Info << "--// Body trans update F: " << F_ << endl;
         
         //Update body linear velocity
         Vel_ = (Vel + deltaT*a_) * velRelaxFac;
@@ -889,7 +566,7 @@ void immersedBody::updateMovementComp
     auto updateRotation = [&]()
     {
         //Update body angular acceleration
-        alpha_ = inv(I_) & T_;
+        alpha_ = inv(getI()) & T_;
         
         //Update body angular velocity
         vector Omega((Axis*omega + deltaT*alpha_) * velRelaxFac);
@@ -930,7 +607,7 @@ void immersedBody::updateMovementComp
     auto updateRotationFixedAxis = [&]()
     {
         //Update body angular velocity
-        vector Omega((Axis*omega + deltaT * ( inv(I_) & T_ )) * velRelaxFac);
+        vector Omega((Axis*omega + deltaT * ( inv(getI()) & T_ )) * velRelaxFac);
         
         //Split Omega into Axis_ and omega_
         omega_ = mag(Omega);
@@ -1579,246 +1256,6 @@ Tuple2<vector,Tuple2<label,label>> immersedBody::findCellCustom
     return tupleToReturn;
 }
 //---------------------------------------------------------------------------//
-// Auxiliary function to add to M_ and I_
-vector immersedBody::addToMAndI
-(
-    volScalarField& body,
-    DynamicLabelList& labelCellLst,
-    vector tmpCom
-)
-{
-    //Get density
-    dimensionedScalar rho=dimensionedScalar(immersedDict_.lookup("rho"));
-    
-    forAll (labelCellLst,cell)
-    {
-        label cellI = labelCellLst[cell];
-        M_ += body[cellI] * rho.value() * mesh_.V()[cellI];
-        tmpCom  += body[cellI] * rho.value() * mesh_.V()[cellI] * mesh_.C()[cellI];
-        
-        I_.xx() += body[cellI]*rho.value()*mesh_.V()[cellI]
-                * (
-                     mesh_.C()[cellI].y()*mesh_.C()[cellI].y()
-                   + mesh_.C()[cellI].z()*mesh_.C()[cellI].z()
-               );
-        
-        I_.yy() += body[cellI]*rho.value()*mesh_.V()[cellI]
-                * (
-                     mesh_.C()[cellI].x()*mesh_.C()[cellI].x()
-                   + mesh_.C()[cellI].z()*mesh_.C()[cellI].z()
-               );
-        I_.zz() += body[cellI]*rho.value()*mesh_.V()[cellI]
-                * (
-                     mesh_.C()[cellI].y()*mesh_.C()[cellI].y()
-                   + mesh_.C()[cellI].x()*mesh_.C()[cellI].x()
-               );
-        
-        I_.xy() -= body[cellI]*rho.value()*mesh_.V()[cellI]
-                * (
-                     mesh_.C()[cellI].x()*mesh_.C()[cellI].y()
-                 );
-        
-        I_.xz() -= body[cellI]*rho.value()*mesh_.V()[cellI]
-                * (
-                     mesh_.C()[cellI].x()*mesh_.C()[cellI].z()
-                 );
-        
-        I_.yz() -= body[cellI]*rho.value()*mesh_.V()[cellI]
-                * (
-                     mesh_.C()[cellI].y()*mesh_.C()[cellI].z()
-                 );
-    }
-    
-    return tmpCom;
-}
-// Note (MI): tmpCom vector is shared between surfCells and intCells
-//            -> I should make it an input argument and return it
-//            from the function (20190206)
-
-//---------------------------------------------------------------------------//
-// auxiliary function just to compute the center of mass and the total
-// mass of the body
-vector immersedBody::addToM
-(
-    volScalarField& body,
-    DynamicLabelList& labelCellLst,
-    vector tmpCoM
-)
-{
-    forAll (labelCellLst,cell)
-    {
-        label cellI  = labelCellLst[cell];
-        scalar Mi    = body[cellI] * rhoS_.value() * mesh_.V()[cellI];
-        M_          += Mi;
-        tmpCoM      += Mi * mesh_.C()[cellI];
-    }
-    return tmpCoM;
-}
-//---------------------------------------------------------------------------//
-// auxiliary function just to inertial tensor of the body
-void immersedBody::addToI
-(
-    volScalarField& body,
-    DynamicLabelList& labelCellLst
-)
-{
-    forAll (labelCellLst,cell)
-    {
-        label cellI  = labelCellLst[cell];
-        
-        scalar Mi    = body[cellI] * rhoS_.value() * mesh_.V()[cellI];
-        //~ const scalar& xLoc = mesh_.C()[cellI].x();
-        //~ const scalar& yLoc = mesh_.C()[cellI].y();
-        //~ const scalar& zLoc = mesh_.C()[cellI].z();
-        scalar xLoc = mesh_.C()[cellI].x() - CoM_.x();
-        scalar yLoc = mesh_.C()[cellI].y() - CoM_.y();
-        scalar zLoc = mesh_.C()[cellI].z() - CoM_.z();
-        // Note (MI): this is just for better code readability
-        
-        I_.xx() += Mi*(yLoc*yLoc + zLoc*zLoc);
-        I_.yy() += Mi*(xLoc*xLoc + zLoc*zLoc);
-        I_.zz() += Mi*(xLoc*xLoc + yLoc*yLoc);
-        
-        I_.xy() -= Mi*(xLoc*yLoc);
-        I_.xz() -= Mi*(xLoc*zLoc);
-        I_.yz() -= Mi*(yLoc*zLoc);
-    }
-}
-
-void immersedBody::updateCoM(volScalarField& body, scalar deltaT)
-{
-    // go through cells and compute local mass and tmpCoM
-    vector tmpCoM(vector::zero);
-    //~ M_ = 0;
-    tmpCoM = addToM(body,surfCells_[Pstream::myProcNo()],tmpCoM);
-    tmpCoM = addToM(body,intCells_[Pstream::myProcNo()],tmpCoM);
-    
-    // collect from processors
-    reduce(M_, sumOp<scalar>());
-    reduce(tmpCoM,  sumOp<vector>());
-    
-    // final computation of the body center of mass
-    CoM_ = tmpCoM / (M_+SMALL);
-    
-    //~ Info << "Recomputed M" << endl;
-}
-
-void immersedBody::updateI(volScalarField& body)
-{
-    I_      = symmTensor::zero;
-    
-    addToI(body,surfCells_[Pstream::myProcNo()]);
-    addToI(body,intCells_[Pstream::myProcNo()]);
-    
-    reduce(I_,  sumOp<symmTensor>());
-}
-
-void immersedBody::calculateGeometricalProperties( volScalarField& body )
-{
-    //Evaluate center of mass
-    M_      = scalar(0);
-    CoM_    = vector::zero;
-    I_      = symmTensor::zero;
-    vector tmpCom(vector::zero);
-    // Note (MI): M_ ... body mass
-
-    // Note (MI): why is the below loop coded this way?
-    //            - forAll intCells and surfCells and cellI is updated
-    //            based on which index I am using at the moment?
-    // Q:         could I make the coding cleaner?
-    // Q (MI)   : is there a common body field for all the immersed
-    //            bodies? (I guess it is) -> yes, it seems that the
-    //            body field is common to all the bodies and intCells_
-    //            and surfCells_ are proper to each body
-    // =>         I need to go only through intCells and surfCells in here
-    //            and going conditionally through body field is not OK
-    tmpCom = addToMAndI(body,surfCells_[Pstream::myProcNo()],tmpCom);
-    tmpCom = addToMAndI(body,intCells_[Pstream::myProcNo()],tmpCom);
-    // Note (MI): clean up of the body geometricalProperties computation
-    //            fixed the issue with improper rotation (at least in
-    //            2D on static mesh), which I probably broke while
-    //            tweaking the code
-    // Note (MI): the rotation seems to be working on 2D dynamically
-    //            refined meshes as well
-    // Note (MI): velocity field with rotation is still broken (20190201)
-    // =>         the imposed force is for some reason applied inside
-    //            the body
-    
-  
-    // Note (MI): I splitted the original combined for loop (see v8) in
-    //            two distinct loops - one for internal cells and one
-    //            for surface cells. for the reasoning behind, go through
-    //            the notes in the function createImmersedBody
-    // Note (MI): it would be good to put addToM_ and addToI_ in separate
-    //            functions - done (20190201)
-    
-    //Collect from processors
-    reduce(M_, sumOp<scalar>());
-    reduce(tmpCom,  sumOp<vector>());
-    reduce(I_,  sumOp<symmTensor>());
-    
-//     CoM_ = tmpCom / (M_+SMALL);
-    // Note (MI): added +SMALL for robustness, effect on result not tested
-    
-    //~ if (isFirstUpdate_)
-    //~ {
-        //~ forAll (surfCells_[Pstream::myProcNo()],sCellI)
-        //~ {
-            //~ label cellI = surfCells_[Pstream::myProcNo()][sCellI];
-            //~ dC_ = max(dC_,mag(CoM_-mesh_.C()[cellI]));
-        //~ }
-        //~ Info << M_ << " " << M0_ << endl;
-        //~ M0_ = M_;
-        //~ Info << "asigning M0_" << endl;
-    //~ }
-    
-//     M_ = M0_;
-    
-    CoM_ = tmpCom / (M_+SMALL);
-    
-    Info << "-- body " << bodyId_ << " current center of mass position: " << CoM_ << endl;
-    // Note (MI): compute characteristic diameter as maximum distance
-    //            of surface cell to the body center of mass
-    
-    //~ //if only 1% of the initial particle mass remains in the domain, switch it off
-    //~ Info << "-- body " << bodyId_ << " current M/M0: " << M_/M0_ << endl;
-    //~ if (M_/(M0_+SMALL) < 1e-2) switchActiveOff(body);
-}
-
-void immersedBody::calculateGeometricalProperties2( volScalarField& body, scalar deltaT )
-{
-    //Evaluate center of mass
-    updateCoM(body, deltaT);
-    
-    //Evaluate tensor of inertia
-    updateI(body);
-    
-    //~ if (isFirstUpdate_)
-    //~ {
-        //~ forAll (surfCells_[Pstream::myProcNo()],sCellI)
-        //~ {
-            //~ label cellI = surfCells_[Pstream::myProcNo()][sCellI];
-            //~ dC_ = max(dC_,mag(CoM_-mesh_.C()[cellI]));
-        //~ }
-        //~ M0_ = M_;
-        //~ Info << "Recomputed M0" << endl;
-    //~ }
-    Info << "-- body " << bodyId_ << " current center of mass position: " << CoM_ << endl;
-    // Note (MI): compute characteristic diameter as maximum distance
-    //            of surface cell to the body center of mass
-    
-    //~ if (isNewBody_)
-    //~ {
-        //~ M0_ = M_;
-        //~ isNewBody_ = false;
-        //~ Info << "Recomputed M0" << endl;
-    //~ }
-
-    //~ Info << "-- body " << bodyId_ << " current M/M0: " << M_/M0_ << endl;
-    //~ //if only 1% of the initial particle mass remains in the domain, switch it off
-    //~ if (M_/(M0_+SMALL) < 1e-2) switchActiveOff(body);
-}
-//---------------------------------------------------------------------------//
 //Move immersed body according to body operation
 void immersedBody::moveImmersedBody
 (
@@ -1840,25 +1277,7 @@ void immersedBody::moveImmersedBody
         // Note: (Vel_-a_*deltaT) => Vel_OLD
         // Note: this is midpoint 2nd order time integration
         // Note (MI): expanded the parantheses and simplified the relation
-        scalar rotIncr(0.5*omega_*deltaT*dC_);
-        
-        dS_ += Foam::sqrt(
-            Foam::magSqr(transIncr) + Foam::pow(rotIncr,2.0)
-        );
-        
-//         Pout << "current ds/charCellSize = " << dS_/(charCellSize_+SMALL) << endl;
-        //~ if (dS_ > 5.0*charCellSize_)
-        if (dS_ > 0.0*charCellSize_)
-        //~ if (dS_ > 0.0*charCellSize_)
-        {
-            recomputeProjection_ = true;
-            dS_  = 0.0;
-//             Pout << "!! The body will be re-projected into the mesh" << endl;
-        }
-        else
-        {
-            CoM_ += transIncr;
-        }
+//         scalar rotIncr(0.5*omega_*deltaT*getDC());
         
         // standard rotation
         //~ tensor rotMatrix(Foam::cos(angle)*tensor::I);
@@ -1912,8 +1331,6 @@ void immersedBody::moveImmersedBody
     boundBox bound(geomModel_->getBounds());
     minBoundPoint_ = bound.min();
     maxBoundPoint_ = bound.max();
-    
-    reduce(recomputeProjection_, orOp<bool>());
 }
 //---------------------------------------------------------------------------//
 //Update imposed vector field
@@ -1969,9 +1386,9 @@ void immersedBody::updateVectorField(volVectorField& VS, word VName,volScalarFie
                     surfPoint -= intDist*surfNorm[cellI]*(0.5-body[cellI]);
                 }
                 
-                vector planarVec       =  surfPoint - CoM_
+                vector planarVec       =  surfPoint - getCoM()
                                      - Axis_*(
-                                          (surfPoint-CoM_)&Axis_
+                                          (surfPoint-getCoM())&Axis_
                                          );
                 
                 vector VSvalue = -(planarVec^Axis_)*omega_ + Vel_;
@@ -1981,9 +1398,9 @@ void immersedBody::updateVectorField(volVectorField& VS, word VName,volScalarFie
             {
                 cellI=intCells_[Pstream::myProcNo()][cell];
                 
-                vector planarVec       =  mesh_.C()[cellI] - CoM_
+                vector planarVec       =  mesh_.C()[cellI] - getCoM()
                                      - Axis_*(
-                                          (mesh_.C()[cellI]-CoM_)&Axis_
+                                          (mesh_.C()[cellI]-getCoM())&Axis_
                                          );
                 
                 vector VSvalue = -(planarVec^Axis_)*omega_ + Vel_;
@@ -2010,7 +1427,7 @@ void immersedBody::resetBody(volScalarField& body, bool resethistoryFt)
         }
     }
     
-    switchWallContact(false);
+    setWallContact(false);
     
     if(!created_ || bodyOperation_ != 0)
     {
@@ -2038,7 +1455,6 @@ void immersedBody::resetBody(volScalarField& body, bool resethistoryFt)
         }
         
         historyFt_ = historyFtNew;
-        contactTimeRes_ = 1;
     }
 }
 //---------------------------------------------------------------------------//
@@ -2050,7 +1466,7 @@ DynamicList<scalar> immersedBody::getLocPartRad(DynamicLabelList& cellsOfInt)
     forAll (cellsOfInt,cellI)
     {
         label cCell(cellsOfInt[cellI]);
-        aLst.append(mag(mesh_.C()[cCell] - CoM_));
+        aLst.append(mag(mesh_.C()[cCell] - getCoM()));
     }
     return aLst;
 }
@@ -2059,11 +1475,8 @@ DynamicList<scalar> immersedBody::getLocPartRad(DynamicLabelList& cellsOfInt)
 void immersedBody::postContactUpdateBodyField(volScalarField& body, volScalarField& refineF)
 {
     // move the body due to the contact
-    if (recomputeProjection_)
-    {
-        resetBody(body);
-        createImmersedBody(body,refineF,false);
-    }
+    resetBody(body);
+    createImmersedBody(body,refineF,false);
 }
 //---------------------------------------------------------------------------//
 void immersedBody::recreateBodyField(volScalarField& body, volScalarField& refineF)
@@ -2087,7 +1500,7 @@ void immersedBody::computeBodyCoNumber()
     meanCoNum_ = 0.0;
     
     // rotation body courant number
-    scalar rotCoNumB(omega_*dC_*0.5*mesh_.time().deltaT().value());
+    scalar rotCoNumB(omega_*getDC()*0.5*mesh_.time().deltaT().value());
     
     //Info << "-- rotCo*dCell: " << rotCoNumB << endl;
     
@@ -2140,8 +1553,8 @@ void immersedBody::computeBodyCoNumber()
 // print out body linear and angular momentum
 void immersedBody::printMomentum()
 {
-    vector L(I_&(Axis_*omega_));
-    vector p(M_*Vel_);
+    vector L(getI()&(Axis_*omega_));
+    vector p(getM()*Vel_);
     
     Info << "-- body " << bodyId_ << "  linear momentum:" << p 
          << " magnitude: " << mag(p) <<endl;
@@ -2152,8 +1565,8 @@ void immersedBody::printMomentum()
 // print out body statistics
 void immersedBody::printStats()
 {
-    vector L(I_&(Axis_*omega_));
-    vector p(M_*Vel_);
+    vector L(getI()&(Axis_*omega_));
+    vector p(getM()*Vel_);
     
     Info << "-- body " << bodyId_ << "  linear momentum:" << p 
          << " magnitude: " << mag(p) <<endl;
@@ -2172,7 +1585,7 @@ void immersedBody::printForcesAndTorques()
 {
     const uniformDimensionedVectorField& g =
         mesh_.lookupObject<uniformDimensionedVectorField>("g");
-    vector FG(M_*(1.0-rhoF_.value()/rhoS_.value())*g.value());
+    vector FG(getM()*(1.0-rhoF_.value()/geomModel_->getRhoS().value())*g.value());
     
     Info << "-- body " << bodyId_ << "     linear force:" << F_ 
          << " magnitude: " << mag(F_) <<endl;
@@ -2209,155 +1622,6 @@ void immersedBody::initializeVarHistory(bool setHistory)
     T_*=0.0;
 }
 //---------------------------------------------------------------------------//
-void immersedBody::solveWallContact
-(
-    scalar kWN,
-    scalar gammaWN,
-    scalar kWt,
-    scalar gammaWt,
-    scalar muW,
-    scalar adhWN,
-    scalar deltaT
-)
-{    
-    Info << "-- Body " << bodyId_ << " is in contact with wall" << endl;
-    
-    // compute mean model parameters
-    scalar aKN(0.5*(kN_+kWN));
-    scalar aGammaN(0.5*(gammaN_+gammaWN));
-    scalar aKt(0.5*(kt_+kWt));
-    scalar aGammat(0.5*(gammat_+gammaWt));
-    scalar amu(0.5*(mu_+muW));
-    scalar aadhN(0.5*(adhN_+adhWN));
-    
-    label nContactFaces(wallContactFaces_[Pstream::myProcNo()].size());
-    //Create placeholders for forces
-    vector FN(vector::zero);
-    vector Ft(vector::zero);
-    vector cLVec(vector::zero);
-    vector nVecF(vector::zero);
-    scalar overallContactArea(0);
-    
-    //if the IB was in contact in previous DEM time step, find the information about tangential force and assigne it
-    vector FtLast(vector::zero);
-    bool FtLastFinded(false);
-    forAll (historyFt_,Fti)
-    {
-        if (historyFt_[Fti].first() == -1)
-        {
-            FtLastFinded = true;
-            FtLast = historyFt_[Fti].second().second();
-            break;
-        }
-    }
-    
-    DynamicLabelList contactCells;
-    vector cVel(vector::zero);
-    scalar reduceM(M0_*M0_/(M0_+M0_));
-    
-    // loop over all faces in contact with walls
-    forAll (wallContactFaces_[Pstream::myProcNo()],faceI)
-    {        
-        label cFace(wallContactFaces_[Pstream::myProcNo()][faceI]);
-    
-        contactCells.append(mesh_.faceOwner()[cFace]);
-        // get the local wall velocity
-//             label cFacePatch(mesh_.boundaryMesh().whichPatch(cFace));
-        //~ vector wVel(U.boundaryField()[cFacePatch][cFace]);
-        vector wVel(vector::zero);
-        // Note (MI): could I go around whichPatch?
-        
-        // compute normal to movement and relative velocitydeltaTDEM
-        vector nVec(-mesh_.Sf()[cFace]/mag(mesh_.Sf()[cFace]));
-
-        nVecF += nVec * mag(mesh_.Sf()[cFace]);
-        overallContactArea += mag(mesh_.Sf()[cFace]);        
-        
-        //project last Ft to new tangential direction
-        vector FtLastP(FtLast - (FtLast & nVec) * nVec);
-        //scale the projected vector to remain the magnitude
-        vector FtLastr(mag(FtLast) * (FtLastP/(mag(FtLastP)+SMALL)));
-        
-        vector ri(mesh_.Cf()[cFace] - CoM_);
-        //Evaluate tangential velocity
-        vector planarVec       =  ri - Axis_*(ri & Axis_);        
-        vector rotDir(planarVec^Axis_);
-
-        vector cVeli(-rotDir*omega_ + Vel_);
-        cVel += cVeli;
-        vector cVeliNorm((cVeli & nVec)*nVec);
-        cVeli -= cVeliNorm;
-        vector Vt(cVeli-wVel);
-        //Compute tangential force
-        vector Fti(FtLastr - aKt*Vt*deltaT);        
-        
-        scalar Lci(4*mag(ri)*mag(ri)/(mag(ri)+mag(ri)));
-        
-        vector Ftdi(- aGammat*sqrt(aKN*reduceM*Lci)*Vt);
-        Ft += (Fti + Ftdi);
-        cLVec += ri;
-    }
-
-    
-    reduce(nContactFaces, sumOp<label>());
-    reduce(overallContactArea, sumOp<scalar>());
-    reduce(Ft, sumOp<vector>());
-    reduce(cVel, sumOp<vector>());
-    reduce(cLVec, sumOp<vector>());
-    reduce(nVecF, sumOp<vector>());
-    
-    vector wVel(vector::zero);
-    cLVec /= (nContactFaces+SMALL);
-    cVel /= (nContactFaces+SMALL);
-    nVecF /= (overallContactArea+SMALL);
-    scalar VnF(-(cVel-wVel) & nVecF);
-    Ft /= (nContactFaces+SMALL);
-    
-    scalar intersectedVolume((M0_-M_)/(rhoS_.value() + SMALL));
-    scalar Lc(4*mag(cLVec)*mag(cLVec)/(mag(cLVec)+mag(cLVec)));
-    
-    FN = (aKN*intersectedVolume/(Lc+SMALL) + aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(VnF*overallContactArea))*nVecF;
-    
-    if (mag(Ft) > amu * mag(FN))
-    {
-        Ft *= amu * mag(FN) / mag(Ft);
-    }
-    
-    scalar FAc(aadhN*overallContactArea);  
-    scalar FAeq(aKN*((adhEqui_*M0_)/(rhoS_.value() + SMALL))/(Lc+SMALL));
-    scalar partMul((M0_-M_)/(M0_+SMALL)/(adhEqui_+SMALL));
-    if(partMul > 1)
-    {
-        partMul = 1;
-    }
-    vector FA((FAeq * partMul  + FAc * (1-partMul)) * nVecF);
-    FN -= FA;
-    
-    // Update or add the history of tangential force
-    if (FtLastFinded)
-    {
-        forAll (historyFt_,Fti)
-        {
-            if (historyFt_[Fti].first() == -1)
-            {
-                Tuple2<label,vector> help(1,Ft);
-                historyFt_[Fti].second() = help;
-                break;
-            }
-        }
-    }
-    else
-    {
-        Tuple2<label,vector> help(1,Ft);
-        Tuple2<label,Tuple2<label,vector>> help2(-1, help);
-                
-        historyFt_.append(help2);
-    }
-
-    F_+=FN + Ft;
-    T_+=cLVec ^ F_;
-}
-//---------------------------------------------------------------------------//
 // switch the particle off (remove it from the simulation)
 void immersedBody::switchActiveOff
 (
@@ -2391,7 +1655,7 @@ bool immersedBody::checkContactMovement
     auto updateTranslation = [&]()
     {
         //compute current acceleration (assume constant over timeStep)
-        ai  = F_/(M0_+SMALL);
+        ai  = F_/(getM0()+SMALL);
         
         //Update body linear velocity
         Veli += deltaT*ai;
@@ -2400,7 +1664,7 @@ bool immersedBody::checkContactMovement
     auto updateRotation = [&]()
     {
         //Update body angular acceleration
-        alphai = inv(I_) & T_;
+        alphai = inv(getI()) & T_;
         
         //Update body angular velocity
         vector Omega(Axis_*omegai + deltaT*alphai);
@@ -2428,7 +1692,7 @@ bool immersedBody::checkContactMovement
     auto updateRotationFixedAxis = [&]()
     {
         //Update body angular velocity
-        vector Omega(Axisi*omegai + deltaT * ( inv(I_) & T_ ));
+        vector Omega(Axisi*omegai + deltaT * ( inv(getI()) & T_ ));
         
         //Split Omega into Axis_ and omega_
         omegai = mag(Omega);
@@ -2488,27 +1752,7 @@ void immersedBody::assignFullHistory()
 }
 //---------------------------------------------------------------------------//
 void immersedBody::initSyncWithFlow(const volVectorField& U)
-{
-    // estimate particle linear velocity
-    //~ vector meanV(vector::zero);scalar totVol(0);
-    //~ label  cellI;
-    //~ forAll (intCells_[Pstream::myProcNo()],iCellI)
-    //~ {
-        //~ cellI   = intCells_[Pstream::myProcNo()][iCellI];
-        //~ meanV  += U[cellI]*mesh_.V()[cellI];
-        //~ totVol += mesh_.V()[cellI];
-    //~ }
-    //~ reduce(meanV, sumOp<vector>());
-    //~ reduce(totVol, sumOp<scalar>());
-    //~ Vel_ = meanV/totVol;
-    
-    // smarter and faster albeir broken implementation
-    // -> oF does not want to see region0SubSet/fvSchemes.gradSchemes
-    //~ fvMeshSubset intCellsMesh(mesh_);
-    //~ intCellsMesh.setCellSubset(intCells_[Pstream::myProcNo()]);
-    //~ volVectorField intU("inBodyU",intCellsMesh.interpolate(U));
-    //~ volVectorField curlU = fvc::curl(intU);
-    
+{    
     // auxiliary computation (unnecessarily expensive)
     volVectorField curlU(fvc::curl(U));
     // Note (MI): if this initialization proves OK, than this needs to
@@ -2574,23 +1818,12 @@ void immersedBody::pimpleUpdate
     updateMovement(VelOld_,AxisOld_,omegaOld_,velRelaxFac_);
 }
 //---------------------------------------------------------------------------//
-void immersedBody::computeBodyCharPars()
-{
-    forAll (surfCells_[Pstream::myProcNo()],sCellI)
-    {
-        label cellI = surfCells_[Pstream::myProcNo()][sCellI];
-        dC_ = max(dC_,mag(CoM_-mesh_.C()[cellI]));
-    }
-    M0_ = M_;
-    reduce(dC_, maxOp<scalar>());
-}
-//---------------------------------------------------------------------------//
 void immersedBody::checkIfInDomain(volScalarField& body)
 {
-    Info << "M0: " << M0_ << endl;
-    Info << "-- body " << bodyId_ << " current M/M0: " << M_/M0_ << endl;
+    Info << "M0: " << getM0() << endl;
+    Info << "-- body " << bodyId_ << " current M/M0: " << getM()/getM0() << endl;
     //if only 1% of the initial particle mass remains in the domain, switch it off
-    if (M_/(M0_+SMALL) < 1e-2) switchActiveOff(body);
+    if (getM()/(getM0()+SMALL) < 1e-2) switchActiveOff(body);
 }
 //---------------------------------------------------------------------------//
 void immersedBody::setRestartSim(vector vel, scalar angVel, vector axisRot, bool setStatic, label timesInContact)
@@ -2598,8 +1831,8 @@ void immersedBody::setRestartSim(vector vel, scalar angVel, vector axisRot, bool
     Vel_ = vel;
     omega_ = angVel;
     Axis_ = axisRot;
-    timeStepsInContWStatic_ = timesInContact;
-    Info << "-- body " << bodyId_ << " timeStepsInContWStatic_: " << timeStepsInContWStatic_ << endl;
+    contactInfo_->setTimeStepsInContWStatic(timesInContact);
+    Info << "-- body " << bodyId_ << " timeStepsInContWStatic_: " << getTimeStepsInContWStatic() << endl;
     if(setStatic)
     {
         bodyOperation_ = 0;
@@ -2615,18 +1848,18 @@ void immersedBody::chceckBodyOp()
     if(bodyOperation_ != 5 || timesToSetStatic_ == -1)
         return;
     
-    if(!inContactWithStatic_ && timeStepsInContWStatic_ > 0)
+    if(!contactInfo_->checkInContactWithStatic() && getTimeStepsInContWStatic() > 0)
     {
-        timeStepsInContWStatic_ = 0;
+    contactInfo_->setTimeStepsInContWStatic(0);
         return;
     }
     
-    if(inContactWithStatic_)
-    {
-        timeStepsInContWStatic_++;
-        Info << "-- body " << bodyId_ << " timeStepsInContWStatic_: " << timeStepsInContWStatic_ << endl;
+    if(contactInfo_->checkInContactWithStatic())
+    {        
+        contactInfo_->setTimeStepsInContWStatic(getTimeStepsInContWStatic() + 1);
+        Info << "-- body " << bodyId_ << " timeStepsInContWStatic_: " << getTimeStepsInContWStatic() << endl;
         
-        if(timeStepsInContWStatic_ >= timesToSetStatic_)
+        if(getTimeStepsInContWStatic() >= timesToSetStatic_)
         {            
             bodyOperation_ = 0;
             omega_ = 0;
@@ -2634,4 +1867,6 @@ void immersedBody::chceckBodyOp()
             Info << "-- body " << bodyId_ << " set as Static" << endl;
         }
     }
+    
+    contactInfo_->inContactWithStatic(false);
 }

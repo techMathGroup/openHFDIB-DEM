@@ -107,10 +107,12 @@ Changelog:
 #include "dynamicFvMesh.H"
 #include "openHFDIBDEM.H"
 #include "singlePhaseTransportModel.H"
-#include "turbulentTransportModel.H"
+#include "kinematicMomentumTransportModel.H"
 #include "pimpleControl.H"
 #include "CorrectPhi.H"
-#include "fvOptions.H" // OF 4.x+
+#include "fvOptions.H"
+#include "localEulerDdtScheme.H"
+#include "fvcSmooth.H"
 
 #include "triSurfaceMesh.H"  // for fd read from stl file
 
@@ -131,18 +133,23 @@ int main(int argc, char *argv[])
     #include "createUfIfPresent.H"
     #include "createFvOptions.H"
     #include "createMRF.H"
-    #include "CourantNo.H"
-    #include "setInitialDeltaT.H"
-    
-    #include "readDynMeshDict.H"
 
     turbulence->validate();
 
+    if (!LTS)
+    {
+        #include "CourantNo.H"
+        #include "setInitialDeltaT.H"
+    }
+
+    #include "readDynMeshDict.H"
+    
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
     Info<< "\nStarting time loop\n" << endl;
 
     volScalarField surface("surf",lambda);
+    scalar thrSurf(readScalar(HFDIBDEMDict.lookup("surfaceThreshold")));
     
     bool isFirstTime(true);
     openHFDIBDEM  HFDIBDEM(mesh);
@@ -155,9 +162,16 @@ int main(int argc, char *argv[])
     {
         
         #include "readDyMControls.H"
-        #include "CourantNo.H"
 
-        #include "setDeltaT.H"
+        if (LTS)
+        {
+            #include "setRDeltaT.H"
+        }
+        else
+        {
+            #include "CourantNo.H"
+            #include "setDeltaT.H"
+        }
         
         word startTime(runTime.timeName());
         
@@ -207,7 +221,7 @@ int main(int argc, char *argv[])
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
-            if (pimple.firstIter() || moveMeshOuterCorrectors)
+            if (pimple.firstPimpleIter() || moveMeshOuterCorrectors)
             {
                 mesh.update();
 
@@ -273,7 +287,7 @@ int main(int argc, char *argv[])
         times[2] = timer.timeIncrement();
         
         Info << "trying to update HFDIBDEM" << endl;
-        CoNum = HFDIBDEM.postUpdateBodies(lambda,f);//uses updated f to recomptute V_el, omega_ and Axis_
+        HFDIBDEM.postUpdateBodies(lambda,f);
         
         times[3] = timer.timeIncrement();
         

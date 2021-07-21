@@ -30,12 +30,12 @@ recordSimulation true;
 
 wallProps
 {
-	kN     1e5;
-	gammaN 4;
+	kN     1e7;
+	gammaN 0;
 	kt     0;
 	gammat 0;
-	mu 15;
-	adhN 5e2;
+	mu 0;
+	adhN 0;
 }
 
 impellerSphere
@@ -44,7 +44,7 @@ prescribedTransRotBody
  {
     axis     (0 0 -1);
     velocity (0 0 0);
-    omega    15;
+    omega    20;
  }
 rho         rho [1 -3 0 0 0 0 0] 3950;
 refineMC 5;
@@ -100,8 +100,8 @@ U
 {
 	BC  noSlip;
 }
-kN     1e5;
-gammaN 2;
+kN     1e7;
+gammaN 0;
 kt     0;
 gammat 0;
 mu     7;

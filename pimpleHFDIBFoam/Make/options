@@ -1,8 +1,9 @@
 EXE_INC = \
-    -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
-    -I$(LIB_SRC)/TurbulenceModels/incompressible/lnInclude \
+    -I$(LIB_SRC)/MomentumTransportModels/momentumTransportModels/lnInclude \
+    -I$(LIB_SRC)/MomentumTransportModels/incompressible/lnInclude \
     -I$(LIB_SRC)/transportModels \
-    -I$(LIB_SRC)/transportModels/incompressible/singlePhaseTransportModel \
+    -I$(LIB_SRC)/transportModels/transportModel \
+    -I$(LIB_SRC)/transportModels/singlePhaseTransportModel \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/lnInclude \
@@ -10,11 +11,11 @@ EXE_INC = \
     -I$(LIB_SRC)/fvOptions/lnInclude \
     -I$(LIB_SRC)/triSurface/lnInclude \
     -I$(LIB_SRC)/sampling/lnInclude \
-    -I../v19b1_HFDIBDEM/lnInclude
+    -I../HFDIBDEM/lnInclude
 
 EXE_LIBS = \
-    -lturbulenceModels \
-    -lincompressibleTurbulenceModels \
+    -lmomentumTransportModels \
+    -lincompressibleMomentumTransportModels \
     -lincompressibleTransportModels \
     -lfiniteVolume \
     -ldynamicFvMesh \

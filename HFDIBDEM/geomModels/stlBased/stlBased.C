@@ -38,12 +38,13 @@ using namespace Foam;
 stlBased::stlBased
 (
     const  dynamicFvMesh&   mesh,
+    contactType cType,
     word      stlPath,
     scalar  thrSurf,
     Vector<label> geometricD
 )
 :
-geomModel(mesh,thrSurf,geometricD),
+geomModel(mesh,cType,thrSurf,geometricD),
 bodySurfMesh_
 (
     IOobject

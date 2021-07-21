@@ -82,6 +82,7 @@ namespace Foam
         shapeBased
         (
             mesh,
+            sphere,
             thrSurf,
             geometricD
         ),
@@ -213,6 +214,11 @@ namespace Foam
         }
         
         pointField sampleSurfacePoints() final override;
+        
+        scalar getDC() final override
+        {
+            return 2*radius_;
+        }
     };
 }
 

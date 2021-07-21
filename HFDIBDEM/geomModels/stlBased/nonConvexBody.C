@@ -38,7 +38,16 @@ bool nonConvexBody::canAddBody
 (
     const volScalarField& body
 )
-{
+{    
+    label nGeomDir(0);
+    forAll(geometricD_,dir)
+    {
+        if(geometricD_[dir] == 1)
+        {
+            nGeomDir += 1;
+        }
+    }
+    
     Field<label> octreeField(mesh_.nCells(),0);
     
     scalar inflFact(2*sqrt(mesh_.magSf()[0]));    
@@ -92,25 +101,28 @@ bool nonConvexBody::canAddBody
                     return false;
                 }
                 
-                const labelList& cFaces = mesh_.cells()[cellI];
-
-                forAll (cFaces,faceI)
+                if(nGeomDir == 3)
                 {
-                    if (!mesh_.isInternalFace(cFaces[faceI]))
+                    const labelList& cFaces = mesh_.cells()[cellI];
+
+                    forAll (cFaces,faceI)
                     {
-                        // Get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
-                        label facePatchId(-1);
-                        facePatchId = mesh_.boundaryMesh().whichPatch(cFaces[faceI]);
-                        const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchId];
-                        if (cPatch.type()=="wall" || cPatch.type()=="patch")
-                        {          
-                            pointField points = mesh_.faces()[cFaces[faceI]].points(pp);
-                            boolList faceVertexesInside = triSurfSearch_().calcInside(vertexPoints);
-                            forAll (faceVertexesInside, verIn)
-                            {
-                                if (faceVertexesInside[verIn]==true)
+                        if (!mesh_.isInternalFace(cFaces[faceI]))
+                        {
+                            // Get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
+                            label facePatchId(-1);
+                            facePatchId = mesh_.boundaryMesh().whichPatch(cFaces[faceI]);
+                            const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchId];
+                            if (cPatch.type()=="wall" || cPatch.type()=="patch")
+                            {          
+                                pointField points = mesh_.faces()[cFaces[faceI]].points(pp);
+                                boolList faceVertexesInside = triSurfSearch_().calcInside(vertexPoints);
+                                forAll (faceVertexesInside, verIn)
                                 {
-                                    return false;
+                                    if (faceVertexesInside[verIn]==true)
+                                    {
+                                        return false;
+                                    }
                                 }
                             }
                         }

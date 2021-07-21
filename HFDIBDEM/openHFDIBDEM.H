@@ -62,6 +62,8 @@ Contributors
 #include "addModelRepeatRandomPosition.H"
 #include "addModelDistribution.H"
 
+#include "contactModel.H"
+
 namespace Foam
 {
     
@@ -91,27 +93,10 @@ namespace Foam
     //addModels (how to add the baseObjects)
     PtrList<addModel> addModels_;
     
+    autoPtr<wallInfo> wallInfo_;
+    
     //Precalculate cellPoints for better performace
     List<pointField> cellPoints_;
-    
-    //Contact variables (global)
-    //spring stiffness for normal contact force (walls)
-    scalar  kWN_;
-    
-    //damping coefficient for normal contact force (walls)
-    scalar gammaWN_;
-    
-    //spring stiffness for normal contact force (walls)
-    scalar  kWt_;
-    
-    //damping coefficient for normal contact force (walls)
-    scalar gammaWt_;
-    
-    //friction coefficient
-    scalar muW_;
-    
-    //adhesion coefficient
-    scalar adhWN_;
     
     DynamicLabelList ibContactList_;
     
@@ -148,21 +133,11 @@ namespace Foam
     DynamicList<Tuple2<label, label>> possibleContactNeighbourList_;
     // List of pairs that are in contact due to intersection of surfaces
     DynamicList<Tuple2<label, label>> prtContactIBList_;
-    // Center of the contact area
-    DynamicVectorList prtContactCenter_;
-    //  Penetration volume for prt-prt contact
-    DynamicScalarList prtContactVolume_;
-    //  Normal direction for prt-prt contact
-    DynamicVectorList prtContactNormal_;
-    //  Contact area for prt-prt contact
-    DynamicScalarList prtContactArea_;
     // number of DEM loops
     DynamicScalarList numberOfDEMloops_;
     //record simulation for start from lastTime possibility
     bool recordSimulation_;
     word recordOutDir_;
-    // Method for iteration over list and find if the pair is present in given list
-    label findIndexOfPairInNeighbourList(DynamicList<Tuple2<label, label>>& listToSearch, Tuple2<label, label> pair);
     // Update positions of bounding points
     // sort the list
     // Solve potential intersections
@@ -185,7 +160,6 @@ namespace Foam
     public:
     
     openHFDIBDEM(const Foam::dynamicFvMesh& mesh);
-    openHFDIBDEM(const Foam::dynamicFvMesh& mesh, const wordList bodyNames);
     ~openHFDIBDEM();
     
     //~ void initialize(volScalarField& body);
@@ -196,7 +170,7 @@ namespace Foam
         volScalarField& body,
         volVectorField& f
     );
-    scalar postUpdateBodies(volScalarField& body,volVectorField& f);
+    void postUpdateBodies(volScalarField& body,volVectorField& f);
     // Note (MI): this function returns the maximal CoNum encountered
     //            between particles (wanted to maintain a stable integration)
     
@@ -244,19 +218,6 @@ namespace Foam
     //~ void addRemoveBodies(volScalarField& body);
     void addRemoveBodies(volScalarField& body,volVectorField& U,volScalarField& refineF);
     
-    // function to find normal vector
-    vector getContactNormal
-    (
-        DynamicLabelList commonCells,
-        vector normalVector,vector contactCenter
-    );
-    
-    // function to find contact area
-    scalar getContactArea(DynamicLabelList commonCells);
-    
-    // function to return variables needed for prt-prt resolution
-    openHFDIBDEM::prtPrtContactInfo getPrtContactInfo(Tuple2<label, label> pairToTest);
-    
     // Method for iteration over list and find if pairs that contains at least some ib
     void findIndexesOfPairWithSomeIb
     (
@@ -265,18 +226,10 @@ namespace Foam
         DynamicList<Tuple2<label,
         label>>& listToAppend
     );    
-        
-    //solve body-body contact
-    void solvePrtContact(openHFDIBDEM::prtPrtContactInfo contactInfo, scalar deltaT);
     
-    //Resolve possible 3D contact info
-    Tuple2<scalar,vector> get3DcontactInfo
-    (
-        DynamicLabelList commonCells,
-        DynamicVectorList edgePoints,
-        vector normalVector,
-        vector contactCenter,
-        label owner
+    label findIndOfPairInNeighbourList(
+            DynamicList<Tuple2<label, label>>& listToSearch, 
+            Tuple2<label, label> pair
     );
     
     void restartSimulation

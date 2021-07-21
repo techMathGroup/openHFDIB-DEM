@@ -37,11 +37,12 @@ using namespace Foam;
 shapeBased::shapeBased
 (
     const  dynamicFvMesh&   mesh,
+    contactType cType,
     scalar  thrSurf,
     Vector<label> geometricD
 )
 :
-geomModel(mesh,thrSurf,geometricD)
+geomModel(mesh,cType,thrSurf,geometricD)
 {}
 //---------------------------------------------------------------------------//
 vector shapeBased::addModelReturnRandomPosition

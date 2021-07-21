@@ -68,6 +68,7 @@ namespace Foam
         stlBased
         (
             const  dynamicFvMesh&   mesh,
+            contactType cType,
             word      stlPath,
             scalar  thrSurf,
             Vector<label> geometricD
@@ -84,17 +85,17 @@ namespace Foam
             List<DynamicLabelList>& intCells,
             List<pointField>& cellPoints
         )
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}    
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}    
         
         virtual bool canAddBody
         (
             const volScalarField& body
         )
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl; return false;}
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return false;}
         
         virtual geomModel* getGeomModel()
         {
-            Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;
+            Info << "-- geomModelMessage-- " << "notIplemented"<<endl;
             geomModel* bodyGeomModel = new geomModel(mesh_);
             return bodyGeomModel;            
         } 

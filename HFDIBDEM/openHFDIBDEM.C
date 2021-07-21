@@ -44,6 +44,7 @@ Contributors
 #define ORDER 2
 
 using namespace Foam;
+using namespace contactModel;
 
 //---------------------------------------------------------------------------//
 openHFDIBDEM::openHFDIBDEM(const Foam::dynamicFvMesh& mesh )
@@ -72,63 +73,33 @@ transportProperties_
     )
 ),
 bodyNames_(HFDIBDEMDict_.lookup("bodyNames")),
-kWN_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("kN"))),
-gammaWN_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("gammaN"))),
-kWt_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("kt"))),
-gammaWt_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("gammat"))),
-muW_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("mu"))),
-adhWN_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("adhN"))),
 minDEMloops_(readScalar(HFDIBDEMDict_.lookup("minDEMloops"))),
 minDEMtimeStep_(readScalar(HFDIBDEMDict_.lookup("minDEMtimeStep"))),
 recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 {
-    if (HFDIBDEMDict_.found("geometricD"))
+    scalar adhN(0.0);
+    if (HFDIBDEMDict_.subDict("wallProps").found("adhN"))
     {
-        geometricD_ = HFDIBDEMDict_.lookup("geometricD");
+        adhN = readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("adhN"));
     }
-    else
+    scalar adhEqui(0.0);
+    if (HFDIBDEMDict_.subDict("wallProps").found("adhEqui"))
     {
-        geometricD_ = mesh_.geometricD();
+        adhEqui = readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("adhEqui"));
     }
     
-    recordOutDir_ = mesh_.time().rootPath() + "/" + mesh_.time().globalCaseName() + "/bodiesInfo";
-}
-openHFDIBDEM::openHFDIBDEM(const Foam::dynamicFvMesh& mesh, const Foam::wordList bodyNames )
-:
-mesh_(mesh),
-HFDIBDEMDict_
-(
-    IOobject
-    (
-        "HFDIBDEMDict",
-        "constant",
-        mesh_,
-        IOobject::MUST_READ,
-        IOobject::NO_WRITE
-    )
-),
-transportProperties_
-(
-    IOobject
-    (
-        "transportProperties",
-        "constant",
-        mesh_,
-        IOobject::MUST_READ,
-        IOobject::NO_WRITE
-    )
-),
-bodyNames_(bodyNames),
-kWN_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("kN"))),
-gammaWN_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("gammaN"))),
-kWt_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("kt"))),
-gammaWt_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("gammat"))),
-muW_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("mu"))),
-adhWN_(readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("adhN"))),
-minDEMloops_(readScalar(HFDIBDEMDict_.lookup("minDEMloops"))),
-minDEMtimeStep_(readScalar(HFDIBDEMDict_.lookup("minDEMtimeStep"))),
-recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
-{
+    wallInfo_.set(
+        new wallInfo(
+            readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("kN")),
+            readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("kt")),
+            readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("gammaN")),
+            readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("gammat")),
+            readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("mu")),
+            adhN,
+            adhEqui
+                  )
+        );
+    
     if (HFDIBDEMDict_.found("geometricD"))
     {
         geometricD_ = HFDIBDEMDict_.lookup("geometricD");
@@ -143,27 +114,6 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 //---------------------------------------------------------------------------//
 openHFDIBDEM::~openHFDIBDEM()
 {
-    //~ Info << "Calling openHFDIBDEM destructor" << endl;
-    //~ forAll (immersedBodies_,bodyI)
-    //~ {
-        //~ Info << "Calling destructor for immersedBody " << bodyI << endl;
-        //~ immersedBodies_[bodyI].~immersedBody();
-        //~ Info << "Destroyed " << bodyI << endl;
-    //~ }
-    //~ Info << "Clearing out now empty pointer list" << endl;
-    //~ immersedBodies_.~PtrList();
-    //~ Info << "Cleared out" << endl;
-    //~ forAll (addModels_,addModelI)
-    //~ {
-        //~ Info << "Calling destructor for addModel " << addModelI << endl;
-        //~ addModels_[addModelI].~addModel();
-    //~ }
-    //~ addModels_.~PtrList();
-    //~ Info << "Clearing out immersed bodies" << endl;
-    //~ immersedBodies_.clear();
-    //~ Info << "Clearing out auxiliary variables" << endl;
-    //~ ibContactList_.clear();
-    //~ Info << "About to exit openHFDIBDEM destructor" << endl;
 }
 //---------------------------------------------------------------------------//
 //~ void openHFDIBDEM::initialize(volScalarField& body)
@@ -194,7 +144,7 @@ void openHFDIBDEM::initialize
             mkDir(recordOutDir_);
         else
         {
-            fileNameList entries(readDir(recordOutDir_,fileName::DIRECTORY));
+            fileNameList entries(readDir(recordOutDir_,fileType::directory)); // OF version 8, For version 6 use fileName::DIRECTORY instead of fileType::directory
             scalar runTimeS(stod(runTime));
             forAll(entries,entry)
             {
@@ -335,10 +285,6 @@ void openHFDIBDEM::preUpdateBodies
     // - particles undergoing contact
     ibContactList_.clear();
     prtContactIBList_.clear();
-    prtContactCenter_.clear();
-    prtContactVolume_.clear();
-    prtContactNormal_.clear();
-    prtContactArea_.clear();
     
     forAll (immersedBodies_,bodyId)
     {
@@ -351,9 +297,12 @@ void openHFDIBDEM::preUpdateBodies
             // create body or compute body-fluid coupling and estimate
             // potential contacts with walls
             
-            immersedBodies_[bodyId].inCotactWithStatic(false);
+            immersedBodies_[bodyId].inContactWithStatic(false);
             
-            immersedBodies_[bodyId].preContactUpdateBodyField(body,f);
+            immersedBodies_[bodyId].preContactUpdateImmersedBody(body,f);
+            
+            if(immersedBodies_[bodyId].detectWallContact())
+                detectWallContact(mesh_,immersedBodies_[bodyId].getContactInfo());
             
             immersedBodies_[bodyId].printStats();
             
@@ -374,23 +323,19 @@ void openHFDIBDEM::preUpdateBodies
     detectPrtContact();
 }
 //---------------------------------------------------------------------------//
-scalar openHFDIBDEM::postUpdateBodies
+void openHFDIBDEM::postUpdateBodies
 (
     volScalarField& body,
     volVectorField& f
 )
-{    
-    // compute max CoNum over the bodies
-    scalar CoNum(0.0);
+{  
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
             immersedBodies_[bodyId].postContactUpdateImmersedBody(body,f);
-            CoNum = max(CoNum,immersedBodies_[bodyId].getCoNum());
         }
     }
-    return CoNum;
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::moveBodies
@@ -732,768 +677,6 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
     }
 }
 //---------------------------------------------------------------------------//
-openHFDIBDEM::prtPrtContactInfo openHFDIBDEM::getPrtContactInfo(Tuple2<label, label> pairToTest)
-{
-    openHFDIBDEM::prtPrtContactInfo returnContactInfoValue;
-    
-    // reference to current body
-    immersedBody& cBody(immersedBodies_[pairToTest.first()]);
-    immersedBody& tBody(immersedBodies_[pairToTest.second()]);
-    
-    List<DynamicLabelList>    commonCells;
-    commonCells.setSize(Pstream::nProcs());
-
-    List<DynamicLabelList> cSurfCells(cBody.getSurfaceCellList());
-    List<DynamicLabelList> cIntCells(cBody.getInternalCellList());
-    List<DynamicLabelList> tSurfCells(tBody.getSurfaceCellList());
-    
-    //Bounding box of body t is used only for optimization of for loop
-    boundBox tBox(tBody.getMinBoundPoint(),tBody.getMaxBoundPoint());
-    // Inflate tBox to include cell center of surfCells
-    tBox.inflate(2*sqrt(mesh_.magSf()[0])/tBox.mag());
-    
-    //Iterate over surfCells to find commen cells 
-    forAll (cSurfCells[Pstream::myProcNo()],cSCellI)
-    {
-        if (tBox.contains(mesh_.C()[cSurfCells[Pstream::myProcNo()][cSCellI]]))
-        {
-            forAll (tSurfCells[Pstream::myProcNo()],tSCellI)
-            {
-                if (mag(cSurfCells[Pstream::myProcNo()][cSCellI]-tSurfCells[Pstream::myProcNo()][tSCellI]) < SMALL)
-                {
-                    commonCells[Pstream::myProcNo()].append(cSurfCells[Pstream::myProcNo()][cSCellI]);                    
-                }
-            }
-        }
-    }
-    
-    label numOfComCells(0);
-    vector contactCenter(vector::zero);
-    //If there are any common cells check if the surfaces are intersected
-    if (commonCells[Pstream::myProcNo()].size() > SMALL)
-    {
-        //Evaluate center of the contact area
-        forAll (commonCells[Pstream::myProcNo()], cCell)
-        {
-            contactCenter += mesh_.C()[commonCells[Pstream::myProcNo()][cCell]];
-        }
-        numOfComCells = commonCells[Pstream::myProcNo()].size();
-    }
-    
-    sumReduce(contactCenter, numOfComCells);
-
-    if (numOfComCells <= 0) 
-    {
-        returnContactInfoValue.prtsInContact_ = pairToTest;
-        returnContactInfoValue.contactCenter_ = vector::zero;
-        returnContactInfoValue.contactVolume_ = 0;
-        returnContactInfoValue.contactNormal_ = vector::zero;
-        returnContactInfoValue.contactArea_ = 0;
-        returnContactInfoValue.inContact_ = false;
-        return returnContactInfoValue;
-    }
-    
-    contactCenter /= numOfComCells;
-    
-    vector cCoM(cBody.getCoM());        //center of mass
-    vector tCoM(tBody.getCoM());        //center of mass
-    scalar tDC(tBody.getDC());          //characteristic diameter
-    
-    //Create triSurfaceSearch
-//     const triSurface& tibTemp( tBody.getTriSurfMesh());
-//     triSurfaceSearch tibTriSurfSearch( tibTemp );
-    
-    //Get nearest point on surface from contact center
-//     pointIndexHit tibPointIndexHit = tibTriSurfSearch.nearest(contactCenter, vector::one * tDC);
-//     List<pointIndexHit> tibPointIndexHitList(1,tibPointIndexHit);
-//     vectorField normalVectorField;
-//     
-//     //Get contact normal direction
-//     const triSurfaceMesh& tibTempMesh( tBody.getTriSurfMesh());
-//     tibTempMesh.getNormal(tibPointIndexHitList,normalVectorField);
-//     // MS note: This normal direction is not correct for sharp edges! 
-//     // therefore it is used only if the normal direction cannot be set
-//     // based on surfcels (there is only one such cell
-    
-    vector normalVector(tBody.getGeomModel().getClosestNormal(contactCenter,vector::one * tDC));
-    scalar contactArea(0);
-    bool case3D(true);
-    //Check if the case is 3D
-    forAll (geometricD_, direction)
-    {
-        if (geometricD_[direction] == -1)
-        {
-            case3D = false;
-            break;
-        }
-    }
-    //Use edge cells to find contact area (better precision then surfcells)
-    DynamicVectorList edgePoints;
-    DynamicLabelList edgeCells;
-        
-    scalar intersectedVolume(0);
-        
-    if (commonCells[Pstream::myProcNo()].size() > SMALL)
-    {
-
-        //Create triSurfaceSearch
-//         const triSurface& cibTemp( cBody.getTriSurfMesh());
-//         triSurfaceSearch cibTriSurfSearch( cibTemp );
-        const pointField& pp = mesh_.points();
-        
-        boolList tcenterInsideList = tBody.getGeomModel().pointInside( mesh_.C());
-        boolList ccenterInsideList = cBody.getGeomModel().pointInside( mesh_.C());
-
-        forAll (cSurfCells[Pstream::myProcNo()],cSCellI)
-        {
-            bool partiallyInT(false);
-            
-            if (tBox.contains(mesh_.C()[cSurfCells[Pstream::myProcNo()][cSCellI]]))
-            {
-                const labelList& vertexLabels = mesh_.cellPoints()[cSurfCells[Pstream::myProcNo()][cSCellI]];
-                const pointField vertexPoints(pp,vertexLabels);
-                boolList tvertexesInside = tBody.getGeomModel().pointInside( vertexPoints );
-                boolList cvertexesInside = cBody.getGeomModel().pointInside( vertexPoints );
-                bool tcenterInside(tcenterInsideList[cSurfCells[Pstream::myProcNo()][cSCellI]] );
-                bool ccenterInside(ccenterInsideList[cSurfCells[Pstream::myProcNo()][cSCellI]] );
-                //~ scalar rVInSize(1.0/(tvertexesInside.size()+1));// MI: WHIS IS THIS HERE?
-                scalar rVInSize(0.5/tvertexesInside.size());
-                // Note: weiggetContactNormalht of a single vertex in the cell
-                
-                DynamicVectorList edgePointsI;
-                
-                scalar partialVolume(0);
-                forAll (tvertexesInside, verIn)
-                {
-                    if (tvertexesInside[verIn]==true && cvertexesInside[verIn]==true)
-                    {
-                        partialVolume += rVInSize; //fraction of cell covered
-                        partiallyInT = true;
-                        edgePointsI.append(vertexPoints[verIn]);
-                    }
-                }
-
-                if (tcenterInside==true && ccenterInside==true)
-                {
-                    partialVolume += 0.5; //fraction of cell covered
-                    partiallyInT = true;
-                    for(label i = 0; i < tvertexesInside.size(); i++)
-                        edgePointsI.append(mesh_.C()[cSurfCells[Pstream::myProcNo()][cSCellI]] );
-                }
-                //Cells is edge cell when the cell is surfcell in both proccessors
-                if (partialVolume + SMALL < 1 && partiallyInT)
-                {
-                    edgeCells.append(cSurfCells[Pstream::myProcNo()][cSCellI]);
-                    vector edgePoint(vector::zero);
-                    forAll(edgePointsI,pointI)
-                    {
-                        edgePoint += edgePointsI[pointI];
-                    }
-                    edgePoint /= edgePointsI.size();
-                    edgePoints.append(edgePoint);
-                }
-                
-                
-                intersectedVolume += mesh_.V()[cSurfCells[Pstream::myProcNo()][cSCellI]] * partialVolume;
-            }
-        }
-        //Calculate remaining intersected volume
-        forAll (cIntCells[Pstream::myProcNo()],cSCellI)
-        {
-            if (tBox.contains(mesh_.C()[cIntCells[Pstream::myProcNo()][cSCellI]]))
-            {
-                const labelList& vertexLabels = mesh_.cellPoints()[cIntCells[Pstream::myProcNo()][cSCellI]];
-                const pointField vertexPoints(pp,vertexLabels);
-                boolList tvertexesInside = tBody.getGeomModel().pointInside( vertexPoints );
-                boolList cvertexesInside = cBody.getGeomModel().pointInside( vertexPoints );
-                bool tcenterInside(tcenterInsideList[cIntCells[Pstream::myProcNo()][cSCellI]] );
-                bool ccenterInside(ccenterInsideList[cIntCells[Pstream::myProcNo()][cSCellI]] );
-                //~ scalar rVInSize(1.0/(tvertexesInside.size()+1));
-                scalar rVInSize(0.5/tvertexesInside.size());
-                // Note: weight of a single vertex in the cell
-                
-                scalar partialVolume(0);
-                forAll (tvertexesInside, verIn)
-                {
-                    if (tvertexesInside[verIn]==true && cvertexesInside[verIn]==true)
-                    {
-                        partialVolume += rVInSize; //fraction of cell covered
-                    }
-                }
-                
-                if (tcenterInside==true && ccenterInside==true)
-                {
-                    partialVolume += 0.5; //fraction of cell covered
-                }
-                
-                intersectedVolume += mesh_.V()[cIntCells[Pstream::myProcNo()][cSCellI]] * partialVolume;
-            }
-        }
-    }
-    
-    reduce(intersectedVolume, sumOp<scalar>());
-    
-    if (intersectedVolume > 0)
-    {
-        if (case3D)
-        {
-            Tuple2<scalar,vector> returnTuple = get3DcontactInfo(edgeCells, edgePoints, normalVector, contactCenter, cBody.getOwner());
-            contactArea = returnTuple.first();
-            normalVector = returnTuple.second();
-        }
-        else
-        {
-            normalVector = getContactNormal(commonCells[Pstream::myProcNo()], normalVector, contactCenter);
-                
-            // Evaluate contact area
-            contactArea = getContactArea(commonCells[Pstream::myProcNo()]);
-        }
-    }
-
-    if (intersectedVolume > 0 && contactArea > 0)
-    {        
-        returnContactInfoValue.prtsInContact_ = pairToTest;
-        returnContactInfoValue.contactCenter_ = contactCenter;
-        returnContactInfoValue.contactVolume_ = intersectedVolume;
-        returnContactInfoValue.contactNormal_ = normalVector;
-        returnContactInfoValue.contactArea_ = contactArea;
-        returnContactInfoValue.inContact_ = true;
-        return returnContactInfoValue;
-    }
-    else
-    {
-        returnContactInfoValue.prtsInContact_ = pairToTest;
-        returnContactInfoValue.contactCenter_ = vector::zero;
-        returnContactInfoValue.contactVolume_ = 0;
-        returnContactInfoValue.contactNormal_ = vector::zero;
-        returnContactInfoValue.contactArea_ = 0;
-        returnContactInfoValue.inContact_ = false;
-        return returnContactInfoValue;
-    }
-}
-//---------------------------------------------------------------------------//
-Tuple2<scalar,vector> openHFDIBDEM::get3DcontactInfo(DynamicLabelList commonCells, DynamicVectorList edgePoints, vector normalVector, vector contactCenter, label owner)
-{      
-    //Collect edge positions from all processors
-    List<DynamicPointList> commCellsPositionsProc;
-    commCellsPositionsProc.setSize(Pstream::nProcs());
-    DynamicPointList commCellsPositions;
-    forAll (commonCells, cCell)
-    {
-        commCellsPositionsProc[Pstream::myProcNo()].append(mesh_.C()[commonCells[cCell]]);
-    }
-    
-    PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);    
-    for (label proci = 0; proci < Pstream::nProcs(); proci++)
-    {
-        if (proci != Pstream::myProcNo())
-        {
-            UOPstream send(proci, pBufs);
-            send << commCellsPositionsProc[Pstream::myProcNo()];
-        }
-    }
-    
-    pBufs.finishedSends();    
-    for (label proci = 0; proci < Pstream::nProcs(); proci++)
-    {
-        if (proci != Pstream::myProcNo())
-        {
-            UIPstream recv(proci, pBufs);
-            DynamicPointList commCellsPositionsi (recv);
-            commCellsPositionsProc[proci].append(commCellsPositionsi);
-        }
-    }
-    //First fill edge positions from owner (better stability for svd)
-    for (label i = 0; i < commCellsPositionsProc[owner].size(); i++)
-    {
-        commCellsPositions.append(commCellsPositionsProc[owner][i]);
-    }
-    
-    for (label proci = 0; proci < Pstream::nProcs(); proci++)
-    {
-        if (proci != owner)
-        {
-            for (label i = 0; i < commCellsPositionsProc[proci].size(); i++)
-            {
-                commCellsPositions.append(commCellsPositionsProc[proci][i]);
-            }
-        }
-    }
-    
-    pBufs.clear();
-    
-    //Collect edge Points from all processors
-    List<DynamicPointList> commPointsPositionsProc;
-    commPointsPositionsProc.setSize(Pstream::nProcs());
-    DynamicPointList commPointsPositions;
-    forAll (edgePoints, cCell)
-    {
-        commPointsPositionsProc[Pstream::myProcNo()].append(edgePoints[cCell]);
-    }
-    
-    for (label proci = 0; proci < Pstream::nProcs(); proci++)
-    {
-        if (proci != Pstream::myProcNo())
-        {
-            UOPstream send(proci, pBufs);
-            send << commPointsPositionsProc[Pstream::myProcNo()];
-        }
-    }
-    
-    pBufs.finishedSends();    
-    for (label proci = 0; proci < Pstream::nProcs(); proci++)
-    {
-        if (proci != Pstream::myProcNo())
-        {
-            UIPstream recv(proci, pBufs);
-            DynamicPointList commPointsPositionsi (recv);
-            commPointsPositionsProc[proci].append(commPointsPositionsi);
-        }
-    }
-    
-    for (label proci = 0; proci < Pstream::nProcs(); proci++)
-    {
-        for (label i = 0; i < commCellsPositionsProc[proci].size(); i++)
-        {
-            commPointsPositions.append(commPointsPositionsProc[proci][i]);
-        }
-    }
-    
-    scalar area(0.0);
-    vector normalVec(vector::zero);
-    
-    if (commPointsPositions.size() >= 3)
-    {        
-        bool normOk(false);
-        vector center(vector::zero);
-        
-        forAll (commPointsPositions,cell)
-        {
-            center += commPointsPositions[cell];
-        }
-        center /= commPointsPositions.size();
-        
-        scalar xx(0);
-        scalar xy(0);
-        scalar xz(0);
-        scalar yy(0);
-        scalar yz(0);
-        scalar zz(0);
-                    
-        forAll (commPointsPositions,cell)
-        {
-            vector subPoint(commPointsPositions[cell] - center);
-            if(subPoint != vector::zero)
-                subPoint = subPoint/mag(subPoint);
-            xx += subPoint[0] * subPoint[0];
-            xy += subPoint[0] * subPoint[1];
-            xz += subPoint[0] * subPoint[2];
-            yy += subPoint[1] * subPoint[1];
-            yz += subPoint[1] * subPoint[2];
-            zz += subPoint[2] * subPoint[2];
-        }
-        
-        xx /= commPointsPositions.size();
-        xy /= commPointsPositions.size();
-        xz /= commPointsPositions.size();
-        yy /= commPointsPositions.size();
-        yz /= commPointsPositions.size();
-        zz /= commPointsPositions.size();
-        
-        vector weightedDir(vector::zero);
-        
-        
-        scalar detX(yy*zz-yz*yz);
-        vector axisDirX(detX,xz*yz-xy*zz,xy*yz-xz*yy);
-        scalar weightX(detX*detX);
-        if((weightedDir & axisDirX) < 0.0)
-            weightX = -weightX;
-        weightedDir += axisDirX * weightX;
-        
-        scalar detY(xx*zz-xz*xz);
-        vector axisDirY(xz*yz-xy*zz,detY,xy*xz-yz*xx);
-        scalar weightY(detY*detY);
-        if((weightedDir & axisDirY) < 0.0)
-            weightY = -weightY;
-        weightedDir += axisDirY * weightY;
-        
-        scalar detZ(xx*yy-xy*xy);
-        vector axisDirZ(xy*yz-xz*yy,xy*xz-yz*xx,detZ);
-        scalar weightZ(detZ*detZ);
-        if((weightedDir & axisDirZ) < 0.0)
-            weightZ = -weightZ;
-        weightedDir += axisDirZ * weightZ;
-        
-        if(mag(weightedDir) > SMALL)
-        {
-            normOk = true;
-            normalVec = weightedDir/mag(weightedDir);
-        }
-        if (!normOk || mag(normalVec) < 1)
-            normalVec = normalVector;
-
-        //Create best fitting plane
-        plane bestFitPlane(contactCenter, normalVec);
-        normalVec = bestFitPlane.normal();
-        DynamicPointList commCellsPosInPlane;    
-        forAll (commCellsPositions,cell)
-            commCellsPosInPlane.append(bestFitPlane.nearestPoint(commCellsPositions[cell]));
-        
-        vector q1(1.0, 0.0, 0.0);
-        vector q2(0.0, 1.0, 0.0);    
-        if (abs(q1 & bestFitPlane.normal()) > abs(q2 & bestFitPlane.normal()))
-            q1 = q2;
-        
-        vector u(bestFitPlane.normal() ^ q1);
-        vector v(bestFitPlane.normal() ^ u); 
-        
-        DynamicList<plane> clockwisePlanes;
-        List<scalar> helpList(6);
-        helpList[0] = 0.0;
-        helpList[1] = 1.0;
-        helpList[2] = 0.0;
-        helpList[3] = -1.0;
-        helpList[4] = 0.0;
-        helpList[5] = 1.0;
-        
-        //Loop over parts of plane to find and sort points
-        DynamicVectorList commCellsInSections; 
-        for (label i = 0; i < 4; i++)
-        {
-            scalar uStep(helpList[i + 1] -  helpList[i]);
-            scalar vStep(helpList[i + 2] -  helpList[i + 1]);
-            DynamicPointList pointsInSection;
-            for (scalar j = 0.0; j < 3.0; j += 1.0)
-            {
-                plane uPlane(contactCenter, u*(helpList[i] + uStep*j/4.0) + v*(helpList[i + 1] + vStep*j/4.0));
-                plane vPlane(contactCenter, u*(helpList[i] + uStep*(j+1)/4.0) + v*(helpList[i + 1] + vStep*(j+1)/4.0));
-                
-                forAll (commCellsPosInPlane, celli)
-                {
-                    if (uPlane.sideOfPlane(commCellsPosInPlane[celli]) == 0 && vPlane.sideOfPlane(commCellsPosInPlane[celli]) == 1)
-                        pointsInSection.append(commCellsPosInPlane[celli]);
-                }
-                
-                if (pointsInSection.size() > SMALL)
-                {
-                    vector average(vector::zero);
-                    forAll (pointsInSection, pointI)
-                        average += pointsInSection[pointI];                
-                    average /= pointsInSection.size();
-                    
-                    commCellsInSections.append(average);
-                }
-            }
-        }
-        //Calculate contact area
-        for (label i = 0; i + 1 < commCellsInSections.size(); i++)
-        {
-            vector AC(commCellsInSections[i] - contactCenter);
-            vector BC(commCellsInSections[i + 1] - contactCenter);
-            vector crossPr(AC ^ BC);
-            area += mag(crossPr)/2;
-        }
-        
-        if (commCellsInSections.size() > 2)
-        {
-            vector AC(commCellsInSections[commCellsInSections.size() - 1] - contactCenter);
-            vector BC(commCellsInSections[0] - contactCenter);
-            vector crossPr(AC ^ BC);
-            area += mag(crossPr)/2;
-        }
-    }
-    
-    if (normalVec == vector::zero)
-        normalVec = normalVector;
-    
-    reduce(area, sumOp<scalar>());
-    area /= Pstream::nProcs();
-    reduce(normalVec, sumOp<vector>());
-    normalVec /= Pstream::nProcs();
-    
-    Tuple2<scalar,vector> returnValue(area,normalVec);
-
-    return returnValue;
-}
-//---------------------------------------------------------------------------//
-scalar openHFDIBDEM::getContactArea(DynamicLabelList commonCells)
-{        
-    DynamicPointList commCellsPositions;
-    
-    forAll (commonCells, cCell)
-    {
-        commCellsPositions.append(mesh_.C()[commonCells[cCell]]);
-    }
-    
-    PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
-    
-    for (label proci = 0; proci < Pstream::nProcs(); proci++)
-    {
-        if (proci != Pstream::myProcNo())
-        {
-            UOPstream send(proci, pBufs);
-            send << commCellsPositions;
-        }
-    }
-    
-    pBufs.finishedSends();
-    
-    for (label proci = 0; proci < Pstream::nProcs(); proci++)
-    {
-        if (proci != Pstream::myProcNo())
-        {
-            UIPstream recv(proci, pBufs);
-            DynamicPointList commCellsPositionsi (recv);
-            commCellsPositions.append(commCellsPositionsi);
-        }
-    }
-    
-    // Evaluate contact area
-    scalar contactArea(0);
-        
-    // MS note: this is dummy way how to calculate contactArea in 2D -> discuss!!
-    scalar highestDistance(0);
-    
-    for (label i = 1; i < commCellsPositions.size(); i++)
-    {
-        if (mag(commCellsPositions[i-1] - commCellsPositions[i]) > highestDistance)
-        {
-            highestDistance = mag(commCellsPositions[i-1] - commCellsPositions[i]);
-        }
-    }
-    
-    reduce(highestDistance, maxOp<scalar>());
-    if (commonCells.size() > 0)
-        contactArea = sqrt(mag(mesh_.Sf()[commonCells[0]])) * highestDistance;
-    reduce(contactArea, maxOp<scalar>());
-    return contactArea;
-}
-//---------------------------------------------------------------------------//
-vector openHFDIBDEM::getContactNormal(DynamicLabelList commonCells, vector normalVector, vector contactCenter)
-{    
-    // Ms note: mesh_.geometricD works only with empty type of boundary!
-    vector geomDirections(mesh_.geometricD());
-    forAll (geomDirections, direction)
-    {
-        if (geomDirections[direction] == 1)
-            geomDirections[direction] = 0;
-        if (geomDirections[direction] == -1)
-            geomDirections[direction] = 1;
-    }
-    
-    vector normalVector2(vector::zero);
-    
-    forAll (commonCells, cCell)
-    {
-        vector tempor((mesh_.C()[commonCells[cCell]] - contactCenter) ^ geomDirections);
-        if ((tempor & normalVector) < 0)
-            tempor *= -1;
-        normalVector2 += tempor;
-    }
-    
-    label numOfComCells(commonCells.size());
-    sumReduce(normalVector2, numOfComCells);
-
-    normalVector2 /= numOfComCells;
-    
-    if (mag(normalVector2) == 0) return normalVector;
-    
-    normalVector2 = normalVector2/mag(normalVector2);
-        
-    // Assure that the normal vector points out of the body
-    if ((normalVector2 & normalVector) < 0)
-        normalVector2 *= -1;
-    
-    return normalVector2;
-}
-//---------------------------------------------------------------------------//
-void openHFDIBDEM::solvePrtContact(openHFDIBDEM::prtPrtContactInfo contactInfo, scalar deltaT)
-{
-    // reference to current body
-    immersedBody& cBody(immersedBodies_[contactInfo.prtsInContact_.first()]);
-    
-    // get data from the current body necessary for computation of
-    // contact forces
-    vector cCoM(cBody.getCoM());        //center of mass
-    vector cVel(cBody.getVel());        //linear velocity
-    scalar cKN(cBody.getKN());          //elastic normal stiffness
-    scalar cGammaN(cBody.getGammaN());  //normal viscosity
-    scalar cKt(cBody.getKt());          //elastic tangential stiffness
-    scalar cGammat(cBody.getGammat());  //tangential viscosity
-    scalar cmu(cBody.getmu());          //firction coef
-    scalar cadhN(cBody.getadhN());      //adhesive force
-    scalar cadhEqui(cBody.getadhEqui());//adhesive force
-    scalar cM(cBody.getM());            //mass
-    scalar cRhoS(cBody.getRhoS().value());      //viscosity
-    vector cAxis(cBody.getAxis());      //Axis
-    scalar cOmega(cBody.getOmega());    //Omega
-
-    immersedBody& tBody(immersedBodies_[contactInfo.prtsInContact_.second()]);
-    
-    vector tCoM(tBody.getCoM());        //center of mass
-    vector tVel(tBody.getVel());        //linear velocity
-    scalar tKN(tBody.getKN());          //elastic normal stiffness
-    scalar tGammaN(tBody.getGammaN());  //normal viscosity
-    scalar tKt(tBody.getKt());          //elastic tangential stiffness
-    scalar tGammat(tBody.getGammat());  //tangential viscosity
-    scalar tmu(tBody.getmu());          //firction coef
-    scalar tadhN(tBody.getadhN());      //adhesive force
-    scalar tadhEqui(tBody.getadhEqui());//adhesive force
-    scalar tM(tBody.getM());            //mass
-    scalar tRhoS(tBody.getRhoS().value());      //viscosity    
-    vector tAxis(tBody.getAxis());      //Axis
-    scalar tOmega(tBody.getOmega());    //Omega
-    
-    
-    vector  FN(vector::zero);//placeholder for normal force
-    vector  Ft(vector::zero);//placeholder for tangential force
-    Info << "-- Detected particle-particle contact " << contactInfo.prtsInContact_.first() << " : " << contactInfo.prtsInContact_.second() << endl;
-    Info << "-- Particle-particle contact center " << contactInfo.contactCenter_ << endl;
-    Info << "-- Particle-particle contact normal " << contactInfo.contactNormal_ << endl;
-    Info << "-- Particle-particle contact volume " << contactInfo.contactVolume_ << endl;
-    Info << "-- Particle-particle contact area "   << contactInfo.contactArea_ << endl;
-    
-    // compute mean model parameters
-    scalar aKN(0.5*(cKN+tKN));
-    scalar aGammaN(0.5*(cGammaN+tGammaN));
-    scalar aKt(0.5*(cKt+tKt));
-    scalar aGammat(0.5*(cGammat+tGammat));
-    scalar amu(0.5*(cmu+tmu));
-    scalar aadhN(0.5*(cadhN+tadhN));
-    
-    vector cLVec(contactInfo.contactCenter_-cCoM);
-    vector tLVec(contactInfo.contactCenter_-tCoM);
-    
-    // compute normal to movement and relative velocity
-    vector nVec(contactInfo.contactNormal_);
-    
-    vector cplanarVec       =  cLVec- cAxis*((cLVec)&cAxis);
-    vector cVeli(-(cplanarVec^cAxis)*cOmega + cVel);
-    
-    vector tplanarVec       =  tLVec- tAxis*((tLVec)&tAxis);
-    vector tVeli(-(tplanarVec^tAxis)*tOmega + tVel);    
-    
-    scalar Vn(-(cVeli - tVeli) & nVec);
-    scalar Lc(4*mag(cLVec)*mag(tLVec)/(mag(cLVec)+mag(tLVec)));
-    
-    scalar reduceM(cM*tM/(cM+tM));
-
-    // compute the normal force
-    FN = (aKN*contactInfo.contactVolume_/(Lc+SMALL) + aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(contactInfo.contactArea_ * Vn))*nVec;
-    // compute adhesive force
-    scalar FAc(aadhN*contactInfo.contactArea_);    
-    scalar FAeq(min(aKN*((cadhEqui*cM)/(cRhoS + SMALL))/(Lc+SMALL), aKN*((tadhEqui*tM)/(tRhoS + SMALL))/(Lc+SMALL)));    
-    scalar partMul(max(contactInfo.contactVolume_ * cRhoS / (cM+SMALL) / (cadhEqui+SMALL), contactInfo.contactVolume_ * tRhoS / (tM+SMALL) / (tadhEqui+SMALL)));
-    if(partMul > 1)
-    {
-        partMul = 1;
-    }
-    vector FA((FAeq * partMul  + FAc * (1-partMul)) * nVec);
-    
-    vector cFtLast(vector::zero);
-    vector tFtLast(vector::zero);
-    
-    // Find history of tangential force between these two particles
-    DynamicList<Tuple2<label,Tuple2<label,vector>>> chistoryFt(cBody.getHistoryhistoryFt());
-    DynamicList<Tuple2<label,Tuple2<label,vector>>> thistoryFt(tBody.getHistoryhistoryFt());
-    
-    bool cFtLastFinded(false);
-    forAll (chistoryFt,cFti)
-    {
-        if (chistoryFt[cFti].first() == tBody.getBodyId())
-        {
-            cFtLastFinded = true;
-            cFtLast = chistoryFt[cFti].second().second();
-            break;
-        }
-    }
-    
-    bool tFtLastFinded(false);
-    forAll (thistoryFt,tFti)
-    {
-        if (thistoryFt[tFti].first() == cBody.getBodyId())
-        {
-            tFtLastFinded = true;
-            tFtLast = thistoryFt[tFti].second().second();
-            break;
-        }
-    }
-    
-    // Note the magnitude of last Ft should be same but only oposite
-    vector FtLast((cFtLast - tFtLast)/2);
-    //Project last Ft into a new direction
-    vector FtLastP(FtLast - (FtLast & nVec) * nVec);
-    //Scale projected Ft to have same magnitude as FtLast
-    vector FtLastr(mag(FtLast) * (FtLastP/(mag(FtLastP)+SMALL)));
-    // Compute relative tangential velocity
-    vector cVeliNorm((cVeli & nVec)*nVec);
-    cVeli -= cVeliNorm;
-    
-    vector tVeliNorm((cVeli & nVec)*nVec);
-    tVeli -= tVeliNorm;
-    
-    vector Vt(cVeli - tVeli);
-    //Compute tangential force
-    vector Ftdi(- aGammat*sqrt(aKN*reduceM*Lc)*Vt);
-    Ft = (FtLastr - aKt*Vt*deltaT + Ftdi);
-    
-    if (mag(Ft) > amu * mag(FN))
-    {
-        Ft *= amu * mag(FN) / mag(Ft);
-    }    
-    
-    FN -= FA;
-    
-    vector F(FN+Ft);
-    
-    // add the computed force to the affected bodies
-    vector cTN(cLVec ^  F);
-    vector tTN(tLVec ^ -F);
-    cBody.updateFAndT( F,cTN);
-    tBody.updateFAndT(-F,tTN);
-    
-    //Update history of tangential force
-    if (cFtLastFinded)
-    {
-        forAll (chistoryFt,cFti)
-        {
-            if (chistoryFt[cFti].first() == tBody.getBodyId())
-            {
-                Tuple2<label,vector> help(1,Ft);
-                chistoryFt[cFti].second() = help;
-                break;
-            }
-        }
-    }
-    else
-    {
-        Tuple2<label,vector> help(1,Ft);
-        Tuple2<label,Tuple2<label,vector>> help2(tBody.getBodyId(), help);
-                
-        chistoryFt.append(help2);
-    }
-    
-    if (tFtLastFinded)
-    {
-        forAll (thistoryFt,tFti)
-        {
-            if (thistoryFt[tFti].first() == cBody.getBodyId())
-            {
-                Tuple2<label,vector> help(1,-Ft);
-                thistoryFt[tFti].second() = help;
-                break;
-            }
-        }
-    }
-    else
-    {
-        Tuple2<label,vector> help(1,-Ft);
-        Tuple2<label,Tuple2<label,vector>> help2(cBody.getBodyId(), help);
-                
-        thistoryFt.append(help2);
-    }
-}
-//---------------------------------------------------------------------------//
 void openHFDIBDEM::writeBodiesInfo()
 {    
     if(!recordSimulation_)
@@ -1556,10 +739,10 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
         }
         
         if(immersedBodies_[prtContactIBList_[pair].first()].getbodyOperation() == 0)
-            immersedBodies_[prtContactIBList_[pair].second()].inCotactWithStatic(true);
+            immersedBodies_[prtContactIBList_[pair].second()].inContactWithStatic(true);
         
         if(immersedBodies_[prtContactIBList_[pair].second()].getbodyOperation() == 0)
-            immersedBodies_[prtContactIBList_[pair].first()].inCotactWithStatic(true);
+            immersedBodies_[prtContactIBList_[pair].first()].inContactWithStatic(true);
     }
     
     forAll (ibPrtContactList,ib)
@@ -1632,12 +815,24 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
             //Find prt-prt contact info
             forAll (pairsToResolve, pair)
             {
-                openHFDIBDEM::prtPrtContactInfo pairContactInfoValue;
-                pairContactInfoValue = getPrtContactInfo(pairsToResolve[pair]);
-                if (pairContactInfoValue.inContact_)
-                {
-                    solvePrtContact(pairContactInfoValue, deltaTime*step);
-                }
+                label cInd(pairsToResolve[pair].first());
+                label tInd(pairsToResolve[pair].second());
+                
+                Tuple2<Tuple2<vector,vector>,Tuple2<vector,vector>> outVars;
+                
+                solvePrtContact(
+                    mesh_,
+                    immersedBodies_[cInd].getContactInfo(),
+                    immersedBodies_[cInd].getContactVars(),
+                    immersedBodies_[tInd].getContactInfo(),
+                    immersedBodies_[tInd].getContactVars(),
+                    geometricD_,
+                    deltaTime*step,
+                    outVars
+                );
+                
+                immersedBodies_[cInd].updateFAndT(outVars.first().first(),outVars.first().second());
+                immersedBodies_[tInd].updateFAndT(outVars.second().first(),outVars.second().second());
             }
             
             DynamicList<bool> contactOk;            
@@ -1645,10 +840,21 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
             {
                 // Detect wall contact and solve it
                 // Update movement and move bodies
-                immersedBodies_[ibToResolve[ib]].detectWallContact(body);
+                if(immersedBodies_[ibToResolve[ib]].detectWallContact())
+                    detectWallContact(mesh_,immersedBodies_[ibToResolve[ib]].getContactInfo());
                 if (immersedBodies_[ibToResolve[ib]].checkWallContact()) 
                 {
-                    immersedBodies_[ibToResolve[ib]].solveWallContact(kWN_, gammaWN_, kWt_, gammaWt_, muW_, adhWN_, deltaTime*step);
+                    Info << "-- Body " << immersedBodies_[ibToResolve[ib]].getBodyId() << " is in contact with wall" << endl;
+                    Tuple2<vector,vector> outVars;
+                    solveWallContact(
+                        mesh_,
+                        wallInfo_(),
+                        immersedBodies_[ibToResolve[ib]].getContactInfo(),
+                        immersedBodies_[ibToResolve[ib]].getContactVars(),
+                        deltaTime*step,
+                        outVars
+                        );
+                    immersedBodies_[ibToResolve[ib]].updateFAndT(outVars.first(),outVars.second());
                 }
 
                 contactOk.append(immersedBodies_[ibToResolve[ib]].checkContactMovement(deltaTime*step));
@@ -1730,7 +936,7 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                 forAll (pairsToResolve, pair)
                 {
                     label indexOfPair(-1);
-                    indexOfPair = findIndexOfPairInNeighbourList(prtContactIBList_, pairsToResolve[pair]);
+                    indexOfPair = findIndOfPairInNeighbourList(prtContactIBList_, pairsToResolve[pair]);
                     //Remove at index
                     DynamicList<Tuple2<label, label>> helpList;
                     
@@ -1763,7 +969,7 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
         immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF);
         while(true)
         {             
-            Info << " Start DEM pos: " << pos << " DEM step: " << step << endl;
+            Info << " Start wall DEM pos: " << pos << " DEM step: " << step << endl;
             // Set F_ and T_ to zero. Do not assign history values
             immersedBodies_[ibContactList_[0]].initializeVarHistory(false);
             // Add fluid coupling force to F and T. This is still same for whole DEM inner loop
@@ -1771,10 +977,21 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
             
             // Detect wall contact and solve it
             // Update movement and move bodies
-            immersedBodies_[ibContactList_[0]].detectWallContact(body);
+            if(immersedBodies_[ibContactList_[0]].detectWallContact())
+                    detectWallContact(mesh_,immersedBodies_[ibContactList_[0]].getContactInfo());
             if (immersedBodies_[ibContactList_[0]].checkWallContact()) 
             {
-                immersedBodies_[ibContactList_[0]].solveWallContact(kWN_, gammaWN_, kWt_, gammaWt_, muW_, adhWN_, deltaTime*step);
+                Info << "-- Body " << immersedBodies_[ibContactList_[0]].getBodyId() << " is in contact with wall" << endl;
+                Tuple2<vector,vector> outVars;
+                solveWallContact(
+                    mesh_,
+                    wallInfo_(),
+                    immersedBodies_[ibContactList_[0]].getContactInfo(),
+                    immersedBodies_[ibContactList_[0]].getContactVars(),
+                    deltaTime*step,
+                    outVars
+                    );
+                immersedBodies_[ibContactList_[0]].updateFAndT(outVars.first(),outVars.second());
             }
             
             bool contactIsOk(immersedBodies_[ibContactList_[0]].checkContactMovement(deltaTime*step));
@@ -1876,7 +1093,8 @@ void openHFDIBDEM::getContactListAndReturnPositions(volScalarField& body)
             if (findIndex(ibContactList_, bodyId) == -1)
             {   
                 //Detect wall contact and assign the body to contact list and return its position
-                immersedBodies_[bodyId].detectWallContact(body);
+                if(immersedBodies_[bodyId].detectWallContact())
+                    detectWallContact(mesh_,immersedBodies_[bodyId].getContactInfo());
                 if (immersedBodies_[bodyId].checkWallContact()) 
                 {
                     ibContactList_.append(immersedBodies_[bodyId].getBodyId());
@@ -1952,7 +1170,7 @@ void openHFDIBDEM::swapInBoundingListPrtContact(label coord, label j)
             Tuple2<label, label> newPair(min(boundLabelNeighbourList_[coord][j-1] - 1,-1*boundLabelNeighbourList_[coord][j] - 1), max(boundLabelNeighbourList_[coord][j-1] - 1,-1*boundLabelNeighbourList_[coord][j] - 1));
             // if this intersection is not already in possible contact list for this coord assign it
             // Note: This should never happen but it prevent multiple assignment
-            if (findIndexOfPairInNeighbourList(contactInCoordNeighbourList_[coord], newPair) == -1)
+            if (findIndOfPairInNeighbourList(contactInCoordNeighbourList_[coord], newPair) == -1)
             {
                 contactInCoordNeighbourList_[coord].append(newPair);
                 
@@ -1963,7 +1181,7 @@ void openHFDIBDEM::swapInBoundingListPrtContact(label coord, label j)
                 {
                     if (coordi != coord)
                     {
-                        if (findIndexOfPairInNeighbourList(contactInCoordNeighbourList_[coordi],newPair) == -1)
+                        if (findIndOfPairInNeighbourList(contactInCoordNeighbourList_[coordi],newPair) == -1)
                         {
                             appendToPossibleContactList = false;
                         }
@@ -1984,7 +1202,7 @@ void openHFDIBDEM::swapInBoundingListPrtContact(label coord, label j)
             label indexOfpair(-1);
             // Remove the pair from coord contact list
             // Note: It is not so straightforward. Create help list and assign to it values before and after the removed pair
-            indexOfpair = findIndexOfPairInNeighbourList(contactInCoordNeighbourList_[coord], removePair);
+            indexOfpair = findIndOfPairInNeighbourList(contactInCoordNeighbourList_[coord], removePair);
             if (indexOfpair != -1)
             {
                 DynamicList<Tuple2<label, label>> newContactInCoordNeighbourList(0);
@@ -2003,7 +1221,7 @@ void openHFDIBDEM::swapInBoundingListPrtContact(label coord, label j)
             
             // Same situation for contact list. If there is not instersection in one dimension the 
             // bounding boxes are not intersected so we should remove this pair from contact list
-            indexOfpair = findIndexOfPairInNeighbourList(possibleContactNeighbourList_, removePair);
+            indexOfpair = findIndOfPairInNeighbourList(possibleContactNeighbourList_, removePair);
             if (indexOfpair != -1)
             {
                 DynamicList<Tuple2<label, label>> newPossibleContactNeighbourList(0);
@@ -2029,8 +1247,8 @@ void openHFDIBDEM::swapInBoundingListPrtContact(label coord, label j)
     boundLabelNeighbourList_[coord][j] = scratchLabel;
 }
 //---------------------------------------------------------------------------//
-// Find index of pair in given list. Return -1 if the pair is not in the list
-label openHFDIBDEM::findIndexOfPairInNeighbourList(DynamicList<Tuple2<label, label>>& listToSearch, Tuple2<label, label> pair)
+//Find index of pair in given list. Return -1 if the pair is not in the list
+label openHFDIBDEM::findIndOfPairInNeighbourList(DynamicList<Tuple2<label, label>>& listToSearch, Tuple2<label, label> pair)
 {
     label returnValue(-1);
     
@@ -2055,7 +1273,7 @@ void openHFDIBDEM::findIndexesOfPairWithSomeIb(DynamicList<Tuple2<label, label>>
     {
         if (listToSearch[i].first() == pair.first() || listToSearch[i].first() == pair.second() || listToSearch[i].second() == pair.first() || listToSearch[i].second() == pair.second())
         {
-            if (findIndexOfPairInNeighbourList(listToAppend,listToSearch[i]) == -1)
+            if (findIndOfPairInNeighbourList(listToAppend,listToSearch[i]) == -1)
             {
                 listToAppend.append(listToSearch[i]);
                 helpList.append(listToSearch[i]);
@@ -2195,133 +1413,42 @@ void openHFDIBDEM::detectPrtContact()
     forAll (possibleContactNeighbourList_,possiblePair)
     {
         //Check only if the pair is not alredy in contactList
-        if (findIndexOfPairInNeighbourList(prtContactIBList_,possibleContactNeighbourList_[possiblePair]) == -1)
+        if (findIndOfPairInNeighbourList(prtContactIBList_, possibleContactNeighbourList_[possiblePair]) == -1)
         {
-            // reference to current body
-            immersedBody& cBody(immersedBodies_[possibleContactNeighbourList_[possiblePair].first()]);
-            immersedBody& tBody(immersedBodies_[possibleContactNeighbourList_[possiblePair].second()]);
+            label cInd(possibleContactNeighbourList_[possiblePair].first());
+            contactInfo& cInfo(immersedBodies_[cInd].getContactInfo());
+            const contactType cT(cInfo.getGeomModel().getcType());
             
-            List<DynamicLabelList>    commonCells;
-            commonCells.setSize(Pstream::nProcs());
-
-            List<DynamicLabelList> cSurfCells(cBody.getSurfaceCellList());
-            List<DynamicLabelList> cIntCells(cBody.getInternalCellList());
-            List<DynamicLabelList> tSurfCells(tBody.getSurfaceCellList());
+            label tInd(possibleContactNeighbourList_[possiblePair].second());
+            contactInfo& tInfo(immersedBodies_[tInd].getContactInfo());
+            const contactType tT(tInfo.getGeomModel().getcType());
             
-            //Bounding box of body t is used only for optimization of for loop
-            boundBox tBox(tBody.getMinBoundPoint(),tBody.getMaxBoundPoint());
-            // Inflate tBox to include cell center of surfCells
-            tBox.inflate(2*sqrt(mesh_.magSf()[0])/tBox.mag());
-            
-            //Iterate over surfCells to find commen cells 
-            forAll (cSurfCells[Pstream::myProcNo()],cSCellI)
+            if(cT == sphere && tT == sphere)
             {
-                if (tBox.contains(mesh_.C()[cSurfCells[Pstream::myProcNo()][cSCellI]]))
+                if(detectPrtPrtContact<sphere,sphere>(
+                    mesh_,
+                    cInfo,
+                    tInfo
+                ))
                 {
-                    forAll (tSurfCells[Pstream::myProcNo()],tSCellI)
-                    {
-                        if (mag(cSurfCells[Pstream::myProcNo()][cSCellI]-tSurfCells[Pstream::myProcNo()][tSCellI]) < SMALL)
-                        {
-                            commonCells[Pstream::myProcNo()].append(cSurfCells[Pstream::myProcNo()][cSCellI]);                    
-                        }
-                    }
+                    prtContactIBList_.append(possibleContactNeighbourList_[possiblePair]);
                 }
             }
-            
-            scalar intersectedVolume(0);
-                
-            if (commonCells[Pstream::myProcNo()].size() > SMALL)
+            else
             {
-                cBody.setRecomputeProjection(true);
-                tBody.setRecomputeProjection(true);
-
-                //Create triSurfaceSearch
-//                 const triSurface& tibTemp( tBody.getTriSurfMesh());
-//                 triSurfaceSearch tibTriSurfSearch( tibTemp );
-//                 const triSurface& cibTemp( cBody.getTriSurfMesh());
-//                 triSurfaceSearch cibTriSurfSearch( cibTemp );
-                const pointField& pp = mesh_.points();
-                
-                boolList tcenterInsideList = tBody.getGeomModel().pointInside(mesh_.C());
-                boolList ccenterInsideList = cBody.getGeomModel().pointInside(mesh_.C());
-
-                // iterate over all surfCells and intCells to evaluate intersected volume
-                forAll (cSurfCells[Pstream::myProcNo()],cSCellI)
+                if(detectPrtPrtContact<arbShape,arbShape>(
+                    mesh_,
+                    cInfo,
+                    tInfo
+                ))
                 {
-                    if (tBox.contains(mesh_.C()[cSurfCells[Pstream::myProcNo()][cSCellI]]))
-                    {                        
-                        const labelList& vertexLabels = mesh_.cellPoints()[cSurfCells[Pstream::myProcNo()][cSCellI]];
-                        const pointField vertexPoints(pp,vertexLabels);
-                        boolList tvertexesInside = tBody.getGeomModel().pointInside( vertexPoints );
-                        boolList cvertexesInside = cBody.getGeomModel().pointInside( vertexPoints );
-                        bool tcenterInside(tcenterInsideList[cSurfCells[Pstream::myProcNo()][cSCellI]] );
-                        bool ccenterInside(ccenterInsideList[cSurfCells[Pstream::myProcNo()][cSCellI]] );
-                        scalar rVInSize(1.0/(tvertexesInside.size()+1));
-                        // Note: weiggetContactNormalht of a single vertex in the cell
-                        
-                        scalar partialVolume(0);
-                        forAll (tvertexesInside, verIn)
-                        {
-                            if (tvertexesInside[verIn]==true && cvertexesInside[verIn]==true)
-                            {
-                                partialVolume += rVInSize; //fraction of cell covered
-                            }
-                        }
-
-                        if (tcenterInside==true && ccenterInside==true)
-                        {
-                            partialVolume += rVInSize; //fraction of cell covered
-                        }
-                        
-                        intersectedVolume += mesh_.V()[cSurfCells[Pstream::myProcNo()][cSCellI]] * partialVolume;
-                        
-                        if (intersectedVolume > 0) break;
-                    }
+                    prtContactIBList_.append(possibleContactNeighbourList_[possiblePair]);
                 }
-
-                forAll (cIntCells[Pstream::myProcNo()],cSCellI)
-                {
-                    if (tBox.contains(mesh_.C()[cIntCells[Pstream::myProcNo()][cSCellI]]))
-                    {                        
-                        const labelList& vertexLabels = mesh_.cellPoints()[cIntCells[Pstream::myProcNo()][cSCellI]];
-                        const pointField vertexPoints(pp,vertexLabels);
-                        boolList tvertexesInside = tBody.getGeomModel().pointInside( vertexPoints );
-                        boolList cvertexesInside = cBody.getGeomModel().pointInside( vertexPoints );
-                        bool tcenterInside(tcenterInsideList[cIntCells[Pstream::myProcNo()][cSCellI]] );
-                        bool ccenterInside(ccenterInsideList[cIntCells[Pstream::myProcNo()][cSCellI]] );
-                        scalar rVInSize(1.0/(tvertexesInside.size()+1));
-                        // Note: weight of a single vertex in the cell
-                        
-                        scalar partialVolume(0);
-                        forAll (tvertexesInside, verIn)
-                        {
-                            if (tvertexesInside[verIn]==true && cvertexesInside[verIn]==true)
-                            {
-                                partialVolume += rVInSize; //fraction of cell covered
-                            }
-                        }
-                        
-                        if (tcenterInside==true && ccenterInside==true)
-                        {
-                            partialVolume += rVInSize; //fraction of cell covered
-                        }
-                        
-                        intersectedVolume += mesh_.V()[cIntCells[Pstream::myProcNo()][cSCellI]] * partialVolume;
-                        
-                        if (intersectedVolume > 0) break;
-                    }
-                }
-            }
-            
-            reduce(intersectedVolume, sumOp<scalar>());
-
-            if (intersectedVolume > 0)
-            {                
-                prtContactIBList_.append(possibleContactNeighbourList_[possiblePair]);
             }
         }
     }
 }
+//---------------------------------------------------------------------------//
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::updateFSCoupling
 (
