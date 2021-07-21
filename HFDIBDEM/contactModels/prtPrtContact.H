@@ -32,7 +32,7 @@ SourceFiles
     addModels.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -48,14 +48,21 @@ Contributors
 #include "prtPrtContactVars.H"
 
 namespace Foam
-{        
+{
     namespace contactModel
-    {        
+    {
         typedef DynamicList<label>  DynamicLabelList;
         typedef DynamicList<scalar> DynamicScalarList;
         typedef DynamicList<vector> DynamicVectorList;
         typedef DynamicList<point>  DynamicPointList;
-        
+
+        bool detectPrtPrtContact
+        (
+            const dynamicFvMesh& mesh,
+            contactInfo& cInfo,
+            contactInfo& tInfo
+        );
+
         template <contactType cT, contactType tT>
         bool detectPrtPrtContact
         (
@@ -63,7 +70,7 @@ namespace Foam
             contactInfo& cInfo,
             contactInfo& tInfo
         );
-        
+
         template <>
         bool detectPrtPrtContact <sphere,sphere>
         (
@@ -71,7 +78,7 @@ namespace Foam
             contactInfo& cInfo,
             contactInfo& tInfo
         );
-        
+
         template <contactType cT, contactType tT>
         void getPrtPrtContactVars(
             const dynamicFvMesh&   mesh,
@@ -80,24 +87,34 @@ namespace Foam
             vector geometricD,
             prtPrtContactVars& prtPrtCntVars
         );
-        
+
         Tuple2<scalar,vector> get3DcontactInfo(
             const dynamicFvMesh&   mesh,
-            DynamicLabelList commonCells, 
-            DynamicVectorList edgePoints, 
-            vector normalVector, 
-            vector contactCenter, 
+            DynamicLabelList commonCells,
+            DynamicVectorList edgePoints,
+            vector normalVector,
+            vector contactCenter,
             label owner
         );
-        
+
         Tuple2<scalar,vector>  get2DcontactInfo(
             const dynamicFvMesh&   mesh,
-            DynamicLabelList commonCells, 
-            vector normalVector, 
+            DynamicLabelList commonCells,
+            vector normalVector,
             vector contactCenter,
             vector geometricD
         );
-        
+
+        template <>
+        void getPrtPrtContactVars  <sphere,sphere>
+        (
+            const dynamicFvMesh&   mesh,
+            contactInfo& cInfo,
+            contactInfo& tInfo,
+            vector geometricD,
+            prtPrtContactVars& prtPrtCntVars
+        );
+
         void solvePrtContact(
             const dynamicFvMesh&   mesh,
             contactInfo& cInfo,
@@ -120,4 +137,3 @@ namespace Foam
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
- 

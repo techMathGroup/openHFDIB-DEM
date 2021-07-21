@@ -87,7 +87,7 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     {
         adhEqui = readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("adhEqui"));
     }
-    
+
     wallInfo_.set(
         new wallInfo(
             readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("kN")),
@@ -99,7 +99,7 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
             adhEqui
                   )
         );
-    
+
     if (HFDIBDEMDict_.found("geometricD"))
     {
         geometricD_ = HFDIBDEMDict_.lookup("geometricD");
@@ -108,7 +108,7 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     {
         geometricD_ = mesh_.geometricD();
     }
-    
+
     recordOutDir_ = mesh_.time().rootPath() + "/" + mesh_.time().globalCaseName() + "/bodiesInfo";
 }
 //---------------------------------------------------------------------------//
@@ -125,21 +125,21 @@ void openHFDIBDEM::initialize
     label recomputeM0,
     word runTime
 )
-{    
+{
     // get data from HFDIBDEMDict
     HFDIBinterpDict_ = HFDIBDEMDict_.subDict("interpolationSchemes");
     preCalculateCellPoints();
-    
+
     bool startTime0(runTime == "0");
-    
+
     // initialize addModels
     addModels_.setSize(bodyNames_.size());
     immersedBodies_.setSize(0);                                         //on the fly creation
     refineF *= 0;
     recomputeM0_ = recomputeM0;
-    
+
     if(!startTime0)
-    {        
+    {
         if(!isDir(recordOutDir_))
             mkDir(recordOutDir_);
         else
@@ -156,7 +156,7 @@ void openHFDIBDEM::initialize
                 }
             }
         }
-        
+
         restartSimulation(body, refineF, runTime);
     }
     else
@@ -169,32 +169,32 @@ void openHFDIBDEM::initialize
             mkDir(recordOutDir_);
         }
     }
-    
+
     #include "initializeAddModels.H"
 
     forAll (addModels_,modelI)
     {
         word bodyName(bodyNames_[modelI]);
         Info << "Creating immersed body based on: " << bodyName << endl;
-        
+
         label maxAdditions(100);
         label cAddition(0);
         // Note (MI): I hardcoded maxAdditions as our code is not
         //            efficient for high number of bodies
-                
+
         while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions)
         {
             Info << "addModel invoked action, trying to add new body" << endl;
             autoPtr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body));
             cAddition++;
-                        
+
             // initialize the immersed bodies
             if (addModels_[modelI].getBodyAdded())
             {
                 label newIBSize(immersedBodies_.size()+1);
                 label addIBPos(newIBSize - 1);
                 immersedBodies_.setSize(newIBSize);
-                
+
                 Info << "Trying to set immersedBodies" << endl;
                 immersedBodies_.set
                 (
@@ -229,7 +229,7 @@ void openHFDIBDEM::initialize
             }
         }
     }
-    
+
     const dimensionedScalar deltaN
     (
         "deltaN",
@@ -237,7 +237,7 @@ void openHFDIBDEM::initialize
     );
     surfNorm_ = -fvc::grad(body);
     surfNorm_ /= (mag(surfNorm_)+deltaN.value());
-    
+
     // Initialize list for neighbour list method based on number of IBs
     boundValueNeighbourList_.setSize(3);
     boundLabelNeighbourList_.setSize(3);
@@ -248,7 +248,7 @@ void openHFDIBDEM::initialize
         boundValueNeighbourList_[i].setSize(2 * immersedBodies_.size());
         boundLabelNeighbourList_[i].setSize(2 * immersedBodies_.size());
     }
-    
+
     // Note: this needs to be done for all the actually registered bodies
     forAll (immersedBodies_,bodyI)
     {
@@ -270,7 +270,7 @@ void openHFDIBDEM::initialize
             boundLabelNeighbourList_[coord][IBboundList[coord][1]] = bodyIdInc;
         }
     }
-    
+
     // After filling of the lists sort all bounding points.
     // This is only place where the sorting is not approximately O(N) efficient
     sortBoundingListPrtContact();
@@ -281,11 +281,11 @@ void openHFDIBDEM::preUpdateBodies
     volScalarField& body,
     volVectorField& f
 )
-{    
+{
     // - particles undergoing contact
     ibContactList_.clear();
     prtContactIBList_.clear();
-    
+
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
@@ -293,25 +293,25 @@ void openHFDIBDEM::preUpdateBodies
             // print out linear and angular momentum (initial)
             //~ immersedBodies_[bodyId].printMomentum();
             //~ immersedBodies_[bodyId].printStats();
-            
+
             // create body or compute body-fluid coupling and estimate
             // potential contacts with walls
-            
+
             immersedBodies_[bodyId].inContactWithStatic(false);
-            
+
             immersedBodies_[bodyId].preContactUpdateImmersedBody(body,f);
-            
-            if(immersedBodies_[bodyId].detectWallContact())
+
+            if(immersedBodies_[bodyId].shouldDetectWallContact())
                 detectWallContact(mesh_,immersedBodies_[bodyId].getContactInfo());
-            
+
             immersedBodies_[bodyId].printStats();
-            
+
             //~ Info << "-- body " << bodyId << "  linear velocity:  " << immersedBodies_[bodyId].getVel() << endl;
             //~ Info << "-- body " << bodyId << " angluar velocity: " << immersedBodies_[bodyId].getOmega() << endl;
             //~ Info << "-- body " << bodyId << " axis of rotation: " << immersedBodies_[bodyId].getAxis() << endl;
-            
+
             // check for body-wall contact
-            if (immersedBodies_[bodyId].checkWallContact()) 
+            if (immersedBodies_[bodyId].checkWallContact())
             {
                 ibContactList_.append(immersedBodies_[bodyId].getBodyId());
             }
@@ -328,7 +328,7 @@ void openHFDIBDEM::postUpdateBodies
     volScalarField& body,
     volVectorField& f
 )
-{  
+{
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
@@ -343,7 +343,7 @@ void openHFDIBDEM::moveBodies
     volScalarField& body,
     volScalarField& refineF
 )
-{    
+{
     refineF *= 0;
     forAll (immersedBodies_,bodyId)
     {
@@ -372,7 +372,7 @@ void openHFDIBDEM::moveBodies
             if (findIndex(ibContactList_, bodyId) == -1)
             {
                 immersedBodies_[bodyId].synchCreateImmersedBody(body,refineF);
-                immersedBodies_[bodyId].checkIfInDomain(body);    
+                immersedBodies_[bodyId].checkIfInDomain(body);
                 immersedBodies_[bodyId].updateOldMovementVars();
                 immersedBodies_[bodyId].printStats();
             }
@@ -409,7 +409,7 @@ void openHFDIBDEM::recreateBodies
             {
                 immersedBodies_[bodyId].computeBodyCharPars();
                 immersedBodies_[bodyId].recomputedM0();
-            }            
+            }
             Info << "-- body " << immersedBodies_[bodyId].getBodyId() << " Re-created" << endl;
         }
     }
@@ -432,7 +432,7 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
                    interpolation<vector>::New(HFDIBinterpDict_, V);
     //Reset imposed field
     Vs *= scalar(0);
-    
+
     //Loop over all the immersed bodies
     forAll (immersedBodies_,bodyId)
     {
@@ -440,13 +440,13 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
         {
             //Update imposed field according to body
             immersedBodies_[bodyId].updateVectorField(Vs, V.name(),body, surfNorm_);
-            
+
             if(immersedBodies_[bodyId].getUseInterpolation())
-            {            
+            {
                 //Get interpolation info a request list
                 const List<DynamicList<immersedBody::intVecRequest>>& intVecReqList = immersedBodies_[bodyId].getinterpolationVecReqs();;
                 List<DynamicList<immersedBody::interpolationInfo>>& intInfoList  = immersedBodies_[bodyId].getInterpolationInfo();
-                
+
                 List<DynamicPointList> intPointsToSend;
                 List<DynamicLabelList> intCellsToSend;
                 intPointsToSend.setSize(Pstream::nProcs());
@@ -467,14 +467,14 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
 
                 PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
                 PstreamBuffers pBufs2(Pstream::commsTypes::nonBlocking);
-        
+
                 for (label proci = 0; proci < Pstream::nProcs(); proci++)
                 {
                     if (proci != Pstream::myProcNo())
                     {
                         UOPstream send(proci, pBufs);
                         send << intPointsToSend[proci];
-                        
+
                         UOPstream send2(proci, pBufs2);
                         send2 << intCellsToSend[proci];
                     }
@@ -482,12 +482,12 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
 
                 pBufs.finishedSends();
                 pBufs2.finishedSends();
-                
+
                 List<DynamicPointList> intPointsRcv;
                 intPointsRcv.setSize(Pstream::nProcs());
                 List<DynamicLabelList> intCellsRcv;
                 intCellsRcv.setSize(Pstream::nProcs());
-                
+
                 List<DynamicVectorList> intVecToReturn;
                 intVecToReturn.setSize(Pstream::nProcs());
                 //Receive interpolation requests from other processors
@@ -498,7 +498,7 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
                         UIPstream recv(proci, pBufs);
                         DynamicPointList recIntPoints (recv);
                         intPointsRcv[proci].append(recIntPoints);
-                        
+
                         UIPstream recv2(proci, pBufs2);
                         DynamicLabelList recIntCells (recv2);
                         intCellsRcv[proci].append(recIntCells);
@@ -517,7 +517,7 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
                 }
 
                 pBufs.clear();
-                //Send computed data back 
+                //Send computed data back
                 for (label proci = 0; proci < Pstream::nProcs(); proci++)
                 {
                     if (proci != Pstream::myProcNo())
@@ -528,7 +528,7 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
                 }
 
                 pBufs.finishedSends();
-                
+
                 List<DynamicVectorList> intVecRcv;
                 intVecRcv.setSize(Pstream::nProcs());
                 //Receive interpolation data from other processors
@@ -572,7 +572,7 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
                                                             );
                                 intInfoList[Pstream::myProcNo()][infoI].intVec_[0] = VP1;
                             }
-                            
+
                             if (intInfoList[Pstream::myProcNo()][infoI].procWithIntCells_[1] == Pstream::myProcNo())
                             {
                                 vector VP2 =  interpV->interpolate(intInfoList[Pstream::myProcNo()][infoI].intPoints_[2], intInfoList[Pstream::myProcNo()][infoI].intCells_[1]
@@ -598,11 +598,11 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
                         }
                         case 1:
                         {
-                            vector VP1 = intInfoList[Pstream::myProcNo()][infoI].intVec_[0] - Vs[cellI];                        
-                            
+                            vector VP1 = intInfoList[Pstream::myProcNo()][infoI].intVec_[0] - Vs[cellI];
+
                             //distance between interpolation points
                             scalar deltaR = mag(intInfoList[Pstream::myProcNo()][infoI].intPoints_[1] -intInfoList[Pstream::myProcNo()][infoI].intPoints_[0]);
-                            
+
                             //cell center to surface distance
                             scalar ds(0.0);
                             if (immersedBodies_[bodyId].getSDBasedLambda())
@@ -615,25 +615,25 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
                             {
                                 ds = deltaR*(0.5-body[cellI]) ;
                             }
-                            
+
                             vector linCoeff = VP1/(deltaR+SMALL);
                             // Note (MI): added +SMALL for robustness, effect on
                             //            solution not tested
-                            
+
                             Vs[cellI] = linCoeff*ds + Vs[cellI];
                             break;
                         }
                         case 2:
                         {
                             vector VP1 =  intInfoList[Pstream::myProcNo()][infoI].intVec_[0] - Vs[cellI];
-                            
+
                             vector VP2 =  intInfoList[Pstream::myProcNo()][infoI].intVec_[1] - Vs[cellI];
-                            
-                            
+
+
                             //distance between interpolation points
                             scalar deltaR1 = mag(intInfoList[Pstream::myProcNo()][infoI].intPoints_[2] -intInfoList[Pstream::myProcNo()][infoI].intPoints_[1]);
                             scalar deltaR2 = mag(intInfoList[Pstream::myProcNo()][infoI].intPoints_[1] -intInfoList[Pstream::myProcNo()][infoI].intPoints_[0]);
-                            
+
                             //cell center to surface distance
                             scalar ds(0.0);
                             if (immersedBodies_[bodyId].getSDBasedLambda())
@@ -653,20 +653,20 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
                                     ds = mag(mesh_.C()[cellI] - intInfoList[Pstream::myProcNo()][infoI].intPoints_[0]);
                                 }
                             }
-                            
+
                             vector quadCoeff = (VP2 - VP1)*deltaR1 - VP1*deltaR2;
                             quadCoeff       /= (deltaR1*deltaR2*(deltaR1 + deltaR2)+SMALL);
-                            
+
                             vector linCoeff  = (VP1-VP2)*Foam::pow(deltaR1,2.0);
                             linCoeff        += 2.0*VP1*deltaR1*deltaR2;
                             linCoeff        += VP1*Foam::pow(deltaR2,2.0);
-                            linCoeff        /= (deltaR1*deltaR2*(deltaR1 + deltaR2)+SMALL); 
-            
+                            linCoeff        /= (deltaR1*deltaR2*(deltaR1 + deltaR2)+SMALL);
+
                             //~ vector quadCoeff = 1.0/(deltaR*deltaR+SMALL) * ( VP2/2.0 - VP1 );
                             //~ vector linCoeff  = 1.0/(2.0*deltaR+SMALL) * ( 4.0*VP1 - VP2 );
                             // Note (MI): added +SMALL for the robustness, effects
                             //            on solution not tested
-                            
+
                             Vs[cellI] = quadCoeff*ds*ds + linCoeff*ds + Vs[cellI];
                             break;
                         }
@@ -678,21 +678,21 @@ void openHFDIBDEM::interpolateIB( volVectorField & V
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::writeBodiesInfo()
-{    
+{
     if(!recordSimulation_)
         return;
-    
+
     word curOutDir(recordOutDir_ + "/" + mesh_.time().timeName());
     mkDir(curOutDir);
     mkDir(curOutDir +"/stlFiles");
-    
+
     wordList bodyNames;
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
-        {            
+        {
             word path(curOutDir + "/body" + std::to_string(immersedBodies_[bodyId].getBodyId()) +".info");
-            OFstream ofStream(path);            
+            OFstream ofStream(path);
             IOobject outInfo
                 (
                     path,
@@ -701,7 +701,7 @@ void openHFDIBDEM::writeBodiesInfo()
                     IOobject::AUTO_WRITE
                 );
             IOdictionary outDict(outInfo);
-                
+
             outDict.writeHeader(ofStream);
             immersedBodies_[bodyId].recordBodyInfo(outDict,curOutDir);
             outDict.writeData(ofStream);
@@ -722,9 +722,9 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
     scalar historyPos(0.0);
     bool doubleMinStep(false);
     bool doubleMinStep2(false);
-    
+
     DynamicLabelList ibPrtContactList;
-    
+
     forAll (prtContactIBList_,pair)
     {
         if (findIndex(ibPrtContactList, prtContactIBList_[pair].first()) == -1)
@@ -737,14 +737,14 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
             ibPrtContactList.append(immersedBodies_[prtContactIBList_[pair].second()].getBodyId());
             immersedBodies_[prtContactIBList_[pair].second()].returnPosition();
         }
-        
+
         if(immersedBodies_[prtContactIBList_[pair].first()].getbodyOperation() == 0)
             immersedBodies_[prtContactIBList_[pair].second()].inContactWithStatic(true);
-        
+
         if(immersedBodies_[prtContactIBList_[pair].second()].getbodyOperation() == 0)
             immersedBodies_[prtContactIBList_[pair].first()].inContactWithStatic(true);
     }
-    
+
     forAll (ibPrtContactList,ib)
     {
         label ibIndex(-1);
@@ -753,18 +753,18 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
         {
             //remove at idex
             DynamicLabelList helpList;
-                    
+
             for (label i = 0; i < ibIndex; i = i + 1)
             {
                 helpList.append(ibContactList_[i]);
             }
-            
+
             for (label i = ibIndex + 1; i < ibContactList_.size(); i = i + 1)
             {
                 helpList.append(ibContactList_[i]);
             }
             ibContactList_ = helpList;
-        }                
+        }
     }
     //Iterate over IBs not in time
     //First resolve prt-prt contacts
@@ -775,11 +775,11 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
         historyPos = 0.0;
         doubleMinStep = false;
         doubleMinStep2 = false;
-        
+
         DynamicList<Tuple2<label, label>> pairsToResolve;
         //We have to resolve whole contact chain not only two prts in contact
         findIndexesOfPairWithSomeIb(prtContactIBList_,prtContactIBList_[0], pairsToResolve);
-        
+
         DynamicLabelList ibToResolve;
         forAll (pairsToResolve,pair)
         {
@@ -792,21 +792,21 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                 ibToResolve.append(immersedBodies_[pairsToResolve[pair].second()].getBodyId());
             }
         }
-        
+
         //Return IBs to begging position
         forAll (ibToResolve, ib)
-        {            
+        {
             immersedBodies_[ibToResolve[ib]].initializeVarHistory(true);
             immersedBodies_[ibToResolve[ib]].resetBody(body, false);
             immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF);
         }
-        
+
         //Compute motion over time. Particles are returned when bad motion occurs
         while(true)
         {
             Info << " Start DEM pos: " << pos << " DEM step: " << step << endl;
             forAll (ibToResolve, ib)
-            {                
+            {
                 // Set F_ and T_ to zero. Do not assign history values
                 immersedBodies_[ibToResolve[ib]].initializeVarHistory(false);
                 // Add fluid coupling force to F and T. This is still same for whole DEM inner loop
@@ -817,9 +817,9 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
             {
                 label cInd(pairsToResolve[pair].first());
                 label tInd(pairsToResolve[pair].second());
-                
+
                 Tuple2<Tuple2<vector,vector>,Tuple2<vector,vector>> outVars;
-                
+
                 solvePrtContact(
                     mesh_,
                     immersedBodies_[cInd].getContactInfo(),
@@ -830,19 +830,19 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                     deltaTime*step,
                     outVars
                 );
-                
+
                 immersedBodies_[cInd].updateFAndT(outVars.first().first(),outVars.first().second());
                 immersedBodies_[tInd].updateFAndT(outVars.second().first(),outVars.second().second());
             }
-            
-            DynamicList<bool> contactOk;            
+
+            DynamicList<bool> contactOk;
             forAll (ibToResolve,ib)
             {
                 // Detect wall contact and solve it
                 // Update movement and move bodies
-                if(immersedBodies_[ibToResolve[ib]].detectWallContact())
+                if(immersedBodies_[ibToResolve[ib]].shouldDetectWallContact())
                     detectWallContact(mesh_,immersedBodies_[ibToResolve[ib]].getContactInfo());
-                if (immersedBodies_[ibToResolve[ib]].checkWallContact()) 
+                if (immersedBodies_[ibToResolve[ib]].checkWallContact())
                 {
                     Info << "-- Body " << immersedBodies_[ibToResolve[ib]].getBodyId() << " is in contact with wall" << endl;
                     Tuple2<vector,vector> outVars;
@@ -869,9 +869,9 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                     break;
                 }
             }
-                        
-            reduce(contactIsOk, orOp<bool>()); 
-            
+
+            reduce(contactIsOk, orOp<bool>());
+
             //Move or return particles
             forAll (ibToResolve,ib)
             {
@@ -889,7 +889,7 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                     immersedBodies_[ibToResolve[ib]].returnPosition();
                     immersedBodies_[ibToResolve[ib]].resetBody(body, false);
                     immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF);
-                }                
+                }
             }
             //Change dem step. If Step is already minimal wait to avoid circulation
             if (doubleMinStep)
@@ -919,7 +919,7 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
             }
             else
             {
-                pos = historyPos;                    
+                pos = historyPos;
                 step /= 2;
                 if (step < minDEMtimeStep_)
                 {
@@ -927,7 +927,7 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                     doubleMinStep = true;
                 }
             }
-            
+
             if (pos + step > 1)
                 step = 1 - pos;
             //If moved to end time remove from list or terminate loop
@@ -939,24 +939,24 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                     indexOfPair = findIndOfPairInNeighbourList(prtContactIBList_, pairsToResolve[pair]);
                     //Remove at index
                     DynamicList<Tuple2<label, label>> helpList;
-                    
+
                     for (label i = 0; i < indexOfPair; i = i + 1)
                     {
                         helpList.append(prtContactIBList_[i]);
                     }
-                    
+
                     for (label i = indexOfPair + 1; i < prtContactIBList_.size(); i = i + 1)
                     {
                         helpList.append(prtContactIBList_[i]);
                     }
                     prtContactIBList_ = helpList;
                 }
-                
+
                 break;
             }
         }
     }
-    //Resolve wall contacts 
+    //Resolve wall contacts
     while(ibContactList_.size() > 0)
     {
         pos = 0.0;
@@ -968,18 +968,18 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
         immersedBodies_[ibContactList_[0]].resetBody(body, false);
         immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF);
         while(true)
-        {             
+        {
             Info << " Start wall DEM pos: " << pos << " DEM step: " << step << endl;
             // Set F_ and T_ to zero. Do not assign history values
             immersedBodies_[ibContactList_[0]].initializeVarHistory(false);
             // Add fluid coupling force to F and T. This is still same for whole DEM inner loop
             immersedBodies_[ibContactList_[0]].updateFAndT(immersedBodies_[ibContactList_[0]].getHistoryCouplingF(), immersedBodies_[ibContactList_[0]].getHistoryCouplingT());
-            
+
             // Detect wall contact and solve it
             // Update movement and move bodies
-            if(immersedBodies_[ibContactList_[0]].detectWallContact())
+            if(immersedBodies_[ibContactList_[0]].shouldDetectWallContact())
                     detectWallContact(mesh_,immersedBodies_[ibContactList_[0]].getContactInfo());
-            if (immersedBodies_[ibContactList_[0]].checkWallContact()) 
+            if (immersedBodies_[ibContactList_[0]].checkWallContact())
             {
                 Info << "-- Body " << immersedBodies_[ibContactList_[0]].getBodyId() << " is in contact with wall" << endl;
                 Tuple2<vector,vector> outVars;
@@ -993,10 +993,10 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                     );
                 immersedBodies_[ibContactList_[0]].updateFAndT(outVars.first(),outVars.second());
             }
-            
+
             bool contactIsOk(immersedBodies_[ibContactList_[0]].checkContactMovement(deltaTime*step));
-            
-            reduce(contactIsOk, orOp<bool>()); 
+
+            reduce(contactIsOk, orOp<bool>());
 
             if (contactIsOk || step == minDEMtimeStep_)
             {
@@ -1013,7 +1013,7 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                 immersedBodies_[ibContactList_[0]].resetBody(body, false);
                 immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF);
             }
-            
+
             if (doubleMinStep)
             {
                 if (doubleMinStep2)
@@ -1041,7 +1041,7 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
             }
             else
             {
-                pos = historyPos;                    
+                pos = historyPos;
                 step /= 2;
                 if (step < minDEMtimeStep_)
                 {
@@ -1051,22 +1051,22 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
             }
             if (pos + step > 1)
                 step = 1 - pos;
-            
+
             if (pos >= 1)
             {
                 //remove at idex
                 DynamicLabelList helpList;
-                
+
                 for (label i = 1; i < ibContactList_.size(); i = i + 1)
                 {
                     helpList.append(ibContactList_[i]);
                 }
-                ibContactList_ = helpList;              
+                ibContactList_ = helpList;
                 break;
             }
         }
     }
-    
+
     const dimensionedScalar deltaN
     (
         "deltaN",
@@ -1074,7 +1074,7 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
     );
     surfNorm_ = -fvc::grad(body);
     surfNorm_ /= (mag(surfNorm_)+deltaN.value());
-    
+
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
@@ -1091,11 +1091,11 @@ void openHFDIBDEM::getContactListAndReturnPositions(volScalarField& body)
         if (immersedBodies_[bodyId].getIsActive())
         {
             if (findIndex(ibContactList_, bodyId) == -1)
-            {   
+            {
                 //Detect wall contact and assign the body to contact list and return its position
-                if(immersedBodies_[bodyId].detectWallContact())
+                if(immersedBodies_[bodyId].shouldDetectWallContact())
                     detectWallContact(mesh_,immersedBodies_[bodyId].getContactInfo());
-                if (immersedBodies_[bodyId].checkWallContact()) 
+                if (immersedBodies_[bodyId].checkWallContact())
                 {
                     ibContactList_.append(immersedBodies_[bodyId].getBodyId());
                     immersedBodies_[bodyId].returnPosition();
@@ -1136,7 +1136,7 @@ void openHFDIBDEM::swapInBoundingListPrtContact(label coord, label j)
     scalar scratchScalar(boundValueNeighbourList_[coord][j-1]);
     boundValueNeighbourList_[coord][j-1] = boundValueNeighbourList_[coord][j];
     boundValueNeighbourList_[coord][j] = scratchScalar;
-    
+
     // Update identification list for both bodies
     // Note (MS): We have to resolve minimal and maximal point in different manner
     //              Therefore, if the label is negative (minimal point) we have to excess in list by its -value
@@ -1149,7 +1149,7 @@ void openHFDIBDEM::swapInBoundingListPrtContact(label coord, label j)
     {
         immersedBodies_[-1 * boundLabelNeighbourList_[coord][j-1] - 1].getBoundIndList()[coord][0] = j;
     }
-    
+
     if (boundLabelNeighbourList_[coord][j] > 0)
     {
         immersedBodies_[boundLabelNeighbourList_[coord][j] - 1].getBoundIndList()[coord][1] = j-1;
@@ -1158,7 +1158,7 @@ void openHFDIBDEM::swapInBoundingListPrtContact(label coord, label j)
     {
         immersedBodies_[-1 * boundLabelNeighbourList_[coord][j] - 1].getBoundIndList()[coord][0] = j-1;
     }
-    
+
     //If we are actualy swapping minimal and maximal point there is change in intersection for these bodies
     //This means that multiplication of labels is negative (minimal is negative label and maximal is pozitive label)
     if (boundLabelNeighbourList_[coord][j-1] * boundLabelNeighbourList_[coord][j] < 0)
@@ -1173,7 +1173,7 @@ void openHFDIBDEM::swapInBoundingListPrtContact(label coord, label j)
             if (findIndOfPairInNeighbourList(contactInCoordNeighbourList_[coord], newPair) == -1)
             {
                 contactInCoordNeighbourList_[coord].append(newPair);
-                
+
                 bool appendToPossibleContactList(true);
                 //Check if this pair is already assigned for the remaining dimensions
                 //If so, add this pair to possible contact list because their bounding boxes are intersected
@@ -1187,7 +1187,7 @@ void openHFDIBDEM::swapInBoundingListPrtContact(label coord, label j)
                         }
                     }
                 }
-                
+
                 if (appendToPossibleContactList)
                 {
                     possibleContactNeighbourList_.append(newPair);
@@ -1198,7 +1198,7 @@ void openHFDIBDEM::swapInBoundingListPrtContact(label coord, label j)
         {
             // There is no intersection for this coord any more for this situation so the pair should be removed from lists
             Tuple2<label, label> removePair(min(-1*boundLabelNeighbourList_[coord][j-1] - 1,boundLabelNeighbourList_[coord][j] - 1), max(-1*boundLabelNeighbourList_[coord][j-1] - 1,boundLabelNeighbourList_[coord][j] - 1));
-            
+
             label indexOfpair(-1);
             // Remove the pair from coord contact list
             // Note: It is not so straightforward. Create help list and assign to it values before and after the removed pair
@@ -1206,42 +1206,42 @@ void openHFDIBDEM::swapInBoundingListPrtContact(label coord, label j)
             if (indexOfpair != -1)
             {
                 DynamicList<Tuple2<label, label>> newContactInCoordNeighbourList(0);
-                
+
                 for (label i = 0; i < indexOfpair; i = i + 1)
                 {
                     newContactInCoordNeighbourList.append(contactInCoordNeighbourList_[coord][i]);
                 }
-                
+
                 for (label i = indexOfpair + 1; i < contactInCoordNeighbourList_[coord].size(); i = i + 1)
                 {
                     newContactInCoordNeighbourList.append(contactInCoordNeighbourList_[coord][i]);
                 }
                 contactInCoordNeighbourList_[coord] = newContactInCoordNeighbourList;
             }
-            
-            // Same situation for contact list. If there is not instersection in one dimension the 
+
+            // Same situation for contact list. If there is not instersection in one dimension the
             // bounding boxes are not intersected so we should remove this pair from contact list
             indexOfpair = findIndOfPairInNeighbourList(possibleContactNeighbourList_, removePair);
             if (indexOfpair != -1)
             {
                 DynamicList<Tuple2<label, label>> newPossibleContactNeighbourList(0);
-                
+
                 for (label i = 0; i < indexOfpair; i = i + 1)
                 {
                     newPossibleContactNeighbourList.append(possibleContactNeighbourList_[i]);
                 }
-                
+
                 for (label i = indexOfpair + 1; i < possibleContactNeighbourList_.size(); i = i + 1)
                 {
                     newPossibleContactNeighbourList.append(possibleContactNeighbourList_[i]);
                 }
-                
+
                 possibleContactNeighbourList_ = newPossibleContactNeighbourList;
             }
         }
     }
-    
-    // Actually swap the labels 
+
+    // Actually swap the labels
     label scratchLabel(boundLabelNeighbourList_[coord][j-1]);
     boundLabelNeighbourList_[coord][j-1] = boundLabelNeighbourList_[coord][j];
     boundLabelNeighbourList_[coord][j] = scratchLabel;
@@ -1251,8 +1251,8 @@ void openHFDIBDEM::swapInBoundingListPrtContact(label coord, label j)
 label openHFDIBDEM::findIndOfPairInNeighbourList(DynamicList<Tuple2<label, label>>& listToSearch, Tuple2<label, label> pair)
 {
     label returnValue(-1);
-    
-    for (label i = 0; i < listToSearch.size(); i = i +1)        
+
+    for (label i = 0; i < listToSearch.size(); i = i +1)
     {
         if (listToSearch[i].first() == pair.first() && listToSearch[i].second() == pair.second())
         {
@@ -1260,7 +1260,7 @@ label openHFDIBDEM::findIndOfPairInNeighbourList(DynamicList<Tuple2<label, label
             break;
         }
     }
-        
+
     return returnValue;
 }
 //---------------------------------------------------------------------------//
@@ -1268,8 +1268,8 @@ label openHFDIBDEM::findIndOfPairInNeighbourList(DynamicList<Tuple2<label, label
 void openHFDIBDEM::findIndexesOfPairWithSomeIb(DynamicList<Tuple2<label, label>>& listToSearch, Tuple2<label, label> pair, DynamicList<Tuple2<label, label>>& listToAppend)
 {
     DynamicList<Tuple2<label, label>> helpList;
-    
-    for (label i = 0; i < listToSearch.size(); i = i +1)        
+
+    for (label i = 0; i < listToSearch.size(); i = i +1)
     {
         if (listToSearch[i].first() == pair.first() || listToSearch[i].first() == pair.second() || listToSearch[i].second() == pair.first() || listToSearch[i].second() == pair.second())
         {
@@ -1280,7 +1280,7 @@ void openHFDIBDEM::findIndexesOfPairWithSomeIb(DynamicList<Tuple2<label, label>>
             }
         }
     }
-    
+
     for (label i = 0; i < helpList.size(); i++)
     {
         findIndexesOfPairWithSomeIb(listToSearch,helpList[i],listToAppend);
@@ -1298,7 +1298,7 @@ void openHFDIBDEM::updateNeighbourLists()
             List<List<label>> IBboundList = immersedBodies_[bodyId].getBoundIndList();
             vector IBboundMinPoint = immersedBodies_[bodyId].getMinBoundPoint();
             vector IBboundMaxPoint = immersedBodies_[bodyId].getMaxBoundPoint();
-            
+
             for (label coord = 0; coord < 3; coord = coord + 1)
             {
                 boundValueNeighbourList_[coord][IBboundList[coord][0]] = IBboundMinPoint[coord];
@@ -1306,7 +1306,7 @@ void openHFDIBDEM::updateNeighbourLists()
             }
         }
     }
-    
+
     sortBoundingListPrtContact();
 }
 //---------------------------------------------------------------------------//
@@ -1318,32 +1318,32 @@ void openHFDIBDEM::addRemoveBodies
     volVectorField& U,
     volScalarField& refineF
 )
-{   
+{
     forAll (addModels_,modelI)
     {
         word bodyName(bodyNames_[modelI]);
-        
+
         label maxAdditions(100);
         label cAddition(0);
         // Note (MI): I hardcoded maxAdditions as our code is not
         //            efficient for high number of bodies
-        
+
         while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions)
         {
-            Info << "addModel invoked action, trying to add new body" << endl;            
+            Info << "addModel invoked action, trying to add new body" << endl;
             autoPtr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body));
-            
+
             cAddition++;
-            
+
             if (addModels_[modelI].getBodyAdded())
             {
                 Info << "STL file correctly generated, registering the new body" << endl;
-                
+
                 // prepare pointer list for IBs (increase its size)
                 label newIBSize(immersedBodies_.size()+1);
                 label addIBPos(newIBSize - 1);
                 immersedBodies_.setSize(newIBSize);
-                
+
                 // create the new body
                 immersedBodies_.set
                 (
@@ -1361,7 +1361,7 @@ void openHFDIBDEM::addRemoveBodies
                         cellPoints_
                     )
                 );
-                
+
                 // get reference for further processing
                 immersedBody& nBody(immersedBodies_[addIBPos]);
                 nBody.createImmersedBody(body,refineF);
@@ -1371,27 +1371,27 @@ void openHFDIBDEM::addRemoveBodies
                     nBody.initSyncWithFlow(U);
                 }
                 nBody.assignFullHistory();
-                
+
                 // update the contact stuff
                 for (label i = 0; i < 3; i = i + 1)
                 {
                     boundValueNeighbourList_[i].setSize(2 * newIBSize);
                     boundLabelNeighbourList_[i].setSize(2 * newIBSize);
                 }
-                
+
                 List<List<label>> IBboundList = nBody.getBoundIndList();
                 vector IBboundMinPoint = nBody.getMinBoundPoint();
                 vector IBboundMaxPoint = nBody.getMaxBoundPoint();
                 label bodyIdInc(addIBPos+1);
-                
+
                 for (label coord = 0; coord < 3; coord = coord + 1)
                 {
                     boundValueNeighbourList_[coord][IBboundList[coord][0]] = IBboundMinPoint[coord];
                     boundLabelNeighbourList_[coord][IBboundList[coord][0]] = -1 * bodyIdInc;
                     boundValueNeighbourList_[coord][IBboundList[coord][1]] = IBboundMaxPoint[coord];
                     boundLabelNeighbourList_[coord][IBboundList[coord][1]] = bodyIdInc;
-                } 
-                
+                }
+
                 Info << "new body included into the simulation" << endl;
                 cAddition = 0;
             }
@@ -1403,7 +1403,7 @@ void openHFDIBDEM::addRemoveBodies
             }
         }
     }
-    
+
     sortBoundingListPrtContact();
 }
 //---------------------------------------------------------------------------//
@@ -1417,34 +1417,18 @@ void openHFDIBDEM::detectPrtContact()
         {
             label cInd(possibleContactNeighbourList_[possiblePair].first());
             contactInfo& cInfo(immersedBodies_[cInd].getContactInfo());
-            const contactType cT(cInfo.getGeomModel().getcType());
-            
+
             label tInd(possibleContactNeighbourList_[possiblePair].second());
             contactInfo& tInfo(immersedBodies_[tInd].getContactInfo());
-            const contactType tT(tInfo.getGeomModel().getcType());
-            
-            if(cT == sphere && tT == sphere)
+
+            if(detectPrtPrtContact(
+                mesh_,
+                cInfo,
+                tInfo
+            ))
             {
-                if(detectPrtPrtContact<sphere,sphere>(
-                    mesh_,
-                    cInfo,
-                    tInfo
-                ))
-                {
-                    prtContactIBList_.append(possibleContactNeighbourList_[possiblePair]);
-                }
-            }
-            else
-            {
-                if(detectPrtPrtContact<arbShape,arbShape>(
-                    mesh_,
-                    cInfo,
-                    tInfo
-                ))
-                {
-                    prtContactIBList_.append(possibleContactNeighbourList_[possiblePair]);
-                }
-            }
+                prtContactIBList_.append(possibleContactNeighbourList_[possiblePair]);
+            };
         }
     }
 }
@@ -1475,9 +1459,9 @@ void openHFDIBDEM::restartSimulation
     word timePath(recordOutDir_+"/"+runTime);
     fileNameList files(readDir(timePath));
     scalar thrSurf(readScalar(HFDIBDEMDict_.lookup("surfaceThreshold")));
-    
+
     forAll(files,f)
-    {        
+    {
         IOdictionary bodyDict
         (
             IOobject
@@ -1488,7 +1472,7 @@ void openHFDIBDEM::restartSimulation
                 IOobject::NO_WRITE
             )
         );
-        
+
         word bodyId(std::to_string(readLabel(bodyDict.lookup("bodyId"))));
         word bodyName(bodyDict.lookup("bodyName"));
         vector Vel(bodyDict.lookup("Vel"));
@@ -1496,12 +1480,12 @@ void openHFDIBDEM::restartSimulation
         vector Axis(bodyDict.lookup("Axis"));
         bool isStatic(readBool(bodyDict.lookup("static")));
         label timeStepsInContWStatic(readLabel(bodyDict.lookup("timeStepsInContWStatic")));
-        
+
         autoPtr<geomModel> bodyGeomModel;
         word bodyGeom;
         // check if the immersedDict_ contains bodyGeom
         if (HFDIBDEMDict_.subDict(bodyName).found("bodyGeom"))
-        {  
+        {
             word input = HFDIBDEMDict_.subDict(bodyName).lookup("bodyGeom");
             bodyGeom = input;
             Info << "Found bodyGeom for " << bodyName << ", the body is: " << bodyGeom << endl;
@@ -1511,14 +1495,14 @@ void openHFDIBDEM::restartSimulation
             bodyGeom = "convex";
             Info << "Did not find bodyGeom for " << bodyName << ", using bodyGeom: " << bodyGeom << endl;
         }
-        
+
         if(bodyGeom == "convex")
         {
             word stlPath(timePath + "/stlFiles/"+bodyId+".stl");
             bodyGeomModel.set(new convexBody(mesh_,stlPath,thrSurf,geometricD_));
         }
         else if(bodyGeom == "nonConvex")
-        {            
+        {
             word stlPath(timePath + "/stlFiles/"+bodyId+".stl");
             bodyGeomModel.set(new nonConvexBody(mesh_,stlPath,thrSurf,geometricD_));
         }
@@ -1526,7 +1510,7 @@ void openHFDIBDEM::restartSimulation
         {
             vector startPosition = bodyDict.subDict("sphere").lookup("position");
             scalar radius = readScalar(bodyDict.subDict("sphere").lookup("radius"));
-            
+
             bodyGeomModel.set(new sphereBody(mesh_,startPosition,radius,thrSurf,geometricD_));
         }
         else
@@ -1536,11 +1520,11 @@ void openHFDIBDEM::restartSimulation
             bodyGeom = "nonConvex";
             bodyGeomModel.set(new nonConvexBody(mesh_,stlPath,thrSurf,geometricD_));
         }
-        
+
         label newIBSize(immersedBodies_.size()+1);
         label addIBPos(newIBSize - 1);
         immersedBodies_.setSize(newIBSize);
-        
+
         Info << "Restarting body: " << bodyId << " as " << addIBPos << " bodyName: " << bodyName << endl;
         immersedBodies_.set
         (
@@ -1558,7 +1542,7 @@ void openHFDIBDEM::restartSimulation
                 cellPoints_
             )
         );
-        
+
         immersedBodies_[addIBPos].createImmersedBody(body,refineF);
         immersedBodies_[addIBPos].computeBodyCharPars();
         immersedBodies_[addIBPos].setRestartSim(Vel,omega,Axis,isStatic,timeStepsInContWStatic);
@@ -1569,13 +1553,13 @@ void openHFDIBDEM::preCalculateCellPoints()
 {
     cellPoints_.clear();
     cellPoints_.setSize(mesh_.nCells());
-    const pointField& pp = mesh_.points(); 
+    const pointField& pp = mesh_.points();
     forAll(mesh_.C(), cellI)
     {
         labelList vertexLabels = mesh_.cellPoints()[cellI];
         cellPoints_[cellI] = filterField(pp,vertexLabels);
     }
-    
+
     forAll (immersedBodies_,bodyId)
     {
         immersedBodies_[bodyId].getGeomModel().resetHashTable();

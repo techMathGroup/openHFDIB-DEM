@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "wallContact.H"
@@ -47,17 +47,17 @@ void detectWallContact(
     const dynamicFvMesh&   mesh,
     contactInfo& cInfo
 )
-{    
+{
     bool inContact(false);
     cInfo.clearContactInfo();
-    
-    //Go through all surfCells and check if there is any surfCell whose face is a boundary face        
+
+    //Go through all surfCells and check if there is any surfCell whose face is a boundary face
     forAll (cInfo.getSurfCells()[Pstream::myProcNo()],sCellI)
     {
         label cCell(cInfo.getSurfCells()[Pstream::myProcNo()][sCellI]);
-        
+
         const labelList& cFaces = mesh.cells()[cCell];
-        
+
         forAll (cFaces,faceI)
         {
             if (!mesh.isInternalFace(cFaces[faceI]))
@@ -67,26 +67,25 @@ void detectWallContact(
                 facePatchId = mesh.boundaryMesh().whichPatch(cFaces[faceI]);
                 const polyPatch& cPatch = mesh.boundaryMesh()[facePatchId];
                 if (cPatch.type()=="wall")
-                {          
+                {
                     cInfo.wallContactFaces()[Pstream::myProcNo()].append(cFaces[faceI]);
                     inContact = true;
                 }
             }
         }
     }
-    
-    Info << "--// Body in contact: " << inContact << endl;
+
     reduce(inContact, orOp<bool>());
-    
+
     if(inContact)
     {
         cInfo.setWallContact(true);
         forAll(cInfo.getIntCells()[Pstream::myProcNo()],iCellI)
         {
             label cCell(cInfo.getIntCells()[Pstream::myProcNo()][iCellI]);
-        
+
             const labelList& cFaces = mesh.cells()[cCell];
-            
+
             forAll (cFaces,faceI)
             {
                 if (!mesh.isInternalFace(cFaces[faceI]))
@@ -96,7 +95,7 @@ void detectWallContact(
                     facePatchId = mesh.boundaryMesh().whichPatch(cFaces[faceI]);
                     const polyPatch& cPatch = mesh.boundaryMesh()[facePatchId];
                     if (cPatch.type()=="wall")
-                    {          
+                    {
                         cInfo.wallContactFaces()[Pstream::myProcNo()].append(cFaces[faceI]);
                     }
                 }
@@ -116,7 +115,7 @@ void solveWallContact
     scalar deltaT,
     Tuple2<vector,vector>& outVars
 )
-{        
+{
     // compute mean model parameters
     scalar aKN((cInfo.getkN()*wInfo.getkN())/(cInfo.getkN()+wInfo.getkN()+SMALL));
     scalar aGammaN((cInfo.getgammaN()*wInfo.getgammaN())/(cInfo.getgammaN()+wInfo.getgammaN()+SMALL));
@@ -125,7 +124,7 @@ void solveWallContact
     scalar amu((cInfo.getmu()*wInfo.getmu())/(cInfo.getmu()+wInfo.getmu()+SMALL));
     scalar aadhN((cInfo.getAdhN()*wInfo.getAdhN())/(cInfo.getAdhN()+wInfo.getAdhN()+SMALL));
     scalar aadhEqui(0.5*(cInfo.getAdhEqui()+wInfo.getAdhEqui()));
-    
+
     label nContactFaces(cInfo.wallContactFaces()[Pstream::myProcNo()].size());
     //Create placeholders for forces
     vector FN(vector::zero);
@@ -133,7 +132,7 @@ void solveWallContact
     vector cLVec(vector::zero);
     vector nVecF(vector::zero);
     scalar overallContactArea(0);
-    
+
     //if the IB was in contact in previous DEM time step, find the information about tangential force and assigne it
     vector FtLast(vector::zero);
     bool FtLastFinded(false);
@@ -146,37 +145,37 @@ void solveWallContact
             break;
         }
     }
-    
+
     DynamicLabelList contactCells;
     vector cVel(vector::zero);
     scalar reduceM(cVars->M0_*cVars->M0_/(cVars->M0_+cVars->M0_));
-    
+
     // loop over all faces in contact with walls
     forAll (cInfo.wallContactFaces()[Pstream::myProcNo()],faceI)
-    {        
+    {
         label cFace(cInfo.wallContactFaces()[Pstream::myProcNo()][faceI]);
-    
+
         contactCells.append(mesh.faceOwner()[cFace]);
         // get the local wall velocity
 //             label cFacePatch(mesh_.boundaryMesh().whichPatch(cFace));
         //~ vector wVel(U.boundaryField()[cFacePatch][cFace]);
         vector wVel(vector::zero);
         // Note (MI): could I go around whichPatch?
-        
+
         // compute normal to movement and relative velocitydeltaTDEM
         vector nVec(-mesh.Sf()[cFace]/mag(mesh.Sf()[cFace]));
 
         nVecF += nVec * mag(mesh.Sf()[cFace]);
-        overallContactArea += mag(mesh.Sf()[cFace]);        
-        
+        overallContactArea += mag(mesh.Sf()[cFace]);
+
         //project last Ft to new tangential direction
         vector FtLastP(FtLast - (FtLast & nVec) * nVec);
         //scale the projected vector to remain the magnitude
         vector FtLastr(mag(FtLast) * (FtLastP/(mag(FtLastP)+SMALL)));
-        
+
         vector ri(mesh.Cf()[cFace] - cInfo.getGeomModel().getCoM());
         //Evaluate tangential velocity
-        vector planarVec       =  ri - cVars->Axis_*(ri & cVars->Axis_);        
+        vector planarVec       =  ri - cVars->Axis_*(ri & cVars->Axis_);
         vector rotDir(planarVec^cVars->Axis_);
 
         vector cVeli(-rotDir*cVars->omega_ + cVars->Vel_);
@@ -185,49 +184,41 @@ void solveWallContact
         cVeli -= cVeliNorm;
         vector Vt(cVeli-wVel);
         //Compute tangential force
-        vector Fti(FtLastr - aKt*Vt*deltaT);        
-        
+        vector Fti(FtLastr - aKt*Vt*deltaT);
+
         scalar Lci(4*mag(ri)*mag(ri)/(mag(ri)+mag(ri)));
-        
+
         vector Ftdi(- aGammat*sqrt(aKN*reduceM*Lci)*Vt);
         Ft += (Fti + Ftdi);
         cLVec += ri;
     }
 
-    
+
     reduce(nContactFaces, sumOp<label>());
     reduce(overallContactArea, sumOp<scalar>());
     reduce(Ft, sumOp<vector>());
     reduce(cVel, sumOp<vector>());
     reduce(cLVec, sumOp<vector>());
     reduce(nVecF, sumOp<vector>());
-    
+
     vector wVel(vector::zero);
     cLVec /= (nContactFaces+SMALL);
     cVel /= (nContactFaces+SMALL);
     nVecF /= (overallContactArea+SMALL);
     scalar VnF(-(cVel-wVel) & nVecF);
     Ft /= (nContactFaces+SMALL);
-    
+
     scalar intersectedVolume((cVars->M0_-cVars->M_)/(cVars->rhoS_.value() + SMALL));
     scalar Lc(4*mag(cLVec)*mag(cLVec)/(mag(cLVec)+mag(cLVec)));
-    
-    
-    Info << "--// Body intersected volume: " << intersectedVolume << endl;
-    Info << "--// Body (aKN*intersectedVolume/(Lc+SMALL): " << (aKN*intersectedVolume/(Lc+SMALL)) << endl;
-    Info << "--// Body aGammaN: " << (aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(VnF*overallContactArea)) << endl;
-    Info << "--// Body nVecF: " << nVecF << endl;
-    
+
     FN = (aKN*intersectedVolume/(Lc+SMALL) + aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(VnF*overallContactArea))*nVecF;
-    
-    Info << "--// Body FN: " << FN << endl;
-    
+
     if (mag(Ft) > amu * mag(FN))
     {
         Ft *= amu * mag(FN) / mag(Ft);
     }
-    
-    scalar FAc(aadhN*overallContactArea);  
+
+    scalar FAc(aadhN*overallContactArea);
     scalar FAeq(aKN*((aadhEqui*cVars->M0_)/(cVars->rhoS_.value() + SMALL))/(Lc+SMALL));
     scalar partMul((cVars->M0_-cVars->M_)/(cVars->M0_+SMALL)/(aadhEqui+SMALL));
     if(partMul > 1)
@@ -235,9 +226,8 @@ void solveWallContact
         partMul = 1;
     }
     vector FA((FAeq * partMul  + FAc * (1-partMul)) * nVecF);
-    Info << "--// Body FA: " << FA << endl;
     FN -= FA;
-    
+
     // Update or add the history of tangential force
     if (FtLastFinded)
     {
@@ -255,7 +245,7 @@ void solveWallContact
     {
         Tuple2<label,vector> help(1,Ft);
         Tuple2<label,Tuple2<label,vector>> help2(-1, help);
-                
+
         cInfo.getHistoryhistoryFt().append(help2);
     }
 
