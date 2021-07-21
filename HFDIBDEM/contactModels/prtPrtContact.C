@@ -856,11 +856,6 @@ void solvePrtContact(
             geometricD,
             prtPrtCntVarsTest
         );
-
-        Info << "Orig normal: " << prtPrtCntVarsTest.contactNormal_ << " new: " << prtPrtCntVars.contactNormal_ << endl;
-        Info << "Orig Center: " << prtPrtCntVarsTest.contactCenter_ << " new: " << prtPrtCntVars.contactCenter_ << endl;
-        Info << "Orig Area: " << prtPrtCntVarsTest.contactArea_ << " new: " << prtPrtCntVars.contactArea_ << endl;
-        Info << "Orig Volume: " << prtPrtCntVarsTest.contactVolume_ << " new: " << prtPrtCntVars.contactVolume_ << endl;
     }
     else
     {
