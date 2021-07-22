@@ -912,12 +912,12 @@ void solvePrtContact(
     Info << "-- Particle-particle contact area "   << prtPrtCntVars.contactArea_ << endl;
 
     // compute mean model parameters
-    scalar aKN(0.5*(cKN+tKN));
-    scalar aGammaN(0.5*(cGammaN+tGammaN));
-    scalar aKt(0.5*(cKt+tKt));
-    scalar aGammat(0.5*(cGammat+tGammat));
-    scalar amu(0.5*(cmu+tmu));
-    scalar aadhN(0.5*(cadhN+tadhN));
+    scalar aKN((cKN*tKN)/(cKN+tKN+SMALL));
+    scalar aGammaN((cGammaN*tGammaN)/(cGammaN+tGammaN+SMALL));
+    scalar aKt((cKt*tKt)/(cKt+tKt+SMALL));
+    scalar aGammat((cGammat*tGammat)/(cGammat+tGammat+SMALL));
+    scalar amu((cmu*tmu)/(cmu+tmu+SMALL));
+    scalar aadhN((cadhN*tadhN)/(cadhN+tadhN+SMALL));
 
     vector cLVec(prtPrtCntVars.contactCenter_-cCoM);
     vector tLVec(prtPrtCntVars.contactCenter_-tCoM);
