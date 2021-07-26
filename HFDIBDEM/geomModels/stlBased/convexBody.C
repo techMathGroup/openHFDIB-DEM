@@ -1,12 +1,12 @@
 /*---------------------------------------------------------------------------*\
-                        _   _ ____________ ___________
-                       | | | ||  ___|  _  \_   _| ___ \     H ybrid
-  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /     F ictitious
- / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \     D omain
-| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /     I mmersed
- \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/      B oundary
-      | |
-      |_|
+                        _   _ ____________ ___________    ______ ______ _    _
+                       | | | ||  ___|  _  \_   _| ___ \   |  _  \|  ___| \  / |
+  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /   | | | || |_  |  \/  |
+ / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \---| | | ||  _| | |\/| |
+| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /---| |/ / | |___| |  | |
+ \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/    |___/  |_____|_|  |_|
+      | |                     H ybrid F ictitious D omain - I mmersed B oundary
+      |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
 
@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "convexBody.H"
@@ -58,21 +58,21 @@ bool convexBody::canAddBody
                 nGeomDir += 1;
             }
         }
-        
+
         if(dirOk)
         {
             ibInsideMesh = true;
             break;
         }
     }
-    
+
     if(!ibInsideMesh)
         return true;
-    
+
     Field<label> octreeField(mesh_.nCells(),0);
-    
+
     const pointField& pp = mesh_.points();
-    
+
     labelList nextToCheck(1,0);
     label iterCount(0);label iterMax(mesh_.nCells());
     labelList vertexLabels;
@@ -82,15 +82,15 @@ bool convexBody::canAddBody
     DynamicLabelList auxToCheck;
     while (nextToCheck.size() > 0 and iterCount < iterMax)
     {
-        iterCount++;        
+        iterCount++;
         auxToCheck.clear();
-        
+
         forAll (nextToCheck,cellToCheck)
         {
             if (octreeField[nextToCheck[cellToCheck]] == 0)
             {
                 octreeField[nextToCheck[cellToCheck]] = 1;
-                
+
                 vertexLabels = mesh_.cellPoints()[nextToCheck[cellToCheck]];
                 pointPos = filterField(pp,vertexLabels);
                 vertexesInside = triSurfSearch_().calcInside(pointPos);
@@ -105,11 +105,11 @@ bool convexBody::canAddBody
                         {
                             return false;
                         }
-                        
+
                         if(nGeomDir == 3)
                         {
                             const labelList& cFaces = mesh_.cells()[nextToCheck[cellToCheck]];
-            
+
                             forAll (cFaces,faceI)
                             {
                                 if (!mesh_.isInternalFace(cFaces[faceI]))
@@ -119,7 +119,7 @@ bool convexBody::canAddBody
                                     facePatchId = mesh_.boundaryMesh().whichPatch(cFaces[faceI]);
                                     const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchId];
                                     if (cPatch.type()=="wall" || cPatch.type()=="patch")
-                                    {          
+                                    {
                                         pointField points = mesh_.faces()[cFaces[faceI]].points(pp);
                                         boolList faceVertexesInside = triSurfSearch_().calcInside(pointPos);
                                         forAll (faceVertexesInside, verIn)
@@ -135,7 +135,7 @@ bool convexBody::canAddBody
                         }
                     }
                 }
-                
+
                 if (!insideIB || cellInside)
                 {
                     auxToCheck.append(mesh_.cellCells()[nextToCheck[cellToCheck]]);
@@ -144,7 +144,7 @@ bool convexBody::canAddBody
         }
         nextToCheck = auxToCheck;
     }
- 
+
     return true;
 }
 //---------------------------------------------------------------------------//
@@ -157,7 +157,7 @@ void convexBody::createImmersedBody
     List<DynamicLabelList>& intCells,
     List<pointField>& cellPoints
 )
-{           
+{
     // Note (MI): I did NOT really modified this function.
     // -> there is almost no speed up filtering cp before calling
     //    calcInside
@@ -168,7 +168,7 @@ void convexBody::createImmersedBody
     //    necessary
     boundBox ibBound(getBounds());
     bool ibInsideMesh(false);
-    
+
     pointField ibBoundPoints(ibBound.points());
 
     forAll(ibBoundPoints,point)
@@ -184,32 +184,32 @@ void convexBody::createImmersedBody
                 }
             }
         }
-        
+
         if(dirOk)
         {
             ibInsideMesh = true;
             break;
         }
     }
-    
+
     // clear old list contents
     intCells[Pstream::myProcNo()].clear();
     surfCells[Pstream::myProcNo()].clear();
     //Find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;
     octreeField *= 0;
-    
+
     if(ibInsideMesh)
-    {   
+    {
         // get the list of cell centroids
         const pointField& cp = mesh_.C();
 
         bool insideIB(false);
         bool insideIbBound(false);
-        
+
         if(cellToStartInCreateIB_ >= octreeField.size())
             cellToStartInCreateIB_ = 0;
-        
+
         labelList nextToCheck(1,cellToStartInCreateIB_);
         label iterCount(0);label iterMax(mesh_.nCells());
         labelList vertexLabels;
@@ -220,21 +220,21 @@ void convexBody::createImmersedBody
         HashTable<pointField,label,Hash<label>> lastIbPoints(0);
         while (nextToCheck.size() > 0 and iterCount < iterMax)
         {
-            iterCount++;        
+            iterCount++;
             auxToCheck.clear();
-            
+
             forAll (nextToCheck,cellToCheck)
             {
                 if (octreeField[nextToCheck[cellToCheck]] == 0)
                 {
                     octreeField[nextToCheck[cellToCheck]] = 1;
-                    
+
                     if(lastIbPoints_.found(nextToCheck[cellToCheck]))
                     {
                         pointPos = lastIbPoints_[nextToCheck[cellToCheck]];
                     }
                     else
-                    {                        
+                    {
                         pointPos = cellPoints[nextToCheck[cellToCheck]];
                     }
                     bool cellInsideBB(false);
@@ -245,12 +245,12 @@ void convexBody::createImmersedBody
                             cellInsideBB = true;
                             break;
                         }
-                    }                    
-                    
+                    }
+
                     if(cellInsideBB)
                     {
                         insideIbBound = true;
-                        cellToStartInCreateIB_ = nextToCheck[cellToCheck];                        
+                        cellToStartInCreateIB_ = nextToCheck[cellToCheck];
                         lastIbPoints.insert(nextToCheck[cellToCheck],pointPos);
 //                         vertexesInside = new boolList(pointsInside, vertexLabels);
                         vertexesInside = triSurfSearch_().calcInside(pointPos);
@@ -275,11 +275,11 @@ void convexBody::createImmersedBody
                     else if(!insideIB && !insideIbBound)
                     {
                         auxToCheck.append(mesh_.cellCells()[nextToCheck[cellToCheck]]);
-                    }                    
+                    }
                 }
             }
             nextToCheck = auxToCheck;
-        }      
+        }
         if(intCells[Pstream::myProcNo()].size() > 0)
             cellToStartInCreateIB_ = min(intCells[Pstream::myProcNo()]);
         lastIbPoints_ = lastIbPoints;
@@ -301,16 +301,16 @@ labelList convexBody::createImmersedBodyByOctTree
     labelList retList;
     scalar rVInSize(0.5/vertexesInside.size());
     // Note: weight of a single vertex in the cell
-    
+
     scalar cBody(0);
     forAll (vertexesInside, verIn)
     {
         if (vertexesInside[verIn]==true)
         {
-            cBody  += rVInSize; //fraction of cell covered                
+            cBody  += rVInSize; //fraction of cell covered
         }
     }
-    
+
     vector sDSpan(4.0*(mesh_.bounds().max()-mesh_.bounds().min()));
     // Note: this is needed for correct definition of internal and
     //       surface cells of the body
@@ -372,7 +372,7 @@ labelList convexBody::createImmersedBodyByOctTree
 //                 createImmersedBodyByOctTree(cellNb[nbCellI], insideIB, ibPartialVolumei, centersInside, pointsInside, body);
 //             }
     }
-    
+
     return retList;
 }
 //---------------------------------------------------------------------------//

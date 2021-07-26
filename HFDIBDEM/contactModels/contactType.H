@@ -26,24 +26,36 @@ InNamspace
     Foam
 
 Description
-    class for addition and removal of immersedBodies
-
-SourceFiles
-    addModels.C
+    Enum to distinguish between different types of contacts
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef contactType_H
 #define contactType_H
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 namespace Foam
-{       
-    enum contactType {wall,
-                      sphere,
-                      arbShape
-    };
-}
+{
+
+/*---------------------------------------------------------------------------*\
+                         Enum contactType Declaration
+\*---------------------------------------------------------------------------*/
+enum contactType
+{
+    arbShape,
+    sphere
+};
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #endif
+
+// ************************************************************************* //

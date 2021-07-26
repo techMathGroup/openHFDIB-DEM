@@ -1,12 +1,12 @@
 /*---------------------------------------------------------------------------*\
-                        _   _ ____________ ___________
-                       | | | ||  ___|  _  \_   _| ___ \     H ybrid
-  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /     F ictitious
- / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \     D omain
-| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /     I mmersed
- \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/      B oundary
-      | |
-      |_|
+                        _   _ ____________ ___________    ______ ______ _    _
+                       | | | ||  ___|  _  \_   _| ___ \   |  _  \|  ___| \  / |
+  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /   | | | || |_  |  \/  |
+ / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \---| | | ||  _| | |\/| |
+| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /---| |/ / | |___| |  | |
+ \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/    |___/  |_____|_|  |_|
+      | |                     H ybrid F ictitious D omain - I mmersed B oundary
+      |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
 
@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "sphereBody.H"
@@ -58,21 +58,21 @@ bool sphereBody::canAddBody
                 nGeomDir += 1;
             }
         }
-        
+
         if(dirOk)
         {
             ibInsideMesh = true;
             break;
         }
     }
-    
+
     if(!ibInsideMesh)
         return true;
-    
+
     Field<label> octreeField(mesh_.nCells(),0);
-    
+
     const pointField& pp = mesh_.points();
-    
+
     labelList nextToCheck(1,0);
     label iterCount(0);label iterMax(mesh_.nCells());
     labelList vertexLabels;
@@ -82,15 +82,15 @@ bool sphereBody::canAddBody
     DynamicLabelList auxToCheck;
     while (nextToCheck.size() > 0 and iterCount < iterMax)
     {
-        iterCount++;        
+        iterCount++;
         auxToCheck.clear();
-        
+
         forAll (nextToCheck,cellToCheck)
         {
             if (octreeField[nextToCheck[cellToCheck]] == 0)
             {
                 octreeField[nextToCheck[cellToCheck]] = 1;
-                
+
                 vertexLabels = mesh_.cellPoints()[nextToCheck[cellToCheck]];
                 pointPos = filterField(pp,vertexLabels);
                 vertexesInside = pointInside(pointPos);
@@ -105,11 +105,11 @@ bool sphereBody::canAddBody
                         {
                             return false;
                         }
-                        
+
                         if(nGeomDir == 3)
                         {
                             const labelList& cFaces = mesh_.cells()[nextToCheck[cellToCheck]];
-            
+
                             forAll (cFaces,faceI)
                             {
                                 if (!mesh_.isInternalFace(cFaces[faceI]))
@@ -119,7 +119,7 @@ bool sphereBody::canAddBody
                                     facePatchId = mesh_.boundaryMesh().whichPatch(cFaces[faceI]);
                                     const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchId];
                                     if (cPatch.type()=="wall" || cPatch.type()=="patch")
-                                    {          
+                                    {
                                         pointField points = mesh_.faces()[cFaces[faceI]].points(pp);
                                         boolList faceVertexesInside = pointInside(pointPos);
                                         forAll (faceVertexesInside, verIn)
@@ -135,7 +135,7 @@ bool sphereBody::canAddBody
                         }
                     }
                 }
-                
+
                 if (!insideIB || cellInside)
                 {
                     auxToCheck.append(mesh_.cellCells()[nextToCheck[cellToCheck]]);
@@ -144,7 +144,7 @@ bool sphereBody::canAddBody
         }
         nextToCheck = auxToCheck;
     }
- 
+
     return true;
 }
 //---------------------------------------------------------------------------//
@@ -157,7 +157,7 @@ void sphereBody::createImmersedBody
     List<DynamicLabelList>& intCells,
     List<pointField>& cellPoints
 )
-{          
+{
     // Note (MI): I did NOT really modified this function.
     // -> there is almost no speed up filtering cp before calling
     //    calcInside
@@ -168,7 +168,7 @@ void sphereBody::createImmersedBody
     //    necessary
     boundBox ibBound(getBounds());
     bool ibInsideMesh(false);
-    
+
     pointField ibBoundPoints(ibBound.points());
 
     forAll(ibBoundPoints,point)
@@ -184,32 +184,32 @@ void sphereBody::createImmersedBody
                 }
             }
         }
-        
+
         if(dirOk)
         {
             ibInsideMesh = true;
             break;
         }
     }
-    
+
     // clear old list contents
     intCells[Pstream::myProcNo()].clear();
     surfCells[Pstream::myProcNo()].clear();
     //Find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;
     octreeField *= 0;
-    
+
     if(ibInsideMesh)
-    {   
+    {
         // get the list of cell centroids
         const pointField& cp = mesh_.C();
 
         bool insideIB(false);
         bool insideIbBound(false);
-        
+
         if(cellToStartInCreateIB_ >= octreeField.size())
             cellToStartInCreateIB_ = 0;
-        
+
         labelList nextToCheck(1,cellToStartInCreateIB_);
         label iterCount(0);label iterMax(mesh_.nCells());
         labelList vertexLabels;
@@ -220,21 +220,21 @@ void sphereBody::createImmersedBody
         HashTable<pointField,label,Hash<label>> lastIbPoints(0);
         while (nextToCheck.size() > 0 and iterCount < iterMax)
         {
-            iterCount++;        
+            iterCount++;
             auxToCheck.clear();
-            
+
             forAll (nextToCheck,cellToCheck)
             {
                 if (octreeField[nextToCheck[cellToCheck]] == 0)
                 {
                     octreeField[nextToCheck[cellToCheck]] = 1;
-                    
+
                     if(lastIbPoints_.found(nextToCheck[cellToCheck]))
                     {
                         pointPos = lastIbPoints_[nextToCheck[cellToCheck]];
                     }
                     else
-                    {                        
+                    {
                         pointPos = cellPoints[nextToCheck[cellToCheck]];
                     }
                     bool cellInsideBB(false);
@@ -245,12 +245,12 @@ void sphereBody::createImmersedBody
                             cellInsideBB = true;
                             break;
                         }
-                    }                    
-                    
+                    }
+
                     if(cellInsideBB)
                     {
                         insideIbBound = true;
-                        cellToStartInCreateIB_ = nextToCheck[cellToCheck];                        
+                        cellToStartInCreateIB_ = nextToCheck[cellToCheck];
                         lastIbPoints.insert(nextToCheck[cellToCheck],pointPos);
 //                         vertexesInside = new boolList(pointsInside, vertexLabels);
                         vertexesInside = pointInside(pointPos);
@@ -275,11 +275,11 @@ void sphereBody::createImmersedBody
                     else if(!insideIB && !insideIbBound)
                     {
                         auxToCheck.append(mesh_.cellCells()[nextToCheck[cellToCheck]]);
-                    }                    
+                    }
                 }
             }
             nextToCheck = auxToCheck;
-        }      
+        }
         if(intCells[Pstream::myProcNo()].size() > 0)
             cellToStartInCreateIB_ = min(intCells[Pstream::myProcNo()]);
         lastIbPoints_ = lastIbPoints;
@@ -301,16 +301,16 @@ labelList sphereBody::createImmersedBodyByOctTree
     labelList retList;
     scalar rVInSize(0.5/vertexesInside.size());
     // Note: weight of a single vertex in the cell
-    
+
     scalar cBody(0);
     forAll (vertexesInside, verIn)
     {
         if (vertexesInside[verIn]==true)
         {
-            cBody  += rVInSize; //fraction of cell covered                
+            cBody  += rVInSize; //fraction of cell covered
         }
     }
-    
+
     vector sDSpan(4.0*(mesh_.bounds().max()-mesh_.bounds().min()));
     // Note: this is needed for correct definition of internal and
     //       surface cells of the body
@@ -369,14 +369,14 @@ labelList sphereBody::createImmersedBodyByOctTree
 //                 createImmersedBodyByOctTree(cellNb[nbCellI], insideIB, ibPartialVolumei, centersInside, pointsInside, body);
 //             }
     }
-    
+
     return retList;
 }
 //---------------------------------------------------------------------------//
 void sphereBody::synchronPos()
 {
     PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
-    
+
     if (owner_ == Pstream::myProcNo())
     {
         for (label proci = 0; proci < Pstream::nProcs(); proci++)
@@ -385,12 +385,12 @@ void sphereBody::synchronPos()
             send << position_;
         }
     }
-    
+
     pBufs.finishedSends();
     //Move body to points calculated by owner_
     UIPstream recv(owner_, pBufs);
     vector pos (recv);
-    
+
     //move mesh
     position_ = pos;
 }
@@ -398,28 +398,33 @@ void sphereBody::synchronPos()
 boolList sphereBody::pointInside(pointField pointI)
 {
     boolList inside(pointI.size());
-    
+
     forAll(pointI,point)
     {
         inside[point] = mag(position_-pointI[point]) < radius_;
     }
-    
+
     return inside;
+}
+//---------------------------------------------------------------------------//
+bool sphereBody::pointInside(point pointI)
+{
+    return mag(position_-pointI) < radius_;
 }
 //---------------------------------------------------------------------------//
 pointField sphereBody::sampleSurfacePoints()
 {
     pointField returnField(6);
-    
+
     vector a(1,0,0);
     vector b(0,1,0);
     vector c(0,0,1);
-    
+
     List<vector> listV(3);
     listV[0] = a;
     listV[1] = b;
     listV[2] = c;
-    
+
     forAll (listV,v)
     {
         returnField[v] = position_ + listV[v] * radius_;
@@ -428,6 +433,6 @@ pointField sphereBody::sampleSurfacePoints()
     {
         returnField[3+v] = position_ - listV[v] * radius_;
     }
-    
+
     return returnField;
 }

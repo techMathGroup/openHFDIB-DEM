@@ -26,28 +26,40 @@ InNamspace
     Foam
 
 Description
-    class for addition and removal of immersedBodies
-
-SourceFiles
-    addModels.C
+    class for storage of particle-particle contact variables
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef prtPrtContactVars_H
 #define prtPrtContactVars_H
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 namespace Foam
-{            
-    class prtPrtContactVars
-    {
-        public:
-        vector contactCenter_;
-        scalar contactVolume_;
-        vector contactNormal_;
-        scalar contactArea_;
-    };
-}
-#endif 
+{
+
+/*---------------------------------------------------------------------------*\
+                      Class prtPrtContactVars Declaration
+\*---------------------------------------------------------------------------*/
+
+class prtPrtContactVars
+{
+    public:
+    vector contactCenter_;
+    scalar contactVolume_;
+    vector contactNormal_;
+    scalar contactArea_;
+};
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

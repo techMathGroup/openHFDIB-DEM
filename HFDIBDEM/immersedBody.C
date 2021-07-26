@@ -377,9 +377,6 @@ void immersedBody::constructRefineField
 //should detect contact with walls
 bool immersedBody::shouldDetectWallContact()
 {
-    Info << "--// Body IB detect M0: " << getM0() << endl;
-    Info << "--// Body IB detect M: " << getM() << endl;
-
     if((getM0()-getM()) < 0)
     {
         contactInfo_->setWallContact(false);
@@ -1820,10 +1817,18 @@ void immersedBody::pimpleUpdate
 //---------------------------------------------------------------------------//
 void immersedBody::checkIfInDomain(volScalarField& body)
 {
+    if(getM0() < SMALL)
+    {
+        switchActiveOff(body);
+    }
+
     Info << "M0: " << getM0() << endl;
     Info << "-- body " << bodyId_ << " current M/M0: " << getM()/getM0() << endl;
     //if only 1% of the initial particle mass remains in the domain, switch it off
-    if (getM()/(getM0()+SMALL) < 1e-2) switchActiveOff(body);
+    if (getM()/(getM0()+SMALL) < 1e-2)
+    {
+        switchActiveOff(body);
+    }
 }
 //---------------------------------------------------------------------------//
 void immersedBody::setRestartSim(vector vel, scalar angVel, vector axisRot, bool setStatic, label timesInContact)

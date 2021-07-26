@@ -6,7 +6,6 @@ geomModels/shapeBased/shapeBased.C
 geomModels/shapeBased/sphereBody.C
 contactModels/contactInfo.C
 contactModels/wallInfo.C
-contactModels/wallContact.C
 addModels/addModel.C
 addModels/addModelOnce.C
 addModels/addModelOnceScatter.C

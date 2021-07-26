@@ -1,12 +1,12 @@
 /*---------------------------------------------------------------------------*\
-                        _   _ ____________ ___________
-                       | | | ||  ___|  _  \_   _| ___ \     H ybrid
-  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /     F ictitious
- / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \     D omain
-| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /     I mmersed
- \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/      B oundary
-      | |
-      |_|
+                        _   _ ____________ ___________    ______ ______ _    _
+                       | | | ||  ___|  _  \_   _| ___ \   |  _  \|  ___| \  / |
+  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /   | | | || |_  |  \/  |
+ / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \---| | | ||  _| | |\/| |
+| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /---| |/ / | |___| |  | |
+ \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/    |___/  |_____|_|  |_|
+      | |                     H ybrid F ictitious D omain - I mmersed B oundary
+      |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
 
@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "nonConvexBody.H"
@@ -38,7 +38,7 @@ bool nonConvexBody::canAddBody
 (
     const volScalarField& body
 )
-{    
+{
     label nGeomDir(0);
     forAll(geometricD_,dir)
     {
@@ -47,26 +47,26 @@ bool nonConvexBody::canAddBody
             nGeomDir += 1;
         }
     }
-    
+
     Field<label> octreeField(mesh_.nCells(),0);
-    
-    scalar inflFact(2*sqrt(mesh_.magSf()[0]));    
-    
+
+    scalar inflFact(2*sqrt(mesh_.magSf()[0]));
+
     boundBox ibBound(getBounds());
-    
+
     vector expMinBBox = ibBound.min() - vector::one*inflFact;
     vector expMaxBBox = ibBound.max() + vector::one*inflFact;
-    
+
     List<DynamicLabelList> bBoxCells(Pstream::nProcs());
-    
+
     bool isInsideBB(false);
     labelList nextToCheck(1,0);
     label iterCount(0);label iterMax(mesh_.nCells());
     while ((nextToCheck.size() > 0 or not isInsideBB) and iterCount < iterMax)
     {
-        iterCount++;        
+        iterCount++;
         DynamicLabelList auxToCheck;
-        
+
         forAll (nextToCheck,cellToCheck)
         {
             auxToCheck.append(
@@ -82,13 +82,13 @@ bool nonConvexBody::canAddBody
         }
         nextToCheck = auxToCheck;
     }
-    
+
     const pointField& pp = mesh_.points();
-    
+
     forAll (bBoxCells[Pstream::myProcNo()],bCellI)                       //go only through bBox
     {
         label cellI(bBoxCells[Pstream::myProcNo()][bCellI]);
-        
+
         const labelList& vertexLabels = mesh_.cellPoints()[cellI];
         const pointField vertexPoints(pp,vertexLabels);
         boolList vertexesInside = triSurfSearch_().calcInside( vertexPoints );
@@ -100,7 +100,7 @@ bool nonConvexBody::canAddBody
                 {
                     return false;
                 }
-                
+
                 if(nGeomDir == 3)
                 {
                     const labelList& cFaces = mesh_.cells()[cellI];
@@ -114,7 +114,7 @@ bool nonConvexBody::canAddBody
                             facePatchId = mesh_.boundaryMesh().whichPatch(cFaces[faceI]);
                             const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchId];
                             if (cPatch.type()=="wall" || cPatch.type()=="patch")
-                            {          
+                            {
                                 pointField points = mesh_.faces()[cFaces[faceI]].points(pp);
                                 boolList faceVertexesInside = triSurfSearch_().calcInside(vertexPoints);
                                 forAll (faceVertexesInside, verIn)
@@ -131,7 +131,7 @@ bool nonConvexBody::canAddBody
             }
         }
     }
- 
+
     return true;
 }
 //---------------------------------------------------------------------------//
@@ -147,7 +147,7 @@ labelList nonConvexBody::getBBoxCellsByOctTree
 )
 {
     labelList retList;
-    
+
     if (octreeField[cellToCheck] ==0)
     {
         octreeField[cellToCheck] = 1;
@@ -183,26 +183,26 @@ void nonConvexBody::createImmersedBody
     List<DynamicLabelList>& intCells,
     List<pointField>& cellPoints
 )
-{           
+{
     // reduce computational domain to the body bounding box
-    scalar inflFact(2*sqrt(mesh_.magSf()[0]));    
-    
+    scalar inflFact(2*sqrt(mesh_.magSf()[0]));
+
     boundBox ibBound(getBounds());
-    
+
     vector expMinBBox = ibBound.min() - vector::one*inflFact;
     vector expMaxBBox = ibBound.max() + vector::one*inflFact;
-    
+
     octreeField *= 0;
     List<DynamicLabelList> bBoxCells(Pstream::nProcs());
-    
+
     bool isInsideBB(false);
     labelList nextToCheck(1,0);
     label iterCount(0);label iterMax(mesh_.nCells());
     while ((nextToCheck.size() > 0 or not isInsideBB) and iterCount < iterMax)
     {
-        iterCount++;        
+        iterCount++;
         DynamicLabelList auxToCheck;
-        
+
         forAll (nextToCheck,cellToCheck)
         {
             auxToCheck.append(
@@ -218,7 +218,7 @@ void nonConvexBody::createImmersedBody
         }
         nextToCheck = auxToCheck;
     }
-    
+
     // get cell centers inside the body bounding box
     const pointField& cp = mesh_.C();
     const pointField fCp = filterField(cp,bBoxCells[Pstream::myProcNo()]);
@@ -227,41 +227,41 @@ void nonConvexBody::createImmersedBody
     //            it seems as calcInside does filtering by itself
     //            also, due to the filtering, I need to make a copy
     //            of cp as fCp
-    
-    
+
+
     // clear old list contents
     intCells[Pstream::myProcNo()].clear();
     surfCells[Pstream::myProcNo()].clear();
-    
+
     //Find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;
-    
+
     //
     vector sDSpan(4.0*(mesh_.bounds().max()-mesh_.bounds().min()));
     //
-        
-    // first loop, construction of body field and identification of 
+
+    // first loop, construction of body field and identification of
     // the number of inside and surface cells
     forAll (bBoxCells[Pstream::myProcNo()],bCellI)                       //go only through bBox
     {
         label cellI(bBoxCells[Pstream::myProcNo()][bCellI]);
-        
+
         //Check if partially or completely inside
         const pointField vertexPoints = cellPoints[cellI];
         boolList vertexesInside = triSurfSearch_().calcInside( vertexPoints );
         bool centerInside(fCentersInside[bCellI]);
         scalar rVInSize(0.5/vertexesInside.size());
         // Note: weight of a single vertex in the cell
-        
+
         scalar cBody(0);
         forAll (vertexesInside, verIn)
         {
             if (vertexesInside[verIn]==true)
             {
-                cBody  += rVInSize; //fraction of cell covered                
+                cBody  += rVInSize; //fraction of cell covered
             }
         }
-        
+
         // Note: this is needed for correct definition of internal and
         //       surface cells of the body
         if (centerInside)//consistency with Blais 2016
@@ -312,11 +312,11 @@ void nonConvexBody::createImmersedBody
         body[cellI] = min(max(0.0,body[cellI]),1.0);
         // Note (MI): max should be useless, min is for overlaps
     }
-    
+
     //gather partial volume from other processors
     Pstream::gatherList(ibPartialVolume_, 0);
     Pstream::scatter(ibPartialVolume_, 0);
-    
+
     for (label i = 0; i < ibPartialVolume_.size(); i++)
     {
         if (ibPartialVolume_[i] == max(ibPartialVolume_))//MI 20201119 OR GMAX?

@@ -851,6 +851,7 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                         wallInfo_(),
                         immersedBodies_[ibToResolve[ib]].getContactInfo(),
                         immersedBodies_[ibToResolve[ib]].getContactVars(),
+                        geometricD_,
                         deltaTime*step,
                         outVars
                         );
@@ -988,6 +989,7 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
                     wallInfo_(),
                     immersedBodies_[ibContactList_[0]].getContactInfo(),
                     immersedBodies_[ibContactList_[0]].getContactVars(),
+                    geometricD_,
                     deltaTime*step,
                     outVars
                     );

@@ -32,7 +32,7 @@ SourceFiles
     addModels.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -42,28 +42,28 @@ Contributors
 #include "geomModel.H"
 
 namespace Foam
-{        
+{
     class stlBased
     : public geomModel
     {
-    
+
         private:
-            
+
         typedef DynamicList<label> DynamicLabelList;
         typedef DynamicList<scalar> DynamicScalarList;
         typedef DynamicList<vector> DynamicVectorList;
         typedef DynamicList<point> DynamicPointList;
-        
-        protected:      
+
+        protected:
         triSurfaceMesh      bodySurfMesh_;
         word                stlPath_;
         autoPtr<triSurface> triSurf_;
         autoPtr<triSurfaceSearch> triSurfSearch_;
-        
+
         pointField historyPoints_;
-        
+
         public:
-        
+
         // Constructors ------------------------------------------------
         stlBased
         (
@@ -73,10 +73,10 @@ namespace Foam
             scalar  thrSurf,
             Vector<label> geometricD
         );
-        
+
         // Destructors -------------------------------------------------
         virtual ~stlBased(){}
-        
+
         virtual void createImmersedBody
         (
             volScalarField& body,
@@ -85,37 +85,37 @@ namespace Foam
             List<DynamicLabelList>& intCells,
             List<pointField>& cellPoints
         )
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}    
-        
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
+
         virtual bool canAddBody
         (
             const volScalarField& body
         )
         {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return false;}
-        
+
         virtual geomModel* getGeomModel()
         {
             Info << "-- geomModelMessage-- " << "notIplemented"<<endl;
             geomModel* bodyGeomModel = new geomModel(mesh_);
-            return bodyGeomModel;            
-        } 
-        
+            return bodyGeomModel;
+        }
+
         vector addModelReturnRandomPosition(
             const bool allActiveCellsInMesh,
-            const boundBox  cellZoneBounds,       
+            const boundBox  cellZoneBounds,
             Random&         randGen
         ) final override;
-        
+
         void bodyMovePoints(vector translVec) final override;
-        
+
         void bodyScalePoints(scalar scaleFac) final override;
-        
+
         void bodyRotatePoints
         (
             scalar rotAngle,
             vector axisOfRot
         ) final override;
-            
+
         void resetBody() final override
         {
             triSurfaceMesh tmpSurf(IOobject
@@ -126,72 +126,79 @@ namespace Foam
                     IOobject::NO_WRITE
                 )
             );
-            
+
             bodySurfMesh_.movePoints(tmpSurf.points());
         }
-        
+
         vector getCoM() final override
         {
-            pointField bSMeshPts = bodySurfMesh_.points();            
+            pointField bSMeshPts = bodySurfMesh_.points();
             // get its center of mass
             vector CoM(vector::zero);
             forAll(bSMeshPts,point)
             {
                 CoM += bSMeshPts[point];
-            }    
+            }
             CoM/= bSMeshPts.size();
             return CoM;
         }
-        
+
         boundBox getBounds() final override
         {
             boundBox bounds(bodySurfMesh_.points());
             return bounds;
         }
-        
+
         void recordHistory() final override
         {
             historyPoints_ = bodySurfMesh_.points();
         }
-        
+
         void returnHistory() final override
         {
-            bodySurfMesh_.movePoints(historyPoints_);      
+            bodySurfMesh_.movePoints(historyPoints_);
             triSurf_.reset(new triSurface(bodySurfMesh_));
             triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
         }
-        
+
         void synchronPos() final override;
-        
+
         void writeBodyInfo(label bodyId, IOdictionary& dict, word path) final override
         {
             triSurface triToRet(bodySurfMesh_);
             triToRet.write(path+"/stlFiles/"+name(bodyId) + ".stl",".stl");
         }
-        
+
         boolList pointInside(pointField pointI) final override
         {
             boolList returnList = triSurfSearch_().calcInside( pointI);
             return returnList;
         }
-        
+
+        bool pointInside(point pointI) final override
+        {
+            pointField points(1,pointI);
+            boolList returnList = triSurfSearch_().calcInside( points);
+            return returnList[0];
+        }
+
         vector getClosestNormal(point startPoint, vector span) final override
         {
             //Get nearest point on surface from contact center
             pointIndexHit ibPointIndexHit = triSurfSearch_().nearest(startPoint, span);
             List<pointIndexHit> ibPointIndexHitList(1,ibPointIndexHit);
             vectorField normalVectorField;
-            
+
             //Get contact normal direction
             const triSurfaceMesh& ibTempMesh( bodySurfMesh_);
             ibTempMesh.getNormal(ibPointIndexHitList,normalVectorField);
-            // MS note: This normal direction is not correct for sharp edges! 
+            // MS note: This normal direction is not correct for sharp edges!
             // therefore it is used only if the normal direction cannot be set
             // based on surfcels (there is only one such cell
-            
+
             return normalVectorField[0];
         }
-        
+
         void initVars(pointField surfPoints, scalar thrSurf, Vector<label> geometricD, scalar intSpan, bool sdBasedLambda)
         {
             bodySurfMesh_.movePoints(surfPoints);

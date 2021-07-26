@@ -26,13 +26,13 @@ InNamspace
     Foam
 
 Description
-    class for addition and removal of immersedBodies
+    class for storage of contact variables
 
 SourceFiles
-    addModels.C
+    contactInfo.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -45,182 +45,197 @@ Contributors
 #include "geomModel.H"
 #include "contactVars.H"
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 namespace Foam
-{            
-    class contactInfo
+{
+
+/*---------------------------------------------------------------------------*\
+                        Class contactInfo Declaration
+\*---------------------------------------------------------------------------*/
+
+class contactInfo
+{
+    private:
+
+    typedef DynamicList<label> DynamicLabelList;
+    typedef DynamicList<scalar> DynamicScalarList;
+    typedef DynamicList<vector> DynamicVectorList;
+    typedef DynamicList<point> DynamicPointList;
+
+    protected:
+
+    geomModel& geomModel_;
+
+    //is the particle in contact with wall
+    bool    isInWallContact_;
+
+    List<DynamicLabelList>& surfCells_;
+    List<DynamicLabelList>& intCells_;
+
+    bool inContactWithStatic_;
+
+    label timeStepsInContWStatic_;
+
+    //faces in contact with walls
+    List<DynamicLabelList>  wallContactFaces_;
+
+    //spring stiffness for normal contact force
+    scalar  kN_;
+
+    //spring stiffness for tangential contact force
+    scalar  kt_;
+
+    //damping coefficient for normal contact force
+    scalar gammaN_;
+
+    //damping coefficient for tangential contact force
+    scalar gammat_;
+
+    //friction coefficient
+    scalar mu_;
+
+    //adhesion coefficient for normal contact force
+    scalar adhN_;
+
+    //adhesion coefficient for normal contact force
+    scalar adhEqui_;
+
+    //Tangential force from last timestep
+    //First label -1 indicates wall other for bodyID
+    DynamicList<Tuple2<label,Tuple2<label,vector>>> historyFt_;
+
+    public:
+
+    // Constructors ------------------------------------------------
+    contactInfo
+    (
+        geomModel& geomModel,
+        List<DynamicLabelList>& surfCells,
+        List<DynamicLabelList>& intCells,
+        scalar kN,
+        scalar kt,
+        scalar gammaN,
+        scalar gammat,
+        scalar mu,
+        scalar adhN,
+        scalar adhEqui
+    );
+
+    // Destructors -------------------------------------------------
+    ~contactInfo();
+
+    geomModel& getGeomModel()
     {
-        private:
-            
-        typedef DynamicList<label> DynamicLabelList;
-        typedef DynamicList<scalar> DynamicScalarList;
-        typedef DynamicList<vector> DynamicVectorList;
-        typedef DynamicList<point> DynamicPointList;
-        
-        protected:
-        
-        geomModel& geomModel_;
-        
-        //is the particle in contact with wall
-        bool    isInWallContact_;
-            
-        List<DynamicLabelList>& surfCells_;
-        List<DynamicLabelList>& intCells_;
-        
-        bool inContactWithStatic_;        
-        
-        label timeStepsInContWStatic_;
-        
-        //faces in contact with walls
-        List<DynamicLabelList>  wallContactFaces_;
-        
-        //spring stiffness for normal contact force
-        scalar  kN_;
-        
-        //spring stiffness for tangential contact force
-        scalar  kt_;
-        
-        //damping coefficient for normal contact force
-        scalar gammaN_;
-        
-        //damping coefficient for tangential contact force
-        scalar gammat_;
-        
-        //friction coefficient
-        scalar mu_;
-        
-        //adhesion coefficient for normal contact force
-        scalar adhN_;
-        
-        //adhesion coefficient for normal contact force
-        scalar adhEqui_;
-        
-        //Tangential force from last timestep
-        //First label -1 indicates wall other for bodyID 
-        DynamicList<Tuple2<label,Tuple2<label,vector>>> historyFt_;
-        
-        public:
-        
-        // Constructors ------------------------------------------------
-        contactInfo
-        (
-            geomModel& geomModel,
-            List<DynamicLabelList>& surfCells,
-            List<DynamicLabelList>& intCells,
-            scalar kN,
-            scalar kt,
-            scalar gammaN,
-            scalar gammat,
-            scalar mu,
-            scalar adhN,
-            scalar adhEqui
-        );
-        
-        // Destructors -------------------------------------------------
-        ~contactInfo();
-        
-        geomModel& getGeomModel()
-        {
-            return geomModel_;
-        };
-        
-        const bool& checkWallContact() const
-        {
-            return isInWallContact_;
-        };
-        
-        void setWallContact(bool inContact)
-        {
-            isInWallContact_ = inContact;
-        };
-        
-        List<DynamicLabelList>& getSurfCells()
-        {
-            return surfCells_;
-        };
-        
-        List<DynamicLabelList>& getIntCells()
-        {
-            return intCells_;
-        };
-        
-        const bool& checkInContactWithStatic() const
-        {
-            return inContactWithStatic_;
-        };
-                
-        void inContactWithStatic(bool inContact)
-        {
-            inContactWithStatic_ = inContact;
-        };
-        
-        const label& getTimeStepsInContWStatic() const
-        {
-            return timeStepsInContWStatic_;
-        };
-        
-        void setTimeStepsInContWStatic(label setter)
-        {
-            timeStepsInContWStatic_ = setter;
-        };
-        
-        List<DynamicLabelList>& wallContactFaces()
-        {
-            return wallContactFaces_;
-        };
-        
-        void distributeWallContactFaces()
-        {
-            //Distribute wallContactfaces over processors
-            Pstream::gatherList(wallContactFaces_, 0);
-            Pstream::scatter(wallContactFaces_, 0);
-        };
-        
-        const scalar& getkN()   const
-        {
-            return kN_;
-        };
-        
-        const scalar& getkt()   const
-        {
-            return kt_;
-        };
-        
-        const scalar& getgammaN()   const
-        {
-            return gammaN_;
-        };
-        
-        const scalar& getgammat()   const
-        {
-            return gammat_;
-        };
-        
-        const scalar& getmu()   const
-        {
-            return mu_;
-        };
-        
-        const scalar& getAdhN()   const
-        {
-            return adhN_;
-        };
-        
-        const scalar& getAdhEqui()   const
-        {
-            return adhEqui_;
-        };
-        
-        DynamicList<Tuple2<label,Tuple2<label,vector>>>& getHistoryhistoryFt()
-        {
-            return historyFt_;
-        };
-        
-        void clearContactInfo()
-        {
-            isInWallContact_ = false;
-            wallContactFaces_.clear();
-            wallContactFaces_.setSize(Pstream::nProcs());
-        };
-    };
-}
+        return geomModel_;
+    }
+
+    const bool& checkWallContact() const
+    {
+        return isInWallContact_;
+    }
+
+    void setWallContact(bool inContact)
+    {
+        isInWallContact_ = inContact;
+    }
+
+    List<DynamicLabelList>& getSurfCells()
+    {
+        return surfCells_;
+    }
+
+    List<DynamicLabelList>& getIntCells()
+    {
+        return intCells_;
+    }
+
+    const bool& checkInContactWithStatic() const
+    {
+        return inContactWithStatic_;
+    }
+
+    void inContactWithStatic(bool inContact)
+    {
+        inContactWithStatic_ = inContact;
+    }
+
+    const label& getTimeStepsInContWStatic() const
+    {
+        return timeStepsInContWStatic_;
+    }
+
+    void setTimeStepsInContWStatic(label setter)
+    {
+        timeStepsInContWStatic_ = setter;
+    }
+
+    List<DynamicLabelList>& wallContactFaces()
+    {
+        return wallContactFaces_;
+    }
+
+    void distributeWallContactFaces()
+    {
+        //Distribute wallContactfaces over processors
+        Pstream::gatherList(wallContactFaces_, 0);
+        Pstream::scatter(wallContactFaces_, 0);
+    }
+
+    const scalar& getkN()   const
+    {
+        return kN_;
+    }
+
+    const scalar& getkt()   const
+    {
+        return kt_;
+    }
+
+    const scalar& getgammaN()   const
+    {
+        return gammaN_;
+    }
+
+    const scalar& getgammat()   const
+    {
+        return gammat_;
+    }
+
+    const scalar& getmu()   const
+    {
+        return mu_;
+    }
+
+    const scalar& getAdhN()   const
+    {
+        return adhN_;
+    }
+
+    const scalar& getAdhEqui()   const
+    {
+        return adhEqui_;
+    }
+
+    DynamicList<Tuple2<label,Tuple2<label,vector>>>& getHistoryhistoryFt()
+    {
+        return historyFt_;
+    }
+
+    void clearContactInfo()
+    {
+        isInWallContact_ = false;
+        wallContactFaces_.clear();
+        wallContactFaces_.setSize(Pstream::nProcs());
+    }
+};
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #endif
+
+// ************************************************************************* //

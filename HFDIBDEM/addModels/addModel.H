@@ -29,10 +29,10 @@ Description
     class for addition and removal of immersedBodies
 
 SourceFiles
-    addModels.C
+    addModel.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -49,78 +49,105 @@ Contributors
 #include "nonConvexBody.H"
 #include "sphereBody.H"
 
-namespace Foam
-{    
-    class addModel
-    {
-    
-        private:
-        
-        protected:            
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-        const  dynamicFvMesh&       mesh_;
-        
-        public:
-        
-        // Constructors ------------------------------------------------
-        addModel(const dynamicFvMesh& mesh)
-        :
-        mesh_(mesh)
-        {}
-        
-        // Destructors -------------------------------------------------
-        virtual ~addModel();
-        
-        // Public subclasses -------------------------------------------
-        
-        // Public variables --------------------------------------------
-        
-        // Virtual methods to be overriden------------------------------
-        // Note:
-        //  - all these needs to have the same arugments accross
-        //    all the addModels (we need to keep a common interface)
-        
-        // -- init
-        virtual void init()
-        {Info << "-- addModelMessage-- " << "notIplemented"<<endl;}
-        // Note: rewrite this function if you need initialization
-        //       and place it into constructor
-        
-        virtual bool shouldAddBody(const volScalarField& body)
-        {Info << "-- addModelMessage-- " << "notIplemented"<<endl; return false;}
-        // Note: check current conditions in simulation and return
-        //       true if a body should be added
-        
-        virtual geomModel* addBody(const volScalarField& body)
-        {
-            Info << "-- addModelMessage-- " << "notImplemented" << endl;
-            geomModel* bodyGeomModel = new geomModel(mesh_);
-            return bodyGeomModel;
-        }
-        // Note: needs to provide a properly scaled/oriented/translated
-        //       triSurface that will be used for IB initialization
-        
-        virtual bool canAddBody
-        (
-            const volScalarField& body,
-            const triSurfaceMesh& bodySurfMesh
-        )
-        {Info << "-- addModelMessage-- " << "notImplemented" << endl;return false;}
-        // Note: auxiliary function to be called from addBody during the
-        //       body addition (check if the body can be added to the
-        //       current position)
-        
-        // -- getters
-        virtual word getAddMode()
-        {Info << "-- addModelMessage-- " << "notImplemented" << endl;return "NO";}
-        
-        virtual bool getBodyAdded()
-        {Info << "-- addModelMessage-- " << "notImplemented" << endl;return false;}
-        // Note: this has to return true if addBody ends with SUCCESS,
-        //       return false otherwise
-        virtual void recreateBoundBox()
-        {Info << "-- addModelMessage-- " << "notIplemented"<<endl;}
-                        
-    };
-}
+namespace Foam
+{
+
+/*---------------------------------------------------------------------------*\
+                          Class addModel Declaration
+\*---------------------------------------------------------------------------*/
+
+class addModel
+{
+
+    private:
+
+    protected:
+
+    const  dynamicFvMesh&       mesh_;
+
+    public:
+
+    // Constructors ------------------------------------------------
+    addModel(const dynamicFvMesh& mesh)
+    :
+    mesh_(mesh)
+    {}
+
+    // Destructors -------------------------------------------------
+    virtual ~addModel();
+
+    // Virtual methods to be overriden------------------------------
+    // Note:
+    //  - all these needs to have the same arugments accross
+    //    all the addModels (we need to keep a common interface)
+
+    // -- init
+    virtual void init()
+    {
+        Info << "-- addModelMessage-- " << "notIplemented"<<endl;
+    }
+    // Note: rewrite this function if you need initialization
+    //       and place it into constructor
+
+    virtual bool shouldAddBody(const volScalarField& body)
+    {
+        Info << "-- addModelMessage-- " << "notIplemented"<<endl;
+        return false;
+    }
+    // Note: check current conditions in simulation and return
+    //       true if a body should be added
+
+    virtual geomModel* addBody(const volScalarField& body)
+    {
+        Info << "-- addModelMessage-- " << "notImplemented" << endl;
+        geomModel* bodyGeomModel = new geomModel(mesh_);
+        return bodyGeomModel;
+    }
+    // Note: needs to provide a properly scaled/oriented/translated
+    //       triSurface that will be used for IB initialization
+
+    virtual bool canAddBody
+    (
+        const volScalarField& body,
+        const triSurfaceMesh& bodySurfMesh
+    )
+    {
+        Info << "-- addModelMessage-- " << "notImplemented" << endl;
+        return false;
+    }
+    // Note: auxiliary function to be called from addBody during the
+    //       body addition (check if the body can be added to the
+    //       current position)
+
+    // -- getters
+    virtual word getAddMode()
+    {
+        Info << "-- addModelMessage-- " << "notImplemented" << endl;
+        return "NO";
+    }
+
+    virtual bool getBodyAdded()
+    {
+        Info << "-- addModelMessage-- " << "notImplemented" << endl;
+        return false;
+    }
+    // Note: this has to return true if addBody ends with SUCCESS,
+    //       return false otherwise
+
+    virtual void recreateBoundBox()
+    {
+        Info << "-- addModelMessage-- " << "notIplemented"<<endl;
+    }
+};
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #endif
+
+// ************************************************************************* //

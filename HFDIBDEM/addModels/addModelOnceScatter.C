@@ -1,12 +1,12 @@
 /*---------------------------------------------------------------------------*\
-                        _   _ ____________ ___________
-                       | | | ||  ___|  _  \_   _| ___ \     H ybrid
-  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /     F ictitious
- / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \     D omain
-| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /     I mmersed
- \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/      B oundary
-      | |
-      |_|
+                        _   _ ____________ ___________    ______ ______ _    _
+                       | | | ||  ___|  _  \_   _| ___ \   |  _  \|  ___| \  / |
+  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /   | | | || |_  |  \/  |
+ / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \---| | | ||  _| | |\/| |
+| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /---| |/ / | |___| |  | |
+ \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/    |___/  |_____|_|  |_|
+      | |                     H ybrid F ictitious D omain - I mmersed B oundary
+      |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
 
@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "addModelOnceScatter.H"
@@ -103,14 +103,14 @@ allActiveCellsInMesh_(true),
 nGeometricD_(0),
 geometricD_(geomDir),
 randGen_(clock::getTime())
-{    
+{
     if(!startTime0)
     {
         finishedAddition_ = true;
     }
 	init();
 }
-    
+
 addModelOnceScatter::~addModelOnceScatter()
 {
 }
@@ -123,7 +123,7 @@ void addModelOnceScatter::init()
     // Set sizes to necessary datatypes
     cellsInBoundBox_.setSize(Pstream::nProcs());
     cellZonePoints_.setSize(Pstream::nProcs());
-    
+
 
 	if (addModeI_ == "multiBody")
 	{
@@ -143,7 +143,7 @@ void addModelOnceScatter::init()
     {
         Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
     }
-	
+
 	if (addDomain_ == "cellZone")
 	{
 		zoneName_ = (word(addDomainCoeffs_.lookup("zoneName")));
@@ -167,7 +167,7 @@ void addModelOnceScatter::init()
     {
 		Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
 	}
-    
+
     // check, if the whole zone is in the mesh
     scalarList procZoneVols(Pstream::nProcs());
     procZoneVols[Pstream::myProcNo()] = 0;
@@ -180,20 +180,20 @@ void addModelOnceScatter::init()
     if (zoneVol - zoneBBoxVol > 1e-5*zoneBBoxVol)
     {
         allActiveCellsInMesh_ = false;
-        Info << "-- addModelMessage-- " 
+        Info << "-- addModelMessage-- "
              << "addition zone NOT completely immersed in mesh "
              << "this computation will be EXPENSIVE" << endl;
         Info << zoneVol << " " << zoneBBoxVol << endl;
     }
     else
     {
-        Info << "-- addModelMessage-- " 
+        Info << "-- addModelMessage-- "
              << "addition zone completely immersed in mesh -> OK" << endl;
     }
     // Note (MI): the coding should be done in such a way that all the
     //            variables should be present irrespective of addDomain_
     //            (check initializeBoundBox and initializeCellZone)
-	
+
 	if (scalingMode_ == "noScaling")
 	{
 		scaleParticles_ = false;
@@ -220,7 +220,7 @@ void addModelOnceScatter::init()
     {
 		Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
 	}
-	
+
 	if (rotationMode_ == "noRotation")
 	{
 		rotateParticles_ = false;
@@ -245,7 +245,7 @@ void addModelOnceScatter::init()
     {
 		Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
 	}
-	
+
 	forAll (geometricD_, direction)
     {
         if (geometricD_[direction] == 1)
@@ -258,14 +258,14 @@ void addModelOnceScatter::init()
 //---------------------------------------------------------------------------//
 bool addModelOnceScatter::shouldAddBody(const volScalarField& body)
 {
-	
+
     if (not finishedAddition_)
     {
         if (multiBody_)
         {
-                 
+
             Info << "-- addModelMessage-- " << "Number of added bodies: " << addedOnTimeLevel_ << endl;
-            
+
             if (partPerAdd_ < addedOnTimeLevel_)
             {
                 finishedAddition_ = false;
@@ -275,7 +275,7 @@ bool addModelOnceScatter::shouldAddBody(const volScalarField& body)
                 finishedAddition_ = true;
             }
         }
-        
+
         if (fieldBased_)
         {
             scalar currentLambdaFrac(checkLambdaFraction(body));
@@ -290,9 +290,9 @@ bool addModelOnceScatter::shouldAddBody(const volScalarField& body)
             }
         }
     }
-    
+
     return not finishedAddition_;
-    
+
 }
 //---------------------------------------------------------------------------//
 geomModel* addModelOnceScatter::addBody
@@ -301,9 +301,9 @@ geomModel* addModelOnceScatter::addBody
 )
 {
     geomModel_->resetBody();
-    
+
     bodyAdditionAttemptCounter_++;
-    
+
     // rotate
     if (rotateParticles_)
     {
@@ -313,10 +313,10 @@ geomModel* addModelOnceScatter::addBody
             axisOfRot_ = returnRandomRotationAxis();
         }
         Info << "-- addModelMessage-- " << "Will rotate by " << rotAngle << " PiRad around axis " << axisOfRot_ << endl;
-        
+
         geomModel_->bodyRotatePoints(rotAngle,axisOfRot_);
     }
-    
+
     // scale
     if (scaleApplication_ or scaleRandomApplication_)
     {
@@ -324,40 +324,40 @@ geomModel* addModelOnceScatter::addBody
         geomModel_->bodyScalePoints(scaleStep_);
     }
     // Note (MI): there should be no change in CoM after rotation and
-    //            scaling BUT CoM is approximate...  
-    
+    //            scaling BUT CoM is approximate...
+
     vector CoM(geomModel_->getCoM());
-    point bBoxCenter = cellZoneBounds_.midpoint(); 
+    point bBoxCenter = cellZoneBounds_.midpoint();
     geomModel_->bodyMovePoints(bBoxCenter - CoM);
-    
+
     vector randomTrans = geomModel_->addModelReturnRandomPosition(allActiveCellsInMesh_,cellZoneBounds_,randGen_);
     geomModel_->bodyMovePoints(randomTrans);
-    
+
     // check if the body can be added
     bool canAddBodyI(geomModel_->canAddBody(body));
-    reduce(canAddBodyI, andOp<bool>());    
+    reduce(canAddBodyI, andOp<bool>());
     bodyAdded_ = (canAddBodyI);
-    
+
     if(!bodyAdded_)
 	{
-		scaleCorrectionCounter_++; 
+		scaleCorrectionCounter_++;
 	}
-	
+
 	if(bodyAdded_)
-	{			
+	{
 		if(multiBody_)
 		{
 			Info << "-- addModelMessage-- " << "addedOnTimeLevel:  " << addedOnTimeLevel_<< endl;
 			addedOnTimeLevel_++;
 		}
-		
+
 		scaleCorrectionCounter_ = 0;
-		
+
 	}
-	
+
 	Info << "-- addModelMessage-- " << "bodyAdditionAttemptNr  : " << bodyAdditionAttemptCounter_<< endl;
 	Info << "-- addModelMessage-- " << "sameScaleAttempts      : " << scaleCorrectionCounter_<< endl;
-	
+
 	if(scaleCorrectionCounter_ > nTriesBeforeScaling_ && scaleParticles_)
 	{
 		scaleApplication_ = true;
@@ -370,34 +370,34 @@ geomModel* addModelOnceScatter::addBody
 		}
 		scaleCorrectionCounter_ = 0;
 	}
-    
+
     return geomModel_->getGeomModel();
 }
 // MODEL SPECIFIC FUNCTIONS==================================================//
 //---------------------------------------------------------------------------//
 void addModelOnceScatter::initializeCellZone()
 {
-	
+
 	label zoneID = mesh_.cellZones().findZoneID(zoneName_);
 	Info << "-- addModelMessage-- " << "label of the cellZone " << zoneID << endl;
-	
+
 	const labelList& cellZoneCells = mesh_.cellZones()[zoneID];
     cellsInBoundBox_[Pstream::myProcNo()] = cellZoneCells;
-	
+
 	const pointField& cp = mesh_.C();
 	const pointField fCp(cp,cellsInBoundBox_[Pstream::myProcNo()]);
 	cellZonePoints_[Pstream::myProcNo()] = fCp;
-	
+
 	updateCellZoneBoundBox();
 }
 //---------------------------------------------------------------------------//
 void addModelOnceScatter::updateCellZoneBoundBox()
 {
 		boundBox cellZoneBounds(cellZonePoints_[Pstream::myProcNo()]);
-		
+
         reduce(cellZoneBounds.min(), minOp<vector>());
         reduce(cellZoneBounds.max(), maxOp<vector>());
-        
+
         if (Pstream::myProcNo() == 0)
         {
             minBound_ = cellZoneBounds_.min();
@@ -407,18 +407,18 @@ void addModelOnceScatter::updateCellZoneBoundBox()
 }
 //---------------------------------------------------------------------------//
 void addModelOnceScatter::initializeBoundBox()
-{    
+{
     octreeField_ *= 0;
     List<DynamicLabelList> bBoxCells(Pstream::nProcs());
-    
+
     bool isInsideBB(false);
     labelList nextToCheck(1,0);
     label iterCount(0);label iterMax(mesh_.nCells());
     while ((nextToCheck.size() > 0 or not isInsideBB) and iterCount < iterMax)
     {
-        iterCount++;        
+        iterCount++;
         DynamicLabelList auxToCheck;
-        
+
         forAll (nextToCheck,cellToCheck)
         {
             auxToCheck.append(
@@ -430,10 +430,10 @@ void addModelOnceScatter::initializeBoundBox()
             );
         }
         nextToCheck = auxToCheck;
-    }    
-    
+    }
+
     cellsInBoundBox_[Pstream::myProcNo()] = bBoxCells[Pstream::myProcNo()];
-    
+
     cellZoneBounds_ = boundBox(minBound_,maxBound_);
 }
 //---------------------------------------------------------------------------//
@@ -447,7 +447,7 @@ labelList addModelOnceScatter::getBBoxCellsByOctTree
 )
 {
     labelList retList;
-    
+
     if (octreeField_[cellToCheck] ==0)
     {
         octreeField_[cellToCheck] = 1;
@@ -505,7 +505,7 @@ scalar addModelOnceScatter::returnRandomAngle()
 scalar addModelOnceScatter::returnRandomScale()
 {
 	scalar ranNum       = randGen_.scalar01();
-	scalar scaleDiff    = maxScale_ - minScale_; 
+	scalar scaleDiff    = maxScale_ - minScale_;
     scalar scaleFactor  = minScale_ + ranNum*scaleDiff;
 	Info << "-- addModelMessage-- " <<"random scaleFactor " << scaleFactor <<endl;
 	return scaleFactor;
@@ -515,7 +515,7 @@ vector addModelOnceScatter::returnRandomRotationAxis()
 {
 	vector  axisOfRotation(vector::zero);
 	scalar ranNum = 0;
-    
+
 	for (int i=0;i<3;i++)
 	{
 		ranNum = randGen_.scalar01();

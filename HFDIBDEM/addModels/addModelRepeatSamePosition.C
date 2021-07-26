@@ -1,12 +1,12 @@
 /*---------------------------------------------------------------------------*\
-                        _   _ ____________ ___________
-                       | | | ||  ___|  _  \_   _| ___ \     H ybrid
-  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /     F ictitious
- / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \     D omain
-| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /     I mmersed
- \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/      B oundary
-      | |
-      |_|
+                        _   _ ____________ ___________    ______ ______ _    _
+                       | | | ||  ___|  _  \_   _| ___ \   |  _  \|  ___| \  / |
+  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /   | | | || |_  |  \/  |
+ / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \---| | | ||  _| | |\/| |
+| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /---| |/ / | |___| |  | |
+ \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/    |___/  |_____|_|  |_|
+      | |                     H ybrid F ictitious D omain - I mmersed B oundary
+      |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
 
@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "addModelRepeatSamePosition.H"
@@ -51,7 +51,7 @@ useNTimes_(readLabel(coeffsDict_.lookup("useNTimes"))),
 timeBetweenUsage_(readScalar(coeffsDict_.lookup("timeBetweenUsage"))),
 addedOnTimeLevel_(0)
 {}
-    
+
 addModelRepeatSamePosition::~addModelRepeatSamePosition()
 {
 }
@@ -67,16 +67,16 @@ bool addModelRepeatSamePosition::shouldAddBody(const volScalarField& body)
     scalar deltaTime(mesh_.time().deltaT().value());
     scalar tmFrac(timeVal/timeBetweenUsage_);
     tmFrac -=  floor(tmFrac+deltaTime);
-    
-    Info << "-- addModelMessage-- " << "Time/(Time beween usage) - floor(Time/Time beween usage): " 
+
+    Info << "-- addModelMessage-- " << "Time/(Time beween usage) - floor(Time/Time beween usage): "
          << tmFrac << endl;
-         
+
     Info << "-- addModelMessage-- " << "Number of bodies added on this time level: " << addedOnTimeLevel_ << endl;
-         
+
     bool tmLevelOk(tmFrac < deltaTime);
-    
+
     if (not tmLevelOk){addedOnTimeLevel_ = 0;}
-             
+
     return (tmLevelOk and useNTimes_ > 0 and addedOnTimeLevel_ == 0);
 }
 
@@ -84,15 +84,15 @@ geomModel* addModelRepeatSamePosition::addBody
 (
     const   volScalarField& body
 )
-{    
+{
     bool canAddBodyI(geomModel_->canAddBody(body));
     reduce(canAddBodyI, andOp<bool>());
-    
+
     bodyAdded_ = canAddBodyI;
     if (bodyAdded_) {useNTimes_--;}
     addedOnTimeLevel_++;
-    
+
     Info << "-- addModelMessage-- " << "will try to use the body " << useNTimes_ << " more times" << endl;
-    
+
     return geomModel_->getGeomModel();
 }

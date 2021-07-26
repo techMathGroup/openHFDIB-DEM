@@ -1,12 +1,12 @@
 /*---------------------------------------------------------------------------*\
-                        _   _ ____________ ___________
-                       | | | ||  ___|  _  \_   _| ___ \     H ybrid
-  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /     F ictitious
- / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \     D omain
-| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /     I mmersed
- \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/      B oundary
-      | |
-      |_|
+                        _   _ ____________ ___________    ______ ______ _    _
+                       | | | ||  ___|  _  \_   _| ___ \   |  _  \|  ___| \  / |
+  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /   | | | || |_  |  \/  |
+ / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \---| | | ||  _| | |\/| |
+| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /---| |/ / | |___| |  | |
+ \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/    |___/  |_____|_|  |_|
+      | |                     H ybrid F ictitious D omain - I mmersed B oundary
+      |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
 
@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "addModelRepeatRandomPosition.H"
@@ -103,10 +103,10 @@ allActiveCellsInMesh_(true),
 nGeometricD_(0),
 geometricD_(geomDir),
 randGen_(clock::getTime())
-{    
+{
 	init();
 }
-    
+
 addModelRepeatRandomPosition::~addModelRepeatRandomPosition()
 {
 }
@@ -119,7 +119,7 @@ void addModelRepeatRandomPosition::init()
     // Set sizes to necessary datatypes
     cellsInBoundBox_.setSize(Pstream::nProcs());
     cellZonePoints_.setSize(Pstream::nProcs());
-    
+
 
 	if (addModeI_ == "timeBased")
 	{
@@ -143,7 +143,7 @@ void addModelRepeatRandomPosition::init()
     {
         Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
     }
-	
+
 	if (addDomain_ == "cellZone")
 	{
 		zoneName_ = (word(addDomainCoeffs_.lookup("zoneName")));
@@ -167,7 +167,7 @@ void addModelRepeatRandomPosition::init()
     {
 		Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
 	}
-    
+
     // check, if the whole zone is in the mesh
     scalarList procZoneVols(Pstream::nProcs());
     procZoneVols[Pstream::myProcNo()] = 0;
@@ -180,20 +180,20 @@ void addModelRepeatRandomPosition::init()
     if (zoneVol - zoneBBoxVol > 1e-5*zoneBBoxVol)
     {
         allActiveCellsInMesh_ = false;
-        Info << "-- addModelMessage-- " 
+        Info << "-- addModelMessage-- "
              << "addition zone NOT completely immersed in mesh "
              << "this computation will be EXPENSIVE" << endl;
         Info << zoneVol << " " << zoneBBoxVol << endl;
     }
     else
     {
-        Info << "-- addModelMessage-- " 
+        Info << "-- addModelMessage-- "
              << "addition zone completely immersed in mesh -> OK" << endl;
     }
     // Note (MI): the coding should be done in such a way that all the
     //            variables should be present irrespective of addDomain_
     //            (check initializeBoundBox and initializeCellZone)
-	
+
 	if (scalingMode_ == "noScaling")
 	{
 		scaleParticles_ = false;
@@ -220,7 +220,7 @@ void addModelRepeatRandomPosition::init()
     {
 		Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
 	}
-	
+
 	if (rotationMode_ == "noRotation")
 	{
 		rotateParticles_ = false;
@@ -245,9 +245,9 @@ void addModelRepeatRandomPosition::init()
     {
 		Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
 	}
-	
-	partPerAddTemp_ = partPerAdd_;    
-    
+
+	partPerAddTemp_ = partPerAdd_;
+
 	forAll (geometricD_, direction)
     {
         if (geometricD_[direction] == 1)
@@ -260,32 +260,32 @@ void addModelRepeatRandomPosition::init()
 //---------------------------------------------------------------------------//
 bool addModelRepeatRandomPosition::shouldAddBody(const volScalarField& body)
 {
-	
+
     if (timeBased_)
     {
         scalar timeVal(mesh_.time().value());
         scalar deltaTime(mesh_.time().deltaT().value());
         scalar tmFrac(timeVal/timeBetweenUsage_);
         tmFrac -=  floor(tmFrac+deltaTime);
-        
-        Info << "-- addModelMessage-- " << "Time/(Time beween usage) - floor(Time/Time beween usage): " 
+
+        Info << "-- addModelMessage-- " << "Time/(Time beween usage) - floor(Time/Time beween usage): "
              << tmFrac << endl;
-             
+
         Info << "-- addModelMessage-- " << "Number of bodies added on this time level: " << addedOnTimeLevel_ << endl;
-             
+
         bool tmLevelOk(tmFrac < deltaTime);
-        
+
         if (not tmLevelOk)
         {
             addedOnTimeLevel_ = 0;
             return false;
         }
-        
+
         if (partPerAdd_ <= addedOnTimeLevel_) {return false;}
-                                 
+
         return (tmLevelOk and useNTimes_ > 0);
     }
-    
+
     if (fieldBased_)
     {
         scalar currentLambdaFrac(checkLambdaFraction(body));
@@ -295,9 +295,9 @@ bool addModelRepeatRandomPosition::shouldAddBody(const volScalarField& body)
             return true;
         }
     }
-    
+
     return false;
-    
+
 }
 //---------------------------------------------------------------------------//
 geomModel* addModelRepeatRandomPosition::addBody
@@ -306,9 +306,9 @@ geomModel* addModelRepeatRandomPosition::addBody
 )
 {
     geomModel_->resetBody();
-    
+
     bodyAdditionAttemptCounter_++;
-    
+
     // rotate
     if (rotateParticles_)
     {
@@ -318,11 +318,11 @@ geomModel* addModelRepeatRandomPosition::addBody
             axisOfRot_ = returnRandomRotationAxis();
         }
         Info << "-- addModelMessage-- " << "Will rotate by " << rotAngle << " PiRad around axis " << axisOfRot_ << endl;
-        
+
         geomModel_->bodyRotatePoints(rotAngle,axisOfRot_);
         //~ CoM = gSum(bodySurfMesh.coordinates())/bodySurfMesh.size();
     }
-    
+
     // scale
     if (scaleApplication_ or scaleRandomApplication_)
     {
@@ -331,29 +331,29 @@ geomModel* addModelRepeatRandomPosition::addBody
         //~ CoM = gSum(bodySurfMesh.coordinates())/bodySurfMesh.size();
     }
     // Note (MI): there should be no change in CoM after rotation and
-    //            scaling BUT CoM is approximate...    
-    
+    //            scaling BUT CoM is approximate...
+
     vector CoM(geomModel_->getCoM());
-    point bBoxCenter = cellZoneBounds_.midpoint(); 
+    point bBoxCenter = cellZoneBounds_.midpoint();
     geomModel_->bodyMovePoints(bBoxCenter - CoM);
-    
+
     // translate
-    
+
     vector randomTrans = geomModel_->addModelReturnRandomPosition(allActiveCellsInMesh_,cellZoneBounds_,randGen_);
     geomModel_->bodyMovePoints(randomTrans);
-    
+
     // check if the body can be added
     bool canAddBodyI(geomModel_->canAddBody(body));
-    reduce(canAddBodyI, andOp<bool>());    
+    reduce(canAddBodyI, andOp<bool>());
     bodyAdded_ = (canAddBodyI);
-    
+
     if(!bodyAdded_)
 	{
-		scaleCorrectionCounter_++; 
+		scaleCorrectionCounter_++;
 	}
-	
+
 	if(bodyAdded_)
-	{			
+	{
 		if(timeBased_)
 		{
 			Info << "-- addModelMessage-- " << "addedOnTimeLevel:  " << addedOnTimeLevel_<< endl;
@@ -366,14 +366,14 @@ geomModel* addModelRepeatRandomPosition::addBody
 				reapeatedAddition_ = false;
 			}
 		}
-		
+
 		scaleCorrectionCounter_ = 0;
-		
+
 	}
-	
+
 	Info << "-- addModelMessage-- " << "bodyAdditionAttemptNr  : " << bodyAdditionAttemptCounter_<< endl;
 	Info << "-- addModelMessage-- " << "sameScaleAttempts      : " << scaleCorrectionCounter_<< endl;
-	
+
 	if(scaleCorrectionCounter_ > nTriesBeforeScaling_ && scaleParticles_)
 	{
 		scaleApplication_ = true;
@@ -386,34 +386,34 @@ geomModel* addModelRepeatRandomPosition::addBody
 		}
 		scaleCorrectionCounter_ = 0;
 	}
-	
+
     return geomModel_->getGeomModel();
 }
 // MODEL SPECIFIC FUNCTIONS==================================================//
 //---------------------------------------------------------------------------//
 void addModelRepeatRandomPosition::initializeCellZone()
 {
-	
+
 	label zoneID = mesh_.cellZones().findZoneID(zoneName_);
 	Info << "-- addModelMessage-- " << "label of the cellZone " << zoneID << endl;
-	
+
 	const labelList& cellZoneCells = mesh_.cellZones()[zoneID];
     cellsInBoundBox_[Pstream::myProcNo()] = cellZoneCells;
-	
+
 	const pointField& cp = mesh_.C();
 	const pointField fCp(cp,cellsInBoundBox_[Pstream::myProcNo()]);
 	cellZonePoints_[Pstream::myProcNo()] = fCp;
-	
+
 	updateCellZoneBoundBox();
 }
 //---------------------------------------------------------------------------//
 void addModelRepeatRandomPosition::updateCellZoneBoundBox()
 {
 		boundBox cellZoneBounds(cellZonePoints_[Pstream::myProcNo()]);
-		
+
         reduce(cellZoneBounds.min(), minOp<vector>());
         reduce(cellZoneBounds.max(), maxOp<vector>());
-        
+
         if (Pstream::myProcNo() == 0)
         {
             minBound_ = cellZoneBounds_.min();
@@ -423,18 +423,18 @@ void addModelRepeatRandomPosition::updateCellZoneBoundBox()
 }
 //---------------------------------------------------------------------------//
 void addModelRepeatRandomPosition::initializeBoundBox()
-{    
+{
     octreeField_ *= 0;
     List<DynamicLabelList> bBoxCells(Pstream::nProcs());
-    
+
     bool isInsideBB(false);
     labelList nextToCheck(1,0);
     label iterCount(0);label iterMax(mesh_.nCells());
     while ((nextToCheck.size() > 0 or not isInsideBB) and iterCount < iterMax)
     {
-        iterCount++;        
+        iterCount++;
         DynamicLabelList auxToCheck;
-        
+
         forAll (nextToCheck,cellToCheck)
         {
             auxToCheck.append(
@@ -446,27 +446,27 @@ void addModelRepeatRandomPosition::initializeBoundBox()
             );
         }
         nextToCheck = auxToCheck;
-    }    
-    
+    }
+
     cellsInBoundBox_[Pstream::myProcNo()] = bBoxCells[Pstream::myProcNo()];
-    
+
     cellZoneBounds_ = boundBox(minBound_,maxBound_);
 }
 //---------------------------------------------------------------------------//
 void addModelRepeatRandomPosition::recreateBoundBox()
-{    
+{
     octreeField_ = Field<label>(mesh_.nCells(), 0);
     cellsInBoundBox_[Pstream::myProcNo()].clear();
     List<DynamicLabelList> bBoxCells(Pstream::nProcs());
-    
+
     bool isInsideBB(false);
     labelList nextToCheck(1,0);
     label iterCount(0);label iterMax(mesh_.nCells());
     while ((nextToCheck.size() > 0 or not isInsideBB) and iterCount < iterMax)
     {
-        iterCount++;        
+        iterCount++;
         DynamicLabelList auxToCheck;
-        
+
         forAll (nextToCheck,cellToCheck)
         {
             auxToCheck.append(
@@ -478,12 +478,12 @@ void addModelRepeatRandomPosition::recreateBoundBox()
             );
         }
         nextToCheck = auxToCheck;
-    }    
-    
+    }
+
     cellsInBoundBox_[Pstream::myProcNo()] = bBoxCells[Pstream::myProcNo()];
-    
+
     Info << "-- addModelMessage-- " << "recreated boundBox size " << cellsInBoundBox_[Pstream::myProcNo()].size() << endl;
-    
+
     cellZoneBounds_ = boundBox(minBound_,maxBound_);
 }
 //---------------------------------------------------------------------------//
@@ -497,7 +497,7 @@ labelList addModelRepeatRandomPosition::getBBoxCellsByOctTree
 )
 {
     labelList retList;
-    
+
     if (octreeField_[cellToCheck] ==0)
     {
         octreeField_[cellToCheck] = 1;
@@ -540,7 +540,7 @@ scalar addModelRepeatRandomPosition::checkLambdaFraction(const volScalarField& b
 		lambdaIntegrate[Pstream::myProcNo()] += mesh_.V()[cell]*body[cell];
 		volumeIntegrate[Pstream::myProcNo()] += mesh_.V()[cell];
 	}
-	
+
 	lambdaFraction = gSum(lambdaIntegrate)/gSum(volumeIntegrate);
 	Info << "-- addModelMessage-- " << "lambda fraction in controlled region: " << lambdaFraction<< endl;
 	return lambdaFraction;
@@ -556,7 +556,7 @@ scalar addModelRepeatRandomPosition::returnRandomAngle()
 scalar addModelRepeatRandomPosition::returnRandomScale()
 {
 	scalar ranNum       = randGen_.scalar01();
-	scalar scaleDiff    = maxScale_ - minScale_; 
+	scalar scaleDiff    = maxScale_ - minScale_;
     scalar scaleFactor  = minScale_ + ranNum*scaleDiff;
 	Info << "-- addModelMessage-- " <<"random scaleFactor " << scaleFactor <<endl;
 	return scaleFactor;
@@ -566,7 +566,7 @@ vector addModelRepeatRandomPosition::returnRandomRotationAxis()
 {
 	vector  axisOfRotation(vector::zero);
 	scalar ranNum = 0;
-    
+
 	for (int i=0;i<3;i++)
 	{
 		ranNum = randGen_.scalar01();

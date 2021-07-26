@@ -32,7 +32,7 @@ SourceFiles
     addModels.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -43,32 +43,32 @@ Contributors
 #include "OFstream.H"
 
 namespace Foam
-{            
+{
     class sphereBody
     : public shapeBased
     {
-    
+
         private:
-            
+
         typedef DynamicList<label> DynamicLabelList;
         typedef DynamicList<scalar> DynamicScalarList;
         typedef DynamicList<vector> DynamicVectorList;
         typedef DynamicList<point> DynamicPointList;
-        
+
         vector position_;
         scalar radius_;
-        
+
         vector startPosition_;
         scalar startRadius_;
-        
+
         vector historyPosition_;
         scalar historyRadius_;
-        
+
         protected:
-        
-        
+
+
         public:
-        
+
         // Constructors ------------------------------------------------
         sphereBody
         (
@@ -91,26 +91,26 @@ namespace Foam
         {
             startPosition_ = position_;
             startRadius_ = radius_;
-            
+
             historyPosition_ = position_;
             historyRadius_ = radius_;
         }
-        
+
         // Destructors -------------------------------------------------
         ~sphereBody(){}
-        
+
         // Public subclasses -------------------------------------------
-        
+
         // Public variables --------------------------------------------
-        
-        // Public methods ---------------------------------------------- 
+
+        // Public methods ----------------------------------------------
         //~ void init();
-        
+
         bool canAddBody
         (
             const volScalarField& body
         ) final override;
-        
+
         void createImmersedBody
         (
             volScalarField& body,
@@ -119,7 +119,7 @@ namespace Foam
             List<DynamicLabelList>& intCells,
             List<pointField>& cellPoints
         ) final override;
-        
+
         labelList createImmersedBodyByOctTree
         (
             label cellToCheck,
@@ -130,38 +130,38 @@ namespace Foam
             List<DynamicLabelList>& surfCells,
             List<DynamicLabelList>& intCells
         );
-        
+
         geomModel* getGeomModel() final override
         {
             sphereBody* sphereBodyModel = new sphereBody(mesh_,position_,radius_,thrSurf_,geometricD_);
             sphereBodyModel->initVars(intSpan_,sdBasedLambda_);
             geomModel* bodyGeomModel = sphereBodyModel;
-            
-            return bodyGeomModel;           
-        } 
-        
-        void bodyMovePoints(vector translVec) final override       
-        {position_ += translVec;} 
-        
-        void bodyScalePoints(scalar scaleFac) final override       
+
+            return bodyGeomModel;
+        }
+
+        void bodyMovePoints(vector translVec) final override
+        {position_ += translVec;}
+
+        void bodyScalePoints(scalar scaleFac) final override
         {radius_ *= scaleFac;}
-        
+
         void bodyRotatePoints
         (
             scalar rotAngle,
             vector axisOfRot
         ) final override
         {}
-            
+
         void resetBody() final override
         {
             position_ = startPosition_;
             radius_ = startRadius_;
         }
-        
+
         vector getCoM() final override
         {return position_;}
-        
+
         boundBox getBounds() final override
         {
             vector one(1,1,1);
@@ -169,32 +169,35 @@ namespace Foam
             boundBox bounds(position_-one,position_+one);
             return bounds;
         }
-        
+
         void recordHistory() final override
         {
             historyPosition_ = position_;
             historyRadius_ = radius_;
         }
-        
+
         void returnHistory() final override
         {
             position_ = historyPosition_;
             radius_ = historyRadius_;
         }
-        
+
         void synchronPos() final override;
-        
+
         void writeBodyInfo(label bodyId, IOdictionary& dict, word path) final override
         {
             dictionary sphereDict("sphere");
             sphereDict.add("position", position_);
             sphereDict.add("radius", radius_);
-            
+
             dict.add("sphere",sphereDict);
         }
-        
+
         boolList pointInside(pointField pointI) final override;
-        
+
+
+        bool pointInside(point pointI) final override;
+
         vector getClosestNormal(point startPoint, vector span) final override
         {
             if(startPoint == position_)
@@ -206,15 +209,15 @@ namespace Foam
                 return normal;
             }
         }
-        
+
         void initVars(scalar intSpan, bool sdBasedLambda)
         {
             intSpan_ = intSpan;
             sdBasedLambda_ = sdBasedLambda;
         }
-        
+
         pointField sampleSurfacePoints() final override;
-        
+
         scalar getDC() final override
         {
             return 2*radius_;

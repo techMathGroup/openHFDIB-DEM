@@ -23,16 +23,16 @@ License
     along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
 
 InNamspace
-    Foam
+    contactModel
 
 Description
-    class for addition and removal of immersedBodies
+    methods to solve particle-particle contact
 
 SourceFiles
-    addModels.C
+    wallContact.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -46,30 +46,70 @@ Contributors
 #include "contactInfo.H"
 #include "wallInfo.H"
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 namespace Foam
-{        
-    namespace contactModel
-    {        
-        typedef DynamicList<label>  DynamicLabelList;
-        typedef DynamicList<scalar> DynamicScalarList;
-        typedef DynamicList<vector> DynamicVectorList;
-        typedef DynamicList<point>  DynamicPointList;
-        
-        void detectWallContact
-        (
-            const dynamicFvMesh&   mesh,
-            contactInfo& cInfo
-        );
-        
-        void solveWallContact
-        (
-            const dynamicFvMesh&   mesh,
-            wallInfo& wInfo,
-            contactInfo& cInfo,
-            contactVars* cVars,
-            scalar deltaT,
-            Tuple2<vector,vector>& outVars
-        );
-    };
+{
+
+/*---------------------------------------------------------------------------*\
+                 Namespace contactModel functions Declaration
+\*---------------------------------------------------------------------------*/
+
+namespace contactModel
+{
+    typedef DynamicList<label>  DynamicLabelList;
+    typedef DynamicList<scalar> DynamicScalarList;
+    typedef DynamicList<vector> DynamicVectorList;
+    typedef DynamicList<point>  DynamicPointList;
+
+    void detectWallContact
+    (
+        const dynamicFvMesh&   mesh,
+        contactInfo& cInfo
+    );
+
+    void solveWallContact
+    (
+        const dynamicFvMesh&   mesh,
+        wallInfo& wInfo,
+        contactInfo& cInfo,
+        contactVars* cVars,
+        vector geometricD,
+        scalar deltaT,
+        Tuple2<vector,vector>& outVars
+    );
+
+    template <contactType cT>
+    scalar getInterVolume
+    (
+        const dynamicFvMesh&   mesh,
+        contactInfo& cInfo,
+        contactVars* cVars,
+        vector geometricD
+    );
+
+    template <>
+    scalar getInterVolume <sphere>
+    (
+        const dynamicFvMesh&   mesh,
+        contactInfo& cInfo,
+        contactVars* cVars,
+        vector geometricD
+    );
 }
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+    #include "wallContact.C"
 #endif
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

@@ -26,51 +26,64 @@ InNamspace
     Foam
 
 Description
-    class for addition and removal of immersedBodies
-
-SourceFiles
-    addModels.C
+    class for storage of contact variables
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef contactVars_H
 #define contactVars_H
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 namespace Foam
-{            
-    class contactVars
-    {
-        public:
-        label bodyId_;
-        vector Vel_;
-        scalar omega_;
-        vector Axis_;
-        scalar M0_;
-        scalar M_;
-        dimensionedScalar rhoS_;
-        
-        contactVars
-        (
-            label bodyId,
-            vector Vel,
-            scalar omega,
-            vector Axis,
-            scalar M0,
-            scalar M,
-            dimensionedScalar rhoS                 
-        )
-        :
-        bodyId_(bodyId),
-        Vel_(Vel),
-        omega_(omega),
-        Axis_(Axis),
-        M0_(M0),
-        M_(M),
-        rhoS_(rhoS)
-        {}
-    };
-}
+{
+
+/*---------------------------------------------------------------------------*\
+                        Class contactVars Declaration
+\*---------------------------------------------------------------------------*/
+
+class contactVars
+{
+    public:
+    label bodyId_;
+    vector Vel_;
+    scalar omega_;
+    vector Axis_;
+    scalar M0_;
+    scalar M_;
+    dimensionedScalar rhoS_;
+
+    // Constructors ------------------------------------------------
+    contactVars
+    (
+        label bodyId,
+        vector Vel,
+        scalar omega,
+        vector Axis,
+        scalar M0,
+        scalar M,
+        dimensionedScalar rhoS
+    )
+    :
+    bodyId_(bodyId),
+    Vel_(Vel),
+    omega_(omega),
+    Axis_(Axis),
+    M0_(M0),
+    M_(M),
+    rhoS_(rhoS)
+    {}
+};
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #endif
+
+// ************************************************************************* //

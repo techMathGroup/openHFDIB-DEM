@@ -1,12 +1,12 @@
 /*---------------------------------------------------------------------------*\
-                        _   _ ____________ ___________
-                       | | | ||  ___|  _  \_   _| ___ \     H ybrid
-  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /     F ictitious
- / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \     D omain
-| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /     I mmersed
- \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/      B oundary
-      | |
-      |_|
+                        _   _ ____________ ___________    ______ ______ _    _
+                       | | | ||  ___|  _  \_   _| ___ \   |  _  \|  ___| \  / |
+  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /   | | | || |_  |  \/  |
+ / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \---| | | ||  _| | |\/| |
+| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /---| |/ / | |___| |  | |
+ \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/    |___/  |_____|_|  |_|
+      | |                     H ybrid F ictitious D omain - I mmersed B oundary
+      |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
 
@@ -63,13 +63,21 @@ void detectWallContact(
             if (!mesh.isInternalFace(cFaces[faceI]))
             {
                 // Get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
-                label facePatchId(-1);
-                facePatchId = mesh.boundaryMesh().whichPatch(cFaces[faceI]);
+                label facePatchId = mesh.boundaryMesh().whichPatch(cFaces[faceI]);
                 const polyPatch& cPatch = mesh.boundaryMesh()[facePatchId];
                 if (cPatch.type()=="wall")
                 {
-                    cInfo.wallContactFaces()[Pstream::myProcNo()].append(cFaces[faceI]);
-                    inContact = true;
+                    labelList facePoints(mesh.faces()[cFaces[faceI]]);//list of vertex indicies
+
+                    forAll(facePoints,pointI)
+                    {
+                        if(cInfo.getGeomModel().pointInside(mesh.points()[facePoints[pointI]]))
+                        {
+                            cInfo.wallContactFaces()[Pstream::myProcNo()].append(cFaces[faceI]);
+                            inContact = true;
+                            break;
+                        }
+                    }
                 }
             }
         }
@@ -96,7 +104,16 @@ void detectWallContact(
                     const polyPatch& cPatch = mesh.boundaryMesh()[facePatchId];
                     if (cPatch.type()=="wall")
                     {
-                        cInfo.wallContactFaces()[Pstream::myProcNo()].append(cFaces[faceI]);
+                        labelList facePoints(mesh.faces()[cFaces[faceI]]);//list of vertex indicies
+
+                        forAll(facePoints,pointI)
+                        {
+                            if(cInfo.getGeomModel().pointInside(mesh.points()[facePoints[pointI]]))
+                            {
+                                cInfo.wallContactFaces()[Pstream::myProcNo()].append(cFaces[faceI]);
+                                break;
+                            }
+                        }
                     }
                 }
             }
@@ -112,6 +129,7 @@ void solveWallContact
     wallInfo& wInfo,
     contactInfo& cInfo,
     contactVars* cVars,
+    vector geometricD,
     scalar deltaT,
     Tuple2<vector,vector>& outVars
 )
@@ -208,7 +226,21 @@ void solveWallContact
     scalar VnF(-(cVel-wVel) & nVecF);
     Ft /= (nContactFaces+SMALL);
 
-    scalar intersectedVolume((cVars->M0_-cVars->M_)/(cVars->rhoS_.value() + SMALL));
+    Info << "-// Ft: " << Ft << endl;
+
+    scalar intersectedVolume;
+    if(cInfo.getGeomModel().getcType() == sphere)
+    {
+        intersectedVolume = getInterVolume<sphere>(mesh,cInfo,cVars,geometricD);
+        scalar OldVol = getInterVolume<arbShape>(mesh,cInfo,cVars,geometricD);
+        Info << "Old Vol " << OldVol << " newVol: " << intersectedVolume;
+    }
+    else
+    {
+        intersectedVolume = getInterVolume<arbShape>(mesh,cInfo,cVars,geometricD);
+    }
+    reduce(intersectedVolume,maxOp<scalar>());
+
     scalar Lc(4*mag(cLVec)*mag(cLVec)/(mag(cLVec)+mag(cLVec)));
 
     FN = (aKN*intersectedVolume/(Lc+SMALL) + aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(VnF*overallContactArea))*nVecF;
@@ -251,6 +283,77 @@ void solveWallContact
 
     outVars.first() = FN + Ft;
     outVars.second() = cLVec ^ (FN + Ft);
+}
+//---------------------------------------------------------------------------//
+template <contactType cT>
+scalar
+getInterVolume(
+    const dynamicFvMesh&   mesh,
+    contactInfo& cInfo,
+    contactVars* cVars,
+    vector geometricD
+)
+{
+    return (cVars->M0_-cVars->M_)/(cVars->rhoS_.value() + SMALL);
+}
+//---------------------------------------------------------------------------//
+template <>
+scalar
+getInterVolume <sphere>(
+    const dynamicFvMesh&   mesh,
+    contactInfo& cInfo,
+    contactVars* cVars,
+    vector geometricD
+)
+{
+    scalar cRadius(cInfo.getGeomModel().getDC() / 2);
+    vector cCenter(cInfo.getGeomModel().getCoM());
+    if(cInfo.wallContactFaces()[Pstream::myProcNo()].size() == 0)
+    {
+        return 0;
+    }
+
+    label cFace(cInfo.wallContactFaces()[Pstream::myProcNo()][0]);
+
+    Info << "cRadius " << cRadius << " cCenter " << cCenter << endl;
+    Info << "contactWallsSize: " << cInfo.wallContactFaces()[Pstream::myProcNo()].size() << endl;
+    vector nVec(-mesh.Sf()[cFace]/mag(mesh.Sf()[cFace]));
+    Info  << "nVec " << nVec << endl;
+    plane contPlane(mesh.Cf()[cFace], nVec);
+    scalar dist = contPlane.distance(cCenter);
+    Info << "dist: " << dist << endl;
+    scalar xH = cRadius - dist;
+    Info << "xH " << xH << endl;
+
+    bool case3D = true;
+    label emptyDim = 0;
+    //Check if the case is 3D
+    forAll (geometricD, direction)
+    {
+        if (geometricD[direction] == -1)
+        {
+            case3D = false;
+            emptyDim = direction;
+            break;
+        }
+    }
+
+    if(case3D)
+    {
+        scalar pi = Foam::constant::mathematical::pi;
+        return (pi*sqr(xH)*(3*cRadius - xH)) / 3;
+    }
+    else
+    {
+        boundBox meshBounds = mesh.bounds();
+        scalar emptyLength = meshBounds.max()[emptyDim]
+                            - meshBounds.min()[emptyDim];
+
+        Info << "emptyLength" << emptyLength << endl;
+        scalar cCirSeg = sqr(cRadius)*acos((dist)/cRadius)
+                         - (dist)*sqrt(sqr(cRadius) - sqr(dist));
+        return cCirSeg*emptyLength;
+    }
 }
 //---------------------------------------------------------------------------//
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

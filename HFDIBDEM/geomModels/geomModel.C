@@ -1,12 +1,12 @@
 /*---------------------------------------------------------------------------*\
-                        _   _ ____________ ___________
-                       | | | ||  ___|  _  \_   _| ___ \     H ybrid
-  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /     F ictitious
- / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \     D omain
-| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /     I mmersed
- \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/      B oundary
-      | |
-      |_|
+                        _   _ ____________ ___________    ______ ______ _    _
+                       | | | ||  ___|  _  \_   _| ___ \   |  _  \|  ___| \  / |
+  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /   | | | || |_  |  \/  |
+ / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \---| | | ||  _| | |\/| |
+| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /---| |/ / | |___| |  | |
+ \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/    |___/  |_____|_|  |_|
+      | |                     H ybrid F ictitious D omain - I mmersed B oundary
+      |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
 
@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "geomModel.H"
@@ -58,8 +58,8 @@ CoM_(vector::zero),
 I_(symmTensor::zero),
 dC_(0.0),
 rhoS_("rho",dimensionSet(1,-3,0,0,0,0,0),1.0)
-{    
-    ibPartialVolume_.setSize(Pstream::nProcs()); 
+{
+    ibPartialVolume_.setSize(Pstream::nProcs());
 }
 geomModel::~geomModel()
 {
@@ -72,15 +72,15 @@ void geomModel::calculateGeometricalProperties( volScalarField& body,List<Dynami
     CoM_    = vector::zero;
     I_      = symmTensor::zero;
     vector tmpCom(vector::zero);
-    
+
     addToMAndI(body,surfCells[Pstream::myProcNo()],tmpCom, CoMOld);
     addToMAndI(body,intCells[Pstream::myProcNo()],tmpCom, CoMOld);
-    
+
     //Collect from processors
     reduce(M_, sumOp<scalar>());
     reduce(tmpCom,  sumOp<vector>());
     reduce(I_,  sumOp<symmTensor>());
-    
+
     CoM_ = tmpCom / (M_+SMALL);
 }
 //---------------------------------------------------------------------------//
@@ -91,7 +91,7 @@ void geomModel::addToMAndI
     vector& tmpCom,
     vector CoMOld
 )
-{    
+{
     forAll (labelCellLst,cell)
     {
         label cellI  = labelCellLst[cell];
@@ -108,11 +108,11 @@ void geomModel::addToMAndI
         scalar yLoc = mesh_.C()[cellI].y() - CoMOld.y();
         scalar zLoc = mesh_.C()[cellI].z() - CoMOld.z();
         // Note (MI): this is just for better code readability
-        
+
         I_.xx() += Mi*(yLoc*yLoc + zLoc*zLoc);
         I_.yy() += Mi*(xLoc*xLoc + zLoc*zLoc);
         I_.zz() += Mi*(xLoc*xLoc + yLoc*yLoc);
-        
+
         I_.xy() -= Mi*(xLoc*yLoc);
         I_.xz() -= Mi*(xLoc*zLoc);
         I_.yz() -= Mi*(yLoc*zLoc);

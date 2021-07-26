@@ -1,12 +1,12 @@
 /*---------------------------------------------------------------------------*\
-                        _   _ ____________ ___________
-                       | | | ||  ___|  _  \_   _| ___ \     H ybrid
-  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /     F ictitious
- / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \     D omain
-| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /     I mmersed
- \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/      B oundary
-      | |
-      |_|
+                        _   _ ____________ ___________    ______ ______ _    _
+                       | | | ||  ___|  _  \_   _| ___ \   |  _  \|  ___| \  / |
+  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /   | | | || |_  |  \/  |
+ / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \---| | | ||  _| | |\/| |
+| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /---| |/ / | |___| |  | |
+ \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/    |___/  |_____|_|  |_|
+      | |                     H ybrid F ictitious D omain - I mmersed B oundary
+      |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
 
@@ -754,6 +754,8 @@ void getPrtPrtContactVars<sphere,sphere>
     prtPrtContactVars& prtPrtCntVars
 )
 {
+    scalar pi = Foam::constant::mathematical::pi;
+
     bool case3D = true;
     label emptyDim = 0;
     //Check if the case is 3D
@@ -772,8 +774,14 @@ void getPrtPrtContactVars<sphere,sphere>
     scalar cRadius(cInfo.getGeomModel().getDC() / 2);
     scalar tRadius(tInfo.getGeomModel().getDC() / 2);
 
+    Info << "Case 3D: " << case3D << endl;
+    Info << "cCenter: " << cCenter << " cRadius " << cRadius << endl;
+    Info << "tCenter: " << tCenter << " tRadius " << tRadius << endl;
+
     vector centerDir = cCenter - tCenter;
+    Info << "centerDir " << centerDir << endl;
     scalar d = mag(centerDir);
+    Info << "d " << d << endl;
 
     if(mag(centerDir) < SMALL || d > (cRadius + tRadius))
     {
@@ -784,20 +792,32 @@ void getPrtPrtContactVars<sphere,sphere>
         return;
     }
 
-    scalar xLength = (sqr(d) - sqr(cRadius) + sqr(tRadius))
-                     /(2*d);
+    scalar xLength = (sqr(d) - sqr(cRadius) + sqr(tRadius))/(2*d);
+    Info << "xLength " << xLength << endl;
     vector contactCenter = tCenter + (centerDir/d)*xLength;
+    Info << "contactCenter " << contactCenter << endl;
+    if(sqr(xLength) > sqr(tRadius))
+    {
+        prtPrtCntVars.contactCenter_ = contactCenter;
+        prtPrtCntVars.contactVolume_ = (4/3)*pi*pow(tRadius,3);
+        prtPrtCntVars.contactNormal_ = centerDir/d;
+        prtPrtCntVars.contactArea_ = pi*sqr(tRadius);
+        return;
+    }
     scalar contactRad = sqrt(sqr(tRadius) - sqr(xLength));
+    Info << "contactRad " << contactRad << endl;
 
     if(case3D)
     {
-        scalar pi = Foam::constant::mathematical::pi;
-
         scalar cSphCapH = cRadius - d + xLength;
+        Info << "cSphCapH " << cSphCapH << endl;
         scalar tSphCapH = tRadius - xLength;
+        Info << "tSphCapH " << tSphCapH << endl;
 
         scalar cSphCapV = (pi*sqr(cSphCapH)*(3*cRadius - cSphCapH)) / 3;
+        Info << "cSphCapV " << cSphCapV  << endl;
         scalar tSphCapV = (pi*sqr(tSphCapH)*(3*tRadius - tSphCapH)) / 3;
+        Info << "tSphCapV " << tSphCapV  << endl;
 
         prtPrtCntVars.contactCenter_ = contactCenter;
         prtPrtCntVars.contactVolume_ = cSphCapV + tSphCapV;

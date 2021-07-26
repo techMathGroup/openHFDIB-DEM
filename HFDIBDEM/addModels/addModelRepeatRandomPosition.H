@@ -29,10 +29,10 @@ Description
     class for addition and removal of immersedBodies
 
 SourceFiles
-    addModels.C
+    addModelRepeatRandomPosition.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -41,147 +41,169 @@ Contributors
 
 #include "addModel.H"
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 namespace Foam
-{    
-    class addModelRepeatRandomPosition
-    : public addModel
+{
+
+/*---------------------------------------------------------------------------*\
+                Class addModelRepeatRandomPosition Declaration
+\*---------------------------------------------------------------------------*/
+
+class addModelRepeatRandomPosition
+:
+    public addModel
+{
+
+    private:
+    typedef DynamicList<label>  DynamicLabelList;
+    const dictionary&           addModelDict_;
+    word                        addMode_;
+    bool                        bodyAdded_;
+
+    autoPtr<geomModel> geomModel_;
+
+    const dictionary&   coeffsDict_;
+
+	word			    addDomain_;
+    word			    scalingMode_;
+    word			    rotationMode_;
+	word			    addModeI_;
+
+	const dictionary& addDomainCoeffs_;
+	const dictionary& scalingModeCoeffs_;
+	const dictionary& rotationModeCoeffs_;
+	const dictionary& addModeICoeffs_;
+
+    label       useNTimes_;
+    scalar      timeBetweenUsage_;
+    label		partPerAdd_;
+	scalar		fieldValue_;
+    label		addedOnTimeLevel_;
+    label		partPerAddTemp_;
+
+	word		zoneName_;
+    vector		minBound_;
+    vector		maxBound_;
+
+	bool 		scaleParticles_;
+	scalar 		minScale_;
+	scalar		maxScale_;
+	scalar 		minScaleFit_;
+	scalar		scaleStep_;
+	scalar		nTriesBeforeScaling_;
+
+	bool 		rotateParticles_;
+	bool		randomAxis_;
+    vector 		axisOfRot_;
+
+	int 		bodyAdditionAttemptCounter_;
+	int 		scaleCorrectionCounter_;
+
+	bool 		scaleApplication_;
+	bool 		scaleRandomApplication_;
+	bool 		rescaleRequirement_;
+	bool 		succesfulladition_;
+	scalar		scalingFactor_;
+	bool		restartPartCountTemp_;
+	bool		reapeatedAddition_;
+	bool		firstTimeRunning_;
+	bool 		cellZoneActive_;
+	bool		boundBoxActive_;
+	Field<label>octreeField_;
+	bool		timeBased_;
+	bool		fieldBased_;
+	scalar		fieldCurrentValue_;
+
+    List<DynamicLabelList>  cellsInBoundBox_;
+    List<pointField>        cellZonePoints_;
+    boundBox                cellZoneBounds_;
+
+    bool        allActiveCellsInMesh_;
+
+    label       nGeometricD_;
+    Vector<label>      geometricD_;
+
+    Random          randGen_;
+
+    public:
+
+    // Constructors ------------------------------------------------
+    addModelRepeatRandomPosition
+    (
+        const dictionary& addModelDict,
+        const Foam::dynamicFvMesh& mesh,
+        const Vector<label> geomDir,
+        geomModel* bodyGeomModel
+    );
+
+    // Destructors -------------------------------------------------
+    ~addModelRepeatRandomPosition();
+
+    // Public methods ----------------------------------------------
+    void init();
+
+    bool shouldAddBody(const volScalarField& body);
+
+    geomModel* addBody(const volScalarField& body);
+
+	scalar returnRandomAngle();
+
+	scalar returnRandomScale();
+
+    vector returnRandomRotationAxis();
+
+	vector computeCoM(const triSurfaceMesh& bodySurfMesh);
+
+	bool isBodyInBoundBox
+    (
+        vector minBound_,
+        vector maxBound_,
+        const triSurfaceMesh& bodySurfMesh
+    );
+
+	void initializeCellZone();
+
+	void updateCellZoneBoundBox();
+
+    void initializeBoundBox();
+
+    void recreateBoundBox();
+
+	labelList getBBoxCellsByOctTree
+    (
+        label cellToCheck,
+        bool& insideBB,
+        vector& bBoxMin,
+        vector& bBoxMax,
+        List<DynamicLabelList>& bBoxCells
+    );
+
+	scalar checkLambdaFraction(const volScalarField& body);
+
+    bool checkIfAdd()
     {
-    
-        private:
-        typedef DynamicList<label>  DynamicLabelList;
-        const dictionary&           addModelDict_;
-        word                        addMode_;
-        bool                        bodyAdded_;
+        return true;
+    }
 
-        autoPtr<geomModel> geomModel_;
+    word getAddMode()
+    {
+        return addMode_;
+    }
 
-        const dictionary&   coeffsDict_;
+    bool getBodyAdded()
+    {
+        return bodyAdded_;
+    }
 
-		word			    addDomain_;
-        word			    scalingMode_;
-        word			    rotationMode_;
-		word			    addModeI_;
+};
 
-		const dictionary& addDomainCoeffs_;
-		const dictionary& scalingModeCoeffs_;
-		const dictionary& rotationModeCoeffs_;
-		const dictionary& addModeICoeffs_;
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-        label       useNTimes_;
-        scalar      timeBetweenUsage_;
-        label		partPerAdd_;
-		scalar		fieldValue_;
-        label		addedOnTimeLevel_;
-        label		partPerAddTemp_;
-                
-		word		zoneName_;
-        vector		minBound_;
-        vector		maxBound_;
-		
-		bool 		scaleParticles_;
-		scalar 		minScale_;
-		scalar		maxScale_;
-		scalar 		minScaleFit_;
-		scalar		scaleStep_;	
-		scalar		nTriesBeforeScaling_;	
+} // End namespace Foam
 
-		bool 		rotateParticles_;
-		bool		randomAxis_;
-        vector 		axisOfRot_; 
-
-		int 		bodyAdditionAttemptCounter_;
-		int 		scaleCorrectionCounter_;
-
-		bool 		scaleApplication_;
-		bool 		scaleRandomApplication_;
-		bool 		rescaleRequirement_;
-		bool 		succesfulladition_;
-		scalar		scalingFactor_;
-		bool		restartPartCountTemp_;
-		bool		reapeatedAddition_;
-		bool		firstTimeRunning_;
-		bool 		cellZoneActive_;
-		bool		boundBoxActive_;
-		Field<label>octreeField_;
-		bool		timeBased_;
-		bool		fieldBased_;
-		scalar		fieldCurrentValue_;
-
-	    List<DynamicLabelList>  cellsInBoundBox_;
-	    List<pointField>        cellZonePoints_;
-	    boundBox                cellZoneBounds_;
-        
-        bool        allActiveCellsInMesh_;
-        
-        label       nGeometricD_;
-        Vector<label>      geometricD_;
-        
-        Random          randGen_;
-
-        protected:
-        
-        
-        public:
-        
-        // Constructors ------------------------------------------------
-        addModelRepeatRandomPosition
-        (
-            const dictionary& addModelDict,
-            const Foam::dynamicFvMesh& mesh,
-            const Vector<label> geomDir,
-            geomModel* bodyGeomModel
-        );
-        
-        // Destructors -------------------------------------------------
-        ~addModelRepeatRandomPosition();
-        
-        // Public subclasses -------------------------------------------
-        
-        // Public variables --------------------------------------------
-        
-        // Public methods ----------------------------------------------
-        void init();
-        
-        bool shouldAddBody(const volScalarField& body);
-        
-        geomModel* addBody(const volScalarField& body);
-		scalar returnRandomAngle();
-		scalar returnRandomScale();
-        vector returnRandomRotationAxis();
-		//~ void scaleImmersedBodyRandom(scalar scaleFactor, triSurfaceMesh& bodySurfMesh);
-		//~ void resetNumberOfParticles();
-		vector computeCoM(const triSurfaceMesh& bodySurfMesh);
-		
-		bool isBodyInBoundBox
-        (
-            vector minBound_,
-            vector maxBound_,
-            const triSurfaceMesh& bodySurfMesh
-        );
-		void initializeCellZone();
-		void updateCellZoneBoundBox();
-        void initializeBoundBox();        
-        void recreateBoundBox();
-		labelList getBBoxCellsByOctTree
-        (
-            label cellToCheck,
-            bool& insideBB,
-            vector& bBoxMin,
-            vector& bBoxMax,
-            List<DynamicLabelList>& bBoxCells
-        );
-		scalar checkLambdaFraction(const volScalarField& body);
-           
-        bool checkIfAdd() {return true;}
-        
-        word getAddMode()
-        {
-            return addMode_;
-        }
-        
-        bool getBodyAdded(){return bodyAdded_;}
-        
-    };
-}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
+
+// ************************************************************************* //

@@ -22,26 +22,28 @@ License
     You should have received a copy of the GNU Lesser General Public License
     along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
 
-InNamspace
-    Foam
+Namspace
+    contactModel
 
 Description
-    class for addition and removal of immersedBodies
-
-SourceFiles
-    addModels.C
+    namespace providing functions to solve contacts
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef contactModel_H
 #define contactModel_H
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #include "prtPrtContact.H"
 #include "wallContact.H"
 #include "wallInfo.H"
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #endif
- 
+
+// ************************************************************************* //

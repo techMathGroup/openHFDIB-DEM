@@ -32,7 +32,7 @@ SourceFiles
     addModels.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -47,15 +47,15 @@ Contributors
 #include "contactType.H"
 
 namespace Foam
-{           
-    // custom field filtration 
+{
+    // custom field filtration
     template<class Type>
     Foam::tmp<Foam::Field<Type>>
     filterField
     (
         const Field<Type>& field,
         const labelList& cellIDs
-    ) 
+    )
     {
         if (isNull(cellIDs))
         {
@@ -66,55 +66,55 @@ namespace Foam
             return tmp<Field<Type>>(new Field<Type>(field, cellIDs));
         }
     }
-    
+
     class geomModel
     {
-    
+
         private:
-            
+
         typedef DynamicList<label> DynamicLabelList;
         typedef DynamicList<scalar> DynamicScalarList;
         typedef DynamicList<vector> DynamicVectorList;
         typedef DynamicList<point> DynamicPointList;
-        
+
         protected:
-            
-        const  dynamicFvMesh&   mesh_; 
-        
+
+        const  dynamicFvMesh&   mesh_;
+
         //contact type based on geometry
         const contactType contactType_;
-        
+
         //list to find the owner of the IB
         DynamicLabelList ibPartialVolume_;
         label owner_;
-        
+
         label cellToStartInCreateIB_;
         scalar  thrSurf_;
         Vector<label> geometricD_;//geometric directions
-        
-        scalar  intSpan_;        
+
+        scalar  intSpan_;
         bool    sdBasedLambda_;
         boundBox curMeshBounds_;
         HashTable<pointField,label,Hash<label>> lastIbPoints_;
-        
+
         //Body mass
         scalar M_;
         scalar M0_;                                                     //initial mass (at addition)
-        
+
         //Location of center of mass
         vector CoM_;
-        
+
         //Moment of intertia tensor
-        symmTensor  I_;        
-        
+        symmTensor  I_;
+
         //characteristic diameter of the body
         scalar  dC_;
-        
+
         //body density
         dimensionedScalar rhoS_;
-        
+
         public:
-        
+
         // Constructors ------------------------------------------------
         geomModel
         (
@@ -123,10 +123,10 @@ namespace Foam
             scalar  thrSurf = 1,
             Vector<label> geometricD = {1,1,1}
         );
-        
+
         // Destructors -------------------------------------------------
         virtual ~geomModel();
-        
+
         virtual void createImmersedBody
         (
             volScalarField& body,
@@ -135,80 +135,83 @@ namespace Foam
             List<DynamicLabelList>& intCells,
             List<pointField>& cellPoints
         )
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}    
-        
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
+
         virtual bool canAddBody
         (
             const volScalarField& body
         )
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return false;} 
-        
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return false;}
+
         virtual geomModel* getGeomModel()
         {
             Info << "-- geomModelMessage-- " << "notIplemented"<<endl;
             geomModel* bodyGeomModel = new geomModel(mesh_);
-            return bodyGeomModel;            
-        } 
-        
+            return bodyGeomModel;
+        }
+
         virtual vector addModelReturnRandomPosition(
             const bool allActiveCellsInMesh,
-            const boundBox  cellZoneBounds,       
+            const boundBox  cellZoneBounds,
             Random&         randGen
         )
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return vector::zero;}  
-        
-        virtual void bodyMovePoints(vector translVec)        
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;} 
-        
-        virtual void bodyScalePoints(scalar scaleFac)        
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return vector::zero;}
+
+        virtual void bodyMovePoints(vector translVec)
         {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
-        
+
+        virtual void bodyScalePoints(scalar scaleFac)
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
+
         virtual void bodyRotatePoints
         (
             scalar rotAngle,
             vector axisOfRot
-        )      
+        )
         {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
-            
+
         virtual void resetBody()
         {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
-        
+
         virtual vector getCoM()
         {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return vector::zero;}
-        
+
         virtual boundBox getBounds()
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; 
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;
             boundBox bound;
             return bound;}
-        
+
          virtual void recordHistory()
         {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
-        
+
          virtual void returnHistory()
         {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
-        
+
         virtual void synchronPos()
         {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
-        
+
         virtual void writeBodyInfo(label bodyId, IOdictionary& dict, word path)
         {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
-        
+
         virtual boolList pointInside(pointField pointI)
         {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return {false};}
-        
+
+        virtual bool pointInside(point pointI)
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return false;}
+
         virtual vector getClosestNormal(point startPoint, vector span)
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return vector::zero;}        
-                
+        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return vector::zero;}
+
         virtual scalar getDC()
         {
             return dC_;
         }
-        
+
         contactType getcType()
         {return contactType_;}
-                
+
         label getOwner()
-        {    
+        {
             Pstream::gatherList(ibPartialVolume_, 0);
             Pstream::scatter(ibPartialVolume_, 0);
             for (label i = 0; i < ibPartialVolume_.size(); i++)
@@ -222,22 +225,22 @@ namespace Foam
             }
             return owner_;
         }
-        
+
         void setIntSpan(scalar intSpan){intSpan_ = intSpan;}
-        
+
         void setSdBasedLambda(bool sdBasedLambda){sdBasedLambda_ = sdBasedLambda;}
-        
+
         void resetHashTable(){lastIbPoints_.clear();}
-        
+
         void setRhoS(dimensionedScalar rhoS){rhoS_ = rhoS;}
         dimensionedScalar getRhoS(){return rhoS_;}
-        
+
         void calculateGeometricalProperties(
             volScalarField& body,
             List<DynamicLabelList>& surfCells,
             List<DynamicLabelList>& intCells
         );
-        
+
         //Evaluate center of mass and inertia tensor
         void addToMAndI
         (
@@ -246,33 +249,33 @@ namespace Foam
             vector& tmpCom,
             vector CoMOld
         );
-        
+
         void computeBodyCharPars(List<DynamicLabelList>& surfCells);
-        
+
         const scalar& getM0()    const
         {
             return M0_;
         }
-        
+
         const scalar& getM()    const
         {
             return M_;
         }
-        
+
         const dimensionedScalar& getRhoS()    const
         {
             return rhoS_;
         }
-        
+
         const vector& getCoM()  const
         {
             return CoM_;
         }
-        
+
         const symmTensor& getI()    const
         {
             return I_;
-        }        
+        }
     };
 }
 #endif
