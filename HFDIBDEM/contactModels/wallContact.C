@@ -232,14 +232,17 @@ void solveWallContact
     if(cInfo.getGeomModel().getcType() == sphere)
     {
         intersectedVolume = getInterVolume<sphere>(mesh,cInfo,cVars,geometricD);
-        scalar OldVol = getInterVolume<arbShape>(mesh,cInfo,cVars,geometricD);
-        Info << "Old Vol " << OldVol << " newVol: " << intersectedVolume;
+        overallContactArea = sphereContactArea(mesh,cInfo,cVars,geometricD);
     }
     else
     {
         intersectedVolume = getInterVolume<arbShape>(mesh,cInfo,cVars,geometricD);
     }
     reduce(intersectedVolume,maxOp<scalar>());
+    reduce(overallContactArea, maxOp<scalar>());
+
+    Info << "-// Volume: " << intersectedVolume << endl;
+    Info << "-// Area: " << overallContactArea << endl;
 
     scalar Lc(4*mag(cLVec)*mag(cLVec)/(mag(cLVec)+mag(cLVec)));
 
@@ -249,6 +252,8 @@ void solveWallContact
     {
         Ft *= amu * mag(FN) / mag(Ft);
     }
+
+    Info << "-// Ft: " << Ft << endl;
 
     scalar FAc(aadhN*overallContactArea);
     scalar FAeq(aKN*((aadhEqui*cVars->M0_)/(cVars->rhoS_.value() + SMALL))/(Lc+SMALL));
@@ -353,6 +358,56 @@ getInterVolume <sphere>(
         scalar cCirSeg = sqr(cRadius)*acos((dist)/cRadius)
                          - (dist)*sqrt(sqr(cRadius) - sqr(dist));
         return cCirSeg*emptyLength;
+    }
+}
+//---------------------------------------------------------------------------//
+scalar sphereContactArea
+(
+    const dynamicFvMesh&   mesh,
+    contactInfo& cInfo,
+    contactVars* cVars,
+    vector geometricD
+)
+{
+    scalar cRadius(cInfo.getGeomModel().getDC() / 2);
+    vector cCenter(cInfo.getGeomModel().getCoM());
+    if(cInfo.wallContactFaces()[Pstream::myProcNo()].size() == 0)
+    {
+        return 0;
+    }
+
+    label cFace(cInfo.wallContactFaces()[Pstream::myProcNo()][0]);
+    vector nVec(-mesh.Sf()[cFace]/mag(mesh.Sf()[cFace]));
+    plane contPlane(mesh.Cf()[cFace], nVec);
+
+    scalar pi = Foam::constant::mathematical::pi;
+    scalar dist = contPlane.distance(cCenter);
+    scalar contactRad = sqr(cRadius) - sqr(dist);
+
+    bool case3D = true;
+    label emptyDim = 0;
+    //Check if the case is 3D
+    forAll (geometricD, direction)
+    {
+        if (geometricD[direction] == -1)
+        {
+            case3D = false;
+            emptyDim = direction;
+            break;
+        }
+    }
+
+    if(case3D)
+    {
+        return pi*sqr(contactRad);
+    }
+    else
+    {
+        boundBox meshBounds = mesh.bounds();
+        scalar emptyLength = meshBounds.max()[emptyDim]
+                            - meshBounds.min()[emptyDim];
+
+        return contactRad*emptyLength;
     }
 }
 //---------------------------------------------------------------------------//

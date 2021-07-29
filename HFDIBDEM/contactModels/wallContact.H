@@ -96,6 +96,14 @@ namespace contactModel
         contactVars* cVars,
         vector geometricD
     );
+
+    scalar sphereContactArea
+    (
+        const dynamicFvMesh&   mesh,
+        contactInfo& cInfo,
+        contactVars* cVars,
+        vector geometricD
+    );
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
