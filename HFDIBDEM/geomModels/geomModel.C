@@ -67,7 +67,7 @@ geomModel::~geomModel()
 //---------------------------------------------------------------------------//
 void geomModel::calculateGeometricalProperties( volScalarField& body,List<DynamicLabelList>& surfCells, List<DynamicLabelList>& intCells )
 {
-    vector CoMOld  = CoM_; //Saving older positon of IB
+    vector CoMOld  = CoM_;
     M_      = scalar(0);
     CoM_    = vector::zero;
     I_      = symmTensor::zero;
@@ -76,7 +76,7 @@ void geomModel::calculateGeometricalProperties( volScalarField& body,List<Dynami
     addToMAndI(body,surfCells[Pstream::myProcNo()],tmpCom, CoMOld);
     addToMAndI(body,intCells[Pstream::myProcNo()],tmpCom, CoMOld);
 
-    //Collect from processors
+    // collect from processors
     reduce(M_, sumOp<scalar>());
     reduce(tmpCom,  sumOp<vector>());
     reduce(I_,  sumOp<symmTensor>());
@@ -95,20 +95,17 @@ void geomModel::addToMAndI
     forAll (labelCellLst,cell)
     {
         label cellI  = labelCellLst[cell];
-        //AddToM_
-        M_ += body[cellI] * rhoS_.value() * mesh_.V()[cellI];
-        tmpCom  += body[cellI] * rhoS_.value() * mesh_.V()[cellI] * mesh_.C()[cellI];
-        //AddToM_
-        //AddToI_
-        scalar Mi    = body[cellI] * rhoS_.value() * mesh_.V()[cellI];
-        //~ const scalar& xLoc = mesh_.C()[cellI].x();
-        //~ const scalar& yLoc = mesh_.C()[cellI].y();
-        //~ const scalar& zLoc = mesh_.C()[cellI].z();
-        scalar xLoc = mesh_.C()[cellI].x() - CoMOld.x();//OSNote: needs to be replaced with CoMOld before calling this function CoM_ is set to vector::zero
+        
+        scalar Mi    = body[cellI]*rhoS_.value()*mesh_.V()[cellI];
+        // add to M_
+        
+        M_      += Mi;
+        tmpCom  += Mi*mesh_.C()[cellI];
+        scalar xLoc = mesh_.C()[cellI].x() - CoMOld.x();
         scalar yLoc = mesh_.C()[cellI].y() - CoMOld.y();
         scalar zLoc = mesh_.C()[cellI].z() - CoMOld.z();
-        // Note (MI): this is just for better code readability
-
+        
+        // add to I_
         I_.xx() += Mi*(yLoc*yLoc + zLoc*zLoc);
         I_.yy() += Mi*(xLoc*xLoc + zLoc*zLoc);
         I_.zz() += Mi*(xLoc*xLoc + yLoc*yLoc);

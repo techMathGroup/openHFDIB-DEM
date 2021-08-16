@@ -8,17 +8,10 @@ cp -r 0.org 0
 paraFoam -touch
 
 runApplication blockMesh
-#~ runApplication decomposePar -force
 
 application=`getApplication`
 
 runApplication $application
-
-#~ runParallel $application
-#~ 
-#~ runParallel reconstructParMesh
-#~ 
-#~ runApplication reconstructPar -newTimes
 
 
 # ----------------------------------------------------------------- end-of-file

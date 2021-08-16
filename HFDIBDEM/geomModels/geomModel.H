@@ -97,14 +97,14 @@ namespace Foam
         boundBox curMeshBounds_;
         HashTable<pointField,label,Hash<label>> lastIbPoints_;
 
-        //Body mass
+        //body mass
         scalar M_;
         scalar M0_;                                                     //initial mass (at addition)
 
-        //Location of center of mass
+        //location of center of mass
         vector CoM_;
 
-        //Moment of intertia tensor
+        //moment of intertia tensor
         symmTensor  I_;
 
         //characteristic diameter of the body
@@ -181,10 +181,10 @@ namespace Foam
             boundBox bound;
             return bound;}
 
-         virtual void recordHistory()
+        virtual void recordHistory()
         {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
 
-         virtual void returnHistory()
+        virtual void returnHistory()
         {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
 
         virtual void synchronPos()
@@ -218,7 +218,7 @@ namespace Foam
             {
                 if (ibPartialVolume_[i] == max(ibPartialVolume_))
                 {
-                    //Set owner of the IB which will move this IB
+                    //set owner of the IB which will move this IB
                     owner_ = i;
                     break;
                 }
@@ -241,7 +241,7 @@ namespace Foam
             List<DynamicLabelList>& intCells
         );
 
-        //Evaluate center of mass and inertia tensor
+        //evaluate center of mass and inertia tensor
         void addToMAndI
         (
             volScalarField& body,

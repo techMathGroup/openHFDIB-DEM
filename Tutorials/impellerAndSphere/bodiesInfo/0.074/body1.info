@@ -10,7 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    location    "/hopper2/sourekm/Documents/HFDIB/Tutorials/impellerAndSphere/bodiesInfo/0.074";
+    location    "/home/isozm/Documents/10_IT_CAS/2021_openHFDIBDEM/00_codes/00_releasedCodes/01_isozEtAlComplement/openHFDIB-DEM/Tutorials/impellerAndSphere/bodiesInfo/0.074";
     object      body1.info;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -19,7 +19,7 @@ bodyId          1;
 
 bodyName        sphere3;
 
-Vel             ( 0.28110268 -0.01460147 0 );
+Vel             ( 0.21312129 -0.026931862 0 );
 
 omega           0;
 
@@ -31,6 +31,6 @@ timeStepsInContWStatic 0;
 
 sphere
 {
-    position        ( 0.021204639 0.063075162 0 );
+    position        ( 0.017815912 0.062732999 0 );
     radius          0.006;
 }

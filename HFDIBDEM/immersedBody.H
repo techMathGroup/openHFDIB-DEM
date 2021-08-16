@@ -9,7 +9,7 @@
       |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
-    openHFDIB is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
     Everyone is permitted to copy and distribute verbatim copies of this license
     document, but changing it is not allowed.
     This version of the GNU Lesser General Public License incorporates the terms
@@ -50,199 +50,175 @@ Contributors
 
 namespace Foam
 {
-//     // custom field filtration
-//     template<class Type>
-//     Foam::tmp<Foam::Field<Type>>
-//     filterField
-//     (
-//         const Field<Type>& field,
-//         const labelList& cellIDs
-//     )
-//     {
-//         if (isNull(cellIDs))
-//         {
-//             return field;
-//         }
-//         else
-//         {
-//             return tmp<Field<Type>>(new Field<Type>(field, cellIDs));
-//         }
-//     }
 
     class immersedBody
     {
 
         private:
 
-        // Private data types
+        // Private data types ------------------------------------------
 
         typedef DynamicList<label> DynamicLabelList;
         typedef DynamicList<scalar> DynamicScalarList;
         typedef DynamicList<vector> DynamicVectorList;
         typedef DynamicList<point> DynamicPointList;
 
-        // name of the STL to base the body on
+        // name of the body
         word    bodyName_;
 
-        //is the particle active in the simulation
+        // is the particle active in the simulation
         bool    isActive_;
 
-        //Dictionary
+        // body set-up
         dictionary&             immersedDict_;
 
-        //Mesh
+        // mesh reference
         const  dynamicFvMesh&   mesh_;
 
-        //Dictionary
+        // fluid properties
         dictionary&             transportProperties_;
 
+        // body geometry
         autoPtr<geomModel> geomModel_;
 
+        // contact models
         autoPtr<contactInfo> contactInfo_;
 
-        //Precalculate cellPoints for better performace
+        // precalculate cellPoints for better performace
         List<pointField>& cellPoints_;
 
-        //Rotation axis
+        // rotation axis
         vector Axis_;
         vector AxisOld_;
 
-        //Angular velocity
+        // angular velocity (scalar)
         scalar omega_;
         scalar omegaOld_;
 
-        //Body velocity
+        // linear velocity
         vector Vel_;
         vector VelOld_;
 
-        //Body linear acceleration
+        // linear acceleration
         vector a_;
 
-        //Body angular acceleration
+        // angular acceleration
         vector alpha_;
 
-        //Total Rodrigues angle of the body
+        // total Rodrigues angle of the body
         vector totalAngle_;
 
-        //Forces acting on the particle
+        // forces acting on the particle
         vector  F_;
 
-        //Total torque acting on the particle
+        // total torque acting on the particle
         vector  T_;
 
-        //maximal body Courant number based on its linear velocity
+        // maximal body Courant number based on its linear velocity
         scalar CoNum_;
 
-        //mean body Courant number based on its linear velocity
+        // mean body Courant number based on its linear velocity
         scalar meanCoNum_;
 
-        //fluid density
+        // fluid density
         dimensionedScalar rhoF_;
 
-        //integer to identify current body
+        // integer to identify current body
         label   bodyId_;
 
-        //Auxiliary switch - do I want to update the torques?
+        // auxiliary switch - do I want to update the torques?
         bool    updateTorque_;
 
-        //Operation to perform
+        // operation to perform
         int     bodyOperation_;
 
-        //fraction of dC_to move by in one DEM loop
+        // fraction of dC_to move by in one DEM loop
         scalar  maxDistInDEMloop_;
 
-        //index holder for particle contact list
+        // index holder for particle contact list
         List<List<label>> boundIndList_;
 
-        //Bounding points of the surface
+        // bounding points of the surface
         point minBoundPoint_;
         point maxBoundPoint_;
 
-        //surface cells
+        // body surface cells
         List<DynamicLabelList>  surfCells_;
 
-        //internal cells
+        // body internal cells
         List<DynamicLabelList>  intCells_;
 
-        //processor num that owns the IB
+        // processor num that owns the IB
         label owner_;
 
-        //Relaxation factor for velocity
+        // relaxation factor for velocity
         scalar velRelaxFac_;
 
-        //Update immersed body info
+        // update immersed body info
         void  updateImmersedBody
         (
             volScalarField& body,
             volVectorField& f
         );
 
-        //Create interpolation points
+        // create interpolation points
         void  calculateInterpolationPoints(volScalarField& body);
 
-        //Update Fluid-Solid fluid
+        // update fluid-solid coupling
         void updateCoupling
         (
             volScalarField& body,
             volVectorField& f
         );
 
-        // history variables for contact correction . They are assigned at the beggining of the main (Pimple) time step
-        //Forces acting on the particle
+        // history variables for contact correction
+        // -- forces acting on the particle
         vector  historyCouplingF_;
 
-        //Total torque acting on the particle
+        // -- total torque acting on the particle
         vector  historyCouplingT_;
 
-        //Rotation axis
+        // -- rotation axis
         vector historyAxis_;
 
-        //Angular velocity
+        // -- angular velocity
         scalar historyOmega_;
 
-        //Body velocity
+        // -- linear velocity
         vector historyVel_;
 
-        //Body linear acceleration
+        // -- linear acceleration
         vector historya_;
 
-        //Body angular acceleration
+        // -- angular acceleration
         vector historyAlpha_;
 
-        //Total Rodrigues angle of the body
+        // -- total Rodrigues angle of the body
         vector historyTotalAngle_;
 
-        //Tangential force from last timestep
-        //First label -1 indicates wall other for bodyID
+        // -- tangential force from last timestep
         DynamicList<Tuple2<label,Tuple2<label,vector>>> historyFt_;
-
-        // variables for re-using the same body several times
-        // Note: all the copies have to have false as re-use
-        //~ label   useNTimes_;
-        //  -1 -> never repeat
-        //   0 -> use indefinitly
-        //   N -> use N times
-        //~ word    startPos_;                                              //NOT IMPLEMENTED
-        //~ scalar  timeBetweenUsage_;
-        // approximate time before re-using the particles
 
         // auxiliary octree variables
         Field<label> octreeField_;
         label cellToStartInCreateIB_;
 
+        // start the body synchronized with the flow (approximate)
         bool    startSynced_;
-
+        
+        // auxiliary variables
         tensor  totRotMatrix_;
         bool    sdBasedLambda_;
         scalar  intSpan_;
-        scalar  charCellSize_;//characteristic cell size over surface
-        label  refineBuffers_;//number of refine buffers around body
-        bool  useInterpolation_;//number of refine buffers around body
-        label recomputeM0_;//how many times rocompute M0_ because of refinement
-        vector geometricD_;//geometric directions
-        bool created_;
-        label timesToSetStatic_;
+        scalar  charCellSize_;                                          //characteristic cell size over surface
+        label   refineBuffers_;                                         //number of refine buffers around body
+        bool    useInterpolation_;                                      //number of refine buffers around body
+        label   recomputeM0_;                                           //how many times rocompute M0_ because of refinement
+        vector  geometricD_;                                            //geometric directions
+        bool    created_;
+        label   timesToSetStatic_;
 
+        // immersed body initialization
         void initializeIB();
 
         protected:
@@ -251,10 +227,10 @@ namespace Foam
         public:
 
         // Constructors ------------------------------------------------
-        // - constructor loading STL from file
+        // -- general constructor for plug-in geomModel
         immersedBody
         (
-            word fileName,
+            word bodyName,
             const Foam::dynamicFvMesh& mesh,
             dictionary& HFDIBDEMDict,
             dictionary& transportProperties,
@@ -269,7 +245,7 @@ namespace Foam
         ~immersedBody();
 
         // Public subclasses -------------------------------------------
-        //Class to keep interpolation data
+        // -- class to keep interpolation data
         class interpolationInfo{
         public:
             label surfCell_;
@@ -280,7 +256,7 @@ namespace Foam
             DynamicVectorList intVec_;
         };
 
-        //Class to ask for interpolation data on other processor
+        // -- class to ask for interpolation data on other processor
         class intVecRequest
         {
             public:
@@ -291,23 +267,21 @@ namespace Foam
         };
 
         // Public variables --------------------------------------------
-        // Note (MI): why is this here? There is a getter bellow (20201126)
-        //            -> catch XXII caused by the necessity to have public subclass
-        //interpolation info list
+        // -- interpolation info list
         List<DynamicList<immersedBody::interpolationInfo>>  interpolationInfo_;
 
-        //interpolation vec request list
+        // -- interpolation vec request list
         List<DynamicList<immersedBody::intVecRequest>>      interpolationVecReqs_;
 
         // Public methods ----------------------------------------------
 
-        //Rotate immersed body
+        // move immersed body
         void moveImmersedBody
         (
             scalar deltaT = -1.0
         );
 
-        //Reset body field
+        // reset body field
         void resetBody(volScalarField& body, bool resethistoryFt = true);
 
         //update body movement based on F_ and T_
@@ -353,7 +327,7 @@ namespace Foam
             scalar velRelaxFac
         );
 
-        //Create immersed body info
+        // create immersed body
         void createImmersedBody
         (
             volScalarField& body,
@@ -361,7 +335,7 @@ namespace Foam
             bool synchCreation = true
         );
 
-        void synchCreateImmersedBody
+        void syncCreateImmersedBody
         (
             volScalarField& body,
             volScalarField& refineF
@@ -375,7 +349,7 @@ namespace Foam
             DynamicLabelList startLevel
         );
 
-        //Getters
+        // getters
 
         const bool& checkWallContact() const
         {
@@ -552,7 +526,7 @@ namespace Foam
 
         void recreateBodyField(volScalarField& body, volScalarField& refineF);
 
-        //Update imposed vector field
+        // update imposed vector field
         void updateVectorField
         (
             volVectorField& VS,
@@ -561,7 +535,7 @@ namespace Foam
             vectorField surfNorm
         );
 
-        //  should we detect contact with wall
+        // should we detect contact with wall
         bool shouldDetectWallContact();
 
         // update force and torque acting on the body
@@ -734,7 +708,7 @@ namespace Foam
             geomModel_->writeBodyInfo(bodyId_,dict, path);
         }
 
-        //update old movement variables (these are stored for pimple loop)
+        // update old movement variables for fluid-solid coupling
         void updateOldMovementVars()
         {
             VelOld_   = Vel_;

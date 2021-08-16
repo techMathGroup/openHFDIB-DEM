@@ -12,12 +12,11 @@ runApplication decomposePar -force
 
 application=`getApplication`
 
-# runApplication $application
 
 runParallel $application
-#~ 
+
 runApplication reconstructParMesh -newTimes
-#~ 
+
 runApplication reconstructPar
 
 

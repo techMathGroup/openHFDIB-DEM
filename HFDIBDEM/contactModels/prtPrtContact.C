@@ -86,7 +86,7 @@ detectPrtPrtContact(
     List<DynamicLabelList> cIntCells(cInfo.getIntCells());
     List<DynamicLabelList> tSurfCells(tInfo.getSurfCells());
 
-    //Iterate over surfCells to find commen cells
+    // iterate over surfCells to find commen cells
     forAll (cSurfCells[Pstream::myProcNo()],cSCellI)
     {
         forAll (tSurfCells[Pstream::myProcNo()],tSCellI)
@@ -117,20 +117,20 @@ detectPrtPrtContact(
             bool ccenterInside(ccenterInsideList[cSurfCells[Pstream::myProcNo()][cSCellI]] );
             bool tcenterInside(tcenterInsideList[cSurfCells[Pstream::myProcNo()][cSCellI]] );
             scalar rVInSize(0.5/(tvertexesInside.size()+1));
-            // Note: weiggetContactNormalht of a single vertex in the cell
+            // Note: weight of a single vertex in the cell
 
             scalar partialVolume(0);
             forAll (tvertexesInside, verIn)
             {
                 if (tvertexesInside[verIn]==true && cvertexesInside[verIn]==true)
                 {
-                    partialVolume += rVInSize; //fraction of cell covered
+                    partialVolume += rVInSize;                          //fraction of cell covered
                 }
             }
 
             if (tcenterInside==true && ccenterInside==true)
             {
-                partialVolume += 0.5; //fraction of cell covered
+                partialVolume += 0.5;                                   //fraction of cell covered
             }
 
             intersectedVolume += mesh.V()[cSurfCells[Pstream::myProcNo()][cSCellI]] * partialVolume;
@@ -154,13 +154,13 @@ detectPrtPrtContact(
             {
                 if (tvertexesInside[verIn]==true && cvertexesInside[verIn]==true)
                 {
-                    partialVolume += rVInSize; //fraction of cell covered
+                    partialVolume += rVInSize;                          //fraction of cell covered
                 }
             }
 
             if (tcenterInside==true && ccenterInside==true)
             {
-                partialVolume += 0.5; //fraction of cell covered
+                partialVolume += 0.5;                                   //fraction of cell covered
             }
 
             intersectedVolume += mesh.V()[cIntCells[Pstream::myProcNo()][cSCellI]] * partialVolume;
@@ -215,7 +215,7 @@ void getPrtPrtContactVars(
     List<DynamicLabelList> cIntCells(cInfo.getIntCells());
     List<DynamicLabelList> tSurfCells(tInfo.getSurfCells());
 
-    //Iterate over surfCells to find commen cells
+    // iterate over surfCells to find commen cells
     forAll (cSurfCells[Pstream::myProcNo()],cSCellI)
     {
         forAll (tSurfCells[Pstream::myProcNo()],tSCellI)
@@ -229,10 +229,10 @@ void getPrtPrtContactVars(
 
     label numOfComCells(0);
     vector contactCenter(vector::zero);
-    //If there are any common cells check if the surfaces are intersected
+    // if there are any common cells check if the surfaces are intersected
     if (commonCells[Pstream::myProcNo()].size() > SMALL)
     {
-        //Evaluate center of the contact area
+        // evaluate center of the contact area
         forAll (commonCells[Pstream::myProcNo()], cCell)
         {
             contactCenter += mesh.C()[commonCells[Pstream::myProcNo()][cCell]];
@@ -253,14 +253,14 @@ void getPrtPrtContactVars(
 
     contactCenter /= numOfComCells;
 
-    vector cCoM(cInfo.getGeomModel().getCoM());        //center of mass
-    vector tCoM(tInfo.getGeomModel().getCoM());        //center of mass
-    scalar tDC(tInfo.getGeomModel().getDC());          //characteristic diameter
+    vector cCoM(cInfo.getGeomModel().getCoM());                         //center of mass (current)
+    vector tCoM(tInfo.getGeomModel().getCoM());                         //center of mass (neighbor)
+    scalar tDC(tInfo.getGeomModel().getDC());                           //characteristic diameter
 
     vector normalVector(tInfo.getGeomModel().getClosestNormal(contactCenter,vector::one * tDC));
     scalar contactArea(0);
     bool case3D(true);
-    //Check if the case is 3D
+    // check if the case is 3D
     forAll (geometricD, direction)
     {
         if (geometricD[direction] == -1)
@@ -269,7 +269,7 @@ void getPrtPrtContactVars(
             break;
         }
     }
-    //Use edge cells to find contact area (better precision then surfcells)
+    // use edge cells to find contact area (better precision then surfcells)
     DynamicVectorList edgePoints;
     DynamicLabelList edgeCells;
 
@@ -292,9 +292,8 @@ void getPrtPrtContactVars(
             boolList cvertexesInside = cInfo.getGeomModel().pointInside( vertexPoints );
             bool tcenterInside(tcenterInsideList[cSurfCells[Pstream::myProcNo()][cSCellI]] );
             bool ccenterInside(ccenterInsideList[cSurfCells[Pstream::myProcNo()][cSCellI]] );
-            //~ scalar rVInSize(1.0/(tvertexesInside.size()+1));// MI: WHIS IS THIS HERE?
             scalar rVInSize(0.5/tvertexesInside.size());
-            // Note: weiggetContactNormalht of a single vertex in the cell
+            // Note: weight of a single vertex in the cell
 
             DynamicVectorList edgePointsI;
 
@@ -303,7 +302,7 @@ void getPrtPrtContactVars(
             {
                 if (tvertexesInside[verIn]==true && cvertexesInside[verIn]==true)
                 {
-                    partialVolume += rVInSize; //fraction of cell covered
+                    partialVolume += rVInSize;                          //fraction of cell covered
                     partiallyInT = true;
                     edgePointsI.append(vertexPoints[verIn]);
                 }
@@ -311,12 +310,12 @@ void getPrtPrtContactVars(
 
             if (tcenterInside==true && ccenterInside==true)
             {
-                partialVolume += 0.5; //fraction of cell covered
+                partialVolume += 0.5;                                   //fraction of cell covered
                 partiallyInT = true;
                 for(label i = 0; i < tvertexesInside.size(); i++)
                     edgePointsI.append(mesh.C()[cSurfCells[Pstream::myProcNo()][cSCellI]] );
             }
-            //Cells is edge cell when the cell is surfcell in both proccessors
+            // cells is edge cell when the cell is surfcell in both proccessors
             if (partialVolume + SMALL < 1 && partiallyInT)
             {
                 edgeCells.append(cSurfCells[Pstream::myProcNo()][cSCellI]);
@@ -332,7 +331,7 @@ void getPrtPrtContactVars(
 
             intersectedVolume += mesh.V()[cSurfCells[Pstream::myProcNo()][cSCellI]] * partialVolume;
         }
-        //Calculate remaining intersected volume
+        // calculate remaining intersected volume
         forAll (cIntCells[Pstream::myProcNo()],cSCellI)
         {
             const labelList& vertexLabels = mesh.cellPoints()[cIntCells[Pstream::myProcNo()][cSCellI]];
@@ -341,7 +340,6 @@ void getPrtPrtContactVars(
             boolList cvertexesInside = cInfo.getGeomModel().pointInside( vertexPoints );
             bool tcenterInside(tcenterInsideList[cIntCells[Pstream::myProcNo()][cSCellI]] );
             bool ccenterInside(ccenterInsideList[cIntCells[Pstream::myProcNo()][cSCellI]] );
-            //~ scalar rVInSize(1.0/(tvertexesInside.size()+1));
             scalar rVInSize(0.5/tvertexesInside.size());
             // Note: weight of a single vertex in the cell
 
@@ -350,13 +348,13 @@ void getPrtPrtContactVars(
             {
                 if (tvertexesInside[verIn]==true && cvertexesInside[verIn]==true)
                 {
-                    partialVolume += rVInSize; //fraction of cell covered
+                    partialVolume += rVInSize;                          //fraction of cell covered
                 }
             }
 
             if (tcenterInside==true && ccenterInside==true)
             {
-                partialVolume += 0.5; //fraction of cell covered
+                partialVolume += 0.5;                                   //fraction of cell covered
             }
 
             intersectedVolume += mesh.V()[cIntCells[Pstream::myProcNo()][cSCellI]] * partialVolume;
@@ -454,7 +452,7 @@ Tuple2<scalar,vector> get3DcontactInfo(
 
     pBufs.clear();
 
-    //Collect edge Points from all processors
+    // collect edge Points from all processors
     List<DynamicPointList> commPointsPositionsProc;
     commPointsPositionsProc.setSize(Pstream::nProcs());
     DynamicPointList commPointsPositions;
@@ -564,7 +562,7 @@ Tuple2<scalar,vector> get3DcontactInfo(
         if (!normOk || mag(normalVec) < 1)
             normalVec = normalVector;
 
-        //Create best fitting plane
+        // create best fitting plane
         plane bestFitPlane(contactCenter, normalVec);
         normalVec = bestFitPlane.normal();
         DynamicPointList commCellsPosInPlane;
@@ -588,7 +586,7 @@ Tuple2<scalar,vector> get3DcontactInfo(
         helpList[4] = 0.0;
         helpList[5] = 1.0;
 
-        //Loop over parts of plane to find and sort points
+        // loop over parts of plane to find and sort points
         DynamicVectorList commCellsInSections;
         for (label i = 0; i < 4; i++)
         {
@@ -617,7 +615,7 @@ Tuple2<scalar,vector> get3DcontactInfo(
                 }
             }
         }
-        //Calculate contact area
+        // calculate contact area
         for (label i = 0; i + 1 < commCellsInSections.size(); i++)
         {
             vector AC(commCellsInSections[i] - contactCenter);
@@ -686,10 +684,9 @@ Tuple2<scalar,vector>  get2DcontactInfo(
         }
     }
 
-    // Evaluate contact area
+    // evaluate contact area
     scalar contactArea(0);
 
-    // MS note: this is dummy way how to calculate contactArea in 2D -> discuss!!
     scalar highestDistance(0);
 
     for (label i = 1; i < commCellsPositions.size(); i++)
@@ -735,7 +732,7 @@ Tuple2<scalar,vector>  get2DcontactInfo(
 
     normalVector2 = normalVector2/mag(normalVector2);
 
-    // Assure that the normal vector points out of the body
+    // assure that the normal vector points out of the body
     if ((normalVector2 & normalVector) < 0)
         normalVector2 *= -1;
 
@@ -758,7 +755,7 @@ void getPrtPrtContactVars<sphere,sphere>
 
     bool case3D = true;
     label emptyDim = 0;
-    //Check if the case is 3D
+    // check if the case is 3D
     forAll (geometricD, direction)
     {
         if (geometricD[direction] == -1)
@@ -894,37 +891,38 @@ void solvePrtContact(
     }
     // get data from the current body necessary for computation of
     // contact forces
-    vector cCoM(cInfo.getGeomModel().getCoM());        //center of mass
-    vector cVel(cVars->Vel_);            //linear velocity
-    scalar cKN(cInfo.getkN());          //elastic normal stiffness
-    scalar cGammaN(cInfo.getgammaN());  //normal viscosity
-    scalar cKt(cInfo.getkt());          //elastic tangential stiffness
-    scalar cGammat(cInfo.getgammat());  //tangential viscosity
-    scalar cmu(cInfo.getmu());          //firction coef
-    scalar cadhN(cInfo.getAdhN());      //adhesive force
-    scalar cadhEqui(cInfo.getAdhEqui());//adhesive force
-    scalar cM(cInfo.getGeomModel().getM0());            //mass
-    scalar cRhoS(cVars->rhoS_.value());  //viscosity
-    vector cAxis(cVars->Axis_);          //Axis
-    scalar cOmega(cVars->omega_);        //Omega
+    vector cCoM(cInfo.getGeomModel().getCoM());                         //center of mass
+    vector cVel(cVars->Vel_);                                           //linear velocity
+    scalar cKN(cInfo.getkN());                                          //elastic normal stiffness
+    scalar cGammaN(cInfo.getgammaN());                                  //normal viscosity
+    scalar cKt(cInfo.getkt());                                          //elastic tangential stiffness
+    scalar cGammat(cInfo.getgammat());                                  //tangential viscosity
+    scalar cmu(cInfo.getmu());                                          //firction coef
+    scalar cadhN(cInfo.getAdhN());                                      //adhesive force
+    scalar cadhEqui(cInfo.getAdhEqui());                                //adhesive force
+    scalar cM(cInfo.getGeomModel().getM0());                            //mass
+    scalar cRhoS(cVars->rhoS_.value());                                 //viscosity
+    vector cAxis(cVars->Axis_);                                         //Axis
+    scalar cOmega(cVars->omega_);                                       //Omega
 
-    vector tCoM(tInfo.getGeomModel().getCoM());        //center of mass
-    vector tVel(tVars->Vel_);            //linear velocity
-    scalar tKN(tInfo.getkN());          //elastic normal stiffness
-    scalar tGammaN(tInfo.getgammaN());  //normal viscosity
-    scalar tKt(tInfo.getkt());          //elastic tangential stiffness
-    scalar tGammat(tInfo.getgammat());  //tangential viscosity
-    scalar tmu(tInfo.getmu());          //firction coef
-    scalar tadhN(tInfo.getAdhN());      //adhesive force
-    scalar tadhEqui(tInfo.getAdhEqui());//adhesive force
-    scalar tM(tInfo.getGeomModel().getM0());            //mass
-    scalar tRhoS(tVars->rhoS_.value());  //viscosity
-    vector tAxis(tVars->Axis_);          //Axis
-    scalar tOmega(tVars->omega_);        //Omega
+    // get data from the neighbor body
+    vector tCoM(tInfo.getGeomModel().getCoM());                         //center of mass
+    vector tVel(tVars->Vel_);                                           //linear velocity
+    scalar tKN(tInfo.getkN());                                          //elastic normal stiffness
+    scalar tGammaN(tInfo.getgammaN());                                  //normal viscosity
+    scalar tKt(tInfo.getkt());                                          //elastic tangential stiffness
+    scalar tGammat(tInfo.getgammat());                                  //tangential viscosity
+    scalar tmu(tInfo.getmu());                                          //firction coef
+    scalar tadhN(tInfo.getAdhN());                                      //adhesive force
+    scalar tadhEqui(tInfo.getAdhEqui());                                //adhesive force
+    scalar tM(tInfo.getGeomModel().getM0());                            //mass
+    scalar tRhoS(tVars->rhoS_.value());                                 //viscosity
+    vector tAxis(tVars->Axis_);                                         //Axis
+    scalar tOmega(tVars->omega_);                                       //Omega
 
 
-    vector  FN(vector::zero);//placeholder for normal force
-    vector  Ft(vector::zero);//placeholder for tangential force
+    vector  FN(vector::zero);                                           //placeholder for normal force
+    vector  Ft(vector::zero);                                           //placeholder for tangential force
     Info << "-- Detected particle-particle contact " << cVars->bodyId_ << " : " << tVars->bodyId_ << endl;
     Info << "-- Particle-particle contact center " << prtPrtCntVars.contactCenter_ << endl;
     Info << "-- Particle-particle contact normal " << prtPrtCntVars.contactNormal_ << endl;
@@ -971,7 +969,7 @@ void solvePrtContact(
     vector cFtLast(vector::zero);
     vector tFtLast(vector::zero);
 
-    // Find history of tangential force between these two particles
+    // find history of tangential force between these two particles
     DynamicList<Tuple2<label,Tuple2<label,vector>>>& chistoryFt(cInfo.getHistoryhistoryFt());
     DynamicList<Tuple2<label,Tuple2<label,vector>>>& thistoryFt(tInfo.getHistoryhistoryFt());
 
@@ -997,13 +995,13 @@ void solvePrtContact(
         }
     }
 
-    // Note the magnitude of last Ft should be same but only oposite
+    // magnitude of last Ft should be same but only oposite
     vector FtLast((cFtLast - tFtLast)/2);
-    //Project last Ft into a new direction
+    // project last Ft into a new direction
     vector FtLastP(FtLast - (FtLast & nVec) * nVec);
-    //Scale projected Ft to have same magnitude as FtLast
+    // scale projected Ft to have same magnitude as FtLast
     vector FtLastr(mag(FtLast) * (FtLastP/(mag(FtLastP)+SMALL)));
-    // Compute relative tangential velocity
+    // compute relative tangential velocity
     vector cVeliNorm((cVeli & nVec)*nVec);
     cVeli -= cVeliNorm;
 
@@ -1011,7 +1009,7 @@ void solvePrtContact(
     tVeli -= tVeliNorm;
 
     vector Vt(cVeli - tVeli);
-    //Compute tangential force
+    // compute tangential force
     vector Ftdi(- aGammat*sqrt(aKN*reduceM*Lc)*Vt);
     Ft = (FtLastr - aKt*Vt*deltaT + Ftdi);
 
@@ -1024,7 +1022,7 @@ void solvePrtContact(
 
     vector F(FN+Ft);
 
-    //Update history of tangential force
+    // update history of tangential force
     if (cFtLastFinded)
     {
         forAll (chistoryFt,cFti)

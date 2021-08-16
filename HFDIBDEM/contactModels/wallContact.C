@@ -51,7 +51,7 @@ void detectWallContact(
     bool inContact(false);
     cInfo.clearContactInfo();
 
-    //Go through all surfCells and check if there is any surfCell whose face is a boundary face
+    // go through all surfCells and check if there is any surfCell whose face is a boundary face
     forAll (cInfo.getSurfCells()[Pstream::myProcNo()],sCellI)
     {
         label cCell(cInfo.getSurfCells()[Pstream::myProcNo()][sCellI]);
@@ -62,7 +62,7 @@ void detectWallContact(
         {
             if (!mesh.isInternalFace(cFaces[faceI]))
             {
-                // Get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
+                // get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
                 label facePatchId = mesh.boundaryMesh().whichPatch(cFaces[faceI]);
                 const polyPatch& cPatch = mesh.boundaryMesh()[facePatchId];
                 if (cPatch.type()=="wall")
@@ -98,7 +98,7 @@ void detectWallContact(
             {
                 if (!mesh.isInternalFace(cFaces[faceI]))
                 {
-                    // Get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
+                    // get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
                     label facePatchId(-1);
                     facePatchId = mesh.boundaryMesh().whichPatch(cFaces[faceI]);
                     const polyPatch& cPatch = mesh.boundaryMesh()[facePatchId];
@@ -144,14 +144,14 @@ void solveWallContact
     scalar aadhEqui(0.5*(cInfo.getAdhEqui()+wInfo.getAdhEqui()));
 
     label nContactFaces(cInfo.wallContactFaces()[Pstream::myProcNo()].size());
-    //Create placeholders for forces
+    // create placeholders for forces
     vector FN(vector::zero);
     vector Ft(vector::zero);
     vector cLVec(vector::zero);
     vector nVecF(vector::zero);
     scalar overallContactArea(0);
 
-    //if the IB was in contact in previous DEM time step, find the information about tangential force and assigne it
+    // if the IB was in contact in previous DEM time step, find the information about tangential force and assigne it
     vector FtLast(vector::zero);
     bool FtLastFinded(false);
     forAll (cInfo.getHistoryhistoryFt(),Fti)
@@ -175,10 +175,7 @@ void solveWallContact
 
         contactCells.append(mesh.faceOwner()[cFace]);
         // get the local wall velocity
-//             label cFacePatch(mesh_.boundaryMesh().whichPatch(cFace));
-        //~ vector wVel(U.boundaryField()[cFacePatch][cFace]);
         vector wVel(vector::zero);
-        // Note (MI): could I go around whichPatch?
 
         // compute normal to movement and relative velocitydeltaTDEM
         vector nVec(-mesh.Sf()[cFace]/mag(mesh.Sf()[cFace]));
@@ -186,13 +183,13 @@ void solveWallContact
         nVecF += nVec * mag(mesh.Sf()[cFace]);
         overallContactArea += mag(mesh.Sf()[cFace]);
 
-        //project last Ft to new tangential direction
+        // project last Ft to new tangential direction
         vector FtLastP(FtLast - (FtLast & nVec) * nVec);
-        //scale the projected vector to remain the magnitude
+        // scale the projected vector to remain the magnitude
         vector FtLastr(mag(FtLast) * (FtLastP/(mag(FtLastP)+SMALL)));
 
         vector ri(mesh.Cf()[cFace] - cInfo.getGeomModel().getCoM());
-        //Evaluate tangential velocity
+        // evaluate tangential velocity
         vector planarVec       =  ri - cVars->Axis_*(ri & cVars->Axis_);
         vector rotDir(planarVec^cVars->Axis_);
 
@@ -201,7 +198,7 @@ void solveWallContact
         vector cVeliNorm((cVeli & nVec)*nVec);
         cVeli -= cVeliNorm;
         vector Vt(cVeli-wVel);
-        //Compute tangential force
+        // compute tangential force
         vector Fti(FtLastr - aKt*Vt*deltaT);
 
         scalar Lci(4*mag(ri)*mag(ri)/(mag(ri)+mag(ri)));
@@ -265,7 +262,7 @@ void solveWallContact
     vector FA((FAeq * partMul  + FAc * (1-partMul)) * nVecF);
     FN -= FA;
 
-    // Update or add the history of tangential force
+    // update or add the history of tangential force
     if (FtLastFinded)
     {
         forAll (cInfo.getHistoryhistoryFt(),Fti)
@@ -332,7 +329,7 @@ getInterVolume <sphere>(
 
     bool case3D = true;
     label emptyDim = 0;
-    //Check if the case is 3D
+    // check if the case is 3D
     forAll (geometricD, direction)
     {
         if (geometricD[direction] == -1)
@@ -386,7 +383,7 @@ scalar sphereContactArea
 
     bool case3D = true;
     label emptyDim = 0;
-    //Check if the case is 3D
+    // check if the case is 3D
     forAll (geometricD, direction)
     {
         if (geometricD[direction] == -1)

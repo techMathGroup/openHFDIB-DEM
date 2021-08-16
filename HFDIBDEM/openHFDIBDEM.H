@@ -72,7 +72,7 @@ namespace Foam
 
     private:
   
-    // Private data types
+    // Private data types ------------------------------------------
 
     typedef DynamicList<label>  DynamicLabelList;
     typedef DynamicList<scalar> DynamicScalarList;
@@ -87,38 +87,35 @@ namespace Foam
     
     const wordList          bodyNames_;
 
-    //Immersed bodies objects
+    // immersed bodies objects
     PtrList<immersedBody> immersedBodies_;
     
-    //addModels (how to add the baseObjects)
+    // addModels (how to add the baseObjects)
     PtrList<addModel> addModels_;
     
     autoPtr<wallInfo> wallInfo_;
     
-    //Precalculate cellPoints for better performace
+    // precalculate cellPoints for better performace
     List<pointField> cellPoints_;
     
     DynamicLabelList ibContactList_;
     
-    //Minimal number of DEM inside loops
+    // minimal number of DEM inside loops
     label minDEMloops_;
     
-    //Minimal timestep in DEM inside loops
+    // minimal timestep in DEM inside loops
     scalar minDEMtimeStep_;
     
-    //how many times rocompute M0_ because of refinement
+    // how many times rocompute M0_ because of mesh refinement
     label recomputeM0_;
     
-    //Store gradient
+    // store gradient
     vectorField surfNorm_;
     
-    vector geometricD_;//geometric directions
+    // mesh geometric directions
+    vector geometricD_;
     
-    //solve body-wall contact
-    //~ void solveWallContact(const DynamicLabelList& wallContactLst);
-    // Note (MI): moved to immersedBody class by MS (as it should be there)
-    
-    //Neighbour list variables - First list is related to dimensions so the size is always 3
+    // neighbour list variables - First list is related to dimensions so the size is always 3
     // List for all bounding points positions
     DynamicList<DynamicScalarList> boundValueNeighbourList_;
     // List for labels holding information about bounding points in boundValueNeighbourList_
@@ -140,7 +137,7 @@ namespace Foam
     word recordOutDir_;
     // Update positions of bounding points
     // sort the list
-    // Solve potential intersections
+    // solve potential intersections
     void updateNeighbourLists();
     // detect prt-prt contact
     void detectPrtContact();
@@ -159,10 +156,13 @@ namespace Foam
     
     public:
     
+    // Constructors ----------------------------------------------------
     openHFDIBDEM(const Foam::dynamicFvMesh& mesh);
+    
+    // Destructors -----------------------------------------------------
     ~openHFDIBDEM();
     
-    //~ void initialize(volScalarField& body);
+    // Public methods --------------------------------------------------
     void initialize(volScalarField& body,volVectorField& U,volScalarField& refineF,label recomputeM0, word runTime);
     
     void preUpdateBodies
@@ -171,8 +171,6 @@ namespace Foam
         volVectorField& f
     );
     void postUpdateBodies(volScalarField& body,volVectorField& f);
-    // Note (MI): this function returns the maximal CoNum encountered
-    //            between particles (wanted to maintain a stable integration)
     
     void updateFSCoupling
     (
@@ -183,16 +181,16 @@ namespace Foam
     void moveBodies(volScalarField& body,volScalarField& refineF);
     
     void recreateBodies(volScalarField& body,volScalarField& refineF);
-    // Void for DEM inner-loops
+    // void for DEM inner-loops
     void correctContact(volScalarField& body,volScalarField& refineF);
-    // Detect wall contact at the end of the time step and return to original positions
+    // detect wall contact at the end of the time step and return to original positions
     void getContactListAndReturnPositions(volScalarField& body);
-    // Sort list of bounding points
+    // sort list of bounding points
     void sortBoundingListPrtContact();
-    // Solve possible intersection of bounding boxes
+    // solve possible intersection of bounding boxes
     void swapInBoundingListPrtContact(label coord, label j);
     
-    //Interpolate vector V using Vs for the surface values
+    // interpolate vector field V using Vs for the surface values
     void interpolateIB
     (
         volVectorField& V,
@@ -200,7 +198,7 @@ namespace Foam
         volScalarField& body
     );
     
-    //Interpolate scalar S using Ss for the surface values
+    // interpolate scalar field S using Ss for the surface values
     void interpolateIB
     (
         volScalarField& S,
@@ -215,10 +213,9 @@ namespace Foam
     void writeBodiesInfo();
     
     // add or remove bodies from the simulation
-    //~ void addRemoveBodies(volScalarField& body);
     void addRemoveBodies(volScalarField& body,volVectorField& U,volScalarField& refineF);
     
-    // Method for iteration over list and find if pairs that contains at least some ib
+    // method for iteration over list and find if pairs that contains at least some ib
     void findIndexesOfPairWithSomeIb
     (
         DynamicList<Tuple2<label, label>>& listToSearch,

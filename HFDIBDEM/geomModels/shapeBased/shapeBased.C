@@ -52,16 +52,6 @@ vector shapeBased::addModelReturnRandomPosition
     Random&          randGen
 )
 {
-    // Note (MI): this function will always return acceptable random
-    //            position IF
-    //            -> body boundBox is completely inside active boundBox
-    //            AND
-    //            -> active boundBox is completely contained in the mesh
-    //
-    // Note (MI): the check if body boundBox is inside active boundBox
-    //            is simple and probably unecessary
-    // Note (MI): an efficient check if all the active boundBox is inside
-    //            mesh is an open issue at the moment
     vector ranVec(vector::zero);
 
     label nGeometricD(0);
@@ -98,7 +88,7 @@ vector shapeBased::addModelReturnRandomPosition
         ranVec[i] = ranNum;
     }
 
-    ranVec = cmptMultiply(validDirs,ranVec);//translate only with respect to valid directions
+    ranVec = cmptMultiply(validDirs,ranVec);                            //translate only with respect to valid directions
     ranVec += dirCorr;
 
     return ranVec;

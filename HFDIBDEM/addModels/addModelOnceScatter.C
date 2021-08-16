@@ -116,11 +116,9 @@ addModelOnceScatter::~addModelOnceScatter()
 }
 
 //---------------------------------------------------------------------------//
-// Note (MI): Initialization of this model is so complex that I moved it to a
-//            specific function
 void addModelOnceScatter::init()
 {
-    // Set sizes to necessary datatypes
+    // set sizes to necessary datatypes
     cellsInBoundBox_.setSize(Pstream::nProcs());
     cellZonePoints_.setSize(Pstream::nProcs());
 
@@ -190,9 +188,6 @@ void addModelOnceScatter::init()
         Info << "-- addModelMessage-- "
              << "addition zone completely immersed in mesh -> OK" << endl;
     }
-    // Note (MI): the coding should be done in such a way that all the
-    //            variables should be present irrespective of addDomain_
-    //            (check initializeBoundBox and initializeCellZone)
 
 	if (scalingMode_ == "noScaling")
 	{
@@ -323,8 +318,6 @@ geomModel* addModelOnceScatter::addBody
         if (scaleRandomApplication_){scaleStep_ = returnRandomScale();}
         geomModel_->bodyScalePoints(scaleStep_);
     }
-    // Note (MI): there should be no change in CoM after rotation and
-    //            scaling BUT CoM is approximate...
 
     vector CoM(geomModel_->getCoM());
     point bBoxCenter = cellZoneBounds_.midpoint();

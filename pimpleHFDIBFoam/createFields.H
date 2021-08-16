@@ -50,16 +50,12 @@ volScalarField lambda
         "lambda",
         runTime.timeName(),
         mesh,
-        //~ IOobject::MUST_READ,
         IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedScalar("zero",dimless,0) // initialising to 0
+    dimensionedScalar("zero",dimless,0)
 );
-// Note: OK, this is not a very nice coding, I read the field and do not
-//       use the values at all... a more suitable definition of lambda
-//       would be appropriate (MI)
 
 Info<< "Reading field f\n" << endl;
 volVectorField f
@@ -87,7 +83,7 @@ volScalarField refineF
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedScalar("zero",dimless,0) // initialising to 0
+    dimensionedScalar("zero",dimless,0)
 );
 
 

@@ -29,8 +29,6 @@ if (mesh_.nGeometricD() < 3)
                 );
     
         Info << bodyName_ << " is a freely moving body with prescribed rotation." << endl;
-        
-        // Note: at the moment, the body always rotates around its center of mass
     }
     else if (immersedDict_.found("prescribedTransRotBody"))
     {
@@ -43,8 +41,6 @@ if (mesh_.nGeometricD() < 3)
                 );
     
         Info << bodyName_ << " has prescribed both movement and rotation." << endl;
-        
-        // Note: at the moment, the body always rotates around its center of mass
     }
     else if (immersedDict_.found("prescribedTransFixedAxisRotBody"))
     {
@@ -54,8 +50,6 @@ if (mesh_.nGeometricD() < 3)
         Axis_ = immersedDict_.subDict("prescribedTransFixedAxisRotBody").lookup("axis");
         
         Info << bodyName_ << " has prescribed movement and axis of rotation." << endl;
-        
-        // Note: at the moment, the body always rotates around its center of mass
     }
     else if (immersedDict_.found("fullyCoupledBody"))
     {
@@ -98,7 +92,7 @@ if (mesh_.nGeometricD() < 3)
         Info << "startSynced was not specified, using startSynced: " << startSynced_ << endl;
     }
     
-    // just auxiliaries due to MOR
+    // body auxiliary settings
     if (immersedDict_.found("sdBasedLambda"))
     {
         sdBasedLambda_ = readBool(immersedDict_.lookup("sdBasedLambda"));
@@ -124,10 +118,12 @@ if (mesh_.nGeometricD() < 3)
         timesToSetStatic_ = readLabel(immersedDict_.lookup("timesToSetStatic"));
     }
     
+    // set up body geometry
     geomModel_->setIntSpan(intSpan_);
     geomModel_->setSdBasedLambda(sdBasedLambda_);
     geomModel_->setRhoS(immersedDict_.lookup("rho"));
     
+    // set up contact properties
     scalar kN(readScalar(immersedDict_.lookup("kN")));
     scalar kt(readScalar(immersedDict_.lookup("kt")));
     scalar gammaN(readScalar(immersedDict_.lookup("gammaN")));
@@ -157,20 +153,20 @@ if (mesh_.nGeometricD() < 3)
         adhEqui)
     );
 
-    // Set sizes for parallel runs
+    // set sizes for parallel runs
     surfCells_.setSize(Pstream::nProcs());
     intCells_.setSize(Pstream::nProcs());
     interpolationInfo_.setSize(Pstream::nProcs());
     interpolationVecReqs_.setSize(Pstream::nProcs());
     
-    // Initialize bounding points
+    // initialize bounding points
     boundBox bound(geomModel_->getBounds());
     minBoundPoint_ = bound.min();
     maxBoundPoint_ = bound.max();    
     
-    //Initialize list of labels for bounding points based on bodyID
-    //This list hold index of both bounding points for each dimension
-    //Thanks to this information the update of bounding points positions is more efficient
+    // initialize list of labels for bounding points based on bodyID
+    // -> this list holds index of both bounding points for each dimension
+    // -> thanks to this information the update of bounding points positions is more efficient
     for (label coord = 0; coord < 3; coord = coord + 1)
     {
         List<label> labeli(2);

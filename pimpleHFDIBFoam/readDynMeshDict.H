@@ -1,9 +1,5 @@
-// Note: in this file, I need to read the necessary data from the
-//       dynamicMeshDict (if it is present?)
+// assume static mesh
 label maxRefinementLevel = 0;
-//~ scalar maxRefinementLevel = 0;
-//~ bool  staticMesh         = true;
-// Note: assume staticFvMesh
 
 // load dynamicMeshDict
 IOdictionary dynamicMeshDict
@@ -27,7 +23,6 @@ const word rfMesh("dynamicRefineFvMesh");
 
 if (dynamicFvMeshTypeName!=stMesh)
 {
-    //~ staticMesh=false;
     if (dynamicFvMeshTypeName==rfMesh)
     {
         maxRefinementLevel = readLabel(dynamicMeshDict.subDict("dynamicRefineFvMeshCoeffs").lookup("maxRefinement"));

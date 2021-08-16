@@ -135,7 +135,7 @@ bool nonConvexBody::canAddBody
     return true;
 }
 //---------------------------------------------------------------------------//
-//Auxiliary for createImmersedBody
+// auxiliary for createImmersedBody
 labelList nonConvexBody::getBBoxCellsByOctTree
 (
     label cellToCheck,
@@ -174,7 +174,7 @@ labelList nonConvexBody::getBBoxCellsByOctTree
     return retList;
 }
 //---------------------------------------------------------------------------//
-//Create immersed body for convex body
+// create immersed body for convex body
 void nonConvexBody::createImmersedBody
 (
     volScalarField& body,
@@ -223,22 +223,16 @@ void nonConvexBody::createImmersedBody
     const pointField& cp = mesh_.C();
     const pointField fCp = filterField(cp,bBoxCells[Pstream::myProcNo()]);
     boolList fCentersInside = triSurfSearch_().calcInside(fCp);
-    // Note (MI): there is almost no speedup using filtering.
-    //            it seems as calcInside does filtering by itself
-    //            also, due to the filtering, I need to make a copy
-    //            of cp as fCp
 
 
     // clear old list contents
     intCells[Pstream::myProcNo()].clear();
     surfCells[Pstream::myProcNo()].clear();
 
-    //Find the processor with most of this IB inside
+    // find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;
 
-    //
     vector sDSpan(4.0*(mesh_.bounds().max()-mesh_.bounds().min()));
-    //
 
     // first loop, construction of body field and identification of
     // the number of inside and surface cells
@@ -246,7 +240,7 @@ void nonConvexBody::createImmersedBody
     {
         label cellI(bBoxCells[Pstream::myProcNo()][bCellI]);
 
-        //Check if partially or completely inside
+        // check if partially or completely inside
         const pointField vertexPoints = cellPoints[cellI];
         boolList vertexesInside = triSurfSearch_().calcInside( vertexPoints );
         bool centerInside(fCentersInside[bCellI]);
@@ -258,13 +252,11 @@ void nonConvexBody::createImmersedBody
         {
             if (vertexesInside[verIn]==true)
             {
-                cBody  += rVInSize; //fraction of cell covered
+                cBody  += rVInSize;                                     //fraction of cell covered
             }
         }
 
-        // Note: this is needed for correct definition of internal and
-        //       surface cells of the body
-        if (centerInside)//consistency with Blais 2016
+        if (centerInside)
         {
             cBody+=0.5;
         }
@@ -292,7 +284,7 @@ void nonConvexBody::createImmersedBody
                         signedDist = mag(pointHit.hitPoint()-cp[cellI]);
                     }
                     else
-                    {// this is due to robustness, not much more can be done here
+                    {
                         Info << "Missed point in signedDist computation !!" << endl;
                     }
                     if (centerInside)
@@ -310,16 +302,15 @@ void nonConvexBody::createImmersedBody
         body[cellI]+= cBody;
         // clip the body field values
         body[cellI] = min(max(0.0,body[cellI]),1.0);
-        // Note (MI): max should be useless, min is for overlaps
     }
 
-    //gather partial volume from other processors
+    // gather partial volume from other processors
     Pstream::gatherList(ibPartialVolume_, 0);
     Pstream::scatter(ibPartialVolume_, 0);
 
     for (label i = 0; i < ibPartialVolume_.size(); i++)
     {
-        if (ibPartialVolume_[i] == max(ibPartialVolume_))//MI 20201119 OR GMAX?
+        if (ibPartialVolume_[i] == max(ibPartialVolume_))
         {
         //Set owner of the IB which will move this IB
             owner_ = i;

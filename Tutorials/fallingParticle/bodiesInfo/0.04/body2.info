@@ -10,7 +10,7 @@ FoamFile
     version     2.0;
     format      ascii;
     class       dictionary;
-    location    "/hopper2/sourekm/Documents/HFDIB/Tutorials/fallingParticle/bodiesInfo/0.04";
+    location    "/home/isozm/Documents/10_IT_CAS/2021_openHFDIBDEM/00_codes/00_releasedCodes/01_isozEtAlComplement/openHFDIB-DEM/Tutorials/fallingParticle/bodiesInfo/0.04";
     object      body2.info;
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -19,7 +19,7 @@ bodyId          2;
 
 bodyName        sphere;
 
-Vel             ( 0.38885967 3.609666e-20 -1.1566458e-05 );
+Vel             ( 0.39213851 2.7189983e-11 -1.7473322e-05 );
 
 omega           0;
 
@@ -31,6 +31,6 @@ timeStepsInContWStatic 0;
 
 sphere
 {
-    position        ( 0.021375276 6.3160399e-22 0.0043549242 );
-    radius          0.0063572127;
+    position        ( 0.027306134 3.1085736e-13 0.01595675 );
+    radius          0.0068076194;
 }

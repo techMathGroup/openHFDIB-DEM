@@ -109,11 +109,9 @@ addModelDistribution::~addModelDistribution()
 }
 
 //---------------------------------------------------------------------------//
-// Note (MI): Initialization of this model is so complex that I moved it to a
-//            specific function
 void addModelDistribution::init()
 {
-    // Set sizes to necessary datatypes
+    // set sizes to necessary datatypes
     cellsInBoundBox_.setSize(Pstream::nProcs());
     cellZonePoints_.setSize(Pstream::nProcs());
     addedParticlesSize_.setSize(particleSize_.size(), 0);
@@ -192,7 +190,6 @@ void addModelDistribution::init()
         zoneVol += procZoneVols[procI];
     }
 
-//     scalar zoneVol(gSum(procZoneVols));
     scalar zoneBBoxVol(cellZoneBounds_.volume());
     if (zoneVol - zoneBBoxVol > 1e-5*zoneBBoxVol)
     {
@@ -207,9 +204,6 @@ void addModelDistribution::init()
         Info << "-- addModelMessage-- "
              << "addition zone completely immersed in mesh -> OK" << endl;
     }
-    // Note (MI): the coding should be done in such a way that all the
-    //            variables should be present irrespective of addDomain_
-    //            (check initializeBoundBox and initializeCellZone)
 
 	partPerAddTemp_ = partPerAdd_;
 

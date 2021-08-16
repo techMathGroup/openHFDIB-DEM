@@ -67,7 +67,7 @@ class contactInfo
 
     geomModel& geomModel_;
 
-    //is the particle in contact with wall
+    // is the particle in contact with wall
     bool    isInWallContact_;
 
     List<DynamicLabelList>& surfCells_;
@@ -77,32 +77,32 @@ class contactInfo
 
     label timeStepsInContWStatic_;
 
-    //faces in contact with walls
+    // faces in contact with walls
     List<DynamicLabelList>  wallContactFaces_;
 
-    //spring stiffness for normal contact force
+    // spring stiffness for normal contact force
     scalar  kN_;
 
-    //spring stiffness for tangential contact force
+    // spring stiffness for tangential contact force
     scalar  kt_;
 
-    //damping coefficient for normal contact force
+    // damping coefficient for normal contact force
     scalar gammaN_;
 
-    //damping coefficient for tangential contact force
+    // damping coefficient for tangential contact force
     scalar gammat_;
 
-    //friction coefficient
+    // friction coefficient
     scalar mu_;
 
-    //adhesion coefficient for normal contact force
+    // adhesion coefficient for normal contact force
     scalar adhN_;
 
-    //adhesion coefficient for normal contact force
+    // adhesion coefficient for normal contact force
     scalar adhEqui_;
 
-    //Tangential force from last timestep
-    //First label -1 indicates wall other for bodyID
+    // tangential force from last timestep
+    // first label -1 indicates wall other for bodyID
     DynamicList<Tuple2<label,Tuple2<label,vector>>> historyFt_;
 
     public:
@@ -177,7 +177,7 @@ class contactInfo
 
     void distributeWallContactFaces()
     {
-        //Distribute wallContactfaces over processors
+        // distribute wallContactfaces over processors
         Pstream::gatherList(wallContactFaces_, 0);
         Pstream::scatter(wallContactFaces_, 0);
     }

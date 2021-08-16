@@ -104,7 +104,6 @@ namespace Foam
         // Public variables --------------------------------------------
 
         // Public methods ----------------------------------------------
-        //~ void init();
 
         bool canAddBody
         (

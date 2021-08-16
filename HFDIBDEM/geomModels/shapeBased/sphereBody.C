@@ -114,7 +114,7 @@ bool sphereBody::canAddBody
                             {
                                 if (!mesh_.isInternalFace(cFaces[faceI]))
                                 {
-                                    // Get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
+                                    // get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
                                     label facePatchId(-1);
                                     facePatchId = mesh_.boundaryMesh().whichPatch(cFaces[faceI]);
                                     const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchId];
@@ -148,7 +148,7 @@ bool sphereBody::canAddBody
     return true;
 }
 //---------------------------------------------------------------------------//
-//Create immersed body for convex body
+// create immersed body for convex body
 void sphereBody::createImmersedBody
 (
     volScalarField& body,
@@ -158,14 +158,6 @@ void sphereBody::createImmersedBody
     List<pointField>& cellPoints
 )
 {
-    // Note (MI): I did NOT really modified this function.
-    // -> there is almost no speed up filtering cp before calling
-    //    calcInside
-    // -> I guess that for pp the situation will be similar
-    // -> to include filtering actually meens running octree on the
-    //    bounding box, which is awfully similar to the actuall body
-    //    creation MS: you can test this and modify, if you deem
-    //    necessary
     boundBox ibBound(getBounds());
     bool ibInsideMesh(false);
 
@@ -195,7 +187,7 @@ void sphereBody::createImmersedBody
     // clear old list contents
     intCells[Pstream::myProcNo()].clear();
     surfCells[Pstream::myProcNo()].clear();
-    //Find the processor with most of this IB inside
+    // find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;
     octreeField *= 0;
 
@@ -252,11 +244,9 @@ void sphereBody::createImmersedBody
                         insideIbBound = true;
                         cellToStartInCreateIB_ = nextToCheck[cellToCheck];
                         lastIbPoints.insert(nextToCheck[cellToCheck],pointPos);
-//                         vertexesInside = new boolList(pointsInside, vertexLabels);
                         vertexesInside = pointInside(pointPos);
                         pointField centerPoint(1,cp[nextToCheck[cellToCheck]]);
                         centerInside = (pointInside(centerPoint))[0];
-//                         centerInside = centersInside[nextToCheck[cellToCheck]];
                         if(std::any_of(vertexesInside.begin(),vertexesInside.end(),[](bool b){return b;}) || centerInside || !insideIB)
                         {
                             auxToCheck.append(
@@ -286,7 +276,7 @@ void sphereBody::createImmersedBody
     }
 }
 //---------------------------------------------------------------------------//
-//Create immersed body info
+// create immersed body info
 labelList sphereBody::createImmersedBodyByOctTree
 (
     label cellToCheck,
@@ -307,14 +297,12 @@ labelList sphereBody::createImmersedBodyByOctTree
     {
         if (vertexesInside[verIn]==true)
         {
-            cBody  += rVInSize; //fraction of cell covered
+            cBody  += rVInSize;                                         //fraction of cell covered
         }
     }
 
     vector sDSpan(4.0*(mesh_.bounds().max()-mesh_.bounds().min()));
-    // Note: this is needed for correct definition of internal and
-    //       surface cells of the body
-    if (centerInside)//consistency with Blais 2016
+    if (centerInside)
     {
         cBody+=0.5;
     }
@@ -339,7 +327,7 @@ labelList sphereBody::createImmersedBodyByOctTree
                     signedDist = mag(nearest-mesh_.C()[cellToCheck]);
                 }
                 else
-                {// this is due to robustness, not much more can be done here
+                {
                     Info << "Missed point in signedDist computation !!" << endl;
                 }
                 if (centerInside)
@@ -357,17 +345,12 @@ labelList sphereBody::createImmersedBodyByOctTree
         insideIB = true;
     }
     body[cellToCheck]+= cBody;
+    
     // clip the body field values
     body[cellToCheck] = min(max(0.0,body[cellToCheck]),1.0);
-    // Note (MI): max should be useless, min is for overlaps
     if (!insideIB || cellInside)
     {
         retList = mesh_.cellCells()[cellToCheck];
-//             labelList cellNb(mesh_.cellCells()[cellToCheck]);//list of neighbours
-//             forAll (cellNb,nbCellI)
-//             {
-//                 createImmersedBodyByOctTree(cellNb[nbCellI], insideIB, ibPartialVolumei, centersInside, pointsInside, body);
-//             }
     }
 
     return retList;
@@ -387,11 +370,11 @@ void sphereBody::synchronPos()
     }
 
     pBufs.finishedSends();
-    //Move body to points calculated by owner_
+    // move body to points calculated by owner_
     UIPstream recv(owner_, pBufs);
     vector pos (recv);
 
-    //move mesh
+    // move mesh
     position_ = pos;
 }
 //---------------------------------------------------------------------------//

@@ -31,16 +31,8 @@ Description
     - turbulence modelling, i.e. laminar, RAS or LES
     - run-time selectable MRF and finite volume options, e.g. explicit porosity
 
-    The code is prepared to use HFDIB method and refine the mesh around
+    The code is prepared to use the HFDIB method and refine the mesh around
     the solids via fvdynamicRefineMesh
-
-    Note: the general code structure is the same as in pisoHFDIBFoam
-          by Federico Municchi but the HFDIB library itself was slightly
-          changed
-    Note: although the code should theoretically work with moving meshes
-          I only borrow the mesh refinement functionality. the
-          initialMeshRefinement.H is completely useles for the rest of
-          dynamic meshes types
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
@@ -54,9 +46,7 @@ Description
 #include "localEulerDdtScheme.H"
 #include "fvcSmooth.H"
 
-#include "triSurfaceMesh.H"  // for fd read from stl file
-
-#include "clockTime.H"
+#include "triSurfaceMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -94,10 +84,6 @@ int main(int argc, char *argv[])
     bool isFirstTime(true);
     openHFDIBDEM  HFDIBDEM(mesh);
 
-    clockTime timer;
-    List<double> times;
-    times.setSize(7);
-
     while (runTime.run())
     {
 
@@ -127,15 +113,11 @@ int main(int argc, char *argv[])
 
             if (maxRefinementLevel > 0 && startTime == "0")
             {
-                #include "initialMeshRefinementV2.H"
+                #include "initialMeshRefinement.H"
             }
 
-            //~ HFDIBDEM.initialize(lambda);
             isFirstTime = false;
         }
-        // Note (MI): initialize before starting the time loop
-
-        times[0] = timer.timeIncrement();
 
         HFDIBDEM.preUpdateBodies(lambda,f);
 
@@ -155,8 +137,6 @@ int main(int argc, char *argv[])
 
         surface.correctBoundaryConditions();
         Ui.correctBoundaryConditions();
-
-        times[1] = timer.timeIncrement();
 
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
@@ -224,29 +204,15 @@ int main(int argc, char *argv[])
             }
         }
 
-        times[2] = timer.timeIncrement();
-
-        Info << "trying to update HFDIBDEM" << endl;
+        Info << "updating HFDIBDEM" << endl;
         HFDIBDEM.postUpdateBodies(lambda,f);
 
-        times[3] = timer.timeIncrement();
-
-        //~ HFDIBDEM.addRemoveBodies(lambda);
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
-        //~ #include "limitDeltaTForDEM.H"
-        times[4] = timer.timeIncrement();
-        //~ #include "refreshCourantNo.H"
-
-        //~ #include "setDeltaT.H"
 
         HFDIBDEM.moveBodies(lambda,refineF);
 
-        times[5] = timer.timeIncrement();
-
         HFDIBDEM.correctContact(lambda,refineF);
         Info << "updated HFDIBDEM" << endl;
-
-        times[6] = timer.timeIncrement();
 
 
         runTime.write();
@@ -255,8 +221,6 @@ int main(int argc, char *argv[])
         {
             HFDIBDEM.writeBodiesInfo();
         }
-
-        Info << "Timer: 0: " << times[0] << " 1: " << times[1] << " 2: " << times[2] << " 3: " << times[3] << " 4: " << times[4] << " 5: " << times[5] << " 6: " << times[6] << endl;
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"

@@ -184,17 +184,14 @@ namespace Foam
 
         vector getClosestNormal(point startPoint, vector span) final override
         {
-            //Get nearest point on surface from contact center
+            // get nearest point on surface from contact center
             pointIndexHit ibPointIndexHit = triSurfSearch_().nearest(startPoint, span);
             List<pointIndexHit> ibPointIndexHitList(1,ibPointIndexHit);
             vectorField normalVectorField;
 
-            //Get contact normal direction
+            // get contact normal direction
             const triSurfaceMesh& ibTempMesh( bodySurfMesh_);
             ibTempMesh.getNormal(ibPointIndexHitList,normalVectorField);
-            // MS note: This normal direction is not correct for sharp edges!
-            // therefore it is used only if the normal direction cannot be set
-            // based on surfcels (there is only one such cell
 
             return normalVectorField[0];
         }

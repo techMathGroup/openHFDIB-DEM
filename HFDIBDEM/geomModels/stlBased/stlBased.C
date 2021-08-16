@@ -69,16 +69,6 @@ vector stlBased::addModelReturnRandomPosition
     Random&          randGen
 )
 {
-    // Note (MI): this function will always return acceptable random
-    //            position IF
-    //            -> body boundBox is completely inside active boundBox
-    //            AND
-    //            -> active boundBox is completely contained in the mesh
-    //
-    // Note (MI): the check if body boundBox is inside active boundBox
-    //            is simple and probably unecessary
-    // Note (MI): an efficient check if all the active boundBox is inside
-    //            mesh is an open issue at the moment
     vector ranVec(vector::zero);
 
     label nGeometricD(0);
@@ -120,7 +110,7 @@ vector stlBased::addModelReturnRandomPosition
         ranVec[i] = ranNum;
     }
 
-    ranVec = cmptMultiply(validDirs,ranVec);//translate only with respect to valid directions
+    ranVec = cmptMultiply(validDirs,ranVec);                            //translate only with respect to valid directions
     ranVec += dirCorr;
 
     return ranVec;
@@ -211,11 +201,11 @@ void stlBased::synchronPos()
     }
 
     pBufs.finishedSends();
-    //Move body to points calculated by owner_
+    // move body to points calculated by owner_
     UIPstream recv(owner_, pBufs);
     pointField bodyPoints (recv);
 
-    //move mesh
+    // move mesh
     bodySurfMesh_.movePoints(bodyPoints);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
