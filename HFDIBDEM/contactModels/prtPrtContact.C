@@ -970,8 +970,8 @@ void solvePrtContact(
     vector tFtLast(vector::zero);
 
     // find history of tangential force between these two particles
-    DynamicList<Tuple2<label,Tuple2<label,vector>>>& chistoryFt(cInfo.getHistoryhistoryFt());
-    DynamicList<Tuple2<label,Tuple2<label,vector>>>& thistoryFt(tInfo.getHistoryhistoryFt());
+    DynamicList<Tuple2<label,Tuple2<label,vector>>>& chistoryFt(cInfo.getHistoryFt());
+    DynamicList<Tuple2<label,Tuple2<label,vector>>>& thistoryFt(tInfo.getHistoryFt());
 
     bool cFtLastFinded(false);
     forAll (chistoryFt,cFti)
@@ -1010,8 +1010,8 @@ void solvePrtContact(
 
     vector Vt(cVeli - tVeli);
     // compute tangential force
-    vector Ftdi(- aGammat*sqrt(aKN*reduceM*Lc)*Vt);
-    Ft = (FtLastr - aKt*Vt*deltaT + Ftdi);
+    vector Ftdi(- aGammat*sqrt(aKt*reduceM*Lc)*Vt);
+    Ft = (FtLastr - aKt*Lc*Vt*deltaT + Ftdi);
 
     if (mag(Ft) > amu * mag(FN))
     {

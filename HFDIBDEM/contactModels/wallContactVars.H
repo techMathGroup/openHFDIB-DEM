@@ -1,4 +1,4 @@
-/*---------------------------------------------------------------------------*\
+ /*---------------------------------------------------------------------------*\
                         _   _ ____________ ___________    ______ ______ _    _
                        | | | ||  ___|  _  \_   _| ___ \   |  _  \|  ___| \  / |
   ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /   | | | || |_  |  \/  |
@@ -25,45 +25,41 @@ License
 InNamspace
     Foam
 
+Description
+    class for storage of particle-wall contact variables
+
 Contributors
     Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
-#include "contactInfo.H"
 
-using namespace Foam;
+#ifndef wallContactVars_H
+#define wallContactVars_H
 
-//---------------------------------------------------------------------------//
-contactInfo::contactInfo
-(
-    geomModel& geomModel,
-    List<DynamicLabelList>& surfCells,
-    List<DynamicLabelList>& intCells,
-    scalar kN,
-    scalar kt,
-    scalar gammaN,
-    scalar gammat,
-    scalar mu,
-    scalar adhN,
-    scalar adhEqui
-)
-:
-geomModel_(geomModel),
-isInWallContact_(false),
-surfCells_(surfCells),
-intCells_(intCells),
-inContactWithStatic_(false),
-timeStepsInContWStatic_(0),
-kN_(kN),
-kt_(kt),
-gammaN_(gammaN),
-gammat_(gammat),
-mu_(mu),
-adhN_(adhN),
-adhEqui_(adhEqui)
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+namespace Foam
 {
-}
-contactInfo::~contactInfo()
+
+/*---------------------------------------------------------------------------*\
+                      Class wallContactVars Declaration
+\*---------------------------------------------------------------------------*/
+
+class wallContactVars
 {
-}
-//---------------------------------------------------------------------------//
+    public:
+    vector contactCenter_;
+    scalar contactVolume_;
+    vector contactNormal_;
+    scalar contactArea_;
+};
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#endif
+
+// ************************************************************************* //

@@ -205,7 +205,7 @@ namespace Foam
 
         // start the body synchronized with the flow (approximate)
         bool    startSynced_;
-        
+
         // auxiliary variables
         tensor  totRotMatrix_;
         bool    sdBasedLambda_;
@@ -466,7 +466,7 @@ namespace Foam
             return bodyOperation_;
         }
 
-        const DynamicList<Tuple2<label,Tuple2<label,vector>>>& getHistoryhistoryFt()   const
+        const DynamicList<Tuple2<label,Tuple2<label,vector>>>& getHistoryFt()   const
         {
             return historyFt_;
         }
@@ -534,9 +534,6 @@ namespace Foam
             volScalarField& body,
             vectorField surfNorm
         );
-
-        // should we detect contact with wall
-        bool shouldDetectWallContact();
 
         // update force and torque acting on the body
         void updateFAndT

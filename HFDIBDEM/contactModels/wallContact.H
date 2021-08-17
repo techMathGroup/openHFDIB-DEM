@@ -65,7 +65,27 @@ namespace contactModel
     void detectWallContact
     (
         const dynamicFvMesh&   mesh,
-        contactInfo& cInfo
+        contactInfo& cInfo,
+        contactVars* cVars,
+        vector geometricD
+    );
+
+    template <contactType cT>
+    void detectWallContact
+    (
+        const dynamicFvMesh&   mesh,
+        contactInfo& cInfo,
+        contactVars* cVars,
+        vector geometricD
+    );
+
+    template <>
+    void detectWallContact <sphere>
+    (
+        const dynamicFvMesh&   mesh,
+        contactInfo& cInfo,
+        contactVars* cVars,
+        vector geometricD
     );
 
     void solveWallContact

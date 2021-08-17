@@ -44,6 +44,7 @@ Contributors
 
 #include "geomModel.H"
 #include "contactVars.H"
+#include "wallContactVars.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -78,7 +79,7 @@ class contactInfo
     label timeStepsInContWStatic_;
 
     // faces in contact with walls
-    List<DynamicLabelList>  wallContactFaces_;
+    wallContactVars wallContactVar;
 
     // spring stiffness for normal contact force
     scalar  kN_;
@@ -170,18 +171,6 @@ class contactInfo
         timeStepsInContWStatic_ = setter;
     }
 
-    List<DynamicLabelList>& wallContactFaces()
-    {
-        return wallContactFaces_;
-    }
-
-    void distributeWallContactFaces()
-    {
-        // distribute wallContactfaces over processors
-        Pstream::gatherList(wallContactFaces_, 0);
-        Pstream::scatter(wallContactFaces_, 0);
-    }
-
     const scalar& getkN()   const
     {
         return kN_;
@@ -217,16 +206,40 @@ class contactInfo
         return adhEqui_;
     }
 
-    DynamicList<Tuple2<label,Tuple2<label,vector>>>& getHistoryhistoryFt()
+    DynamicList<Tuple2<label,Tuple2<label,vector>>>& getHistoryFt()
     {
         return historyFt_;
+    }
+
+    void clearHistoryFt()
+    {
+        DynamicList<Tuple2<label,Tuple2<label,vector>>> newHistory;
+
+        forAll (historyFt_,Fti)
+        {
+            if (historyFt_[Fti].second().first() == 1)
+            {
+                Tuple2<label,vector> help(-1,historyFt_[Fti].second().second());
+                Tuple2<label,Tuple2<label,vector>> help2(historyFt_[Fti].first(),help);
+                newHistory.append(help2);
+            }
+        }
+
+        historyFt_ = newHistory;
     }
 
     void clearContactInfo()
     {
         isInWallContact_ = false;
-        wallContactFaces_.clear();
-        wallContactFaces_.setSize(Pstream::nProcs());
+        wallContactVar.contactCenter_ = vector::zero;
+        wallContactVar.contactVolume_ = 0;
+        wallContactVar.contactNormal_ = vector::zero;
+        wallContactVar.contactArea_ = 0;
+    }
+
+    wallContactVars& getWallContactVar()
+    {
+        return wallContactVar;
     }
 };
 

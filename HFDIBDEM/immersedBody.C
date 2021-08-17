@@ -261,7 +261,7 @@ void immersedBody::constructRefineField
 
     List<DynamicLabelList> facesReceivedFromProcs;
     List<DynamicLabelList> cellsReceivedFromProcsLevel;
-    
+
     // send points that are not on this proc to other proc
     PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
     for (label proci = 0; proci < Pstream::nProcs(); proci++)
@@ -371,16 +371,6 @@ void immersedBody::constructRefineField
     {
         constructRefineField(body, refineF, newCellsToIterate, newCellsToIterateStartLevel);
     }
-}
-//---------------------------------------------------------------------------//
-bool immersedBody::shouldDetectWallContact()
-{
-    if((getM0()-getM()) < 0)
-    {
-        contactInfo_->setWallContact(false);
-        return false;
-    }
-    return true;
 }
 //---------------------------------------------------------------------------//
 // update immersed body info (pre-contact, ends with contact detection)
@@ -651,7 +641,7 @@ void immersedBody::calculateInterpolationPoints
         "deltaN",
         1e-8/pow(average(mesh_.V()), 1.0/3.0)
     );
-    
+
     // create temporary unit surface normals
     vectorField surfNorm(-fvc::grad(body));
     surfNorm /= (mag(surfNorm)+deltaN.value());
@@ -767,7 +757,7 @@ void immersedBody::calculateInterpolationPoints
                 procOfCells.append(Pstream::myProcNo());
             }
         }
-        
+
         // assign to global variables
         immersedBody::interpolationInfo intInfo;
         intInfo.surfCell_ = scell;
@@ -777,7 +767,7 @@ void immersedBody::calculateInterpolationPoints
         intInfo.intVec_.setSize(2);
         interpolationInfo_[Pstream::myProcNo()].append(intInfo);
     }
-    
+
     // send points that are not on this proc to other proc
     PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
     PstreamBuffers pBufs2(Pstream::commsTypes::nonBlocking);
@@ -1185,7 +1175,7 @@ void immersedBody::moveImmersedBody
 
         // translation increment
         vector transIncr = Vel_*deltaT - 0.5*a_*deltaT*deltaT;
-        
+
         // rotation matrix
         tensor rotMatrix(Foam::cos(angle)*tensor::I);
         rotMatrix += Foam::sin(angle)*tensor(

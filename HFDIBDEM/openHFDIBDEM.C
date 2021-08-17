@@ -266,7 +266,7 @@ void openHFDIBDEM::initialize
             boundLabelNeighbourList_[coord][IBboundList[coord][1]] = bodyIdInc;
         }
     }
-    
+
     sortBoundingListPrtContact();
 }
 //---------------------------------------------------------------------------//
@@ -290,8 +290,12 @@ void openHFDIBDEM::preUpdateBodies
 
             immersedBodies_[bodyId].preContactUpdateImmersedBody(body,f);
 
-            if(immersedBodies_[bodyId].shouldDetectWallContact())
-                detectWallContact(mesh_,immersedBodies_[bodyId].getContactInfo());
+            detectWallContact(
+                mesh_,
+                immersedBodies_[bodyId].getContactInfo(),
+                immersedBodies_[bodyId].getContactVars(),
+                geometricD_
+            );
 
             immersedBodies_[bodyId].printStats();
 
@@ -817,8 +821,13 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
             {
                 // detect wall contact and solve it
                 // update movement and move bodies
-                if(immersedBodies_[ibToResolve[ib]].shouldDetectWallContact())
-                    detectWallContact(mesh_,immersedBodies_[ibToResolve[ib]].getContactInfo());
+                detectWallContact(
+                    mesh_,
+                    immersedBodies_[ibToResolve[ib]].getContactInfo(),
+                    immersedBodies_[ibToResolve[ib]].getContactVars(),
+                    geometricD_
+                );
+
                 if (immersedBodies_[ibToResolve[ib]].checkWallContact())
                 {
                     Info << "-- Body " << immersedBodies_[ibToResolve[ib]].getBodyId() << " is in contact with wall" << endl;
@@ -955,8 +964,13 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
 
             // detect wall contact and solve it
             // update movement and move bodies
-            if(immersedBodies_[ibContactList_[0]].shouldDetectWallContact())
-                    detectWallContact(mesh_,immersedBodies_[ibContactList_[0]].getContactInfo());
+            detectWallContact(
+                mesh_,
+                immersedBodies_[ibContactList_[0]].getContactInfo(),
+                immersedBodies_[ibContactList_[0]].getContactVars(),
+                geometricD_
+            );
+
             if (immersedBodies_[ibContactList_[0]].checkWallContact())
             {
                 Info << "-- Body " << immersedBodies_[ibContactList_[0]].getBodyId() << " is in contact with wall" << endl;
@@ -1059,6 +1073,7 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
         if (immersedBodies_[bodyId].getIsActive())
         {
             immersedBodies_[bodyId].chceckBodyOp();
+            immersedBodies_[bodyId].getContactInfo().clearHistoryFt();
         }
     }
 }
@@ -1072,8 +1087,13 @@ void openHFDIBDEM::getContactListAndReturnPositions(volScalarField& body)
             if (findIndex(ibContactList_, bodyId) == -1)
             {
                 // detect wall contact and assign the body to contact list and return its position
-                if(immersedBodies_[bodyId].shouldDetectWallContact())
-                    detectWallContact(mesh_,immersedBodies_[bodyId].getContactInfo());
+                detectWallContact(
+                    mesh_,
+                    immersedBodies_[bodyId].getContactInfo(),
+                    immersedBodies_[bodyId].getContactVars(),
+                    geometricD_
+                );
+
                 if (immersedBodies_[bodyId].checkWallContact())
                 {
                     ibContactList_.append(immersedBodies_[bodyId].getBodyId());
