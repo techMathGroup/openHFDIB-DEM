@@ -489,7 +489,7 @@ scalar sphereContactArea
 
     scalar pi = Foam::constant::mathematical::pi;
     scalar dist = contPlane.distance(cCenter);
-    scalar contactRad = sqr(cRadius) - sqr(dist);
+    scalar contactRad = sqrt(sqr(cRadius) - sqr(dist));
 
     bool case3D = true;
     label emptyDim = 0;

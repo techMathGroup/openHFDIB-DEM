@@ -534,6 +534,14 @@ void immersedBody::updateMovementComp
 {
     auto updateTranslation = [&]()
     {
+        forAll(geometricD_,dir)
+        {
+            if(geometricD_[dir] == -1)
+            {
+                F_[dir] *= 0;
+            }
+        }
+
         // compute current acceleration (assume constant over timeStep)
         a_  = F_/(getM0()+SMALL);
         Info << "--// Body trans update F: " << F_ << endl;

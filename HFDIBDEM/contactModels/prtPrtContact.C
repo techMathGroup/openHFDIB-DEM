@@ -956,6 +956,10 @@ void solvePrtContact(
 
     // compute the normal force
     FN = (aKN*prtPrtCntVars.contactVolume_/(Lc+SMALL) + aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(prtPrtCntVars.contactArea_ * Vn))*nVec;
+    Info << "-// Vn: " << Vn << endl;
+    Info << "-// Fn: " << FN << endl;
+    Info << "-// Fn norm: " << aKN*prtPrtCntVars.contactVolume_/(Lc+SMALL) << endl;
+    Info << "-// Fn dump: " << (aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(Vn*prtPrtCntVars.contactArea_)) << endl;
     // compute adhesive force
     scalar FAc(aadhN*prtPrtCntVars.contactArea_);
     scalar FAeq(min(aKN*((cadhEqui*cM)/(cRhoS + SMALL))/(Lc+SMALL), aKN*((tadhEqui*tM)/(tRhoS + SMALL))/(Lc+SMALL)));
@@ -1013,10 +1017,15 @@ void solvePrtContact(
     vector Ftdi(- aGammat*sqrt(aKt*reduceM*Lc)*Vt);
     Ft = (FtLastr - aKt*Lc*Vt*deltaT + Ftdi);
 
+    Info << "-// Vt: " << Vt << endl;
+    Info << "-// AngVel: " << cVars->omega_ << endl;
+    Info << "-// Ft: " << Ft << endl;
+
     if (mag(Ft) > amu * mag(FN))
     {
         Ft *= amu * mag(FN) / mag(Ft);
     }
+    Info << "-// Ft small: " << Ft << endl;
 
     FN -= FA;
 
