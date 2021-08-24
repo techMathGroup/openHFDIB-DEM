@@ -4,7 +4,7 @@ if (mesh_.nGeometricD() < 3)
         Axis_ -= validDirs;
     }
     Axis_ /= mag(Axis_);
-    
+
     // read the body operation name from immersedDict_
     if (immersedDict_.found("staticBody"))
     {
@@ -14,47 +14,55 @@ if (mesh_.nGeometricD() < 3)
     else if (immersedDict_.found("prescribedTransBody"))
     {
         bodyOperation_ = 1;
-        
+
         Vel_   = immersedDict_.subDict("prescribedTransBody").lookup("velocity");
-        
+
         Info << bodyName_ << " is a freely rotating body with prescribed linear velocity." << endl;
     }
     else if (immersedDict_.found("prescribedRotBody"))
     {
         bodyOperation_ = 2;
-        
-        Axis_ = immersedDict_.subDict("prescribedRotBody").lookup("axis");       
+
+        Axis_ = immersedDict_.subDict("prescribedRotBody").lookup("axis");
         omega_  = readScalar(
                     immersedDict_.subDict("prescribedRotBody").lookup("omega")
                 );
-    
+
         Info << bodyName_ << " is a freely moving body with prescribed rotation." << endl;
     }
     else if (immersedDict_.found("prescribedTransRotBody"))
     {
         bodyOperation_ = 3;
-        
+
         Vel_   = immersedDict_.subDict("prescribedTransRotBody").lookup("velocity");
-        Axis_ = immersedDict_.subDict("prescribedTransRotBody").lookup("axis");       
+        Axis_ = immersedDict_.subDict("prescribedTransRotBody").lookup("axis");
         omega_  = readScalar(
                     immersedDict_.subDict("prescribedTransRotBody").lookup("omega")
                 );
-    
+
         Info << bodyName_ << " has prescribed both movement and rotation." << endl;
     }
     else if (immersedDict_.found("prescribedTransFixedAxisRotBody"))
     {
         bodyOperation_ = 4;
-        
+
         Vel_   = immersedDict_.subDict("prescribedTransFixedAxisRotBody").lookup("velocity");
         Axis_ = immersedDict_.subDict("prescribedTransFixedAxisRotBody").lookup("axis");
-        
+
         Info << bodyName_ << " has prescribed movement and axis of rotation." << endl;
     }
     else if (immersedDict_.found("fullyCoupledBody"))
     {
         bodyOperation_ = 5;
-        
+
+        if (immersedDict_.isDict("fullyCoupledBody"))
+        {
+            if(immersedDict_.subDict("fullyCoupledBody").found("velocity"))
+            {
+                Vel_ = immersedDict_.subDict("fullyCoupledBody").lookup("velocity");
+            }
+        }
+
         Info << bodyName_ << " is fully coupled with fluid phase." << endl;
     }
     else
@@ -62,7 +70,7 @@ if (mesh_.nGeometricD() < 3)
         Info << "No body operation was found for " << bodyName_ << endl
           << "Assuming static body.";
     }
-    
+
     // check if the immersedDict_ contains switch for updateTorque_
     if (immersedDict_.found("updateTorque"))
     {
@@ -73,7 +81,7 @@ if (mesh_.nGeometricD() < 3)
     {
         Info << "Did not find updateTorque, using updateTorque: " << updateTorque_ << endl;
     }
-    
+
     // do I want the IB to start as in sync with the flow?
     if (immersedDict_.found("startSynced"))
     {
@@ -91,7 +99,7 @@ if (mesh_.nGeometricD() < 3)
     {
         Info << "startSynced was not specified, using startSynced: " << startSynced_ << endl;
     }
-    
+
     // body auxiliary settings
     if (immersedDict_.found("sdBasedLambda"))
     {
@@ -117,12 +125,12 @@ if (mesh_.nGeometricD() < 3)
     {
         timesToSetStatic_ = readLabel(immersedDict_.lookup("timesToSetStatic"));
     }
-    
+
     // set up body geometry
     geomModel_->setIntSpan(intSpan_);
     geomModel_->setSdBasedLambda(sdBasedLambda_);
     geomModel_->setRhoS(immersedDict_.lookup("rho"));
-    
+
     // set up contact properties
     scalar kN(readScalar(immersedDict_.lookup("kN")));
     scalar kt(readScalar(immersedDict_.lookup("kt")));
@@ -139,7 +147,7 @@ if (mesh_.nGeometricD() < 3)
     {
         adhEqui = readScalar(immersedDict_.lookup("adhEqui"));
     }
-    
+
     contactInfo_.set(new contactInfo(
         geomModel_(),
         surfCells_,
@@ -158,12 +166,12 @@ if (mesh_.nGeometricD() < 3)
     intCells_.setSize(Pstream::nProcs());
     interpolationInfo_.setSize(Pstream::nProcs());
     interpolationVecReqs_.setSize(Pstream::nProcs());
-    
+
     // initialize bounding points
     boundBox bound(geomModel_->getBounds());
     minBoundPoint_ = bound.min();
-    maxBoundPoint_ = bound.max();    
-    
+    maxBoundPoint_ = bound.max();
+
     // initialize list of labels for bounding points based on bodyID
     // -> this list holds index of both bounding points for each dimension
     // -> thanks to this information the update of bounding points positions is more efficient
@@ -173,4 +181,4 @@ if (mesh_.nGeometricD() < 3)
         labeli[0] = 2 * bodyId_;
         labeli[1] = 2 * bodyId_ + 1;
         boundIndList_[coord] = labeli;
-    } 
+    }
