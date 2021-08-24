@@ -79,7 +79,7 @@ class contactInfo
     label timeStepsInContWStatic_;
 
     // faces in contact with walls
-    wallContactVars wallContactVar;
+    List<wallContactVars> wallContactsVars;
 
     // spring stiffness for normal contact force
     scalar  kN_;
@@ -231,15 +231,12 @@ class contactInfo
     void clearContactInfo()
     {
         isInWallContact_ = false;
-        wallContactVar.contactCenter_ = vector::zero;
-        wallContactVar.contactVolume_ = 0;
-        wallContactVar.contactNormal_ = vector::zero;
-        wallContactVar.contactArea_ = 0;
+        wallContactsVars.clear();
     }
 
-    wallContactVars& getWallContactVar()
+    List<wallContactVars>& getWallContactVar()
     {
-        return wallContactVar;
+        return wallContactsVars;
     }
 };
 

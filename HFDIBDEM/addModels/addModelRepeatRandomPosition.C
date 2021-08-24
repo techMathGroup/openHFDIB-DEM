@@ -532,7 +532,6 @@ scalar addModelRepeatRandomPosition::checkLambdaFraction(const volScalarField& b
 		lambdaIntegrate[Pstream::myProcNo()] += mesh_.V()[cell]*body[cell];
 		volumeIntegrate[Pstream::myProcNo()] += mesh_.V()[cell];
 	}
-
 	lambdaFraction = gSum(lambdaIntegrate)/gSum(volumeIntegrate);
 	Info << "-- addModelMessage-- " << "lambda fraction in controlled region: " << lambdaFraction<< endl;
 	return lambdaFraction;

@@ -90,11 +90,9 @@ namespace contactModel
 
     void solveWallContact
     (
-        const dynamicFvMesh&   mesh,
         wallInfo& wInfo,
         contactInfo& cInfo,
         contactVars* cVars,
-        vector geometricD,
         scalar deltaT,
         Tuple2<vector,vector>& outVars
     );
@@ -105,7 +103,9 @@ namespace contactModel
         const dynamicFvMesh&   mesh,
         contactInfo& cInfo,
         contactVars* cVars,
-        vector geometricD
+        vector geometricD,
+        vector nVec,
+        vector center
     );
 
     template <>
@@ -114,7 +114,9 @@ namespace contactModel
         const dynamicFvMesh&   mesh,
         contactInfo& cInfo,
         contactVars* cVars,
-        vector geometricD
+        vector geometricD,
+        vector nVec,
+        vector center
     );
 
     scalar sphereContactArea
@@ -122,7 +124,9 @@ namespace contactModel
         const dynamicFvMesh&   mesh,
         contactInfo& cInfo,
         contactVars* cVars,
-        vector geometricD
+        vector geometricD,
+        vector nVec,
+        vector center
     );
 }
 

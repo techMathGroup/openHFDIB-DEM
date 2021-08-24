@@ -491,25 +491,47 @@ vector addModelDistribution::returnRandomRotationAxis()
 //---------------------------------------------------------------------------//
 Tuple2<label, scalar> addModelDistribution::returnScaleFactor()
 {
-    DynamicScalarList  distributionDiff;
+    DynamicLabelList  missingParticles;
+    scalar maxSizeVolume = 1.0/6.0*3.14*pow(stlBaseSize_
+                           *particleSize_[particleSize_.size()-1]
+                           *convertToMeters_/stlBaseSize_,3);
     forAll (addedParticlesSize_,size)
     {
-        distributionDiff.append(distribution_[size] - 100*addedParticlesSize_[size]/(volumeOfAddedBodies_+SMALL));
-    }
-
-    label highestDiff(0);
-    forAll (distributionDiff,size)
-    {
-        if(distributionDiff[size] > distributionDiff[highestDiff])
+        scalar distribDiff = distribution_[size] - 100*addedParticlesSize_[size]/(volumeOfAddedBodies_+SMALL);
+        if(distribDiff > 0)
         {
-            highestDiff = size;
+            scalar meanFactor = particleSize_[size]*convertToMeters_/stlBaseSize_;
+            scalar meanVolume = 1.0/6.0*3.14*pow(stlBaseSize_ * meanFactor,3);
+            missingParticles.append(floor((distribDiff*maxSizeVolume)/meanVolume));
+        }
+        else
+        {
+            missingParticles.append(0);
         }
     }
 
-    scalar factor(particleSize_[highestDiff - 1] + (particleSize_[highestDiff] - particleSize_[highestDiff - 1]) * randGen_.scalar01());
+    label totalMissParts(0);
+    forAll (missingParticles,size)
+    {
+        totalMissParts += missingParticles[size];
+    }
+
+    label randomMissPart = floor(randGen_.scalar01()*totalMissParts);
+    label missingPart(0);
+    forAll (missingParticles,size)
+    {
+        missingPart = size;
+        randomMissPart -= missingParticles[size];
+        if(randomMissPart < 0)
+        {
+            break;
+        }
+    }
+
+    scalar factor(particleSize_[missingPart - 1] + (particleSize_[missingPart] - particleSize_[missingPart - 1]) * randGen_.scalar01());
     factor *= convertToMeters_/stlBaseSize_;
 
-    Tuple2<label, scalar> returnValue(highestDiff, factor);
+    Tuple2<label, scalar> returnValue(missingPart, factor);
 
     return returnValue;
 }

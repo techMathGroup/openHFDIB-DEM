@@ -544,7 +544,6 @@ void immersedBody::updateMovementComp
 
         // compute current acceleration (assume constant over timeStep)
         a_  = F_/(getM0()+SMALL);
-        Info << "--// Body trans update F: " << F_ << endl;
 
         // update body linear velocity
         Vel_ = (Vel + deltaT*a_) * velRelaxFac;

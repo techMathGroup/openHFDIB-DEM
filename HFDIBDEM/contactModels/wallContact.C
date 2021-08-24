@@ -176,17 +176,24 @@ void detectWallContact(
         normal /= centerPoints;
         normal /= mag(normal);
 
-        cInfo.getWallContactVar().contactArea_ = area;
-        cInfo.getWallContactVar().contactCenter_ = center;
-        cInfo.getWallContactVar().contactVolume_ = getInterVolume<cT>(mesh,cInfo,cVars,geometricD);
-        cInfo.getWallContactVar().contactNormal_ = normal;
+        wallContactVars wallContactVar;
+
+        wallContactVar.contactArea_ = area;
+        wallContactVar.contactCenter_ = center;
+        wallContactVar.contactVolume_ = getInterVolume<cT>(mesh,cInfo,cVars,geometricD,normal,center);
+        wallContactVar.contactNormal_ = normal;
+        cInfo.getWallContactVar().append(wallContactVar);
     }
     else
     {
-        cInfo.getWallContactVar().contactArea_ = 0;
-        cInfo.getWallContactVar().contactCenter_ = vector::zero;
-        cInfo.getWallContactVar().contactVolume_ = 0;
-        cInfo.getWallContactVar().contactNormal_ = vector::zero;
+        wallContactVars wallContactVar;
+
+        wallContactVar.contactArea_ = 0;
+        wallContactVar.contactCenter_ = vector::zero;
+        wallContactVar.contactVolume_ = 0;
+        wallContactVar.contactNormal_ = vector::zero;
+
+        cInfo.getWallContactVar().append(wallContactVar);
     }
 }
 //---------------------------------------------------------------------------//
@@ -198,100 +205,115 @@ void detectWallContact <sphere>(
     vector geometricD
 )
 {
-    bool inContact(false);
     cInfo.clearContactInfo();
 
     scalar cRadius(cInfo.getGeomModel().getDC() / 2);
     vector cCenter(cInfo.getGeomModel().getCoM());
 
-    DynamicVectorList center(Pstream::nProcs(),vector::zero);
-    DynamicVectorList normal(Pstream::nProcs(),vector::zero);
-
-    // go through all surfCells and check if there is any surfCell whose face is a boundary face
-    forAll (cInfo.getSurfCells()[Pstream::myProcNo()],sCellI)
+    while(true)
     {
-        label cCell(cInfo.getSurfCells()[Pstream::myProcNo()][sCellI]);
+        bool inContact(false);
+        DynamicVectorList center(Pstream::nProcs(),vector::zero);
+        DynamicVectorList normal(Pstream::nProcs(),vector::zero);
 
-        const labelList& cFaces = mesh.cells()[cCell];
-
-        forAll (cFaces,faceI)
+        // go through all surfCells and check if there is any surfCell whose face is a boundary face
+        forAll (cInfo.getSurfCells()[Pstream::myProcNo()],sCellI)
         {
-            if (!mesh.isInternalFace(cFaces[faceI]))
+            label cCell(cInfo.getSurfCells()[Pstream::myProcNo()][sCellI]);
+
+            const labelList& cFaces = mesh.cells()[cCell];
+
+            forAll (cFaces,faceI)
             {
-                // get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
-                label facePatchId = mesh.boundaryMesh().whichPatch(cFaces[faceI]);
-                const polyPatch& cPatch = mesh.boundaryMesh()[facePatchId];
-                if (cPatch.type()=="wall")
+                if (!mesh.isInternalFace(cFaces[faceI]))
                 {
-                    vector nVec(-mesh.Sf()[cFaces[faceI]]/mag(mesh.Sf()[cFaces[faceI]]));
-                    plane contPlane(mesh.Cf()[cFaces[faceI]], nVec);
-                    scalar dist = contPlane.distance(cCenter);
-                    scalar xH = cRadius - dist;
-                    if(xH > 0)
+                    // get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
+                    label facePatchId = mesh.boundaryMesh().whichPatch(cFaces[faceI]);
+                    const polyPatch& cPatch = mesh.boundaryMesh()[facePatchId];
+                    if (cPatch.type()=="wall")
                     {
-                        center[Pstream::myProcNo()] = contPlane.nearestPoint(cCenter);
-                        normal[Pstream::myProcNo()] = nVec;
-                        inContact = true;
-                        break;
+                        vector nVec(-mesh.Sf()[cFaces[faceI]]/mag(mesh.Sf()[cFaces[faceI]]));
+                        plane contPlane(mesh.Cf()[cFaces[faceI]], nVec);
+                        scalar dist = contPlane.distance(cCenter);
+                        scalar xH = cRadius - dist;
+                        if(xH > 0)
+                        {
+                            bool newVec(true);
+                            forAll(cInfo.getWallContactVar(),contVar)
+                            {
+                                if(cInfo.getWallContactVar()[contVar].contactNormal_ == nVec)
+                                {
+                                    newVec = false;
+                                    break;
+                                }
+                            }
+
+                            if(newVec)
+                            {
+                                center[Pstream::myProcNo()] = contPlane.nearestPoint(cCenter);
+                                normal[Pstream::myProcNo()] = nVec;
+                                inContact = true;
+                                break;
+                            }
+                        }
                     }
+                }
+
+                if(inContact)
+                {
+                    break;
+                }
+            }
+        }
+
+        reduce(inContact, orOp<bool>());
+
+        if(inContact)
+        {
+            cInfo.setWallContact(true);
+
+            Pstream::gatherList(center, 0);
+            Pstream::scatter(center, 0);
+
+            Pstream::gatherList(normal, 0);
+            Pstream::scatter(normal, 0);
+
+            Info << center << endl;
+            Info << normal << endl;
+
+            label contProc(0);
+
+            forAll(normal,ci)
+            {
+                if(normal[ci] != vector::zero)
+                {
+                    contProc = ci;
+                    break;
                 }
             }
 
-            if(inContact)
-            {
-                break;
-            }
+            wallContactVars wallContactVar;
+
+            wallContactVar.contactCenter_ = center[contProc];
+            wallContactVar.contactNormal_ = normal[contProc];
+            wallContactVar.contactArea_ = sphereContactArea(mesh,cInfo,cVars,geometricD,normal[contProc],center[contProc]);
+            wallContactVar.contactVolume_ = getInterVolume<sphere>(mesh,cInfo,cVars,geometricD,normal[contProc],center[contProc]);
+
+            cInfo.getWallContactVar().append(wallContactVar);
         }
-    }
-
-    reduce(inContact, orOp<bool>());
-
-    if(inContact)
-    {
-        cInfo.setWallContact(true);
-        Info << "Wall contact app" << endl;
-
-        Pstream::gatherList(center, 0);
-        Pstream::scatter(center, 0);
-
-        Pstream::gatherList(normal, 0);
-        Pstream::scatter(normal, 0);
-
-        Info << center << endl;
-        Info << normal << endl;
-
-        label contProc(0);
-
-        forAll(normal,ci)
+        else
         {
-            if(normal[ci] != vector::zero)
-            {
-                contProc = ci;
-                break;
-            }
+            Info << "Num of contacts: " << cInfo.getWallContactVar().size() << endl;
+            break;
         }
-
-        cInfo.getWallContactVar().contactCenter_ = center[contProc];
-        cInfo.getWallContactVar().contactNormal_ = normal[contProc];
-        cInfo.getWallContactVar().contactArea_ = sphereContactArea(mesh,cInfo,cVars,geometricD);
-        cInfo.getWallContactVar().contactVolume_ = getInterVolume<sphere>(mesh,cInfo,cVars,geometricD);
-    }
-    else
-    {
-        cInfo.getWallContactVar().contactCenter_ = vector::zero;
-        cInfo.getWallContactVar().contactNormal_ = vector::zero;
-        cInfo.getWallContactVar().contactArea_ = 0;
-        cInfo.getWallContactVar().contactVolume_ = 0;
     }
 }
 //---------------------------------------------------------------------------//
 void solveWallContact
 (
-    const dynamicFvMesh&   mesh,
     wallInfo& wInfo,
     contactInfo& cInfo,
     contactVars* cVars,
-    vector geometricD,
     scalar deltaT,
     Tuple2<vector,vector>& outVars
 )
@@ -305,84 +327,98 @@ void solveWallContact
     scalar aadhN((cInfo.getAdhN()*wInfo.getAdhN())/(cInfo.getAdhN()+wInfo.getAdhN()+SMALL));
     scalar aadhEqui(0.5*(cInfo.getAdhEqui()+wInfo.getAdhEqui()));
 
-    //label nContactFaces(cInfo.wallContactFaces()[Pstream::myProcNo()].size());
-    // create placeholders for forces
-    //vector FN(vector::zero);
-    scalar intersectedVolume = cInfo.getWallContactVar().contactVolume_;
-    scalar overallContactArea = cInfo.getWallContactVar().contactArea_;
-    vector nVec = cInfo.getWallContactVar().contactNormal_;
-    vector cLVec = cInfo.getWallContactVar().contactCenter_
-                   - cInfo.getGeomModel().getCoM();
-    Info << "-// Volume: " << intersectedVolume << endl;
-    Info << "-// Area: " << overallContactArea << endl;
-    Info << "-// nVec: " << nVec << endl;
-
-    if(intersectedVolume == 0)
-    {
-        return;
-    }
-
-    scalar Lc(4*mag(cLVec)*mag(cLVec)/(mag(cLVec)+mag(cLVec)));
-    scalar reduceM(cVars->M0_*cVars->M0_/(cVars->M0_+cVars->M0_));
-
-    vector planarVec       =  cLVec - cVars->Axis_*(cLVec & cVars->Axis_);
-    vector rotDir(planarVec^cVars->Axis_);
-
-    vector cVel(-rotDir*cVars->omega_ + cVars->Vel_);
-    vector wVel(vector::zero);
-    scalar VnF(-(cVel-wVel) & nVec);
-
-    vector FN = (aKN*intersectedVolume/(Lc+SMALL)
-        + aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))
-        *(VnF*overallContactArea))*nVec;
-
-    Info << "-// VnF: " << VnF << endl;
-    Info << "-// Fn: " << FN << endl;
-    Info << "-// Fn norm: " << aKN*intersectedVolume/(Lc+SMALL) << endl;
-    Info << "-// Fn dump: " << (aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(VnF*overallContactArea)) << endl;
-
-    // if the IB was in contact in previous DEM time step, find the information about tangential force and assigne it
-    vector FtLast(vector::zero);
+    vector FnormOut = vector::zero;
+    vector FtanOut = vector::zero;
+    vector cLVecOut = vector::zero;
     bool FtLastFinded(false);
-    forAll (cInfo.getHistoryFt(),Fti)
+
+    forAll(cInfo.getWallContactVar(),contVar)
     {
-        if (cInfo.getHistoryFt()[Fti].first() == -1)
+        Info << "-// Wall contact num: " << (contVar + 1) << endl;
+
+        scalar intersectedVolume = cInfo.getWallContactVar()[contVar].contactVolume_;
+        scalar overallContactArea = cInfo.getWallContactVar()[contVar].contactArea_;
+        vector nVec = cInfo.getWallContactVar()[contVar].contactNormal_;
+        vector cLVec = cInfo.getWallContactVar()[contVar].contactCenter_
+                       - cInfo.getGeomModel().getCoM();
+        Info << "-// Volume: " << intersectedVolume << endl;
+        Info << "-// Area: " << overallContactArea << endl;
+        Info << "-// nVec: " << nVec << endl;
+
+        if(intersectedVolume == 0)
         {
-            FtLastFinded = true;
-            FtLast = cInfo.getHistoryFt()[Fti].second().second();
-            break;
+            return;
         }
+
+        scalar Lc(4*mag(cLVec)*mag(cLVec)/(mag(cLVec)+mag(cLVec)));
+        scalar reduceM(cVars->M0_*cVars->M0_/(cVars->M0_+cVars->M0_));
+
+        vector planarVec       =  cLVec - cVars->Axis_*(cLVec & cVars->Axis_);
+        vector rotDir(planarVec^cVars->Axis_);
+
+        vector cVel(-rotDir*cVars->omega_ + cVars->Vel_);
+        vector wVel(vector::zero);
+        scalar VnF(-(cVel-wVel) & nVec);
+
+        vector FN = (aKN*intersectedVolume/(Lc+SMALL)
+            + aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))
+            *(VnF*overallContactArea))*nVec;
+
+        Info << "-// VnF: " << VnF << endl;
+        Info << "-// Fn: " << FN << endl;
+        Info << "-// Fn norm: " << aKN*intersectedVolume/(Lc+SMALL) << endl;
+        Info << "-// Fn dump: " << (aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(VnF*overallContactArea)) << endl;
+
+        // if the IB was in contact in previous DEM time step, find the information about tangential force and assigne it
+        vector FtLast(vector::zero);
+        forAll (cInfo.getHistoryFt(),Fti)
+        {
+            if (cInfo.getHistoryFt()[Fti].first() == -1)
+            {
+                FtLastFinded = true;
+                FtLast = cInfo.getHistoryFt()[Fti].second().second();
+                break;
+            }
+        }
+
+        // project last Ft to new tangential direction
+        vector FtLastP(FtLast - (FtLast & nVec) * nVec);
+        // scale the projected vector to remain the magnitude
+        vector FtLastr(mag(FtLast) * (FtLastP/(mag(FtLastP)+SMALL)));
+
+        vector cVeliNorm((cVel & nVec)*nVec);
+        vector Vt = cVel-cVeliNorm-wVel;
+        vector Ft = FtLastr - aKt*Lc*Vt*deltaT - aGammat*sqrt(aKt*reduceM*Lc)*Vt;
+
+        Info << "-// Vt: " << Vt << endl;
+        Info << "-// AngVel: " << cVars->omega_ << endl;
+        Info << "-// Ft: " << Ft << endl;
+
+        if (mag(Ft) > amu * mag(FN))
+        {
+            Ft *= amu * mag(FN) / mag(Ft);
+        }
+
+        Info << "-// Ft small: " << Ft << endl;
+
+        scalar FAc(aadhN*overallContactArea);
+        scalar FAeq(aKN*((aadhEqui*cVars->M0_)/(cVars->rhoS_.value() + SMALL))/(Lc+SMALL));
+        scalar partMul((cVars->M0_-cVars->M_)/(cVars->M0_+SMALL)/(aadhEqui+SMALL));
+        if(partMul > 1)
+        {
+            partMul = 1;
+        }
+        vector FA((FAeq * partMul  + FAc * (1-partMul)) * nVec);
+        FN -= FA;
+
+        FnormOut += FN;
+        FtanOut += Ft;
+        cLVecOut += cLVec;
     }
 
-    // project last Ft to new tangential direction
-    vector FtLastP(FtLast - (FtLast & nVec) * nVec);
-    // scale the projected vector to remain the magnitude
-    vector FtLastr(mag(FtLast) * (FtLastP/(mag(FtLastP)+SMALL)));
-
-    vector cVeliNorm((cVel & nVec)*nVec);
-    vector Vt = cVel-cVeliNorm-wVel;
-    vector Ft = FtLastr - aKt*Lc*Vt*deltaT - aGammat*sqrt(aKt*reduceM*Lc)*Vt;
-
-    Info << "-// Vt: " << Vt << endl;
-    Info << "-// AngVel: " << cVars->omega_ << endl;
-    Info << "-// Ft: " << Ft << endl;
-
-    if (mag(Ft) > amu * mag(FN))
-    {
-        Ft *= amu * mag(FN) / mag(Ft);
-    }
-
-    Info << "-// Ft small: " << Ft << endl;
-
-    scalar FAc(aadhN*overallContactArea);
-    scalar FAeq(aKN*((aadhEqui*cVars->M0_)/(cVars->rhoS_.value() + SMALL))/(Lc+SMALL));
-    scalar partMul((cVars->M0_-cVars->M_)/(cVars->M0_+SMALL)/(aadhEqui+SMALL));
-    if(partMul > 1)
-    {
-        partMul = 1;
-    }
-    vector FA((FAeq * partMul  + FAc * (1-partMul)) * nVec);
-    FN -= FA;
+    Info << "FnormOut: " << FnormOut << endl;
+    Info << "FtanOut: " << FtanOut << endl;
+    Info << "cLVecOut: " << cLVecOut << endl;
 
     // update or add the history of tangential force
     if (FtLastFinded)
@@ -391,7 +427,7 @@ void solveWallContact
         {
             if (cInfo.getHistoryFt()[Fti].first() == -1)
             {
-                Tuple2<label,vector> help(1,Ft);
+                Tuple2<label,vector> help(1,FtanOut);
                 cInfo.getHistoryFt()[Fti].second() = help;
                 break;
             }
@@ -399,14 +435,14 @@ void solveWallContact
     }
     else
     {
-        Tuple2<label,vector> help(1,Ft);
+        Tuple2<label,vector> help(1,FtanOut);
         Tuple2<label,Tuple2<label,vector>> help2(-1, help);
 
         cInfo.getHistoryFt().append(help2);
     }
 
-    outVars.first() = FN + Ft;
-    outVars.second() = cLVec ^ (FN + Ft);
+    outVars.first() = FnormOut + FtanOut;
+    outVars.second() = cLVecOut ^ (FnormOut + FtanOut);
 }
 //---------------------------------------------------------------------------//
 template <contactType cT>
@@ -415,7 +451,9 @@ getInterVolume(
     const dynamicFvMesh&   mesh,
     contactInfo& cInfo,
     contactVars* cVars,
-    vector geometricD
+    vector geometricD,
+    vector nVec,
+    vector center
 )
 {
     return (cVars->M0_-cVars->M_)/(cVars->rhoS_.value() + SMALL);
@@ -427,16 +465,16 @@ getInterVolume <sphere>(
     const dynamicFvMesh&   mesh,
     contactInfo& cInfo,
     contactVars* cVars,
-    vector geometricD
+    vector geometricD,
+    vector nVec,
+    vector center
 )
 {
     scalar cRadius(cInfo.getGeomModel().getDC() / 2);
     vector cCenter(cInfo.getGeomModel().getCoM());
 
     Info << "cRadius " << cRadius << " cCenter " << cCenter << endl;
-    vector nVec(cInfo.getWallContactVar().contactNormal_);
-    Info  << "nVec " << nVec << endl;
-    plane contPlane(cInfo.getWallContactVar().contactCenter_, nVec);
+    plane contPlane(center, nVec);
     scalar dist = contPlane.distance(cCenter);
     Info << "dist: " << dist << endl;
     scalar xH = cRadius - dist;
@@ -478,14 +516,15 @@ scalar sphereContactArea
     const dynamicFvMesh&   mesh,
     contactInfo& cInfo,
     contactVars* cVars,
-    vector geometricD
+    vector geometricD,
+    vector nVec,
+    vector center
 )
 {
     scalar cRadius(cInfo.getGeomModel().getDC() / 2);
     vector cCenter(cInfo.getGeomModel().getCoM());
 
-    vector nVec(cInfo.getWallContactVar().contactNormal_);
-    plane contPlane(cInfo.getWallContactVar().contactCenter_, nVec);
+    plane contPlane(center, nVec);
 
     scalar pi = Foam::constant::mathematical::pi;
     scalar dist = contPlane.distance(cCenter);
