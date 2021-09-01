@@ -241,7 +241,7 @@ void detectWallContact <sphere>(
                             bool newVec(true);
                             forAll(cInfo.getWallContactVar(),contVar)
                             {
-                                if(cInfo.getWallContactVar()[contVar].contactNormal_ == nVec)
+                                if(mag(cInfo.getWallContactVar()[contVar].contactNormal_- nVec) < 1e-4)
                                 {
                                     newVec = false;
                                     break;
