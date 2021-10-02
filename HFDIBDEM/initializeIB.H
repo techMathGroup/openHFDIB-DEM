@@ -150,8 +150,6 @@ if (mesh_.nGeometricD() < 3)
 
     contactInfo_.set(new contactInfo(
         geomModel_(),
-        surfCells_,
-        intCells_,
         kN,
         kt,
         gammaN,

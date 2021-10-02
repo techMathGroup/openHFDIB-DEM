@@ -98,6 +98,7 @@ bool nonConvexBody::canAddBody
             {
                 if(body[cellI] > SMALL)
                 {
+                    Info << "Body overlapping another body" << endl;
                     return false;
                 }
 
@@ -121,6 +122,7 @@ bool nonConvexBody::canAddBody
                                 {
                                     if (faceVertexesInside[verIn]==true)
                                     {
+                                        Info << "Body in contact with wall" << endl;
                                         return false;
                                     }
                                 }

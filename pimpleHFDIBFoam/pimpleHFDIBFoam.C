@@ -143,7 +143,9 @@ int main(int argc, char *argv[])
         {
             if (pimple.firstPimpleIter() || moveMeshOuterCorrectors)
             {
+                Pout << "Before mesh.update()" << endl;
                 mesh.update();
+                Pout << "After mesh.update()" << endl;
 
                 if (mesh.changing())
                 {

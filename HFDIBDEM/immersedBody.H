@@ -132,9 +132,6 @@ namespace Foam
         // operation to perform
         int     bodyOperation_;
 
-        // fraction of dC_to move by in one DEM loop
-        scalar  maxDistInDEMloop_;
-
         // index holder for particle contact list
         List<List<label>> boundIndList_;
 
@@ -217,6 +214,7 @@ namespace Foam
         vector  geometricD_;                                            //geometric directions
         bool    created_;
         label   timesToSetStatic_;
+        vector  staticContactPost_;
 
         // immersed body initialization
         void initializeIB();
@@ -361,29 +359,9 @@ namespace Foam
             return bodyId_;
         }
 
-        const scalar& getM0()    const
-        {
-            return geomModel_->getM0();
-        }
-
-        const scalar& getM()    const
-        {
-            return geomModel_->getM();
-        }
-
-        const dimensionedScalar& getRhoS()    const
-        {
-            return geomModel_->getRhoS();
-        }
-
         const vector& getVel()  const
         {
             return Vel_;
-        }
-
-        const vector& getCoM()  const
-        {
-            return geomModel_->getCoM();
         }
 
         const scalar& getOmega()    const
@@ -404,46 +382,6 @@ namespace Foam
         const vector& getT()    const
         {
             return T_;
-        }
-
-        const symmTensor& getI()    const
-        {
-            return geomModel_->getI();
-        }
-
-        const scalar& getKN()   const
-        {
-            return contactInfo_->getkN();
-        }
-
-        const scalar& getGammaN()   const
-        {
-            return contactInfo_->getgammaN();
-        }
-
-        const scalar& getKt()   const
-        {
-            return contactInfo_->getkt();
-        }
-
-        const scalar& getGammat()   const
-        {
-            return contactInfo_->getgammat();
-        }
-
-        const scalar& getmu()   const
-        {
-            return contactInfo_->getmu();
-        }
-
-        const scalar& getadhN()   const
-        {
-            return contactInfo_->getAdhN();
-        }
-
-        const scalar& getadhEqui()   const
-        {
-            return contactInfo_->getAdhEqui();
         }
 
         const scalar& getCoNum()   const
@@ -514,11 +452,6 @@ namespace Foam
         const point& getMaxBoundPoint() const
         {
             return maxBoundPoint_;
-        };
-
-        const label& getTimeStepsInContWStatic() const
-        {
-            return contactInfo_->getTimeStepsInContWStatic();
         };
 
         // move the body post-contact
@@ -600,8 +533,6 @@ namespace Foam
         {
             return isActive_;
         }
-
-        bool checkContactMovement(scalar deltaT);
 
         void assignFullHistory();
 
@@ -686,8 +617,8 @@ namespace Foam
                 Vel_,
                 omega_,
                 Axis_,
-                getM0(),
-                getM(),
+                geomModel_->getM0(),
+                geomModel_->getM(),
                 geomModel_->getRhoS()
             );
             return cVars;
@@ -701,7 +632,7 @@ namespace Foam
             dict.add("omega",omega_);
             dict.add("Axis",Axis_);
             dict.add("static",bodyOperation_ == 0);
-            dict.add("timeStepsInContWStatic", getTimeStepsInContWStatic());
+            dict.add("timeStepsInContWStatic", contactInfo_->getTimeStepsInContWStatic());
             geomModel_->writeBodyInfo(bodyId_,dict, path);
         }
 

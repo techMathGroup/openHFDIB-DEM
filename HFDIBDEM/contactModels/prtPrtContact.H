@@ -122,7 +122,7 @@ namespace contactModel
         prtPrtContactVars& prtPrtCntVars
     );
 
-    void solvePrtContact(
+    bool solvePrtContact(
         const dynamicFvMesh&   mesh,
         contactInfo& cInfo,
         contactVars* cVars,

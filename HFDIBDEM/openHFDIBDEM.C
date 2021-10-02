@@ -73,8 +73,7 @@ transportProperties_
     )
 ),
 bodyNames_(HFDIBDEMDict_.lookup("bodyNames")),
-minDEMloops_(readScalar(HFDIBDEMDict_.lookup("minDEMloops"))),
-minDEMtimeStep_(readScalar(HFDIBDEMDict_.lookup("minDEMtimeStep"))),
+stepDEM_(readScalar(HFDIBDEMDict_.lookup("stepDEM"))),
 recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 {
     scalar adhN(0.0);
@@ -287,6 +286,12 @@ void openHFDIBDEM::preUpdateBodies
             // create body or compute body-fluid coupling and estimate
             // potential contacts with walls
             immersedBodies_[bodyId].inContactWithStatic(false);
+            immersedBodies_[bodyId].getContactInfo().clearCellsList();
+            immersedBodies_[bodyId].getContactInfo().appendLists
+            (
+                immersedBodies_[bodyId].getSurfaceCellList(),
+                immersedBodies_[bodyId].getInternalCellList()
+            );
 
             immersedBodies_[bodyId].preContactUpdateImmersedBody(body,f);
 
@@ -361,12 +366,21 @@ void openHFDIBDEM::moveBodies
             if (findIndex(ibContactList_, bodyId) == -1)
             {
                 immersedBodies_[bodyId].syncCreateImmersedBody(body,refineF);
+                immersedBodies_[bodyId].getContactInfo().appendLists
+                (
+                    immersedBodies_[bodyId].getSurfaceCellList(),
+                    immersedBodies_[bodyId].getInternalCellList()
+                );
                 immersedBodies_[bodyId].checkIfInDomain(body);
                 immersedBodies_[bodyId].updateOldMovementVars();
                 immersedBodies_[bodyId].printStats();
             }
         }
     }
+
+    // Update neighbour list and detect possible prt-prt contact
+    updateNeighbourLists();
+    detectPrtContact();
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::recreateBodies
@@ -393,6 +407,12 @@ void openHFDIBDEM::recreateBodies
         if (immersedBodies_[bodyId].getIsActive())
         {
             immersedBodies_[bodyId].syncCreateImmersedBody(body,refineF);
+            immersedBodies_[bodyId].getContactInfo().clearCellsList();
+            immersedBodies_[bodyId].getContactInfo().appendLists
+            (
+                immersedBodies_[bodyId].getSurfaceCellList(),
+                immersedBodies_[bodyId].getInternalCellList()
+            );
             immersedBodies_[bodyId].checkIfInDomain(body);
             if(immersedBodies_[bodyId].getrecomputeM0() > 0)
             {
@@ -696,14 +716,10 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
     // first detect prt contact to be sure that all Contact during CFD step will be solved during DEM inner loops
     detectPrtContact();
     // get new contacts with wall and return their position
-    getContactListAndReturnPositions(body);
+    getWallContactList();
     scalar deltaTime(mesh_.time().deltaT().value());
-    scalar maxDemStep(1.0/minDEMloops_);
     scalar pos(0.0);
-    scalar step(maxDemStep);
-    scalar historyPos(0.0);
-    bool doubleMinStep(false);
-    bool doubleMinStep2(false);
+    scalar step(stepDEM_);
 
     DynamicLabelList ibPrtContactList;
 
@@ -712,12 +728,10 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
         if (findIndex(ibPrtContactList, prtContactIBList_[pair].first()) == -1)
         {
             ibPrtContactList.append(immersedBodies_[prtContactIBList_[pair].first()].getBodyId());
-            immersedBodies_[prtContactIBList_[pair].first()].returnPosition();
         }
         if (findIndex(ibPrtContactList, prtContactIBList_[pair].second()) == -1)
         {
             ibPrtContactList.append(immersedBodies_[prtContactIBList_[pair].second()].getBodyId());
-            immersedBodies_[prtContactIBList_[pair].second()].returnPosition();
         }
 
         if(immersedBodies_[prtContactIBList_[pair].first()].getbodyOperation() == 0)
@@ -748,310 +762,302 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
         }
     }
 
-    // resolve prt-prt contacts
-    while(prtContactIBList_.size() > 0)
+    DynamicLabelList ibToCreate;
+
+    while(prtContactIBList_.size() > 0 || ibContactList_.size() > 0)
     {
-        pos = 0.0;
-        step = maxDemStep;
-        historyPos = 0.0;
-        doubleMinStep = false;
-        doubleMinStep2 = false;
-
-        DynamicList<Tuple2<label, label>> pairsToResolve;
-        // we have to resolve whole contact chain not only two prts in contact
-        findIndexesOfPairWithSomeIb(prtContactIBList_,prtContactIBList_[0], pairsToResolve);
-
-        DynamicLabelList ibToResolve;
-        forAll (pairsToResolve,pair)
+        // resolve prt-prt contacts
+        while(prtContactIBList_.size() > 0)
         {
-            if (findIndex(ibToResolve, pairsToResolve[pair].first()) == -1)
+            pos = 0.0;
+            step = stepDEM_;
+
+            DynamicList<Tuple2<label, label>> pairsToResolve;
+            // we have to resolve whole contact chain not only two prts in contact
+            findIndexesOfPairWithSomeIb(prtContactIBList_,prtContactIBList_[0], pairsToResolve);
+
+            DynamicLabelList ibToResolve;
+            forAll (pairsToResolve,pair)
             {
-                ibToResolve.append(immersedBodies_[pairsToResolve[pair].first()].getBodyId());
+                if (findIndex(ibToResolve, pairsToResolve[pair].first()) == -1)
+                {
+                    ibToResolve.append(immersedBodies_[pairsToResolve[pair].first()].getBodyId());
+                }
+                if (findIndex(ibToResolve, pairsToResolve[pair].second()) == -1)
+                {
+                    ibToResolve.append(immersedBodies_[pairsToResolve[pair].second()].getBodyId());
+                }
             }
-            if (findIndex(ibToResolve, pairsToResolve[pair].second()) == -1)
-            {
-                ibToResolve.append(immersedBodies_[pairsToResolve[pair].second()].getBodyId());
-            }
-        }
 
-        // return IBs to the start position
-        forAll (ibToResolve, ib)
-        {
-            immersedBodies_[ibToResolve[ib]].initializeVarHistory(true);
-            immersedBodies_[ibToResolve[ib]].resetBody(body, false);
-            immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF);
-        }
-
-        // compute motion over time. particles position is reversed when bad motion occurs
-        while(true)
-        {
-            Info << " Start DEM pos: " << pos << " DEM step: " << step << endl;
             forAll (ibToResolve, ib)
             {
+                immersedBodies_[ibToResolve[ib]].returnPosition();
+                ibToCreate.append(ibToResolve[ib]);
+                immersedBodies_[ibToResolve[ib]].initializeVarHistory(true);
+                //immersedBodies_[ibToResolve[ib]].resetBody(body, false);
+                //immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF);
+            }
+
+            // compute motion over time
+            while(true)
+            {
+                Info << " Start DEM pos: " << pos << " DEM step: " << step << endl;
+                forAll (ibToResolve, ib)
+                {
+                    // set F_ and T_ to zero. Do not assign history values
+                    immersedBodies_[ibToResolve[ib]].initializeVarHistory(false);
+                    // add fluid coupling force to F and T. This is still same for whole DEM inner loop
+                    immersedBodies_[ibToResolve[ib]].updateFAndT(immersedBodies_[ibToResolve[ib]].getHistoryCouplingF(), immersedBodies_[ibToResolve[ib]].getHistoryCouplingT());
+                }
+                // find prt-prt contact info
+                forAll (pairsToResolve, pair)
+                {
+                    label cInd(pairsToResolve[pair].first());
+                    label tInd(pairsToResolve[pair].second());
+
+                    Tuple2<Tuple2<vector,vector>,Tuple2<vector,vector>> outVars;
+                    if(solvePrtContact(
+                        mesh_,
+                        immersedBodies_[cInd].getContactInfo(),
+                        immersedBodies_[cInd].getContactVars(),
+                        immersedBodies_[tInd].getContactInfo(),
+                        immersedBodies_[tInd].getContactVars(),
+                        geometricD_,
+                        deltaTime*step,
+                        outVars
+                    ))
+                    {
+                        immersedBodies_[cInd].updateFAndT(outVars.first().first(),outVars.first().second());
+                        immersedBodies_[tInd].updateFAndT(outVars.second().first(),outVars.second().second());
+                    }
+                }
+
+                forAll (ibToResolve,ib)
+                {
+                    // detect wall contact and solve it
+                    // update movement and move bodies
+                    detectWallContact(
+                        mesh_,
+                        immersedBodies_[ibToResolve[ib]].getContactInfo(),
+                        immersedBodies_[ibToResolve[ib]].getContactVars(),
+                        geometricD_
+                    );
+
+                    if (immersedBodies_[ibToResolve[ib]].checkWallContact())
+                    {
+                        Info << "-- Body " << immersedBodies_[ibToResolve[ib]].getBodyId() << " is in contact with wall" << endl;
+                        Tuple2<vector,vector> outVars;
+
+                        solveWallContact(
+                            wallInfo_(),
+                            immersedBodies_[ibToResolve[ib]].getContactInfo(),
+                            immersedBodies_[ibToResolve[ib]].getContactVars(),
+                            deltaTime*step,
+                            outVars
+                            );
+                        immersedBodies_[ibToResolve[ib]].updateFAndT(outVars.first(),outVars.second());
+                    }
+                }
+
+                forAll (ibToResolve,ib)
+                {
+                    immersedBodies_[ibToResolve[ib]].updateMovement(deltaTime*step);
+                    immersedBodies_[ibToResolve[ib]].moveImmersedBody(deltaTime*step);
+                }
+
+                if (pos + step > 1)
+                    step = 1 - pos;
+
+                pos += step;
+                // if moved to end time remove from list or terminate loop
+                if (pos >= 1)
+                {
+                    updateNeighbourLists();
+                    DynamicList<Tuple2<label, label>> newPairsToResolve;
+                    detectPrtContact(newPairsToResolve, ibToResolve, pairsToResolve);
+
+                    if(newPairsToResolve.size() == 0)
+                    {
+                        forAll (pairsToResolve, pair)
+                        {
+                            label indexOfPair(-1);
+                            indexOfPair = findIndOfPairInNeighbourList(prtContactIBList_, pairsToResolve[pair]);
+                            // remove at index
+                            DynamicList<Tuple2<label, label>> helpList;
+
+                            for (label i = 0; i < indexOfPair; i = i + 1)
+                            {
+                                helpList.append(prtContactIBList_[i]);
+                            }
+
+                            for (label i = indexOfPair + 1; i < prtContactIBList_.size(); i = i + 1)
+                            {
+                                helpList.append(prtContactIBList_[i]);
+                            }
+                            prtContactIBList_ = helpList;
+                        }
+                    }
+                    else
+                    {
+                        DynamicLabelList newIbPrtContactList;
+
+                        forAll(newPairsToResolve,newPair)
+                        {
+                            if (findIndOfPairInNeighbourList(prtContactIBList_, newPairsToResolve[newPair]) == -1)
+                            {
+                                prtContactIBList_.append(newPairsToResolve[newPair]);
+
+                                if (findIndex(newIbPrtContactList, newPairsToResolve[newPair].first()) == -1)
+                                {
+                                    newIbPrtContactList.append(immersedBodies_[newPairsToResolve[newPair].first()].getBodyId());
+                                }
+                                if (findIndex(newIbPrtContactList, newPairsToResolve[newPair].second()) == -1)
+                                {
+                                    newIbPrtContactList.append(immersedBodies_[newPairsToResolve[newPair].second()].getBodyId());
+                                }
+                            }
+                        }
+
+                        forAll (newIbPrtContactList,ib)
+                        {
+                            label ibIndex(-1);
+                            ibIndex = findIndex(ibContactList_, newIbPrtContactList[ib]);
+                            if (ibIndex > -1)
+                            {
+                                DynamicLabelList helpList;
+
+                                for (label i = 0; i < ibIndex; i = i + 1)
+                                {
+                                    helpList.append(ibContactList_[i]);
+                                }
+
+                                for (label i = ibIndex + 1; i < ibContactList_.size(); i = i + 1)
+                                {
+                                    helpList.append(ibContactList_[i]);
+                                }
+                                ibContactList_ = helpList;
+                            }
+                        }
+                    }
+
+                    break;
+                }
+            }
+        }
+        // resolve wall contacts
+        while(ibContactList_.size() > 0 && prtContactIBList_.size() == 0)
+        {
+            pos = 0.0;
+            step = stepDEM_;
+
+            immersedBodies_[ibContactList_[0]].initializeVarHistory(true);
+            immersedBodies_[ibContactList_[0]].returnPosition();
+            //immersedBodies_[ibContactList_[0]].resetBody(body, false);
+            //immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF);
+            while(true)
+            {
+                Info << " Start wall DEM pos: " << pos << " DEM step: " << step << endl;
                 // set F_ and T_ to zero. Do not assign history values
-                immersedBodies_[ibToResolve[ib]].initializeVarHistory(false);
+                immersedBodies_[ibContactList_[0]].initializeVarHistory(false);
                 // add fluid coupling force to F and T. This is still same for whole DEM inner loop
-                immersedBodies_[ibToResolve[ib]].updateFAndT(immersedBodies_[ibToResolve[ib]].getHistoryCouplingF(), immersedBodies_[ibToResolve[ib]].getHistoryCouplingT());
-            }
-            // find prt-prt contact info
-            forAll (pairsToResolve, pair)
-            {
-                label cInd(pairsToResolve[pair].first());
-                label tInd(pairsToResolve[pair].second());
+                immersedBodies_[ibContactList_[0]].updateFAndT(immersedBodies_[ibContactList_[0]].getHistoryCouplingF(), immersedBodies_[ibContactList_[0]].getHistoryCouplingT());
 
-                Tuple2<Tuple2<vector,vector>,Tuple2<vector,vector>> outVars;
-
-                solvePrtContact(
-                    mesh_,
-                    immersedBodies_[cInd].getContactInfo(),
-                    immersedBodies_[cInd].getContactVars(),
-                    immersedBodies_[tInd].getContactInfo(),
-                    immersedBodies_[tInd].getContactVars(),
-                    geometricD_,
-                    deltaTime*step,
-                    outVars
-                );
-
-                immersedBodies_[cInd].updateFAndT(outVars.first().first(),outVars.first().second());
-                immersedBodies_[tInd].updateFAndT(outVars.second().first(),outVars.second().second());
-            }
-
-            DynamicList<bool> contactOk;
-            forAll (ibToResolve,ib)
-            {
                 // detect wall contact and solve it
                 // update movement and move bodies
                 detectWallContact(
                     mesh_,
-                    immersedBodies_[ibToResolve[ib]].getContactInfo(),
-                    immersedBodies_[ibToResolve[ib]].getContactVars(),
+                    immersedBodies_[ibContactList_[0]].getContactInfo(),
+                    immersedBodies_[ibContactList_[0]].getContactVars(),
                     geometricD_
                 );
 
-                if (immersedBodies_[ibToResolve[ib]].checkWallContact())
+                if (immersedBodies_[ibContactList_[0]].checkWallContact())
                 {
-                    Info << "-- Body " << immersedBodies_[ibToResolve[ib]].getBodyId() << " is in contact with wall" << endl;
+                    Info << "-- Body " << immersedBodies_[ibContactList_[0]].getBodyId() << " is in contact with wall" << endl;
                     Tuple2<vector,vector> outVars;
                     solveWallContact(
                         wallInfo_(),
-                        immersedBodies_[ibToResolve[ib]].getContactInfo(),
-                        immersedBodies_[ibToResolve[ib]].getContactVars(),
+                        immersedBodies_[ibContactList_[0]].getContactInfo(),
+                        immersedBodies_[ibContactList_[0]].getContactVars(),
                         deltaTime*step,
                         outVars
                         );
-                    immersedBodies_[ibToResolve[ib]].updateFAndT(outVars.first(),outVars.second());
+                    immersedBodies_[ibContactList_[0]].updateFAndT(outVars.first(),outVars.second());
                 }
 
-                contactOk.append(immersedBodies_[ibToResolve[ib]].checkContactMovement(deltaTime*step));
-            }
-            // if there is any bad motion reverse all currently moving particles
-            bool contactIsOk(true);
-            forAll (contactOk,isOK)
-            {
-                if (!contactOk[isOK])
+                immersedBodies_[ibContactList_[0]].updateMovement(deltaTime*step);
+                immersedBodies_[ibContactList_[0]].moveImmersedBody(deltaTime*step);
+
+                if (pos + step > 1)
+                    step = 1 - pos;
+
+                pos += step;
+
+                if (pos >= 1)
                 {
-                    contactIsOk = false;
+                    updateNeighbourLists();
+                    DynamicList<Tuple2<label, label>> newPairsToResolve;
+                    DynamicList<Tuple2<label, label>> nothingToExclude;
+                    DynamicLabelList ibToInclude(1,immersedBodies_[ibContactList_[0]].getBodyId());
+                    detectPrtContact(newPairsToResolve, ibToInclude, nothingToExclude);
+
+                    if(newPairsToResolve.size() == 0)
+                    {
+                        //remove at idex
+                        DynamicLabelList helpList;
+
+                        for (label i = 1; i < ibContactList_.size(); i = i + 1)
+                        {
+                            helpList.append(ibContactList_[i]);
+                        }
+                        ibToCreate.append(ibContactList_[0]);
+                        ibContactList_ = helpList;
+                    }
+                    else
+                    {
+                        DynamicLabelList newIbPrtContactList;
+
+                        forAll(newPairsToResolve,newPair)
+                        {
+                            if (findIndOfPairInNeighbourList(prtContactIBList_, newPairsToResolve[newPair]) == -1)
+                            {
+                                prtContactIBList_.append(newPairsToResolve[newPair]);
+
+                                if (findIndex(newIbPrtContactList, newPairsToResolve[newPair].first()) == -1)
+                                {
+                                    newIbPrtContactList.append(immersedBodies_[newPairsToResolve[newPair].first()].getBodyId());
+                                }
+                                if (findIndex(newIbPrtContactList, newPairsToResolve[newPair].second()) == -1)
+                                {
+                                    newIbPrtContactList.append(immersedBodies_[newPairsToResolve[newPair].second()].getBodyId());
+                                }
+                            }
+                        }
+
+                        forAll (newIbPrtContactList,ib)
+                        {
+                            label ibIndex(-1);
+                            ibIndex = findIndex(ibContactList_, newIbPrtContactList[ib]);
+                            if (ibIndex > -1)
+                            {
+                                DynamicLabelList helpList;
+
+                                for (label i = 0; i < ibIndex; i = i + 1)
+                                {
+                                    helpList.append(ibContactList_[i]);
+                                }
+
+                                for (label i = ibIndex + 1; i < ibContactList_.size(); i = i + 1)
+                                {
+                                    helpList.append(ibContactList_[i]);
+                                }
+                                ibContactList_ = helpList;
+                            }
+                        }
+                    }
+
                     break;
                 }
-            }
-
-            reduce(contactIsOk, orOp<bool>());
-
-            // move or reverse particles
-            forAll (ibToResolve,ib)
-            {
-                if (contactIsOk || step == minDEMtimeStep_)
-                {
-                    immersedBodies_[ibToResolve[ib]].assignFullHistory();
-                    immersedBodies_[ibToResolve[ib]].updateMovement(deltaTime*step);
-                    immersedBodies_[ibToResolve[ib]].resetBody(body);
-                    immersedBodies_[ibToResolve[ib]].moveImmersedBody(deltaTime*step);
-                    immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF);
-                }
-                else
-                {
-                    immersedBodies_[ibToResolve[ib]].initializeVarHistory(true);
-                    immersedBodies_[ibToResolve[ib]].returnPosition();//return to history position
-                    immersedBodies_[ibToResolve[ib]].resetBody(body, false);
-                    immersedBodies_[ibToResolve[ib]].createImmersedBody(body, refineF);
-                }
-            }
-            // change dem step. If Step is already minimal wait to avoid infinite loop
-            if (doubleMinStep)
-            {
-                if (doubleMinStep2)
-                {
-                    doubleMinStep2 = false;
-                    doubleMinStep = false;
-                }
-                else
-                    doubleMinStep2 = true;
-                historyPos = pos;
-                pos += step;
-            }
-            else if (contactIsOk)
-            {
-                historyPos = pos;
-                pos += step;
-                step *= 1.2;
-                if (step > maxDemStep)
-                    step = maxDemStep;
-            }
-            else if (!contactIsOk && step == minDEMtimeStep_)
-            {
-                historyPos = pos;
-                pos += step;
-            }
-            else
-            {
-                pos = historyPos;
-                step /= 2;
-                if (step < minDEMtimeStep_)
-                {
-                    step = minDEMtimeStep_;
-                    doubleMinStep = true;
-                }
-            }
-
-            if (pos + step > 1)
-                step = 1 - pos;
-            // if moved to end time remove from list or terminate loop
-            if (pos >= 1)
-            {
-                forAll (pairsToResolve, pair)
-                {
-                    label indexOfPair(-1);
-                    indexOfPair = findIndOfPairInNeighbourList(prtContactIBList_, pairsToResolve[pair]);
-                    // remove at index
-                    DynamicList<Tuple2<label, label>> helpList;
-
-                    for (label i = 0; i < indexOfPair; i = i + 1)
-                    {
-                        helpList.append(prtContactIBList_[i]);
-                    }
-
-                    for (label i = indexOfPair + 1; i < prtContactIBList_.size(); i = i + 1)
-                    {
-                        helpList.append(prtContactIBList_[i]);
-                    }
-                    prtContactIBList_ = helpList;
-                }
-
-                break;
-            }
-        }
-    }
-    // resolve wall contacts
-    while(ibContactList_.size() > 0)
-    {
-        pos = 0.0;
-        step = maxDemStep;
-        historyPos = 0.0;
-        doubleMinStep = false;
-        doubleMinStep2 = false;
-        immersedBodies_[ibContactList_[0]].initializeVarHistory(true);
-        immersedBodies_[ibContactList_[0]].resetBody(body, false);
-        immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF);
-        while(true)
-        {
-            Info << " Start wall DEM pos: " << pos << " DEM step: " << step << endl;
-            // set F_ and T_ to zero. Do not assign history values
-            immersedBodies_[ibContactList_[0]].initializeVarHistory(false);
-            // add fluid coupling force to F and T. This is still same for whole DEM inner loop
-            immersedBodies_[ibContactList_[0]].updateFAndT(immersedBodies_[ibContactList_[0]].getHistoryCouplingF(), immersedBodies_[ibContactList_[0]].getHistoryCouplingT());
-
-            // detect wall contact and solve it
-            // update movement and move bodies
-            detectWallContact(
-                mesh_,
-                immersedBodies_[ibContactList_[0]].getContactInfo(),
-                immersedBodies_[ibContactList_[0]].getContactVars(),
-                geometricD_
-            );
-
-            if (immersedBodies_[ibContactList_[0]].checkWallContact())
-            {
-                Info << "-- Body " << immersedBodies_[ibContactList_[0]].getBodyId() << " is in contact with wall" << endl;
-                Tuple2<vector,vector> outVars;
-                solveWallContact(
-                    wallInfo_(),
-                    immersedBodies_[ibContactList_[0]].getContactInfo(),
-                    immersedBodies_[ibContactList_[0]].getContactVars(),
-                    deltaTime*step,
-                    outVars
-                    );
-                immersedBodies_[ibContactList_[0]].updateFAndT(outVars.first(),outVars.second());
-            }
-
-            bool contactIsOk(immersedBodies_[ibContactList_[0]].checkContactMovement(deltaTime*step));
-
-            reduce(contactIsOk, orOp<bool>());
-
-            if (contactIsOk || step == minDEMtimeStep_)
-            {
-                immersedBodies_[ibContactList_[0]].assignFullHistory();
-                immersedBodies_[ibContactList_[0]].updateMovement(deltaTime*step);
-                immersedBodies_[ibContactList_[0]].resetBody(body);
-                immersedBodies_[ibContactList_[0]].moveImmersedBody(deltaTime*step);
-                immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF);
-            }
-            else
-            {
-                immersedBodies_[ibContactList_[0]].initializeVarHistory(true);
-                immersedBodies_[ibContactList_[0]].returnPosition();
-                immersedBodies_[ibContactList_[0]].resetBody(body, false);
-                immersedBodies_[ibContactList_[0]].createImmersedBody(body, refineF);
-            }
-
-            if (doubleMinStep)
-            {
-                if (doubleMinStep2)
-                {
-                    doubleMinStep2 = false;
-                    doubleMinStep = false;
-                }
-                else
-                    doubleMinStep2 = true;
-                historyPos = pos;
-                pos += step;
-            }
-            else if (contactIsOk)
-            {
-                historyPos = pos;
-                pos += step;
-                step *= 1.2;
-                if (step > maxDemStep)
-                    step = maxDemStep;
-            }
-            else if (!contactIsOk && step == minDEMtimeStep_)
-            {
-                historyPos = pos;
-                pos += step;
-            }
-            else
-            {
-                pos = historyPos;
-                step /= 2;
-                if (step < minDEMtimeStep_)
-                {
-                    step = minDEMtimeStep_;
-                    doubleMinStep = true;
-                }
-            }
-            if (pos + step > 1)
-                step = 1 - pos;
-
-            if (pos >= 1)
-            {
-                //remove at idex
-                DynamicLabelList helpList;
-
-                for (label i = 1; i < ibContactList_.size(); i = i + 1)
-                {
-                    helpList.append(ibContactList_[i]);
-                }
-                ibContactList_ = helpList;
-                break;
             }
         }
     }
@@ -1064,6 +1070,12 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
     surfNorm_ = -fvc::grad(body);
     surfNorm_ /= (mag(surfNorm_)+deltaN.value());
 
+    forAll(ibToCreate,ib)
+    {
+        immersedBodies_[ibToCreate[ib]].resetBody(body, false);
+        immersedBodies_[ibToCreate[ib]].createImmersedBody(body, refineF);
+    }
+
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
@@ -1074,7 +1086,7 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
     }
 }
 //---------------------------------------------------------------------------//
-void openHFDIBDEM::getContactListAndReturnPositions(volScalarField& body)
+void openHFDIBDEM::getWallContactList()
 {
     forAll (immersedBodies_,bodyId)
     {
@@ -1093,7 +1105,6 @@ void openHFDIBDEM::getContactListAndReturnPositions(volScalarField& body)
                 if (immersedBodies_[bodyId].checkWallContact())
                 {
                     ibContactList_.append(immersedBodies_[bodyId].getBodyId());
-                    immersedBodies_[bodyId].returnPosition();
                 }
             }
         }
@@ -1419,6 +1430,48 @@ void openHFDIBDEM::detectPrtContact()
     }
 }
 //---------------------------------------------------------------------------//
+void openHFDIBDEM::detectPrtContact(DynamicList<Tuple2<label, label>>& contactList, DynamicLabelList& ibIncluded, DynamicList<Tuple2<label, label>>& pairsToExclude)
+{
+    // check only pairs whose bounding boxes are intersected for the contact
+    forAll (possibleContactNeighbourList_,possiblePair)
+    {
+        // check only if the pair is not alredy in contactList
+        if (findIndOfPairInNeighbourList(contactList, possibleContactNeighbourList_[possiblePair]) == -1)
+        {
+            if (findIndOfPairInNeighbourList(pairsToExclude, possibleContactNeighbourList_[possiblePair]) == -1)
+            {
+                label cInd(possibleContactNeighbourList_[possiblePair].first());
+                contactInfo& cInfo(immersedBodies_[cInd].getContactInfo());
+
+                label tInd(possibleContactNeighbourList_[possiblePair].second());
+                contactInfo& tInfo(immersedBodies_[tInd].getContactInfo());
+
+                bool cont = true;
+                forAll(ibIncluded, ibI)
+                {
+                    if(cInd == ibIncluded[ibI] || tInd == ibIncluded[ibI])
+                    {
+                        cont = false;
+                    }
+                }
+
+                if(cont)
+                {
+                    continue;
+                }
+
+                if(detectPrtPrtContact(
+                    mesh_,
+                    cInfo,
+                    tInfo
+                ))
+                {
+                    contactList.append(possibleContactNeighbourList_[possiblePair]);
+                }
+            }
+        }
+    }
+}
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::updateFSCoupling
 (

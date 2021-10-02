@@ -71,8 +71,8 @@ class contactInfo
     // is the particle in contact with wall
     bool    isInWallContact_;
 
-    List<DynamicLabelList>& surfCells_;
-    List<DynamicLabelList>& intCells_;
+    List<DynamicLabelList> surfCells_;
+    List<DynamicLabelList> intCells_;
 
     bool inContactWithStatic_;
 
@@ -112,8 +112,6 @@ class contactInfo
     contactInfo
     (
         geomModel& geomModel,
-        List<DynamicLabelList>& surfCells,
-        List<DynamicLabelList>& intCells,
         scalar kN,
         scalar kt,
         scalar gammaN,
@@ -238,6 +236,16 @@ class contactInfo
     {
         return wallContactsVars;
     }
+
+    void clearCellsList()
+    {
+        surfCells_[Pstream::myProcNo()].clear();
+        intCells_[Pstream::myProcNo()].clear();
+    }
+
+    bool cellNotInLists(label cell);
+
+    void appendLists(List<DynamicLabelList> surfCells, List<DynamicLabelList> intCells);
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

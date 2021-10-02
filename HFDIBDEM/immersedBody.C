@@ -89,7 +89,6 @@ rhoF_(transportProperties_.lookup("rho")),
 bodyId_(bodyId),
 updateTorque_(false),
 bodyOperation_(0),
-maxDistInDEMloop_(readScalar(HFDIBDEMDict.lookup("maxDistInDEMloop"))),
 boundIndList_(3),
 owner_(false),
 historyCouplingF_(vector::zero),
@@ -111,7 +110,8 @@ useInterpolation_(true),
 recomputeM0_(recomputeM0),
 geometricD_(geometricD),
 created_(false),
-timesToSetStatic_(-1)
+timesToSetStatic_(-1),
+staticContactPost_(vector::zero)
 {
     initializeIB();
 }
@@ -155,7 +155,7 @@ void immersedBody::syncCreateImmersedBody(volScalarField& body, volScalarField& 
         }
         Info << "Computing geometrical properties" << endl;
         geomModel_->calculateGeometricalProperties(body,surfCells_,intCells_);
-        Info << "-- body " << bodyId_ << " current center of mass position: " << getCoM() << endl;
+        Info << "-- body " << bodyId_ << " current center of mass position: " << geomModel_->getCoM() << endl;
         created_ = true;
     }
 
@@ -410,7 +410,7 @@ void immersedBody::postContactUpdateImmersedBody
     // update body courant number
     computeBodyCoNumber();
 
-    Info << "-- body: " << bodyId_ << " current center of mass position: " << getCoM() << endl;
+    Info << "-- body: " << bodyId_ << " current center of mass position: " << geomModel_->getCoM() << endl;
 }
 void immersedBody::postContactUpdateImmersedBody(scalar deltaT)
 {
@@ -420,7 +420,7 @@ void immersedBody::postContactUpdateImmersedBody(scalar deltaT)
     // update body courant number
     computeBodyCoNumber();
 
-    Info << "-- body: " << bodyId_ << " current center of mass position: " << getCoM() << endl;
+    Info << "-- body: " << bodyId_ << " current center of mass position: " << geomModel_->getCoM() << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateCoupling
@@ -433,7 +433,7 @@ void immersedBody::updateCoupling
         mesh_.lookupObject<uniformDimensionedVectorField>("g");
 
   vector FV(vector::zero);
-  vector FG(getM()*(1.0-rhoF_.value()/geomModel_->getRhoS().value())*g.value());
+  vector FG(geomModel_->getM()*(1.0-rhoF_.value()/geomModel_->getRhoS().value())*g.value());
   vector TA(vector::zero);
 
   // calcualate viscous force and torque
@@ -442,14 +442,14 @@ void immersedBody::updateCoupling
      label cellI = surfCells_[Pstream::myProcNo()][sCellI];
 
      FV -=  f[cellI]*mesh_.V()[cellI];
-     TA +=  ((mesh_.C()[cellI] - getCoM())^f[cellI])*mesh_.V()[cellI];
+     TA +=  ((mesh_.C()[cellI] - geomModel_->getCoM())^f[cellI])*mesh_.V()[cellI];
   }
   forAll (intCells_[Pstream::myProcNo()],iCellI)
   {
      label cellI = intCells_[Pstream::myProcNo()][iCellI];
 
      FV -=  f[cellI]*mesh_.V()[cellI];//viscosity?
-     TA +=  ((mesh_.C()[cellI] - getCoM())^f[cellI])*mesh_.V()[cellI];
+     TA +=  ((mesh_.C()[cellI] - geomModel_->getCoM())^f[cellI])*mesh_.V()[cellI];
   }
 
   reduce(FV, sumOp<vector>());
@@ -543,7 +543,7 @@ void immersedBody::updateMovementComp
         }
 
         // compute current acceleration (assume constant over timeStep)
-        a_  = F_/(getM0()+SMALL);
+        a_  = F_/(geomModel_->getM0()+SMALL);
 
         // update body linear velocity
         Vel_ = (Vel + deltaT*a_) * velRelaxFac;
@@ -552,7 +552,7 @@ void immersedBody::updateMovementComp
     auto updateRotation = [&]()
     {
         // update body angular acceleration
-        alpha_ = inv(getI()) & T_;
+        alpha_ = inv(geomModel_->getI()) & T_;
 
         // update body angular velocity
         vector Omega((Axis*omega + deltaT*alpha_) * velRelaxFac);
@@ -585,7 +585,7 @@ void immersedBody::updateMovementComp
     auto updateRotationFixedAxis = [&]()
     {
         // update body angular velocity
-        vector Omega((Axis*omega + deltaT * ( inv(getI()) & T_ )) * velRelaxFac);
+        vector Omega((Axis*omega + deltaT * ( inv(geomModel_->getI()) & T_ )) * velRelaxFac);
 
         // split Omega into Axis_ and omega_
         omega_ = mag(Omega);
@@ -1215,13 +1215,11 @@ void immersedBody::moveImmersedBody
         Info << "-- body " << bodyId_ << " total rotation matrix: " << totRotMatrix_ << endl;
         Info << "-- body " << bodyId_ << " total euler angles   : " << eulerAngles << endl;
 
-
         geomModel_->bodyRotatePoints(angle,Axis_);
         geomModel_->bodyMovePoints(transIncr);
     }
 
     geomModel_->synchronPos();
-
     // update bounds of the body
     boundBox bound(geomModel_->getBounds());
     minBoundPoint_ = bound.min();
@@ -1278,9 +1276,9 @@ void immersedBody::updateVectorField(volVectorField& VS, word VName,volScalarFie
                     surfPoint -= intDist*surfNorm[cellI]*(0.5-body[cellI]);
                 }
 
-                vector planarVec       =  surfPoint - getCoM()
+                vector planarVec       =  surfPoint - geomModel_->getCoM()
                                      - Axis_*(
-                                          (surfPoint-getCoM())&Axis_
+                                          (surfPoint-geomModel_->getCoM())&Axis_
                                          );
 
                 vector VSvalue = -(planarVec^Axis_)*omega_ + Vel_;
@@ -1290,9 +1288,9 @@ void immersedBody::updateVectorField(volVectorField& VS, word VName,volScalarFie
             {
                 cellI=intCells_[Pstream::myProcNo()][cell];
 
-                vector planarVec       =  mesh_.C()[cellI] - getCoM()
+                vector planarVec       =  mesh_.C()[cellI] - geomModel_->getCoM()
                                      - Axis_*(
-                                          (mesh_.C()[cellI]-getCoM())&Axis_
+                                          (mesh_.C()[cellI]-geomModel_->getCoM())&Axis_
                                          );
 
                 vector VSvalue = -(planarVec^Axis_)*omega_ + Vel_;
@@ -1358,7 +1356,7 @@ DynamicList<scalar> immersedBody::getLocPartRad(DynamicLabelList& cellsOfInt)
     forAll (cellsOfInt,cellI)
     {
         label cCell(cellsOfInt[cellI]);
-        aLst.append(mag(mesh_.C()[cCell] - getCoM()));
+        aLst.append(mag(mesh_.C()[cCell] - geomModel_->getCoM()));
     }
     return aLst;
 }
@@ -1438,8 +1436,8 @@ void immersedBody::computeBodyCoNumber()
 // print out body linear and angular momentum
 void immersedBody::printMomentum()
 {
-    vector L(getI()&(Axis_*omega_));
-    vector p(getM()*Vel_);
+    vector L(geomModel_->getI()&(Axis_*omega_));
+    vector p(geomModel_->getM()*Vel_);
 
     Info << "-- body " << bodyId_ << "  linear momentum:" << p
          << " magnitude: " << mag(p) <<endl;
@@ -1450,8 +1448,8 @@ void immersedBody::printMomentum()
 // print out body statistics
 void immersedBody::printStats()
 {
-    vector L(getI()&(Axis_*omega_));
-    vector p(getM()*Vel_);
+    vector L(geomModel_->getI()&(Axis_*omega_));
+    vector p(geomModel_->getM()*Vel_);
 
     Info << "-- body " << bodyId_ << "  linear momentum:" << p
          << " magnitude: " << mag(p) <<endl;
@@ -1470,7 +1468,7 @@ void immersedBody::printForcesAndTorques()
 {
     const uniformDimensionedVectorField& g =
         mesh_.lookupObject<uniformDimensionedVectorField>("g");
-    vector FG(getM()*(1.0-rhoF_.value()/geomModel_->getRhoS().value())*g.value());
+    vector FG(geomModel_->getM()*(1.0-rhoF_.value()/geomModel_->getRhoS().value())*g.value());
 
     Info << "-- body " << bodyId_ << "     linear force:" << F_
          << " magnitude: " << mag(F_) <<endl;
@@ -1518,102 +1516,6 @@ void immersedBody::switchActiveOff
 
     // rewrite the body field
     resetBody(body);
-}
-//---------------------------------------------------------------------------//
-//update movement variables of the body
-bool immersedBody::checkContactMovement
-(
-    scalar deltaT
-)
-{
-    if (mag(deltaT + 1.0) < SMALL) deltaT = mesh_.time().deltaT().value();
-
-    vector ai(vector::zero);
-    vector Veli(Vel_);
-    vector Axisi = Axis_;
-    scalar omegai = omega_;
-    vector alphai = alpha_;
-
-    // auxiliary (nested) functions
-    auto updateTranslation = [&]()
-    {
-        // compute current acceleration (assume constant over timeStep)
-        ai  = F_/(getM0()+SMALL);
-
-        // update body linear velocity
-        Veli += deltaT*ai;
-    };
-
-    auto updateRotation = [&]()
-    {
-        // update body angular acceleration
-        alphai = inv(getI()) & T_;
-
-        // update body angular velocity
-        vector Omega(Axis_*omegai + deltaT*alphai);
-
-        // split Omega into Axis_ and omega_
-        omegai = mag(Omega);
-
-        if (omegai < SMALL)
-        {
-            Axisi = vector::one;
-        }
-        else
-        {
-            Axisi =  Omega/(omegai+SMALL);
-            forAll (Axisi,axElI)
-            {
-                if (mag(Axisi[axElI]) < 1.0e-08) Axisi[axElI] = 0.0;
-            }
-        }
-        Axisi /= mag(Axisi);
-    };
-
-    auto updateRotationFixedAxis = [&]()
-    {
-        // update body angular velocity
-        vector Omega(Axisi*omegai + deltaT * ( inv(getI()) & T_ ));
-
-        // split Omega into Axis_ and omega_
-        omegai = mag(Omega);
-
-        vector newAxis = Omega/(omegai+SMALL);
-        if ((newAxis & Axisi) < 0) Axisi *= (-1.0);;
-    };
-
-    if (bodyOperation_ == 0 or bodyOperation_ == 3)
-    {
-        if (mag(Veli)/(mag(Vel_)+SMALL) > maxDistInDEMloop_ || (omegai)/(omega_+SMALL) > maxDistInDEMloop_) return false;
-        return true;
-    }
-    else if (bodyOperation_ == 1)
-    {
-        updateRotation();
-
-        if (mag(Veli)/(mag(Vel_)+SMALL) > maxDistInDEMloop_ || (omegai)/(omega_+SMALL) > maxDistInDEMloop_) return false;
-        return true;
-    }
-    else if (bodyOperation_ == 2)
-    {
-        updateTranslation();
-
-        if (mag(Veli)/(mag(Vel_)+SMALL) > maxDistInDEMloop_ || (omegai)/(omega_+SMALL) > maxDistInDEMloop_) return false;
-        return true;
-    }
-    else if (bodyOperation_ == 4)
-    {
-        updateRotationFixedAxis();
-
-        if (mag(Veli)/(mag(Vel_)+SMALL) > maxDistInDEMloop_ || (omegai)/(omega_+SMALL) > maxDistInDEMloop_) return false;
-        return true;
-    }
-
-    updateTranslation();
-    if (updateTorque_) updateRotation();
-
-    if (mag(Veli)/(mag(Vel_)+SMALL) > maxDistInDEMloop_ || (omegai)/(omega_+SMALL) > maxDistInDEMloop_) return false;
-    return true;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::assignFullHistory()
@@ -1697,15 +1599,15 @@ void immersedBody::pimpleUpdate
 //---------------------------------------------------------------------------//
 void immersedBody::checkIfInDomain(volScalarField& body)
 {
-    if(getM0() < SMALL)
+    if(geomModel_->getM0() < SMALL)
     {
         switchActiveOff(body);
     }
 
-    Info << "M0: " << getM0() << endl;
-    Info << "-- body " << bodyId_ << " current M/M0: " << getM()/getM0() << endl;
+    Info << "M0: " << geomModel_->getM0() << endl;
+    Info << "-- body " << bodyId_ << " current M/M0: " << geomModel_->getM()/geomModel_->getM0() << endl;
     // if only 1% of the initial particle mass remains in the domain, switch it off
-    if (getM()/(getM0()+SMALL) < 1e-2)
+    if (geomModel_->getM()/(geomModel_->getM0()+SMALL) < 1e-2)
     {
         switchActiveOff(body);
     }
@@ -1717,7 +1619,7 @@ void immersedBody::setRestartSim(vector vel, scalar angVel, vector axisRot, bool
     omega_ = angVel;
     Axis_ = axisRot;
     contactInfo_->setTimeStepsInContWStatic(timesInContact);
-    Info << "-- body " << bodyId_ << " timeStepsInContWStatic_: " << getTimeStepsInContWStatic() << endl;
+    Info << "-- body " << bodyId_ << " timeStepsInContWStatic_: " << contactInfo_->getTimeStepsInContWStatic() << endl;
     if(setStatic)
     {
         bodyOperation_ = 0;
@@ -1729,22 +1631,34 @@ void immersedBody::setRestartSim(vector vel, scalar angVel, vector axisRot, bool
 //---------------------------------------------------------------------------//
 void immersedBody::chceckBodyOp()
 {
-
     if(bodyOperation_ != 5 || timesToSetStatic_ == -1)
         return;
 
-    if(!contactInfo_->checkInContactWithStatic() && getTimeStepsInContWStatic() > 0)
+    if(!contactInfo_->checkInContactWithStatic() && contactInfo_->getTimeStepsInContWStatic() > 0)
     {
-    contactInfo_->setTimeStepsInContWStatic(0);
+        contactInfo_->setTimeStepsInContWStatic(0);
         return;
     }
 
     if(contactInfo_->checkInContactWithStatic())
     {
-        contactInfo_->setTimeStepsInContWStatic(getTimeStepsInContWStatic() + 1);
-        Info << "-- body " << bodyId_ << " timeStepsInContWStatic_: " << getTimeStepsInContWStatic() << endl;
+        contactInfo_->setTimeStepsInContWStatic(contactInfo_->getTimeStepsInContWStatic() + 1);
+        Info << "-- body " << bodyId_ << " timeStepsInContWStatic_: " << contactInfo_->getTimeStepsInContWStatic() << endl;
 
-        if(getTimeStepsInContWStatic() >= timesToSetStatic_)
+        if(contactInfo_->getTimeStepsInContWStatic() == 1)
+        {
+            staticContactPost_ = geomModel_->getCoM();
+        }
+        else
+        {
+            if(mag(staticContactPost_ - geomModel_->getCoM()) > 0.1 * geomModel_->getDC())
+            {
+                contactInfo_->setTimeStepsInContWStatic(0);
+                return;
+            }
+        }
+
+        if(contactInfo_->getTimeStepsInContWStatic() >= timesToSetStatic_)
         {
             bodyOperation_ = 0;
             omega_ = 0;

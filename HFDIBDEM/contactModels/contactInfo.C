@@ -37,8 +37,6 @@ using namespace Foam;
 contactInfo::contactInfo
 (
     geomModel& geomModel,
-    List<DynamicLabelList>& surfCells,
-    List<DynamicLabelList>& intCells,
     scalar kN,
     scalar kt,
     scalar gammaN,
@@ -50,8 +48,6 @@ contactInfo::contactInfo
 :
 geomModel_(geomModel),
 isInWallContact_(false),
-surfCells_(surfCells),
-intCells_(intCells),
 inContactWithStatic_(false),
 timeStepsInContWStatic_(0),
 kN_(kN),
@@ -62,8 +58,50 @@ mu_(mu),
 adhN_(adhN),
 adhEqui_(adhEqui)
 {
+    surfCells_.setSize(Pstream::nProcs());
+    intCells_.setSize(Pstream::nProcs());
 }
 contactInfo::~contactInfo()
 {
+}
+//---------------------------------------------------------------------------//
+bool contactInfo::cellNotInLists(label cell)
+{
+    forAll(surfCells_[Pstream::myProcNo()],cellI)
+    {
+        if(surfCells_[Pstream::myProcNo()][cellI] == cell)
+        {
+            return false;
+        }
+    }
+
+    forAll(intCells_[Pstream::myProcNo()],cellI)
+    {
+        if(intCells_[Pstream::myProcNo()][cellI] == cell)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+//---------------------------------------------------------------------------//
+void contactInfo::appendLists(List<DynamicLabelList> surfCells, List<DynamicLabelList> intCells)
+{
+    forAll(surfCells[Pstream::myProcNo()],cellI)
+    {
+        if(cellNotInLists(surfCells[Pstream::myProcNo()][cellI]))
+        {
+            surfCells_[Pstream::myProcNo()].append(surfCells[Pstream::myProcNo()][cellI]);
+        }
+    }
+
+    forAll(intCells[Pstream::myProcNo()],cellI)
+    {
+        if(cellNotInLists(intCells[Pstream::myProcNo()][cellI]))
+        {
+            intCells_[Pstream::myProcNo()].append(intCells[Pstream::myProcNo()][cellI]);
+        }
+    }
 }
 //---------------------------------------------------------------------------//

@@ -88,6 +88,16 @@ namespace contactModel
         vector geometricD
     );
 
+    DynamicLabelList getContactFaces
+    (
+        const dynamicFvMesh&   mesh,
+        contactInfo& cInfo,
+        label faceLabel,
+        DynamicLabelList& checkedFaces,
+        bool case3D,
+        vector& emptydir
+    );
+
     void solveWallContact
     (
         wallInfo& wInfo,

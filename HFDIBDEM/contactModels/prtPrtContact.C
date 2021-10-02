@@ -771,14 +771,8 @@ void getPrtPrtContactVars<sphere,sphere>
     scalar cRadius(cInfo.getGeomModel().getDC() / 2);
     scalar tRadius(tInfo.getGeomModel().getDC() / 2);
 
-    Info << "Case 3D: " << case3D << endl;
-    Info << "cCenter: " << cCenter << " cRadius " << cRadius << endl;
-    Info << "tCenter: " << tCenter << " tRadius " << tRadius << endl;
-
     vector centerDir = cCenter - tCenter;
-    Info << "centerDir " << centerDir << endl;
     scalar d = mag(centerDir);
-    Info << "d " << d << endl;
 
     if(mag(centerDir) < SMALL || d > (cRadius + tRadius))
     {
@@ -790,9 +784,7 @@ void getPrtPrtContactVars<sphere,sphere>
     }
 
     scalar xLength = (sqr(d) - sqr(cRadius) + sqr(tRadius))/(2*d);
-    Info << "xLength " << xLength << endl;
     vector contactCenter = tCenter + (centerDir/d)*xLength;
-    Info << "contactCenter " << contactCenter << endl;
     if(sqr(xLength) > sqr(tRadius))
     {
         prtPrtCntVars.contactCenter_ = contactCenter;
@@ -802,19 +794,14 @@ void getPrtPrtContactVars<sphere,sphere>
         return;
     }
     scalar contactRad = sqrt(sqr(tRadius) - sqr(xLength));
-    Info << "contactRad " << contactRad << endl;
 
     if(case3D)
     {
         scalar cSphCapH = cRadius - d + xLength;
-        Info << "cSphCapH " << cSphCapH << endl;
         scalar tSphCapH = tRadius - xLength;
-        Info << "tSphCapH " << tSphCapH << endl;
 
         scalar cSphCapV = (pi*sqr(cSphCapH)*(3*cRadius - cSphCapH)) / 3;
-        Info << "cSphCapV " << cSphCapV  << endl;
         scalar tSphCapV = (pi*sqr(tSphCapH)*(3*tRadius - tSphCapH)) / 3;
-        Info << "tSphCapV " << tSphCapV  << endl;
 
         prtPrtCntVars.contactCenter_ = contactCenter;
         prtPrtCntVars.contactVolume_ = cSphCapV + tSphCapV;
@@ -839,7 +826,7 @@ void getPrtPrtContactVars<sphere,sphere>
     }
 }
 //---------------------------------------------------------------------------//
-void solvePrtContact(
+bool solvePrtContact(
     const dynamicFvMesh&   mesh,
     contactInfo& cInfo,
     contactVars* cVars,
@@ -864,15 +851,6 @@ void solvePrtContact(
             geometricD,
             prtPrtCntVars
         );
-
-        prtPrtContactVars prtPrtCntVarsTest;
-        getPrtPrtContactVars<arbShape,arbShape>(
-            mesh,
-            cInfo,
-            tInfo,
-            geometricD,
-            prtPrtCntVarsTest
-        );
     }
     else
     {
@@ -885,9 +863,9 @@ void solvePrtContact(
         );
     }
 
-    if (prtPrtCntVars.contactVolume_ < SMALL)
+    if (!(prtPrtCntVars.contactVolume_ > 0))
     {
-        return;
+        return false;
     }
     // get data from the current body necessary for computation of
     // contact forces
@@ -923,7 +901,7 @@ void solvePrtContact(
 
     vector  FN(vector::zero);                                           //placeholder for normal force
     vector  Ft(vector::zero);                                           //placeholder for tangential force
-    Info << "-- Detected particle-particle contact " << cVars->bodyId_ << " : " << tVars->bodyId_ << endl;
+    Info << "-- Detected particle-particle contact: -- body " << cVars->bodyId_ << " & -- body " << tVars->bodyId_ << endl;
     Info << "-- Particle-particle contact center " << prtPrtCntVars.contactCenter_ << endl;
     Info << "-- Particle-particle contact normal " << prtPrtCntVars.contactNormal_ << endl;
     Info << "-- Particle-particle contact volume " << prtPrtCntVars.contactVolume_ << endl;
@@ -956,19 +934,6 @@ void solvePrtContact(
 
     // compute the normal force
     FN = (aKN*prtPrtCntVars.contactVolume_/(Lc+SMALL) + aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(prtPrtCntVars.contactArea_ * Vn))*nVec;
-    Info << "-// Vn: " << Vn << endl;
-    Info << "-// Fn: " << FN << endl;
-    Info << "-// Fn norm: " << aKN*prtPrtCntVars.contactVolume_/(Lc+SMALL) << endl;
-    Info << "-// Fn dump: " << (aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(Vn*prtPrtCntVars.contactArea_)) << endl;
-    // compute adhesive force
-    scalar FAc(aadhN*prtPrtCntVars.contactArea_);
-    scalar FAeq(min(aKN*((cadhEqui*cM)/(cRhoS + SMALL))/(Lc+SMALL), aKN*((tadhEqui*tM)/(tRhoS + SMALL))/(Lc+SMALL)));
-    scalar partMul(max(prtPrtCntVars.contactVolume_ * cRhoS / (cM+SMALL) / (cadhEqui+SMALL), prtPrtCntVars.contactVolume_ * tRhoS / (tM+SMALL) / (tadhEqui+SMALL)));
-    if(partMul > 1)
-    {
-        partMul = 1;
-    }
-    vector FA((FAeq * partMul  + FAc * (1-partMul)) * nVec);
 
     vector cFtLast(vector::zero);
     vector tFtLast(vector::zero);
@@ -1016,18 +981,30 @@ void solvePrtContact(
     // compute tangential force
     vector Ftdi(- aGammat*sqrt(aKt*reduceM*Lc)*Vt);
     Ft = (FtLastr - aKt*Lc*Vt*deltaT + Ftdi);
-
-    Info << "-// Vt: " << Vt << endl;
-    Info << "-// AngVel: " << cVars->omega_ << endl;
-    Info << "-// Ft: " << Ft << endl;
+    Info << "prtPrt Ft " << Ft << endl;
 
     if (mag(Ft) > amu * mag(FN))
     {
         Ft *= amu * mag(FN) / mag(Ft);
     }
-    Info << "-// Ft small: " << Ft << endl;
+    Info << "prtPrt Ft final " << Ft << endl;
+    // compute adhesive force
+    // scalar FAc(aadhN*prtPrtCntVars.contactArea_);
+    //scalar FAc(aadhN*aKN*prtPrtCntVars.contactVolume_);
+    //scalar FAeq(min(aKN*((cadhEqui*cM)/(cRhoS + SMALL))/(Lc+SMALL), aKN*((tadhEqui*tM)/(tRhoS + SMALL))/(Lc+SMALL)));
+    //scalar partMul(max(prtPrtCntVars.contactVolume_ * cRhoS / (cM+SMALL) / (cadhEqui+SMALL), prtPrtCntVars.contactVolume_ * tRhoS / (tM+SMALL) / (tadhEqui+SMALL)));
+    //if(partMul > 1)
+    //{
+    //    partMul = 1;
+    //}
+    //vector FA((FAeq * partMul  + FAc * (1-partMul)) * nVec);
 
+    scalar pi = Foam::constant::mathematical::pi;
+    vector FA((sqrt(8*pi*prtPrtCntVars.contactVolume_*aKN*aadhN)) * nVec);
+    Info << "prtPrt FN " << FN << endl;
+    Info << "prtPrt FA " << FA << endl;
     FN -= FA;
+    Info << "prtPrt FN final " << FN << endl;
 
     vector F(FN+Ft);
 
@@ -1079,6 +1056,7 @@ void solvePrtContact(
     outVars.first().second() = cTN;
     outVars.second().first() = -F;
     outVars.second().second() = tTN;
+    return true;
 }
 //---------------------------------------------------------------------------//
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
