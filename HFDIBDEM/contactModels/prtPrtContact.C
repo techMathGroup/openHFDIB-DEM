@@ -890,10 +890,10 @@ bool solvePrtContact(
     scalar tOmega(tVars->omega_);                                       //Omega
 
     // compute mean model parameters
-    scalar aY = (1 - sqr(cInfo.getNu()))/cInfo.getY()
-                + (1 - sqr(tInfo.getNu()))/tInfo.getY();                // Contact Young modulus
-    scalar aG = 2*(2 - cInfo.getNu())*(1 + cInfo.getNu())/cInfo.getY()
-                + 2*(2 - tInfo.getNu())*(1 + tInfo.getNu())/tInfo.getY(); // Contact shear modulus
+    scalar aY = 1/((1 - sqr(cInfo.getNu()))/cInfo.getY()
+                + (1 - sqr(tInfo.getNu()))/tInfo.getY());                // Contact Young modulus
+    scalar aG = 1/(2*(2 - cInfo.getNu())*(1 + cInfo.getNu())/cInfo.getY()
+                + 2*(2 - tInfo.getNu())*(1 + tInfo.getNu())/tInfo.getY()); // Contact shear modulus
     scalar aGammaN = aY*(cInfo.getGamma()*tInfo.getGamma())
                     /(cInfo.getGamma()+tInfo.getGamma()+SMALL);         // Contact normal gamma
     scalar aGammat = aG*(cInfo.getGamma()*tInfo.getGamma())

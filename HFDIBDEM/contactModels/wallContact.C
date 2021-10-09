@@ -472,10 +472,10 @@ void solveWallContact
 )
 {
     // compute mean model parameters
-    scalar aY = (1 - sqr(cInfo.getNu()))/cInfo.getY()
-                + (1 - sqr(wInfo.getNu()))/wInfo.getY();                // Contact Young modulus
-    scalar aG = 2*(2 - cInfo.getNu())*(1 + cInfo.getNu())/cInfo.getY()
-                + 2*(2 - wInfo.getNu())*(1 + wInfo.getNu())/wInfo.getY(); // Contact shear modulus
+    scalar aY = 1/((1 - sqr(cInfo.getNu()))/cInfo.getY()
+                + (1 - sqr(wInfo.getNu()))/wInfo.getY());                // Contact Young modulus
+    scalar aG = 1/(2*(2 - cInfo.getNu())*(1 + cInfo.getNu())/cInfo.getY()
+                + 2*(2 - wInfo.getNu())*(1 + wInfo.getNu())/wInfo.getY()); // Contact shear modulus
     scalar aGammaN = aY*(cInfo.getGamma()*wInfo.getGamma())
                     /(cInfo.getGamma()+wInfo.getGamma()+SMALL);         // Contact normal gamma
     scalar aGammat = aG*(cInfo.getGamma()*wInfo.getGamma())
