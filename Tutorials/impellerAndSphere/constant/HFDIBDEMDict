@@ -22,20 +22,17 @@ interpolationSchemes
 }
 
 surfaceThreshold    1e-4;
-minDEMloops    10;
-minDEMtimeStep    0.1;
-maxDistInDEMloop    100;
+stepDEM     0.02;
 geometricD (1 1 -1);
 recordSimulation true;
 
 wallProps
 {
-	kN     1e7;
-	gammaN 0;
-	kt     0;
-	gammat 0;
-	mu 0;
-	adhN 0;
+	Y       1e7;
+    nu      0.2;
+	gamma   4e-6;
+	mu      0;
+	adhN    0;
 }
 
 impellerSphere
@@ -52,13 +49,11 @@ U
 {
 	BC  noSlip;
 }
-kN     1e5;
-gammaN 2;
-kt     0;
-gammat 0;
-mu     7;
-adhN 0;
-adhEqui 0;
+Y       1e7;
+nu      0.2;
+gamma   4e-6;
+mu      0;
+adhN    0;
 bodyGeom nonConvex;
 bodyConvex false;
 updateTorque false;
@@ -100,13 +95,11 @@ U
 {
 	BC  noSlip;
 }
-kN     1e7;
-gammaN 0;
-kt     0;
-gammat 0;
-mu     7;
-adhN 0;
-adhEqui 0;
+Y       1e7;
+nu      0.2;
+gamma   4e-6;
+mu      0;
+adhN    0;
 bodyGeom sphere;
 sphere
 {
