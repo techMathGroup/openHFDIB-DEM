@@ -867,54 +867,42 @@ bool solvePrtContact(
     {
         return false;
     }
+
+    Info << "-- Detected Particle-particle contact: -- body " << cVars->bodyId_ << " & -- body " << tVars->bodyId_ << endl;
+    Info << "-- Particle-particle contact center " << prtPrtCntVars.contactCenter_ << endl;
+    Info << "-- Particle-particle contact normal " << prtPrtCntVars.contactNormal_ << endl;
+    Info << "-- Particle-particle contact volume " << prtPrtCntVars.contactVolume_ << endl;
+    Info << "-- Particle-particle contact area "   << prtPrtCntVars.contactArea_ << endl;
+
     // get data from the current body necessary for computation of
     // contact forces
     vector cCoM(cInfo.getGeomModel().getCoM());                         //center of mass
     vector cVel(cVars->Vel_);                                           //linear velocity
-    scalar cKN(cInfo.getkN());                                          //elastic normal stiffness
-    scalar cGammaN(cInfo.getgammaN());                                  //normal viscosity
-    scalar cKt(cInfo.getkt());                                          //elastic tangential stiffness
-    scalar cGammat(cInfo.getgammat());                                  //tangential viscosity
-    scalar cmu(cInfo.getmu());                                          //firction coef
-    scalar cadhN(cInfo.getAdhN());                                      //adhesive force
-    scalar cadhEqui(cInfo.getAdhEqui());                                //adhesive force
     scalar cM(cInfo.getGeomModel().getM0());                            //mass
-    scalar cRhoS(cVars->rhoS_.value());                                 //viscosity
     vector cAxis(cVars->Axis_);                                         //Axis
     scalar cOmega(cVars->omega_);                                       //Omega
 
     // get data from the neighbor body
     vector tCoM(tInfo.getGeomModel().getCoM());                         //center of mass
     vector tVel(tVars->Vel_);                                           //linear velocity
-    scalar tKN(tInfo.getkN());                                          //elastic normal stiffness
-    scalar tGammaN(tInfo.getgammaN());                                  //normal viscosity
-    scalar tKt(tInfo.getkt());                                          //elastic tangential stiffness
-    scalar tGammat(tInfo.getgammat());                                  //tangential viscosity
-    scalar tmu(tInfo.getmu());                                          //firction coef
-    scalar tadhN(tInfo.getAdhN());                                      //adhesive force
-    scalar tadhEqui(tInfo.getAdhEqui());                                //adhesive force
     scalar tM(tInfo.getGeomModel().getM0());                            //mass
-    scalar tRhoS(tVars->rhoS_.value());                                 //viscosity
     vector tAxis(tVars->Axis_);                                         //Axis
     scalar tOmega(tVars->omega_);                                       //Omega
 
-
-    vector  FN(vector::zero);                                           //placeholder for normal force
-    vector  Ft(vector::zero);                                           //placeholder for tangential force
-    Info << "-- Detected particle-particle contact: -- body " << cVars->bodyId_ << " & -- body " << tVars->bodyId_ << endl;
-    Info << "-- Particle-particle contact center " << prtPrtCntVars.contactCenter_ << endl;
-    Info << "-- Particle-particle contact normal " << prtPrtCntVars.contactNormal_ << endl;
-    Info << "-- Particle-particle contact volume " << prtPrtCntVars.contactVolume_ << endl;
-    Info << "-- Particle-particle contact area "   << prtPrtCntVars.contactArea_ << endl;
-
     // compute mean model parameters
-    scalar aKN((cKN*tKN)/(cKN+tKN+SMALL));
-    scalar aGammaN((cGammaN*tGammaN)/(cGammaN+tGammaN+SMALL));
-    scalar aKt((cKt*tKt)/(cKt+tKt+SMALL));
-    scalar aGammat((cGammat*tGammat)/(cGammat+tGammat+SMALL));
-    scalar amu((cmu*tmu)/(cmu+tmu+SMALL));
-    scalar aadhN((cadhN*tadhN)/(cadhN+tadhN+SMALL));
+    scalar aY = (1 - sqr(cInfo.getNu()))/cInfo.getY()
+                + (1 - sqr(tInfo.getNu()))/tInfo.getY();                // Contact Young modulus
+    scalar aG = 2*(2 - cInfo.getNu())*(1 + cInfo.getNu())/cInfo.getY()
+                + 2*(2 - tInfo.getNu())*(1 + tInfo.getNu())/tInfo.getY(); // Contact shear modulus
+    scalar aGammaN = aY*(cInfo.getGamma()*tInfo.getGamma())
+                    /(cInfo.getGamma()+tInfo.getGamma()+SMALL);         // Contact normal gamma
+    scalar aGammat = aG*(cInfo.getGamma()*tInfo.getGamma())
+                    /(cInfo.getGamma()+tInfo.getGamma()+SMALL);         // Contact tangential gamma
+    scalar aMu = (cInfo.getmu()+tInfo.getmu())/2;                       // Contact frictional coef
+    scalar aadhN = (cInfo.getAdhN()+tInfo.getAdhN())/2;                 // Contact adhesive coef
 
+    vector FN(vector::zero);                                            // placeholder for normal force
+    vector Ft(vector::zero);                                            // placeholder for tangential force
     vector cLVec(prtPrtCntVars.contactCenter_-cCoM);
     vector tLVec(prtPrtCntVars.contactCenter_-tCoM);
 
@@ -933,7 +921,9 @@ bool solvePrtContact(
     scalar reduceM(cM*tM/(cM+tM));
 
     // compute the normal force
-    FN = (aKN*prtPrtCntVars.contactVolume_/(Lc+SMALL) + aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))*(prtPrtCntVars.contactArea_ * Vn))*nVec;
+    FN = (aY*prtPrtCntVars.contactVolume_/(Lc+SMALL) + aGammaN*sqrt(aY*reduceM/pow(Lc+SMALL,3))*(prtPrtCntVars.contactArea_ * Vn))*nVec;
+
+    Info << "-- Particle-particle contact FN " << FN << endl;
 
     vector cFtLast(vector::zero);
     vector tFtLast(vector::zero);
@@ -979,32 +969,21 @@ bool solvePrtContact(
 
     vector Vt(cVeli - tVeli);
     // compute tangential force
-    vector Ftdi(- aGammat*sqrt(aKt*reduceM*Lc)*Vt);
-    Ft = (FtLastr - aKt*Lc*Vt*deltaT + Ftdi);
-    Info << "prtPrt Ft " << Ft << endl;
+    vector Ftdi(- aGammat*sqrt(aG*reduceM*Lc)*Vt);
+    Ft = (FtLastr - aG*Lc*Vt*deltaT + Ftdi);
 
-    if (mag(Ft) > amu * mag(FN))
+    Info << "-- Particle-particle contact Ft " << Ft << endl;
+
+    if (mag(Ft) > aMu * mag(FN))
     {
-        Ft *= amu * mag(FN) / mag(Ft);
+        Ft *= aMu * mag(FN) / mag(Ft);
     }
-    Info << "prtPrt Ft final " << Ft << endl;
-    // compute adhesive force
-    // scalar FAc(aadhN*prtPrtCntVars.contactArea_);
-    //scalar FAc(aadhN*aKN*prtPrtCntVars.contactVolume_);
-    //scalar FAeq(min(aKN*((cadhEqui*cM)/(cRhoS + SMALL))/(Lc+SMALL), aKN*((tadhEqui*tM)/(tRhoS + SMALL))/(Lc+SMALL)));
-    //scalar partMul(max(prtPrtCntVars.contactVolume_ * cRhoS / (cM+SMALL) / (cadhEqui+SMALL), prtPrtCntVars.contactVolume_ * tRhoS / (tM+SMALL) / (tadhEqui+SMALL)));
-    //if(partMul > 1)
-    //{
-    //    partMul = 1;
-    //}
-    //vector FA((FAeq * partMul  + FAc * (1-partMul)) * nVec);
+    Info << "-- Particle-particle contact Ft clamped " << Ft << endl;
 
     scalar pi = Foam::constant::mathematical::pi;
-    vector FA((sqrt(8*pi*prtPrtCntVars.contactVolume_*aKN*aadhN)) * nVec);
-    Info << "prtPrt FN " << FN << endl;
-    Info << "prtPrt FA " << FA << endl;
+    vector FA((sqrt(8*pi*aY*aadhN*prtPrtCntVars.contactVolume_)) * nVec);
+    Info << "-- Particle-particle contact FA " << FA << endl;
     FN -= FA;
-    Info << "prtPrt FN final " << FN << endl;
 
     vector F(FN+Ft);
 

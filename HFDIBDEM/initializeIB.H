@@ -132,31 +132,23 @@ if (mesh_.nGeometricD() < 3)
     geomModel_->setRhoS(immersedDict_.lookup("rho"));
 
     // set up contact properties
-    scalar kN(readScalar(immersedDict_.lookup("kN")));
-    scalar kt(readScalar(immersedDict_.lookup("kt")));
-    scalar gammaN(readScalar(immersedDict_.lookup("gammaN")));
-    scalar gammat(readScalar(immersedDict_.lookup("gammat")));
+    scalar Y(readScalar(immersedDict_.lookup("Y")));
+    scalar nu(readScalar(immersedDict_.lookup("nu")));
+    scalar gamma(readScalar(immersedDict_.lookup("gamma")));
     scalar mu(readScalar(immersedDict_.lookup("mu")));
     scalar adhN(0.0);
     if (immersedDict_.found("adhN"))
     {
         adhN = readScalar(immersedDict_.lookup("adhN"));
     }
-    scalar adhEqui(0.0);
-    if (immersedDict_.found("adhEqui"))
-    {
-        adhEqui = readScalar(immersedDict_.lookup("adhEqui"));
-    }
 
     contactInfo_.set(new contactInfo(
         geomModel_(),
-        kN,
-        kt,
-        gammaN,
-        gammat,
+        Y,
+        nu,
+        gamma,
         mu,
-        adhN,
-        adhEqui)
+        adhN)
     );
 
     // set sizes for parallel runs

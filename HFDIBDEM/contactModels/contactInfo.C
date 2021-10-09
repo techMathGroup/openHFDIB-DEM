@@ -37,26 +37,22 @@ using namespace Foam;
 contactInfo::contactInfo
 (
     geomModel& geomModel,
-    scalar kN,
-    scalar kt,
-    scalar gammaN,
-    scalar gammat,
+    scalar Y,
+    scalar nu,
+    scalar gamma,
     scalar mu,
-    scalar adhN,
-    scalar adhEqui
+    scalar adhN
 )
 :
 geomModel_(geomModel),
 isInWallContact_(false),
 inContactWithStatic_(false),
 timeStepsInContWStatic_(0),
-kN_(kN),
-kt_(kt),
-gammaN_(gammaN),
-gammat_(gammat),
+Y_(Y),
+nu_(nu),
+gamma_(gamma),
 mu_(mu),
-adhN_(adhN),
-adhEqui_(adhEqui)
+adhN_(adhN)
 {
     surfCells_.setSize(Pstream::nProcs());
     intCells_.setSize(Pstream::nProcs());

@@ -36,22 +36,18 @@ using namespace Foam;
 //---------------------------------------------------------------------------//
 wallInfo::wallInfo
 (
-    scalar kN,
-    scalar kt,
-    scalar gammaN,
-    scalar gammat,
+    scalar Y,
+    scalar nu,
+    scalar gamma,
     scalar mu,
-    scalar adhN,
-    scalar adhEqui
+    scalar adhN
 )
 :
-kN_(kN),
-kt_(kt),
-gammaN_(gammaN),
-gammat_(gammat),
+Y_(Y),
+nu_(nu),
+gamma_(gamma),
 mu_(mu),
-adhN_(adhN),
-adhEqui_(adhEqui)
+adhN_(adhN)
 {
 }
 wallInfo::~wallInfo()

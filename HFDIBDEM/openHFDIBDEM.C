@@ -81,21 +81,14 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     {
         adhN = readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("adhN"));
     }
-    scalar adhEqui(0.0);
-    if (HFDIBDEMDict_.subDict("wallProps").found("adhEqui"))
-    {
-        adhEqui = readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("adhEqui"));
-    }
 
     wallInfo_.set(
         new wallInfo(
-            readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("kN")),
-            readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("kt")),
-            readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("gammaN")),
-            readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("gammat")),
+            readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("Y")),
+            readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("nu")),
+            readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("gamma")),
             readScalar(HFDIBDEMDict_.subDict("wallProps").lookup("mu")),
-            adhN,
-            adhEqui
+            adhN
                   )
         );
 
@@ -845,7 +838,6 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
 
                     if (immersedBodies_[ibToResolve[ib]].checkWallContact())
                     {
-                        Info << "-- Body " << immersedBodies_[ibToResolve[ib]].getBodyId() << " is in contact with wall" << endl;
                         Tuple2<vector,vector> outVars;
 
                         solveWallContact(
@@ -973,7 +965,6 @@ void openHFDIBDEM::correctContact(volScalarField& body,volScalarField& refineF)
 
                 if (immersedBodies_[ibContactList_[0]].checkWallContact())
                 {
-                    Info << "-- Body " << immersedBodies_[ibContactList_[0]].getBodyId() << " is in contact with wall" << endl;
                     Tuple2<vector,vector> outVars;
                     solveWallContact(
                         wallInfo_(),

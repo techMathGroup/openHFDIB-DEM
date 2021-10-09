@@ -62,62 +62,49 @@ class wallInfo
 
     protected:
 
-    //spring stiffness for normal contact force
-    scalar  kN_;
+        // Young modulus
+        scalar  Y_;
 
-    //spring stiffness for tangential contact force
-    scalar  kt_;
+        // poisson ration
+        scalar  nu_;
 
-    //damping coefficient for normal contact force
-    scalar gammaN_;
+        // dissipative coef
+        scalar gamma_;
 
-    //damping coefficient for tangential contact force
-    scalar gammat_;
+        // friction coefficient
+        scalar mu_;
 
-    //friction coefficient
-    scalar mu_;
-
-    //adhesion coefficient for normal contact force
-    scalar adhN_;
-
-    //adhesion coefficient for normal contact force
-    scalar adhEqui_;
+        // adhesion coefficient for normal contact force
+        scalar adhN_;
 
     public:
 
     // Constructors ------------------------------------------------
     wallInfo
     (
-        scalar kN,
-        scalar kt,
-        scalar gammaN,
-        scalar gammat,
+        scalar Y,
+        scalar nu,
+        scalar gamma,
         scalar mu,
-        scalar adhN,
-        scalar adhEqui
+        scalar adhN
     );
 
     // Destructors -------------------------------------------------
     ~wallInfo();
 
-    const scalar& getkN()   const
+    const scalar& getY()   const
     {
-        return kN_;
+        return Y_;
     }
 
-    const scalar& getkt()   const
+    const scalar& getNu()   const
     {
-        return kt_;
+        return nu_;
     }
 
-    const scalar& getgammaN()   const
+    const scalar& getGamma()   const
     {
-        return gammaN_;
-    }
-
-    const scalar& getgammat()   const
-    {
-        return gammat_;
+        return gamma_;
     }
 
     const scalar& getmu()   const
@@ -128,11 +115,6 @@ class wallInfo
     const scalar& getAdhN()   const
     {
         return adhN_;
-    }
-
-    const scalar& getAdhEqui()   const
-    {
-        return adhEqui_;
     }
 };
 

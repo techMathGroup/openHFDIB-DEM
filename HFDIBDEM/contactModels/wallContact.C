@@ -472,14 +472,16 @@ void solveWallContact
 )
 {
     // compute mean model parameters
-    scalar aKN((cInfo.getkN()*wInfo.getkN())/(cInfo.getkN()+wInfo.getkN()+SMALL));
-    scalar aGammaN((cInfo.getgammaN()*wInfo.getgammaN())/(cInfo.getgammaN()+wInfo.getgammaN()+SMALL));
-    //scalar aKt((cInfo.getkt()*wInfo.getkt())/(cInfo.getkt()+wInfo.getkt()+SMALL));
-    scalar aKt(0.5*(cInfo.getkt()+wInfo.getkt()));
-    scalar aGammat((cInfo.getgammat()*wInfo.getgammat())/(cInfo.getgammat()+wInfo.getgammat()+SMALL));
-    scalar amu((cInfo.getmu()*wInfo.getmu())/(cInfo.getmu()+wInfo.getmu()+SMALL));
-    scalar aadhN((cInfo.getAdhN()*wInfo.getAdhN())/(cInfo.getAdhN()+wInfo.getAdhN()+SMALL));
-    scalar aadhEqui(0.5*(cInfo.getAdhEqui()+wInfo.getAdhEqui()));
+    scalar aY = (1 - sqr(cInfo.getNu()))/cInfo.getY()
+                + (1 - sqr(wInfo.getNu()))/wInfo.getY();                // Contact Young modulus
+    scalar aG = 2*(2 - cInfo.getNu())*(1 + cInfo.getNu())/cInfo.getY()
+                + 2*(2 - wInfo.getNu())*(1 + wInfo.getNu())/wInfo.getY(); // Contact shear modulus
+    scalar aGammaN = aY*(cInfo.getGamma()*wInfo.getGamma())
+                    /(cInfo.getGamma()+wInfo.getGamma()+SMALL);         // Contact normal gamma
+    scalar aGammat = aG*(cInfo.getGamma()*wInfo.getGamma())
+                    /(cInfo.getGamma()+wInfo.getGamma()+SMALL);         // Contact tangential gamma
+    scalar aMu = (cInfo.getmu()+wInfo.getmu())/2;                       // Contact frictional coef
+    scalar aadhN = (cInfo.getAdhN()+wInfo.getAdhN())/2;                 // Contact adhesive coef
 
     vector FnormOut = vector::zero;
     vector FtanOut = vector::zero;
@@ -500,6 +502,12 @@ void solveWallContact
             continue;
         }
 
+        Info << "-- Detected Particle-wall contact: -- body " << cVars->bodyId_ << endl;
+        Info << "-- Particle-wall contact center " << cInfo.getWallContactVar()[contVar].contactCenter_ << endl;
+        Info << "-- Particle-wall contact normal " << cInfo.getWallContactVar()[contVar].contactNormal_ << endl;
+        Info << "-- Particle-wall contact volume " << cInfo.getWallContactVar()[contVar].contactVolume_ << endl;
+        Info << "-- Particle-wall contact area "   << cInfo.getWallContactVar()[contVar].contactArea_ << endl;
+
         scalar Lc(4*mag(cLVec)*mag(cLVec)/(mag(cLVec)+mag(cLVec)));
         scalar reduceM(cVars->M0_*cVars->M0_/(cVars->M0_+cVars->M0_));
 
@@ -510,9 +518,11 @@ void solveWallContact
         vector wVel(vector::zero);
         scalar Vn(-(cVel-wVel) & nVec);
 
-        vector FN = (aKN*intersectedVolume/(Lc+SMALL)
-            + aGammaN*sqrt(aKN*reduceM/pow(Lc+SMALL,3))
+        vector FN = (aY*intersectedVolume/(Lc+SMALL)
+            + aGammaN*sqrt(aY*reduceM/pow(Lc+SMALL,3))
             *(Vn*overallContactArea))*nVec;
+
+        Info << "-- Particle-wall contact FN " << FN << endl;
 
         // if the IB was in contact in previous DEM time step, find the information about tangential force and assigne it
         vector FtLast(vector::zero);
@@ -533,29 +543,20 @@ void solveWallContact
 
         vector cVeliNorm((cVel & nVec)*nVec);
         vector Vt = cVel-cVeliNorm-wVel;
-        vector Ft = FtLastr - aKt*Lc*Vt*deltaT - aGammat*sqrt(aKt*reduceM*Lc)*Vt;
+        vector Ft = FtLastr - aG*Lc*Vt*deltaT - aGammat*sqrt(aG*reduceM*Lc)*Vt;
 
-        Info << "prtPrt Ft " << Ft << endl;
-        if (mag(Ft) > amu * mag(FN))
+        Info << "-- Particle-wall contact Ft " << Ft << endl;
+        if (mag(Ft) > aMu * mag(FN))
         {
-            Ft *= amu * mag(FN) / mag(Ft);
+            Ft *= aMu * mag(FN) / mag(Ft);
         }
-        Info << "prtPrt Ft final " << Ft << endl;
+        Info << "-- Particle-wall contact Ft clamped" << Ft << endl;
 
-        //scalar FAc(aadhN*overallContactArea);
-        //scalar FAeq(aKN*((aadhEqui*cVars->M0_)/(cVars->rhoS_.value() + SMALL))/(Lc+SMALL));
-        //scalar partMul((cVars->M0_-cVars->M_)/(cVars->M0_+SMALL)/(aadhEqui+SMALL));
-        //if(partMul > 1)
-        //{
-        //    partMul = 1;
-        //}
-        //vector FA((FAeq * partMul  + FAc * (1-partMul)) * nVec);
         scalar pi = Foam::constant::mathematical::pi;
-        vector FA((sqrt(8*pi*intersectedVolume*aKN*aadhN)) * nVec);
-        Info << "FN " << FN << endl;
-        Info << "FA " << FA << endl;
+        vector FA((sqrt(8*pi*aY*aadhN*intersectedVolume)) * nVec);
+
+        Info << "-- Particle-wall FA " << FA << endl;
         FN -= FA;
-        Info << "FN final " << FN << endl;
 
         FnormOut += FN;
         FtanOut += Ft;

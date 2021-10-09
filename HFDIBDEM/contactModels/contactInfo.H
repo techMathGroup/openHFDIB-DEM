@@ -81,26 +81,20 @@ class contactInfo
     // faces in contact with walls
     List<wallContactVars> wallContactsVars;
 
-    // spring stiffness for normal contact force
-    scalar  kN_;
+    // Young modulus
+    scalar  Y_;
 
-    // spring stiffness for tangential contact force
-    scalar  kt_;
+    // poisson ration
+    scalar  nu_;
 
-    // damping coefficient for normal contact force
-    scalar gammaN_;
-
-    // damping coefficient for tangential contact force
-    scalar gammat_;
+    // dissipative coef
+    scalar gamma_;
 
     // friction coefficient
     scalar mu_;
 
     // adhesion coefficient for normal contact force
     scalar adhN_;
-
-    // adhesion coefficient for normal contact force
-    scalar adhEqui_;
 
     // tangential force from last timestep
     // first label -1 indicates wall other for bodyID
@@ -112,13 +106,11 @@ class contactInfo
     contactInfo
     (
         geomModel& geomModel,
-        scalar kN,
-        scalar kt,
-        scalar gammaN,
-        scalar gammat,
+        scalar Y,
+        scalar nu,
+        scalar gamma,
         scalar mu,
-        scalar adhN,
-        scalar adhEqui
+        scalar adhN
     );
 
     // Destructors -------------------------------------------------
@@ -169,24 +161,19 @@ class contactInfo
         timeStepsInContWStatic_ = setter;
     }
 
-    const scalar& getkN()   const
+    const scalar& getY()   const
     {
-        return kN_;
+        return Y_;
     }
 
-    const scalar& getkt()   const
+    const scalar& getNu()   const
     {
-        return kt_;
+        return nu_;
     }
 
-    const scalar& getgammaN()   const
+    const scalar& getGamma()   const
     {
-        return gammaN_;
-    }
-
-    const scalar& getgammat()   const
-    {
-        return gammat_;
+        return gamma_;
     }
 
     const scalar& getmu()   const
@@ -197,11 +184,6 @@ class contactInfo
     const scalar& getAdhN()   const
     {
         return adhN_;
-    }
-
-    const scalar& getAdhEqui()   const
-    {
-        return adhEqui_;
     }
 
     DynamicList<Tuple2<label,Tuple2<label,vector>>>& getHistoryFt()
