@@ -29,10 +29,10 @@ Description
     class for addition and removal of immersedBodies
 
 SourceFiles
-    addModels.C
+    addModelRepeatSamePosition.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -41,72 +41,80 @@ Contributors
 
 #include "addModel.H"
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 namespace Foam
-{    
-    class addModelRepeatSamePosition
-    : public addModel
+{
+
+/*---------------------------------------------------------------------------*\
+                 Class addModelRepeatSamePosition Declaration
+\*---------------------------------------------------------------------------*/
+
+class addModelRepeatSamePosition
+:
+    public addModel
+{
+
+    private:
+    const dictionary&       addModelDict_;
+    word                    addMode_;
+    bool                    bodyAdded_;
+    autoPtr<geomModel> geomModel_;
+
+    const dictionary&       coeffsDict_;
+    label                   useNTimes_;
+    scalar                  timeBetweenUsage_;
+    label                   addedOnTimeLevel_;
+
+    public:
+
+    // Constructors ------------------------------------------------
+    addModelRepeatSamePosition
+    (
+        const dictionary& addModelDict,
+        const Foam::dynamicFvMesh& mesh,
+        geomModel* bodyGeomModel
+    );
+
+    // Destructors -------------------------------------------------
+    ~addModelRepeatSamePosition();
+
+    // Public methods ----------------------------------------------
+    //~ void init();
+
+    bool shouldAddBody(const volScalarField& body);
+
+    geomModel* addBody(const volScalarField& body);
+
+    bool checkIfAdd()
     {
-    
-        private:
-        const dictionary&       addModelDict_;
-        word                    addMode_;
-        const word              stlName_;
-        bool                    bodyAdded_;
-        
-        const  dynamicFvMesh&   mesh_;
-        
-        const dictionary&       coeffsDict_;
-        label                   useNTimes_;
-        scalar                  timeBetweenUsage_;
-        label                   addedOnTimeLevel_;
-                
-        protected:
-        
-        
-        public:
-        
-        // Constructors ------------------------------------------------
-        addModelRepeatSamePosition
-        (
-            const dictionary& addModelDict,
-            const word        stlName,
-            const Foam::dynamicFvMesh& mesh
-        );
-        
-        // Destructors -------------------------------------------------
-        ~addModelRepeatSamePosition();
-        
-        // Public subclasses -------------------------------------------
-        
-        // Public variables --------------------------------------------
-        
-        // Public methods ----------------------------------------------
-        //~ void init();
-        
-        bool shouldAddBody(const volScalarField& body);
-        
-        triSurface addBody(const volScalarField& body);
-        
-        bool canAddBody
-        (
-            const volScalarField& body,
-            const triSurfaceMesh& bodySurfMesh
-        );
-           
-        bool checkIfAdd() {return true;}
-        
-        void translateRandom() {Info << "-- addModelMessage-- " << "Not needed"<< endl;}
-        
-        void rotateRandom() {Info << "-- addModelMessage-- " << "Not needed"<< endl;}
-        
-        word getAddMode()
-        {
-            return addMode_;
-        }
-        
-        bool getBodyAdded(){return bodyAdded_;}
-        
-    };
-}
+        return true;
+    }
+
+    void translateRandom()
+    {
+        Info << "-- addModelMessage-- " << "Not needed"<< endl;
+    }
+
+    void rotateRandom()
+    {
+        Info << "-- addModelMessage-- " << "Not needed"<< endl;
+    }
+
+    word getAddMode()
+    {
+        return addMode_;
+    }
+
+    bool getBodyAdded(){return bodyAdded_;}
+};
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
+
+// ************************************************************************* //

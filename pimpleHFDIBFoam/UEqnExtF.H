@@ -6,7 +6,7 @@ fvVectorMatrix UEqn
 (
     fvm::ddt(U) + fvm::div(phi, U)
   + MRF.DDt(U)
-  + turbulence->divDevReff(U)
+  + turbulence->divDevSigma(U)
  ==
     fvOptions(U)
   + g
@@ -19,7 +19,7 @@ fvOptions.constrain(UEqn);
 
 volScalarField UA(UEqn.A());
 UA.correctBoundaryConditions();
-HFDIBDEM.updateFSCoupling(lambda,f);//updates V_el, omega_ and Axis_
+HFDIBDEM.updateFSCoupling(lambda,f);                                    //updates V_el, omega_ and Axis_
 HFDIBDEM.interpolateIB(U,Ui,lambda);
 Ui.correctBoundaryConditions();
 
@@ -29,7 +29,6 @@ f.correctBoundaryConditions();
 if (pimple.momentumPredictor())
 {    
     solve(UEqn == -fvc::grad(p) + f);
-    //~ solve(UEqn == -fvc::grad(p));
     fvOptions.correct(U);
 }
 

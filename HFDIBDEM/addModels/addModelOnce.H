@@ -29,10 +29,10 @@ Description
     class for addition and removal of immersedBodies
 
 SourceFiles
-    addModels.C
+    addModelOnce.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -41,57 +41,61 @@ Contributors
 
 #include "addModel.H"
 
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 namespace Foam
-{    
-    class addModelOnce
-    : public addModel
+{
+
+/*---------------------------------------------------------------------------*\
+                        Class addModelOnce Declaration
+\*---------------------------------------------------------------------------*/
+
+class addModelOnce
+:
+    public addModel
+{
+
+    private:
+    const dictionary&       addModelDict_;
+    word                    addMode_;
+    bool                    bodyAdded_;
+    autoPtr<geomModel> geomModel_;
+
+    public:
+
+    // Constructors ------------------------------------------------
+    addModelOnce
+    (
+        const dictionary& addModelDict,
+        const Foam::dynamicFvMesh& mesh,
+        const bool startTime0,
+        geomModel* bodyGeomModel
+    );
+
+    // Destructors -------------------------------------------------
+    ~addModelOnce();
+
+    // Public methods ----------------------------------------------
+
+    bool shouldAddBody(const volScalarField& body)
     {
-    
-        private:
-        const dictionary&       addModelDict_;
-        word                    addMode_;
-        const word              stlName_;
-        bool                    bodyAdded_;
-        
-        const  dynamicFvMesh&   mesh_;
-        
-        protected:
-        
-        
-        public:
-        
-        // Constructors ------------------------------------------------
-        addModelOnce
-        (
-            const dictionary& addModelDict,
-            const word        stlName,
-            const Foam::dynamicFvMesh& mesh
-        );
-        
-        // Destructors -------------------------------------------------
-        ~addModelOnce();
-        
-        // Public subclasses -------------------------------------------
-        
-        // Public variables --------------------------------------------
-        
-        // Public methods ---------------------------------------------- 
-        //~ void init();
-        
-        bool shouldAddBody(const volScalarField& body){return not bodyAdded_;}
-        
-        triSurface addBody(const volScalarField& body);
-        
-        bool canAddBody
-        (
-            const volScalarField& body,
-            const triSurfaceMesh& bodySurfMesh
-        );
-        
-        bool getBodyAdded(){return bodyAdded_;}
-        
-                       
-    };
-}
+        return not bodyAdded_;
+    }
+
+    geomModel* addBody(const volScalarField& body);
+
+    bool getBodyAdded()
+    {
+        return bodyAdded_;
+    }
+};
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 #endif
+
+// ************************************************************************* //

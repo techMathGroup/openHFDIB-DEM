@@ -1,12 +1,12 @@
 /*---------------------------------------------------------------------------*\
-                        _   _ ____________ ___________
-                       | | | ||  ___|  _  \_   _| ___ \     H ybrid
-  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /     F ictitious
- / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \     D omain
-| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /     I mmersed
- \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/      B oundary
-      | |
-      |_|
+                        _   _ ____________ ___________    ______ ______ _    _
+                       | | | ||  ___|  _  \_   _| ___ \   |  _  \|  ___| \  / |
+  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /   | | | || |_  |  \/  |
+ / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \---| | | ||  _| | |\/| |
+| (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /---| |/ / | |___| |  | |
+ \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/    |___/  |_____|_|  |_|
+      | |                     H ybrid F ictitious D omain - I mmersed B oundary
+      |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
 
@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "addModelOnce.H"
@@ -37,16 +37,19 @@ using namespace Foam;
 addModelOnce::addModelOnce
 (
     const dictionary& addModelDict,
-    const word        stlName,
-    const Foam::dynamicFvMesh& mesh
+    const Foam::dynamicFvMesh& mesh,
+    const bool startTime0,
+    geomModel* bodyGeomModel
 )
 :
+addModel(mesh),
 addModelDict_(addModelDict),
 addMode_(word(addModelDict_.lookup("addModel"))),
-stlName_(stlName),
 bodyAdded_(false),
-mesh_(mesh)
+geomModel_(bodyGeomModel)
 {
+    if(!startTime0)
+        bodyAdded_ = true;
 }
 
 addModelOnce::~addModelOnce()
@@ -54,39 +57,14 @@ addModelOnce::~addModelOnce()
 }
 //---------------------------------------------------------------------------//
 
-triSurface addModelOnce::addBody
+geomModel* addModelOnce::addBody
 (
     const   volScalarField& body
 )
 {
-    triSurfaceMesh bodySurfMesh
-    (
-        IOobject
-        (
-            stlName_ +".stl",
-            "constant",
-            "triSurface",
-            mesh_,
-            IOobject::MUST_READ,
-            IOobject::NO_WRITE
-        )
-    );
-    
-    bool canAddBodyI(canAddBody(body,bodySurfMesh));
+    bool canAddBodyI(geomModel_().canAddBody(body));
     reduce(canAddBodyI, andOp<bool>());
-    
-    bodyAdded_ = canAddBodyI;
-    
-    triSurface triToRet(bodySurfMesh);
-    
-    return triToRet;
-}
 
-bool addModelOnce::canAddBody
-(
-    const volScalarField& body,
-    const triSurfaceMesh& bodySurfMesh
-)
-{
-    #include "canAddBodySource.H"
+    bodyAdded_ = canAddBodyI;
+    return geomModel_().getGeomModel();
 }

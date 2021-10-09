@@ -1,3 +1,5 @@
+#include "createRDeltaT.H"
+
 Info<< "Reading field p\n" << endl;
 volScalarField p
 (
@@ -48,16 +50,12 @@ volScalarField lambda
         "lambda",
         runTime.timeName(),
         mesh,
-        //~ IOobject::MUST_READ,
         IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
     mesh,
-    dimensionedScalar("zero",dimless,0) // initialising to 0
+    dimensionedScalar("zero",dimless,0)
 );
-// Note: OK, this is not a very nice coding, I read the field and do not
-//       use the values at all... a more suitable definition of lambda
-//       would be appropriate (MI)
 
 Info<< "Reading field f\n" << endl;
 volVectorField f
@@ -72,19 +70,21 @@ volVectorField f
     ),
     mesh
 );
-/*
-volVectorField UHelp
+
+Info<< "Creating field refineF\n" << endl;
+volScalarField refineF
 (
     IOobject
     (
-        "UHelp",
+        "refineF",
         runTime.timeName(),
         mesh,
         IOobject::READ_IF_PRESENT,
         IOobject::AUTO_WRITE
     ),
-    mesh
-);*/
+    mesh,
+    dimensionedScalar("zero",dimless,0)
+);
 
 
 #include "createPhi.H"
@@ -115,9 +115,9 @@ dimensionedScalar rho = dimensionedScalar(
 
 singlePhaseTransportModel laminarTransport(U, phi);
 
-autoPtr<incompressible::turbulenceModel> turbulence
+autoPtr<incompressible::momentumTransportModel> turbulence
 (
-    incompressible::turbulenceModel::New(U, phi, laminarTransport)
+    incompressible::momentumTransportModel::New(U, phi, laminarTransport)
 );
 
 
@@ -132,5 +132,3 @@ IOdictionary HFDIBDEMDict
         IOobject::NO_WRITE
     )
 );
-
-scalar thrSurf(readScalar(HFDIBDEMDict.lookup("surfaceThreshold")));
