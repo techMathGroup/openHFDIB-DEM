@@ -88,5 +88,5 @@ doc/Doxygen/DTAGS
 /.project
 /.dir-locals.el
 
-# Ignore the test directory
-/tutorialsTest
+# Ignore the gitignore
+.gitignore
