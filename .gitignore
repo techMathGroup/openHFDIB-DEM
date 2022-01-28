@@ -87,6 +87,3 @@ doc/Doxygen/DTAGS
 /.cproject
 /.project
 /.dir-locals.el
-
-# Ignore the gitignore
-.gitignore
