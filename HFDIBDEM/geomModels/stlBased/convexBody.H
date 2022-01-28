@@ -29,10 +29,10 @@ Description
     class for addition and removal of immersedBodies
 
 SourceFiles
-    addModels.C
+    convexBody.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*), 
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -42,30 +42,29 @@ Contributors
 #include "stlBased.H"
 
 namespace Foam
-{            
+{
     class convexBody
     : public stlBased
     {
-    
+
         private:
-            
+
         typedef DynamicList<label> DynamicLabelList;
         typedef DynamicList<scalar> DynamicScalarList;
         typedef DynamicList<vector> DynamicVectorList;
         typedef DynamicList<point> DynamicPointList;
-        
+
         protected:
-        
-        
+
+
         public:
-        
+
         // Constructors ------------------------------------------------
         convexBody
         (
-            const  dynamicFvMesh&   mesh,
+            const  fvMesh&   mesh,
             word      stlPath,
-            scalar  thrSurf = 1,
-            Vector<label> geometricD = {1,1,1}
+            scalar  thrSurf = 1
         )
         :
         stlBased
@@ -73,25 +72,24 @@ namespace Foam
             mesh,
             arbShape,
             stlPath,
-            thrSurf,
-            geometricD
+            thrSurf
         ){}
-        
+
         // Destructors -------------------------------------------------
         ~convexBody(){}
-        
+
         // Public subclasses -------------------------------------------
-        
+
         // Public variables --------------------------------------------
-        
-        // Public methods ---------------------------------------------- 
+
+        // Public methods ----------------------------------------------
         //~ void init();
-        
+
         bool canAddBody
         (
             const volScalarField& body
         ) final override;
-        
+
         void createImmersedBody
         (
             volScalarField& body,
@@ -100,7 +98,7 @@ namespace Foam
             List<DynamicLabelList>& intCells,
             List<pointField>& cellPoints
         ) final override;
-        
+
         labelList createImmersedBodyByOctTree
         (
             label cellToCheck,
@@ -110,13 +108,13 @@ namespace Foam
             volScalarField& body,
             List<DynamicLabelList>& surfCells,
             List<DynamicLabelList>& intCells
-        );        
-                
+        );
+
         geomModel* getGeomModel() final override
         {
-            convexBody* convexBodyModel = new convexBody(mesh_,stlPath_,thrSurf_,geometricD_);
+            convexBody* convexBodyModel = new convexBody(mesh_,stlPath_,thrSurf_);
             stlBased* stlBasedModel = convexBodyModel;
-            stlBasedModel->initVars(bodySurfMesh_.points(), thrSurf_, geometricD_, intSpan_, sdBasedLambda_);
+            stlBasedModel->initVars(bodySurfMesh_.points(), thrSurf_, intSpan_, sdBasedLambda_);
             geomModel* bodyGeomModel = stlBasedModel;
             return bodyGeomModel;
         }

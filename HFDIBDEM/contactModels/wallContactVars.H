@@ -29,12 +29,15 @@ Description
     class for storage of particle-wall contact variables
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef wallContactVars_H
 #define wallContactVars_H
+
+#include "meanContactPar.H"
+// #include "fvMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -52,6 +55,47 @@ class wallContactVars
     scalar contactVolume_;
     vector contactNormal_;
     scalar contactArea_;
+
+    meanContactPar meanContactPar_;
+
+    vector lVec_;
+    vector Veli_;
+    scalar Vn_;
+    scalar Lc_;
+    scalar curAdhN_;    // Current contact adhesive coef
+
+    vector FtPrev_;     // Tangential force from previous time-step
+
+    // Constructors ------------------------------------------------
+    wallContactVars()
+    {
+        contactCenter_ = vector::zero;
+        contactVolume_ = 0;
+        contactNormal_ = vector::zero;
+        contactArea_ = 0;
+
+        lVec_ = vector::zero;
+        Veli_ = vector::zero;
+        Vn_ = 0;
+        Lc_ = 0;
+        curAdhN_ = 0;
+        FtPrev_ = vector::zero;
+    }
+
+    // Destructors -------------------------------------------------
+    ~wallContactVars(){}
+
+    void setMeanCntPars
+    (
+        const fvMesh&   mesh,
+        DynamicList<Tuple2<label,string>>& contactFaces,
+        HashTable<meanContactPar,string,Hash<string>>& wallMeanPars
+    );
+
+    meanContactPar& getMeanCntPar()
+    {
+        return meanContactPar_;
+    }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

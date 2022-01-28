@@ -32,7 +32,7 @@ SourceFiles
     addModelOnceScatter.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -78,6 +78,7 @@ class addModelOnceScatter
     label		partPerAdd_;
 	scalar		fieldValue_;
     label		addedOnTimeLevel_;
+    const scalar startTimeValue_;
 
 	word		zoneName_;
     vector		minBound_;
@@ -118,9 +119,6 @@ class addModelOnceScatter
 
     bool        allActiveCellsInMesh_;
 
-    label       nGeometricD_;
-    Vector<label>      geometricD_;
-
     Random          randGen_;
 
     public:
@@ -129,9 +127,8 @@ class addModelOnceScatter
     addModelOnceScatter
     (
         const dictionary& addModelDict,
-        const Foam::dynamicFvMesh& mesh,
+        const Foam::fvMesh& mesh,
         const bool startTime0,
-        const Vector<label> geomDir,
         geomModel* bodyGeomModel
     );
 

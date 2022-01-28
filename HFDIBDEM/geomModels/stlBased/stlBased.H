@@ -29,10 +29,10 @@ Description
     class for addition and removal of immersedBodies
 
 SourceFiles
-    addModels.C
+    stlBased.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -67,11 +67,10 @@ namespace Foam
         // Constructors ------------------------------------------------
         stlBased
         (
-            const  dynamicFvMesh&   mesh,
-            contactType cType,
+            const  fvMesh&   mesh,
+            const contactType cType,
             word      stlPath,
-            scalar  thrSurf,
-            Vector<label> geometricD
+            scalar  thrSurf
         );
 
         // Destructors -------------------------------------------------
@@ -85,20 +84,22 @@ namespace Foam
             List<DynamicLabelList>& intCells,
             List<pointField>& cellPoints
         )
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual bool canAddBody
         (
             const volScalarField& body
         )
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return false;}
-
-        virtual geomModel* getGeomModel()
         {
-            Info << "-- geomModelMessage-- " << "notIplemented"<<endl;
-            geomModel* bodyGeomModel = new geomModel(mesh_);
-            return bodyGeomModel;
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            return false;
         }
+
+        virtual geomModel* getGeomModel() = 0;
 
         vector addModelReturnRandomPosition(
             const bool allActiveCellsInMesh,
@@ -149,18 +150,6 @@ namespace Foam
             return bounds;
         }
 
-        void recordHistory() final override
-        {
-            historyPoints_ = bodySurfMesh_.points();
-        }
-
-        void returnHistory() final override
-        {
-            bodySurfMesh_.movePoints(historyPoints_);
-            triSurf_.reset(new triSurface(bodySurfMesh_));
-            triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
-        }
-
         void synchronPos() final override;
 
         void writeBodyInfo(label bodyId, IOdictionary& dict, word path) final override
@@ -182,7 +171,13 @@ namespace Foam
             return returnList[0];
         }
 
-        vector getClosestNormal(point startPoint, vector span) final override
+        void getClosestPointAndNormal
+        (
+            const point& startPoint,
+            const vector& span,
+            point& closestPoint,
+            vector& normal
+        ) final override
         {
             // get nearest point on surface from contact center
             pointIndexHit ibPointIndexHit = triSurfSearch_().nearest(startPoint, span);
@@ -193,19 +188,30 @@ namespace Foam
             const triSurfaceMesh& ibTempMesh( bodySurfMesh_);
             ibTempMesh.getNormal(ibPointIndexHitList,normalVectorField);
 
-            return normalVectorField[0];
+            normal = normalVectorField[0];
+            closestPoint = ibPointIndexHit.hitPoint();
         }
 
-        void initVars(pointField surfPoints, scalar thrSurf, Vector<label> geometricD, scalar intSpan, bool sdBasedLambda)
+        void initVars(pointField surfPoints, scalar thrSurf, scalar intSpan, bool sdBasedLambda)
         {
             bodySurfMesh_.movePoints(surfPoints);
             triSurf_.reset(new triSurface(bodySurfMesh_));
             triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
             historyPoints_ = surfPoints;
             thrSurf_ = thrSurf;
-            geometricD_ = geometricD;
             intSpan_ = intSpan;
             sdBasedLambda_ = sdBasedLambda;
+        }
+
+        void setCoM() final override
+        {
+            pointField bSMeshPts = bodySurfMesh_.points();
+            CoM_    = vector::zero;
+            forAll(bSMeshPts,point)
+            {
+                CoM_ += bSMeshPts[point];
+            }
+            CoM_/= bSMeshPts.size();
         }
     };
 }

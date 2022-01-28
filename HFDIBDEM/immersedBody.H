@@ -21,7 +21,7 @@ InNamspace
     Foam
 Contributors
     Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Šourek (2019-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef immersedBody_H
@@ -38,7 +38,7 @@ Contributors
 #include "volFieldsFwd.H"
 #include "fvMatricesFwd.H"
 //~ #include "fvMesh.H"
-#include "dynamicFvMesh.H"
+// #include "fvMesh.H"
 #include "triSurfaceMesh.H"
 
 #include "geomModel.H"
@@ -46,7 +46,10 @@ Contributors
 #include "convexBody.H"
 #include "nonConvexBody.H"
 
-#include "contactInfo.H"
+#include "ibContactClass.H"
+#include "wallContactInfo.H"
+#include "interpolationInfo.H"
+#include "ibInterpolation.H"
 
 namespace Foam
 {
@@ -73,7 +76,7 @@ namespace Foam
         dictionary&             immersedDict_;
 
         // mesh reference
-        const  dynamicFvMesh&   mesh_;
+        const  fvMesh&   mesh_;
 
         // fluid properties
         dictionary&             transportProperties_;
@@ -81,8 +84,15 @@ namespace Foam
         // body geometry
         autoPtr<geomModel> geomModel_;
 
+        // Interpolation Info
+        autoPtr<interpolationInfo> intpInfo_;
+
         // contact models
-        autoPtr<contactInfo> contactInfo_;
+        autoPtr<ibContactClass> ibContactClass_;
+
+        autoPtr<ibContactVars> ibCntVars_;
+
+        autoPtr<wallContactInfo> wallCntInfo_;
 
         // precalculate cellPoints for better performace
         List<pointField>& cellPoints_;
@@ -148,18 +158,12 @@ namespace Foam
         // processor num that owns the IB
         label owner_;
 
-        // relaxation factor for velocity
-        scalar velRelaxFac_;
-
         // update immersed body info
         void  updateImmersedBody
         (
             volScalarField& body,
             volVectorField& f
         );
-
-        // create interpolation points
-        void  calculateInterpolationPoints(volScalarField& body);
 
         // update fluid-solid coupling
         void updateCoupling
@@ -175,27 +179,6 @@ namespace Foam
         // -- total torque acting on the particle
         vector  historyCouplingT_;
 
-        // -- rotation axis
-        vector historyAxis_;
-
-        // -- angular velocity
-        scalar historyOmega_;
-
-        // -- linear velocity
-        vector historyVel_;
-
-        // -- linear acceleration
-        vector historya_;
-
-        // -- angular acceleration
-        vector historyAlpha_;
-
-        // -- total Rodrigues angle of the body
-        vector historyTotalAngle_;
-
-        // -- tangential force from last timestep
-        DynamicList<Tuple2<label,Tuple2<label,vector>>> historyFt_;
-
         // auxiliary octree variables
         Field<label> octreeField_;
         label cellToStartInCreateIB_;
@@ -209,15 +192,10 @@ namespace Foam
         scalar  intSpan_;
         scalar  charCellSize_;                                          //characteristic cell size over surface
         label   refineBuffers_;                                         //number of refine buffers around body
-        bool    useInterpolation_;                                      //number of refine buffers around body
         label   recomputeM0_;                                           //how many times rocompute M0_ because of refinement
-        vector  geometricD_;                                            //geometric directions
         bool    created_;
         label   timesToSetStatic_;
         vector  staticContactPost_;
-
-        // immersed body initialization
-        void initializeIB();
 
         protected:
 
@@ -229,14 +207,18 @@ namespace Foam
         immersedBody
         (
             word bodyName,
-            const Foam::dynamicFvMesh& mesh,
+            const Foam::fvMesh& mesh,
+            const volScalarField& body,
             dictionary& HFDIBDEMDict,
             dictionary& transportProperties,
             label bodyId,
             label recomputeM0,
-            vector geometricD,
             geomModel* bodyGeomModel,
-            List<pointField>& cellPoints
+            autoPtr<ibInterpolation>& ibIntp,
+            List<pointField>& cellPoints,
+            HashTable<materialInfo,string,Hash<string>>& materialInfos,
+            HashTable<materialInfo,string,Hash<string>>& wInfos,
+            HashTable<scalar,string,Hash<string>>& matInterAdh
         );
 
         // Destructors -------------------------------------------------
@@ -244,7 +226,7 @@ namespace Foam
 
         // Public subclasses -------------------------------------------
         // -- class to keep interpolation data
-        class interpolationInfo{
+        class interpolationInfoOld{
         public:
             label surfCell_;
             DynamicPointList intPoints_;
@@ -266,7 +248,7 @@ namespace Foam
 
         // Public variables --------------------------------------------
         // -- interpolation info list
-        List<DynamicList<immersedBody::interpolationInfo>>  interpolationInfo_;
+        List<DynamicList<immersedBody::interpolationInfoOld>>  interpolationInfoOld_;
 
         // -- interpolation vec request list
         List<DynamicList<immersedBody::intVecRequest>>      interpolationVecReqs_;
@@ -283,46 +265,23 @@ namespace Foam
         void resetBody(volScalarField& body, bool resethistoryFt = true);
 
         //update body movement based on F_ and T_
-        void updateMovement();
         void updateMovement
         (
             scalar deltaT
         );
         void updateMovement
         (
-            scalar deltaT,
             vector Vel,
             vector Axis,
             scalar omega
         );
-        void updateMovement
-        (
-            scalar deltaT,
-            vector Vel,
-            vector Axis,
-            scalar omega,
-            scalar velRelaxFac
-        );
-        void updateMovement
-        (
-            vector Vel,
-            vector Axis,
-            scalar omega
-        );
-        void updateMovement
-        (
-            vector Vel,
-            vector Axis,
-            scalar omega,
-            scalar velRelaxFac
-        );
+
         void updateMovementComp
         (
             scalar deltaT,
             vector Vel,
             vector Axis,
-            scalar omega,
-            scalar velRelaxFac
+            scalar omega
         );
 
         // create immersed body
@@ -349,9 +308,22 @@ namespace Foam
 
         // getters
 
+        interpolationInfo& getIntpInfo()
+        {
+            return intpInfo_();
+        }
+
+        void clearIntpInfo()
+        {
+            if(intpInfo_.valid())
+            {
+                intpInfo_().clearIntpInfo();
+            }
+        }
+
         const bool& checkWallContact() const
         {
-            return contactInfo_->checkWallContact();
+            return ibContactClass_->checkWallContact();
         }
 
         const label& getBodyId() const
@@ -404,11 +376,6 @@ namespace Foam
             return bodyOperation_;
         }
 
-        const DynamicList<Tuple2<label,Tuple2<label,vector>>>& getHistoryFt()   const
-        {
-            return historyFt_;
-        }
-
         const vector& getHistoryCouplingF()   const
         {
             return historyCouplingF_;
@@ -434,9 +401,9 @@ namespace Foam
             return interpolationVecReqs_;
         };
 
-        List<DynamicList<immersedBody::interpolationInfo>>& getInterpolationInfo()
+        List<DynamicList<immersedBody::interpolationInfoOld>>& getInterpolationInfo()
         {
-            return interpolationInfo_;
+            return interpolationInfoOld_;
         };
 
         List<List<label>>& getBoundIndList()
@@ -454,7 +421,6 @@ namespace Foam
             return maxBoundPoint_;
         };
 
-        // move the body post-contact
         void postContactUpdateBodyField(volScalarField& body, volScalarField& refineF);
 
         void recreateBodyField(volScalarField& body, volScalarField& refineF);
@@ -464,8 +430,7 @@ namespace Foam
         (
             volVectorField& VS,
             word VName,
-            volScalarField& body,
-            vectorField surfNorm
+            volScalarField& body
         );
 
         // update force and torque acting on the body
@@ -479,15 +444,9 @@ namespace Foam
             T_+=TIn;
         }
 
-        void preContactUpdateImmersedBody
-        (
-            volScalarField& body,
-            volVectorField& f
-        );
-        void setWallContact(bool inContact){contactInfo_->setWallContact(inContact);;}
+        void setWallContact(bool inContact){ibContactClass_->setWallContact(inContact);;}
 
-        void postContactUpdateImmersedBody(volScalarField& body,volVectorField& f);
-        void postContactUpdateImmersedBody(scalar deltaT);
+        void postPimpleUpdateImmersedBody(volScalarField& body,volVectorField& f);
 
         // compute the mean and maximal body courant number (based on
         // the body linear velocity)
@@ -502,39 +461,24 @@ namespace Foam
         // print out "eulerian" forces acting on the body for control
         void printForcesAndTorques();
 
-        // function to compute local particle radii w.r.t. CoM_
-        DynamicScalarList getLocPartRad(DynamicLabelList& cellsOfInt);
-
         // auxiliary switch to turn off/on torque update
         bool& retUpdateTorque()
         {
             return updateTorque_;
         }
 
-        // return to history position
-        void returnPosition();
-
         // initialize variables base to history
-        void initializeVarHistory( bool setHistory);
-
-        void solveWallContact
-        (
-            scalar kWN,
-            scalar gammaWN,
-            scalar kWt,
-            scalar gammaWt,
-            scalar muW,
-            scalar adhWN,
-            scalar deltaT
-        );
+        void resetForces()
+        {
+            F_*=0.0;
+            T_*=0.0;
+        }
 
         void switchActiveOff(volScalarField& body);
         const bool& getIsActive()
         {
             return isActive_;
         }
-
-        void assignFullHistory();
 
         const label& getOwner() const
         {
@@ -545,15 +489,6 @@ namespace Foam
         {
             return startSynced_;
         }
-
-        Tuple2<vector,Tuple2<label,label>> findCellCustom
-        (
-            vector& prevPoint,
-            label& startCell,
-            label& startProc,
-            vector& gradToBody,
-            scalar& intDist
-        );
 
         void initSyncWithFlow(const volVectorField& U);
 
@@ -573,11 +508,6 @@ namespace Foam
             return intSpan_;
         }
 
-        const bool& getUseInterpolation() const
-        {
-            return useInterpolation_;
-        }
-
         void computeBodyCharPars(){geomModel_->computeBodyCharPars(surfCells_);}
 
         void checkIfInDomain(volScalarField& body);
@@ -593,7 +523,7 @@ namespace Foam
 
         void inContactWithStatic(bool inContact)
         {
-            contactInfo_->inContactWithStatic(inContact);
+            ibContactClass_->inContactWithStatic(inContact);
         }
 
         void chceckBodyOp();
@@ -605,23 +535,19 @@ namespace Foam
             return geomModel_();
         }
 
-        contactInfo& getContactInfo()
+        ibContactClass& getibContactClass()
         {
-            return contactInfo_();
+            return ibContactClass_();
         }
 
-        contactVars* getContactVars()
+        ibContactVars& getContactVars()
         {
-            contactVars* cVars = new contactVars(
-                bodyId_,
-                Vel_,
-                omega_,
-                Axis_,
-                geomModel_->getM0(),
-                geomModel_->getM(),
-                geomModel_->getRhoS()
-            );
-            return cVars;
+            return ibCntVars_();
+        }
+
+        wallContactInfo& getWallCntInfo()
+        {
+            return wallCntInfo_();
         }
 
         void recordBodyInfo(IOdictionary& dict, word path)
@@ -632,7 +558,7 @@ namespace Foam
             dict.add("omega",omega_);
             dict.add("Axis",Axis_);
             dict.add("static",bodyOperation_ == 0);
-            dict.add("timeStepsInContWStatic", contactInfo_->getTimeStepsInContWStatic());
+            dict.add("timeStepsInContWStatic", ibContactClass_->getTimeStepsInContWStatic());
             geomModel_->writeBodyInfo(bodyId_,dict, path);
         }
 
@@ -643,6 +569,17 @@ namespace Foam
             AxisOld_  = Axis_;
             omegaOld_ = omega_;
         }
+
+        void writeIbInfo()
+        {
+            InfoH << iB_Info;
+            InfoH << "-- body " << bodyId_ << " center of mass       : " << geomModel_->getCoM() << endl;
+            InfoH << "-- body " << bodyId_ << " linear velocity      : " << Vel_ << endl;
+            InfoH << "-- body " << bodyId_ << " angluar velocity     : " << omega_ << endl;
+            InfoH << "-- body " << bodyId_ << " axis of rotation     : " << Axis_ << endl;
+        }
+
+        vectorField getUatIbPoints();
     };
 }
 #endif

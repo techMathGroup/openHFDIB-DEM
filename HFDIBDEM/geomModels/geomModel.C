@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "geomModel.H"
@@ -36,18 +36,16 @@ using namespace Foam;
 //---------------------------------------------------------------------------//
 geomModel::geomModel
 (
-    const  dynamicFvMesh&   mesh,
-    contactType cType,
-    scalar  thrSurf,
-    Vector<label> geometricD
+    const  fvMesh&   mesh,
+    const contactType cType,
+    scalar  thrSurf
 )
 :
-mesh_(mesh),
 contactType_(cType),
+mesh_(mesh),
 owner_(0),
 cellToStartInCreateIB_(0),
 thrSurf_(thrSurf),
-geometricD_(geometricD),
 intSpan_(2.0),
 sdBasedLambda_(false),
 curMeshBounds_(mesh_.points(),false),
@@ -65,46 +63,51 @@ geomModel::~geomModel()
 {
 }
 //---------------------------------------------------------------------------//
-void geomModel::calculateGeometricalProperties( volScalarField& body,List<DynamicLabelList>& surfCells, List<DynamicLabelList>& intCells )
+void geomModel::calculateGeometricalProperties
+(
+    volScalarField& body,List<DynamicLabelList>& surfCells,
+    List<DynamicLabelList>& intCells
+)
 {
-    vector CoMOld  = CoM_;
+    //vector CoMOld  = CoM_;
     M_      = scalar(0);
-    CoM_    = vector::zero;
+    //CoM_    = vector::zero;
+    setCoM();
     I_      = symmTensor::zero;
-    vector tmpCom(vector::zero);
+    //vector tmpCom(vector::zero);
 
-    addToMAndI(body,surfCells[Pstream::myProcNo()],tmpCom, CoMOld);
-    addToMAndI(body,intCells[Pstream::myProcNo()],tmpCom, CoMOld);
+    addToMAndI(body,surfCells[Pstream::myProcNo()]);
+    addToMAndI(body,intCells[Pstream::myProcNo()]);
 
     // collect from processors
     reduce(M_, sumOp<scalar>());
-    reduce(tmpCom,  sumOp<vector>());
+    //reduce(tmpCom,  sumOp<vector>());
     reduce(I_,  sumOp<symmTensor>());
 
-    CoM_ = tmpCom / (M_+SMALL);
+    /*if(M_ > 0)
+    {
+        CoM_ = tmpCom / M_;
+    }*/
 }
 //---------------------------------------------------------------------------//
 void geomModel::addToMAndI
 (
     volScalarField& body,
-    DynamicLabelList& labelCellLst,
-    vector& tmpCom,
-    vector CoMOld
+    DynamicLabelList& labelCellLst
 )
 {
     forAll (labelCellLst,cell)
     {
         label cellI  = labelCellLst[cell];
-        
+
         scalar Mi    = body[cellI]*rhoS_.value()*mesh_.V()[cellI];
         // add to M_
-        
+
         M_      += Mi;
-        tmpCom  += Mi*mesh_.C()[cellI];
-        scalar xLoc = mesh_.C()[cellI].x() - CoMOld.x();
-        scalar yLoc = mesh_.C()[cellI].y() - CoMOld.y();
-        scalar zLoc = mesh_.C()[cellI].z() - CoMOld.z();
-        
+        scalar xLoc = mesh_.C()[cellI].x() - CoM_.x();
+        scalar yLoc = mesh_.C()[cellI].y() - CoM_.y();
+        scalar zLoc = mesh_.C()[cellI].z() - CoM_.z();
+
         // add to I_
         I_.xx() += Mi*(yLoc*yLoc + zLoc*zLoc);
         I_.yy() += Mi*(xLoc*xLoc + zLoc*zLoc);

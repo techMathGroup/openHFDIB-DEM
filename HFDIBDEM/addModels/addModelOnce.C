@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "addModelOnce.H"
@@ -37,7 +37,7 @@ using namespace Foam;
 addModelOnce::addModelOnce
 (
     const dictionary& addModelDict,
-    const Foam::dynamicFvMesh& mesh,
+    const Foam::fvMesh& mesh,
     const bool startTime0,
     geomModel* bodyGeomModel
 )
@@ -65,6 +65,7 @@ geomModel* addModelOnce::addBody
     bool canAddBodyI(geomModel_().canAddBody(body));
     reduce(canAddBodyI, andOp<bool>());
 
-    bodyAdded_ = canAddBodyI;
+    //bodyAdded_ = canAddBodyI;
+    bodyAdded_ = true;
     return geomModel_().getGeomModel();
 }

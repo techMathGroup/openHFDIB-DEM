@@ -1,0 +1,111 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \    /   O peration     | Version:  3.0.x                                 |
+|   \  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      HFDIBDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+bodyNames ( "sphere" );
+
+surfaceThreshold    1e-4;
+stepDEM     0.02;
+geometricD (1 -1 1);
+recordSimulation true;
+
+outputSetup
+{
+    basic true;
+    iB  false;
+    DEM false;
+    addModel true;
+}
+
+DEM
+{
+    materials
+    {
+        particle
+        {
+            Y       1e7;
+            nu      0.3;
+            gamma   5e-6;
+            mu      0.05;
+            adhN    0;
+        }
+        
+        wall
+        {
+            Y       1e7;
+            nu      0.2;
+            gamma   5e-6;
+            mu      0;
+            adhN    0;
+        }   
+    }
+
+    collisionPatches
+    {
+        walls wall;
+    }
+}
+
+sphere
+{
+fullyCoupledBody;
+rho         rho [1 -3 0 0 0 0 0] 3950;
+refineMC 5;
+U
+{
+	BC  noSlip;
+}
+material particle;
+bodyGeom sphere;
+sphere
+{
+    startPosition   (0.018 0 0);
+    radius  0.004;
+}
+updateTorque false;
+sdBasedLambda false;
+interfaceSpan 1.0;
+startSynced false;
+refineBuffers 0;
+useInterpolation false;
+timesToSetStatic -1; //number of timeSteps in contact with wall/static body to set body as static. Never when -1
+bodyAddition
+{
+	addModel onceScatter;
+    onceScatterCoeffs
+    {
+        addMode             fieldBased;
+        fieldBasedCoeffs
+        {
+            fieldName   lambda;                                      //name of the indicator field
+            fieldValue	0.7;                                         //minimal field value before addition
+        }
+        
+        addDomain      boundBox;
+        boundBoxCoeffs
+        {
+            minBound (-0.095 -1.0 -0.1);
+            maxBound (0 1.0 0.1);
+        }
+        
+        scalingMode    noScaling;
+        noScalingCoeffs{};
+        
+        rotationMode   noRotation;
+        noRotationCoeffs{};
+    }
+}
+}
+// ************************************************************************* //

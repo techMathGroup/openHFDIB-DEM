@@ -29,7 +29,7 @@ Description
     namespace providing functions to solve contacts
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -38,9 +38,9 @@ Contributors
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "prtPrtContact.H"
+#include "prtContact.H"
 #include "wallContact.H"
-#include "wallInfo.H"
+#include "materialInfo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "addModelDistribution.H"
@@ -38,8 +38,7 @@ using namespace Foam;
 addModelDistribution::addModelDistribution
 (
     const dictionary& addModelDict,
-    const Foam::dynamicFvMesh& mesh,
-    const Vector<label> geomDir,
+    const Foam::fvMesh& mesh,
     geomModel* bodyGeomModel
 )
 :
@@ -97,8 +96,6 @@ timeBased_(false),
 fieldBased_(false),
 fieldCurrentValue_(0),
 allActiveCellsInMesh_(true),
-nGeometricD_(0),
-geometricD_(geomDir),
 randGen_(clock::getTime())
 {
 	init();
@@ -119,18 +116,22 @@ void addModelDistribution::init()
 
 	if (addModeI_ == "timeBased")
 	{
-        Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notImplemented, will crash" << endl;
 	}
 	else if (addModeI_ == "fieldBased")
 	{
 		fieldValue_ = (readScalar(addModeICoeffs_.lookup("fieldValue")));
         fieldBased_ = true;
-        Info << "-- addModelMessage-- " << "addModel will control particles volume fraction" << endl;
-		Info << "-- addModelMessage-- " << "preset volume fraction: " << fieldValue_ << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "addModel will control particles volume fraction" << endl;
+		InfoH << "-- addModelMessage-- " << "preset volume fraction: "
+            << fieldValue_ << endl;
 	}
     else
     {
-        Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notImplemented, will crash" << endl;
     }
 
 	if (addDomain_ == "cellZone")
@@ -138,39 +139,28 @@ void addModelDistribution::init()
 		zoneName_ = (word(addDomainCoeffs_.lookup("zoneName")));
 		cellZoneActive_ = true;
         initializeCellZone();
-        Info << "-- addModelMessage-- " << "cellZone based addition zone" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "cellZone based addition zone" << endl;
 	}
 	else if (addDomain_ == "boundBox")
 	{
 		minBound_       = (addDomainCoeffs_.lookup("minBound"));
 		maxBound_       = (addDomainCoeffs_.lookup("maxBound"));
 		boundBoxActive_ = true;
-                if (addDomainCoeffs_.found("nGeometricD"))
-        {
-            nGeometricD_ = readLabel(addDomainCoeffs_.lookup("nGeometricD"));
-        }
-        else
-        {
-            nGeometricD_ = mesh_.nGeometricD();
-        }
-        if (addDomainCoeffs_.found("geometricD"))
-        {
-            geometricD_ = addDomainCoeffs_.lookup("geometricD");
-        }
-        else
-        {
-            geometricD_ = mesh_.geometricD();
-        }
+
         initializeBoundBox();
-        Info << "-- addModelMessage-- " << "boundBox based addition zone" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "boundBox based addition zone" << endl;
 	}
 	else if (addDomain_ == "domain")
 	{
-		Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
+		InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notImplemented, will crash" << endl;
 	}
     else
     {
-		Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
+		InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notImplemented, will crash" << endl;
 	}
 
     // check, if the whole zone is in the mesh
@@ -194,26 +184,18 @@ void addModelDistribution::init()
     if (zoneVol - zoneBBoxVol > 1e-5*zoneBBoxVol)
     {
         allActiveCellsInMesh_ = false;
-        Info << "-- addModelMessage-- "
+        InfoH << addModel_Info << "-- addModelMessage-- "
              << "addition zone NOT completely immersed in mesh "
              << "this computation will be EXPENSIVE" << endl;
-        Info << zoneVol << " " << zoneBBoxVol << endl;
+        InfoH << zoneVol << " " << zoneBBoxVol << endl;
     }
     else
     {
-        Info << "-- addModelMessage-- "
+        InfoH << addModel_Info << "-- addModelMessage-- "
              << "addition zone completely immersed in mesh -> OK" << endl;
     }
 
 	partPerAddTemp_ = partPerAdd_;
-
-	forAll (geometricD_, direction)
-    {
-        if (geometricD_[direction] == 1)
-        {
-            nGeometricD_++;
-        }
-    }
 }
 
 //---------------------------------------------------------------------------//
@@ -227,10 +209,13 @@ bool addModelDistribution::shouldAddBody(const volScalarField& body)
         scalar tmFrac(timeVal/timeBetweenUsage_);
         tmFrac -=  floor(tmFrac+deltaTime);
 
-        Info << "-- addModelMessage-- " << "Time/(Time beween usage) - floor(Time/Time beween usage): "
-             << tmFrac << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "Time/(Time beween usage) - floor(Time/Time beween usage): "
+            << tmFrac << endl;
 
-        Info << "-- addModelMessage-- " << "Number of bodies added on this time level: " << addedOnTimeLevel_ << endl;
+        InfoH << "-- addModelMessage-- "
+            << "Number of bodies added on this time level: "
+            << addedOnTimeLevel_ << endl;
 
         bool tmLevelOk(tmFrac < deltaTime);
 
@@ -250,7 +235,9 @@ bool addModelDistribution::shouldAddBody(const volScalarField& body)
         scalar currentLambdaFrac(checkLambdaFraction(body));
         if (currentLambdaFrac < fieldValue_ )
         {
-            Info << "-- addModelMessage-- " << "Current lambda fraction = " << currentLambdaFrac << " < then preset lambda fraction = " << fieldValue_ << endl;
+            InfoH << addModel_Info << "-- addModelMessage-- "
+                << "Current lambda fraction = " << currentLambdaFrac
+                << " < then preset lambda fraction = " << fieldValue_ << endl;
             return true;
         }
     }
@@ -269,7 +256,8 @@ geomModel* addModelDistribution::addBody
     geomModel_->resetBody();
 
     Tuple2<label, scalar> scaleFactor = returnScaleFactor();
-    Info << "-- addModelMessage-- " << "scaled STL size: " << stlBaseSize_ * scaleFactor.second() << endl;
+    InfoH << addModel_Info << "-- addModelMessage-- "
+        << "scaled STL size: " << stlBaseSize_ * scaleFactor.second() << endl;
     geomModel_->bodyScalePoints(scaleFactor.second());
     scalar partVolume(1.0/6.0*3.14*pow(stlBaseSize_ * scaleFactor.second(),3));
 
@@ -294,13 +282,17 @@ geomModel* addModelDistribution::addBody
 	{
 		if(timeBased_)
 		{
-			Info << "-- addModelMessage-- " << "addedOnTimeLevel:  " << addedOnTimeLevel_<< endl;
+			InfoH << addModel_Info << "-- addModelMessage-- "
+                << "addedOnTimeLevel:  " << addedOnTimeLevel_<< endl;
 			addedOnTimeLevel_++;
-			Info << "-- addModelMessage-- " << "bodyAdded: " << bodyAdded_ << " addedOnTimeLevel:  " << addedOnTimeLevel_<<" useNTimes: " << useNTimes_<<  endl;
+			InfoH << addModel_Info << "-- addModelMessage-- " << "bodyAdded: "
+                << bodyAdded_ << " addedOnTimeLevel:  " << addedOnTimeLevel_
+                << " useNTimes: " << useNTimes_<<  endl;
 			if(addedOnTimeLevel_ == partPerAdd_)
 			{
 				useNTimes_--;
-				Info << "-- addModelMessage-- " <<" useNTimes: " << useNTimes_<<  endl;
+				InfoH << addModel_Info << "-- addModelMessage-- "
+                    << " useNTimes: " << useNTimes_<<  endl;
 				reapeatedAddition_ = false;
 			}
 		}
@@ -309,7 +301,8 @@ geomModel* addModelDistribution::addBody
         addedParticlesSize_[scaleFactor.first()] += partVolume;
 	}
 
-	Info << "-- addModelMessage-- " << "bodyAdditionAttemptNr  : " << bodyAdditionAttemptCounter_<< endl;
+	InfoH << addModel_Info << "-- addModelMessage-- "
+        << "bodyAdditionAttemptNr  : " << bodyAdditionAttemptCounter_<< endl;
 
     return geomModel_->getGeomModel();;
 }
@@ -319,7 +312,8 @@ void addModelDistribution::initializeCellZone()
 {
 
 	label zoneID = mesh_.cellZones().findZoneID(zoneName_);
-	Info << "-- addModelMessage-- " << "label of the cellZone " << zoneID << endl;
+	InfoH << addModel_Info << "-- addModelMessage-- "
+        << "label of the cellZone " << zoneID << endl;
 
 	const labelList& cellZoneCells = mesh_.cellZones()[zoneID];
     cellsInBoundBox_[Pstream::myProcNo()] = cellZoneCells;
@@ -463,7 +457,8 @@ scalar addModelDistribution::checkLambdaFraction(const volScalarField& body)
 		volumeIntegrate[Pstream::myProcNo()] += mesh_.V()[cell];
 	}
 	lambdaFraction = gSum(lambdaIntegrate)/gSum(volumeIntegrate);
-	Info << "-- addModelMessage-- " << "lambda fraction in controlled region: " << lambdaFraction<< endl;
+	InfoH << addModel_Info << "-- addModelMessage-- "
+        << "lambda fraction in controlled region: " << lambdaFraction<< endl;
 	return lambdaFraction;
 }
 //---------------------------------------------------------------------------//

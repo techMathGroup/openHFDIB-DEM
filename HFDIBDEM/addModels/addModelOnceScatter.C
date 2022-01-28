@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "addModelOnceScatter.H"
@@ -38,9 +38,8 @@ using namespace Foam;
 addModelOnceScatter::addModelOnceScatter
 (
     const dictionary& addModelDict,
-    const Foam::dynamicFvMesh& mesh,
+    const Foam::fvMesh& mesh,
     const bool startTime0,
-    const Vector<label> geomDir,
     geomModel* bodyGeomModel
 )
 :
@@ -66,6 +65,7 @@ addModeICoeffs_(coeffsDict_.subDict(addModeI_ + "Coeffs")),
 partPerAdd_(0),
 fieldValue_(0),
 addedOnTimeLevel_(0),
+startTimeValue_(mesh_.time().value()),
 
 zoneName_(),
 minBound_(vector::zero),
@@ -100,8 +100,6 @@ multiBody_(false),
 fieldBased_(false),
 fieldCurrentValue_(0),
 allActiveCellsInMesh_(true),
-nGeometricD_(0),
-geometricD_(geomDir),
 randGen_(clock::getTime())
 {
     if(!startTime0)
@@ -127,19 +125,23 @@ void addModelOnceScatter::init()
 	{
 		partPerAdd_ = (readLabel(addModeICoeffs_.lookup("partPerAdd")));
         multiBody_  = true;
-        Info << "-- addModelMessage-- " << "addModel will initialize simulation with "
-             << partPerAdd_ << " randomly scattered bodies" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "addModel will initialize simulation with "
+            << partPerAdd_ << " randomly scattered bodies" << endl;
 	}
 	else if (addModeI_ == "fieldBased")
 	{
 		fieldValue_ = (readScalar(addModeICoeffs_.lookup("fieldValue")));
         fieldBased_ = true;
-        Info << "-- addModelMessage-- " << "addModel will fill the given domain up to preset solid volume fraction" << endl;
-		Info << "-- addModelMessage-- " << "preset volume fraction: " << fieldValue_ << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "addModel will fill domain up to preset volume fraction" << endl;
+		InfoH << "-- addModelMessage-- "
+            << "preset volume fraction: " << fieldValue_ << endl;
 	}
     else
     {
-        Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notImplemented, will crash" << endl;
     }
 
 	if (addDomain_ == "cellZone")
@@ -147,7 +149,8 @@ void addModelOnceScatter::init()
 		zoneName_ = (word(addDomainCoeffs_.lookup("zoneName")));
 		cellZoneActive_ = true;
         initializeCellZone();
-        Info << "-- addModelMessage-- " << "cellZone based addition zone" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "cellZone based addition zone" << endl;
 	}
 	else if (addDomain_ == "boundBox")
 	{
@@ -155,15 +158,18 @@ void addModelOnceScatter::init()
 		maxBound_       = (addDomainCoeffs_.lookup("maxBound"));
 		boundBoxActive_ = true;
         initializeBoundBox();
-        Info << "-- addModelMessage-- " << "boundBox based addition zone" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "boundBox based addition zone" << endl;
 	}
 	else if (addDomain_ == "domain")
 	{
-		Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
+		InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notImplemented, will crash" << endl;
 	}
     else
     {
-		Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
+		InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notImplemented, will crash" << endl;
 	}
 
     // check, if the whole zone is in the mesh
@@ -178,21 +184,22 @@ void addModelOnceScatter::init()
     if (zoneVol - zoneBBoxVol > 1e-5*zoneBBoxVol)
     {
         allActiveCellsInMesh_ = false;
-        Info << "-- addModelMessage-- "
+        InfoH << addModel_Info << "-- addModelMessage-- "
              << "addition zone NOT completely immersed in mesh "
              << "this computation will be EXPENSIVE" << endl;
-        Info << zoneVol << " " << zoneBBoxVol << endl;
+        InfoH << zoneVol << " " << zoneBBoxVol << endl;
     }
     else
     {
-        Info << "-- addModelMessage-- "
+        InfoH << addModel_Info << "-- addModelMessage-- "
              << "addition zone completely immersed in mesh -> OK" << endl;
     }
 
 	if (scalingMode_ == "noScaling")
 	{
 		scaleParticles_ = false;
-        Info << "-- addModelMessage-- " << "all particles will have the same scale" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "all particles will have the same scale" << endl;
 	}
 	else if (scalingMode_ == "randomScaling")
 	{
@@ -200,66 +207,71 @@ void addModelOnceScatter::init()
 		maxScale_               = (readScalar(scalingModeCoeffs_.lookup("maxScale")));
 		scaleParticles_         = false;
 		scaleRandomApplication_ = true;
-        Info << "-- addModelMessage-- " << "particles will be randomly scaled" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "particles will be randomly scaled" << endl;
 	}
 	else if (scalingMode_ == "scaleToFit")
 	{
 		minScaleFit_        = (readScalar(scalingModeCoeffs_.lookup("minScale")));
 		scaleStep_          = (readScalar(scalingModeCoeffs_.lookup("scaleStep")));
 		nTriesBeforeScaling_= (readScalar(scalingModeCoeffs_.lookup("nTriesBeforeScaling")));
-        Info << "-- addModelMessage-- " << "particles will be downscaled to better fill the domain" << endl;
-		Info << "-- addModelMessage-- " << "nTriesBeforeDownScaling: " << nTriesBeforeScaling_ << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "particles will be downscaled to better fill the domain" << endl;
+		InfoH << "-- addModelMessage-- " << "nTriesBeforeDownScaling: "
+            << nTriesBeforeScaling_ << endl;
 		scaleParticles_ = true;
 	}
     else
     {
-		Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
+		InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notImplemented, will crash" << endl;
 	}
 
 	if (rotationMode_ == "noRotation")
 	{
 		rotateParticles_ = false;
 		randomAxis_      = false;
-        Info << "-- addModelMessage-- " << "source STL will not be rotated upon addition" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "source STL will not be rotated upon addition" << endl;
 	}
 	else if (rotationMode_ == "randomRotation")
 	{
 		rotateParticles_ = true;
 		randomAxis_      = true;
-        Info << "-- addModelMessage-- " << "source STL will be randomly rotated upon addition" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "source STL will be randomly rotated upon addition" << endl;
 	}
 	else if (rotationMode_ == "fixedAxisRandomRotation")
 	{
 		axisOfRot_       = (rotationModeCoeffs_.lookup("axis"));
-        Info << "-- addModelMessage-- " << "source STL will be rotated by a random angle around a fixed axis upon addition" << endl;
-		Info << "-- addModelMessage-- " << "set rotation axis: " << axisOfRot_ << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "source STL will be rotated by a random angle around a fixed axis upon addition" << endl;
+		InfoH << "-- addModelMessage-- " << "set rotation axis: " << axisOfRot_ << endl;
 		rotateParticles_ = true;
 		randomAxis_      = false;
 	}
     else
     {
-		Info << "-- addModelMessage-- " << "notImplemented, will crash" << endl;
+		InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notImplemented, will crash" << endl;
 	}
-
-	forAll (geometricD_, direction)
-    {
-        if (geometricD_[direction] == 1)
-        {
-            nGeometricD_++;
-        }
-    }
 }
 
 //---------------------------------------------------------------------------//
 bool addModelOnceScatter::shouldAddBody(const volScalarField& body)
 {
+    if(startTimeValue_ != mesh_.time().value())
+    {
+        return false;
+    }
 
-    if (not finishedAddition_)
+    if (!finishedAddition_)
     {
         if (multiBody_)
         {
 
-            Info << "-- addModelMessage-- " << "Number of added bodies: " << addedOnTimeLevel_ << endl;
+            InfoH << addModel_Info << "-- addModelMessage-- "
+                << "Number of added bodies: " << addedOnTimeLevel_ << endl;
 
             if (partPerAdd_ < addedOnTimeLevel_)
             {
@@ -276,7 +288,10 @@ bool addModelOnceScatter::shouldAddBody(const volScalarField& body)
             scalar currentLambdaFrac(checkLambdaFraction(body));
             if (currentLambdaFrac < fieldValue_ )
             {
-                Info << "-- addModelMessage-- " << "Current lambda fraction = " << currentLambdaFrac << " < then preset lambda fraction = " << fieldValue_ << endl;
+                InfoH << addModel_Info << "-- addModelMessage-- "
+                    << "Current lambda fraction = " << currentLambdaFrac
+                    << " < then preset lambda fraction = "
+                    << fieldValue_ << endl;
                 finishedAddition_ = false;
             }
             else
@@ -286,7 +301,7 @@ bool addModelOnceScatter::shouldAddBody(const volScalarField& body)
         }
     }
 
-    return not finishedAddition_;
+    return !finishedAddition_;
 
 }
 //---------------------------------------------------------------------------//
@@ -307,7 +322,9 @@ geomModel* addModelOnceScatter::addBody
         {
             axisOfRot_ = returnRandomRotationAxis();
         }
-        Info << "-- addModelMessage-- " << "Will rotate by " << rotAngle << " PiRad around axis " << axisOfRot_ << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "Will rotate by " << rotAngle
+            << " PiRad around axis " << axisOfRot_ << endl;
 
         geomModel_->bodyRotatePoints(rotAngle,axisOfRot_);
     }
@@ -340,7 +357,8 @@ geomModel* addModelOnceScatter::addBody
 	{
 		if(multiBody_)
 		{
-			Info << "-- addModelMessage-- " << "addedOnTimeLevel:  " << addedOnTimeLevel_<< endl;
+			InfoH << addModel_Info << "-- addModelMessage-- "
+                << "addedOnTimeLevel:  " << addedOnTimeLevel_<< endl;
 			addedOnTimeLevel_++;
 		}
 
@@ -348,8 +366,10 @@ geomModel* addModelOnceScatter::addBody
 
 	}
 
-	Info << "-- addModelMessage-- " << "bodyAdditionAttemptNr  : " << bodyAdditionAttemptCounter_<< endl;
-	Info << "-- addModelMessage-- " << "sameScaleAttempts      : " << scaleCorrectionCounter_<< endl;
+	InfoH << addModel_Info << "-- addModelMessage-- "
+        << "bodyAdditionAttemptNr  : " << bodyAdditionAttemptCounter_<< endl;
+	InfoH << "-- addModelMessage-- "
+        << "sameScaleAttempts      : " << scaleCorrectionCounter_<< endl;
 
 	if(scaleCorrectionCounter_ > nTriesBeforeScaling_ && scaleParticles_)
 	{
@@ -372,7 +392,8 @@ void addModelOnceScatter::initializeCellZone()
 {
 
 	label zoneID = mesh_.cellZones().findZoneID(zoneName_);
-	Info << "-- addModelMessage-- " << "label of the cellZone " << zoneID << endl;
+	InfoH << addModel_Info << "-- addModelMessage-- "
+        << "label of the cellZone " << zoneID << endl;
 
 	const labelList& cellZoneCells = mesh_.cellZones()[zoneID];
     cellsInBoundBox_[Pstream::myProcNo()] = cellZoneCells;
@@ -484,7 +505,8 @@ scalar addModelOnceScatter::checkLambdaFraction(const volScalarField& body)
 		volumeIntegrate[Pstream::myProcNo()] += mesh_.V()[cell];
 	}
 	lambdaFraction = gSum(lambdaIntegrate)/gSum(volumeIntegrate);
-	Info << "-- addModelMessage-- " << "lambda fraction in controlled region: " << lambdaFraction<< endl;
+	InfoH << addModel_Info << "-- addModelMessage-- "
+        << "lambda fraction in controlled region: " << lambdaFraction<< endl;
 	return lambdaFraction;
 }
 //---------------------------------------------------------------------------//
@@ -500,7 +522,8 @@ scalar addModelOnceScatter::returnRandomScale()
 	scalar ranNum       = randGen_.scalar01();
 	scalar scaleDiff    = maxScale_ - minScale_;
     scalar scaleFactor  = minScale_ + ranNum*scaleDiff;
-	Info << "-- addModelMessage-- " <<"random scaleFactor " << scaleFactor <<endl;
+	InfoH << addModel_Info << "-- addModelMessage-- "
+        <<"random scaleFactor " << scaleFactor <<endl;
 	return scaleFactor;
 }
 //---------------------------------------------------------------------------//

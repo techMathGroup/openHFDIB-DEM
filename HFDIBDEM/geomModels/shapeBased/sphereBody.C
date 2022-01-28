@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "sphereBody.H"
@@ -42,20 +42,18 @@ bool sphereBody::canAddBody
     boundBox ibBound(getBounds());
     bool ibInsideMesh(false);
     pointField ibBoundPoints(ibBound.points());
-    label nGeomDir(0);
 
     forAll(ibBoundPoints,point)
     {
         bool dirOk(true);
-        forAll(geometricD_,dir)
+        forAll(geometricD,dir)
         {
-            if(geometricD_[dir] == 1)
+            if(geometricD[dir] == 1)
             {
                 if(!(curMeshBounds_.min()[dir] < ibBoundPoints[point][dir] && curMeshBounds_.max()[dir] > ibBoundPoints[point][dir]))
                 {
                     dirOk = false;
                 }
-                nGeomDir += 1;
             }
         }
 
@@ -106,7 +104,7 @@ bool sphereBody::canAddBody
                             return false;
                         }
 
-                        if(nGeomDir == 3)
+                        if(case3D)
                         {
                             const labelList& cFaces = mesh_.cells()[nextToCheck[cellToCheck]];
 
@@ -161,27 +159,23 @@ void sphereBody::createImmersedBody
     boundBox ibBound(getBounds());
     bool ibInsideMesh(false);
 
-    pointField ibBoundPoints(ibBound.points());
-
-    forAll(ibBoundPoints,point)
+    bool dirOk(true);
+    forAll(geometricD,dir)
     {
-        bool dirOk(true);
-        forAll(geometricD_,dir)
+        if(geometricD[dir] == 1)
         {
-            if(geometricD_[dir] == 1)
+            if(!(curMeshBounds_.max()[dir] >= ibBound.min()[dir]
+                && curMeshBounds_.min()[dir] <= ibBound.max()[dir]))
             {
-                if(!(curMeshBounds_.min()[dir] < ibBoundPoints[point][dir] && curMeshBounds_.max()[dir] > ibBoundPoints[point][dir]))
-                {
-                    dirOk = false;
-                }
+                dirOk = false;
+                break;
             }
         }
+    }
 
-        if(dirOk)
-        {
-            ibInsideMesh = true;
-            break;
-        }
+    if(dirOk)
+    {
+        ibInsideMesh = true;
     }
 
     // clear old list contents
@@ -202,33 +196,27 @@ void sphereBody::createImmersedBody
         if(cellToStartInCreateIB_ >= octreeField.size())
             cellToStartInCreateIB_ = 0;
 
-        labelList nextToCheck(1,cellToStartInCreateIB_);
+        autoPtr<DynamicLabelList> nextToCheck(
+            new DynamicLabelList(1,cellToStartInCreateIB_));
+        autoPtr<DynamicLabelList> auxToCheck(
+            new DynamicLabelList);
+
         label iterCount(0);label iterMax(mesh_.nCells());
-        labelList vertexLabels;
         boolList vertexesInside;
-        pointField pointPos;
         bool centerInside;
-        DynamicLabelList auxToCheck;
-        HashTable<pointField,label,Hash<label>> lastIbPoints(0);
-        while (nextToCheck.size() > 0 and iterCount < iterMax)
+        while (nextToCheck().size() > 0 and iterCount++ < iterMax)
         {
-            iterCount++;
-            auxToCheck.clear();
+            auxToCheck().clear();
 
-            forAll (nextToCheck,cellToCheck)
+            forAll (nextToCheck(),cellToCheck)
             {
-                if (octreeField[nextToCheck[cellToCheck]] == 0)
+                if (octreeField[nextToCheck()[cellToCheck]] == 0)
                 {
-                    octreeField[nextToCheck[cellToCheck]] = 1;
+                    octreeField[nextToCheck()[cellToCheck]] = 1;
 
-                    if(lastIbPoints_.found(nextToCheck[cellToCheck]))
-                    {
-                        pointPos = lastIbPoints_[nextToCheck[cellToCheck]];
-                    }
-                    else
-                    {
-                        pointPos = cellPoints[nextToCheck[cellToCheck]];
-                    }
+                    const pointField& pointPos =
+                        cellPoints[nextToCheck()[cellToCheck]];
+
                     bool cellInsideBB(false);
                     forAll(pointPos,pos)
                     {
@@ -242,16 +230,15 @@ void sphereBody::createImmersedBody
                     if(cellInsideBB)
                     {
                         insideIbBound = true;
-                        cellToStartInCreateIB_ = nextToCheck[cellToCheck];
-                        lastIbPoints.insert(nextToCheck[cellToCheck],pointPos);
+                        cellToStartInCreateIB_ = nextToCheck()[cellToCheck];
                         vertexesInside = pointInside(pointPos);
-                        pointField centerPoint(1,cp[nextToCheck[cellToCheck]]);
+                        pointField centerPoint(1,cp[nextToCheck()[cellToCheck]]);
                         centerInside = (pointInside(centerPoint))[0];
                         if(std::any_of(vertexesInside.begin(),vertexesInside.end(),[](bool b){return b;}) || centerInside || !insideIB)
                         {
-                            auxToCheck.append(
+                            auxToCheck().append(
                                 createImmersedBodyByOctTree(
-                                    nextToCheck[cellToCheck],
+                                    nextToCheck()[cellToCheck],
                                     insideIB,
                                     centerInside,
                                     vertexesInside,
@@ -264,15 +251,16 @@ void sphereBody::createImmersedBody
                     }
                     else if(!insideIB && !insideIbBound)
                     {
-                        auxToCheck.append(mesh_.cellCells()[nextToCheck[cellToCheck]]);
+                        auxToCheck().append(mesh_.cellCells()[nextToCheck()[cellToCheck]]);
                     }
                 }
             }
-            nextToCheck = auxToCheck;
+            const autoPtr<DynamicLabelList> helpPtr(nextToCheck.ptr());
+            nextToCheck.set(auxToCheck.ptr());
+            auxToCheck = helpPtr;
         }
         if(intCells[Pstream::myProcNo()].size() > 0)
             cellToStartInCreateIB_ = min(intCells[Pstream::myProcNo()]);
-        lastIbPoints_ = lastIbPoints;
     }
 }
 //---------------------------------------------------------------------------//
@@ -328,7 +316,8 @@ labelList sphereBody::createImmersedBodyByOctTree
                 }
                 else
                 {
-                    Info << "Missed point in signedDist computation !!" << endl;
+                    InfoH << iB_Info
+                        << "Missed point in signedDist computation !!" << endl;
                 }
                 if (centerInside)
                 {
@@ -345,7 +334,7 @@ labelList sphereBody::createImmersedBodyByOctTree
         insideIB = true;
     }
     body[cellToCheck]+= cBody;
-    
+
     // clip the body field values
     body[cellToCheck] = min(max(0.0,body[cellToCheck]),1.0);
     if (!insideIB || cellInside)

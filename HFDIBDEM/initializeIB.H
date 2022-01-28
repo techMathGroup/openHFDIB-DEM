@@ -9,7 +9,7 @@ if (mesh_.nGeometricD() < 3)
     if (immersedDict_.found("staticBody"))
     {
         bodyOperation_ = 0;
-        Info << bodyName_ << " is a static body." << endl;
+        InfoH << iB_Info << bodyName_ << " is a static body." << endl;
     }
     else if (immersedDict_.found("prescribedTransBody"))
     {
@@ -17,7 +17,7 @@ if (mesh_.nGeometricD() < 3)
 
         Vel_   = immersedDict_.subDict("prescribedTransBody").lookup("velocity");
 
-        Info << bodyName_ << " is a freely rotating body with prescribed linear velocity." << endl;
+        InfoH << iB_Info << bodyName_ << " is a freely rotating body with prescribed linear velocity." << endl;
     }
     else if (immersedDict_.found("prescribedRotBody"))
     {
@@ -28,7 +28,7 @@ if (mesh_.nGeometricD() < 3)
                     immersedDict_.subDict("prescribedRotBody").lookup("omega")
                 );
 
-        Info << bodyName_ << " is a freely moving body with prescribed rotation." << endl;
+        InfoH << iB_Info << bodyName_ << " is a freely moving body with prescribed rotation." << endl;
     }
     else if (immersedDict_.found("prescribedTransRotBody"))
     {
@@ -40,7 +40,7 @@ if (mesh_.nGeometricD() < 3)
                     immersedDict_.subDict("prescribedTransRotBody").lookup("omega")
                 );
 
-        Info << bodyName_ << " has prescribed both movement and rotation." << endl;
+        InfoH << iB_Info << bodyName_ << " has prescribed both movement and rotation." << endl;
     }
     else if (immersedDict_.found("prescribedTransFixedAxisRotBody"))
     {
@@ -49,7 +49,7 @@ if (mesh_.nGeometricD() < 3)
         Vel_   = immersedDict_.subDict("prescribedTransFixedAxisRotBody").lookup("velocity");
         Axis_ = immersedDict_.subDict("prescribedTransFixedAxisRotBody").lookup("axis");
 
-        Info << bodyName_ << " has prescribed movement and axis of rotation." << endl;
+        InfoH << iB_Info << bodyName_ << " has prescribed movement and axis of rotation." << endl;
     }
     else if (immersedDict_.found("fullyCoupledBody"))
     {
@@ -63,11 +63,11 @@ if (mesh_.nGeometricD() < 3)
             }
         }
 
-        Info << bodyName_ << " is fully coupled with fluid phase." << endl;
+        InfoH << iB_Info << bodyName_ << " is fully coupled with fluid phase." << endl;
     }
     else
     {
-        Info << "No body operation was found for " << bodyName_ << endl
+        InfoH << iB_Info << "No body operation was found for " << bodyName_ << endl
           << "Assuming static body.";
     }
 
@@ -75,11 +75,11 @@ if (mesh_.nGeometricD() < 3)
     if (immersedDict_.found("updateTorque"))
     {
         updateTorque_ = readBool(immersedDict_.lookup("updateTorque"));
-        Info << "Found updateTorque: " << updateTorque_ << endl;
+        InfoH << iB_Info << "Found updateTorque: " << updateTorque_ << endl;
     }
     else
     {
-        Info << "Did not find updateTorque, using updateTorque: " << updateTorque_ << endl;
+        InfoH << iB_Info << "Did not find updateTorque, using updateTorque: " << updateTorque_ << endl;
     }
 
     // do I want the IB to start as in sync with the flow?
@@ -88,16 +88,16 @@ if (mesh_.nGeometricD() < 3)
         startSynced_ = readBool(immersedDict_.lookup("startSynced"));
         if (startSynced_)
         {
-            Info << "Will try to sync the body with the flow upon creation" << endl;
+            InfoH << iB_Info << "Will try to sync the body with the flow upon creation" << endl;
         }
         else
         {
-            Info << "The body will be created as static" << endl;
+            InfoH << iB_Info << "The body will be created as static" << endl;
         }
     }
     else
     {
-        Info << "startSynced was not specified, using startSynced: " << startSynced_ << endl;
+        InfoH << iB_Info << "startSynced was not specified, using startSynced: " << startSynced_ << endl;
     }
 
     // body auxiliary settings
@@ -109,17 +109,9 @@ if (mesh_.nGeometricD() < 3)
     {
         intSpan_ = readScalar(immersedDict_.lookup("interfaceSpan"));
     }
-    if (immersedDict_.found("velRelaxFac"))
-    {
-        velRelaxFac_ = readScalar(immersedDict_.lookup("velRelaxFac"));
-    }
     if (immersedDict_.found("refineBuffers"))
     {
         refineBuffers_ = readLabel(immersedDict_.lookup("refineBuffers"));
-    }
-    if (immersedDict_.found("useInterpolation"))
-    {
-        useInterpolation_ = readBool(immersedDict_.lookup("useInterpolation"));
     }
     if (immersedDict_.found("timesToSetStatic"))
     {
@@ -131,30 +123,47 @@ if (mesh_.nGeometricD() < 3)
     geomModel_->setSdBasedLambda(sdBasedLambda_);
     geomModel_->setRhoS(immersedDict_.lookup("rho"));
 
-    // set up contact properties
-    scalar Y(readScalar(immersedDict_.lookup("Y")));
-    scalar nu(readScalar(immersedDict_.lookup("nu")));
-    scalar gamma(readScalar(immersedDict_.lookup("gamma")));
-    scalar mu(readScalar(immersedDict_.lookup("mu")));
-    scalar adhN(0.0);
-    if (immersedDict_.found("adhN"))
+    string material = word(immersedDict_.lookup("material"));
+
+    if(ibIntp.valid())
     {
-        adhN = readScalar(immersedDict_.lookup("adhN"));
+        intpInfo_.set(ibIntp().createIntpInfo(
+            mesh_,
+            body,
+            surfCells_,
+            sdBasedLambda_,
+            intSpan_
+        ));
     }
 
-    contactInfo_.set(new contactInfo(
+    ibContactClass_.set(new ibContactClass(
         geomModel_(),
-        Y,
-        nu,
-        gamma,
-        mu,
-        adhN)
-    );
+        materialInfos[material]
+    ));
+
+    ibCntVars_.set(new ibContactVars
+    (
+        bodyId_,
+        Vel_,
+        omega_,
+        Axis_,
+        geomModel_->getM0(),
+        geomModel_->getM(),
+        geomModel_->getRhoS()
+    ));
+
+    wallCntInfo_.set(new wallContactInfo
+    (
+        ibContactClass_(),
+        ibCntVars_(),
+        wInfos,
+        matInterAdh
+    ));
 
     // set sizes for parallel runs
     surfCells_.setSize(Pstream::nProcs());
     intCells_.setSize(Pstream::nProcs());
-    interpolationInfo_.setSize(Pstream::nProcs());
+    interpolationInfoOld_.setSize(Pstream::nProcs());
     interpolationVecReqs_.setSize(Pstream::nProcs());
 
     // initialize bounding points

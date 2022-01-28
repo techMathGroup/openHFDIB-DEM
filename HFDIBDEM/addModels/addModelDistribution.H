@@ -32,7 +32,7 @@ SourceFiles
     addModelDistribution.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -111,9 +111,6 @@ class addModelDistribution
 
     bool        allActiveCellsInMesh_;
 
-    label       nGeometricD_;
-    Vector<label>      geometricD_;
-
     Random          randGen_;
 
     protected:
@@ -125,8 +122,7 @@ class addModelDistribution
     addModelDistribution
     (
         const dictionary& addModelDict,
-        const Foam::dynamicFvMesh& mesh,
-        const Vector<label> geomDir,
+        const Foam::fvMesh& mesh,
         geomModel* bodyGeomModel
     );
 

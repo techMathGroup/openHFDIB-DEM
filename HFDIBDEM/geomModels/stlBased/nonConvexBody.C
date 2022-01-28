@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "nonConvexBody.H"
@@ -39,15 +39,6 @@ bool nonConvexBody::canAddBody
     const volScalarField& body
 )
 {
-    label nGeomDir(0);
-    forAll(geometricD_,dir)
-    {
-        if(geometricD_[dir] == 1)
-        {
-            nGeomDir += 1;
-        }
-    }
-
     Field<label> octreeField(mesh_.nCells(),0);
 
     scalar inflFact(2*sqrt(mesh_.magSf()[0]));
@@ -98,11 +89,11 @@ bool nonConvexBody::canAddBody
             {
                 if(body[cellI] > SMALL)
                 {
-                    Info << "Body overlapping another body" << endl;
+                    InfoH << addModel_Info << "Body overlapping another body" << endl;
                     return false;
                 }
 
-                if(nGeomDir == 3)
+                if(case3D)
                 {
                     const labelList& cFaces = mesh_.cells()[cellI];
 
@@ -122,7 +113,9 @@ bool nonConvexBody::canAddBody
                                 {
                                     if (faceVertexesInside[verIn]==true)
                                     {
-                                        Info << "Body in contact with wall" << endl;
+                                        InfoH << addModel_Info
+                                            << "Body in contact with wall"
+                                            << endl;
                                         return false;
                                     }
                                 }
@@ -287,7 +280,9 @@ void nonConvexBody::createImmersedBody
                     }
                     else
                     {
-                        Info << "Missed point in signedDist computation !!" << endl;
+                        InfoH << iB_Info
+                            << "Missed point in signedDist computation !!"
+                            << endl;
                     }
                     if (centerInside)
                     {

@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "shapeBased.H"
@@ -36,13 +36,12 @@ using namespace Foam;
 //---------------------------------------------------------------------------//
 shapeBased::shapeBased
 (
-    const  dynamicFvMesh&   mesh,
-    contactType cType,
-    scalar  thrSurf,
-    Vector<label> geometricD
+    const  fvMesh&   mesh,
+    const contactType cType,
+    scalar  thrSurf
 )
 :
-geomModel(mesh,cType,thrSurf,geometricD)
+geomModel(mesh,cType,thrSurf)
 {}
 //---------------------------------------------------------------------------//
 vector shapeBased::addModelReturnRandomPosition
@@ -54,21 +53,12 @@ vector shapeBased::addModelReturnRandomPosition
 {
     vector ranVec(vector::zero);
 
-    label nGeometricD(0);
-    forAll (geometricD_, direction)
-    {
-        if (geometricD_[direction] == 1)
-        {
-            nGeometricD++;
-        }
-    }
-
     meshSearch searchEng(mesh_);
 
     // get its center of mass
     vector CoM(getCoM());
 
-    const vector validDirs = (geometricD_ + Vector<label>::one)/2;
+    const vector validDirs = (geometricD + vector::one)/2;
     vector dirCorr(cmptMultiply((vector::one - validDirs),CoM));
     dirCorr += cmptMultiply((vector::one - validDirs),0.5*(mesh_.bounds().max() + mesh_.bounds().min()));
 
@@ -79,7 +69,8 @@ vector shapeBased::addModelReturnRandomPosition
     maxScales -= cellZoneBounds.min() - bodyBounds.min();
     maxScales *= 0.5*0.9;//0.Y is there just to be sure
 
-    Info << "-- addModelMessage-- " << "acceptable movements: " << maxScales << endl;
+    InfoH << addModel_Info << "-- addModelMessage-- "
+        << "acceptable movements: " << maxScales << endl;
 
     scalar ranNum = 0;
     for (int i=0;i<3;i++)

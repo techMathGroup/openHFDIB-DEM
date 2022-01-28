@@ -29,10 +29,10 @@ Description
     class for addition and removal of immersedBodies
 
 SourceFiles
-    addModels.C
+    sphereBody.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -57,6 +57,7 @@ namespace Foam
 
         vector position_;
         scalar radius_;
+        scalar sphereM_;
 
         vector startPosition_;
         scalar startRadius_;
@@ -72,22 +73,21 @@ namespace Foam
         // Constructors ------------------------------------------------
         sphereBody
         (
-            const  dynamicFvMesh&   mesh,
+            const  fvMesh&   mesh,
             vector startPos,
             scalar radius,
-            scalar  thrSurf = 1,
-            Vector<label> geometricD = {1,1,1}
+            scalar  thrSurf = 1
         )
         :
         shapeBased
         (
             mesh,
             sphere,
-            thrSurf,
-            geometricD
+            thrSurf
         ),
         position_(startPos),
-        radius_(radius)
+        radius_(radius),
+        sphereM_((4*Foam::constant::mathematical::pi*pow(radius,3))/3)
         {
             startPosition_ = position_;
             startRadius_ = radius_;
@@ -132,7 +132,7 @@ namespace Foam
 
         geomModel* getGeomModel() final override
         {
-            sphereBody* sphereBodyModel = new sphereBody(mesh_,position_,radius_,thrSurf_,geometricD_);
+            sphereBody* sphereBodyModel = new sphereBody(mesh_,position_,radius_,thrSurf_);
             sphereBodyModel->initVars(intSpan_,sdBasedLambda_);
             geomModel* bodyGeomModel = sphereBodyModel;
 
@@ -169,18 +169,6 @@ namespace Foam
             return bounds;
         }
 
-        void recordHistory() final override
-        {
-            historyPosition_ = position_;
-            historyRadius_ = radius_;
-        }
-
-        void returnHistory() final override
-        {
-            position_ = historyPosition_;
-            radius_ = historyRadius_;
-        }
-
         void synchronPos() final override;
 
         void writeBodyInfo(label bodyId, IOdictionary& dict, word path) final override
@@ -197,15 +185,24 @@ namespace Foam
 
         bool pointInside(point pointI) final override;
 
-        vector getClosestNormal(point startPoint, vector span) final override
+        void getClosestPointAndNormal
+        (
+            const point& startPoint,
+            const vector& span,
+            point& closestPoint,
+            vector& normal
+        ) final override
         {
             if(startPoint == position_)
-                return vector::zero;
+            {
+                closestPoint = startPoint;
+                normal = vector::zero;
+            }
             else
             {
-                vector normal(startPoint-position_);
+                normal = startPoint-position_;
                 normal /= mag(normal);
-                return normal;
+                closestPoint = position_ + normal * radius_;
             }
         }
 
@@ -220,6 +217,22 @@ namespace Foam
         scalar getDC() final override
         {
             return 2*radius_;
+        }
+
+        scalar& getM0() final override
+        {
+            return sphereM_;
+        }
+
+        void setRhoS(dimensionedScalar rhoS)
+        {
+            rhoS_ = rhoS;
+            sphereM_ = ((4*Foam::constant::mathematical::pi*pow(radius_,3))/3)*rhoS_.value();
+        }
+
+        void setCoM() final override
+        {
+            CoM_ = position_;
         }
     };
 }

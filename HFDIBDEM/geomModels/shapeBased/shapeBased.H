@@ -29,10 +29,10 @@ Description
     class for addition and removal of immersedBodies
 
 SourceFiles
-    addModels.C
+    shapeBased.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -62,10 +62,9 @@ namespace Foam
         // Constructors ------------------------------------------------
         shapeBased
         (
-            const  dynamicFvMesh&   mesh,
-            contactType cType,
-            scalar  thrSurf,
-            Vector<label> geometricD
+            const  fvMesh&   mesh,
+            const contactType cType,
+            scalar  thrSurf
         );
 
         // Destructors -------------------------------------------------
@@ -79,20 +78,22 @@ namespace Foam
             List<DynamicLabelList>& intCells,
             List<pointField>& cellPoints
         )
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- shapeModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual bool canAddBody
         (
             const volScalarField& body
         )
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl; return false;}
-
-        virtual geomModel* getGeomModel()
         {
-            Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;
-            geomModel* bodyGeomModel = new geomModel(mesh_);
-            return bodyGeomModel;
+            InfoH << iB_Info << "-- shapeModelMessage-- "
+                << "notIplemented"<<endl;
+            return false;
         }
+
+        virtual geomModel* getGeomModel() = 0;
 
         vector addModelReturnRandomPosition(
             const bool allActiveCellsInMesh,
@@ -101,56 +102,99 @@ namespace Foam
         ) final override;
 
         virtual void bodyMovePoints(vector translVec)
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- shapeModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual void bodyScalePoints(scalar scaleFac)
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- shapeModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual void bodyRotatePoints
         (
             scalar rotAngle,
             vector axisOfRot
         )
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- shapeModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual void resetBody()
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- shapeModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual vector getCoM()
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl; return vector::zero;}
+        {
+            InfoH << iB_Info << "-- shapeModelMessage-- "
+                << "notIplemented"<<endl;
+            return vector::zero;
+        }
 
         virtual boundBox getBounds()
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;
+        {
+            InfoH << iB_Info << "-- shapeModelMessage-- "
+                << "notIplemented"<<endl;
             boundBox bound;
-            return bound;}
-
-         virtual void recordHistory()
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
-
-         virtual void returnHistory()
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+            return bound;
+        }
 
         virtual void synchronPos()
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- shapeModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual void writeBodyInfo(label bodyId, IOdictionary& dict, word path)
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- shapeModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual boolList pointInside(pointField pointI)
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl; return {false};}
+        {
+            InfoH << iB_Info << "-- shapeModelMessage-- "
+                << "notIplemented"<<endl;
+            return {false};
+        }
 
 
         virtual bool pointInside(point pointI)
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return false;}
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            return false;
+        }
 
-        virtual vector getClosestNormal(point startPoint, vector span)
-        {Info << "-- shapeModelMessage-- " << "notIplemented"<<endl; return vector::zero;}
+        virtual void getClosestPointAndNormal
+        (
+            const point& startPoint,
+            const vector& span,
+            point& closestPoint,
+            vector& normal
+        )
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual pointField sampleSurfacePoints()
         {
-            Info << "-- shapeModelMessage-- " << "notIplemented"<<endl;
+            InfoH << iB_Info << "-- shapeModelMessage-- "
+                << "notIplemented"<<endl;
             pointField returnField;
             return returnField;
+        }
+
+        virtual void setCoM()
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
         }
     };
 }

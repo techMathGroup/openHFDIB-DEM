@@ -29,10 +29,10 @@ Description
     class for addition and removal of immersedBodies
 
 SourceFiles
-    addModels.C
+    geomModel.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -41,10 +41,13 @@ Contributors
 
 #include "dictionary.H"
 #include "fvCFD.H"
-#include "dynamicFvMesh.H"
+// #include "fvMesh.H"
 #include "triSurfaceMesh.H"
 
 #include "contactType.H"
+
+#include "outputHFDIBDEM.H"
+using namespace outputHFDIBDEM;
 
 namespace Foam
 {
@@ -77,12 +80,12 @@ namespace Foam
         typedef DynamicList<vector> DynamicVectorList;
         typedef DynamicList<point> DynamicPointList;
 
-        protected:
-
-        const  dynamicFvMesh&   mesh_;
-
         //contact type based on geometry
         const contactType contactType_;
+
+        protected:
+
+        const  fvMesh&   mesh_;
 
         //list to find the owner of the IB
         DynamicLabelList ibPartialVolume_;
@@ -90,7 +93,6 @@ namespace Foam
 
         label cellToStartInCreateIB_;
         scalar  thrSurf_;
-        Vector<label> geometricD_;//geometric directions
 
         scalar  intSpan_;
         bool    sdBasedLambda_;
@@ -118,10 +120,9 @@ namespace Foam
         // Constructors ------------------------------------------------
         geomModel
         (
-            const  dynamicFvMesh&   mesh,
-            contactType cType = arbShape,
-            scalar  thrSurf = 1,
-            Vector<label> geometricD = {1,1,1}
+            const  fvMesh&   mesh,
+            const contactType cType,
+            scalar  thrSurf = 1
         );
 
         // Destructors -------------------------------------------------
@@ -135,79 +136,127 @@ namespace Foam
             List<DynamicLabelList>& intCells,
             List<pointField>& cellPoints
         )
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual bool canAddBody
         (
             const volScalarField& body
         )
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return false;}
-
-        virtual geomModel* getGeomModel()
         {
-            Info << "-- geomModelMessage-- " << "notIplemented"<<endl;
-            geomModel* bodyGeomModel = new geomModel(mesh_);
-            return bodyGeomModel;
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            return false;
         }
+
+        virtual geomModel* getGeomModel() = 0;
 
         virtual vector addModelReturnRandomPosition(
             const bool allActiveCellsInMesh,
             const boundBox  cellZoneBounds,
             Random&         randGen
         )
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return vector::zero;}
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            return vector::zero;
+        }
 
         virtual void bodyMovePoints(vector translVec)
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual void bodyScalePoints(scalar scaleFac)
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual void bodyRotatePoints
         (
             scalar rotAngle,
             vector axisOfRot
         )
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual void resetBody()
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual vector getCoM()
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return vector::zero;}
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            return vector::zero;
+        }
 
         virtual boundBox getBounds()
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
             boundBox bound;
-            return bound;}
-
-        virtual void recordHistory()
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
-
-        virtual void returnHistory()
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
+            return bound;
+        }
 
         virtual void synchronPos()
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual void writeBodyInfo(label bodyId, IOdictionary& dict, word path)
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl;}
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
 
         virtual boolList pointInside(pointField pointI)
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return {false};}
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            return {false};
+        }
 
         virtual bool pointInside(point pointI)
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return false;}
-
-        virtual vector getClosestNormal(point startPoint, vector span)
-        {Info << "-- geomModelMessage-- " << "notIplemented"<<endl; return vector::zero;}
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            return false;
+        }
 
         virtual scalar getDC()
         {
             return dC_;
         }
 
-        contactType getcType()
+        virtual void getClosestPointAndNormal
+        (
+            const point& startPoint,
+            const vector& span,
+            point& closestPoint,
+            vector& normal
+        )
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
+
+        virtual void setCoM()
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
+
+        constexpr contactType getcType()
         {return contactType_;}
 
         label getOwner()
@@ -232,7 +281,7 @@ namespace Foam
 
         void resetHashTable(){lastIbPoints_.clear();}
 
-        void setRhoS(dimensionedScalar rhoS){rhoS_ = rhoS;}
+        virtual void setRhoS(dimensionedScalar rhoS){rhoS_ = rhoS;}
         dimensionedScalar getRhoS(){return rhoS_;}
 
         void calculateGeometricalProperties(
@@ -245,24 +294,22 @@ namespace Foam
         void addToMAndI
         (
             volScalarField& body,
-            DynamicLabelList& labelCellLst,
-            vector& tmpCom,
-            vector CoMOld
+            DynamicLabelList& labelCellLst
         );
 
         void computeBodyCharPars(List<DynamicLabelList>& surfCells);
 
-        const scalar& getM0()    const
+        virtual scalar& getM0()
         {
             return M0_;
         }
 
-        const scalar& getM()    const
+        scalar& getM()
         {
             return M_;
         }
 
-        const dimensionedScalar& getRhoS()    const
+        const dimensionedScalar getRhoS()    const
         {
             return rhoS_;
         }

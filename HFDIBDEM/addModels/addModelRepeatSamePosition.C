@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "addModelRepeatSamePosition.H"
@@ -37,7 +37,7 @@ using namespace Foam;
 addModelRepeatSamePosition::addModelRepeatSamePosition
 (
     const dictionary& addModelDict,
-    const Foam::dynamicFvMesh& mesh,
+    const Foam::fvMesh& mesh,
     geomModel* bodyGeomModel
 )
 :
@@ -68,10 +68,13 @@ bool addModelRepeatSamePosition::shouldAddBody(const volScalarField& body)
     scalar tmFrac(timeVal/timeBetweenUsage_);
     tmFrac -=  floor(tmFrac+deltaTime);
 
-    Info << "-- addModelMessage-- " << "Time/(Time beween usage) - floor(Time/Time beween usage): "
-         << tmFrac << endl;
+    InfoH << addModel_Info << "-- addModelMessage-- "
+        << "Time/(Time beween usage) - floor(Time/Time beween usage): "
+        << tmFrac << endl;
 
-    Info << "-- addModelMessage-- " << "Number of bodies added on this time level: " << addedOnTimeLevel_ << endl;
+    InfoH << "-- addModelMessage-- "
+        << "Number of bodies added on this time level: "
+        << addedOnTimeLevel_ << endl;
 
     bool tmLevelOk(tmFrac < deltaTime);
 
@@ -92,7 +95,8 @@ geomModel* addModelRepeatSamePosition::addBody
     if (bodyAdded_) {useNTimes_--;}
     addedOnTimeLevel_++;
 
-    Info << "-- addModelMessage-- " << "will try to use the body " << useNTimes_ << " more times" << endl;
+    InfoH << addModel_Info << "-- addModelMessage-- "
+        << "will try to use the body " << useNTimes_ << " more times" << endl;
 
     return geomModel_->getGeomModel();
 }

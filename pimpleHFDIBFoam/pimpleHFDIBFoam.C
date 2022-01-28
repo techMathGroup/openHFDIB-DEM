@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
   =========                 |
   \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
-   \\    /   O peration     |
-    \\  /    A nd           | Copyright (C) 2011-2015 OpenFOAM Foundation
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Copyright (C) 2011-2020 OpenFOAM Foundation
      \\/     M anipulation  |
 -------------------------------------------------------------------------------
 License
@@ -22,22 +22,18 @@ License
     along with OpenFOAM.  If not, see <http://www.gnu.org/licenses/>.
 
 Application
-    pimpleHFDIBDyMFoam
+    pimpleHFDIBFoam
 
 Description
-    Transient solver for incompressible flow.
+    Transient solver for incompressible, turbulent flow of Newtonian fluids,
+    with optional mesh motion and mesh topology changes.
 
-    Sub-models include:
-    - turbulence modelling, i.e. laminar, RAS or LES
-    - run-time selectable MRF and finite volume options, e.g. explicit porosity
+    Turbulence modelling is generic, i.e. laminar, RAS or LES may be selected.
 
-    The code is prepared to use the HFDIB method and refine the mesh around
-    the solids via fvdynamicRefineMesh
 \*---------------------------------------------------------------------------*/
 
 #include "fvCFD.H"
 #include "dynamicFvMesh.H"
-#include "openHFDIBDEM.H"
 #include "singlePhaseTransportModel.H"
 #include "kinematicMomentumTransportModel.H"
 #include "pimpleControl.H"
@@ -47,6 +43,7 @@ Description
 #include "fvcSmooth.H"
 
 #include "triSurfaceMesh.H"
+#include "openHFDIBDEM.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -54,15 +51,13 @@ int main(int argc, char *argv[])
 {
     #include "postProcess.H"
 
-    #include "setRootCase.H"
+    #include "setRootCaseLists.H"
     #include "createTime.H"
     #include "createDynamicFvMesh.H"
     #include "initContinuityErrs.H"
     #include "createDyMControls.H"
     #include "createFields.H"
     #include "createUfIfPresent.H"
-    #include "createFvOptions.H"
-    #include "createMRF.H"
 
     turbulence->validate();
 
@@ -76,17 +71,15 @@ int main(int argc, char *argv[])
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+    Info << "\nInitializing HFDIBDEM\n" << endl;
+    openHFDIBDEM  HFDIBDEM(mesh);
+    HFDIBDEM.initialize(lambda,U,refineF,maxRefinementLevel,runTime.timeName());
+    #include "initialMeshRefinement.H"
+
     Info<< "\nStarting time loop\n" << endl;
 
-    volScalarField surface("surf",lambda);
-    scalar thrSurf(readScalar(HFDIBDEMDict.lookup("surfaceThreshold")));
-
-    bool isFirstTime(true);
-    openHFDIBDEM  HFDIBDEM(mesh);
-
-    while (runTime.run())
+    while (pimple.run(runTime))
     {
-
         #include "readDyMControls.H"
 
         if (LTS)
@@ -99,53 +92,19 @@ int main(int argc, char *argv[])
             #include "setDeltaT.H"
         }
 
-        word startTime(runTime.timeName());
-
         runTime++;
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        if (isFirstTime)
-        {
-            Info << "\nInitializing HFDIBDEM\n" << endl;
-
-            HFDIBDEM.initialize(lambda,U,refineF,maxRefinementLevel,startTime);
-
-            if (maxRefinementLevel > 0 && startTime == "0")
-            {
-                #include "initialMeshRefinement.H"
-            }
-
-            isFirstTime = false;
-        }
-
+        HFDIBDEM.createBodies(lambda,refineF);
         HFDIBDEM.preUpdateBodies(lambda,f);
-
-        surface = lambda;
-        forAll (Ui,cellI)
-        {
-            if (lambda[cellI]>thrSurf)
-            {
-                surface[cellI] =1.0;
-            }
-            else
-            {
-                surface[cellI] =0.0;
-                Ui[cellI] *=0;
-            }
-        }
-
-        surface.correctBoundaryConditions();
-        Ui.correctBoundaryConditions();
 
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
             if (pimple.firstPimpleIter() || moveMeshOuterCorrectors)
             {
-                Pout << "Before mesh.update()" << endl;
                 mesh.update();
-                Pout << "After mesh.update()" << endl;
 
                 if (mesh.changing())
                 {
@@ -170,33 +129,17 @@ int main(int argc, char *argv[])
 
                     lambda *= 0;
                     HFDIBDEM.recreateBodies(lambda,refineF);
-
-                    surface = lambda;
-                    forAll (Ui,cellI)
-                    {
-                        if (lambda[cellI]>thrSurf)
-                        {
-                            surface[cellI] =1.0;
-                        }
-                        else
-                        {
-                            surface[cellI] =0.0;
-                            Ui[cellI] *=0;
-                        }
-                    }
-
-                    surface.correctBoundaryConditions();
-                    Ui.correctBoundaryConditions();
                 }
-            }
-            f.storePrevIter();
 
-            #include "UEqnExtF.H"
+                f *= lambda;
+            }
+
+            #include "UEqn.H"
 
             // --- Pressure corrector loop
             while (pimple.correct())
             {
-                #include "pEqnExtF.H"
+                #include "pEqn.H"
             }
 
             if (pimple.turbCorr())
@@ -211,9 +154,7 @@ int main(int argc, char *argv[])
 
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
 
-        HFDIBDEM.moveBodies(lambda,refineF);
-
-        HFDIBDEM.correctContact(lambda,refineF);
+        HFDIBDEM.updateDEM(lambda,refineF);
         Info << "updated HFDIBDEM" << endl;
 
 
@@ -227,13 +168,12 @@ int main(int argc, char *argv[])
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
-
     }
 
     Info<< "End\n" << endl;
 
     return 0;
-};
+}
 
 
 // ************************************************************************* //

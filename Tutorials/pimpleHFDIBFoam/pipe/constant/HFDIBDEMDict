@@ -1,0 +1,118 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \    /   O peration     | Version:  3.0.x                                 |
+|   \  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      HFDIBDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+bodyNames ( "particles" );
+
+outputSetup
+{
+    basic true;
+    iB  false;
+    DEM false;
+    addModel true;
+}
+
+surfaceThreshold    1e-4;
+stepDEM     0.02;
+recordSimulation true;
+
+DEM
+{
+    materials
+    {
+        particle
+        {
+            Y       1e7;
+            nu      0.2;
+            gamma   4e-6;
+            mu      0;
+            adhN    1e-3;
+        }
+        
+        wall
+        {
+            Y       1e7;
+            nu      0.2;
+            gamma   4e-6;
+            mu      0.8;
+            adhN    0;
+        }   
+    }
+
+    interfaceAdh
+    {
+        particle-wall
+        {
+            materials   (particle wall);
+            value   5e-4;
+        }
+    }
+
+    collisionPatches
+    {
+        wall wall;
+    }
+}
+
+particles
+{
+fullyCoupledBody;
+rho         rho [1 -3 0 0 0 0 0] 3950;
+refineMC 5;
+U
+{
+	BC  noSlip;
+}
+material particle;
+bodyGeom sphere;
+sphere
+{
+    startPosition   (9e-3 0.046 0);
+    radius  2.5e-3;
+}
+updateTorque false;
+sdBasedLambda true;
+interfaceSpan 1.0;
+startSynced true;
+refineBuffers 0;
+timesToSetStatic -1;
+bodyAddition
+{
+	addModel repeatRandomPosition;
+	repeatRandomPositionCoeffs
+	{
+		addMode            fieldBased;
+        fieldBasedCoeffs
+        {
+            fieldName   lambda;
+            fieldValue	0.05;
+        }
+        
+        addDomain      boundBox;
+        boundBoxCoeffs
+        {
+            minBound (-1e-2 0 -1e-3);
+            maxBound (1e-2 2e-2 1e-3);
+        }
+        
+        scalingMode    noScaling;
+        noScalingCoeffs{};
+        
+        rotationMode   noRotation;
+        noRotationCoeffs{};
+	}
+}
+}
+// ************************************************************************* //

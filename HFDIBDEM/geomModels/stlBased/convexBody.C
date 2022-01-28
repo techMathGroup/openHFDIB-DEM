@@ -26,7 +26,7 @@ InNamspace
     Foam
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "convexBody.H"
@@ -42,20 +42,18 @@ bool convexBody::canAddBody
     boundBox ibBound(getBounds());
     bool ibInsideMesh(false);
     pointField ibBoundPoints(ibBound.points());
-    label nGeomDir(0);
 
     forAll(ibBoundPoints,point)
     {
         bool dirOk(true);
-        forAll(geometricD_,dir)
+        forAll(geometricD,dir)
         {
-            if(geometricD_[dir] == 1)
+            if(geometricD[dir] == 1)
             {
                 if(!(curMeshBounds_.min()[dir] < ibBoundPoints[point][dir] && curMeshBounds_.max()[dir] > ibBoundPoints[point][dir]))
                 {
                     dirOk = false;
                 }
-                nGeomDir += 1;
             }
         }
 
@@ -106,7 +104,7 @@ bool convexBody::canAddBody
                             return false;
                         }
 
-                        if(nGeomDir == 3)
+                        if(case3D)
                         {
                             const labelList& cFaces = mesh_.cells()[nextToCheck[cellToCheck]];
 
@@ -161,27 +159,22 @@ void convexBody::createImmersedBody
     boundBox ibBound(getBounds());
     bool ibInsideMesh(false);
 
-    pointField ibBoundPoints(ibBound.points());
-
-    forAll(ibBoundPoints,point)
+    bool dirOk(true);
+    forAll(geometricD,dir)
     {
-        bool dirOk(true);
-        forAll(geometricD_,dir)
+        if(geometricD[dir] == 1)
         {
-            if(geometricD_[dir] == 1)
+            if(!(curMeshBounds_.max()[dir] >= ibBound.min()[dir] && curMeshBounds_.min()[dir] <= ibBound.max()[dir]))
             {
-                if(!(curMeshBounds_.min()[dir] < ibBoundPoints[point][dir] && curMeshBounds_.max()[dir] > ibBoundPoints[point][dir]))
-                {
-                    dirOk = false;
-                }
+                dirOk = false;
+                break;
             }
         }
+    }
 
-        if(dirOk)
-        {
-            ibInsideMesh = true;
-            break;
-        }
+    if(dirOk)
+    {
+        ibInsideMesh = true;
     }
 
     // clear old list contents
@@ -331,7 +324,8 @@ labelList convexBody::createImmersedBodyByOctTree
                 }
                 else
                 {
-                    Info << "Missed point in signedDist computation !!" << endl;
+                    InfoH << iB_Info
+                        << "Missed point in signedDist computation !!" << endl;
                 }
                 if (centerInside)
                 {

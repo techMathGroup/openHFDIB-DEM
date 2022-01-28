@@ -35,7 +35,7 @@ SourceFiles
 
 Contributors
     Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Šourek (2019-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef openHFDIBDEM_H
@@ -51,7 +51,7 @@ Contributors
 #include "primitiveFieldsFwd.H"
 #include "volFieldsFwd.H"
 #include "fvMatricesFwd.H"
-#include "dynamicFvMesh.H"
+//// #include "fvMesh.H"
 #include "triSurfaceMesh.H"
 #include "immersedBody.H"
 
@@ -63,6 +63,8 @@ Contributors
 #include "addModelDistribution.H"
 
 #include "contactModel.H"
+#include "leastSquaresInt.H"
+#include "lineInt.H"
 
 namespace Foam
 {
@@ -80,7 +82,7 @@ namespace Foam
     typedef DynamicList<point>  DynamicPointList;
 
     //Basic members
-    const  dynamicFvMesh&   mesh_;
+    const  fvMesh&   mesh_;
     IOdictionary            HFDIBDEMDict_;
     dictionary              HFDIBinterpDict_;
     IOdictionary            transportProperties_;
@@ -90,24 +92,30 @@ namespace Foam
     // immersed bodies objects
     PtrList<immersedBody> immersedBodies_;
 
+    // Interpolation class
+    autoPtr<ibInterpolation> ibInterp_;
+
     // addModels (how to add the baseObjects)
     PtrList<addModel> addModels_;
 
-    autoPtr<wallInfo> wallInfo_;
+    // materialInfo for each material (key is material name)
+    HashTable<materialInfo,string,Hash<string>> materialInfos_;
+    // materialInfo for each contact patch (key is the patch name)
+    HashTable<materialInfo,string,Hash<string>> wallInfos_;
+
+    HashTable<scalar,string,Hash<string>> matInterAdh_;
 
     // precalculate cellPoints for better performace
     List<pointField> cellPoints_;
 
-    DynamicLabelList ibContactList_;
+    HashTable<prtContactInfo,Tuple2<label, label>,Hash<Tuple2<label, label>>>
+        prtcInfoTable_;
 
     // DEM step
     scalar stepDEM_;
 
     // how many times rocompute M0_ because of mesh refinement
     label recomputeM0_;
-
-    // store gradient
-    vectorField surfNorm_;
 
     // mesh geometric directions
     vector geometricD_;
@@ -121,12 +129,10 @@ namespace Foam
     // Negative label indicates minimal bounding point of body -label-1
     DynamicList<DynamicLabelList> boundLabelNeighbourList_;
     // List for pairs of intersected Bodies in specific coordinate
-    DynamicList<DynamicList<Tuple2<label, label>>> contactInCoordNeighbourList_;
+    List<HashSet<Tuple2<label, label>,Hash<Tuple2<label, label>>>> cntNeighList_;
     // List of possible contact du to intersection of bounding boxes.
-    // Pair is added to this list when it is present in all 3 contactInCoordNeighbourList_.
-    DynamicList<Tuple2<label, label>> possibleContactNeighbourList_;
-    // List of pairs that are in contact due to intersection of surfaces
-    DynamicList<Tuple2<label, label>> prtContactIBList_;
+    // Pair is added to this list when it is present in all 3 cntNeighList_.
+    HashSet<Tuple2<label, label>,Hash<Tuple2<label, label>>> posCntList_;
     // number of DEM loops
     DynamicScalarList numberOfDEMloops_;
     //record simulation for start from lastTime possibility
@@ -136,37 +142,23 @@ namespace Foam
     // sort the list
     // solve potential intersections
     void updateNeighbourLists();
-    // detect prt-prt contact
-    void detectPrtContact();
-    void detectPrtContact
-    (
-        DynamicList<Tuple2<label, label>>& contactList,
-        DynamicLabelList& ibIncluded,
-        DynamicList<Tuple2<label, label>>& pairsToExclude
-    );
-
-    protected:
-
-    class prtPrtContactInfo{
-    public:
-        Tuple2<label, label> prtsInContact_;
-        vector contactCenter_;
-        scalar contactVolume_;
-        vector contactNormal_;
-        scalar contactArea_;
-        bool inContact_;
-    };
 
     public:
 
     // Constructors ----------------------------------------------------
-    openHFDIBDEM(const Foam::dynamicFvMesh& mesh);
+    openHFDIBDEM(const Foam::fvMesh& mesh);
 
     // Destructors -----------------------------------------------------
     ~openHFDIBDEM();
 
     // Public methods --------------------------------------------------
     void initialize(volScalarField& body,volVectorField& U,volScalarField& refineF,label recomputeM0, word runTime);
+
+    void createBodies
+    (
+        volScalarField& body,
+        volScalarField& refineF
+    );
 
     void preUpdateBodies
     (
@@ -181,13 +173,12 @@ namespace Foam
         volVectorField& f
     );
 
-    void moveBodies(volScalarField& body,volScalarField& refineF);
-
     void recreateBodies(volScalarField& body,volScalarField& refineF);
     // void for DEM inner-loops
-    void correctContact(volScalarField& body,volScalarField& refineF);
-    // detect wall contact at the end of the time step and return to original positions
-    void getWallContactList();
+    void updateDEM(volScalarField& body,volScalarField& refineF);
+
+    prtContactInfo& getPrtcInfo(Tuple2<label,label> cPair);
+
     // sort list of bounding points
     void sortBoundingListPrtContact();
     // solve possible intersection of bounding boxes
@@ -218,15 +209,6 @@ namespace Foam
     // add or remove bodies from the simulation
     void addRemoveBodies(volScalarField& body,volVectorField& U,volScalarField& refineF);
 
-    // method for iteration over list and find if pairs that contains at least some ib
-    void findIndexesOfPairWithSomeIb
-    (
-        DynamicList<Tuple2<label, label>>& listToSearch,
-        Tuple2<label, label> pair,
-        DynamicList<Tuple2<label,
-        label>>& listToAppend
-    );
-
     label findIndOfPairInNeighbourList(
             DynamicList<Tuple2<label, label>>& listToSearch,
             Tuple2<label, label> pair
@@ -241,8 +223,9 @@ namespace Foam
 
     void preCalculateCellPoints();
 
+    void initialSorting();
+    void mergeSortList(List<Tuple2<label,scalar>>& listToSort);
  };
-
 }
 
 #endif

@@ -32,7 +32,7 @@ SourceFiles
     wallContact.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -41,10 +41,11 @@ Contributors
 
 #include "dictionary.H"
 #include "fvCFD.H"
-#include "dynamicFvMesh.H"
+// #include "fvMesh.H"
 
-#include "contactInfo.H"
-#include "wallInfo.H"
+#include "ibContactClass.H"
+#include "materialInfo.H"
+#include "wallContactInfo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -64,56 +65,81 @@ namespace contactModel
 
     void detectWallContact
     (
-        const dynamicFvMesh&   mesh,
-        contactInfo& cInfo,
-        contactVars* cVars,
-        vector geometricD
+        const fvMesh&   mesh,
+        wallContactInfo& wallCntInfo
     );
 
     template <contactType cT>
     void detectWallContact
     (
-        const dynamicFvMesh&   mesh,
-        contactInfo& cInfo,
-        contactVars* cVars,
-        vector geometricD
+        const fvMesh&   mesh,
+        wallContactInfo& wallCntInfo
     );
 
     template <>
     void detectWallContact <sphere>
     (
-        const dynamicFvMesh&   mesh,
-        contactInfo& cInfo,
-        contactVars* cVars,
-        vector geometricD
+        const fvMesh&   mesh,
+        wallContactInfo& wallCntInfo
     );
 
-    DynamicLabelList getContactFaces
+    void getWallContactVars
     (
-        const dynamicFvMesh&   mesh,
-        contactInfo& cInfo,
+        const fvMesh&   mesh,
+        wallContactInfo& wallCntInfo,
+        const scalar deltaT
+    );
+
+    template <contactType cT>
+    void getWallContactVars
+    (
+        const fvMesh&   mesh,
+        wallContactInfo& wallCntInfo,
+        const scalar deltaT
+    );
+
+    template <>
+    void getWallContactVars <sphere>
+    (
+        const fvMesh&   mesh,
+        wallContactInfo& wallCntInfo,
+        const scalar deltaT
+    );
+
+    DynamicList<Tuple2<label,string>> getContactFacesSphere
+    (
+        const fvMesh&   mesh,
+        wallContactInfo& wallCntInfo,
         label faceLabel,
-        DynamicLabelList& checkedFaces,
-        bool case3D,
-        vector& emptydir
+        DynamicList<Tuple2<label,string>>& checkedFaces
+    );
+
+    DynamicList<Tuple2<label,string>> getContactFacesArbShape
+    (
+        const fvMesh&   mesh,
+        wallContactInfo& wallCntInfo,
+        label faceLabel,
+        DynamicList<Tuple2<label,string>>& checkedFaces,
+        HashTable<bool,label,Hash<label>>& pointTable,
+        DynamicVectorList& center,
+        DynamicVectorList& normal,
+        DynamicLabelList& centerPoints,
+        DynamicScalarList& area
     );
 
     void solveWallContact
     (
-        wallInfo& wInfo,
-        contactInfo& cInfo,
-        contactVars* cVars,
-        scalar deltaT,
-        Tuple2<vector,vector>& outVars
+        const fvMesh&   mesh,
+        wallContactInfo& wallCntInfo,
+        scalar deltaT
     );
 
     template <contactType cT>
     scalar getInterVolume
     (
-        const dynamicFvMesh&   mesh,
-        contactInfo& cInfo,
-        contactVars* cVars,
-        vector geometricD,
+        const fvMesh&   mesh,
+        ibContactClass& cClass,
+        ibContactVars& cVars,
         vector nVec,
         vector center
     );
@@ -121,20 +147,18 @@ namespace contactModel
     template <>
     scalar getInterVolume <sphere>
     (
-        const dynamicFvMesh&   mesh,
-        contactInfo& cInfo,
-        contactVars* cVars,
-        vector geometricD,
+        const fvMesh&   mesh,
+        ibContactClass& cClass,
+        ibContactVars& cVars,
         vector nVec,
         vector center
     );
 
     scalar sphereContactArea
     (
-        const dynamicFvMesh&   mesh,
-        contactInfo& cInfo,
-        contactVars* cVars,
-        vector geometricD,
+        const fvMesh&   mesh,
+        ibContactClass& cClass,
+        ibContactVars& cVars,
         vector nVec,
         vector center
     );

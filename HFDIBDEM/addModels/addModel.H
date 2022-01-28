@@ -32,7 +32,7 @@ SourceFiles
     addModel.C
 
 Contributors
-    Martin Isoz (2019-*), Martin Šourek (2019-*),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
@@ -41,7 +41,7 @@ Contributors
 
 #include "dictionary.H"
 #include "fvCFD.H"
-#include "dynamicFvMesh.H"
+// #include "fvMesh.H"
 #include "triSurfaceMesh.H"
 
 #include "geomModel.H"
@@ -65,12 +65,12 @@ class addModel
 
     protected:
 
-    const  dynamicFvMesh&       mesh_;
+    const  fvMesh&       mesh_;
 
     public:
 
     // Constructors ------------------------------------------------
-    addModel(const dynamicFvMesh& mesh)
+    addModel(const fvMesh& mesh)
     :
     mesh_(mesh)
     {}
@@ -86,25 +86,22 @@ class addModel
     // -- init
     virtual void init()
     {
-        Info << "-- addModelMessage-- " << "notIplemented"<<endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notIplemented"<<endl;
     }
     // Note: rewrite this function if you need initialization
     //       and place it into constructor
 
     virtual bool shouldAddBody(const volScalarField& body)
     {
-        Info << "-- addModelMessage-- " << "notIplemented"<<endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notIplemented"<<endl;
         return false;
     }
     // Note: check current conditions in simulation and return
     //       true if a body should be added
 
-    virtual geomModel* addBody(const volScalarField& body)
-    {
-        Info << "-- addModelMessage-- " << "notImplemented" << endl;
-        geomModel* bodyGeomModel = new geomModel(mesh_);
-        return bodyGeomModel;
-    }
+    virtual geomModel* addBody(const volScalarField& body) = 0;
     // Note: needs to provide a properly scaled/oriented/translated
     //       triSurface that will be used for IB initialization
 
@@ -114,7 +111,8 @@ class addModel
         const triSurfaceMesh& bodySurfMesh
     )
     {
-        Info << "-- addModelMessage-- " << "notImplemented" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notIplemented"<<endl;
         return false;
     }
     // Note: auxiliary function to be called from addBody during the
@@ -124,13 +122,15 @@ class addModel
     // -- getters
     virtual word getAddMode()
     {
-        Info << "-- addModelMessage-- " << "notImplemented" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notIplemented"<<endl;
         return "NO";
     }
 
     virtual bool getBodyAdded()
     {
-        Info << "-- addModelMessage-- " << "notImplemented" << endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notIplemented"<<endl;
         return false;
     }
     // Note: this has to return true if addBody ends with SUCCESS,
@@ -138,7 +138,8 @@ class addModel
 
     virtual void recreateBoundBox()
     {
-        Info << "-- addModelMessage-- " << "notIplemented"<<endl;
+        InfoH << addModel_Info << "-- addModelMessage-- "
+            << "notIplemented"<<endl;
     }
 };
 

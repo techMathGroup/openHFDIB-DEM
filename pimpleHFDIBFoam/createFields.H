@@ -28,7 +28,7 @@ volVectorField U
     mesh
 );
 
-Info<< "Creating field Ui\n" << endl;
+InfoH<< "Reading field Ui\n" << endl;
 volVectorField Ui
 (
     IOobject
@@ -42,7 +42,7 @@ volVectorField Ui
     U
 );
 
-Info<< "Reading field lambda\n" << endl;
+InfoH<< "Reading field lambda\n" << endl;
 volScalarField lambda
 (
     IOobject
@@ -57,7 +57,7 @@ volScalarField lambda
     dimensionedScalar("zero",dimless,0)
 );
 
-Info<< "Reading field f\n" << endl;
+InfoH<< "Reading field f\n" << endl;
 volVectorField f
 (
     IOobject
@@ -71,7 +71,7 @@ volVectorField f
     mesh
 );
 
-Info<< "Creating field refineF\n" << endl;
+InfoH<< "Reading field refineF\n" << endl;
 volScalarField refineF
 (
     IOobject
@@ -86,7 +86,6 @@ volScalarField refineF
     dimensionedScalar("zero",dimless,0)
 );
 
-
 #include "createPhi.H"
 
 
@@ -97,22 +96,6 @@ mesh.setFluxRequired(p.name());
 
 #include "readGravitationalAcceleration.H"
 
-IOdictionary transportProperties
-(
-    IOobject
-    (
-        "transportProperties",
-        runTime.constant(),
-        mesh,
-        IOobject::MUST_READ,
-        IOobject::NO_WRITE
-    )
-);
-
-dimensionedScalar rho = dimensionedScalar(
-  transportProperties.lookup("rho")
-);
-
 singlePhaseTransportModel laminarTransport(U, phi);
 
 autoPtr<incompressible::momentumTransportModel> turbulence
@@ -120,15 +103,5 @@ autoPtr<incompressible::momentumTransportModel> turbulence
     incompressible::momentumTransportModel::New(U, phi, laminarTransport)
 );
 
-
-IOdictionary HFDIBDEMDict
-(
-    IOobject
-    (
-        "HFDIBDEMDict",
-        runTime.constant(),
-        mesh,
-        IOobject::MUST_READ,
-        IOobject::NO_WRITE
-    )
-);
+#include "createMRF.H"
+#include "createFvOptions.H"

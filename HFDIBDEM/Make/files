@@ -4,14 +4,22 @@ geomModels/stlBased/convexBody.C
 geomModels/stlBased/nonConvexBody.C
 geomModels/shapeBased/shapeBased.C
 geomModels/shapeBased/sphereBody.C
-contactModels/contactInfo.C
-contactModels/wallInfo.C
+contactModels/materialInfo.C
+contactModels/wallContactVars.C
+contactModels/ibContactClass.C
+contactModels/prtContactInfo.C
+contactModels/wallContactInfo.C
 addModels/addModel.C
 addModels/addModelOnce.C
 addModels/addModelOnceScatter.C
 addModels/addModelRepeatSamePosition.C
 addModels/addModelRepeatRandomPosition.C
 addModels/addModelDistribution.C
+ibInterpolation/interpolationInfo.C
+ibInterpolation/lineInt/lineIntInfo.C
+ibInterpolation/lineInt/lineInt.C
+ibInterpolation/leastSquaresInt/leastSquaresIntInfo.C
+ibInterpolation/leastSquaresInt/leastSquaresInt.C
 immersedBody.C
 openHFDIBDEM.C
 LIB = $(FOAM_USER_LIBBIN)/libHFDIBDEM
