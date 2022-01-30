@@ -40,9 +40,13 @@
 
 >> ***materialName*** - *required* > Custom name of material. Multiple blocks possible (see example)
 >>> **Y** - *required* > Young's modulus
+
 >>> **nu** - *required* > Poisson ratio
+
 >>> **gamma** - *required* > viscoelastic damping constant
+
 >>> **mu** - *required* > tangential force truncation
+
 >>> **adhN** - *required* > adhesive force coefficient
 
 > **interfaceAdh** - *optional* > Truncation for adhesive for between materials
