@@ -43,7 +43,8 @@
 >>> **nu** - *required* > Poisson ratio  
 >>> **gamma** - *required* > Viscoelastic damping constant  
 >>> **mu** - *required* > Tangential force truncation  
->>> **adhN** - *required* > Adhesive force coefficient  
+>>> **adhN** - *required* > Adhesive force coefficient
+
 > **interfaceAdh** - *optional* > Truncation for adhesive for between materials
 
 >> ***name*** - *required* > Custom id name
