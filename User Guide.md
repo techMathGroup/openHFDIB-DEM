@@ -68,5 +68,5 @@
 >> - *prescribedTransBody* > Body has prescribed translational movement
 >>> **velocity** - *required* > Translational velocity. (*in subdictionary*)
 >> - *prescribedRotBody* > Body has prescribed rotational movement
->>> **axis** - *required* > Axis of rotation. (*in subdictionary*)
+>>> **axis** - *required* > Axis of rotation. (*in subdictionary*)  
 >>> **omega** - *required* > Angular velocity . (*in subdictionary*)
