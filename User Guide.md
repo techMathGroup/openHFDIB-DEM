@@ -23,8 +23,7 @@
 **outputSetup** - *optional* > Output settings. When not provided, everything is outputted.
 
 > **basic** - *required* > Basic output
->> Possible values: {*true*, *false*}
-
+>> Possible values: {*true*, *false*}  
 > **iB** - *required* > Detail output for bodies
 >> Possible values: {*true*, *false*}
 
@@ -48,7 +47,7 @@
 > **interfaceAdh** - *optional* > Truncation for adhesive for between materials
 
 >> ***name*** - *required* > Custom id name
->>> **materials** - *required* > Two names of affected materials
+>>> **materials** - *required* > Two names of affected materials  
 >>> **value** - *required* > Value is used for both materials
 
 > **collisionPatches** - *required* > List of patches with which the bodies collide
@@ -70,3 +69,10 @@
 >>> **velocity** - *required* > Translational velocity. (*in subdictionary*)  
 >>> **axis** - *required* > Axis of rotation. (*in subdictionary*)  
 >>> **omega** - *required* > Angular velocity . (*in subdictionary*)
+>> - *prescribedTransFixedAxisRotBody* > Body has prescribed translational movement. Rotational movement has fixed axis.
+>>> **velocity** - *required* > Translational velocity. (*in subdictionary*)  
+>>> **axis** - *required* > Axis of rotation. (*in subdictionary*)
+>> - *fullyCoupledBody* > Body is fully coupled with fluid phase
+>>> **velocity** - *optional* > Translational velocity. (*in subdictionary*)
+
+> **rho** - *required* > Density of the body
