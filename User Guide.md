@@ -37,3 +37,16 @@
 **DEM** - *required* > Input for DEM
 
 > **materials** - *required* > Input for materials
+
+>> ***materialName*** - *required* > Custom name of material. Multiple blocks possible (see example)
+>>> **Y** - *required* > Young's modulus
+>>> **nu** - *required* > Poisson ratio
+>>> **gamma** - *required* > viscoelastic damping constant
+>>> **mu** - *required* > tangential force truncation
+>>> **adhN** - *required* > adhesive force coefficient
+
+> **interfaceAdh** - *optional* > Truncation for adhesive for between materials
+
+>> ***name*** - *required* > Custom id name
+>>> **materials** - *required* > Two names of affected materials
+>>> **value** - *required* > value is used for both materials
