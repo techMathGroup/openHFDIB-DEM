@@ -24,7 +24,7 @@
 
 > **basic** - *required* > Basic output
 >> Possible values: {*true*, *false*}  
-> **iB** - *required* > Detail output for bodies
+**iB** - *required* > Detail output for bodies
 >> Possible values: {*true*, *false*}
 
 > **DEM** - *required* > Output for DEM
