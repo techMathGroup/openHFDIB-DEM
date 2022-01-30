@@ -1,37 +1,37 @@
 # Documentation for HFDIBDEMdict
 
-**bodyNames** - *required* > List of body names
+**bodyNames** - *required* > List of body names (***bodyName***)
 
 **surfaceThreshold** - *required* > Cutoff value for determining body presence in a cell (based on lambda fraction)
 
-**stepDEM** - *required* > fraction of timestep used as a sub timestep for DEM calculation
+**stepDEM** - *required* > Fraction of timestep used as a sub timestep for DEM calculation
 
-**geometricD** - *optional* > define empty direction for pseudo 2D simulation.
+**geometricD** - *optional* > Define empty direction for pseudo 2D simulation.
 > *default value is taken from fvMesh i.e. empty patch is recognized.*
 
-**recordSimulation** - *required* > should be particles recorded into bodiesInfo directory
+**recordSimulation** - *required* > Should be particles recorded into bodiesInfo directory
 > Possible values: {*true*, *false*}
 
-**interpolationSchemes** - *optional* > interpolation settings used for velocity reconstruction near bodies
+**interpolationSchemes** - *optional* > Interpolation settings used for velocity reconstruction near bodies
 
-> **U** - *required* > scheme for velocity interpolation inside a cell. Values according to Foam::interpolation
+> **U** - *required* > Scheme for velocity interpolation inside a cell. Values according to Foam::interpolation
 >> Possible values: {*cell*, *cellPoint*, *cellPointFace*}
 
-> **method** - *required* > method for interpolation point searching
+> **method** - *required* > Method for interpolation point searching
 >> Possible values: {*line*}
 
-**outputSetup** - *optional* > output settings. When not provided, everything is outputted.
+**outputSetup** - *optional* > Output settings. When not provided, everything is outputted.
 
-> **basic** - *required* > basic output
+> **basic** - *required* > Basic output
 >> Possible values: {*true*, *false*}
 
-> **iB** - *required* > detail output for bodies
+> **iB** - *required* > Detail output for bodies
 >> Possible values: {*true*, *false*}
 
-> **DEM** - *required* > output for DEM
+> **DEM** - *required* > Output for DEM
 >> Possible values: {*true*, *false*}
 
-> **addModel** - *required* > output for body addition
+> **addModel** - *required* > Output for body addition
 >> Possible values: {*true*, *false*}
 
 **DEM** - *required* > Input for DEM
@@ -43,14 +43,30 @@
 
 >>> **nu** - *required* > Poisson ratio
 
->>> **gamma** - *required* > viscoelastic damping constant
+>>> **gamma** - *required* > Viscoelastic damping constant
 
->>> **mu** - *required* > tangential force truncation
+>>> **mu** - *required* > Tangential force truncation
 
->>> **adhN** - *required* > adhesive force coefficient
+>>> **adhN** - *required* > Adhesive force coefficient
 
 > **interfaceAdh** - *optional* > Truncation for adhesive for between materials
 
 >> ***name*** - *required* > Custom id name
 >>> **materials** - *required* > Two names of affected materials
->>> **value** - *required* > value is used for both materials
+>>> **value** - *required* > Value is used for both materials
+
+> **collisionPatches** - *required* > List of patches with which the bodies collide
+
+>> ***patchName*** - *required* > Name of the patch
+>>> Possible values: ***materialName***
+
+***bodyName*** - *required* > Body name which correspond to value in **bodyNames**
+
+> ***bodyType*** - *required* > type of body
+>> Possible values:
+>> - *staticBody* > Body is static
+>> - *prescribedTransBody* > Body has prescribed translational movement
+>>> **velocity** - *required* > Translational velocity. (*in subdictionary*)
+>> - *prescribedRotBody* > Body has prescribed rotational movement
+>>> **axis** - *required* > Axis of rotation. (*in subdictionary*)
+>>> **omega** - *required* > Angular velocity . (*in subdictionary*)
