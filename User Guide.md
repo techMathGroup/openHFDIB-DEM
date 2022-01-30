@@ -39,16 +39,11 @@
 > **materials** - *required* > Input for materials
 
 >> ***materialName*** - *required* > Custom name of material. Multiple blocks possible (see example)
->>> **Y** - *required* > Young's modulus
-
->>> **nu** - *required* > Poisson ratio
-
->>> **gamma** - *required* > Viscoelastic damping constant
-
->>> **mu** - *required* > Tangential force truncation
-
->>> **adhN** - *required* > Adhesive force coefficient
-
+>>> **Y** - *required* > Young's modulus  
+>>> **nu** - *required* > Poisson ratio  
+>>> **gamma** - *required* > Viscoelastic damping constant  
+>>> **mu** - *required* > Tangential force truncation  
+>>> **adhN** - *required* > Adhesive force coefficient  
 > **interfaceAdh** - *optional* > Truncation for adhesive for between materials
 
 >> ***name*** - *required* > Custom id name
@@ -68,5 +63,9 @@
 >> - *prescribedTransBody* > Body has prescribed translational movement
 >>> **velocity** - *required* > Translational velocity. (*in subdictionary*)
 >> - *prescribedRotBody* > Body has prescribed rotational movement
+>>> **axis** - *required* > Axis of rotation. (*in subdictionary*)  
+>>> **omega** - *required* > Angular velocity . (*in subdictionary*)
+>> - *prescribedTransRotBody* > Body has prescribed translational and rotational movement
+>>> **velocity** - *required* > Translational velocity. (*in subdictionary*)  
 >>> **axis** - *required* > Axis of rotation. (*in subdictionary*)  
 >>> **omega** - *required* > Angular velocity . (*in subdictionary*)
