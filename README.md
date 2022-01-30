@@ -1,4 +1,5 @@
 # openHFDIB-DEM
+Version 2.2
 
 Implementation of the Hybrid Fictitious Domain-Immersed Boundary (HFDIB)
 coupled with the Discrete Element Method (DEM) by
