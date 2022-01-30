@@ -62,7 +62,6 @@ sphere
 {
 fullyCoupledBody;
 rho         rho [1 -3 0 0 0 0 0] 3950;
-refineMC 5;
 U
 {
 	BC  noSlip;

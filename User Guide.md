@@ -6,7 +6,7 @@
 
 **stepDEM** - *required* > Fraction of timestep used as a sub timestep for DEM calculation
 
-**geometricD** - *optional* > Define empty direction for pseudo 2D simulation.
+**geometricD** - *optional* > Define empty direction for pseudo 2D simulation
 > *default value is taken from fvMesh i.e. empty patch is recognized.*
 
 **recordSimulation** - *required* > Should be particles recorded into bodiesInfo directory
@@ -20,11 +20,12 @@
 > **method** - *required* > Method for interpolation point searching
 >> Possible values: {*line*}
 
-**outputSetup** - *optional* > Output settings. When not provided, everything is outputted.
+**outputSetup** - *optional* > Output settings. When not provided, everything is outputted
 
 > **basic** - *required* > Basic output
->> Possible values: {*true*, *false*}  
-**iB** - *required* > Detail output for bodies
+>> Possible values: {*true*, *false*}
+
+> **iB** - *required* > Detail output for bodies
 >> Possible values: {*true*, *false*}
 
 > **DEM** - *required* > Output for DEM
@@ -35,9 +36,8 @@
 
 **DEM** - *required* > Input for DEM
 
-> **materials** - *required* > Input for materials
-
->> ***materialName*** - *required* > Custom name of material. Multiple blocks possible (see example)
+> **materials** - *required* > Input for materials  
+>> ***materialName*** - *required* > Custom name of material Multiple blocks possible (see example)
 >>> **Y** - *required* > Young's modulus  
 >>> **nu** - *required* > Poisson ratio  
 >>> **gamma** - *required* > Viscoelastic damping constant  
@@ -57,7 +57,7 @@
 
 ***bodyName*** - *required* > Body name which correspond to value in **bodyNames**
 
-> ***bodyType*** - *required* > type of body
+> ***bodyType*** - *required* > Type of body
 >> Possible values:
 >> - *staticBody* > Body is static
 >> - *prescribedTransBody* > Body has prescribed translational movement
@@ -76,3 +76,22 @@
 >>> **velocity** - *optional* > Translational velocity. (*in subdictionary*)
 
 > **rho** - *required* > Density of the body
+
+> **U** - *required* > Dictionary for boundary condition
+>> **BC** - *required* > Name of boundary condition
+>>> Possible values: {*noSlip*}
+
+> **material** - *required* > Material of the body
+>> Possible values: ***materialName***
+
+> **bodyGeom** - *required* > Body geometry type
+>> Possible values:
+>> - *convex* > Body is defined according to STL file: ./constant/triSurface/***bodyName***.stl. Solver is optimized for this type of geometry.
+>> - *nonConvex* > Body is defined according to STL file: ./constant/triSurface/***bodyName***.stl
+>> - *sphere* > Body is defined by center and radius.
+>> **sphere** - *required*  
+>>> **startPosition** - *required* > Starting position of the center. (*in subdictionary*. May not be used in some **addModel**)  
+>>> **radius** - *required* > Radius of the sphere. (*in subdictionary*)
+
+> **updateTorque** - *optional* > Should be rotational movement updated according to acting forces?
+>> Possible values: {*true*, *false*}
