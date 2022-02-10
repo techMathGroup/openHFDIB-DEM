@@ -39,7 +39,6 @@ leastSquaresIntInfo::leastSquaresIntInfo
 (
     const  fvMesh&   mesh,
     geomModel& gModel,
-    // const volScalarField& body,
     List<DynamicLabelList>& surfCells,
     scalar distFactor,
     scalar radiusFactor,

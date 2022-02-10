@@ -40,10 +40,7 @@ lineIntInfo::lineIntInfo
 (
     const  fvMesh&   mesh,
     geomModel& gModel,
-    // const volScalarField& body,
     List<DynamicLabelList>& surfCells
-    // bool sdBasedLambda,
-    // scalar intSpan
 )
 :
 interpolationInfo(mesh, gModel, surfCells)

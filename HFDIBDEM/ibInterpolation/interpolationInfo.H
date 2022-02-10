@@ -53,47 +53,16 @@ namespace Foam
         typedef DynamicList<vector> DynamicVectorList;
         typedef DynamicList<point> DynamicPointList;
 
-        public:
-
-        // static autoPtr<vectorField> surfNorm_;
-
         protected:
 
         // mesh reference
         const Foam::fvMesh& mesh_;
         // geomModel reference
         geomModel& geomModel_;
-        // const  volScalarField& body_;
         List<DynamicLabelList>& surfCells_;
 
-        // bool sdBasedLambda_;
-        // scalar  intSpan_;
         autoPtr<List<point>> ibPointsPtr_; // cellIbPoint mapping
         autoPtr<List<vector>> ibNormalsPtr_; // cellIbNormal mapping
-
-
-
-        // vectorField& getSurfNorm_()
-        // {
-        //     if(surfNorm_.valid())
-        //     {
-        //         return surfNorm_();
-        //     }
-        //     else
-        //     {
-        //         // stabilisation for normalisation of the interface normal
-        //         const dimensionedScalar deltaN
-        //         (
-        //             "deltaN",
-        //             1e-8/pow(average(mesh_.V()), 1.0/3.0)
-        //         );
-
-        //         // create temporary unit surface normals
-        //         surfNorm_ = new vectorField(-fvc::grad(body_));
-        //         surfNorm_() /= (mag(surfNorm_())+deltaN.value());
-        //         return surfNorm_();
-        //     }
-        // }
 
         public:
 
@@ -102,10 +71,7 @@ namespace Foam
         (
             const Foam::fvMesh& mesh,
             geomModel& gModel,
-            // const volScalarField& body,
             List<DynamicLabelList>& surfCells
-            // bool sdBasedLambda,
-            // scalar intSpan
         );
 
         // Destructors -------------------------------------------------
@@ -137,18 +103,6 @@ namespace Foam
             ibPointsPtr_.clear();
             ibNormalsPtr_.clear();
         }
-
-        // point getIbPoint
-        // (
-        //     label scell,
-        //     vectorField& surfNorm,
-        //     const volScalarField& body
-        // );
-
-        // static void clearSurfNorm()
-        // {
-        //     surfNorm_.clear();
-        // }
     };
 }
 #endif

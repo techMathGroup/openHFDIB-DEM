@@ -40,49 +40,14 @@ interpolationInfo::interpolationInfo
 (
     const Foam::fvMesh& mesh,
     geomModel& gModel,
-    // const volScalarField& body,
     List<DynamicLabelList>& surfCells
-    // bool sdBasedLambda,
-    // scalar intSpan
 )
 :
 mesh_(mesh),
 geomModel_(gModel),
-// body_(body),
 surfCells_(surfCells)
-// sdBasedLambda_(sdBasedLambda),
-// intSpan_(intSpan)
 {}
 
 interpolationInfo::~interpolationInfo()
 {}
 //---------------------------------------------------------------------------//
-// point interpolationInfo::getIbPoint
-// (
-//     label scell,
-//     vectorField& surfNorm,
-//     const volScalarField& body
-// )
-// {
-//     scalar span = Foam::pow(mesh_.V()[scell],0.333)*2;
-
-//     if (sdBasedLambda_)
-//     {
-//         scalar minMaxBody(max(min(body[scell],1.0-SMALL),SMALL));
-//         scalar intDist = Foam::atanh(2.0*minMaxBody - 1.0)
-//                             *Foam::pow(mesh_.V()[scell],0.333)/intSpan_;
-//         return (mesh_.C()[scell] + surfNorm[scell]*intDist);
-//     }
-//     else
-//     {
-//         labelList cellNb(mesh_.cellCells()[scell]); //list of neighbours
-//         scalar intDist = 0;
-//         forAll (cellNb,nbCellI)
-//         {
-//             intDist += mag(mesh_.C()[cellNb[nbCellI]] - mesh_.C()[scell]);
-//         }
-//         intDist /= scalar(cellNb.size());
-//         return (mesh_.C()[scell] - surfNorm[scell]*(0.5-body[scell])*intDist);
-//     }
-// }
-// //---------------------------------------------------------------------------//

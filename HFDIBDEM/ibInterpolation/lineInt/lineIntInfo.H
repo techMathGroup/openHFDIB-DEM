@@ -95,7 +95,6 @@ namespace Foam
         (
             const  fvMesh&   mesh,
             geomModel& gModel,
-            // const volScalarField& body,
             List<DynamicLabelList>& surfCells
         );
 

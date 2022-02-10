@@ -52,7 +52,6 @@ namespace Foam
 
         private:
 
-        // autoPtr<List<vector>> ibNormalsPtr_; // cellIbNormal mapping
         autoPtr<labelListList> cellCellsPtr_; // cellCell mapping
         PtrList<scalarRectangularMatrix> invDirichletMatrices_;
         autoPtr<DynamicLabelList> ibFacesPtr_;
@@ -98,7 +97,6 @@ namespace Foam
         (
             const  fvMesh&   mesh,
             geomModel& gModel,
-            // const volScalarField& body,
             List<DynamicLabelList>& surfCells,         
             scalar distFactor,
             scalar radiusFactor,

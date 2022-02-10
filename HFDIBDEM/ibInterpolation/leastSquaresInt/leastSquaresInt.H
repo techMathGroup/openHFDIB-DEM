@@ -41,10 +41,8 @@ Contributors
 
 #include "dictionary.H"
 #include "fvCFD.H"
-// #include "fvMesh.H"
 #include "triSurfaceMesh.H"
 #include "ibInterpolation.H"
-//#include "interpolationInfo.H"
 #include "leastSquaresIntInfo.H"
 
 namespace Foam
