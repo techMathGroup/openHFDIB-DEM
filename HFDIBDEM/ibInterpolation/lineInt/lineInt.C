@@ -112,9 +112,9 @@ void lineInt::correctVelocity
                 vector VP2 =  intPoints[ibp][1].iVel_ - ibPointsVal[ibp];
 
                 // distance between interpolation points
-                scalar deltaR1 = mag(intPoints[ibp][1].iPoint_
+                scalar deltaR1 = mag(intPoints[ibp][0].iPoint_ - ibPoints[ibp]);
+                scalar deltaR2 = mag(intPoints[ibp][1].iPoint_
                         - intPoints[ibp][0].iPoint_);
-                scalar deltaR2 = mag(intPoints[ibp][0].iPoint_ - ibPoints[ibp]);
 
                 // cell center to surface distance
                 scalar ds = mag(mesh.C()[cellI] - ibPoints[ibp]);
@@ -131,32 +131,6 @@ void lineInt::correctVelocity
                 break;
             }
         }
-    }
-
-    static int bodyId(0);
-
-    autoPtr<OFstream> outFilePtr;
-    word fileName = "interpolationInfo_bodyId_" + name(bodyId++) + "_" + name(Pstream::myProcNo()) + ".dat";
-
-    outFilePtr.reset(new OFstream(fileName));
-    outFilePtr() << "cellI,cellCenter,order,intPoints,intCells" << endl;
-
-    forAll(intPoints, ibp)
-    {
-        DynamicVectorList intPointsList(0);
-        intPointsList.append(ibPoints[ibp]);
-        intPointsList.append(intPoints[ibp][0].iPoint_);
-        intPointsList.append(intPoints[ibp][1].iPoint_);
-
-        DynamicLabelList intCellsList(0);
-        intCellsList.append(intPoints[ibp][0].iCell_);
-        intCellsList.append(intPoints[ibp][1].iCell_);
-
-        outFilePtr() << cSurfCells[ibp] << ","
-            << mesh.C()[cSurfCells[ibp]] << ","
-            << intOrder[ibp] << ","
-            << intPointsList << ","
-            << intCellsList << endl;
     }
 }
 //---------------------------------------------------------------------------//
