@@ -132,6 +132,32 @@ void lineInt::correctVelocity
             }
         }
     }
+
+    static int bodyId(0);
+
+    autoPtr<OFstream> outFilePtr;
+    word fileName = "interpolationInfo_bodyId_" + name(bodyId++) + "_" + name(Pstream::myProcNo()) + ".dat";
+
+    outFilePtr.reset(new OFstream(fileName));
+    outFilePtr() << "cellI,cellCenter,order,intPoints,intCells" << endl;
+
+    forAll(intPoints, ibp)
+    {
+        DynamicVectorList intPointsList(0);
+        intPointsList.append(ibPoints[ibp]);
+        intPointsList.append(intPoints[ibp][0].iPoint_);
+        intPointsList.append(intPoints[ibp][1].iPoint_);
+
+        DynamicLabelList intCellsList(0);
+        intCellsList.append(intPoints[ibp][0].iCell_);
+        intCellsList.append(intPoints[ibp][1].iCell_);
+
+        outFilePtr() << cSurfCells[ibp] << ","
+            << mesh.C()[cSurfCells[ibp]] << ","
+            << intOrder[ibp] << ","
+            << intPointsList << ","
+            << intCellsList << endl;
+    }
 }
 //---------------------------------------------------------------------------//
 void lineInt::getCurVelocity

@@ -71,10 +71,8 @@ namespace Foam
         virtual interpolationInfo* createIntpInfo
         (
             const Foam::fvMesh& mesh,
-            const volScalarField& body,
-            List<DynamicLabelList>& surfCells,
-            bool sdBasedLambda,
-            scalar intSpan
+            geomModel& gModel,
+            List<DynamicLabelList>& surfCells
         ) = 0;
     };
 }

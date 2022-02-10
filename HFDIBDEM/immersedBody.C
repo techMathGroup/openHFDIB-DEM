@@ -379,12 +379,9 @@ void immersedBody::postPimpleUpdateImmersedBody
     // update Vel_, Axis_ and omega_
     updateCoupling(body,f);
 
-    Info << "viscous force: " << historyCouplingF_ << endl;
-    Info << "current mass: " << geomModel_->getM() << endl;
     const uniformDimensionedVectorField& g =
         mesh_.lookupObject<uniformDimensionedVectorField>("g");
     vector FG(geomModel_->getM0()*(1.0-rhoF_.value()/geomModel_->getRhoS().value())*g.value());
-    Info << "grav/buy force: " << FG << endl;
 
     Vel_ = VelOld_;
     Axis_ = AxisOld_;

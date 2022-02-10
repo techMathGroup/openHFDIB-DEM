@@ -104,19 +104,15 @@ namespace Foam
         interpolationInfo* createIntpInfo
         (
             const Foam::fvMesh& mesh,
-            const volScalarField& body,
-            List<DynamicLabelList>& surfCells,
-            bool sdBasedLambda,
-            scalar intSpan
+            geomModel& gModel,
+            List<DynamicLabelList>& surfCells
         ) override
         {
             return new lineIntInfo
             (
                 mesh,
-                body,
-                surfCells,
-                sdBasedLambda,
-                intSpan
+                gModel,
+                surfCells
             );
         };
     };

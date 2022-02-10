@@ -55,42 +55,45 @@ namespace Foam
 
         public:
 
-        static autoPtr<vectorField> surfNorm_;
+        // static autoPtr<vectorField> surfNorm_;
 
         protected:
 
         // mesh reference
-        const  fvMesh&   mesh_;
-        const  volScalarField& body_;
+        const Foam::fvMesh& mesh_;
+        // geomModel reference
+        geomModel& geomModel_;
+        // const  volScalarField& body_;
         List<DynamicLabelList>& surfCells_;
 
-        bool sdBasedLambda_;
-        scalar  intSpan_;
+        // bool sdBasedLambda_;
+        // scalar  intSpan_;
         autoPtr<List<point>> ibPointsPtr_; // cellIbPoint mapping
+        autoPtr<List<vector>> ibNormalsPtr_; // cellIbNormal mapping
 
 
 
-        vectorField& getSurfNorm_()
-        {
-            if(surfNorm_.valid())
-            {
-                return surfNorm_();
-            }
-            else
-            {
-                // stabilisation for normalisation of the interface normal
-                const dimensionedScalar deltaN
-                (
-                    "deltaN",
-                    1e-8/pow(average(mesh_.V()), 1.0/3.0)
-                );
+        // vectorField& getSurfNorm_()
+        // {
+        //     if(surfNorm_.valid())
+        //     {
+        //         return surfNorm_();
+        //     }
+        //     else
+        //     {
+        //         // stabilisation for normalisation of the interface normal
+        //         const dimensionedScalar deltaN
+        //         (
+        //             "deltaN",
+        //             1e-8/pow(average(mesh_.V()), 1.0/3.0)
+        //         );
 
-                // create temporary unit surface normals
-                surfNorm_ = new vectorField(-fvc::grad(body_));
-                surfNorm_() /= (mag(surfNorm_())+deltaN.value());
-                return surfNorm_();
-            }
-        }
+        //         // create temporary unit surface normals
+        //         surfNorm_ = new vectorField(-fvc::grad(body_));
+        //         surfNorm_() /= (mag(surfNorm_())+deltaN.value());
+        //         return surfNorm_();
+        //     }
+        // }
 
         public:
 
@@ -98,10 +101,11 @@ namespace Foam
         interpolationInfo
         (
             const Foam::fvMesh& mesh,
-            const volScalarField& body,
-            List<DynamicLabelList>& surfCells,
-            bool sdBasedLambda,
-            scalar intSpan
+            geomModel& gModel,
+            // const volScalarField& body,
+            List<DynamicLabelList>& surfCells
+            // bool sdBasedLambda,
+            // scalar intSpan
         );
 
         // Destructors -------------------------------------------------
@@ -116,6 +120,11 @@ namespace Foam
             return ibPointsPtr_();
         }
 
+        List<vector>& getIbNormals()
+        {
+            return ibNormalsPtr_();
+        }
+
         virtual void setIntpInfo() = 0;
 
         const DynamicLabelList& getSurfCells() const
@@ -126,19 +135,20 @@ namespace Foam
         virtual void clearIntpInfo()
         {
             ibPointsPtr_.clear();
+            ibNormalsPtr_.clear();
         }
 
-        point getIbPoint
-        (
-            label scell,
-            vectorField& surfNorm,
-            const volScalarField& body
-        );
+        // point getIbPoint
+        // (
+        //     label scell,
+        //     vectorField& surfNorm,
+        //     const volScalarField& body
+        // );
 
-        static void clearSurfNorm()
-        {
-            surfNorm_.clear();
-        }
+        // static void clearSurfNorm()
+        // {
+        //     surfNorm_.clear();
+        // }
     };
 }
 #endif

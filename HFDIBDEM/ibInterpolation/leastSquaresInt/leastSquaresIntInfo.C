@@ -37,11 +37,10 @@ using namespace Foam;
 //---------------------------------------------------------------------------//
 leastSquaresIntInfo::leastSquaresIntInfo
 (
-    const Foam::fvMesh& mesh,
-    const volScalarField& body,
+    const  fvMesh&   mesh,
+    geomModel& gModel,
+    // const volScalarField& body,
     List<DynamicLabelList>& surfCells,
-    bool sdBasedLambda,
-    scalar intSpan,
     scalar distFactor,
     scalar radiusFactor,
     scalar angleFactor,
@@ -51,10 +50,8 @@ leastSquaresIntInfo::leastSquaresIntInfo
 interpolationInfo
 (
     mesh,
-    body,
-    surfCells,
-    sdBasedLambda,
-    intSpan
+    gModel,
+    surfCells
 ),
 distFactor_(distFactor),
 radiusFactor_(radiusFactor),
@@ -88,14 +85,12 @@ void leastSquaresIntInfo::setIntpInfo()
 
         vector span(centerMeanDist, centerMeanDist, centerMeanDist);
 
-        ibPoints[cellI] = getIbPoint
-            (
-                cSurfCells[cellI],
-                getSurfNorm_(),
-                body_
-            );
-
-        ibNormals[cellI] = getSurfNorm_()[cSurfCells[cellI]];
+        geomModel_.getClosestPointAndNormal(
+            C[cSurfCells[cellI]],
+            span*2,
+            ibPoints[cellI],
+            ibNormals[cellI]
+        );
 
         scalar angleLimit =
             Foam::cos(angleFactor_*Foam::constant::mathematical::pi/180);
@@ -345,13 +340,10 @@ void leastSquaresIntInfo::findCellCells
                 forAll(curPointCells, nCellI)
                 {
                     label nCellId = curPointCells[nCellI];
-                    if(body_[nCellId] + SMALL < 1)
+                    if(!cellSet.found(nCellId))
                     {
-                        if(!cellSet.found(nCellId))
-                        {
-                            cellSet.insert(nCellId);
-                            auxCells.append(nCellId);
-                        }
+                        cellSet.insert(nCellId);
+                        auxCells.append(nCellId);
                     }
                 }
             }

@@ -39,13 +39,14 @@ using namespace Foam;
 lineIntInfo::lineIntInfo
 (
     const  fvMesh&   mesh,
-    const volScalarField& body,
-    List<DynamicLabelList>& surfCells,
-    bool sdBasedLambda,
-    scalar intSpan
+    geomModel& gModel,
+    // const volScalarField& body,
+    List<DynamicLabelList>& surfCells
+    // bool sdBasedLambda,
+    // scalar intSpan
 )
 :
-interpolationInfo(mesh, body, surfCells, sdBasedLambda, intSpan)
+interpolationInfo(mesh, gModel, surfCells)
 {}
 lineIntInfo::~lineIntInfo()
 {}
@@ -56,23 +57,23 @@ void lineIntInfo::setIntpInfo()
 
     resetIntpInfo(cSurfCells.size());
     List<point>& ibPoints = getIbPoints();
+    List<vector>& ibNormals = getIbNormals();
     List<List<intPoint>>& intPoints = getIntPoints();
 
     // create temporary unit surface normals
-    vectorField& surfNorm = getSurfNorm_();
+    // vectorField& surfNorm = getSurfNorm_();
     forAll (cSurfCells, cellI)
     {
         // get surface cell label
         label scell = cSurfCells[cellI];
-
-        ibPoints[cellI] = getIbPoint
-        (
-            scell,
-            surfNorm,
-            body_
-        );
-
         scalar intDist = Foam::pow(mesh_.V()[scell],0.333);
+
+        geomModel_.getClosestPointAndNormal(
+            mesh_.C()[scell],
+            intDist*2*vector::one,
+            ibPoints[cellI],
+            ibNormals[cellI]
+        );
 
         intPoints[cellI].setSize(ORDER);
         intPoint cIntPoint
@@ -87,7 +88,7 @@ void lineIntInfo::setIntpInfo()
         {
             cPoint = cIntPoint.iPoint_;
             do {
-                cPoint += surfNorm[scell]*intDist;
+                cPoint += ibNormals[cellI]*intDist;
             } while(pointInCell(cPoint, cIntPoint.iCell_));
 
             intPoints[cellI][i] = findIntPoint(cIntPoint, cPoint);
@@ -441,7 +442,7 @@ void lineIntInfo::syncIntPoints()
                 correctIntPoint(ibPointsRecv[proci][ibpI], foundP);
                 cIntPoint = foundP;
 
-                if(cIntPoint.iProc_ != Pstream::myProcNo())
+                if(cIntPoint.iProc_ != proci)
                 {
                     break;
                 }

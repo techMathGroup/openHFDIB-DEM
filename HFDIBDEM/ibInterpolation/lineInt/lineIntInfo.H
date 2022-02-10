@@ -93,11 +93,10 @@ namespace Foam
         // Constructors ------------------------------------------------
         lineIntInfo
         (
-            const Foam::fvMesh& mesh,
-            const volScalarField& body,
-            List<DynamicLabelList>& surfCells,
-            bool sdBasedLambda,
-            scalar intSpan
+            const  fvMesh&   mesh,
+            geomModel& gModel,
+            // const volScalarField& body,
+            List<DynamicLabelList>& surfCells
         );
 
         // Destructors -------------------------------------------------
@@ -108,6 +107,7 @@ namespace Foam
         void resetIntpInfo(label newSize)
         {
             ibPointsPtr_.reset(new List<point>(newSize, vector::zero));
+            ibNormalsPtr_.reset(new List<point>(newSize, vector::zero));
             intPointsPtr_.reset(new List<List<intPoint>>(newSize));
             intVelocPtr_.reset(new List<List<vector>>(newSize));
         }

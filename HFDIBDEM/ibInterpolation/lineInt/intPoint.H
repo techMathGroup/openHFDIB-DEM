@@ -43,7 +43,7 @@ namespace Foam
     struct intPoint
     {
         point iPoint_ = vector::zero;
-        label iCell_= 0;
+        label iCell_ = 0;
         label iProc_ = -1;
         vector iVel_ = vector::zero;
 

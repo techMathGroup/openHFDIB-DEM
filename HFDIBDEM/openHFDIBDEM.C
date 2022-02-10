@@ -427,8 +427,6 @@ void openHFDIBDEM::postUpdateBodies
             immersedBodies_[bodyId].postPimpleUpdateImmersedBody(body,f);
         }
     }
-
-    interpolationInfo::clearSurfNorm();
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::recreateBodies

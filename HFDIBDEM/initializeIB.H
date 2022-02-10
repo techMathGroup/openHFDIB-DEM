@@ -129,10 +129,8 @@ if (mesh_.nGeometricD() < 3)
     {
         intpInfo_.set(ibIntp().createIntpInfo(
             mesh_,
-            body,
-            surfCells_,
-            sdBasedLambda_,
-            intSpan_
+            getGeomModel(),
+            surfCells_
         ));
     }
 

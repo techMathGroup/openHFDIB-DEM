@@ -52,7 +52,7 @@ namespace Foam
 
         private:
 
-        autoPtr<List<vector>> ibNormalsPtr_; // cellIbNormal mapping
+        // autoPtr<List<vector>> ibNormalsPtr_; // cellIbNormal mapping
         autoPtr<labelListList> cellCellsPtr_; // cellCell mapping
         PtrList<scalarRectangularMatrix> invDirichletMatrices_;
         autoPtr<DynamicLabelList> ibFacesPtr_;
@@ -96,11 +96,10 @@ namespace Foam
         // Constructors ------------------------------------------------
         leastSquaresIntInfo
         (
-            const Foam::fvMesh& mesh,
-            const volScalarField& body,
-            List<DynamicLabelList>& surfCells,
-            bool sdBasedLambda,
-            scalar intSpan,            
+            const  fvMesh&   mesh,
+            geomModel& gModel,
+            // const volScalarField& body,
+            List<DynamicLabelList>& surfCells,         
             scalar distFactor,
             scalar radiusFactor,
             scalar angleFactor,

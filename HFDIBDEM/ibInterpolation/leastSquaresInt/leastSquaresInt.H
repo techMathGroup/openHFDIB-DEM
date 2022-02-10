@@ -105,19 +105,15 @@ namespace Foam
         interpolationInfo* createIntpInfo
         (
             const Foam::fvMesh& mesh,
-            const volScalarField& body,
-            List<DynamicLabelList>& surfCells,
-            bool sdBasedLambda,
-            scalar intSpan
+            geomModel& gModel,
+            List<DynamicLabelList>& surfCells
         ) override
         {
             return new leastSquaresIntInfo
             (
                 mesh,
-                body,
+                gModel,
                 surfCells,
-                sdBasedLambda,
-                intSpan,
                 distFactor_,
                 radiusFactor_,
                 angleFactor_,
