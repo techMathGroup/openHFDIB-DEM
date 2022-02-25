@@ -85,8 +85,29 @@ refineBuffers 2;
 timesToSetStatic 30; //number of timeSteps in contact with wall/static body to set body as static. Never when -1
 bodyAddition
 {
-	addModel once;
-    onceCoeffs{}
+	addModel distribution;
+    distributionCoeffs
+    {
+        stlBaseSize     0.005;
+        addMode             fieldBased;
+        fieldBasedCoeffs
+        {
+            fieldName   lambda;                                      //name of the indicator field
+            fieldValue	0.05;                                        //minimal field value before addition
+        }
+        
+        addDomain      boundBox;
+        boundBoxCoeffs
+        {
+            minBound (0 -0.001 -0.03);
+            maxBound (0.04 0.001 0.03);
+        }
+        
+        scalingMode    noScaling;
+        noScalingCoeffs{};
+        rotationMode   noRotation;
+        noRotationCoeffs{};
+    }
 }
 }
 
