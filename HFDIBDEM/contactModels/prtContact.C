@@ -746,6 +746,7 @@ void getPrtContactVars<sphere,sphere>
 
     vector centerDir = cClass.getGeomModel().getCoM()
                         - tCenter;
+
     scalar d = mag(centerDir);
 
     if(mag(centerDir) < SMALL || d > (cRadius + tRadius))
@@ -775,10 +776,10 @@ void getPrtContactVars<sphere,sphere>
 
         scalar cSphCapV = (Foam::constant::mathematical::pi
                             *sqr(cRadius - d + xLength)
-                            *(3*cRadius - cRadius - d + xLength)) / 3;
+                            *(3*cRadius - (cRadius - d + xLength))) / 3;
         scalar tSphCapV = (Foam::constant::mathematical::pi
                             *sqr(tRadius - xLength)
-                            *(3*tRadius - tRadius - xLength)) / 3;
+                            *(3*tRadius - (tRadius - xLength))) / 3;
 
         prtCntVars.contactCenter_ = tCenter + (centerDir/d)*xLength;
         prtCntVars.contactVolume_ = cSphCapV + tSphCapV;
