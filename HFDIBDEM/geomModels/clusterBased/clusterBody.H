@@ -26,25 +26,26 @@ InNamspace
     Foam
 
 Description
-    class for addition and removal of immersedBodies
+    class for clustering of immersedBodies
 
 SourceFiles
-    nonConvexBody.C
+    clusterBody.C
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef nonConvexBody_H
-#define nonConvexBody_H
+#ifndef clusterBody_H
+#define clusterBody_H
 
-#include "stlBased.H"
+#include "geomModel.H"
+#include "OFstream.H"
 
 namespace Foam
 {
-    class nonConvexBody
-    : public stlBased
+    class clusterBody
+    : public geomModel
     {
 
         private:
@@ -54,41 +55,36 @@ namespace Foam
         typedef DynamicList<vector> DynamicVectorList;
         typedef DynamicList<point> DynamicPointList;
 
+        PtrList<geomModel> ibGeomModelList;
+
         protected:
 
 
         public:
 
         // Constructors ------------------------------------------------
-        nonConvexBody
+        clusterBody
         (
             const  fvMesh&   mesh,
-            word      stlPath,
             scalar  thrSurf = 1
         )
         :
-        stlBased
+        geomModel
         (
             mesh,
             arbShape,
-            stlPath,
             thrSurf
-        ){}
+        )
+        {}
 
         // Destructors -------------------------------------------------
-        ~nonConvexBody(){}
+        ~clusterBody(){}
 
         // Public subclasses -------------------------------------------
 
         // Public variables --------------------------------------------
 
         // Public methods ----------------------------------------------
-        //~ void init();
-
-        bool canAddBody
-        (
-            const volScalarField& body
-        ) final override;
 
         void createImmersedBody
         (
@@ -97,24 +93,44 @@ namespace Foam
             List<pointField>& cellPoints
         ) final override;
 
-        labelList getBBoxCellsByOctTree
-        (
-            label cellToCheck,
-            bool& insideBB,
-            vector& bBoxMin,
-            vector& bBoxMax,
-            List<DynamicLabelList>& bBoxCells,
-            Field<label>& octreeField
-        );
-
         geomModel* getGeomModel() final override
         {
-            nonConvexBody* convexBodyModel = new nonConvexBody(mesh_,stlPath_,thrSurf_);
-            stlBased* stlBasedModel = convexBodyModel;
-            stlBasedModel->initVars(bodySurfMesh_.points(), thrSurf_, intSpan_, sdBasedLambda_);
-            geomModel* bodyGeomModel = stlBasedModel;
-            return bodyGeomModel;
+            return this;
         }
+
+        void calculateGeometricalProperties(
+            volScalarField& body
+        ) final override;
+
+        void bodyMovePoints(vector translVec) final override;
+
+        void bodyScalePoints(scalar scaleFac) final override;
+
+        void bodyRotatePoints
+        (
+            scalar rotAngle,
+            vector axisOfRot
+        ) final override;
+
+
+        boundBox getBounds() final override;
+
+        void synchronPos() final override;
+
+        boolList pointInside(pointField pointI) final override;
+
+
+        bool pointInside(point pointI) final override;
+
+        scalar getDC() final override;
+
+        void getClosestPointAndNormal
+        (
+            const point& startPoint,
+            const vector& span,
+            point& closestPoint,
+            vector& normal
+        ) final override;
     };
 }
 

@@ -94,6 +94,8 @@ bodyId_(bodyId),
 updateTorque_(false),
 bodyOperation_(0),
 boundIndList_(3),
+surfCells_(bodyGeomModel->getSurfaceCellList()),
+intCells_(bodyGeomModel->getInternalCellList()),
 owner_(false),
 historyCouplingF_(vector::zero),
 historyCouplingT_(vector::zero),
@@ -127,8 +129,6 @@ void immersedBody::createImmersedBody(volScalarField& body, volScalarField& refi
     geomModel_->createImmersedBody(
         body,
         octreeField_,
-        surfCells_,
-        intCells_,
         cellPoints_
     );
 
@@ -144,7 +144,7 @@ void immersedBody::syncCreateImmersedBody(volScalarField& body, volScalarField& 
     InfoH << iB_Info << "body: " << bodyId_ << " owner: " << owner_ << endl;
 
     InfoH << iB_Info << "Computing geometrical properties" << endl;
-    geomModel_->calculateGeometricalProperties(body,surfCells_,intCells_);
+    geomModel_->calculateGeometricalProperties(body);
 
     // update body courant number
     computeBodyCoNumber();

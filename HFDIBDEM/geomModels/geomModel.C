@@ -65,8 +65,7 @@ geomModel::~geomModel()
 //---------------------------------------------------------------------------//
 void geomModel::calculateGeometricalProperties
 (
-    volScalarField& body,List<DynamicLabelList>& surfCells,
-    List<DynamicLabelList>& intCells
+    volScalarField& body
 )
 {
     //vector CoMOld  = CoM_;
@@ -76,8 +75,8 @@ void geomModel::calculateGeometricalProperties
     I_      = symmTensor::zero;
     //vector tmpCom(vector::zero);
 
-    addToMAndI(body,surfCells[Pstream::myProcNo()]);
-    addToMAndI(body,intCells[Pstream::myProcNo()]);
+    addToMAndI(body,surfCells_[Pstream::myProcNo()]);
+    addToMAndI(body,intCells_[Pstream::myProcNo()]);
 
     // collect from processors
     reduce(M_, sumOp<scalar>());

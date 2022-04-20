@@ -87,6 +87,12 @@ namespace Foam
 
         const  fvMesh&   mesh_;
 
+        // body surface cells
+        List<DynamicLabelList>  surfCells_;
+
+        // body internal cells
+        List<DynamicLabelList>  intCells_;
+
         //list to find the owner of the IB
         DynamicLabelList ibPartialVolume_;
         label owner_;
@@ -132,8 +138,6 @@ namespace Foam
         (
             volScalarField& body,
             Field<label>& octreeField,
-            List<DynamicLabelList>& surfCells,
-            List<DynamicLabelList>& intCells,
             List<pointField>& cellPoints
         )
         {
@@ -152,6 +156,26 @@ namespace Foam
         }
 
         virtual geomModel* getGeomModel() = 0;
+
+        List<DynamicLabelList>& getSurfaceCellList()
+        {
+            return surfCells_;
+        };
+
+        List<DynamicLabelList>& getInternalCellList()
+        {
+            return intCells_;
+        };
+
+        const List<DynamicLabelList>& getSurfaceCellList()        const
+        {
+            return surfCells_;
+        };
+
+        const List<DynamicLabelList>& getInternalCellList()       const
+        {
+            return intCells_;
+        };
 
         virtual vector addModelReturnRandomPosition(
             const bool allActiveCellsInMesh,
@@ -284,10 +308,8 @@ namespace Foam
         virtual void setRhoS(dimensionedScalar rhoS){rhoS_ = rhoS;}
         dimensionedScalar getRhoS(){return rhoS_;}
 
-        void calculateGeometricalProperties(
-            volScalarField& body,
-            List<DynamicLabelList>& surfCells,
-            List<DynamicLabelList>& intCells
+        virtual void calculateGeometricalProperties(
+            volScalarField& body
         );
 
         //evaluate center of mass and inertia tensor

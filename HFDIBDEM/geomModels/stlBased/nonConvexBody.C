@@ -174,8 +174,6 @@ void nonConvexBody::createImmersedBody
 (
     volScalarField& body,
     Field<label>& octreeField,
-    List<DynamicLabelList>& surfCells,
-    List<DynamicLabelList>& intCells,
     List<pointField>& cellPoints
 )
 {
@@ -221,8 +219,8 @@ void nonConvexBody::createImmersedBody
 
 
     // clear old list contents
-    intCells[Pstream::myProcNo()].clear();
-    surfCells[Pstream::myProcNo()].clear();
+    intCells_[Pstream::myProcNo()].clear();
+    surfCells_[Pstream::myProcNo()].clear();
 
     // find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;
@@ -259,12 +257,12 @@ void nonConvexBody::createImmersedBody
         {
             if (cBody > (1.0-thrSurf_))
             {
-                intCells[Pstream::myProcNo()].append(cellI);
+                intCells_[Pstream::myProcNo()].append(cellI);
                 cellToStartInCreateIB_ = cellI;
             }
             else if (cBody  <= (1.0-thrSurf_))
             {
-                surfCells[Pstream::myProcNo()].append(cellI);
+                surfCells_[Pstream::myProcNo()].append(cellI);
                 if (sdBasedLambda_)
                 {
                     pointIndexHit pointHit(

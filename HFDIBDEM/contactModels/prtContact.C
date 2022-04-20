@@ -254,8 +254,6 @@ void getPrtContactVars(
 
     contactCenter /= numOfComCells;
 
-    vector cCoM(cClass.getGeomModel().getCoM());                         //center of mass (current)
-    vector tCoM(tClass.getGeomModel().getCoM());                         //center of mass (neighbor)
     scalar tDC(tClass.getGeomModel().getDC());                           //characteristic diameter
 
     point closestPoint = vector::zero;

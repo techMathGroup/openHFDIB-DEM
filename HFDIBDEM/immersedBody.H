@@ -150,10 +150,10 @@ namespace Foam
         point maxBoundPoint_;
 
         // body surface cells
-        List<DynamicLabelList>  surfCells_;
+        List<DynamicLabelList>&  surfCells_;
 
         // body internal cells
-        List<DynamicLabelList>  intCells_;
+        List<DynamicLabelList>&  intCells_;
 
         // processor num that owns the IB
         label owner_;

@@ -114,8 +114,6 @@ namespace Foam
         (
             volScalarField& body,
             Field<label>& octreeField,
-            List<DynamicLabelList>& surfCells,
-            List<DynamicLabelList>& intCells,
             List<pointField>& cellPoints
         ) final override;
 
@@ -125,9 +123,7 @@ namespace Foam
             bool& insideIB,
             bool& centerInside,
             boolList& vertexesInside,
-            volScalarField& body,
-            List<DynamicLabelList>& surfCells,
-            List<DynamicLabelList>& intCells
+            volScalarField& body
         );
 
         geomModel* getGeomModel() final override

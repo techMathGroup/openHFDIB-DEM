@@ -151,8 +151,6 @@ void convexBody::createImmersedBody
 (
     volScalarField& body,
     Field<label>& octreeField,
-    List<DynamicLabelList>& surfCells,
-    List<DynamicLabelList>& intCells,
     List<pointField>& cellPoints
 )
 {
@@ -178,8 +176,8 @@ void convexBody::createImmersedBody
     }
 
     // clear old list contents
-    intCells[Pstream::myProcNo()].clear();
-    surfCells[Pstream::myProcNo()].clear();
+    intCells_[Pstream::myProcNo()].clear();
+    surfCells_[Pstream::myProcNo()].clear();
     // find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;
     octreeField *= 0;
@@ -248,9 +246,7 @@ void convexBody::createImmersedBody
                                     insideIB,
                                     centerInside,
                                     vertexesInside,
-                                    body,
-                                    surfCells,
-                                    intCells
+                                    body
                                 )
                             );
                         }
@@ -263,8 +259,8 @@ void convexBody::createImmersedBody
             }
             nextToCheck = auxToCheck;
         }
-        if(intCells[Pstream::myProcNo()].size() > 0)
-            cellToStartInCreateIB_ = min(intCells[Pstream::myProcNo()]);
+        if(intCells_[Pstream::myProcNo()].size() > 0)
+            cellToStartInCreateIB_ = min(intCells_[Pstream::myProcNo()]);
         lastIbPoints_ = lastIbPoints;
     }
 }
@@ -276,9 +272,7 @@ labelList convexBody::createImmersedBodyByOctTree
     bool& insideIB,
     bool& centerInside,
     boolList& vertexesInside,
-    volScalarField& body,
-    List<DynamicLabelList>& surfCells,
-    List<DynamicLabelList>& intCells
+    volScalarField& body
 )
 {
     labelList retList;
@@ -304,11 +298,11 @@ labelList convexBody::createImmersedBodyByOctTree
     {
         if (cBody > (1.0-thrSurf_))
         {
-            intCells[Pstream::myProcNo()].append(cellToCheck);
+            intCells_[Pstream::myProcNo()].append(cellToCheck);
         }
         else if (cBody  <= (1.0-thrSurf_))
         {
-            surfCells[Pstream::myProcNo()].append(cellToCheck);
+            surfCells_[Pstream::myProcNo()].append(cellToCheck);
             if (sdBasedLambda_)
             {
                 pointIndexHit pointHit(

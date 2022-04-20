@@ -80,8 +80,6 @@ namespace Foam
         (
             volScalarField& body,
             Field<label>& octreeField,
-            List<DynamicLabelList>& surfCells,
-            List<DynamicLabelList>& intCells,
             List<pointField>& cellPoints
         )
         {
