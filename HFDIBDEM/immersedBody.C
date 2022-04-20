@@ -106,7 +106,6 @@ intSpan_(2.0),
 charCellSize_(1e3),
 refineBuffers_(0),
 recomputeM0_(recomputeM0),
-created_(false),
 timesToSetStatic_(-1),
 staticContactPost_(vector::zero)
 {
@@ -146,7 +145,6 @@ void immersedBody::syncCreateImmersedBody(volScalarField& body, volScalarField& 
 
     InfoH << iB_Info << "Computing geometrical properties" << endl;
     geomModel_->calculateGeometricalProperties(body,surfCells_,intCells_);
-    created_ = true;
 
     // update body courant number
     computeBodyCoNumber();
@@ -698,26 +696,20 @@ vectorField immersedBody::getUatIbPoints()
 // reset body field for this immersed object
 void immersedBody::resetBody(volScalarField& body, bool resethistoryFt)
 {
-    if(!created_ || bodyOperation_ != 0)
+    forAll (intCells_[Pstream::myProcNo()],cellI)
     {
-        forAll (intCells_[Pstream::myProcNo()],cellI)
-        {
-            body[intCells_[Pstream::myProcNo()][cellI]] = 0;
-        }
-        forAll (surfCells_[Pstream::myProcNo()],cellI)
-        {
-            body[surfCells_[Pstream::myProcNo()][cellI]] = 0;
-        }
+        body[intCells_[Pstream::myProcNo()][cellI]] = 0;
+    }
+    forAll (surfCells_[Pstream::myProcNo()],cellI)
+    {
+        body[surfCells_[Pstream::myProcNo()][cellI]] = 0;
     }
 
-    if(!created_ || bodyOperation_ != 0)
-    {
-        interpolationInfoOld_[Pstream::myProcNo()].clear();
-        interpolationVecReqs_[Pstream::myProcNo()].clear();
+    interpolationInfoOld_[Pstream::myProcNo()].clear();
+    interpolationVecReqs_[Pstream::myProcNo()].clear();
 
-        surfCells_[Pstream::myProcNo()].clear();
-        intCells_[Pstream::myProcNo()].clear();
-    }
+    surfCells_[Pstream::myProcNo()].clear();
+    intCells_[Pstream::myProcNo()].clear();
 }
 //---------------------------------------------------------------------------//
 // function to move the body after the contact
@@ -730,8 +722,6 @@ void immersedBody::postContactUpdateBodyField(volScalarField& body, volScalarFie
 //---------------------------------------------------------------------------//
 void immersedBody::recreateBodyField(volScalarField& body, volScalarField& refineF)
 {
-    created_ = false;
-
     octreeField_ = Field<label>(mesh_.nCells(), 0);
     interpolationInfoOld_[Pstream::myProcNo()].clear();
     interpolationVecReqs_[Pstream::myProcNo()].clear();

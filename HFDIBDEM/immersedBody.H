@@ -193,7 +193,6 @@ namespace Foam
         scalar  charCellSize_;                                          //characteristic cell size over surface
         label   refineBuffers_;                                         //number of refine buffers around body
         label   recomputeM0_;                                           //how many times rocompute M0_ because of refinement
-        bool    created_;
         label   timesToSetStatic_;
         vector  staticContactPost_;
 
