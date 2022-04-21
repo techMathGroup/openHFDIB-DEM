@@ -130,3 +130,21 @@ void geomModel::computeBodyCharPars(List<DynamicLabelList>& surfCells)
     reduce(dC_, maxOp<scalar>());
 }
 //---------------------------------------------------------------------------//
+bool geomModel::isBBoxInMesh()
+{
+    boundBox ibBound(getBounds());
+
+    forAll(geometricD,dir)
+    {
+        if(geometricD[dir] == 1)
+        {
+            if(!(curMeshBounds_.max()[dir] >= ibBound.min()[dir]
+                && curMeshBounds_.min()[dir] <= ibBound.max()[dir]))
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+//---------------------------------------------------------------------------//

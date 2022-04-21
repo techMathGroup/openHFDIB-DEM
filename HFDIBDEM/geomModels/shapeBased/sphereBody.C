@@ -156,36 +156,40 @@ void sphereBody::createImmersedBody
     List<pointField>& cellPoints
 )
 {
-    boundBox ibBound(getBounds());
-    bool ibInsideMesh(false);
-
-    bool dirOk(true);
-    forAll(geometricD,dir)
-    {
-        if(geometricD[dir] == 1)
-        {
-            if(!(curMeshBounds_.max()[dir] >= ibBound.min()[dir]
-                && curMeshBounds_.min()[dir] <= ibBound.max()[dir]))
-            {
-                dirOk = false;
-                break;
-            }
-        }
-    }
-
-    if(dirOk)
-    {
-        ibInsideMesh = true;
-    }
-
     // clear old list contents
     intCells[Pstream::myProcNo()].clear();
     surfCells[Pstream::myProcNo()].clear();
     // find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;
+
+    if(!isBBoxInMesh())
+    {
+        return;
+    }
+
+    label cellInIB = getCellInBody(octreeField);
+    if(cellInIB == -1)
+    {
+        return;
+    }
+
+    // get the list of cell centroids
+    const pointField& cp = mesh_.C();
     octreeField *= 0;
 
-    if(ibInsideMesh)
+    autoPtr<DynamicLabelList> nextToCheck(
+        new DynamicLabelList(1,cellInIB));
+    autoPtr<DynamicLabelList> auxToCheck(
+        new DynamicLabelList);
+
+    label iterCount(0);label iterMax(mesh_.nCells());
+    while (nextToCheck().size() > 0 and iterCount++ < iterMax)
+    {
+
+    }
+
+
+    if(isBBoxInMesh())
     {
         // get the list of cell centroids
         const pointField& cp = mesh_.C();
@@ -343,6 +347,53 @@ labelList sphereBody::createImmersedBodyByOctTree
     }
 
     return retList;
+}
+//---------------------------------------------------------------------------//
+// create immersed body for convex body
+void sphereBody::getCellInBody
+(
+    Field<label>& octreeField
+)
+{
+    octreeField *= 0;
+    // get the list of cell centroids
+    const pointField& cp = mesh_.C();
+
+    if(cellToStartInCreateIB_ >= octreeField.size())
+        cellToStartInCreateIB_ = 0;
+
+    autoPtr<DynamicLabelList> nextToCheck(
+        new DynamicLabelList(1,cellToStartInCreateIB_));
+    autoPtr<DynamicLabelList> auxToCheck(
+        new DynamicLabelList);
+
+    label iterCount(0);label iterMax(mesh_.nCells());
+
+    while (nextToCheck().size() > 0 and iterCount < iterMax)
+    {
+        auxToCheck().clear();
+        forAll (nextToCheck(),cellToCheck)
+        {
+            if (octreeField[nextToCheck()[cellToCheck]] == 0)
+            {
+                octreeField[nextToCheck()[cellToCheck]] = 1;
+                iterCount++;
+
+                if(pointInside(cp[nextToCheck()[cellToCheck]]))
+                {
+                    return nextToCheck()[cellToCheck];
+                }
+                else
+                {
+                    auxToCheck().append(mesh_.cellCells()[nextToCheck()[cellToCheck]]);
+                }
+            }
+        }
+        const autoPtr<DynamicLabelList> helpPtr(nextToCheck.ptr());
+        nextToCheck.set(auxToCheck.ptr());
+        auxToCheck = helpPtr;
+    }
+    return -1;
 }
 //---------------------------------------------------------------------------//
 void sphereBody::synchronPos()

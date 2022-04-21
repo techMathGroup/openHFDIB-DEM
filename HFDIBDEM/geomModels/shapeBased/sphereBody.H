@@ -65,7 +65,7 @@ namespace Foam
         vector historyPosition_;
         scalar historyRadius_;
 
-        protected:
+        autoPtr<HashTable<labelList, label>> cachedNeighbours;
 
 
         public:
@@ -129,6 +129,11 @@ namespace Foam
             List<DynamicLabelList>& surfCells,
             List<DynamicLabelList>& intCells
         );
+
+        label getCellInBody
+        (
+            Field<label>& octreeField
+        )
 
         geomModel* getGeomModel() final override
         {

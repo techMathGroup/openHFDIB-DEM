@@ -323,6 +323,8 @@ namespace Foam
         {
             return I_;
         }
+
+        bool isBBoxInMesh();
     };
 }
 #endif
