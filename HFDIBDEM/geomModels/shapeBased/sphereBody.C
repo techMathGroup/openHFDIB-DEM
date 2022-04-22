@@ -156,8 +156,6 @@ void sphereBody::createImmersedBody
     List<labelList>& cellPoints
 )
 {
-    clockTime stopWatch;
-    stopWatch.timeIncrement();
     // clear old list contents
     intCells[Pstream::myProcNo()].clear();
     surfCells[Pstream::myProcNo()].clear();
@@ -249,8 +247,6 @@ void sphereBody::createImmersedBody
     }
     cachedNeighbours_().erase(keyToErase);
 
-    geomModel::t1 += stopWatch.timeIncrement();
-
     DynamicLabelList potentSurfCells = 
         getPotentSurfCells(
             body,
@@ -259,7 +255,6 @@ void sphereBody::createImmersedBody
             cellPoints
         );
 
-    geomModel::t2 += stopWatch.timeIncrement();
     correctSurfCells
     (
         body,
@@ -274,7 +269,6 @@ void sphereBody::createImmersedBody
     {
         cellToStartInCreateIB_ = min(intCells[Pstream::myProcNo()]);
     }
-    geomModel::t3 += stopWatch.timeIncrement();
 }
 //---------------------------------------------------------------------------//
 // Find first cell with center inside the body

@@ -33,14 +33,6 @@ Contributors
 
 using namespace Foam;
 
-scalar geomModel::t1;
-scalar geomModel::t2;
-scalar geomModel::t3;
-scalar geomModel::t4;
-scalar geomModel::t5;
-scalar geomModel::t6;
-scalar geomModel::t7;
-
 //---------------------------------------------------------------------------//
 geomModel::geomModel
 (
@@ -213,8 +205,6 @@ void geomModel::correctSurfCells
     List<labelList>& cellPoints
 )
 {
-    clockTime stopWatch;
-    stopWatch.timeIncrement();
     HashTable<bool, label, Hash<label>> verticesStatus(potentSurfCells.size()*6);
     forAll(potentSurfCells, cellLabel)
     {    
@@ -228,7 +218,6 @@ void geomModel::correctSurfCells
 
         const labelList& cVerts = cellPoints[cCell];
         scalar rVInSize(0.5/cVerts.size());
-        geomModel::t4 += stopWatch.timeIncrement();
         forAll(cVerts, vertI)
         {
             if(!verticesStatus.found(cVerts[vertI]))
@@ -250,7 +239,6 @@ void geomModel::correctSurfCells
                 cBody += rVInSize;
             }
         }
-        geomModel::t5 += stopWatch.timeIncrement();
 
         if (cBody > thrSurf_)
         {
@@ -268,7 +256,6 @@ void geomModel::correctSurfCells
 
         // clip the body field values
         body[cCell] = min(max(0.0,body[cCell]),1.0);
-        geomModel::t6 += stopWatch.timeIncrement();
     }
 }
 //---------------------------------------------------------------------------//

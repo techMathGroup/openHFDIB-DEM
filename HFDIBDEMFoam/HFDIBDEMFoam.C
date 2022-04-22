@@ -68,13 +68,6 @@ int main(int argc, char *argv[])
     Info<< "\nStarting time loop\n" << endl;
 
     clockTime stopWatch;
-    geomModel::t1 = 0;
-    geomModel::t2 = 0;
-    geomModel::t3 = 0;
-    geomModel::t4 = 0;
-    geomModel::t5 = 0;
-    geomModel::t6 = 0;
-    geomModel::t7 = 0;
 
     while (runTime.run())
     {
@@ -89,22 +82,8 @@ int main(int argc, char *argv[])
 
         stopWatch.timeIncrement();
         HFDIBDEM.createBodies(lambda,refineF);
-        Info << "Create body time: " << stopWatch.timeIncrement() 
-        << "t1: " << geomModel::t1 
-        << "t2: " << geomModel::t2 
-        << "t3: " << geomModel::t3 
-        << "t4: " << geomModel::t4 
-        << "t5: " << geomModel::t5 
-        << "t6: " << geomModel::t6
-        << "t7: " << geomModel::t7 << endl;
-
-        geomModel::t1 = 0;
-        geomModel::t2 = 0;
-        geomModel::t3 = 0;
-        geomModel::t4 = 0;
-        geomModel::t5 = 0;
-        geomModel::t6 = 0;
-        geomModel::t7 = 0;
+        Info << "Create body time: " << stopWatch.timeIncrement() << endl;
+        
         HFDIBDEM.preUpdateBodies(lambda,f);
 
         mesh.update();
