@@ -76,7 +76,7 @@ namespace Foam
             Field<label>& octreeField,
             List<DynamicLabelList>& surfCells,
             List<DynamicLabelList>& intCells,
-            List<pointField>& cellPoints
+            List<labelList>& cellPoints
         )
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "

@@ -106,7 +106,7 @@ namespace Foam
     HashTable<scalar,string,Hash<string>> matInterAdh_;
 
     // precalculate cellPoints for better performace
-    List<pointField> cellPoints_;
+    List<labelList> cellPoints_;
 
     HashTable<prtContactInfo,Tuple2<label, label>,Hash<Tuple2<label, label>>>
         prtcInfoTable_;

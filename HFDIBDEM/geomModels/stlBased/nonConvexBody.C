@@ -176,7 +176,7 @@ void nonConvexBody::createImmersedBody
     Field<label>& octreeField,
     List<DynamicLabelList>& surfCells,
     List<DynamicLabelList>& intCells,
-    List<pointField>& cellPoints
+    List<labelList>& cellPoints
 )
 {
     // reduce computational domain to the body bounding box
@@ -231,12 +231,13 @@ void nonConvexBody::createImmersedBody
 
     // first loop, construction of body field and identification of
     // the number of inside and surface cells
+    const pointField& pp = mesh_.points();
     forAll (bBoxCells[Pstream::myProcNo()],bCellI)                       //go only through bBox
     {
         label cellI(bBoxCells[Pstream::myProcNo()][bCellI]);
 
         // check if partially or completely inside
-        const pointField vertexPoints = cellPoints[cellI];
+        const pointField vertexPoints(pp,cellPoints[cellI]);
         boolList vertexesInside = triSurfSearch_().calcInside( vertexPoints );
         bool centerInside(fCentersInside[bCellI]);
         scalar rVInSize(0.5/vertexesInside.size());

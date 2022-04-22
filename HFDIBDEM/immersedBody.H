@@ -95,7 +95,7 @@ namespace Foam
         autoPtr<wallContactInfo> wallCntInfo_;
 
         // precalculate cellPoints for better performace
-        List<pointField>& cellPoints_;
+        List<labelList>& cellPoints_;
 
         // rotation axis
         vector Axis_;
@@ -214,7 +214,7 @@ namespace Foam
             label recomputeM0,
             geomModel* bodyGeomModel,
             autoPtr<ibInterpolation>& ibIntp,
-            List<pointField>& cellPoints,
+            List<labelList>& cellPoints,
             HashTable<materialInfo,string,Hash<string>>& materialInfos,
             HashTable<materialInfo,string,Hash<string>>& wInfos,
             HashTable<scalar,string,Hash<string>>& matInterAdh

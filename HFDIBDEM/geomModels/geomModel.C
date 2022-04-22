@@ -33,6 +33,14 @@ Contributors
 
 using namespace Foam;
 
+scalar geomModel::t1;
+scalar geomModel::t2;
+scalar geomModel::t3;
+scalar geomModel::t4;
+scalar geomModel::t5;
+scalar geomModel::t6;
+scalar geomModel::t7;
+
 //---------------------------------------------------------------------------//
 geomModel::geomModel
 (
@@ -146,5 +154,121 @@ bool geomModel::isBBoxInMesh()
         }
     }
     return true;
+}
+//---------------------------------------------------------------------------//
+DynamicList<label> geomModel::getPotentSurfCells
+(
+    volScalarField& body,
+    List<DynamicLabelList>& intCells,
+    HashTable<bool, label, Hash<label>>& cellInside,
+    List<labelList>& cellPoints
+)
+{
+    const labelList foundCells = cellInside.toc();
+    DynamicLabelList potentSurfCells(foundCells.size()/2);
+    forAll(foundCells, cellI)
+    {
+        label cCell = foundCells[cellI];
+
+        if(cellInside[cCell])
+        {
+            const labelList& neigh = cachedNeighbours_()[cCell];
+
+            bool anyOutside = false;
+            forAll(neigh, neighI)
+            {
+                if(!cellInside[neigh[neighI]])
+                {
+                    anyOutside = true;
+                    break;
+                }
+            }
+
+            if(anyOutside)
+            {
+                potentSurfCells.append(cCell);
+            }
+            else
+            {
+                intCells[Pstream::myProcNo()].append(cCell);
+                ibPartialVolume_[Pstream::myProcNo()] += 1;
+                body[cCell] = 1.0;
+            }
+        }
+        else
+        {
+            potentSurfCells.append(cCell);
+        }
+    }
+    return potentSurfCells;
+}
+//---------------------------------------------------------------------------//
+void geomModel::correctSurfCells
+(
+    volScalarField& body,
+    List<DynamicLabelList>& intCells,
+    List<DynamicLabelList>& surfCells,
+    DynamicLabelList& potentSurfCells,
+    HashTable<bool, label, Hash<label>>& cellInside,
+    List<labelList>& cellPoints
+)
+{
+    clockTime stopWatch;
+    stopWatch.timeIncrement();
+    HashTable<bool, label, Hash<label>> verticesStatus(potentSurfCells.size()*6);
+    forAll(potentSurfCells, cellLabel)
+    {    
+        label cCell = potentSurfCells[cellLabel];
+        scalar cBody(0);
+
+        if(cellInside[cCell])
+        {
+            cBody += 0.5;
+        }
+
+        const labelList& cVerts = cellPoints[cCell];
+        scalar rVInSize(0.5/cVerts.size());
+        geomModel::t4 += stopWatch.timeIncrement();
+        forAll(cVerts, vertI)
+        {
+            if(!verticesStatus.found(cVerts[vertI]))
+            {
+                bool vertexInside = pointInside(mesh_.points()[cVerts[vertI]]);
+                verticesStatus.insert
+                (
+                    cVerts[vertI],
+                    vertexInside
+                );
+
+                if(vertexInside)
+                {
+                    cBody += rVInSize;
+                }
+            }
+            else if(verticesStatus[cVerts[vertI]])
+            {
+                cBody += rVInSize;
+            }
+        }
+        geomModel::t5 += stopWatch.timeIncrement();
+
+        if (cBody > thrSurf_)
+        {
+            if (cBody > (1.0-thrSurf_))
+            {
+                intCells[Pstream::myProcNo()].append(cCell);
+            }
+            else if (cBody  <= (1.0-thrSurf_))
+            {
+                surfCells[Pstream::myProcNo()].append(cCell);
+            }
+            ibPartialVolume_[Pstream::myProcNo()] += 1;
+        }
+        body[cCell] += cBody;
+
+        // clip the body field values
+        body[cCell] = min(max(0.0,body[cCell]),1.0);
+        geomModel::t6 += stopWatch.timeIncrement();
+    }
 }
 //---------------------------------------------------------------------------//

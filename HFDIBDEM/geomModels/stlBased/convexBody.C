@@ -153,7 +153,7 @@ void convexBody::createImmersedBody
     Field<label>& octreeField,
     List<DynamicLabelList>& surfCells,
     List<DynamicLabelList>& intCells,
-    List<pointField>& cellPoints
+    List<labelList>& cellPoints
 )
 {
     boundBox ibBound(getBounds());
@@ -201,6 +201,7 @@ void convexBody::createImmersedBody
         boolList vertexesInside;
         pointField pointPos;
         bool centerInside;
+        const pointField& pp = mesh_.points();
         DynamicLabelList auxToCheck;
         HashTable<pointField,label,Hash<label>> lastIbPoints(0);
         while (nextToCheck.size() > 0 and iterCount < iterMax)
@@ -220,7 +221,7 @@ void convexBody::createImmersedBody
                     }
                     else
                     {
-                        pointPos = cellPoints[nextToCheck[cellToCheck]];
+                        pointPos = filterField(pp,cellPoints[nextToCheck[cellToCheck]]);
                     }
                     bool cellInsideBB(false);
                     forAll(pointPos,pos)

@@ -49,6 +49,8 @@ Contributors
 #include "outputHFDIBDEM.H"
 using namespace outputHFDIBDEM;
 
+#include "clockTime.H"
+
 namespace Foam
 {
     // custom field filtration
@@ -98,6 +100,7 @@ namespace Foam
         bool    sdBasedLambda_;
         boundBox curMeshBounds_;
         HashTable<pointField,label,Hash<label>> lastIbPoints_;
+        autoPtr<HashTable<const labelList&, label, Hash<label>>> cachedNeighbours_;
 
         //body mass
         scalar M_;
@@ -117,6 +120,14 @@ namespace Foam
 
         public:
 
+        static scalar t1;
+        static scalar t2;
+        static scalar t3;
+        static scalar t4;
+        static scalar t5;
+        static scalar t6;
+        static scalar t7;
+
         // Constructors ------------------------------------------------
         geomModel
         (
@@ -134,7 +145,7 @@ namespace Foam
             Field<label>& octreeField,
             List<DynamicLabelList>& surfCells,
             List<DynamicLabelList>& intCells,
-            List<pointField>& cellPoints
+            List<labelList>& cellPoints
         )
         {
             InfoH << iB_Info << "-- geomModelMessage-- "
@@ -325,6 +336,24 @@ namespace Foam
         }
 
         bool isBBoxInMesh();
+
+        DynamicLabelList getPotentSurfCells
+        (
+            volScalarField& body,
+            List<DynamicLabelList>& intCells,
+            HashTable<bool, label, Hash<label>>& cellInside,
+            List<labelList>& cellPoints
+        );
+
+        void correctSurfCells
+        (
+            volScalarField& body,
+            List<DynamicLabelList>& intCells,
+            List<DynamicLabelList>& surfCells,
+            DynamicLabelList& potentSurfCells,
+            HashTable<bool, label, Hash<label>>& cellInside,
+            List<labelList>& cellPoints
+        );
     };
 }
 #endif

@@ -65,9 +65,6 @@ namespace Foam
         vector historyPosition_;
         scalar historyRadius_;
 
-        autoPtr<HashTable<labelList, label>> cachedNeighbours;
-
-
         public:
 
         // Constructors ------------------------------------------------
@@ -116,24 +113,13 @@ namespace Foam
             Field<label>& octreeField,
             List<DynamicLabelList>& surfCells,
             List<DynamicLabelList>& intCells,
-            List<pointField>& cellPoints
+            List<labelList>& cellPoints
         ) final override;
-
-        labelList createImmersedBodyByOctTree
-        (
-            label cellToCheck,
-            bool& insideIB,
-            bool& centerInside,
-            boolList& vertexesInside,
-            volScalarField& body,
-            List<DynamicLabelList>& surfCells,
-            List<DynamicLabelList>& intCells
-        );
 
         label getCellInBody
         (
             Field<label>& octreeField
-        )
+        );
 
         geomModel* getGeomModel() final override
         {

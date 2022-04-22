@@ -64,7 +64,7 @@ immersedBody::immersedBody
     label recomputeM0,
     geomModel* bodyGeomModel,
     autoPtr<ibInterpolation>& ibIntp,
-    List<pointField>& cellPoints,
+    List<labelList>& cellPoints,
     HashTable<materialInfo,string,Hash<string>>& materialInfos,
     HashTable<materialInfo,string,Hash<string>>& wInfos,
     HashTable<scalar,string,Hash<string>>& matInterAdh
