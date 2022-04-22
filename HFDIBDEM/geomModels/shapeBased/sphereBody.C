@@ -175,7 +175,6 @@ void sphereBody::createImmersedBody
 
     // get the list of cell centroids
     const pointField& cp = mesh_.C();
-    // octreeField *= 0;
 
     autoPtr<DynamicLabelList> nextToCheck(
         new DynamicLabelList(1,cellInIB));
@@ -193,8 +192,6 @@ void sphereBody::createImmersedBody
     }
 
     HashTable<bool, label, Hash<label>> cellInside(tableSize);
-    // autoPtr<HashTable<const labelList&, label, Hash<label>>> newNeigh( 
-    //     new HashTable<const labelList&, label, Hash<label>>(tableSize));
 
     label iterCount(0);label iterMax(mesh_.nCells());
     while (nextToCheck().size() > 0 and iterCount++ < iterMax)
@@ -213,14 +210,11 @@ void sphereBody::createImmersedBody
 
                     if(cachedNeighbours_.valid() && cachedNeighbours_().found(cCell))
                     {
-                        // const labelList& neigh = cachedNeighbours_()[cCell];
-                        // newNeigh().insert(cCell, neigh);
                         auxToCheck().append(cachedNeighbours_()[cCell]);
                     }
                     else
                     {
                         const labelList& neigh = mesh_.cellCells(cCell);
-                        // newNeigh().insert(cCell, neigh);
                         cachedNeighbours_().insert(cCell, neigh);
                         auxToCheck().append(neigh);
                     }
@@ -236,7 +230,6 @@ void sphereBody::createImmersedBody
         auxToCheck = helpPtr;
     }
 
-    // cachedNeighbours_ = newNeigh;
     DynamicLabelList keyToErase;
     for(auto it = cachedNeighbours_().begin(); it != cachedNeighbours_().end(); ++it)
     {

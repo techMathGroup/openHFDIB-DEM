@@ -99,15 +99,9 @@ namespace Foam
             List<labelList>& cellPoints
         ) final override;
 
-        labelList createImmersedBodyByOctTree
+        label getCellInBody
         (
-            label cellToCheck,
-            bool& insideIB,
-            bool& centerInside,
-            boolList& vertexesInside,
-            volScalarField& body,
-            List<DynamicLabelList>& surfCells,
-            List<DynamicLabelList>& intCells
+            Field<label>& octreeField
         );
 
         geomModel* getGeomModel() final override
