@@ -99,7 +99,6 @@ namespace Foam
         scalar  intSpan_;
         bool    sdBasedLambda_;
         boundBox curMeshBounds_;
-        HashTable<pointField,label,Hash<label>> lastIbPoints_;
         autoPtr<HashTable<const labelList&, label, Hash<label>>> cachedNeighbours_;
 
         //body mass
@@ -290,7 +289,7 @@ namespace Foam
 
         void setSdBasedLambda(bool sdBasedLambda){sdBasedLambda_ = sdBasedLambda;}
 
-        void resetHashTable(){lastIbPoints_.clear();}
+        void resetHashTable(){cachedNeighbours_.clear();}
 
         virtual void setRhoS(dimensionedScalar rhoS){rhoS_ = rhoS;}
         dimensionedScalar getRhoS(){return rhoS_;}
