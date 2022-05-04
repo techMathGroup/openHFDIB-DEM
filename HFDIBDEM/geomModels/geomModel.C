@@ -245,16 +245,17 @@ void geomModel::correctSurfCells
             {
                 intCells[Pstream::myProcNo()].append(cCell);
             }
-            else if (cBody  <= (1.0-thrSurf_))
+            else
             {
                 surfCells[Pstream::myProcNo()].append(cCell);
             }
             ibPartialVolume_[Pstream::myProcNo()] += 1;
-        }
-        body[cCell] += cBody;
 
-        // clip the body field values
-        body[cCell] = min(max(0.0,body[cCell]),1.0);
+            body[cCell] += cBody;
+
+            // clip the body field values
+            body[cCell] = min(max(0.0,body[cCell]),1.0);
+        }
     }
 }
 //---------------------------------------------------------------------------//
