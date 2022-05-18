@@ -22,26 +22,62 @@ License
     You should have received a copy of the GNU Lesser General Public License
     along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
 
-Namspace
+InNamspace
     contactModel
 
 Description
-    namespace providing functions to solve contacts
+    methods to solve particle-particle contact
+
+SourceFiles
+    cyclicContact.C
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef contactModel_H
-#define contactModel_H
+#ifndef cyclicContact_H
+#define cyclicContact_H
+
+#include "dictionary.H"
+#include "fvCFD.H"
+
+#include "wallContactInfo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-#include "prtContact.H"
-#include "wallContact.H"
-#include "cyclicContact.H"
-#include "materialInfo.H"
+namespace Foam
+{
+
+/*---------------------------------------------------------------------------*\
+                 Namespace contactModel functions Declaration
+\*---------------------------------------------------------------------------*/
+
+namespace contactModel
+{
+    typedef DynamicList<label>  DynamicLabelList;
+    typedef DynamicList<scalar> DynamicScalarList;
+    typedef DynamicList<vector> DynamicVectorList;
+    typedef DynamicList<point>  DynamicPointList;
+
+    bool detectCyclicContact
+    (
+        const fvMesh&   mesh,
+        wordList& cyclicPatches,
+        wallContactInfo& wallCntInfo,
+        vector& transVec
+    );
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+} // End namespace Foam
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+#ifdef NoRepository
+    #include "cyclicContact.C"
+#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

@@ -48,6 +48,7 @@ Contributors
 #include "convexBody.H"
 #include "nonConvexBody.H"
 #include "sphereBody.H"
+#include "clusterBody.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

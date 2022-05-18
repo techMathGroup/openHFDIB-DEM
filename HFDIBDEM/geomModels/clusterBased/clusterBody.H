@@ -98,6 +98,12 @@ namespace Foam
             return this;
         }
 
+        void getReferencedLists(
+            List<DynamicLabelList>& intLists,
+            List<DynamicLabelList>& surfLists,
+            DynamicVectorList& referenceCoM
+        ) final override;
+
         void calculateGeometricalProperties(
             volScalarField& body
         ) final override;
@@ -131,6 +137,18 @@ namespace Foam
             point& closestPoint,
             vector& normal
         ) final override;
+
+        scalar& getM0() final override;
+
+        bool isCluster() const final override
+        {
+            return true;
+        }
+
+        void addBodyToCluster(autoPtr<geomModel> bodyToAdd)
+        {
+            ibGeomModelList.append(bodyToAdd);
+        }
     };
 }
 

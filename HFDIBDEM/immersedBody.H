@@ -534,6 +534,11 @@ namespace Foam
             return geomModel_();
         }
 
+        autoPtr<geomModel>& getGeomModelPtr()
+        {
+            return geomModel_;
+        }
+
         ibContactClass& getibContactClass()
         {
             return ibContactClass_();

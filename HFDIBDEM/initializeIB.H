@@ -159,8 +159,6 @@ if (mesh_.nGeometricD() < 3)
     ));
 
     // set sizes for parallel runs
-    surfCells_.setSize(Pstream::nProcs());
-    intCells_.setSize(Pstream::nProcs());
     interpolationInfoOld_.setSize(Pstream::nProcs());
     interpolationVecReqs_.setSize(Pstream::nProcs());
 

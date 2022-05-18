@@ -162,6 +162,17 @@ namespace Foam
             return surfCells_;
         };
 
+        virtual void getReferencedLists(
+            List<DynamicLabelList>& intLists,
+            List<DynamicLabelList>& surfLists,
+            DynamicVectorList& referenceCoM
+        )
+        {
+            intLists.resize(1, intCells_[Pstream::myProcNo()]);
+            surfLists.resize(1, surfCells_[Pstream::myProcNo()]);
+            referenceCoM.resize(1, getCoM());
+        };
+
         List<DynamicLabelList>& getInternalCellList()
         {
             return intCells_;
@@ -344,6 +355,12 @@ namespace Foam
         const symmTensor& getI()    const
         {
             return I_;
+            
+        }
+
+        virtual bool isCluster() const
+        {
+            return false;
         }
     };
 }

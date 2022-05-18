@@ -137,6 +137,11 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         );
     }
 
+    if(demDic.found("cyclicPatches"))
+    {
+        cyclicPatches_ = wordList(demDic.lookup("cyclicPatches"));
+    }
+
     if (HFDIBDEMDict_.found("geometricD"))
     {
         geometricD = HFDIBDEMDict_.lookup("geometricD");
@@ -538,6 +543,33 @@ void openHFDIBDEM::writeBodiesInfo()
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 {
+    if (cyclicPatches_.size() > 0)
+    {
+        forAll (immersedBodies_,bodyId)
+        {
+            if (!immersedBodies_[bodyId].getGeomModel().isCluster())
+            {
+                vector newPos = vector::zero;
+                bool inContact = detectCyclicContact(mesh_, cyclicPatches_, immersedBodies_[bodyId].getWallCntInfo(), newPos);
+                if (inContact)
+                {
+                    scalar thrSurf(readScalar(HFDIBDEMDict_.lookup("surfaceThreshold")));
+                    autoPtr<clusterBody> newClusterBody(new clusterBody(mesh_, thrSurf));
+                    autoPtr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getGeomModel());
+                    vector transVec = newPos - iBcopy().getCoM();
+                    iBcopy->bodyMovePoints(transVec);
+                    Info << "New pos: " << newPos << endl;
+                    
+                    newClusterBody->addBodyToCluster(immersedBodies_[bodyId].getGeomModelPtr());
+                    newClusterBody->addBodyToCluster(iBcopy);
+                    geomModel* clusterGeomModel = newClusterBody.ptr();
+                    immersedBodies_[bodyId].getGeomModelPtr().set(clusterGeomModel);
+                }
+            }
+        }
+    }
+
+
     scalar deltaTime(mesh_.time().deltaT().value());
     scalar pos(0.0);
     scalar step(stepDEM_);

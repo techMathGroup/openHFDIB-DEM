@@ -105,6 +105,9 @@ namespace Foam
 
     HashTable<scalar,string,Hash<string>> matInterAdh_;
 
+    // List of patches set as cyclic
+    wordList cyclicPatches_;
+
     // precalculate cellPoints for better performace
     List<pointField> cellPoints_;
 

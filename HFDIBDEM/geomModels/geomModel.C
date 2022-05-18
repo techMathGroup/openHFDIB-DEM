@@ -57,6 +57,8 @@ I_(symmTensor::zero),
 dC_(0.0),
 rhoS_("rho",dimensionSet(1,-3,0,0,0,0,0),1.0)
 {
+    surfCells_.setSize(Pstream::nProcs());
+    intCells_.setSize(Pstream::nProcs());
     ibPartialVolume_.setSize(Pstream::nProcs());
 }
 geomModel::~geomModel()

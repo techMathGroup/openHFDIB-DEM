@@ -44,11 +44,36 @@ void clusterBody::createImmersedBody
 {
     forAll(ibGeomModelList, ibI)
     {
+        Info << "Creating body for com: " << ibGeomModelList[ibI].getCoM() << endl;
         ibGeomModelList[ibI].createImmersedBody(
             body,
             octreeField,
             cellPoints
         );
+    }
+}
+//---------------------------------------------------------------------------//
+void clusterBody::getReferencedLists
+(
+    List<DynamicLabelList>& intLists,
+    List<DynamicLabelList>& surfLists,
+    DynamicVectorList& referenceCoM
+)
+{
+    intLists.resize(ibGeomModelList.size());
+    surfLists.resize(ibGeomModelList.size());
+    referenceCoM.resize(ibGeomModelList.size());
+
+    forAll(ibGeomModelList, ibI)
+    {
+        intLists[ibI] = 
+            ibGeomModelList[ibI].getInternalCellList()[Pstream::myProcNo()];
+        
+        surfLists[ibI] = 
+            ibGeomModelList[ibI].getSurfaceCellList()[Pstream::myProcNo()];
+
+        referenceCoM[ibI] = 
+            ibGeomModelList[ibI].getCoM();
     }
 }
 //---------------------------------------------------------------------------//
@@ -201,4 +226,13 @@ void clusterBody::getClosestPointAndNormal
         }
     }
 }
-
+//---------------------------------------------------------------------------//
+scalar& clusterBody::getM0()
+{
+    M0_ = 0;
+    forAll(ibGeomModelList, ibI)
+    {
+        M0_ += ibGeomModelList[ibI].getM0();
+    }
+    return M0_;
+}

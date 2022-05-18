@@ -156,6 +156,7 @@ void sphereBody::createImmersedBody
 {
     boundBox ibBound(getBounds());
     bool ibInsideMesh(false);
+    Info << "1" << endl;
 
     bool dirOk(true);
     forAll(geometricD,dir)
@@ -170,6 +171,7 @@ void sphereBody::createImmersedBody
             }
         }
     }
+    Info << "2" << endl;
 
     if(dirOk)
     {
@@ -182,6 +184,7 @@ void sphereBody::createImmersedBody
     // find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;
     octreeField *= 0;
+    Info << "3" << endl;
 
     if(ibInsideMesh)
     {
@@ -193,6 +196,7 @@ void sphereBody::createImmersedBody
 
         if(cellToStartInCreateIB_ >= octreeField.size())
             cellToStartInCreateIB_ = 0;
+        Info << "4" << endl;
 
         autoPtr<DynamicLabelList> nextToCheck(
             new DynamicLabelList(1,cellToStartInCreateIB_));
@@ -202,6 +206,7 @@ void sphereBody::createImmersedBody
         label iterCount(0);label iterMax(mesh_.nCells());
         boolList vertexesInside;
         bool centerInside;
+        Info << "5" << endl;
         while (nextToCheck().size() > 0 and iterCount++ < iterMax)
         {
             auxToCheck().clear();
@@ -255,6 +260,7 @@ void sphereBody::createImmersedBody
             nextToCheck.set(auxToCheck.ptr());
             auxToCheck = helpPtr;
         }
+        Info << "6" << endl;
         if(intCells_[Pstream::myProcNo()].size() > 0)
             cellToStartInCreateIB_ = min(intCells_[Pstream::myProcNo()]);
     }

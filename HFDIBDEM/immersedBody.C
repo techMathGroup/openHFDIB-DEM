@@ -392,25 +392,44 @@ void immersedBody::updateCoupling
     volVectorField& f
 )
 {
-  vector FV(vector::zero);
-  vector TA(vector::zero);
+    vector FV(vector::zero);
+    vector TA(vector::zero);
+
+    List<DynamicLabelList> intLists;
+    List<DynamicLabelList> surfLists;
+    DynamicVectorList refCoMList;
+
+    geomModel_->getReferencedLists(
+        intLists,
+        surfLists,
+        refCoMList
+    );
 
   // calcualate viscous force and torque
-  forAll (surfCells_[Pstream::myProcNo()],sCellI)
-  {
-     label cellI = surfCells_[Pstream::myProcNo()][sCellI];
 
-     FV -=  f[cellI]*mesh_.V()[cellI];
-     TA -=  ((mesh_.C()[cellI] - geomModel_->getCoM())^f[cellI])*mesh_.V()[cellI];
-  }
+    forAll (intLists, i)
+    {
+        DynamicLabelList& intListI = intLists[i];
+        forAll (intListI, intCell)
+        {
+            label cellI = intListI[intCell];
 
-  forAll (intCells_[Pstream::myProcNo()],iCellI)
-  {
-     label cellI = intCells_[Pstream::myProcNo()][iCellI];
+            FV -=  f[cellI]*mesh_.V()[cellI];
+            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])*mesh_.V()[cellI];
+        }
+    }
 
-     FV -=  f[cellI]*mesh_.V()[cellI];//viscosity?
-     TA -=  ((mesh_.C()[cellI] - geomModel_->getCoM())^f[cellI])*mesh_.V()[cellI];
-  }
+    forAll (surfLists, i)
+    {
+        DynamicLabelList& surfListI = surfLists[i];
+        forAll (surfListI, surfCell)
+        {
+            label cellI = surfListI[surfCell];
+
+            FV -=  f[cellI]*mesh_.V()[cellI];
+            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])*mesh_.V()[cellI];
+        }
+    }
 
   reduce(FV, sumOp<vector>());
   reduce(TA, sumOp<vector>());
@@ -623,51 +642,74 @@ void immersedBody::updateVectorField(volVectorField& VS, word VName,volScalarFie
     // check dictionary for parameters (only noSlip allowed)
     word BC = immersedDict_.subDict(VName).lookup("BC");
 
+    List<DynamicLabelList> intLists;
+    List<DynamicLabelList> surfLists;
+    DynamicVectorList refCoMList;
+
+    geomModel_->getReferencedLists(
+        intLists,
+        surfLists,
+        refCoMList
+    );
+
     if (BC=="noSlip")
     {
         // if STATICBODY set to zero
         if ( bodyOperation_==0)
         {
-            forAll (surfCells_[Pstream::myProcNo()],cell)
+            forAll (intLists, i)
             {
-                label cellI = surfCells_[Pstream::myProcNo()][cell];
-                VS[cellI]   = Vel_;
+                DynamicLabelList& intListI = intLists[i];
+                forAll (intListI, intCell)
+                {
+                    label cellI = intListI[intCell];
+                    VS[cellI]   = Vel_;
+                }
             }
-            forAll (intCells_[Pstream::myProcNo()],cell)
+
+            forAll (surfLists, i)
             {
-                label cellI = intCells_[Pstream::myProcNo()][cell];
-                VS[cellI] = Vel_;
+                DynamicLabelList& surfListI = surfLists[i];
+                forAll (surfListI, surfCell)
+                {
+                    label cellI = surfListI[surfCell];
+                    VS[cellI]   = Vel_;
+                }
             }
         }
         else
         {
-            label cellI;
-            forAll (surfCells_[Pstream::myProcNo()],cell)
+            forAll (intLists, i)
             {
-                cellI=surfCells_[Pstream::myProcNo()][cell];
-
-                vector planarVec =  mesh_.C()[cellI] - geomModel_->getCoM()
+                DynamicLabelList& intListI = intLists[i];
+                forAll (intListI, intCell)
+                {
+                    label cellI = intListI[intCell];
+                    vector planarVec =  mesh_.C()[cellI] - refCoMList[i]
                                     - Axis_*(
-                                    (mesh_.C()[cellI] - geomModel_->getCoM())
+                                    (mesh_.C()[cellI] - refCoMList[i])
                                     &Axis_);
 
-                //vector VSvalue = (-(planarVec^Axis_)*omega_ + Vel_) *body[cellI] + VS[cellI] * (1-body[cellI]);
-                vector VSvalue = (-(planarVec^Axis_)*omega_ + Vel_);
-                VS[cellI] = VSvalue;
+                    vector VSvalue = (-(planarVec^Axis_)*omega_ + Vel_);
+                    VS[cellI] = VSvalue;
+                }
             }
 
-            forAll (intCells_[Pstream::myProcNo()],cell)
+            forAll (surfLists, i)
             {
-                cellI=intCells_[Pstream::myProcNo()][cell];
+                DynamicLabelList& surfListI = surfLists[i];
+                forAll (surfListI, surfCell)
+                {
+                    label cellI = surfListI[surfCell];
 
-                vector planarVec =  mesh_.C()[cellI] - geomModel_->getCoM()
+                    vector planarVec =  mesh_.C()[cellI] - refCoMList[i]
                                     - Axis_*(
-                                    (mesh_.C()[cellI] - geomModel_->getCoM())
+                                    (mesh_.C()[cellI] - refCoMList[i])
                                     &Axis_);
 
-                //vector VSvalue = (-(planarVec^Axis_)*omega_ + Vel_) *body[cellI] + VS[cellI] * (1-body[cellI]);
-                vector VSvalue = (-(planarVec^Axis_)*omega_ + Vel_);
-                VS[cellI] = VSvalue;
+                    vector VSvalue = (-(planarVec^Axis_)*omega_ + Vel_);
+                    VS[cellI] = VSvalue;
+                }
             }
         }
 
