@@ -58,8 +58,7 @@ namespace Foam
         // mesh reference
         const Foam::fvMesh& mesh_;
         // geomModel reference
-        geomModel& geomModel_;
-        List<DynamicLabelList>& surfCells_;
+        autoPtr<geomModel>& geomModel_;
 
         autoPtr<List<point>> ibPointsPtr_; // cellIbPoint mapping
         autoPtr<List<vector>> ibNormalsPtr_; // cellIbNormal mapping
@@ -70,8 +69,7 @@ namespace Foam
         interpolationInfo
         (
             const Foam::fvMesh& mesh,
-            geomModel& gModel,
-            List<DynamicLabelList>& surfCells
+            autoPtr<geomModel>& gModel
         );
 
         // Destructors -------------------------------------------------
@@ -95,7 +93,7 @@ namespace Foam
 
         const DynamicLabelList& getSurfCells() const
         {
-            return surfCells_[Pstream::myProcNo()];
+            return geomModel_->getSurfaceCellList()[Pstream::myProcNo()];
         }
 
         virtual void clearIntpInfo()

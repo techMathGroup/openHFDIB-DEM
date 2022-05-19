@@ -71,8 +71,7 @@ namespace Foam
         virtual interpolationInfo* createIntpInfo
         (
             const Foam::fvMesh& mesh,
-            geomModel& gModel,
-            List<DynamicLabelList>& surfCells
+            autoPtr<geomModel>& gModel
         ) = 0;
     };
 }

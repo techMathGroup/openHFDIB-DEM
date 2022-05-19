@@ -149,12 +149,6 @@ namespace Foam
         point minBoundPoint_;
         point maxBoundPoint_;
 
-        // body surface cells
-        List<DynamicLabelList>&  surfCells_;
-
-        // body internal cells
-        List<DynamicLabelList>&  intCells_;
-
         // processor num that owns the IB
         label owner_;
 
@@ -261,7 +255,7 @@ namespace Foam
         );
 
         // reset body field
-        void resetBody(volScalarField& body, bool resethistoryFt = true);
+        void resetBody(volScalarField& body);
 
         //update body movement based on F_ and T_
         void updateMovement
@@ -387,12 +381,12 @@ namespace Foam
 
         const List<DynamicLabelList>& getSurfaceCellList()        const
         {
-            return surfCells_;
+            return geomModel_->getSurfaceCellList();
         };
 
         const List<DynamicLabelList>& getInternalCellList()       const
         {
-            return intCells_;
+            return geomModel_->getInternalCellList();
         };
 
         const List<DynamicList<immersedBody::intVecRequest>>& getinterpolationVecReqs() const
@@ -507,7 +501,7 @@ namespace Foam
             return intSpan_;
         }
 
-        void computeBodyCharPars(){geomModel_->computeBodyCharPars(surfCells_);}
+        void computeBodyCharPars(){geomModel_->computeBodyCharPars();}
 
         void checkIfInDomain(volScalarField& body);
 

@@ -103,15 +103,13 @@ namespace Foam
         interpolationInfo* createIntpInfo
         (
             const Foam::fvMesh& mesh,
-            geomModel& gModel,
-            List<DynamicLabelList>& surfCells
+            autoPtr<geomModel>& gModel
         ) override
         {
             return new leastSquaresIntInfo
             (
                 mesh,
                 gModel,
-                surfCells,
                 distFactor_,
                 radiusFactor_,
                 angleFactor_,

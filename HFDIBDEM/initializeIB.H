@@ -129,13 +129,12 @@ if (mesh_.nGeometricD() < 3)
     {
         intpInfo_.set(ibIntp().createIntpInfo(
             mesh_,
-            getGeomModel(),
-            surfCells_
+            geomModel_
         ));
     }
 
     ibContactClass_.set(new ibContactClass(
-        geomModel_(),
+        geomModel_,
         materialInfos[material]
     ));
 

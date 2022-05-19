@@ -140,15 +140,21 @@ namespace Foam
 
         scalar& getM0() final override;
 
+        void resetBody(volScalarField& body) final override;
+
         bool isCluster() const final override
         {
             return true;
         }
 
-        void addBodyToCluster(autoPtr<geomModel> bodyToAdd)
+        void addBodyToCluster(autoPtr<geomModel>& bodyToAdd)
         {
             ibGeomModelList.append(bodyToAdd);
         }
+
+        bool shouldBeUnclustered();
+
+        autoPtr<geomModel> getRemGeomModel(); 
     };
 }
 

@@ -54,9 +54,7 @@ bool detectCyclicContact(
     DynamicVectorList transVecs(Pstream::nProcs());
 
     label nCells = mesh.nCells();
-
     List<DynamicLabelList>& surfCells(wallCntInfo.getcClass().getSurfCells());
-
     // go through all surfCells and check if there is any surfCell whose face is a boundary face
     forAll (surfCells[Pstream::myProcNo()],sCellI)
     {

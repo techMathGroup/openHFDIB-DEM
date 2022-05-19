@@ -113,6 +113,8 @@ namespace Foam
             stlBased* stlBasedModel = convexBodyModel;
             stlBasedModel->initVars(bodySurfMesh_.points(), thrSurf_, intSpan_, sdBasedLambda_);
             geomModel* bodyGeomModel = stlBasedModel;
+            bodyGeomModel->setRhoS(rhoS_);
+            bodyGeomModel->setM0(M0_);
             return bodyGeomModel;
         }
     };

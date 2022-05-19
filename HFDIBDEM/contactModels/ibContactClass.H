@@ -71,7 +71,7 @@ class ibContactClass
 
     protected:
 
-    geomModel& geomModel_;
+    autoPtr<geomModel>& geomModel_;
 
     // is the particle in contact with wall
     bool    isInWallContact_;
@@ -90,7 +90,7 @@ class ibContactClass
     // Constructors ------------------------------------------------
     ibContactClass
     (
-        geomModel& geomModel,
+        autoPtr<geomModel>& geomModel,
         materialInfo& matInfo
     );
 
@@ -99,7 +99,7 @@ class ibContactClass
 
     geomModel& getGeomModel()
     {
-        return geomModel_;
+        return geomModel_();
     }
 
     const bool& checkWallContact() const

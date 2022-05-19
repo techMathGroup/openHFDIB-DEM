@@ -39,11 +39,10 @@ using namespace Foam;
 lineIntInfo::lineIntInfo
 (
     const  fvMesh&   mesh,
-    geomModel& gModel,
-    List<DynamicLabelList>& surfCells
+    autoPtr<geomModel>& gModel
 )
 :
-interpolationInfo(mesh, gModel, surfCells)
+interpolationInfo(mesh, gModel)
 {}
 lineIntInfo::~lineIntInfo()
 {}
@@ -65,7 +64,7 @@ void lineIntInfo::setIntpInfo()
         label scell = cSurfCells[cellI];
         scalar intDist = Foam::pow(mesh_.V()[scell],0.333);
 
-        geomModel_.getClosestPointAndNormal(
+        geomModel_->getClosestPointAndNormal(
             mesh_.C()[scell],
             intDist*2*vector::one,
             ibPoints[cellI],

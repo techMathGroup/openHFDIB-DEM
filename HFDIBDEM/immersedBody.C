@@ -94,8 +94,6 @@ bodyId_(bodyId),
 updateTorque_(false),
 bodyOperation_(0),
 boundIndList_(3),
-surfCells_(bodyGeomModel->getSurfaceCellList()),
-intCells_(bodyGeomModel->getInternalCellList()),
 owner_(false),
 historyCouplingF_(vector::zero),
 historyCouplingT_(vector::zero),
@@ -152,12 +150,13 @@ void immersedBody::syncCreateImmersedBody(volScalarField& body, volScalarField& 
     InfoH << iB_Info << "-- body: " << bodyId_
         << " current center of mass position: " << geomModel_->getCoM() << endl;
 
-    DynamicLabelList zeroList(surfCells_[Pstream::myProcNo()].size(), 0);
-    constructRefineField(body, refineF, surfCells_[Pstream::myProcNo()], zeroList);
+    const List<DynamicLabelList>& surfCells = geomModel_->getSurfaceCellList();
+    DynamicLabelList zeroList(surfCells[Pstream::myProcNo()].size(), 0);
+    constructRefineField(body, refineF, surfCells[Pstream::myProcNo()], zeroList);
     scalarList charCellSizeL(Pstream::nProcs(),1e4);
-    forAll (surfCells_[Pstream::myProcNo()],sCellI)
+    forAll (surfCells[Pstream::myProcNo()],sCellI)
     {
-        label cellI = surfCells_[Pstream::myProcNo()][sCellI];
+        label cellI = surfCells[Pstream::myProcNo()][sCellI];
         charCellSizeL[Pstream::myProcNo()] = min(charCellSizeL[Pstream::myProcNo()],Foam::pow(mesh_.V()[cellI],0.3333));
     }
     forAll(charCellSizeL,indl)
@@ -736,27 +735,17 @@ vectorField immersedBody::getUatIbPoints()
 }
 //---------------------------------------------------------------------------//
 // reset body field for this immersed object
-void immersedBody::resetBody(volScalarField& body, bool resethistoryFt)
+void immersedBody::resetBody(volScalarField& body)
 {
-    forAll (intCells_[Pstream::myProcNo()],cellI)
-    {
-        body[intCells_[Pstream::myProcNo()][cellI]] = 0;
-    }
-    forAll (surfCells_[Pstream::myProcNo()],cellI)
-    {
-        body[surfCells_[Pstream::myProcNo()][cellI]] = 0;
-    }
-
     interpolationInfoOld_[Pstream::myProcNo()].clear();
     interpolationVecReqs_[Pstream::myProcNo()].clear();
-
-    surfCells_[Pstream::myProcNo()].clear();
-    intCells_[Pstream::myProcNo()].clear();
 }
 //---------------------------------------------------------------------------//
 // function to move the body after the contact
 void immersedBody::postContactUpdateBodyField(volScalarField& body, volScalarField& refineF)
 {
+    geomModel_->resetBody(body);
+
     // move the body due to the contact
     resetBody(body);
     createImmersedBody(body,refineF,false);
@@ -767,8 +756,8 @@ void immersedBody::recreateBodyField(volScalarField& body, volScalarField& refin
     octreeField_ = Field<label>(mesh_.nCells(), 0);
     interpolationInfoOld_[Pstream::myProcNo()].clear();
     interpolationVecReqs_[Pstream::myProcNo()].clear();
-    surfCells_[Pstream::myProcNo()].clear();
-    intCells_[Pstream::myProcNo()].clear();
+    geomModel_->getSurfaceCellList()[Pstream::myProcNo()].clear();
+    geomModel_->getInternalCellList()[Pstream::myProcNo()].clear();
     createImmersedBody(body,refineF,false);
 }
 //---------------------------------------------------------------------------//
@@ -783,10 +772,10 @@ void immersedBody::computeBodyCoNumber()
     // rotation body courant number
     scalar rotCoNumB(omega_*getDC()*0.5*mesh_.time().deltaT().value());
 
-
-    forAll (surfCells_[Pstream::myProcNo()],sCellI)
+    const List<DynamicLabelList>& surfCells = geomModel_->getSurfaceCellList();
+    forAll (surfCells[Pstream::myProcNo()],sCellI)
     {
-        label cellI(surfCells_[Pstream::myProcNo()][sCellI]);
+        label cellI(surfCells[Pstream::myProcNo()][sCellI]);
 
         scalar dCell(Foam::pow(mesh_.V()[cellI],0.3333));
         scalar CoNumCell(VelMag*mesh_.time().deltaT().value()/dCell);
@@ -797,9 +786,10 @@ void immersedBody::computeBodyCoNumber()
         meanCoNum_ += CoNumCell;
         auxCntr    += 1;
     }
-    forAll (intCells_[Pstream::myProcNo()],iCellI)
+    const List<DynamicLabelList>& intCells = geomModel_->getInternalCellList();
+    forAll (intCells[Pstream::myProcNo()],iCellI)
     {
-        label cellI(intCells_[Pstream::myProcNo()][iCellI]);
+        label cellI(intCells[Pstream::myProcNo()][iCellI]);
 
         scalar dCell(Foam::pow(mesh_.V()[cellI],0.3333));
         scalar CoNumCell(VelMag*mesh_.time().deltaT().value()/dCell);
@@ -899,9 +889,10 @@ void immersedBody::initSyncWithFlow(const volVectorField& U)
     scalar totVol(0);
     vector meanC(vector::zero);
     label  cellI;
-    forAll (intCells_[Pstream::myProcNo()],iCellI)
+    const List<DynamicLabelList>& intCells = geomModel_->getInternalCellList();
+    forAll (intCells[Pstream::myProcNo()],iCellI)
     {
-        cellI   = intCells_[Pstream::myProcNo()][iCellI];
+        cellI   = intCells[Pstream::myProcNo()][iCellI];
         meanV  += U[cellI]*mesh_.V()[cellI];
         meanC  += curlU[cellI]*mesh_.V()[cellI];
         totVol += mesh_.V()[cellI];
@@ -962,6 +953,7 @@ void immersedBody::checkIfInDomain(volScalarField& body)
     if(geomModel_->getM0() < SMALL)
     {
         switchActiveOff(body);
+        geomModel_->resetBody(body);
     }
 
     InfoH << iB_Info << "-- body " << bodyId_ << " current M/M0: "
@@ -970,6 +962,7 @@ void immersedBody::checkIfInDomain(volScalarField& body)
     if (geomModel_->getM()/(geomModel_->getM0()+SMALL) < 1e-2)
     {
         switchActiveOff(body);
+        geomModel_->resetBody(body);
     }
 }
 //---------------------------------------------------------------------------//

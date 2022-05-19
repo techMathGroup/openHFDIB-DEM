@@ -131,6 +131,8 @@ namespace Foam
             sphereBody* sphereBodyModel = new sphereBody(mesh_,position_,radius_,thrSurf_);
             sphereBodyModel->initVars(intSpan_,sdBasedLambda_);
             geomModel* bodyGeomModel = sphereBodyModel;
+            bodyGeomModel->setRhoS(rhoS_);
+            bodyGeomModel->setM0(M0_);
 
             return bodyGeomModel;
         }
@@ -217,7 +219,14 @@ namespace Foam
 
         scalar& getM0() final override
         {
-            return sphereM_;
+            if(case3D)
+            {
+                return sphereM_;
+            }
+            else
+            {
+                return M0_;
+            }
         }
 
         void setRhoS(dimensionedScalar rhoS)

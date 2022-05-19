@@ -38,8 +38,7 @@ using namespace Foam;
 leastSquaresIntInfo::leastSquaresIntInfo
 (
     const  fvMesh&   mesh,
-    geomModel& gModel,
-    List<DynamicLabelList>& surfCells,
+    autoPtr<geomModel>& gModel,
     scalar distFactor,
     scalar radiusFactor,
     scalar angleFactor,
@@ -49,8 +48,7 @@ leastSquaresIntInfo::leastSquaresIntInfo
 interpolationInfo
 (
     mesh,
-    gModel,
-    surfCells
+    gModel
 ),
 distFactor_(distFactor),
 radiusFactor_(radiusFactor),
@@ -84,7 +82,7 @@ void leastSquaresIntInfo::setIntpInfo()
 
         vector span(centerMeanDist, centerMeanDist, centerMeanDist);
 
-        geomModel_.getClosestPointAndNormal(
+        geomModel_->getClosestPointAndNormal(
             C[cSurfCells[cellI]],
             span*2,
             ibPoints[cellI],

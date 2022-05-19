@@ -330,11 +330,16 @@ namespace Foam
             DynamicLabelList& labelCellLst
         );
 
-        void computeBodyCharPars(List<DynamicLabelList>& surfCells);
+        void computeBodyCharPars();
 
         virtual scalar& getM0()
         {
             return M0_;
+        }
+
+        void setM0(scalar M0)
+        {
+            M0_ = M0;
         }
 
         scalar& getM()
@@ -358,10 +363,21 @@ namespace Foam
             
         }
 
+        virtual void resetBody(volScalarField& body);
+
         virtual bool isCluster() const
         {
             return false;
         }
+
+        virtual bool checkCluster()
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "not cluster model"<<endl;
+                return false;
+        }
+
+        
     };
 }
 #endif

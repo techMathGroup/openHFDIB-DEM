@@ -44,7 +44,6 @@ void clusterBody::createImmersedBody
 {
     forAll(ibGeomModelList, ibI)
     {
-        Info << "Creating body for com: " << ibGeomModelList[ibI].getCoM() << endl;
         ibGeomModelList[ibI].createImmersedBody(
             body,
             octreeField,
@@ -229,10 +228,44 @@ void clusterBody::getClosestPointAndNormal
 //---------------------------------------------------------------------------//
 scalar& clusterBody::getM0()
 {
-    M0_ = 0;
+    return ibGeomModelList[0].getM0();
+}
+//---------------------------------------------------------------------------//
+void clusterBody::resetBody(volScalarField& body)
+{
     forAll(ibGeomModelList, ibI)
     {
-        M0_ += ibGeomModelList[ibI].getM0();
+        ibGeomModelList[ibI].resetBody(body);
     }
-    return M0_;
+}
+//---------------------------------------------------------------------------//
+bool clusterBody::shouldBeUnclustered()
+{
+    int remBodies = 0;
+    forAll(ibGeomModelList, ibI)
+    {
+        if(ibGeomModelList[ibI].getM() > 0)
+        {
+            ++remBodies;
+        }
+    }
+
+    if(remBodies == 1)
+    {
+        return true;
+    }
+    return false;
+}
+//---------------------------------------------------------------------------//
+autoPtr<geomModel> clusterBody::getRemGeomModel()
+{
+    forAll(ibGeomModelList, ibI)
+    {
+        if(ibGeomModelList[ibI].getM() > 0)
+        {
+            return ibGeomModelList.set(ibI, nullptr);
+        }
+    }
+
+    return ibGeomModelList.set(0, nullptr);
 }

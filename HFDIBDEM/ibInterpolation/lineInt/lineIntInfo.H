@@ -94,8 +94,7 @@ namespace Foam
         lineIntInfo
         (
             const  fvMesh&   mesh,
-            geomModel& gModel,
-            List<DynamicLabelList>& surfCells
+            autoPtr<geomModel>& gModel
         );
 
         // Destructors -------------------------------------------------

@@ -558,17 +558,23 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     autoPtr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getGeomModel());
                     vector transVec = newPos - iBcopy().getCoM();
                     iBcopy->bodyMovePoints(transVec);
-                    Info << "New pos: " << newPos << endl;
-                    
                     newClusterBody->addBodyToCluster(immersedBodies_[bodyId].getGeomModelPtr());
                     newClusterBody->addBodyToCluster(iBcopy);
                     geomModel* clusterGeomModel = newClusterBody.ptr();
                     immersedBodies_[bodyId].getGeomModelPtr().set(clusterGeomModel);
                 }
             }
+            else
+            {
+                clusterBody& cBody = dynamic_cast<clusterBody&>(immersedBodies_[bodyId].getGeomModel());
+
+                if(cBody.shouldBeUnclustered())
+                {
+                    immersedBodies_[bodyId].getGeomModelPtr().reset(cBody.getRemGeomModel().ptr());
+                }
+            }
         }
     }
-
 
     scalar deltaTime(mesh_.time().deltaT().value());
     scalar pos(0.0);

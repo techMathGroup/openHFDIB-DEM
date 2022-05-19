@@ -120,14 +120,29 @@ void geomModel::addToMAndI
     }
 }
 //---------------------------------------------------------------------------//
-void geomModel::computeBodyCharPars(List<DynamicLabelList>& surfCells)
+void geomModel::computeBodyCharPars()
 {
-    forAll (surfCells[Pstream::myProcNo()],sCellI)
+    forAll (surfCells_[Pstream::myProcNo()],sCellI)
     {
-        label cellI = surfCells[Pstream::myProcNo()][sCellI];
+        label cellI = surfCells_[Pstream::myProcNo()][sCellI];
         dC_ = max(dC_,mag(CoM_-mesh_.C()[cellI]));
     }
     M0_ = M_;
     reduce(dC_, maxOp<scalar>());
+}
+//---------------------------------------------------------------------------//
+void geomModel::resetBody(volScalarField& body)
+{
+    forAll (intCells_[Pstream::myProcNo()],cellI)
+    {
+        body[intCells_[Pstream::myProcNo()][cellI]] = 0;
+    }
+    forAll (surfCells_[Pstream::myProcNo()],cellI)
+    {
+        body[surfCells_[Pstream::myProcNo()][cellI]] = 0;
+    }
+
+    surfCells_[Pstream::myProcNo()].clear();
+    intCells_[Pstream::myProcNo()].clear();
 }
 //---------------------------------------------------------------------------//

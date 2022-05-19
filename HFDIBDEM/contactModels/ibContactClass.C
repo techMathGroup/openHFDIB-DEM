@@ -36,7 +36,7 @@ using namespace Foam;
 //---------------------------------------------------------------------------//
 ibContactClass::ibContactClass
 (
-    geomModel& geomModel,
+    autoPtr<geomModel>& geomModel,
     materialInfo& matInfo
 )
 :

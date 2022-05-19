@@ -39,13 +39,11 @@ using namespace Foam;
 interpolationInfo::interpolationInfo
 (
     const Foam::fvMesh& mesh,
-    geomModel& gModel,
-    List<DynamicLabelList>& surfCells
+    autoPtr<geomModel>& gModel
 )
 :
 mesh_(mesh),
-geomModel_(gModel),
-surfCells_(surfCells)
+geomModel_(gModel)
 {}
 
 interpolationInfo::~interpolationInfo()

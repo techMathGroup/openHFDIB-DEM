@@ -85,10 +85,10 @@ namespace Foam
             scalarSquareMatrix& matrix
         );
 
-        void setIntpInfo
-        (
-            const List<DynamicLabelList>& surfCells
-        );
+        // void setIntpInfo
+        // (
+        //     const List<DynamicLabelList>& surfCells
+        // );
 
         public:
 
@@ -96,8 +96,7 @@ namespace Foam
         leastSquaresIntInfo
         (
             const  fvMesh&   mesh,
-            geomModel& gModel,
-            List<DynamicLabelList>& surfCells,         
+            autoPtr<geomModel>& gModel,         
             scalar distFactor,
             scalar radiusFactor,
             scalar angleFactor,
