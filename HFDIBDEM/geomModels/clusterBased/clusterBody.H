@@ -57,6 +57,12 @@ namespace Foam
 
         PtrList<geomModel> ibGeomModelList;
 
+        // body surface cells
+        List<DynamicLabelList>  surfCells_;
+
+        // body internal cells
+        List<DynamicLabelList>  intCells_;
+
         protected:
 
 
@@ -104,6 +110,22 @@ namespace Foam
             DynamicVectorList& referenceCoM
         ) final override;
 
+        void updateSurfList();
+
+        virtual List<DynamicLabelList>& getSurfaceCellList() final override
+        {
+            updateSurfList();
+            return surfCells_;
+        };
+
+        void updateIntList();
+
+        virtual List<DynamicLabelList>& getInternalCellList() final override
+        {
+            updateIntList();
+            return intCells_;
+        };
+
         void calculateGeometricalProperties(
             volScalarField& body
         ) final override;
@@ -139,6 +161,8 @@ namespace Foam
         ) final override;
 
         scalar& getM0() final override;
+
+        vector getLVec(const point& toPoint) final override;
 
         void resetBody(volScalarField& body) final override;
 

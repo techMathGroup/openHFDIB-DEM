@@ -379,12 +379,12 @@ namespace Foam
             return historyCouplingT_;
         }
 
-        const List<DynamicLabelList>& getSurfaceCellList()        const
+        List<DynamicLabelList>& getSurfaceCellList()
         {
             return geomModel_->getSurfaceCellList();
         };
 
-        const List<DynamicLabelList>& getInternalCellList()       const
+        List<DynamicLabelList>& getInternalCellList()
         {
             return geomModel_->getInternalCellList();
         };

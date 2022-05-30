@@ -102,8 +102,7 @@ prtContactInfo::~prtContactInfo()
 //---------------------------------------------------------------------------//
 vector prtContactInfo::getLVec(ibContactClass& contactClass)
 {
-    return prtCntVars_.contactCenter_
-        -contactClass.getGeomModel().getCoM();
+    return contactClass.getGeomModel().getLVec(prtCntVars_.contactCenter_);
 }
 //---------------------------------------------------------------------------//
 vector prtContactInfo::getVeli(ibContactVars& cVars, vector& lVec)

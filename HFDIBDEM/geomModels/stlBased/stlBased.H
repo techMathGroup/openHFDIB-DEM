@@ -186,8 +186,17 @@ namespace Foam
             const triSurfaceMesh& ibTempMesh( bodySurfMesh_);
             ibTempMesh.getNormal(ibPointIndexHitList,normalVectorField);
 
-            normal = normalVectorField[0];
-            closestPoint = ibPointIndexHit.hitPoint();
+            if(ibPointIndexHit.hit())
+            {
+                normal = normalVectorField[0];
+                closestPoint = ibPointIndexHit.hitPoint();
+            }
+            else
+            {
+                InfoH << basic_Info << "Missing the closest point!" << endl;
+                normal = startPoint - getCoM();
+                closestPoint = getCoM();
+            }
         }
 
         void initVars(pointField surfPoints, scalar thrSurf, scalar intSpan, bool sdBasedLambda)

@@ -157,7 +157,7 @@ namespace Foam
 
         virtual geomModel* getGeomModel() = 0;
 
-        List<DynamicLabelList>& getSurfaceCellList()
+        virtual List<DynamicLabelList>& getSurfaceCellList()
         {
             return surfCells_;
         };
@@ -173,17 +173,7 @@ namespace Foam
             referenceCoM.resize(1, getCoM());
         };
 
-        List<DynamicLabelList>& getInternalCellList()
-        {
-            return intCells_;
-        };
-
-        const List<DynamicLabelList>& getSurfaceCellList()        const
-        {
-            return surfCells_;
-        };
-
-        const List<DynamicLabelList>& getInternalCellList()       const
+        virtual List<DynamicLabelList>& getInternalCellList()
         {
             return intCells_;
         };
@@ -357,6 +347,11 @@ namespace Foam
             return CoM_;
         }
 
+        virtual vector getLVec(const point& toPoint)
+        {
+            return toPoint - CoM_;
+        }
+
         const symmTensor& getI()    const
         {
             return I_;
@@ -377,7 +372,7 @@ namespace Foam
                 return false;
         }
 
-        
+
     };
 }
 #endif

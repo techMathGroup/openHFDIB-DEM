@@ -159,8 +159,7 @@ void wallContactInfo::clearWallCntVars()
 //---------------------------------------------------------------------------//
 vector wallContactInfo::getLVec(wallContactVars& wallCntvar)
 {
-    return wallCntvar.contactCenter_
-        -ibContactClass_.getGeomModel().getCoM();
+    return ibContactClass_.getGeomModel().getLVec(wallCntvar.contactCenter_);
 }
 //---------------------------------------------------------------------------//
 vector wallContactInfo::getVeli(wallContactVars& wallCntvar)

@@ -76,6 +76,32 @@ void clusterBody::getReferencedLists
     }
 }
 //---------------------------------------------------------------------------//
+void clusterBody::updateSurfList()
+{
+    surfCells_.clear();
+    surfCells_.setSize(Pstream::nProcs());
+
+    forAll(ibGeomModelList, ibI)
+    {
+        surfCells_[Pstream::myProcNo()].append(
+            ibGeomModelList[ibI].getSurfaceCellList()[Pstream::myProcNo()]
+        );
+    }
+}
+//---------------------------------------------------------------------------//
+void clusterBody::updateIntList()
+{
+    intCells_.clear();
+    intCells_.setSize(Pstream::nProcs());
+
+    forAll(ibGeomModelList, ibI)
+    {
+        intCells_[Pstream::myProcNo()].append(
+            ibGeomModelList[ibI].getInternalCellList()[Pstream::myProcNo()]
+        );
+    }
+}
+//---------------------------------------------------------------------------//
 void clusterBody::calculateGeometricalProperties
 (
     volScalarField& body
@@ -199,8 +225,8 @@ void clusterBody::getClosestPointAndNormal
     vector& normal
 )
 {
-    DynamicPointList closestPoints(ibGeomModelList.size());
-    DynamicVectorList  closestNormals(ibGeomModelList.size());
+    List<point> closestPoints(ibGeomModelList.size());
+    List<vector> closestNormals(ibGeomModelList.size());
 
     forAll(ibGeomModelList, ibI)
     {
@@ -214,8 +240,7 @@ void clusterBody::getClosestPointAndNormal
 
     closestPoint = closestPoints[0];
     normal = closestNormals[0];
-
-    for(int i = 1; i < closestPoints.size(); ++i)
+    for (int i = 1; i < closestPoints.size(); ++i)
     {
         if(mag(startPoint - closestPoint) 
             > mag(startPoint - closestPoints[i]))
@@ -229,6 +254,37 @@ void clusterBody::getClosestPointAndNormal
 scalar& clusterBody::getM0()
 {
     return ibGeomModelList[0].getM0();
+}
+//---------------------------------------------------------------------------//
+vector clusterBody::getLVec(const point& toPoint)
+{
+    DynamicPointList closestPoints(ibGeomModelList.size());
+    DynamicVectorList  closestNormals(ibGeomModelList.size());
+
+    forAll(ibGeomModelList, ibI)
+    {
+        ibGeomModelList[ibI].getClosestPointAndNormal(
+            toPoint,
+            (ibGeomModelList[ibI].getCoM() - toPoint),
+            closestPoints[ibI],
+            closestNormals[ibI]
+        );
+    }
+
+    vector closestPoint = closestPoints[0];
+    label cGModel = 0;
+
+    for(int i = 1; i < closestPoints.size(); ++i)
+    {
+        if(mag(toPoint - closestPoint) 
+            > mag(toPoint - closestPoints[i]))
+        {
+            closestPoint = closestPoints[i];
+            cGModel = i;
+        }
+    }
+
+    return toPoint - ibGeomModelList[cGModel].getCoM();
 }
 //---------------------------------------------------------------------------//
 void clusterBody::resetBody(volScalarField& body)

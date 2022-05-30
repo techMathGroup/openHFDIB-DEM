@@ -634,6 +634,8 @@ void immersedBody::moveImmersedBody
     boundBox bound(geomModel_->getBounds());
     minBoundPoint_ = bound.min();
     maxBoundPoint_ = bound.max();
+
+    Info << "New bounds: " << minBoundPoint_ << " - " << maxBoundPoint_ << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateVectorField(volVectorField& VS, word VName,volScalarField& body)
@@ -723,6 +725,10 @@ vectorField immersedBody::getUatIbPoints()
     vectorField ibPointsVal(ibPoints.size());
     forAll(ibPoints, pointI)
     {
+        // vector planarVec =  geomModel_->getLVec(ibPoints[pointI])
+        //                     - Axis_*(
+        //                     (geomModel_->getLVec(ibPoints[pointI]))&Axis_);
+
         vector planarVec =  ibPoints[pointI] - geomModel_->getCoM()
                             - Axis_*(
                             (ibPoints[pointI]-geomModel_->getCoM())&Axis_);
