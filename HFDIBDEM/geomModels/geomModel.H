@@ -284,7 +284,7 @@ namespace Foam
         constexpr contactType getcType()
         {return contactType_;}
 
-        label getOwner()
+        virtual label getOwner()
         {
             Pstream::gatherList(ibPartialVolume_, 0);
             Pstream::scatter(ibPartialVolume_, 0);

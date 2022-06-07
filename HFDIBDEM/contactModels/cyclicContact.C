@@ -51,7 +51,6 @@ bool detectCyclicContact(
 )
 {
     bool inContact = false;
-    DynamicVectorList transVecs(Pstream::nProcs());
 
     label nCells = mesh.nCells();
     List<DynamicLabelList>& surfCells(wallCntInfo.getcClass().getSurfCells());
@@ -82,6 +81,19 @@ bool detectCyclicContact(
                             }
                         }
                     }
+                    else if(cPatch.type()=="processorCyclic")
+                    {
+                        forAll (cyclicPatches, patchI)
+                        {
+                            if(cPatch.name().find(cyclicPatches[patchI]) != string::npos)
+                            {
+                                const coupledPolyPatch& cyclicPatch = refCast<const coupledPolyPatch>(cPatch);
+                                transVec = cyclicPatch.transform().invTransformPosition(wallCntInfo.getcClass().getGeomModel().getCoM());
+                                inContact = true;
+                                break;
+                            }
+                        }
+                    }
                 }
                 if(inContact)
                     break;
@@ -95,6 +107,7 @@ bool detectCyclicContact(
 
     if(inContact)
     {
+        reduce(transVec, sumOp<vector>());
         return true;
     }
     return false;

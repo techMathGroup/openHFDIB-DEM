@@ -160,6 +160,8 @@ namespace Foam
             vector& normal
         ) final override;
 
+        label getOwner() final override;
+
         scalar& getM0() final override;
 
         vector getLVec(const point& toPoint) final override;

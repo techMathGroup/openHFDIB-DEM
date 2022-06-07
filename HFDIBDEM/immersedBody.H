@@ -149,9 +149,6 @@ namespace Foam
         point minBoundPoint_;
         point maxBoundPoint_;
 
-        // processor num that owns the IB
-        label owner_;
-
         // update immersed body info
         void  updateImmersedBody
         (
@@ -471,11 +468,6 @@ namespace Foam
         const bool& getIsActive()
         {
             return isActive_;
-        }
-
-        const label& getOwner() const
-        {
-            return owner_;
         }
 
         const bool& getStartSynced() const

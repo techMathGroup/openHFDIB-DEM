@@ -94,7 +94,6 @@ bodyId_(bodyId),
 updateTorque_(false),
 bodyOperation_(0),
 boundIndList_(3),
-owner_(false),
 historyCouplingF_(vector::zero),
 historyCouplingT_(vector::zero),
 octreeField_(mesh_.nCells(), 0),
@@ -138,8 +137,7 @@ void immersedBody::createImmersedBody(volScalarField& body, volScalarField& refi
 //---------------------------------------------------------------------------//
 void immersedBody::syncCreateImmersedBody(volScalarField& body, volScalarField& refineF)
 {
-    owner_ = geomModel_->getOwner();
-    InfoH << iB_Info << "body: " << bodyId_ << " owner: " << owner_ << endl;
+    InfoH << iB_Info << "body: " << bodyId_ << " owner: " << geomModel_->getOwner() << endl;
 
     InfoH << iB_Info << "Computing geometrical properties" << endl;
     geomModel_->calculateGeometricalProperties(body);
@@ -582,7 +580,7 @@ void immersedBody::moveImmersedBody
 {
     if (bodyOperation_ == 0) return;
 
-    if (owner_ == Pstream::myProcNo())
+    if (geomModel_->getOwner() == Pstream::myProcNo())
     {
         if (mag(deltaT + 1.0) < SMALL) deltaT = mesh_.time().deltaT().value();
 
@@ -634,8 +632,6 @@ void immersedBody::moveImmersedBody
     boundBox bound(geomModel_->getBounds());
     minBoundPoint_ = bound.min();
     maxBoundPoint_ = bound.max();
-
-    Info << "New bounds: " << minBoundPoint_ << " - " << maxBoundPoint_ << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateVectorField(volVectorField& VS, word VName,volScalarField& body)

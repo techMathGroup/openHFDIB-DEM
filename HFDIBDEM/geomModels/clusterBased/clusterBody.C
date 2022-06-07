@@ -125,7 +125,10 @@ void clusterBody::bodyMovePoints
 {
     forAll(ibGeomModelList, ibI)
     {
-        ibGeomModelList[ibI].bodyMovePoints(translVec);
+        if(ibGeomModelList[ibI].getOwner() == Pstream::myProcNo())
+        {
+            ibGeomModelList[ibI].bodyMovePoints(translVec);
+        }
     }
 }
 //---------------------------------------------------------------------------//
@@ -148,7 +151,10 @@ void clusterBody::bodyRotatePoints
 {
     forAll(ibGeomModelList, ibI)
     {
-        ibGeomModelList[ibI].bodyRotatePoints(rotAngle, axisOfRot);
+        if(ibGeomModelList[ibI].getOwner() == Pstream::myProcNo())
+        {
+            ibGeomModelList[ibI].bodyRotatePoints(rotAngle, axisOfRot);
+        }
     }
 }
 //---------------------------------------------------------------------------//
@@ -249,6 +255,11 @@ void clusterBody::getClosestPointAndNormal
             normal = closestNormals[i];
         }
     }
+}
+//---------------------------------------------------------------------------//
+label clusterBody::getOwner()
+{
+    return Pstream::myProcNo();
 }
 //---------------------------------------------------------------------------//
 scalar& clusterBody::getM0()
