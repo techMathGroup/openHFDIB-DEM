@@ -63,6 +63,20 @@ bool detectPrtPrtContact(
             tClass
         );
     }
+    else if
+    (
+        cClass.getGeomModel().getcType() == cluster
+        ||
+        tClass.getGeomModel().getcType() == cluster
+    )
+    {
+        return detectPrtPrtContact<cluster,cluster>
+        (
+            mesh,
+            cClass,
+            tClass
+        );
+    }
     else
     {
         return detectPrtPrtContact<arbShape,arbShape>(
@@ -178,6 +192,78 @@ detectPrtPrtContact(
         return true;
     }
 
+    return false;
+}
+//---------------------------------------------------------------------------//
+template <>
+bool detectPrtPrtContact <cluster,cluster>
+(
+    const fvMesh&   mesh,
+    ibContactClass& cClass,
+    ibContactClass& tClass
+)
+{
+    PtrList<geomModel> cBodies(0);
+    PtrList<geomModel> tBodies(0);
+
+    if(cClass.getGeomModel().isCluster())
+    {
+        clusterBody& cCluster = dynamic_cast<clusterBody&>(cClass.getGeomModel());
+        PtrList<geomModel>& cBodiesR = cCluster.getClusterBodies();
+        forAll(cBodiesR, cIbI)
+        {
+            cBodies.append(cBodiesR[cIbI].getGeomModel());
+        }
+    }
+    else
+    {
+        cBodies.append(cClass.getGeomModel().getGeomModel());
+    }
+
+    if(tClass.getGeomModel().isCluster())
+    {
+        clusterBody& tCluster = dynamic_cast<clusterBody&>(tClass.getGeomModel());
+        PtrList<geomModel>& tBodiesR = tCluster.getClusterBodies();
+        forAll(tBodiesR, tIbI)
+        {
+            tBodies.append(tBodiesR[tIbI].getGeomModel());
+        }
+    }
+    else
+    {
+        tBodies.append(tClass.getGeomModel().getGeomModel());
+    }
+
+    forAll(cBodies, cIbI)
+    {
+        forAll(tBodies, tIbI)
+        {
+            Info << "ClDet: Detecting for cluster: " << cIbI << " - " << tIbI << endl; 
+
+            autoPtr<geomModel> cGeomModel(cBodies[cIbI].getGeomModel());
+            autoPtr<ibContactClass> cIbClassI(new ibContactClass(
+                cGeomModel,
+                cClass.getMatInfo()
+            ));
+
+            autoPtr<geomModel> tGeomModel(tBodies[tIbI].getGeomModel());
+            autoPtr<ibContactClass> tIbClassI(new ibContactClass(
+                tGeomModel,
+                tClass.getMatInfo()
+            ));
+
+            if (detectPrtPrtContact(
+                mesh,
+                cIbClassI(),
+                cIbClassI()
+            ))
+            {
+                Info << "ClDet: Returning true for: " << cIbI << " - " << tIbI << endl; 
+                return true;
+            }
+        }
+    }
+    Info << "ClDet: returning false" << endl;
     return false;
 }
 //---------------------------------------------------------------------------//

@@ -86,6 +86,14 @@ namespace contactModel
         ibContactClass& tClass
     );
 
+    template <>
+    bool detectPrtPrtContact <cluster,cluster>
+    (
+        const fvMesh& mesh,
+        ibContactClass& cClass,
+        ibContactClass& tClass
+    );
+
     template <contactType cT, contactType tT>
     void getPrtContactVars(
         const fvMesh&   mesh,
