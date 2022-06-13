@@ -180,7 +180,12 @@ namespace Foam
 
         bool shouldBeUnclustered();
 
-        autoPtr<geomModel> getRemGeomModel(); 
+        autoPtr<geomModel> getRemGeomModel();
+
+        PtrList<geomModel>& getClusterBodies()
+        {
+            return ibGeomModelList;
+        }
     };
 }
 
