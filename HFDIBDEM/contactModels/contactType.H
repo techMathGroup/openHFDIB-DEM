@@ -47,6 +47,7 @@ namespace Foam
 enum contactType
 {
     arbShape,
+    cluster,
     sphere
 };
 

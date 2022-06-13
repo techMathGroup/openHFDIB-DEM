@@ -78,7 +78,7 @@ namespace Foam
         geomModel
         (
             mesh,
-            arbShape,
+            cluster,
             thrSurf
         )
         {}
