@@ -46,54 +46,8 @@ inContactWithStatic_(false),
 timeStepsInContWStatic_(0),
 matInfo_(matInfo)
 {
-    surfCells_.setSize(Pstream::nProcs());
-    intCells_.setSize(Pstream::nProcs());
 }
 ibContactClass::~ibContactClass()
 {
-}
-//---------------------------------------------------------------------------//
-bool ibContactClass::cellNotInLists(label cell)
-{
-    forAll(surfCells_[Pstream::myProcNo()],cellI)
-    {
-        if(surfCells_[Pstream::myProcNo()][cellI] == cell)
-        {
-            return false;
-        }
-    }
-
-    forAll(intCells_[Pstream::myProcNo()],cellI)
-    {
-        if(intCells_[Pstream::myProcNo()][cellI] == cell)
-        {
-            return false;
-        }
-    }
-
-    return true;
-}
-//---------------------------------------------------------------------------//
-void ibContactClass::appendLists
-(
-    const List<DynamicLabelList>& surfCells,
-    const List<DynamicLabelList>& intCells
-)
-{
-    forAll(surfCells[Pstream::myProcNo()],cellI)
-    {
-        if(cellNotInLists(surfCells[Pstream::myProcNo()][cellI]))
-        {
-            surfCells_[Pstream::myProcNo()].append(surfCells[Pstream::myProcNo()][cellI]);
-        }
-    }
-
-    forAll(intCells[Pstream::myProcNo()],cellI)
-    {
-        if(cellNotInLists(intCells[Pstream::myProcNo()][cellI]))
-        {
-            intCells_[Pstream::myProcNo()].append(intCells[Pstream::myProcNo()][cellI]);
-        }
-    }
 }
 //---------------------------------------------------------------------------//

@@ -76,9 +76,6 @@ class ibContactClass
     // is the particle in contact with wall
     bool    isInWallContact_;
 
-    List<DynamicLabelList> surfCells_;
-    List<DynamicLabelList> intCells_;
-
     bool inContactWithStatic_;
 
     label timeStepsInContWStatic_;
@@ -114,12 +111,12 @@ class ibContactClass
 
     List<DynamicLabelList>& getSurfCells()
     {
-        return surfCells_;
+        return geomModel_().getSurfaceCellList();
     }
 
     List<DynamicLabelList>& getIntCells()
     {
-        return intCells_;
+        return geomModel_().getInternalCellList();
     }
 
     materialInfo& getMatInfo()
@@ -146,20 +143,6 @@ class ibContactClass
     {
         timeStepsInContWStatic_ = setter;
     }
-
-    void clearCellsList()
-    {
-        surfCells_[Pstream::myProcNo()].clear();
-        intCells_[Pstream::myProcNo()].clear();
-    }
-
-    bool cellNotInLists(label cell);
-
-    void appendLists
-    (
-        const List<DynamicLabelList>& surfCells,
-        const List<DynamicLabelList>& intCells
-    );
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -373,11 +373,6 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
         if (immersedBodies_[bodyId].getIsActive())
         {
             immersedBodies_[bodyId].syncCreateImmersedBody(body,refineF);
-            immersedBodies_[bodyId].getibContactClass().appendLists
-            (
-                immersedBodies_[bodyId].getSurfaceCellList(),
-                immersedBodies_[bodyId].getInternalCellList()
-            );
             immersedBodies_[bodyId].checkIfInDomain(body);
             immersedBodies_[bodyId].updateOldMovementVars();
         }
@@ -405,12 +400,6 @@ void openHFDIBDEM::preUpdateBodies
             // create body or compute body-fluid coupling and estimate
             // potential contacts with walls
             immersedBodies_[bodyId].inContactWithStatic(false);
-            immersedBodies_[bodyId].getibContactClass().clearCellsList();
-            immersedBodies_[bodyId].getibContactClass().appendLists
-            (
-                immersedBodies_[bodyId].getSurfaceCellList(),
-                immersedBodies_[bodyId].getInternalCellList()
-            );
 
             immersedBodies_[bodyId].updateOldMovementVars();
             immersedBodies_[bodyId].printStats();
@@ -458,12 +447,6 @@ void openHFDIBDEM::recreateBodies
         if (immersedBodies_[bodyId].getIsActive())
         {
             immersedBodies_[bodyId].syncCreateImmersedBody(body,refineF);
-            immersedBodies_[bodyId].getibContactClass().clearCellsList();
-            immersedBodies_[bodyId].getibContactClass().appendLists
-            (
-                immersedBodies_[bodyId].getSurfaceCellList(),
-                immersedBodies_[bodyId].getInternalCellList()
-            );
             immersedBodies_[bodyId].checkIfInDomain(body);
             if(immersedBodies_[bodyId].getrecomputeM0() > 0)
             {
