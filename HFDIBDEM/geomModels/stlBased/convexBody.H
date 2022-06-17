@@ -114,6 +114,9 @@ namespace Foam
             geomModel* bodyGeomModel = stlBasedModel;
             bodyGeomModel->setRhoS(rhoS_);
             bodyGeomModel->setM0(M0_);
+            bodyGeomModel->getSurfaceCellList() = surfCells_;
+            bodyGeomModel->getInternalCellList() = intCells_;
+            
             return bodyGeomModel;
         }
     };
