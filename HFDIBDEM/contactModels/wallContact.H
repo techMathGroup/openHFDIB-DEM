@@ -83,6 +83,13 @@ namespace contactModel
         wallContactInfo& wallCntInfo
     );
 
+    template <>
+    void detectWallContact <cluster>
+    (
+        const fvMesh&   mesh,
+        wallContactInfo& wallCntInfo
+    );
+
     void getWallContactVars
     (
         const fvMesh&   mesh,
@@ -100,6 +107,14 @@ namespace contactModel
 
     template <>
     void getWallContactVars <sphere>
+    (
+        const fvMesh&   mesh,
+        wallContactInfo& wallCntInfo,
+        const scalar deltaT
+    );
+
+    template <>
+    void getWallContactVars <cluster>
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo,

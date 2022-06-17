@@ -71,6 +71,8 @@ class wallContactInfo
 
     ibContactClass& ibContactClass_;
     ibContactVars& ibContactVars_;
+    HashTable<materialInfo,string,Hash<string>>& wInfos_;
+    HashTable<scalar,string,Hash<string>>& matInterAdh_;
 
     label bodyId_;
 
@@ -100,7 +102,7 @@ class wallContactInfo
         ibContactClass& cClass,
         ibContactVars& cVars,
         HashTable<materialInfo,string,Hash<string>>& wInfos,
-        HashTable<scalar,string,Hash<string>> matInterAdh
+        HashTable<scalar,string,Hash<string>>& matInterAdh
     );
 
     // Destructors -------------------------------------------------
@@ -116,6 +118,16 @@ class wallContactInfo
         return ibContactVars_;
     }
 
+    HashTable<materialInfo,string,Hash<string>>& getWInfos()
+    {
+        return wInfos_;
+    }
+
+    HashTable<scalar,string,Hash<string>>& getMatInterAdh()
+    {
+        return matInterAdh_;
+    }
+
     label getBodyId()
     {
         return bodyId_;
@@ -129,6 +141,11 @@ class wallContactInfo
     );
 
     void clearWallCntVars();
+
+    DynamicLabelList& getCurUsedHashes()
+    {
+        return curUsedHashes_;
+    }
 
     DynamicLabelList& getWallCntHashes()
     {

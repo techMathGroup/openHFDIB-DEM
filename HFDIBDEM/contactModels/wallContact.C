@@ -58,6 +58,14 @@ void detectWallContact(
             wallCntInfo
         );
     }
+    else if(wallCntInfo.getcClass().getGeomModel().getcType() == cluster)
+    {
+        detectWallContact<cluster>
+        (
+            mesh,
+            wallCntInfo
+        );
+    }
     else
     {
         detectWallContact<arbShape>(
@@ -200,6 +208,46 @@ void detectWallContact <sphere>(
     }
 }
 //---------------------------------------------------------------------------//
+template <>
+void detectWallContact <cluster>(
+    const fvMesh&   mesh,
+    wallContactInfo& wallCntInfo
+)
+{
+    clusterBody& cCluster = dynamic_cast<clusterBody&>(wallCntInfo.getcClass().getGeomModel());
+    PtrList<geomModel>& cBodies = cCluster.getClusterBodies();
+
+    forAll(cBodies, cIbI)
+    {
+        autoPtr<geomModel> cGeomModel(cBodies[cIbI].getGeomModel());
+        autoPtr<ibContactClass> cIbClassI(new ibContactClass(
+            cGeomModel,
+            wallCntInfo.getcClass().getMatInfo()
+        ));
+        autoPtr<wallContactInfo> cWallCntI(new wallContactInfo(
+            cIbClassI(),
+            wallCntInfo.getcVars(),
+            wallCntInfo.getWInfos(),
+            wallCntInfo.getMatInterAdh()
+        ));
+
+        detectWallContact(
+            mesh,
+            cWallCntI()
+        );
+
+        if(cWallCntI().getcClass().checkWallContact())
+        {
+            wallCntInfo.getcClass().setWallContact(true);
+        }
+
+        if(cWallCntI().getcClass().checkInContactWithStatic())
+        {
+            wallCntInfo.getcClass().inContactWithStatic(true);
+        }
+    }
+}
+//---------------------------------------------------------------------------//
 void getWallContactVars(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo,
@@ -209,6 +257,16 @@ void getWallContactVars(
     if(wallCntInfo.getcClass().getGeomModel().getcType() == sphere)
     {
         getWallContactVars<sphere>
+        (
+            mesh,
+            wallCntInfo,
+            deltaT
+        );
+        wallCntInfo.clearWallCntVars();
+    }
+    else if(wallCntInfo.getcClass().getGeomModel().getcType() == cluster)
+    {
+        getWallContactVars<cluster>
         (
             mesh,
             wallCntInfo,
@@ -751,6 +809,51 @@ DynamicList<Tuple2<label,string>> getContactFacesSphere
     }
 
     return facesReturnList;
+}
+//---------------------------------------------------------------------------//
+template <>
+void getWallContactVars <cluster>(
+    const fvMesh&   mesh,
+    wallContactInfo& wallCntInfo,
+    const scalar deltaT
+)
+{
+    clusterBody& cCluster = dynamic_cast<clusterBody&>(wallCntInfo.getcClass().getGeomModel());
+    PtrList<geomModel>& cBodies = cCluster.getClusterBodies();
+
+    forAll(cBodies, cIbI)
+    {
+        autoPtr<geomModel> cGeomModel(cBodies[cIbI].getGeomModel());
+        autoPtr<ibContactClass> cIbClassI(new ibContactClass(
+            cGeomModel,
+            wallCntInfo.getcClass().getMatInfo()
+        ));
+        autoPtr<wallContactInfo> cWallCntI(new wallContactInfo(
+            cIbClassI(),
+            wallCntInfo.getcVars(),
+            wallCntInfo.getWInfos(),
+            wallCntInfo.getMatInterAdh()
+        ));
+
+        getWallContactVars(
+            mesh,
+            cWallCntI(),
+            deltaT
+        );
+
+        DynamicLabelList& wallCntHashesI(cWallCntI().getWallCntHashes());
+        forAll(wallCntHashesI,contVar)
+        {
+            wallContactVars& wallCntVarI(
+                cWallCntI().getWallcVarsTable()[wallCntHashesI[contVar]]
+            );
+
+            label newHash = wallCntInfo.getWallCntHashes().size();
+            wallCntInfo.getWallcVarsTable().insert(newHash, wallCntVarI);
+            wallCntInfo.getWallCntHashes().append(newHash);
+            wallCntInfo.getCurUsedHashes().append(wallCntInfo.getWallCntHashes().last());
+        }
+    }
 }
 //---------------------------------------------------------------------------//
 void solveWallContact

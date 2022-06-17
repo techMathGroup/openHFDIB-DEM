@@ -39,11 +39,13 @@ wallContactInfo::wallContactInfo
     ibContactClass& cClass,
     ibContactVars& cVars,
     HashTable<materialInfo,string,Hash<string>>& wInfos,
-    HashTable<scalar,string,Hash<string>> matInterAdh
+    HashTable<scalar,string,Hash<string>>& matInterAdh
 )
 :
 ibContactClass_(cClass),
-ibContactVars_(cVars)
+ibContactVars_(cVars),
+wInfos_(wInfos),
+matInterAdh_(matInterAdh)
 {
     bodyId_ = cVars.bodyId_;
     materialInfo& cMatInfo(cClass.getMatInfo());
