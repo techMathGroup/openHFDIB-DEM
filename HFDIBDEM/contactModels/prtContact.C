@@ -191,7 +191,6 @@ detectPrtPrtContact(
     {
         return true;
     }
-
     return false;
 }
 //---------------------------------------------------------------------------//
@@ -238,8 +237,6 @@ bool detectPrtPrtContact <cluster,cluster>
     {
         forAll(tBodies, tIbI)
         {
-            Info << "ClDet: Detecting for cluster: " << cIbI << " - " << tIbI << endl; 
-
             autoPtr<geomModel> cGeomModel(cBodies[cIbI].getGeomModel());
             autoPtr<ibContactClass> cIbClassI(new ibContactClass(
                 cGeomModel,
@@ -255,15 +252,13 @@ bool detectPrtPrtContact <cluster,cluster>
             if (detectPrtPrtContact(
                 mesh,
                 cIbClassI(),
-                cIbClassI()
+                tIbClassI()
             ))
             {
-                Info << "ClDet: Returning true for: " << cIbI << " - " << tIbI << endl; 
                 return true;
             }
         }
     }
-    Info << "ClDet: returning false" << endl;
     return false;
 }
 //---------------------------------------------------------------------------//
@@ -890,35 +885,143 @@ void getPrtContactVars<sphere,sphere>
     }
 }
 //---------------------------------------------------------------------------//
-bool solvePrtContact(
+template<>
+void getPrtContactVars<cluster,cluster>
+(
     const fvMesh&   mesh,
-    prtContactInfo& cInfo,
-    scalar deltaT
+    ibContactClass& cClass,
+    ibContactClass& tClass,
+    prtContactVars& prtCntVars
+)
+{
+    prtCntVars.contactCenter_ = vector::zero;
+    prtCntVars.contactVolume_ = 0;
+    prtCntVars.contactNormal_ = vector::zero;
+    prtCntVars.contactArea_ = 0;
+
+    PtrList<geomModel> cBodies(0);
+    PtrList<geomModel> tBodies(0);
+
+    if(cClass.getGeomModel().isCluster())
+    {
+        clusterBody& cCluster = dynamic_cast<clusterBody&>(cClass.getGeomModel());
+        PtrList<geomModel>& cBodiesR = cCluster.getClusterBodies();
+        forAll(cBodiesR, cIbI)
+        {
+            cBodies.append(cBodiesR[cIbI].getGeomModel());
+        }
+    }
+    else
+    {
+        cBodies.append(cClass.getGeomModel().getGeomModel());
+    }
+
+    if(tClass.getGeomModel().isCluster())
+    {
+        clusterBody& tCluster = dynamic_cast<clusterBody&>(tClass.getGeomModel());
+        PtrList<geomModel>& tBodiesR = tCluster.getClusterBodies();
+        forAll(tBodiesR, tIbI)
+        {
+            tBodies.append(tBodiesR[tIbI].getGeomModel());
+        }
+    }
+    else
+    {
+        tBodies.append(tClass.getGeomModel().getGeomModel());
+    }
+
+    forAll(cBodies, cIbI)
+    {
+        forAll(tBodies, tIbI)
+        {
+            autoPtr<geomModel> cGeomModel(cBodies[cIbI].getGeomModel());
+            autoPtr<ibContactClass> cIbClassI(new ibContactClass(
+                cGeomModel,
+                cClass.getMatInfo()
+            ));
+
+            autoPtr<geomModel> tGeomModel(tBodies[tIbI].getGeomModel());
+            autoPtr<ibContactClass> tIbClassI(new ibContactClass(
+                tGeomModel,
+                tClass.getMatInfo()
+            ));
+
+            prtContactVars prtCntVarsI;
+
+            getPrtContactVars(
+                mesh,
+                cIbClassI(),
+                tIbClassI(),
+                prtCntVarsI
+            );
+
+            if (prtCntVarsI.contactVolume_ > prtCntVars.contactVolume_)
+            {
+                prtCntVars = prtCntVarsI;
+            }
+        }
+    }
+}
+//---------------------------------------------------------------------------//
+void getPrtContactVars
+(
+    const fvMesh&   mesh,
+    ibContactClass& cClass,
+    ibContactClass& tClass,
+    prtContactVars& prtCntVars
 )
 {
     if
     (
-        cInfo.getcClass().getGeomModel().getcType() == sphere
+        cClass.getGeomModel().getcType() == sphere
         &&
-        cInfo.gettClass().getGeomModel().getcType() == sphere
+        tClass.getGeomModel().getcType() == sphere
     )
     {
         getPrtContactVars<sphere,sphere>(
             mesh,
-            cInfo.getcClass(),
-            cInfo.gettClass(),
-            cInfo.getprtCntVars()
+            cClass,
+            tClass,
+            prtCntVars
+        );
+    }
+    else if
+    (
+        cClass.getGeomModel().getcType() == cluster
+        ||
+        tClass.getGeomModel().getcType() == cluster
+    )
+    {
+        getPrtContactVars<cluster,cluster>(
+            mesh,
+            cClass,
+            tClass,
+            prtCntVars
         );
     }
     else
     {
         getPrtContactVars<arbShape,arbShape>(
             mesh,
-            cInfo.getcClass(),
-            cInfo.gettClass(),
-            cInfo.getprtCntVars()
+            cClass,
+            tClass,
+            prtCntVars
         );
     }
+}
+//---------------------------------------------------------------------------//
+bool solvePrtContact(
+    const fvMesh&   mesh,
+    prtContactInfo& cInfo,
+    scalar deltaT
+)
+{
+    getPrtContactVars(
+        mesh,
+        cInfo.getcClass(),
+        cInfo.gettClass(),
+        cInfo.getprtCntVars()
+    );
 
     if (!(cInfo.getprtCntVars().contactVolume_ > 0))
     {

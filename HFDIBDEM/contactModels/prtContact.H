@@ -94,6 +94,13 @@ namespace contactModel
         ibContactClass& tClass
     );
 
+    void getPrtContactVars(
+        const fvMesh&   mesh,
+        ibContactClass& cClass,
+        ibContactClass& tClass,
+        prtContactVars& prtCntVars
+    );
+
     template <contactType cT, contactType tT>
     void getPrtContactVars(
         const fvMesh&   mesh,
