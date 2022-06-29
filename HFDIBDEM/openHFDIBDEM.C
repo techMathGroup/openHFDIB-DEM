@@ -536,7 +536,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 bool inContact = detectCyclicContact(mesh_, cyclicPatches_, immersedBodies_[bodyId].getWallCntInfo(), newPos);
                 if (inContact)
                 {
-                    Info << "Creating Cluster" << endl;
+                    Info << "Creating Cluster for body " << immersedBodies_[bodyId].getBodyId() << endl;
                     scalar thrSurf(readScalar(HFDIBDEMDict_.lookup("surfaceThreshold")));
                     autoPtr<clusterBody> newClusterBody(new clusterBody(mesh_, thrSurf));
                     autoPtr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getGeomModel());

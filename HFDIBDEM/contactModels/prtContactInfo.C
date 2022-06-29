@@ -114,13 +114,19 @@ vector prtContactInfo::getVeli(ibContactVars& cVars, vector& lVec)
 void prtContactInfo::evalVariables()
 {
     cLVec_ = getLVec(cIbContactClass_);
+    InfoH << DEM_Info << "-- Particle-particle contact cLVec_ " << cLVec_ << endl;
     tLVec_ = getLVec(tIbContactClass_);
+    InfoH << DEM_Info << "-- Particle-particle contact tLVec_ " << tLVec_ << endl;
 
     cVeli_ = getVeli(cContactVars_, cLVec_);
+    InfoH << DEM_Info << "-- Particle-particle contact cVeli_ " << cVeli_ << endl;
     tVeli_ = getVeli(tContactVars_, tLVec_);
+    InfoH << DEM_Info << "-- Particle-particle contact tVeli_ " << tVeli_ << endl;
 
     Vn_ = -(cVeli_ - tVeli_) & prtCntVars_.contactNormal_;
+    InfoH << DEM_Info << "-- Particle-particle contact Vn_ " << Vn_ << endl;
     Lc_ = 4*mag(cLVec_)*mag(tLVec_)/(mag(cLVec_) + mag(tLVec_));
+    InfoH << DEM_Info << "-- Particle-particle contact Lc_ " << Lc_ << endl;
 
     curAdhN_ = min
     (
