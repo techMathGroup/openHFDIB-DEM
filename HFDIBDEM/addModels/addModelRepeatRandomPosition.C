@@ -39,10 +39,11 @@ addModelRepeatRandomPosition::addModelRepeatRandomPosition
 (
     const dictionary& addModelDict,
     const Foam::fvMesh& mesh,
-    geomModel* bodyGeomModel
+    geomModel* bodyGeomModel,
+    List<pointField>& cellPoints
 )
 :
-addModel(mesh),
+addModel(mesh, cellPoints),
 addModelDict_(addModelDict),
 addMode_(word(addModelDict_.lookup("addModel"))),
 bodyAdded_(false),
@@ -313,7 +314,8 @@ bool addModelRepeatRandomPosition::shouldAddBody(const volScalarField& body)
 //---------------------------------------------------------------------------//
 geomModel* addModelRepeatRandomPosition::addBody
 (
-    const   volScalarField& body
+    const volScalarField& body,
+    const PtrList<immersedBody>& immersedBodies  
 )
 {
     geomModel_->resetBody();

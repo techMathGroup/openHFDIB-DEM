@@ -129,7 +129,8 @@ class addModelOnceScatter
         const dictionary& addModelDict,
         const Foam::fvMesh& mesh,
         const bool startTime0,
-        geomModel* bodyGeomModel
+        geomModel* bodyGeomModel,
+        List<pointField>& cellPoints
     );
 
     // Destructors -------------------------------------------------
@@ -144,7 +145,10 @@ class addModelOnceScatter
 
     bool shouldAddBody(const volScalarField& body);
 
-    geomModel* addBody(const volScalarField& body);
+    geomModel* addBody(
+        const volScalarField& body,
+        const PtrList<immersedBody>& immersedBodies        
+        );
 
 	scalar returnRandomAngle();
 

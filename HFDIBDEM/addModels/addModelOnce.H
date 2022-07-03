@@ -69,7 +69,8 @@ class addModelOnce
         const dictionary& addModelDict,
         const Foam::fvMesh& mesh,
         const bool startTime0,
-        geomModel* bodyGeomModel
+        geomModel* bodyGeomModel,
+        List<pointField>& cellPoints
     );
 
     // Destructors -------------------------------------------------
@@ -82,7 +83,10 @@ class addModelOnce
         return not bodyAdded_;
     }
 
-    geomModel* addBody(const volScalarField& body);
+    geomModel* addBody(
+        const volScalarField& body,
+        const PtrList<immersedBody>& immersedBodies        
+        );
 
     bool getBodyAdded()
     {

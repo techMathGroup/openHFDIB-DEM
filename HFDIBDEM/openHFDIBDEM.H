@@ -62,7 +62,7 @@ Contributors
 #include "addModelRepeatRandomPosition.H"
 #include "addModelDistribution.H"
 
-#include "contactModel.H"
+// #include "contactModel.H"
 #include "leastSquaresInt.H"
 #include "lineInt.H"
 

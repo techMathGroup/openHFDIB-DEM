@@ -39,10 +39,11 @@ addModelDistribution::addModelDistribution
 (
     const dictionary& addModelDict,
     const Foam::fvMesh& mesh,
-    geomModel* bodyGeomModel
+    geomModel* bodyGeomModel,
+    List<pointField>& cellPoints
 )
 :
-addModel(mesh),
+addModel(mesh, cellPoints),
 addModelDict_(addModelDict),
 addMode_(word(addModelDict_.lookup("addModel"))),
 bodyAdded_(false),
@@ -248,7 +249,8 @@ bool addModelDistribution::shouldAddBody(const volScalarField& body)
 //---------------------------------------------------------------------------//
 geomModel* addModelDistribution::addBody
 (
-    const   volScalarField& body
+    const volScalarField& body,
+    const PtrList<immersedBody>& immersedBodies   
 )
 {
     bodyAdditionAttemptCounter_++;

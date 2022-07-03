@@ -73,7 +73,8 @@ class addModelRepeatSamePosition
     (
         const dictionary& addModelDict,
         const Foam::fvMesh& mesh,
-        geomModel* bodyGeomModel
+        geomModel* bodyGeomModel,
+        List<pointField>& cellPoints
     );
 
     // Destructors -------------------------------------------------
@@ -84,7 +85,10 @@ class addModelRepeatSamePosition
 
     bool shouldAddBody(const volScalarField& body);
 
-    geomModel* addBody(const volScalarField& body);
+    geomModel* addBody(
+        const volScalarField& body,
+        const PtrList<immersedBody>& immersedBodies        
+        );
 
     bool checkIfAdd()
     {

@@ -130,7 +130,8 @@ class addModelRepeatRandomPosition
     (
         const dictionary& addModelDict,
         const Foam::fvMesh& mesh,
-        geomModel* bodyGeomModel
+        geomModel* bodyGeomModel,
+        List<pointField>& cellPoints
     );
 
     // Destructors -------------------------------------------------
@@ -141,7 +142,10 @@ class addModelRepeatRandomPosition
 
     bool shouldAddBody(const volScalarField& body);
 
-    geomModel* addBody(const volScalarField& body);
+    geomModel* addBody(
+        const volScalarField& body,
+        const PtrList<immersedBody>& immersedBodies        
+        );
 
 	scalar returnRandomAngle();
 

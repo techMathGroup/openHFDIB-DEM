@@ -123,7 +123,8 @@ class addModelDistribution
     (
         const dictionary& addModelDict,
         const Foam::fvMesh& mesh,
-        geomModel* bodyGeomModel
+        geomModel* bodyGeomModel,
+        List<pointField>& cellPoints
     );
 
     // Destructors -------------------------------------------------
@@ -134,7 +135,10 @@ class addModelDistribution
 
     bool shouldAddBody(const volScalarField& body);
 
-    geomModel* addBody(const volScalarField& body);
+    geomModel* addBody(
+        const volScalarField& body,
+        const PtrList<immersedBody>& immersedBodies        
+        );
 
     Tuple2<label, scalar> returnScaleFactor();
 

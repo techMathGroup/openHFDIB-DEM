@@ -67,7 +67,8 @@
                     addModelDict,
                     mesh_,
                     startTime0,
-                    bodyGeomModel.ptr()
+                    bodyGeomModel.ptr(),
+                    cellPoints_
                 )
             );
         }
@@ -81,7 +82,8 @@
                     addModelDict,
                     mesh_,
                     startTime0,
-                    bodyGeomModel.ptr()
+                    bodyGeomModel.ptr(),
+                    cellPoints_
                 )
             );
         }
@@ -94,7 +96,8 @@
                 (
                     addModelDict,
                     mesh_,
-                    bodyGeomModel.ptr()
+                    bodyGeomModel.ptr(),
+                    cellPoints_
                 )
             );
         }
@@ -107,7 +110,8 @@
                 (
                     addModelDict,
                     mesh_,
-                    bodyGeomModel.ptr()
+                    bodyGeomModel.ptr(),
+                    cellPoints_
                 )
             );
         }
@@ -120,7 +124,8 @@
                 (
                     addModelDict,
                     mesh_,
-                    bodyGeomModel.ptr()
+                    bodyGeomModel.ptr(),
+                    cellPoints_
                 )
             );
         }
@@ -138,7 +143,8 @@
                     addModelDict,
                     mesh_,
                     startTime0,
-                    bodyGeomModel.ptr()
+                    bodyGeomModel.ptr(),
+                    cellPoints_
                 )
             );
         }

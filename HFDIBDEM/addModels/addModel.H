@@ -50,10 +50,14 @@ Contributors
 #include "sphereBody.H"
 #include "clusterBody.H"
 
+#include "contactModel.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+
+class immersedBody;
 
 /*---------------------------------------------------------------------------*\
                           Class addModel Declaration
@@ -67,14 +71,19 @@ class addModel
     protected:
 
     const  fvMesh&       mesh_;
+    List<pointField>& cellPoints_;
+    Field<label> octreeField_;
 
     public:
 
     // Constructors ------------------------------------------------
-    addModel(const fvMesh& mesh)
+    addModel(const fvMesh& mesh, List<pointField>& cellPoints)
     :
-    mesh_(mesh)
-    {}
+    mesh_(mesh),
+    cellPoints_(cellPoints)
+    {
+        octreeField_ = Field<label>(mesh_.nCells(), 0);
+    }
 
     // Destructors -------------------------------------------------
     virtual ~addModel();
@@ -102,7 +111,10 @@ class addModel
     // Note: check current conditions in simulation and return
     //       true if a body should be added
 
-    virtual geomModel* addBody(const volScalarField& body) = 0;
+    virtual geomModel* addBody(
+        const volScalarField& body,
+        const PtrList<immersedBody>& immersedBodies
+        ) = 0;
     // Note: needs to provide a properly scaled/oriented/translated
     //       triSurface that will be used for IB initialization
 

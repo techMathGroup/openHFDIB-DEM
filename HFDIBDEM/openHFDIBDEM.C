@@ -272,7 +272,7 @@ void openHFDIBDEM::initialize
         while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions)
         {
             InfoH << addModel_Info << "addModel invoked action, trying to add new body" << endl;
-            autoPtr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body));
+            autoPtr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));
             cAddition++;
 
             // initialize the immersed bodies
@@ -992,7 +992,7 @@ void openHFDIBDEM::addRemoveBodies
         while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions)
         {
             InfoH << addModel_Info << "addModel invoked action, trying to add new body" << endl;
-            autoPtr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body));
+            autoPtr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));
 
             cAddition++;
 

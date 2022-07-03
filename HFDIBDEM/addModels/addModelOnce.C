@@ -39,10 +39,11 @@ addModelOnce::addModelOnce
     const dictionary& addModelDict,
     const Foam::fvMesh& mesh,
     const bool startTime0,
-    geomModel* bodyGeomModel
+    geomModel* bodyGeomModel,
+    List<pointField>& cellPoints
 )
 :
-addModel(mesh),
+addModel(mesh, cellPoints),
 addModelDict_(addModelDict),
 addMode_(word(addModelDict_.lookup("addModel"))),
 bodyAdded_(false),
@@ -59,7 +60,8 @@ addModelOnce::~addModelOnce()
 
 geomModel* addModelOnce::addBody
 (
-    const   volScalarField& body
+    const volScalarField& body,
+    const PtrList<immersedBody>& immersedBodies  
 )
 {
     bool canAddBodyI(geomModel_().canAddBody(body));
