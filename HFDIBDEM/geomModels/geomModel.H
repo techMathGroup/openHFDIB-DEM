@@ -49,6 +49,8 @@ Contributors
 #include "outputHFDIBDEM.H"
 using namespace outputHFDIBDEM;
 
+#include "clockTime.H"
+
 namespace Foam
 {
     // custom field filtration
@@ -103,7 +105,7 @@ namespace Foam
         scalar  intSpan_;
         bool    sdBasedLambda_;
         boundBox curMeshBounds_;
-        HashTable<pointField,label,Hash<label>> lastIbPoints_;
+        autoPtr<HashTable<const labelList&, label, Hash<label>>> cachedNeighbours_;
 
         //body mass
         scalar M_;
@@ -123,6 +125,14 @@ namespace Foam
 
         public:
 
+        static scalar t1;
+        static scalar t2;
+        static scalar t3;
+        static scalar t4;
+        static scalar t5;
+        static scalar t6;
+        static scalar t7;
+
         // Constructors ------------------------------------------------
         geomModel
         (
@@ -138,7 +148,7 @@ namespace Foam
         (
             volScalarField& body,
             Field<label>& octreeField,
-            List<pointField>& cellPoints
+            List<labelList>& cellPoints
         )
         {
             InfoH << iB_Info << "-- geomModelMessage-- "
@@ -304,7 +314,7 @@ namespace Foam
 
         void setSdBasedLambda(bool sdBasedLambda){sdBasedLambda_ = sdBasedLambda;}
 
-        void resetHashTable(){lastIbPoints_.clear();}
+        void resetHashTable(){cachedNeighbours_.clear();}
 
         virtual void setRhoS(dimensionedScalar rhoS){rhoS_ = rhoS;}
         dimensionedScalar getRhoS(){return rhoS_;}
@@ -372,7 +382,22 @@ namespace Foam
                 return false;
         }
 
+        bool isBBoxInMesh();
 
+        DynamicLabelList getPotentSurfCells
+        (
+            volScalarField& body,
+            HashTable<bool, label, Hash<label>>& cellInside,
+            List<labelList>& cellPoints
+        );
+
+        void correctSurfCells
+        (
+            volScalarField& body,
+            DynamicLabelList& potentSurfCells,
+            HashTable<bool, label, Hash<label>>& cellInside,
+            List<labelList>& cellPoints
+        );
     };
 }
 #endif

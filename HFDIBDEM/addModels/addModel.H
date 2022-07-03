@@ -71,13 +71,13 @@ class addModel
     protected:
 
     const  fvMesh&       mesh_;
-    List<pointField>& cellPoints_;
+    List<labelList>& cellPoints_;
     Field<label> octreeField_;
 
     public:
 
     // Constructors ------------------------------------------------
-    addModel(const fvMesh& mesh, List<pointField>& cellPoints)
+    addModel(const fvMesh& mesh, List<labelList>& cellPoints)
     :
     mesh_(mesh),
     cellPoints_(cellPoints)

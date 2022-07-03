@@ -74,7 +74,7 @@ namespace Foam
         (
             volScalarField& body,
             Field<label>& octreeField,
-            List<pointField>& cellPoints
+            List<labelList>& cellPoints
         )
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "

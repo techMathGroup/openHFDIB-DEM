@@ -94,7 +94,7 @@ namespace Foam
         (
             volScalarField& body,
             Field<label>& octreeField,
-            List<pointField>& cellPoints
+            List<labelList>& cellPoints
         ) final override;
 
         labelList getBBoxCellsByOctTree

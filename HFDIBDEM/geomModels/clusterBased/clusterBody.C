@@ -39,7 +39,7 @@ void clusterBody::createImmersedBody
 (
     volScalarField& body,
     Field<label>& octreeField,
-    List<pointField>& cellPoints
+    List<labelList>& cellPoints
 )
 {
     forAll(ibGeomModelList, ibI)

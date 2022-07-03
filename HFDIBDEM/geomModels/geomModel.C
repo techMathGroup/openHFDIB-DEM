@@ -49,7 +49,6 @@ thrSurf_(thrSurf),
 intSpan_(2.0),
 sdBasedLambda_(false),
 curMeshBounds_(mesh_.points(),false),
-lastIbPoints_(0),
 M_(0.0),
 M0_(0.0),
 CoM_(vector::zero),
@@ -144,5 +143,132 @@ void geomModel::resetBody(volScalarField& body)
 
     surfCells_[Pstream::myProcNo()].clear();
     intCells_[Pstream::myProcNo()].clear();
+    }
+//---------------------------------------------------------------------------//
+bool geomModel::isBBoxInMesh()
+{
+    boundBox ibBound(getBounds());
+
+    forAll(geometricD,dir)
+    {
+        if(geometricD[dir] == 1)
+        {
+            if(!(curMeshBounds_.max()[dir] >= ibBound.min()[dir]
+                && curMeshBounds_.min()[dir] <= ibBound.max()[dir]))
+            {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+//---------------------------------------------------------------------------//
+DynamicList<label> geomModel::getPotentSurfCells
+(
+    volScalarField& body,
+    HashTable<bool, label, Hash<label>>& cellInside,
+    List<labelList>& cellPoints
+)
+{
+    const labelList foundCells = cellInside.toc();
+    DynamicLabelList potentSurfCells(foundCells.size()/2);
+    forAll(foundCells, cellI)
+    {
+        label cCell = foundCells[cellI];
+
+        if(cellInside[cCell])
+        {
+            const labelList& neigh = cachedNeighbours_()[cCell];
+
+            bool anyOutside = false;
+            forAll(neigh, neighI)
+            {
+                if(!cellInside[neigh[neighI]])
+                {
+                    anyOutside = true;
+                    break;
+                }
+            }
+
+            if(anyOutside)
+            {
+                potentSurfCells.append(cCell);
+            }
+            else
+            {
+                intCells_[Pstream::myProcNo()].append(cCell);
+                ibPartialVolume_[Pstream::myProcNo()] += 1;
+                body[cCell] = 1.0;
+            }
+        }
+        else
+        {
+            potentSurfCells.append(cCell);
+        }
+    }
+    return potentSurfCells;
+}
+//---------------------------------------------------------------------------//
+void geomModel::correctSurfCells
+(
+    volScalarField& body,
+    DynamicLabelList& potentSurfCells,
+    HashTable<bool, label, Hash<label>>& cellInside,
+    List<labelList>& cellPoints
+)
+{
+    HashTable<bool, label, Hash<label>> verticesStatus(potentSurfCells.size()*6);
+    forAll(potentSurfCells, cellLabel)
+    {    
+        label cCell = potentSurfCells[cellLabel];
+        scalar cBody(0);
+
+        if(cellInside[cCell])
+        {
+            cBody += 0.5;
+        }
+
+        const labelList& cVerts = cellPoints[cCell];
+        scalar rVInSize(0.5/cVerts.size());
+        forAll(cVerts, vertI)
+        {
+            if(!verticesStatus.found(cVerts[vertI]))
+            {
+                bool vertexInside = pointInside(mesh_.points()[cVerts[vertI]]);
+                verticesStatus.insert
+                (
+                    cVerts[vertI],
+                    vertexInside
+                );
+
+                if(vertexInside)
+                {
+                    cBody += rVInSize;
+                }
+            }
+            else if(verticesStatus[cVerts[vertI]])
+            {
+                cBody += rVInSize;
+            }
+        }
+
+        if (cBody > thrSurf_)
+        {
+            if (cBody > (1.0-thrSurf_))
+            {
+                intCells_[Pstream::myProcNo()].append(cCell);
+            }
+            else
+            {
+                surfCells_[Pstream::myProcNo()].append(cCell);
+            }
+            ibPartialVolume_[Pstream::myProcNo()] += 1;
+
+            body[cCell] += cBody;
+
+            // clip the body field values
+            body[cCell] = min(max(0.0,body[cCell]),1.0);
+        }
+    }
 }
 //---------------------------------------------------------------------------//

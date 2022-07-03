@@ -94,16 +94,12 @@ namespace Foam
         (
             volScalarField& body,
             Field<label>& octreeField,
-            List<pointField>& cellPoints
+            List<labelList>& cellPoints
         ) final override;
 
-        labelList createImmersedBodyByOctTree
+        label getCellInBody
         (
-            label cellToCheck,
-            bool& insideIB,
-            bool& centerInside,
-            boolList& vertexesInside,
-            volScalarField& body
+            Field<label>& octreeField
         );
 
         geomModel* getGeomModel() final override

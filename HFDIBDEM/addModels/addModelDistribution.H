@@ -124,7 +124,7 @@ class addModelDistribution
         const dictionary& addModelDict,
         const Foam::fvMesh& mesh,
         geomModel* bodyGeomModel,
-        List<pointField>& cellPoints
+        List<labelList>& cellPoints
     );
 
     // Destructors -------------------------------------------------

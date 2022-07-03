@@ -1200,11 +1200,9 @@ void openHFDIBDEM::preCalculateCellPoints()
 {
     cellPoints_.clear();
     cellPoints_.setSize(mesh_.nCells());
-    const pointField& pp = mesh_.points();
     forAll(mesh_.C(), cellI)
     {
-        labelList vertexLabels = mesh_.cellPoints()[cellI];
-        cellPoints_[cellI] = filterField(pp,vertexLabels);
+        cellPoints_[cellI] = mesh_.cellPoints()[cellI];
     }
 
     forAll (immersedBodies_,bodyId)

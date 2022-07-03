@@ -151,28 +151,18 @@ void convexBody::createImmersedBody
 (
     volScalarField& body,
     Field<label>& octreeField,
-    List<pointField>& cellPoints
+    List<labelList>& cellPoints
 )
 {
-    boundBox ibBound(getBounds());
-    bool ibInsideMesh(false);
-
-    bool dirOk(true);
-    forAll(geometricD,dir)
+    if(!isBBoxInMesh())
     {
-        if(geometricD[dir] == 1)
-        {
-            if(!(curMeshBounds_.max()[dir] >= ibBound.min()[dir] && curMeshBounds_.min()[dir] <= ibBound.max()[dir]))
-            {
-                dirOk = false;
-                break;
-            }
-        }
+        return;
     }
 
-    if(dirOk)
+    label cellInIB = getCellInBody(octreeField);
+    if(cellInIB == -1)
     {
-        ibInsideMesh = true;
+        return;
     }
 
     // clear old list contents
@@ -181,168 +171,141 @@ void convexBody::createImmersedBody
     // find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;
     octreeField *= 0;
+    // get the list of cell centroids
+    const pointField& cp = mesh_.C();
 
-    if(ibInsideMesh)
+    autoPtr<DynamicLabelList> nextToCheck(
+        new DynamicLabelList(1,cellInIB));
+    autoPtr<DynamicLabelList> auxToCheck(
+        new DynamicLabelList);
+
+    label tableSize = 128;
+    if(cachedNeighbours_.valid())
     {
-        // get the list of cell centroids
-        const pointField& cp = mesh_.C();
+        tableSize = cachedNeighbours_().toc().size()*1.5;
+    }
+    else
+    {
+        cachedNeighbours_ = new HashTable<const labelList&, label, Hash<label>>;
+    }
 
-        bool insideIB(false);
-        bool insideIbBound(false);
+    HashTable<bool, label, Hash<label>> cellInside(tableSize);
 
-        if(cellToStartInCreateIB_ >= octreeField.size())
-            cellToStartInCreateIB_ = 0;
-
-        labelList nextToCheck(1,cellToStartInCreateIB_);
-        label iterCount(0);label iterMax(mesh_.nCells());
-        labelList vertexLabels;
-        boolList vertexesInside;
-        pointField pointPos;
-        bool centerInside;
-        DynamicLabelList auxToCheck;
-        HashTable<pointField,label,Hash<label>> lastIbPoints(0);
-        while (nextToCheck.size() > 0 and iterCount < iterMax)
+    label iterCount(0);label iterMax(mesh_.nCells());
+    while (nextToCheck().size() > 0 and iterCount++ < iterMax)
+    {
+        auxToCheck().clear();
+        forAll (nextToCheck(),cellToCheck)
         {
-            iterCount++;
-            auxToCheck.clear();
-
-            forAll (nextToCheck,cellToCheck)
+            label cCell = nextToCheck()[cellToCheck];
+            if (!cellInside.found(cCell))
             {
-                if (octreeField[nextToCheck[cellToCheck]] == 0)
-                {
-                    octreeField[nextToCheck[cellToCheck]] = 1;
+                iterCount++;
 
-                    if(lastIbPoints_.found(nextToCheck[cellToCheck]))
+                if(pointInside(cp[cCell]))
+                {
+                    cellInside.set(cCell, true);
+
+                    if(cachedNeighbours_.valid() && cachedNeighbours_().found(cCell))
                     {
-                        pointPos = lastIbPoints_[nextToCheck[cellToCheck]];
+                        auxToCheck().append(cachedNeighbours_()[cCell]);
                     }
                     else
                     {
-                        pointPos = cellPoints[nextToCheck[cellToCheck]];
-                    }
-                    bool cellInsideBB(false);
-                    forAll(pointPos,pos)
-                    {
-                        if(ibBound.contains(pointPos[pos]))
-                        {
-                            cellInsideBB = true;
-                            break;
-                        }
-                    }
-
-                    if(cellInsideBB)
-                    {
-                        insideIbBound = true;
-                        cellToStartInCreateIB_ = nextToCheck[cellToCheck];
-                        lastIbPoints.insert(nextToCheck[cellToCheck],pointPos);
-                        vertexesInside = triSurfSearch_().calcInside(pointPos);
-                        pointField centerPoint(1,cp[nextToCheck[cellToCheck]]);
-                        centerInside = (triSurfSearch_().calcInside(centerPoint))[0];
-                        if(std::any_of(vertexesInside.begin(),vertexesInside.end(),[](bool b){return b;}) || centerInside || !insideIB)
-                        {
-                            auxToCheck.append(
-                                createImmersedBodyByOctTree(
-                                    nextToCheck[cellToCheck],
-                                    insideIB,
-                                    centerInside,
-                                    vertexesInside,
-                                    body
-                                )
-                            );
-                        }
-                    }
-                    else if(!insideIB && !insideIbBound)
-                    {
-                        auxToCheck.append(mesh_.cellCells()[nextToCheck[cellToCheck]]);
+                        const labelList& neigh = mesh_.cellCells(cCell);
+                        cachedNeighbours_().insert(cCell, neigh);
+                        auxToCheck().append(neigh);
                     }
                 }
+                else
+                {
+                    cellInside.set(cCell, false);
+                }
             }
-            nextToCheck = auxToCheck;
         }
-        if(intCells_[Pstream::myProcNo()].size() > 0)
-            cellToStartInCreateIB_ = min(intCells_[Pstream::myProcNo()]);
-        lastIbPoints_ = lastIbPoints;
+        const autoPtr<DynamicLabelList> helpPtr(nextToCheck.ptr());
+        nextToCheck.set(auxToCheck.ptr());
+        auxToCheck = helpPtr;
+    }
+
+    DynamicLabelList keyToErase;
+    for(auto it = cachedNeighbours_().begin(); it != cachedNeighbours_().end(); ++it)
+    {
+        if(!cellInside.found(it.key()))
+        {
+            keyToErase.append(it.key());
+        }
+    }
+    cachedNeighbours_().erase(keyToErase);
+
+    DynamicLabelList potentSurfCells = 
+        getPotentSurfCells(
+            body,
+            cellInside,
+            cellPoints
+        );
+
+    correctSurfCells
+    (
+        body,
+        potentSurfCells,
+        cellInside,
+        cellPoints
+    );
+
+    if(intCells_
+    [Pstream::myProcNo()].size() > 0)
+    {
+        cellToStartInCreateIB_ = min(intCells_
+        [Pstream::myProcNo()]);
     }
 }
 //---------------------------------------------------------------------------//
-// create immersed body info
-labelList convexBody::createImmersedBodyByOctTree
+// Find first cell with center inside the body
+label convexBody::getCellInBody
 (
-    label cellToCheck,
-    bool& insideIB,
-    bool& centerInside,
-    boolList& vertexesInside,
-    volScalarField& body
+    Field<label>& octreeField
 )
 {
-    labelList retList;
-    scalar rVInSize(0.5/vertexesInside.size());
-    // Note: weight of a single vertex in the cell
+    // octreeField *= 0;
+    labelHashSet checkedCells;
+    // get the list of cell centroids
+    const pointField& cp = mesh_.C();
 
-    scalar cBody(0);
-    forAll (vertexesInside, verIn)
-    {
-        if (vertexesInside[verIn]==true)
-        {
-            cBody  += rVInSize;                                         //fraction of cell covered
-        }
-    }
+    if(cellToStartInCreateIB_ >= octreeField.size())
+        cellToStartInCreateIB_ = 0;
 
-    vector sDSpan(4.0*(mesh_.bounds().max()-mesh_.bounds().min()));
-    if (centerInside)
+    autoPtr<DynamicLabelList> nextToCheck(
+        new DynamicLabelList(1,cellToStartInCreateIB_));
+    autoPtr<DynamicLabelList> auxToCheck(
+        new DynamicLabelList);
+
+    label iterCount(0);label iterMax(mesh_.nCells());
+
+    while (nextToCheck().size() > 0 and iterCount < iterMax)
     {
-        cBody+=0.5;
-    }
-    bool cellInside(false);
-    if (cBody > thrSurf_)
-    {
-        if (cBody > (1.0-thrSurf_))
+        auxToCheck().clear();
+        forAll (nextToCheck(),cellToCheck)
         {
-            intCells_[Pstream::myProcNo()].append(cellToCheck);
-        }
-        else if (cBody  <= (1.0-thrSurf_))
-        {
-            surfCells_[Pstream::myProcNo()].append(cellToCheck);
-            if (sdBasedLambda_)
+            if (!checkedCells.found(nextToCheck()[cellToCheck]))
             {
-                pointIndexHit pointHit(
-                    triSurfSearch_().nearest(
-                        mesh_.C()[cellToCheck],
-                        sDSpan
-                    )
-                );
-                scalar signedDist(0.0);
-                if (pointHit.hit())
+                checkedCells.insert(nextToCheck()[cellToCheck]);
+                iterCount++;
+
+                if(pointInside(cp[nextToCheck()[cellToCheck]]))
                 {
-                    signedDist = mag(pointHit.hitPoint()-mesh_.C()[cellToCheck]);
+                    return nextToCheck()[cellToCheck];
                 }
                 else
                 {
-                    InfoH << iB_Info
-                        << "Missed point in signedDist computation !!" << endl;
-                }
-                if (centerInside)
-                {
-                    cBody = 0.5*(Foam::tanh(intSpan_*signedDist/Foam::pow(mesh_.V()[cellToCheck],0.333))+1.0);
-                }
-                else
-                {
-                    cBody = 0.5*(-1.0*Foam::tanh(intSpan_*signedDist/Foam::pow(mesh_.V()[cellToCheck],0.333))+1.0);
+                    auxToCheck().append(mesh_.cellCells()[nextToCheck()[cellToCheck]]);
                 }
             }
         }
-        ibPartialVolume_[Pstream::myProcNo()] += 1;
-        cellInside = true;
-        insideIB = true;
+        const autoPtr<DynamicLabelList> helpPtr(nextToCheck.ptr());
+        nextToCheck.set(auxToCheck.ptr());
+        auxToCheck = helpPtr;
     }
-    body[cellToCheck]+= cBody;
-    // clip the body field values
-    body[cellToCheck] = min(max(0.0,body[cellToCheck]),1.0);
-    if (!insideIB || cellInside)
-    {
-        retList = mesh_.cellCells()[cellToCheck];
-    }
-
-    return retList;
+    return -1;
 }
 //---------------------------------------------------------------------------//

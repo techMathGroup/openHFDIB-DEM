@@ -70,7 +70,7 @@ class addModelOnce
         const Foam::fvMesh& mesh,
         const bool startTime0,
         geomModel* bodyGeomModel,
-        List<pointField>& cellPoints
+        List<labelList>& cellPoints
     );
 
     // Destructors -------------------------------------------------
