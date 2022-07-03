@@ -46,6 +46,7 @@ Contributors
 #include "ibContactClass.H"
 #include "materialInfo.H"
 #include "wallContactInfo.H"
+#include "clusterBody.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -69,22 +70,19 @@ namespace contactModel
         wallContactInfo& wallCntInfo
     );
 
-    template <contactType cT>
-    void detectWallContact
+    void detectWallContact_ArbShape
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo
     );
 
-    template <>
-    void detectWallContact <sphere>
+    void detectWallContact_Sphere
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo
     );
 
-    template <>
-    void detectWallContact <cluster>
+    void detectWallContact_Cluster
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo
@@ -97,24 +95,21 @@ namespace contactModel
         const scalar deltaT
     );
 
-    template <contactType cT>
-    void getWallContactVars
+    void getWallContactVars_ArbShape
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo,
         const scalar deltaT
     );
 
-    template <>
-    void getWallContactVars <sphere>
+    void getWallContactVars_Sphere
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo,
         const scalar deltaT
     );
 
-    template <>
-    void getWallContactVars <cluster>
+    void getWallContactVars_Cluster
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo,
@@ -149,8 +144,7 @@ namespace contactModel
         scalar deltaT
     );
 
-    template <contactType cT>
-    scalar getInterVolume
+    scalar getInterVolume_ArbShape
     (
         const fvMesh&   mesh,
         ibContactClass& cClass,
@@ -159,8 +153,7 @@ namespace contactModel
         vector center
     );
 
-    template <>
-    scalar getInterVolume <sphere>
+    scalar getInterVolume_Sphere
     (
         const fvMesh&   mesh,
         ibContactClass& cClass,
@@ -182,12 +175,6 @@ namespace contactModel
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#ifdef NoRepository
-    #include "wallContact.C"
-#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

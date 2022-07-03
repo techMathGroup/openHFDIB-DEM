@@ -46,6 +46,7 @@ Contributors
 #include "ibContactClass.H"
 #include "prtContactVars.H"
 #include "prtContactInfo.H"
+#include "clusterBody.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -70,24 +71,21 @@ namespace contactModel
         ibContactClass& tClass
     );
 
-    template <contactType cT, contactType tT>
-    bool detectPrtPrtContact
+    bool detectPrtPrtContact_ArbShape
     (
         const fvMesh& mesh,
         ibContactClass& cClass,
         ibContactClass& tClass
     );
 
-    template <>
-    bool detectPrtPrtContact <sphere,sphere>
+    bool detectPrtPrtContact_Sphere
     (
         const fvMesh& mesh,
         ibContactClass& cClass,
         ibContactClass& tClass
     );
 
-    template <>
-    bool detectPrtPrtContact <cluster,cluster>
+    bool detectPrtPrtContact_Cluster
     (
         const fvMesh& mesh,
         ibContactClass& cClass,
@@ -101,8 +99,7 @@ namespace contactModel
         prtContactVars& prtCntVars
     );
 
-    template <contactType cT, contactType tT>
-    void getPrtContactVars(
+    void getPrtContactVars_ArbShape(
         const fvMesh&   mesh,
         ibContactClass& cClass,
         ibContactClass& tClass,
@@ -125,8 +122,15 @@ namespace contactModel
         vector contactCenter
     );
 
-    template <>
-    void getPrtContactVars  <sphere,sphere>
+    void getPrtContactVars_Sphere
+    (
+        const fvMesh&   mesh,
+        ibContactClass& cClass,
+        ibContactClass& tClass,
+        prtContactVars& prtCntVars
+    );
+
+    void getPrtContactVars_Cluster
     (
         const fvMesh&   mesh,
         ibContactClass& cClass,
@@ -144,12 +148,6 @@ namespace contactModel
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#ifdef NoRepository
-    #include "prtContact.C"
-#endif
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

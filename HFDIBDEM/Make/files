@@ -10,6 +10,9 @@ contactModels/wallContactVars.C
 contactModels/ibContactClass.C
 contactModels/prtContactInfo.C
 contactModels/wallContactInfo.C
+contactModels/prtContact.C
+contactModels/wallContact.C
+contactModels/cyclicContact.C
 addModels/addModel.C
 addModels/addModelOnce.C
 addModels/addModelOnceScatter.C

@@ -52,7 +52,7 @@ void detectWallContact(
 
     if(wallCntInfo.getcClass().getGeomModel().getcType() == sphere)
     {
-        detectWallContact<sphere>
+        detectWallContact_Sphere
         (
             mesh,
             wallCntInfo
@@ -60,7 +60,7 @@ void detectWallContact(
     }
     else if(wallCntInfo.getcClass().getGeomModel().getcType() == cluster)
     {
-        detectWallContact<cluster>
+        detectWallContact_Cluster
         (
             mesh,
             wallCntInfo
@@ -68,15 +68,15 @@ void detectWallContact(
     }
     else
     {
-        detectWallContact<arbShape>(
+        detectWallContact_ArbShape
+        (
             mesh,
             wallCntInfo
         );
     }
 }
 //---------------------------------------------------------------------------//
-template <contactType cT>
-void detectWallContact(
+void detectWallContact_ArbShape(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo
 )
@@ -143,8 +143,7 @@ void detectWallContact(
     }
 }
 //---------------------------------------------------------------------------//
-template <>
-void detectWallContact <sphere>(
+void detectWallContact_Sphere(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo
 )
@@ -208,8 +207,7 @@ void detectWallContact <sphere>(
     }
 }
 //---------------------------------------------------------------------------//
-template <>
-void detectWallContact <cluster>(
+void detectWallContact_Cluster(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo
 )
@@ -256,7 +254,7 @@ void getWallContactVars(
 {
     if(wallCntInfo.getcClass().getGeomModel().getcType() == sphere)
     {
-        getWallContactVars<sphere>
+        getWallContactVars_Sphere
         (
             mesh,
             wallCntInfo,
@@ -266,7 +264,7 @@ void getWallContactVars(
     }
     else if(wallCntInfo.getcClass().getGeomModel().getcType() == cluster)
     {
-        getWallContactVars<cluster>
+        getWallContactVars_Cluster
         (
             mesh,
             wallCntInfo,
@@ -276,7 +274,8 @@ void getWallContactVars(
     }
     else
     {
-        getWallContactVars<arbShape>(
+        getWallContactVars_ArbShape
+        (
             mesh,
             wallCntInfo,
             deltaT
@@ -285,8 +284,7 @@ void getWallContactVars(
     }
 }
 //---------------------------------------------------------------------------//
-template <contactType cT>
-void getWallContactVars(
+void getWallContactVars_ArbShape(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo,
     const scalar deltaT
@@ -450,7 +448,7 @@ void getWallContactVars(
 
             wallCntVars.contactArea_ = area[cntI];
             wallCntVars.contactCenter_ = center[cntI];
-            wallCntVars.contactVolume_ = getInterVolume<cT>
+            wallCntVars.contactVolume_ = getInterVolume_ArbShape
             (
                 mesh,
                 wallCntInfo.getcClass(),
@@ -570,8 +568,7 @@ DynamicList<Tuple2<label,string>> getContactFacesArbShape
     return facesReturnList;
 }
 //---------------------------------------------------------------------------//
-template <>
-void getWallContactVars <sphere>(
+void getWallContactVars_Sphere(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo,
     const scalar deltaT
@@ -710,7 +707,7 @@ void getWallContactVars <sphere>(
             nVec,
             bPoint
         );
-        wallCntVars.contactVolume_ = getInterVolume<sphere>
+        wallCntVars.contactVolume_ = getInterVolume_Sphere
         (
             mesh,
             wallCntInfo.getcClass(),
@@ -811,8 +808,7 @@ DynamicList<Tuple2<label,string>> getContactFacesSphere
     return facesReturnList;
 }
 //---------------------------------------------------------------------------//
-template <>
-void getWallContactVars <cluster>(
+void getWallContactVars_Cluster(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo,
     const scalar deltaT
@@ -949,9 +945,7 @@ void solveWallContact
     wallCntInfo.getOutForce().T = cLVecOut ^  outF;
 }
 //---------------------------------------------------------------------------//
-template <contactType cT>
-scalar
-getInterVolume(
+scalar getInterVolume_ArbShape(
     const fvMesh&   mesh,
     ibContactClass& cClass,
     ibContactVars& cVars,
@@ -962,9 +956,7 @@ getInterVolume(
     return (cVars.M0_-cVars.M_)/(cVars.rhoS_.value() + SMALL);
 }
 //---------------------------------------------------------------------------//
-template <>
-scalar
-getInterVolume <sphere>(
+scalar getInterVolume_Sphere(
     const fvMesh&   mesh,
     ibContactClass& cClass,
     ibContactVars& cVars,

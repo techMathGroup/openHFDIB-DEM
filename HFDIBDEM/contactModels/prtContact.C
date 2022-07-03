@@ -56,7 +56,7 @@ bool detectPrtPrtContact(
         tClass.getGeomModel().getcType() == sphere
     )
     {
-        return detectPrtPrtContact<sphere,sphere>
+        return detectPrtPrtContact_Sphere
         (
             mesh,
             cClass,
@@ -70,7 +70,7 @@ bool detectPrtPrtContact(
         tClass.getGeomModel().getcType() == cluster
     )
     {
-        return detectPrtPrtContact<cluster,cluster>
+        return detectPrtPrtContact_Cluster
         (
             mesh,
             cClass,
@@ -79,7 +79,8 @@ bool detectPrtPrtContact(
     }
     else
     {
-        return detectPrtPrtContact<arbShape,arbShape>(
+        return detectPrtPrtContact_ArbShape
+        (
             mesh,
             cClass,
             tClass
@@ -87,9 +88,7 @@ bool detectPrtPrtContact(
     }
 }
 //---------------------------------------------------------------------------//
-template <contactType cT, contactType tT>
-bool
-detectPrtPrtContact(
+bool detectPrtPrtContact_ArbShape(
     const fvMesh&   mesh,
     ibContactClass& cClass,
     ibContactClass& tClass
@@ -194,8 +193,26 @@ detectPrtPrtContact(
     return false;
 }
 //---------------------------------------------------------------------------//
-template <>
-bool detectPrtPrtContact <cluster,cluster>
+bool detectPrtPrtContact_Sphere
+(
+    const fvMesh&   mesh,
+    ibContactClass& cClass,
+    ibContactClass& tClass
+)
+{
+    if
+    (
+        mag(cClass.getGeomModel().getCoM()-tClass.getGeomModel().getCoM())
+        <
+        ((cClass.getGeomModel().getDC() / 2) + (tClass.getGeomModel().getDC() / 2))
+    )
+    {
+        return true;
+    }
+    return false;
+}
+//---------------------------------------------------------------------------//
+bool detectPrtPrtContact_Cluster
 (
     const fvMesh&   mesh,
     ibContactClass& cClass,
@@ -262,28 +279,7 @@ bool detectPrtPrtContact <cluster,cluster>
     return false;
 }
 //---------------------------------------------------------------------------//
-template <>
-bool detectPrtPrtContact <sphere,sphere>
-(
-    const fvMesh&   mesh,
-    ibContactClass& cClass,
-    ibContactClass& tClass
-)
-{
-    if
-    (
-        mag(cClass.getGeomModel().getCoM()-tClass.getGeomModel().getCoM())
-        <
-        ((cClass.getGeomModel().getDC() / 2) + (tClass.getGeomModel().getDC() / 2))
-    )
-    {
-        return true;
-    }
-    return false;
-}
-//---------------------------------------------------------------------------//
-template <contactType cT, contactType tT>
-void getPrtContactVars(
+void getPrtContactVars_ArbShape(
     const fvMesh&   mesh,
     ibContactClass& cClass,
     ibContactClass& tClass,
@@ -810,8 +806,7 @@ Tuple2<scalar,vector>  get2DcontactVars(
     return returnValue;
 }
 //---------------------------------------------------------------------------//
-template<>
-void getPrtContactVars<sphere,sphere>
+void getPrtContactVars_Sphere
 (
     const fvMesh&   mesh,
     ibContactClass& cClass,
@@ -885,8 +880,7 @@ void getPrtContactVars<sphere,sphere>
     }
 }
 //---------------------------------------------------------------------------//
-template<>
-void getPrtContactVars<cluster,cluster>
+void getPrtContactVars_Cluster
 (
     const fvMesh&   mesh,
     ibContactClass& cClass,
@@ -978,7 +972,7 @@ void getPrtContactVars
         tClass.getGeomModel().getcType() == sphere
     )
     {
-        getPrtContactVars<sphere,sphere>(
+        getPrtContactVars_Sphere(
             mesh,
             cClass,
             tClass,
@@ -992,7 +986,7 @@ void getPrtContactVars
         tClass.getGeomModel().getcType() == cluster
     )
     {
-        getPrtContactVars<cluster,cluster>(
+        getPrtContactVars_Cluster(
             mesh,
             cClass,
             tClass,
@@ -1001,7 +995,7 @@ void getPrtContactVars
     }
     else
     {
-        getPrtContactVars<arbShape,arbShape>(
+        getPrtContactVars_ArbShape(
             mesh,
             cClass,
             tClass,
