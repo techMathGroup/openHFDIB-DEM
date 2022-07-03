@@ -64,25 +64,25 @@ namespace contactModel
     typedef DynamicList<vector> DynamicVectorList;
     typedef DynamicList<point>  DynamicPointList;
 
-    void detectWallContact
+    bool detectWallContact
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo
     );
 
-    void detectWallContact_ArbShape
+    bool detectWallContact_ArbShape
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo
     );
 
-    void detectWallContact_Sphere
+    bool detectWallContact_Sphere
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo
     );
 
-    void detectWallContact_Cluster
+    bool detectWallContact_Cluster
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo

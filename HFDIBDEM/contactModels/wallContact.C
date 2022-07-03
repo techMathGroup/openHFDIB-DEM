@@ -43,7 +43,7 @@ namespace contactModel
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 //---------------------------------------------------------------------------//
-void detectWallContact(
+bool detectWallContact(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo
 )
@@ -52,7 +52,7 @@ void detectWallContact(
 
     if(wallCntInfo.getcClass().getGeomModel().getcType() == sphere)
     {
-        detectWallContact_Sphere
+        return detectWallContact_Sphere
         (
             mesh,
             wallCntInfo
@@ -60,7 +60,7 @@ void detectWallContact(
     }
     else if(wallCntInfo.getcClass().getGeomModel().getcType() == cluster)
     {
-        detectWallContact_Cluster
+        return detectWallContact_Cluster
         (
             mesh,
             wallCntInfo
@@ -68,7 +68,7 @@ void detectWallContact(
     }
     else
     {
-        detectWallContact_ArbShape
+        return detectWallContact_ArbShape
         (
             mesh,
             wallCntInfo
@@ -76,7 +76,7 @@ void detectWallContact(
     }
 }
 //---------------------------------------------------------------------------//
-void detectWallContact_ArbShape(
+bool detectWallContact_ArbShape(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo
 )
@@ -138,12 +138,12 @@ void detectWallContact_ArbShape(
 
     if(inContact)
     {
-        wallCntInfo.getcClass().setWallContact(true);
-        wallCntInfo.getcClass().inContactWithStatic(true);
+        return true;
     }
+    return false;
 }
 //---------------------------------------------------------------------------//
-void detectWallContact_Sphere(
+bool detectWallContact_Sphere(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo
 )
@@ -202,12 +202,12 @@ void detectWallContact_Sphere(
 
     if(inContact)
     {
-        wallCntInfo.getcClass().setWallContact(true);
-        wallCntInfo.getcClass().inContactWithStatic(true);
+        return true;
     }
+    return false;
 }
 //---------------------------------------------------------------------------//
-void detectWallContact_Cluster(
+bool detectWallContact_Cluster(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo
 )
@@ -229,21 +229,21 @@ void detectWallContact_Cluster(
             wallCntInfo.getMatInterAdh()
         ));
 
-        detectWallContact(
+        if(detectWallContact(
             mesh,
             cWallCntI()
-        );
+        ))
+        {
+            cWallCntI->getcClass().setWallContact(true);
+            cWallCntI->getcClass().inContactWithStatic(true);
+        }
 
         if(cWallCntI().getcClass().checkWallContact())
         {
-            wallCntInfo.getcClass().setWallContact(true);
-        }
-
-        if(cWallCntI().getcClass().checkInContactWithStatic())
-        {
-            wallCntInfo.getcClass().inContactWithStatic(true);
+            return true;
         }
     }
+    return false;
 }
 //---------------------------------------------------------------------------//
 void getWallContactVars(
