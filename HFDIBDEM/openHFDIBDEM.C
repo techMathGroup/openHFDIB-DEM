@@ -590,11 +590,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     if(detectWallContact
                     (
                         mesh_,
-                        cIb.getWallCntInfo()
+                        cIb.getibContactClass()
                     ))
                     {
-                        cIb.getWallCntInfo().getcClass().setWallContact(true);
-                        cIb.getWallCntInfo().getcClass().inContactWithStatic(true);
+                        cIb.getibContactClass().setWallContact(true);
+                        cIb.getibContactClass().inContactWithStatic(true);
                     }
                     // solve wall contact
                     if (cIb.checkWallContact())
