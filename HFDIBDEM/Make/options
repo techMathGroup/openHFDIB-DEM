@@ -5,7 +5,7 @@ EXE_INC = \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
     -I$(LIB_SRC)/mesh/blockMesh/lnInclude \
     -I$(MPI_ARCH_PATH)/include \
-    -I./addModels/lnInclude
+    -I./lnInclude
 
 
 LIB_LIBS = \
