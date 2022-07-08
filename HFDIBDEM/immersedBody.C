@@ -616,18 +616,19 @@ void immersedBody::moveImmersedBody
             eulerAngles.z() = 0.0;
         }
 
-        InfoH << iB_Info;
-        InfoH << "-- body " << bodyId_ << " linear velocity      :  " << Vel_ << endl;
-        InfoH << "-- body " << bodyId_ << " angluar velocity     : " << omega_ << endl;
-        InfoH << "-- body " << bodyId_ << " axis of rotation     : " << Axis_ << endl;
-        InfoH << "-- body " << bodyId_ << " total rotation matrix: " << totRotMatrix_ << endl;
-        InfoH << "-- body " << bodyId_ << " total euler angles   : " << eulerAngles << endl;
-
         geomModel_->bodyRotatePoints(angle,Axis_);
         geomModel_->bodyMovePoints(transIncr);
     }
 
     geomModel_->synchronPos();
+
+    InfoH << iB_Info;
+    InfoH << "-- body " << bodyId_ << " CoM                  : " << geomModel_->getCoM() << endl;
+    InfoH << "-- body " << bodyId_ << " linear velocity      : " << Vel_ << endl;
+    InfoH << "-- body " << bodyId_ << " angluar velocity     : " << omega_ << endl;
+    InfoH << "-- body " << bodyId_ << " axis of rotation     : " << Axis_ << endl;
+    InfoH << "-- body " << bodyId_ << " total rotation matrix: " << totRotMatrix_ << endl;
+
     // update bounds of the body
     boundBox bound(geomModel_->getBounds());
     minBoundPoint_ = bound.min();
