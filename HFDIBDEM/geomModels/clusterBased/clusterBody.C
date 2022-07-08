@@ -158,6 +158,11 @@ void clusterBody::bodyRotatePoints
     }
 }
 //---------------------------------------------------------------------------//
+vector clusterBody::getCoM()
+{    
+    return ibGeomModelList[0].getCoM();
+}
+//---------------------------------------------------------------------------//
 boundBox clusterBody::getBounds()
 {
     DynamicPointList allBounds;
@@ -269,8 +274,8 @@ scalar& clusterBody::getM0()
 //---------------------------------------------------------------------------//
 vector clusterBody::getLVec(const point& toPoint)
 {
-    DynamicPointList closestPoints(ibGeomModelList.size());
-    DynamicVectorList  closestNormals(ibGeomModelList.size());
+    List<point> closestPoints(ibGeomModelList.size());
+    List<vector> closestNormals(ibGeomModelList.size());
 
     forAll(ibGeomModelList, ibI)
     {

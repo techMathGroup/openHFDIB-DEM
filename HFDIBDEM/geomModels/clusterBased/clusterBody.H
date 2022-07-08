@@ -140,6 +140,7 @@ namespace Foam
             vector axisOfRot
         ) final override;
 
+        vector getCoM() final override;
 
         boundBox getBounds() final override;
 
