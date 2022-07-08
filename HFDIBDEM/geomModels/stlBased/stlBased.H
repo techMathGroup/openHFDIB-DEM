@@ -87,16 +87,6 @@ namespace Foam
                 << "notIplemented"<<endl;
         }
 
-        virtual bool canAddBody
-        (
-            const volScalarField& body
-        )
-        {
-            InfoH << iB_Info << "-- geomModelMessage-- "
-                << "notIplemented"<<endl;
-            return false;
-        }
-
         virtual geomModel* getGeomModel() = 0;
 
         vector addModelReturnRandomPosition(

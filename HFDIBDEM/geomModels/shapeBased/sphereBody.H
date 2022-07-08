@@ -102,11 +102,6 @@ namespace Foam
 
         // Public methods ----------------------------------------------
 
-        bool canAddBody
-        (
-            const volScalarField& body
-        ) final override;
-
         void createImmersedBody
         (
             volScalarField& body,
