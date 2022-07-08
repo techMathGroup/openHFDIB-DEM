@@ -59,7 +59,6 @@ class addModelRepeatSamePosition
     const dictionary&       addModelDict_;
     word                    addMode_;
     bool                    bodyAdded_;
-    autoPtr<geomModel> geomModel_;
 
     const dictionary&       coeffsDict_;
     label                   useNTimes_;
@@ -87,7 +86,7 @@ class addModelRepeatSamePosition
 
     geomModel* addBody(
         const volScalarField& body,
-        const PtrList<immersedBody>& immersedBodies        
+        PtrList<immersedBody>& immersedBodies        
         );
 
     bool checkIfAdd()

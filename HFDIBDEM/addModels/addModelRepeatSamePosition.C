@@ -42,11 +42,10 @@ addModelRepeatSamePosition::addModelRepeatSamePosition
     List<labelList>& cellPoints
 )
 :
-addModel(mesh, cellPoints),
+addModel(mesh, bodyGeomModel, cellPoints),
 addModelDict_(addModelDict),
 addMode_(word(addModelDict_.lookup("addModel"))),
 bodyAdded_(false),
-geomModel_(bodyGeomModel),
 coeffsDict_(addModelDict_.subDict(addMode_+"Coeffs")),
 useNTimes_(readLabel(coeffsDict_.lookup("useNTimes"))),
 timeBetweenUsage_(readScalar(coeffsDict_.lookup("timeBetweenUsage"))),
@@ -87,10 +86,18 @@ bool addModelRepeatSamePosition::shouldAddBody(const volScalarField& body)
 geomModel* addModelRepeatSamePosition::addBody
 (
     const volScalarField& body,
-    const PtrList<immersedBody>& immersedBodies   
+    PtrList<immersedBody>& immersedBodies   
 )
 {
-    bool canAddBodyI(geomModel_->canAddBody(body));
+    volScalarField helpBodyField_ = body;
+    geomModel_->createImmersedBody(
+        helpBodyField_,
+        octreeField_,
+        cellPoints_
+    );
+
+    bool canAddBodyI = !isBodyInContact(immersedBodies);
+
     reduce(canAddBodyI, andOp<bool>());
 
     bodyAdded_ = canAddBodyI;

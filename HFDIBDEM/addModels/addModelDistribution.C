@@ -43,11 +43,10 @@ addModelDistribution::addModelDistribution
     List<labelList>& cellPoints
 )
 :
-addModel(mesh, cellPoints),
+addModel(mesh, bodyGeomModel, cellPoints),
 addModelDict_(addModelDict),
 addMode_(word(addModelDict_.lookup("addModel"))),
 bodyAdded_(false),
-geomModel_(bodyGeomModel),
 distributionDict_
 (
     IOobject
@@ -250,7 +249,7 @@ bool addModelDistribution::shouldAddBody(const volScalarField& body)
 geomModel* addModelDistribution::addBody
 (
     const volScalarField& body,
-    const PtrList<immersedBody>& immersedBodies   
+    PtrList<immersedBody>& immersedBodies   
 )
 {
     bodyAdditionAttemptCounter_++;
@@ -276,7 +275,15 @@ geomModel* addModelDistribution::addBody
     vector randomTrans = geomModel_->addModelReturnRandomPosition(allActiveCellsInMesh_,cellZoneBounds_,randGen_);
     geomModel_->bodyMovePoints(randomTrans);
     // check if the body can be added
-    bool canAddBodyI(geomModel_->canAddBody(body));
+    volScalarField helpBodyField_ = body;
+    geomModel_->createImmersedBody(
+        helpBodyField_,
+        octreeField_,
+        cellPoints_
+    );
+
+    bool canAddBodyI = !isBodyInContact(immersedBodies);
+
     reduce(canAddBodyI, andOp<bool>());
     bodyAdded_ = (canAddBodyI);
 

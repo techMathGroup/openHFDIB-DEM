@@ -37,3 +37,61 @@ using namespace Foam;
 addModel::~addModel()
 {
 }
+//---------------------------------------------------------------------------//
+bool addModel::isBodyInContact(PtrList<immersedBody>& immersedBodies)
+{
+    autoPtr<materialInfo> cMatInfo(new  materialInfo(
+            "None",
+            0, 0, 0, 0, 0
+    ));
+
+    autoPtr<ibContactClass> cIbClass(new ibContactClass(
+        geomModel_,
+        cMatInfo()
+    ));
+
+    bool inContact = contactModel::detectWallContact(
+        mesh_,
+        cIbClass()
+    );
+
+    if(!inContact)
+    {
+        forAll(immersedBodies, ibI)
+        {
+            bool bBoxContact = true;
+            boundBox ibIbBox = immersedBodies[ibI].getGeomModel().getBounds();
+            boundBox cbBox = geomModel_->getBounds();
+
+            forAll(geometricD,dir)
+            {
+                if(geometricD[dir] == 1)
+                {
+                    if(!(ibIbBox.max()[dir] >= cbBox.min()[dir]
+                        && ibIbBox.min()[dir] <= cbBox.max()[dir]))
+                    {
+                        bBoxContact = false;
+                        break;
+                    }
+                }
+            }
+
+            if(!bBoxContact)
+            {
+                continue;
+            }
+
+            if(contactModel::detectPrtPrtContact(
+                mesh_,
+                cIbClass(),
+                immersedBodies[ibI].getibContactClass()
+            ))
+            {
+                inContact = true;
+                break;
+            }
+        }
+    }
+
+    return inContact;
+}

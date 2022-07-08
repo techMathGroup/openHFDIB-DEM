@@ -61,8 +61,6 @@ class addModelRepeatRandomPosition
     word                        addMode_;
     bool                        bodyAdded_;
 
-    autoPtr<geomModel> geomModel_;
-
     const dictionary&   coeffsDict_;
 
 	word			    addDomain_;
@@ -144,7 +142,7 @@ class addModelRepeatRandomPosition
 
     geomModel* addBody(
         const volScalarField& body,
-        const PtrList<immersedBody>& immersedBodies        
+        PtrList<immersedBody>& immersedBodies        
         );
 
 	scalar returnRandomAngle();

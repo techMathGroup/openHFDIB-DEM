@@ -61,7 +61,6 @@ class addModelDistribution
     const dictionary&           addModelDict_;
     word                        addMode_;
     bool                        bodyAdded_;
-    autoPtr<geomModel> geomModel_;
 
     IOdictionary           distributionDict_;
     const scalarList       distribution_;
@@ -137,7 +136,7 @@ class addModelDistribution
 
     geomModel* addBody(
         const volScalarField& body,
-        const PtrList<immersedBody>& immersedBodies        
+        PtrList<immersedBody>& immersedBodies        
         );
 
     Tuple2<label, scalar> returnScaleFactor();

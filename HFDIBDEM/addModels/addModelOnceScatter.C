@@ -44,12 +44,11 @@ addModelOnceScatter::addModelOnceScatter
     List<labelList>& cellPoints
 )
 :
-addModel(mesh, cellPoints),
+addModel(mesh, bodyGeomModel, cellPoints),
 addModelDict_(addModelDict),
 addMode_(word(addModelDict_.lookup("addModel"))),
 bodyAdded_(false),
 finishedAddition_(false),
-geomModel_(bodyGeomModel),
 
 coeffsDict_(addModelDict_.subDict(addMode_+"Coeffs")),
 
@@ -309,7 +308,7 @@ bool addModelOnceScatter::shouldAddBody(const volScalarField& body)
 geomModel* addModelOnceScatter::addBody
 (
     const   volScalarField& body,
-    const PtrList<immersedBody>& immersedBodies
+    PtrList<immersedBody>& immersedBodies
 )
 {
     geomModel_->resetBody();
@@ -346,15 +345,15 @@ geomModel* addModelOnceScatter::addBody
     geomModel_->bodyMovePoints(randomTrans);
 
     // check if the body can be added
-    // bool canAddBodyI(geomModel_->canAddBody(body));
     volScalarField helpBodyField_ = body;
     geomModel_->createImmersedBody(
         helpBodyField_,
         octreeField_,
         cellPoints_
     );
-    // bool canAddBodyI = contactModel::detectPrtPrtContact()
-    bool canAddBodyI = true;
+
+    bool canAddBodyI = !isBodyInContact(immersedBodies);
+
     reduce(canAddBodyI, andOp<bool>());
     bodyAdded_ = (canAddBodyI);
 

@@ -43,11 +43,10 @@ addModelOnce::addModelOnce
     List<labelList>& cellPoints
 )
 :
-addModel(mesh, cellPoints),
+addModel(mesh, bodyGeomModel, cellPoints),
 addModelDict_(addModelDict),
 addMode_(word(addModelDict_.lookup("addModel"))),
-bodyAdded_(false),
-geomModel_(bodyGeomModel)
+bodyAdded_(false)
 {
     if(!startTime0)
         bodyAdded_ = true;
@@ -61,10 +60,18 @@ addModelOnce::~addModelOnce()
 geomModel* addModelOnce::addBody
 (
     const volScalarField& body,
-    const PtrList<immersedBody>& immersedBodies  
+    PtrList<immersedBody>& immersedBodies  
 )
 {
-    bool canAddBodyI(geomModel_().canAddBody(body));
+    volScalarField helpBodyField_ = body;
+    geomModel_->createImmersedBody(
+        helpBodyField_,
+        octreeField_,
+        cellPoints_
+    );
+
+    bool canAddBodyI = !isBodyInContact(immersedBodies);
+
     reduce(canAddBodyI, andOp<bool>());
 
     //bodyAdded_ = canAddBodyI;

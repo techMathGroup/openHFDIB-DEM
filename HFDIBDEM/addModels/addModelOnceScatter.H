@@ -61,8 +61,6 @@ class addModelOnceScatter
     bool                        bodyAdded_;
     bool                        finishedAddition_;
 
-    autoPtr<geomModel> geomModel_;
-
     const dictionary&   coeffsDict_;
 
 	word			    addDomain_;
@@ -147,7 +145,7 @@ class addModelOnceScatter
 
     geomModel* addBody(
         const volScalarField& body,
-        const PtrList<immersedBody>& immersedBodies        
+        PtrList<immersedBody>& immersedBodies        
         );
 
 	scalar returnRandomAngle();

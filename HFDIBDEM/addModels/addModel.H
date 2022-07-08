@@ -51,13 +51,14 @@ Contributors
 #include "clusterBody.H"
 
 #include "contactModel.H"
+#include "immersedBody.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-class immersedBody;
+// class immersedBody;
 
 /*---------------------------------------------------------------------------*\
                           Class addModel Declaration
@@ -73,14 +74,20 @@ class addModel
     const  fvMesh&       mesh_;
     List<labelList>& cellPoints_;
     Field<label> octreeField_;
+    autoPtr<geomModel> geomModel_;
 
     public:
 
     // Constructors ------------------------------------------------
-    addModel(const fvMesh& mesh, List<labelList>& cellPoints)
+    addModel(
+        const fvMesh& mesh,
+        geomModel* bodyGeomModel,
+        List<labelList>& cellPoints
+    )
     :
     mesh_(mesh),
-    cellPoints_(cellPoints)
+    cellPoints_(cellPoints),
+    geomModel_(bodyGeomModel)
     {
         octreeField_ = Field<label>(mesh_.nCells(), 0);
     }
@@ -113,24 +120,10 @@ class addModel
 
     virtual geomModel* addBody(
         const volScalarField& body,
-        const PtrList<immersedBody>& immersedBodies
+        PtrList<immersedBody>& immersedBodies
         ) = 0;
     // Note: needs to provide a properly scaled/oriented/translated
     //       triSurface that will be used for IB initialization
-
-    virtual bool canAddBody
-    (
-        const volScalarField& body,
-        const triSurfaceMesh& bodySurfMesh
-    )
-    {
-        InfoH << addModel_Info << "-- addModelMessage-- "
-            << "notIplemented"<<endl;
-        return false;
-    }
-    // Note: auxiliary function to be called from addBody during the
-    //       body addition (check if the body can be added to the
-    //       current position)
 
     // -- getters
     virtual word getAddMode()
@@ -154,6 +147,8 @@ class addModel
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "notIplemented"<<endl;
     }
+
+    bool isBodyInContact(PtrList<immersedBody>& immersedBodies);
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

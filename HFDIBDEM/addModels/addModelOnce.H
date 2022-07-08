@@ -59,7 +59,6 @@ class addModelOnce
     const dictionary&       addModelDict_;
     word                    addMode_;
     bool                    bodyAdded_;
-    autoPtr<geomModel> geomModel_;
 
     public:
 
@@ -85,7 +84,7 @@ class addModelOnce
 
     geomModel* addBody(
         const volScalarField& body,
-        const PtrList<immersedBody>& immersedBodies        
+        PtrList<immersedBody>& immersedBodies        
         );
 
     bool getBodyAdded()
