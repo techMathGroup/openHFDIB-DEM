@@ -45,25 +45,25 @@ namespace contactModel
 //---------------------------------------------------------------------------//
 bool detectWallContact(
     const fvMesh&   mesh,
-    wallContactInfo& wallCntInfo
+    ibContactClass& ibClass
 )
 {
-    wallCntInfo.getcClass().setWallContact(false);
+    ibClass.setWallContact(false);
 
-    if(wallCntInfo.getcClass().getGeomModel().getcType() == sphere)
+    if(ibClass.getGeomModel().getcType() == sphere)
     {
         return detectWallContact_Sphere
         (
             mesh,
-            wallCntInfo
+            ibClass
         );
     }
-    else if(wallCntInfo.getcClass().getGeomModel().getcType() == cluster)
+    else if(ibClass.getGeomModel().getcType() == cluster)
     {
         return detectWallContact_Cluster
         (
             mesh,
-            wallCntInfo
+            ibClass
         );
     }
     else
@@ -71,14 +71,14 @@ bool detectWallContact(
         return detectWallContact_ArbShape
         (
             mesh,
-            wallCntInfo
+            ibClass
         );
     }
 }
 //---------------------------------------------------------------------------//
 bool detectWallContact_ArbShape(
     const fvMesh&   mesh,
-    wallContactInfo& wallCntInfo
+    ibContactClass& ibClass
 )
 {
     bool inContact = false;
@@ -86,7 +86,7 @@ bool detectWallContact_ArbShape(
     label nCells = mesh.nCells();
 
     List<DynamicLabelList> contactFaces;
-    List<DynamicLabelList>& surfCells(wallCntInfo.getcClass().getSurfCells());
+    List<DynamicLabelList>& surfCells(ibClass.getSurfCells());
 
     // go through all surfCells and check if there is any surfCell whose face is a boundary face
     forAll (surfCells[Pstream::myProcNo()],sCellI)
@@ -118,7 +118,7 @@ bool detectWallContact_ArbShape(
 
                         forAll(facePoints,pointI)
                         {
-                            if(wallCntInfo.getcClass().getGeomModel().pointInside(mesh.points()[facePoints[pointI]]))
+                            if(ibClass.getGeomModel().pointInside(mesh.points()[facePoints[pointI]]))
                             {
                                 inContact = true;
                                 break;
@@ -145,15 +145,15 @@ bool detectWallContact_ArbShape(
 //---------------------------------------------------------------------------//
 bool detectWallContact_Sphere(
     const fvMesh&   mesh,
-    wallContactInfo& wallCntInfo
+    ibContactClass& ibClass
 )
 {
-    scalar cRadius(wallCntInfo.getcClass().getGeomModel().getDC() / 2);
-    vector cCenter(wallCntInfo.getcClass().getGeomModel().getCoM());
+    scalar cRadius(ibClass.getGeomModel().getDC() / 2);
+    vector cCenter(ibClass.getGeomModel().getCoM());
 
     label nCells = mesh.nCells();
 
-    List<DynamicLabelList>& surfCells(wallCntInfo.getcClass().getSurfCells());
+    List<DynamicLabelList>& surfCells(ibClass.getSurfCells());
     bool inContact = false;
 
     // go through all surfCells and check if there is any surfCell whose face is a boundary face
@@ -209,10 +209,10 @@ bool detectWallContact_Sphere(
 //---------------------------------------------------------------------------//
 bool detectWallContact_Cluster(
     const fvMesh&   mesh,
-    wallContactInfo& wallCntInfo
+    ibContactClass& ibClass
 )
 {
-    clusterBody& cCluster = dynamic_cast<clusterBody&>(wallCntInfo.getcClass().getGeomModel());
+    clusterBody& cCluster = dynamic_cast<clusterBody&>(ibClass.getGeomModel());
     PtrList<geomModel>& cBodies = cCluster.getClusterBodies();
 
     forAll(cBodies, cIbI)
@@ -220,25 +220,19 @@ bool detectWallContact_Cluster(
         autoPtr<geomModel> cGeomModel(cBodies[cIbI].getGeomModel());
         autoPtr<ibContactClass> cIbClassI(new ibContactClass(
             cGeomModel,
-            wallCntInfo.getcClass().getMatInfo()
-        ));
-        autoPtr<wallContactInfo> cWallCntI(new wallContactInfo(
-            cIbClassI(),
-            wallCntInfo.getcVars(),
-            wallCntInfo.getWInfos(),
-            wallCntInfo.getMatInterAdh()
+            ibClass.getMatInfo()
         ));
 
         if(detectWallContact(
             mesh,
-            cWallCntI()
+            cIbClassI()
         ))
         {
-            cWallCntI->getcClass().setWallContact(true);
-            cWallCntI->getcClass().inContactWithStatic(true);
+            cIbClassI->setWallContact(true);
+            cIbClassI->inContactWithStatic(true);
         }
 
-        if(cWallCntI().getcClass().checkWallContact())
+        if(cIbClassI->checkWallContact())
         {
             return true;
         }

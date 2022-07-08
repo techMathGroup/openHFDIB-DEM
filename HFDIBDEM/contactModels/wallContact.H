@@ -67,25 +67,25 @@ namespace contactModel
     bool detectWallContact
     (
         const fvMesh&   mesh,
-        wallContactInfo& wallCntInfo
+        ibContactClass& ibClass
     );
 
     bool detectWallContact_ArbShape
     (
         const fvMesh&   mesh,
-        wallContactInfo& wallCntInfo
+        ibContactClass& ibClass
     );
 
     bool detectWallContact_Sphere
     (
         const fvMesh&   mesh,
-        wallContactInfo& wallCntInfo
+        ibContactClass& ibClass
     );
 
     bool detectWallContact_Cluster
     (
         const fvMesh&   mesh,
-        wallContactInfo& wallCntInfo
+        ibContactClass& ibClass
     );
 
     void getWallContactVars

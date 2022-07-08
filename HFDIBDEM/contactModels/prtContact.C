@@ -207,8 +207,10 @@ bool detectPrtPrtContact_Sphere
         ((cClass.getGeomModel().getDC() / 2) + (tClass.getGeomModel().getDC() / 2))
     )
     {
+        Info << "There is prt prt contact" << endl;
         return true;
     }
+    Info << "There is NOT prt prt contact" << endl;
     return false;
 }
 //---------------------------------------------------------------------------//
@@ -1025,6 +1027,9 @@ bool solvePrtContact(
     InfoH << DEM_Info << "-- Detected Particle-particle contact: -- body "
             << cInfo.getcPair().first() << " & -- body "
             << cInfo.getcPair().second() << endl;
+    InfoH << DEM_Info << "-- Particle-particle contact cBody pos: "
+            << cInfo.getcClass().getGeomModel().getCoM() << " & tBody pos: "
+            << cInfo.gettClass().getGeomModel().getCoM() << endl;
     InfoH << DEM_Info << "-- Particle-particle contact center "
             << cInfo.getprtCntVars().contactCenter_ << endl;
     InfoH << DEM_Info << "-- Particle-particle contact normal "
