@@ -207,10 +207,8 @@ bool detectPrtPrtContact_Sphere
         ((cClass.getGeomModel().getDC() / 2) + (tClass.getGeomModel().getDC() / 2))
     )
     {
-        Info << "There is prt prt contact" << endl;
         return true;
     }
-    Info << "There is NOT prt prt contact" << endl;
     return false;
 }
 //---------------------------------------------------------------------------//
