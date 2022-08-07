@@ -61,6 +61,16 @@ if (mesh_.nGeometricD() < 3)
             {
                 Vel_ = immersedDict_.subDict("fullyCoupledBody").lookup("velocity");
             }
+            if(immersedDict_.subDict("fullyCoupledBody").found("axis"))
+            {            
+                Axis_ = immersedDict_.subDict("fullyCoupledBody").lookup("axis");
+            }
+            if(immersedDict_.subDict("fullyCoupledBody").found("omega"))
+            {
+                omega_  = readScalar(
+                    immersedDict_.subDict("fullyCoupledBody").lookup("omega")
+                );
+            }
         }
 
         InfoH << iB_Info << bodyName_ << " is fully coupled with fluid phase." << endl;
