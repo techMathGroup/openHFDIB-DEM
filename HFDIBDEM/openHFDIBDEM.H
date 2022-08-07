@@ -57,6 +57,7 @@ Contributors
 
 #include "addModel.H"
 #include "addModelOnce.H"
+#include "addModelOnceFromFile.H"
 #include "addModelOnceScatter.H"
 #include "addModelRepeatSamePosition.H"
 #include "addModelRepeatRandomPosition.H"

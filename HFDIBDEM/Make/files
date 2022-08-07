@@ -15,6 +15,7 @@ contactModels/wallContact.C
 contactModels/cyclicContact.C
 addModels/addModel.C
 addModels/addModelOnce.C
+addModels/addModelOnceFromFile.C
 addModels/addModelOnceScatter.C
 addModels/addModelRepeatSamePosition.C
 addModels/addModelRepeatRandomPosition.C

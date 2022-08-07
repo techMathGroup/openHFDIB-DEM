@@ -72,6 +72,21 @@
                 )
             );
         }
+        else if (howToAdd == "onceFromFile")
+        {
+            addModels_.set
+            (
+                nameI,
+                new addModelOnceFromFile
+                (
+                    addModelDict,
+                    mesh_,
+                    startTime0,
+                    bodyGeomModel.ptr(),
+                    cellPoints_
+                )
+            );
+        }
         else if (howToAdd == "onceScatter")
         {
             addModels_.set
