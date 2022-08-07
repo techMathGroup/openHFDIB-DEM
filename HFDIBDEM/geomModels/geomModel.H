@@ -342,11 +342,6 @@ namespace Foam
             return rhoS_;
         }
 
-        const vector& getCoM()  const
-        {
-            return CoM_;
-        }
-
         virtual vector getLVec(const point& toPoint)
         {
             return toPoint - CoM_;

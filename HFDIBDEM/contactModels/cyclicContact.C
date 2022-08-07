@@ -51,6 +51,7 @@ bool detectCyclicContact(
 )
 {
     bool inContact = false;
+    int numOfContact = 0;
 
     label nCells = mesh.nCells();
     List<DynamicLabelList>& surfCells(wallCntInfo.getcClass().getSurfCells());
@@ -77,6 +78,7 @@ bool detectCyclicContact(
                                 const cyclicPolyPatch& cyclicPatch = refCast<const cyclicPolyPatch>(cPatch);
                                 transVec = cyclicPatch.transform().invTransformPosition(wallCntInfo.getcClass().getGeomModel().getCoM());
                                 inContact = true;
+                                numOfContact = 1;
                                 break;
                             }
                         }
@@ -90,6 +92,7 @@ bool detectCyclicContact(
                                 const coupledPolyPatch& cyclicPatch = refCast<const coupledPolyPatch>(cPatch);
                                 transVec = cyclicPatch.transform().invTransformPosition(wallCntInfo.getcClass().getGeomModel().getCoM());
                                 inContact = true;
+                                numOfContact = 1;
                                 break;
                             }
                         }
@@ -108,6 +111,8 @@ bool detectCyclicContact(
     if(inContact)
     {
         reduce(transVec, sumOp<vector>());
+        reduce(numOfContact, sumOp<int>());
+        transVec /= numOfContact;
         return true;
     }
     return false;
