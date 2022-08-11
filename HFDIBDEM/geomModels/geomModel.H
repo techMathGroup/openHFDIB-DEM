@@ -45,6 +45,7 @@ Contributors
 #include "triSurfaceMesh.H"
 
 #include "contactType.H"
+#include "verletPoint.H"
 
 #include "outputHFDIBDEM.H"
 using namespace outputHFDIBDEM;
@@ -116,6 +117,9 @@ namespace Foam
 
         //moment of intertia tensor
         symmTensor  I_;
+
+        //Boundbox of the particle
+        boundBox bBox_;
 
         //characteristic diameter of the body
         scalar  dC_;
@@ -383,6 +387,8 @@ namespace Foam
             HashTable<bool, label, Hash<label>>& cellInside,
             List<labelList>& cellPoints
         );
+
+        virtual List<boundBox*> getBBoxes();
     };
 }
 #endif

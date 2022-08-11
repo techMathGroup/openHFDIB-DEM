@@ -67,6 +67,8 @@ Contributors
 #include "leastSquaresInt.H"
 #include "lineInt.H"
 
+#include "verletList.H"
+
 namespace Foam
 {
 
@@ -124,6 +126,9 @@ namespace Foam
     // mesh geometric directions
     vector geometricD_;
 
+    // Verlet list object
+    verletList verletList_;
+
     // neighbour list variables - First list is related to dimensions so the size is always 3
     // List for all bounding points positions
     DynamicList<DynamicScalarList> boundValueNeighbourList_;
@@ -137,8 +142,7 @@ namespace Foam
     // List of possible contact du to intersection of bounding boxes.
     // Pair is added to this list when it is present in all 3 cntNeighList_.
     HashSet<Tuple2<label, label>,Hash<Tuple2<label, label>>> posCntList_;
-    // number of DEM loops
-    DynamicScalarList numberOfDEMloops_;
+
     //record simulation for start from lastTime possibility
     bool recordSimulation_;
     word recordOutDir_;

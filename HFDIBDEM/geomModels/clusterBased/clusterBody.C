@@ -341,3 +341,16 @@ autoPtr<geomModel> clusterBody::getRemGeomModel()
 
     return ibGeomModelList.set(0, nullptr);
 }
+//---------------------------------------------------------------------------//
+List<boundBox*> clusterBody::getBBoxes()
+{
+    List<boundBox*> retList;
+    forAll(ibGeomModelList, ibI)
+    {
+        List<boundBox*> bBoxI = ibGeomModelList[ibI].getBBoxes();
+        retList.transfer(bBoxI);
+    }
+
+    return retList;
+}
+//---------------------------------------------------------------------------//

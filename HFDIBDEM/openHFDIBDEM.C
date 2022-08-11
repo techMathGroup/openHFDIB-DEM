@@ -309,6 +309,7 @@ void openHFDIBDEM::initialize
                 {
                     immersedBodies_[addIBPos].initSyncWithFlow(U);
                 }
+                verletList_.addBodyToVList(immersedBodies_[addIBPos]);
                 InfoH << addModel_Info << "Body based on: " << bodyName << " successfully added" << endl;
                 cAddition = 0;
             }
@@ -327,7 +328,7 @@ void openHFDIBDEM::initialize
     boundLabelNeighbourList_.setSize(3);
     //contactInCoordNeighbourList_.setSize(3);
     cntNeighList_.setSize(3);
-    numberOfDEMloops_.setSize(Pstream::nProcs());
+    
     for (label i = 0; i < 3; i = i + 1)
     {
         boundValueNeighbourList_[i].setSize(2 * immersedBodies_.size());
@@ -356,6 +357,7 @@ void openHFDIBDEM::initialize
     }
 
     initialSorting();
+    verletList_.initialSorting();
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
@@ -569,6 +571,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             << " DEM step: " << step << endl;
 
         updateNeighbourLists();
+        for (auto it = posCntList_.begin(); it != posCntList_.end(); ++it)
+        {
+            Info << "Old posCntList_: " << it.key() << endl;
+        }
+        verletList_.update(immersedBodies_);
 
         forAll (immersedBodies_,bodyId)
         {
@@ -616,10 +623,9 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         }
 
         // check only pairs whose bounding boxes are intersected for the contact
-        List<Tuple2<label, label>> keyList(posCntList_.toc());
-        forAll (keyList,key)
+        for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
         {
-            Tuple2<label, label>& cPair = keyList[key];
+            const Tuple2<label, label>& cPair = it.key();
 
             label cInd(cPair.first());
             bool cStatic(immersedBodies_[cInd].getbodyOperation() == 0);
@@ -1038,6 +1044,7 @@ void openHFDIBDEM::addRemoveBodies
                 {
                     nBody.initSyncWithFlow(U);
                 }
+                verletList_.addBodyToVList(nBody);
 
                 // update the contact stuff
                 for (label i = 0; i < 3; i = i + 1)
@@ -1196,6 +1203,7 @@ void openHFDIBDEM::restartSimulation
         immersedBodies_[addIBPos].createImmersedBody(body,refineF);
         immersedBodies_[addIBPos].computeBodyCharPars();
         immersedBodies_[addIBPos].setRestartSim(Vel,omega,Axis,isStatic,timeStepsInContWStatic);
+        verletList_.addBodyToVList(immersedBodies_[addIBPos]);
     }
 }
 //---------------------------------------------------------------------------//

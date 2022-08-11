@@ -272,3 +272,14 @@ void geomModel::correctSurfCells
     }
 }
 //---------------------------------------------------------------------------//
+List<boundBox*> geomModel::getBBoxes()
+{   
+    boundBox cBBox = getBounds();
+    bBox_.min() = cBBox.min();
+    bBox_.max() = cBBox.max();
+
+    List<boundBox*> retList(1);
+    retList[0] = &bBox_;
+    return retList;
+}
+//---------------------------------------------------------------------------//

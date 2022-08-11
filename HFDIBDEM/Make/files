@@ -13,6 +13,7 @@ contactModels/wallContactInfo.C
 contactModels/prtContact.C
 contactModels/wallContact.C
 contactModels/cyclicContact.C
+contactModels/verletList/verletList.C
 addModels/addModel.C
 addModels/addModelOnce.C
 addModels/addModelOnceFromFile.C

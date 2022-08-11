@@ -187,6 +187,8 @@ namespace Foam
         {
             return ibGeomModelList;
         }
+
+        List<boundBox*> getBBoxes() final override;
     };
 }
 
