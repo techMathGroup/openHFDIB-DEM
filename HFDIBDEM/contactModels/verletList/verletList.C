@@ -86,21 +86,21 @@ void verletList::mergeSortList(IDLList<verletPoint>& listToSort, label coord)
 //---------------------------------------------------------------------------//
 void verletList::swapVerletPoints(verletPoint* a, verletPoint* b, label coord)
 {
-    if(a->getBodyID() != b->getBodyID())
+    if(a->getBodyId() != b->getBodyId())
     {
         if(!a->isMin() && b->isMin())
         {
             Tuple2<label, label> newPair(
-                min(a->getBodyID(), b->getBodyID()), 
-                max(a->getBodyID(), b->getBodyID())
+                min(a->getBodyId(), b->getBodyId()), 
+                max(a->getBodyId(), b->getBodyId())
             );
             addCPairToCntNList(newPair, coord);
         }
         else if(a->isMin() && !b->isMin())
         {
             Tuple2<label, label> cPair(
-                min(a->getBodyID(), b->getBodyID()), 
-                max(a->getBodyID(), b->getBodyID())
+                min(a->getBodyId(), b->getBodyId()), 
+                max(a->getBodyId(), b->getBodyId())
             );
             if(cntNeighList_[coord].found(cPair))
             {
@@ -158,6 +158,43 @@ void verletList::addBodyToVList(immersedBody& ib)
     }
 }
 //---------------------------------------------------------------------------//
+void verletList::removeBodyFromVList(immersedBody& ib)
+{
+    forAll (verletLists_, coordI)
+    {
+        for (auto it = verletLists_[coordI].begin();
+            it != verletLists_[coordI].end(); ++it)
+        {
+            if ((*it).getBodyId() == ib.getBodyId())
+            {
+                delete(verletLists_[coordI].remove(it));
+            }
+        }
+
+        for (auto it = cntNeighList_[coordI].begin();
+            it != cntNeighList_[coordI].end(); ++it)
+        {
+            if (it.key().first() == ib.getBodyId()
+                ||
+                it.key().second() == ib.getBodyId())
+            {
+                cntNeighList_[coordI].erase(it.key());
+            }
+        }
+    }
+
+    for (auto it = posCntList_.begin();
+        it != posCntList_.end(); ++it)
+    {
+        if (it.key().first() == ib.getBodyId()
+            ||
+            it.key().second() == ib.getBodyId())
+        {
+            posCntList_.erase(it.key());
+        }
+    }
+}
+//---------------------------------------------------------------------------//
 void verletList::initialSorting()
 {
     for (label coord = 0; coord < 3; ++coord)
@@ -170,7 +207,7 @@ void verletList::initialSorting()
         {
             if((*i).isMin())
             {
-                label curIb = (*i).getBodyID();
+                label curIb = (*i).getBodyId();
                 for (auto oIbIter = openedIb.begin();
                     oIbIter != openedIb.end(); ++oIbIter)
                 {
@@ -187,7 +224,7 @@ void verletList::initialSorting()
             }
             else
             {
-                label curIb = (*i).getBodyID();
+                label curIb = (*i).getBodyId();
                 if(openedIb.found(curIb))
                 {
                     openedIb.erase(curIb);

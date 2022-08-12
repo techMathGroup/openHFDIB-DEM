@@ -89,6 +89,9 @@ class verletList
     // Add new body to be tracked by Verlet list
     void addBodyToVList(immersedBody& ib);
 
+    // Remove body from Verlet list
+    void removeBodyFromVList(immersedBody& ib);
+
     // More efficient initial soting
     void initialSorting();
 

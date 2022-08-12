@@ -89,7 +89,7 @@ class verletPoint
         return pointLoc_;
     }
 
-    label getBodyID()
+    label getBodyId()
     {
         return bodyID_;
     }
