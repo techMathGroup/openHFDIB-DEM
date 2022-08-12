@@ -129,27 +129,9 @@ namespace Foam
     // Verlet list object
     verletList verletList_;
 
-    // neighbour list variables - First list is related to dimensions so the size is always 3
-    // List for all bounding points positions
-    DynamicList<DynamicScalarList> boundValueNeighbourList_;
-    // List for labels holding information about bounding points in boundValueNeighbourList_
-    // This is only list in which bodyID is increased by 1
-    // Positive label indicates maximal bounding point of body Label-1
-    // Negative label indicates minimal bounding point of body -label-1
-    DynamicList<DynamicLabelList> boundLabelNeighbourList_;
-    // List for pairs of intersected Bodies in specific coordinate
-    List<HashSet<Tuple2<label, label>,Hash<Tuple2<label, label>>>> cntNeighList_;
-    // List of possible contact du to intersection of bounding boxes.
-    // Pair is added to this list when it is present in all 3 cntNeighList_.
-    HashSet<Tuple2<label, label>,Hash<Tuple2<label, label>>> posCntList_;
-
     //record simulation for start from lastTime possibility
     bool recordSimulation_;
     word recordOutDir_;
-    // Update positions of bounding points
-    // sort the list
-    // solve potential intersections
-    void updateNeighbourLists();
 
     public:
 
@@ -186,11 +168,6 @@ namespace Foam
     void updateDEM(volScalarField& body,volScalarField& refineF);
 
     prtContactInfo& getPrtcInfo(Tuple2<label,label> cPair);
-
-    // sort list of bounding points
-    void sortBoundingListPrtContact();
-    // solve possible intersection of bounding boxes
-    void swapInBoundingListPrtContact(label coord, label j);
 
     // interpolate vector field V using Vs for the surface values
     void interpolateIB
@@ -230,9 +207,6 @@ namespace Foam
     );
 
     void preCalculateCellPoints();
-
-    void initialSorting();
-    void mergeSortList(List<Tuple2<label,scalar>>& listToSort);
  };
 }
 

@@ -208,32 +208,30 @@ void verletList::update(PtrList<immersedBody>& ibs)
     // besides the first sorting, this is O(N) efficient
     for (label coord = 0; coord < 3; ++coord)
     {
-        IDLList<verletPoint>::link* it = verletLists_[coord].first();
-        while(it != verletLists_[coord].last())
+        if (!verletLists_[coord].empty())
         {
-            if(it != verletLists_[coord].first())
+            IDLList<verletPoint>::link* it = verletLists_[coord].first();
+            while(it != verletLists_[coord].last())
             {
-                verletPoint* currPoint = 
-                    static_cast<verletPoint*>(it);
-
-                verletPoint* prevPoint = 
-                    static_cast<verletPoint*>(it->prev_);
-
-                if(prevPoint->getPoint()[coord]
-                    > currPoint->getPoint()[coord])
+                if(it != verletLists_[coord].first())
                 {
-                    swapVerletPoints(prevPoint, currPoint, coord);
-                    it = it->prev_;
+                    verletPoint* currPoint = 
+                        static_cast<verletPoint*>(it);
+
+                    verletPoint* prevPoint = 
+                        static_cast<verletPoint*>(it->prev_);
+
+                    if(prevPoint->getPoint()[coord]
+                        > currPoint->getPoint()[coord])
+                    {
+                        swapVerletPoints(prevPoint, currPoint, coord);
+                        it = it->prev_;
+                    }
                 }
+
+                it = it->next_;
             }
-
-            it = it->next_;
         }
-    }
-
-    for (auto it = posCntList_.begin(); it != posCntList_.end(); ++it)
-    {
-        Info << "VerletList posCntList_: " << it.key() << endl;
     }
 }
 //---------------------------------------------------------------------------//
