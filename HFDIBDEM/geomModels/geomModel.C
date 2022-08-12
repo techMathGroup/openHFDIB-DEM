@@ -43,6 +43,7 @@ geomModel::geomModel
 :
 contactType_(cType),
 mesh_(mesh),
+ibPartialVolume_(Pstream::nProcs(), 0),
 owner_(0),
 cellToStartInCreateIB_(0),
 thrSurf_(thrSurf),
@@ -58,7 +59,6 @@ rhoS_("rho",dimensionSet(1,-3,0,0,0,0,0),1.0)
 {
     surfCells_.setSize(Pstream::nProcs());
     intCells_.setSize(Pstream::nProcs());
-    ibPartialVolume_.setSize(Pstream::nProcs());
 }
 geomModel::~geomModel()
 {

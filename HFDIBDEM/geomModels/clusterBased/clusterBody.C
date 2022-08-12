@@ -348,9 +348,8 @@ List<boundBox*> clusterBody::getBBoxes()
     forAll(ibGeomModelList, ibI)
     {
         List<boundBox*> bBoxI = ibGeomModelList[ibI].getBBoxes();
-        retList.transfer(bBoxI);
+        retList.append(bBoxI);
     }
-
     return retList;
 }
 //---------------------------------------------------------------------------//

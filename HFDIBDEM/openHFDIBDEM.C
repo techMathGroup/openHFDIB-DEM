@@ -504,6 +504,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 bool inContact = detectCyclicContact(mesh_, cyclicPatches_, immersedBodies_[bodyId].getWallCntInfo(), newPos);
                 if (inContact)
                 {
+                    verletList_.removeBodyFromVList(immersedBodies_[bodyId]);
+
                     scalar thrSurf(readScalar(HFDIBDEMDict_.lookup("surfaceThreshold")));
                     autoPtr<clusterBody> newClusterBody(new clusterBody(mesh_, thrSurf));
                     autoPtr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getGeomModel());
@@ -513,6 +515,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     newClusterBody->addBodyToCluster(iBcopy);
                     geomModel* clusterGeomModel = newClusterBody.ptr();
                     immersedBodies_[bodyId].getGeomModelPtr().set(clusterGeomModel);
+
+                    verletList_.addBodyToVList(immersedBodies_[bodyId]);
                 }
             }
             else
@@ -521,7 +525,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
                 if(cBody.shouldBeUnclustered())
                 {
+                    verletList_.removeBodyFromVList(immersedBodies_[bodyId]);
+
                     immersedBodies_[bodyId].getGeomModelPtr().reset(cBody.getRemGeomModel().ptr());
+
+                    verletList_.addBodyToVList(immersedBodies_[bodyId]);
                 }
             }
         }

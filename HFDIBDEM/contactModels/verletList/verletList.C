@@ -178,7 +178,7 @@ void verletList::removeBodyFromVList(immersedBody& ib)
                 ||
                 it.key().second() == ib.getBodyId())
             {
-                cntNeighList_[coordI].erase(it.key());
+                cntNeighList_[coordI].erase(it);
             }
         }
     }
@@ -190,7 +190,7 @@ void verletList::removeBodyFromVList(immersedBody& ib)
             ||
             it.key().second() == ib.getBodyId())
         {
-            posCntList_.erase(it.key());
+            posCntList_.erase(it);
         }
     }
 }
