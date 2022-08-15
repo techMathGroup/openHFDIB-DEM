@@ -46,7 +46,7 @@ Contributors
 #include "ibContactClass.H"
 #include "prtContactVars.H"
 #include "prtContactInfo.H"
-#include "clusterBody.H"
+#include "periodicBody.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

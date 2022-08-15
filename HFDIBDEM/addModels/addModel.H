@@ -48,7 +48,7 @@ Contributors
 #include "convexBody.H"
 #include "nonConvexBody.H"
 #include "sphereBody.H"
-#include "clusterBody.H"
+#include "periodicBody.H"
 
 #include "contactModel.H"
 #include "immersedBody.H"

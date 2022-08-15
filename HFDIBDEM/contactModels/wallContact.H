@@ -46,7 +46,7 @@ Contributors
 #include "ibContactClass.H"
 #include "materialInfo.H"
 #include "wallContactInfo.H"
-#include "clusterBody.H"
+#include "periodicBody.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

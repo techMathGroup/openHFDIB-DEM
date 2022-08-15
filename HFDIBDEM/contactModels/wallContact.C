@@ -212,7 +212,7 @@ bool detectWallContact_Cluster(
     ibContactClass& ibClass
 )
 {
-    clusterBody& cCluster = dynamic_cast<clusterBody&>(ibClass.getGeomModel());
+    periodicBody& cCluster = dynamic_cast<periodicBody&>(ibClass.getGeomModel());
     PtrList<geomModel>& cBodies = cCluster.getClusterBodies();
 
     forAll(cBodies, cIbI)
@@ -808,7 +808,7 @@ void getWallContactVars_Cluster(
     const scalar deltaT
 )
 {
-    clusterBody& cCluster = dynamic_cast<clusterBody&>(wallCntInfo.getcClass().getGeomModel());
+    periodicBody& cCluster = dynamic_cast<periodicBody&>(wallCntInfo.getcClass().getGeomModel());
     PtrList<geomModel>& cBodies = cCluster.getClusterBodies();
 
     forAll(cBodies, cIbI)

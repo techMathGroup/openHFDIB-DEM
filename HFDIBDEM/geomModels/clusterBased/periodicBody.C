@@ -29,13 +29,13 @@ Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
-#include "clusterBody.H"
+#include "periodicBody.H"
 
 using namespace Foam;
 
 //---------------------------------------------------------------------------//
 // create immersed body for convex body
-void clusterBody::createImmersedBody
+void periodicBody::createImmersedBody
 (
     volScalarField& body,
     Field<label>& octreeField,
@@ -52,7 +52,7 @@ void clusterBody::createImmersedBody
     }
 }
 //---------------------------------------------------------------------------//
-void clusterBody::getReferencedLists
+void periodicBody::getReferencedLists
 (
     List<DynamicLabelList>& intLists,
     List<DynamicLabelList>& surfLists,
@@ -76,7 +76,7 @@ void clusterBody::getReferencedLists
     }
 }
 //---------------------------------------------------------------------------//
-void clusterBody::updateSurfList()
+void periodicBody::updateSurfList()
 {
     surfCells_.clear();
     surfCells_.setSize(Pstream::nProcs());
@@ -89,7 +89,7 @@ void clusterBody::updateSurfList()
     }
 }
 //---------------------------------------------------------------------------//
-void clusterBody::updateIntList()
+void periodicBody::updateIntList()
 {
     intCells_.clear();
     intCells_.setSize(Pstream::nProcs());
@@ -102,7 +102,7 @@ void clusterBody::updateIntList()
     }
 }
 //---------------------------------------------------------------------------//
-void clusterBody::calculateGeometricalProperties
+void periodicBody::calculateGeometricalProperties
 (
     volScalarField& body
 )
@@ -118,7 +118,7 @@ void clusterBody::calculateGeometricalProperties
     }
 }
 //---------------------------------------------------------------------------//
-void clusterBody::bodyMovePoints
+void periodicBody::bodyMovePoints
 (
     vector translVec
 )
@@ -132,7 +132,7 @@ void clusterBody::bodyMovePoints
     }
 }
 //---------------------------------------------------------------------------//
-void clusterBody::bodyScalePoints
+void periodicBody::bodyScalePoints
 (
     scalar scaleFac
 )
@@ -143,7 +143,7 @@ void clusterBody::bodyScalePoints
     }
 }
 //---------------------------------------------------------------------------//
-void clusterBody::bodyRotatePoints
+void periodicBody::bodyRotatePoints
 (
     scalar rotAngle,
     vector axisOfRot
@@ -158,12 +158,12 @@ void clusterBody::bodyRotatePoints
     }
 }
 //---------------------------------------------------------------------------//
-vector clusterBody::getCoM()
+vector periodicBody::getCoM()
 {    
     return ibGeomModelList[0].getCoM();
 }
 //---------------------------------------------------------------------------//
-boundBox clusterBody::getBounds()
+boundBox periodicBody::getBounds()
 {
     DynamicPointList allBounds;
     forAll(ibGeomModelList, ibI)
@@ -176,7 +176,7 @@ boundBox clusterBody::getBounds()
     return boundBox(allBounds);
 }
 //---------------------------------------------------------------------------//
-void clusterBody::synchronPos()
+void periodicBody::synchronPos()
 {
     forAll(ibGeomModelList, ibI)
     {
@@ -184,7 +184,7 @@ void clusterBody::synchronPos()
     }
 }
 //---------------------------------------------------------------------------//
-boolList clusterBody::pointInside(pointField pointF)
+boolList periodicBody::pointInside(pointField pointF)
 {
     boolList inside(pointF.size());
 
@@ -203,7 +203,7 @@ boolList clusterBody::pointInside(pointField pointF)
     return inside;
 }
 //---------------------------------------------------------------------------//
-bool clusterBody::pointInside(point pointI)
+bool periodicBody::pointInside(point pointI)
 {
     bool pointInside = false;
     forAll(ibGeomModelList, ibI)
@@ -215,7 +215,7 @@ bool clusterBody::pointInside(point pointI)
     return pointInside;
 }
 //---------------------------------------------------------------------------//
-scalar clusterBody::getDC()
+scalar periodicBody::getDC()
 {
     scalar dc = ibGeomModelList[0].getDC();
     for(int i = 1; i < ibGeomModelList.size(); ++i)
@@ -228,7 +228,7 @@ scalar clusterBody::getDC()
     return dc;
 }
 //---------------------------------------------------------------------------//
-void clusterBody::getClosestPointAndNormal
+void periodicBody::getClosestPointAndNormal
 (
     const point& startPoint,
     const vector& span,
@@ -262,17 +262,17 @@ void clusterBody::getClosestPointAndNormal
     }
 }
 //---------------------------------------------------------------------------//
-label clusterBody::getOwner()
+label periodicBody::getOwner()
 {
     return Pstream::myProcNo();
 }
 //---------------------------------------------------------------------------//
-scalar& clusterBody::getM0()
+scalar& periodicBody::getM0()
 {
     return ibGeomModelList[0].getM0();
 }
 //---------------------------------------------------------------------------//
-vector clusterBody::getLVec(const point& toPoint)
+vector periodicBody::getLVec(const point& toPoint)
 {
     List<point> closestPoints(ibGeomModelList.size());
     List<vector> closestNormals(ibGeomModelList.size());
@@ -303,7 +303,7 @@ vector clusterBody::getLVec(const point& toPoint)
     return toPoint - ibGeomModelList[cGModel].getCoM();
 }
 //---------------------------------------------------------------------------//
-void clusterBody::resetBody(volScalarField& body)
+void periodicBody::resetBody(volScalarField& body)
 {
     forAll(ibGeomModelList, ibI)
     {
@@ -311,7 +311,7 @@ void clusterBody::resetBody(volScalarField& body)
     }
 }
 //---------------------------------------------------------------------------//
-bool clusterBody::shouldBeUnclustered()
+bool periodicBody::shouldBeUnclustered()
 {
     int remBodies = 0;
     forAll(ibGeomModelList, ibI)
@@ -329,7 +329,7 @@ bool clusterBody::shouldBeUnclustered()
     return false;
 }
 //---------------------------------------------------------------------------//
-autoPtr<geomModel> clusterBody::getRemGeomModel()
+autoPtr<geomModel> periodicBody::getRemGeomModel()
 {
     forAll(ibGeomModelList, ibI)
     {
@@ -342,7 +342,7 @@ autoPtr<geomModel> clusterBody::getRemGeomModel()
     return ibGeomModelList.set(0, nullptr);
 }
 //---------------------------------------------------------------------------//
-List<boundBox*> clusterBody::getBBoxes()
+List<boundBox*> periodicBody::getBBoxes()
 {
     List<boundBox*> retList;
     forAll(ibGeomModelList, ibI)

@@ -29,22 +29,22 @@ Description
     class for clustering of immersedBodies
 
 SourceFiles
-    clusterBody.C
+    periodicBody.C
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef clusterBody_H
-#define clusterBody_H
+#ifndef periodicBody_H
+#define periodicBody_H
 
 #include "geomModel.H"
 #include "OFstream.H"
 
 namespace Foam
 {
-    class clusterBody
+    class periodicBody
     : public geomModel
     {
 
@@ -69,7 +69,7 @@ namespace Foam
         public:
 
         // Constructors ------------------------------------------------
-        clusterBody
+        periodicBody
         (
             const  fvMesh&   mesh,
             scalar  thrSurf = 1
@@ -84,7 +84,7 @@ namespace Foam
         {}
 
         // Destructors -------------------------------------------------
-        ~clusterBody(){}
+        ~periodicBody(){}
 
         // Public subclasses -------------------------------------------
 

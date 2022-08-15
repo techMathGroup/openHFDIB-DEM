@@ -224,7 +224,7 @@ bool detectPrtPrtContact_Cluster
 
     if(cClass.getGeomModel().isCluster())
     {
-        clusterBody& cCluster = dynamic_cast<clusterBody&>(cClass.getGeomModel());
+        periodicBody& cCluster = dynamic_cast<periodicBody&>(cClass.getGeomModel());
         PtrList<geomModel>& cBodiesR = cCluster.getClusterBodies();
         forAll(cBodiesR, cIbI)
         {
@@ -238,7 +238,7 @@ bool detectPrtPrtContact_Cluster
 
     if(tClass.getGeomModel().isCluster())
     {
-        clusterBody& tCluster = dynamic_cast<clusterBody&>(tClass.getGeomModel());
+        periodicBody& tCluster = dynamic_cast<periodicBody&>(tClass.getGeomModel());
         PtrList<geomModel>& tBodiesR = tCluster.getClusterBodies();
         forAll(tBodiesR, tIbI)
         {
@@ -898,7 +898,7 @@ void getPrtContactVars_Cluster
 
     if(cClass.getGeomModel().isCluster())
     {
-        clusterBody& cCluster = dynamic_cast<clusterBody&>(cClass.getGeomModel());
+        periodicBody& cCluster = dynamic_cast<periodicBody&>(cClass.getGeomModel());
         PtrList<geomModel>& cBodiesR = cCluster.getClusterBodies();
         forAll(cBodiesR, cIbI)
         {
@@ -912,7 +912,7 @@ void getPrtContactVars_Cluster
 
     if(tClass.getGeomModel().isCluster())
     {
-        clusterBody& tCluster = dynamic_cast<clusterBody&>(tClass.getGeomModel());
+        periodicBody& tCluster = dynamic_cast<periodicBody&>(tClass.getGeomModel());
         PtrList<geomModel>& tBodiesR = tCluster.getClusterBodies();
         forAll(tBodiesR, tIbI)
         {

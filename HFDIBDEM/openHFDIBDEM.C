@@ -507,7 +507,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     verletList_.removeBodyFromVList(immersedBodies_[bodyId]);
 
                     scalar thrSurf(readScalar(HFDIBDEMDict_.lookup("surfaceThreshold")));
-                    autoPtr<clusterBody> newClusterBody(new clusterBody(mesh_, thrSurf));
+                    autoPtr<periodicBody> newClusterBody(new periodicBody(mesh_, thrSurf));
                     autoPtr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getGeomModel());
                     vector transVec = newPos - iBcopy().getCoM();
                     iBcopy->bodyMovePoints(transVec);
@@ -521,7 +521,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             }
             else
             {
-                clusterBody& cBody = dynamic_cast<clusterBody&>(immersedBodies_[bodyId].getGeomModel());
+                periodicBody& cBody = dynamic_cast<periodicBody&>(immersedBodies_[bodyId].getGeomModel());
 
                 if(cBody.shouldBeUnclustered())
                 {
