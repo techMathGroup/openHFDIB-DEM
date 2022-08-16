@@ -29,129 +29,135 @@ Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
-#include "periodicBody.H"
+#include "clusterBody.H"
 
 using namespace Foam;
 
 //---------------------------------------------------------------------------//
-void periodicBody::getReferencedLists
+// create immersed body for convex body
+void clusterBody::createImmersedBody
 (
-    List<DynamicLabelList>& intLists,
-    List<DynamicLabelList>& surfLists,
-    DynamicVectorList& referenceCoM
+    volScalarField& body,
+    Field<label>& octreeField,
+    List<labelList>& cellPoints
 )
 {
-    intLists.resize(ibGeomModelList.size());
-    surfLists.resize(ibGeomModelList.size());
-    referenceCoM.resize(ibGeomModelList.size());
+    forAll(ibGeomModelList, ibI)
+    {
+        ibGeomModelList[ibI].createImmersedBody(
+            body,
+            octreeField,
+            cellPoints
+        );
+    }
+}
+//---------------------------------------------------------------------------//
+void clusterBody::updateSurfList()
+{
+    surfCells_.clear();
+    surfCells_.setSize(Pstream::nProcs());
 
     forAll(ibGeomModelList, ibI)
     {
-        intLists[ibI] = 
-            ibGeomModelList[ibI].getInternalCellList()[Pstream::myProcNo()];
-        
-        surfLists[ibI] = 
-            ibGeomModelList[ibI].getSurfaceCellList()[Pstream::myProcNo()];
+        surfCells_[Pstream::myProcNo()].append(
+            ibGeomModelList[ibI].getSurfaceCellList()[Pstream::myProcNo()]
+        );
+    }
+}
+//---------------------------------------------------------------------------//
+void clusterBody::updateIntList()
+{
+    intCells_.clear();
+    intCells_.setSize(Pstream::nProcs());
 
-        referenceCoM[ibI] = 
-            ibGeomModelList[ibI].getCoM();
-    }
-}
-//---------------------------------------------------------------------------//
-void periodicBody::bodyMovePoints
-(
-    vector translVec
-)
-{
     forAll(ibGeomModelList, ibI)
     {
-        if(ibGeomModelList[ibI].getOwner() == Pstream::myProcNo())
-        {
-            ibGeomModelList[ibI].bodyMovePoints(translVec);
-        }
+        intCells_[Pstream::myProcNo()].append(
+            ibGeomModelList[ibI].getInternalCellList()[Pstream::myProcNo()]
+        );
     }
 }
 //---------------------------------------------------------------------------//
-void periodicBody::bodyScalePoints
+void clusterBody::calculateGeometricalProperties
 (
-    scalar scaleFac
+    volScalarField& body
 )
 {
+    M_      = scalar(0);
+    I_      = symmTensor::zero;
+
     forAll(ibGeomModelList, ibI)
     {
-        ibGeomModelList[ibI].bodyScalePoints(scaleFac);
+        ibGeomModelList[ibI].calculateGeometricalProperties(body);
+        M_ += ibGeomModelList[ibI].getM();
+        I_ += ibGeomModelList[ibI].getI();
     }
 }
 //---------------------------------------------------------------------------//
-void periodicBody::bodyRotatePoints
-(
-    scalar rotAngle,
-    vector axisOfRot
-)
-{
-    forAll(ibGeomModelList, ibI)
-    {
-        if(ibGeomModelList[ibI].getOwner() == Pstream::myProcNo())
-        {
-            ibGeomModelList[ibI].bodyRotatePoints(rotAngle, axisOfRot);
-        }
-    }
-}
-//---------------------------------------------------------------------------//
-vector periodicBody::getCoM()
+vector clusterBody::getCoM()
 {    
     return ibGeomModelList[0].getCoM();
 }
 //---------------------------------------------------------------------------//
-scalar periodicBody::getDC()
+boundBox clusterBody::getBounds()
 {
-    scalar dc = ibGeomModelList[0].getDC();
-    for(int i = 1; i < ibGeomModelList.size(); ++i)
-    {
-        if(dc < ibGeomModelList[i].getDC())
-        {
-            dc = ibGeomModelList[i].getDC();
-        }
-    }
-    return dc;
-}
-//---------------------------------------------------------------------------//
-label periodicBody::getOwner()
-{
-    HashTable<label, label, Hash<label>> frequency;
+    DynamicPointList allBounds;
     forAll(ibGeomModelList, ibI)
     {
-        label ownerI = ibGeomModelList[ibI].getOwner();
-        if(!frequency.found(ownerI))
-        {
-            frequency.insert(ownerI, 1);
-        }
-        else
-        {
-            frequency[ownerI]++;
-        }
+        boundBox bBoxI = ibGeomModelList[ibI].getBounds();
+        allBounds.append(bBoxI.min());
+        allBounds.append(bBoxI.max());
     }
-
-    label maxFreq = 0;
-    label maxProc = 0;
-    for (auto it = frequency.begin(); it != frequency.end(); ++it)
-    {
-        if (*it > maxFreq)
-        {
-            maxFreq = *it;
-            maxProc = it.key();
-        }
-    }
-
-    return maxProc;
+    
+    return boundBox(allBounds);
 }
 //---------------------------------------------------------------------------//
-scalar& periodicBody::getM0()
+void clusterBody::synchronPos()
 {
-    return ibGeomModelList[0].getM0();
+    forAll(ibGeomModelList, ibI)
+    {
+        ibGeomModelList[ibI].synchronPos();
+    }
 }
 //---------------------------------------------------------------------------//
-vector periodicBody::getLVec(const point& toPoint)
+boolList clusterBody::pointInside(pointField pointF)
+{
+    boolList inside(pointF.size());
+
+    forAll(pointF,pointI)
+    {
+        bool pointInside = false;
+        forAll(ibGeomModelList, ibI)
+        {
+            pointInside = ibGeomModelList[ibI].pointInside(pointF[pointI]);
+            if(pointInside)
+                break;
+        }
+        inside[pointI] = pointInside;
+    }
+
+    return inside;
+}
+//---------------------------------------------------------------------------//
+bool clusterBody::pointInside(point pointI)
+{
+    bool pointInside = false;
+    forAll(ibGeomModelList, ibI)
+    {
+        pointInside = ibGeomModelList[ibI].pointInside(pointI);
+        if(pointInside)
+            break;
+    }
+    return pointInside;
+}
+//---------------------------------------------------------------------------//
+void clusterBody::getClosestPointAndNormal
+(
+    const point& startPoint,
+    const vector& span,
+    point& closestPoint,
+    vector& normal
+)
 {
     List<point> closestPoints(ibGeomModelList.size());
     List<vector> closestNormals(ibGeomModelList.size());
@@ -159,57 +165,42 @@ vector periodicBody::getLVec(const point& toPoint)
     forAll(ibGeomModelList, ibI)
     {
         ibGeomModelList[ibI].getClosestPointAndNormal(
-            toPoint,
-            (ibGeomModelList[ibI].getCoM() - toPoint),
+            startPoint,
+            span,
             closestPoints[ibI],
             closestNormals[ibI]
         );
     }
 
-    vector closestPoint = closestPoints[0];
-    label cGModel = 0;
-
-    for(int i = 1; i < closestPoints.size(); ++i)
+    closestPoint = closestPoints[0];
+    normal = closestNormals[0];
+    for (int i = 1; i < closestPoints.size(); ++i)
     {
-        if(mag(toPoint - closestPoint) 
-            > mag(toPoint - closestPoints[i]))
+        if(mag(startPoint - closestPoint) 
+            > mag(startPoint - closestPoints[i]))
         {
             closestPoint = closestPoints[i];
-            cGModel = i;
+            normal = closestNormals[i];
         }
     }
-
-    return toPoint - ibGeomModelList[cGModel].getCoM();
 }
 //---------------------------------------------------------------------------//
-bool periodicBody::shouldBeUnclustered()
-{
-    int remBodies = 0;
-    forAll(ibGeomModelList, ibI)
-    {
-        if(ibGeomModelList[ibI].getM() > 0)
-        {
-            ++remBodies;
-        }
-    }
-
-    if(remBodies == 1)
-    {
-        return true;
-    }
-    return false;
-}
-//---------------------------------------------------------------------------//
-autoPtr<geomModel> periodicBody::getRemGeomModel()
+void clusterBody::resetBody(volScalarField& body)
 {
     forAll(ibGeomModelList, ibI)
     {
-        if(ibGeomModelList[ibI].getM() > 0)
-        {
-            return ibGeomModelList.set(ibI, nullptr);
-        }
+        ibGeomModelList[ibI].resetBody(body);
     }
-
-    return ibGeomModelList.set(0, nullptr);
+}
+//---------------------------------------------------------------------------//
+List<boundBox*> clusterBody::getBBoxes()
+{
+    List<boundBox*> retList;
+    forAll(ibGeomModelList, ibI)
+    {
+        List<boundBox*> bBoxI = ibGeomModelList[ibI].getBBoxes();
+        retList.append(bBoxI);
+    }
+    return retList;
 }
 //---------------------------------------------------------------------------//

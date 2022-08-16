@@ -29,23 +29,23 @@ Description
     class for clustering of immersedBodies
 
 SourceFiles
-    periodicBody.C
+    clusterBody.C
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef periodicBody_H
-#define periodicBody_H
+#ifndef clusterBody_H
+#define clusterBody_H
 
-#include "clusterBody.H"
+#include "geomModel.H"
 #include "OFstream.H"
 
 namespace Foam
 {
-    class periodicBody
-    : public clusterBody
+    class clusterBody
+    : public geomModel
     {
 
         private:
@@ -57,25 +57,27 @@ namespace Foam
 
         protected:
 
+        PtrList<geomModel> ibGeomModelList;
 
         public:
 
         // Constructors ------------------------------------------------
-        periodicBody
+        clusterBody
         (
             const  fvMesh&   mesh,
             scalar  thrSurf = 1
         )
         :
-        clusterBody
+        geomModel
         (
             mesh,
+            cluster,
             thrSurf
         )
         {}
 
         // Destructors -------------------------------------------------
-        ~periodicBody(){}
+        ~clusterBody(){}
 
         // Public subclasses -------------------------------------------
 
@@ -83,42 +85,99 @@ namespace Foam
 
         // Public methods ----------------------------------------------
 
-        void getReferencedLists(
+        void createImmersedBody
+        (
+            volScalarField& body,
+            Field<label>& octreeField,
+            List<labelList>& cellPoints
+        ) final override;
+
+        geomModel* getGeomModel() final override
+        {
+            return this;
+        }
+
+        // Connect int/surf cells with correct center of mass 
+        // for fluid-solid interaction
+        virtual void getReferencedLists(
             List<DynamicLabelList>& intLists,
             List<DynamicLabelList>& surfLists,
             DynamicVectorList& referenceCoM
+        ) = 0;
+
+        void updateSurfList();
+
+        virtual List<DynamicLabelList>& getSurfaceCellList() final override
+        {
+            updateSurfList();
+            return surfCells_;
+        };
+
+        void updateIntList();
+
+        virtual List<DynamicLabelList>& getInternalCellList() final override
+        {
+            updateIntList();
+            return intCells_;
+        };
+
+        void calculateGeometricalProperties(
+            volScalarField& body
         ) final override;
 
-        void bodyMovePoints(vector translVec) final override;
+        virtual void bodyMovePoints(vector translVec) = 0;
 
-        void bodyScalePoints(scalar scaleFac) final override;
+        virtual void bodyScalePoints(scalar scaleFac) = 0;
 
-        void bodyRotatePoints
+        virtual void bodyRotatePoints
         (
             scalar rotAngle,
             vector axisOfRot
+        ) = 0;
+
+        virtual vector getCoM() = 0;
+
+        boundBox getBounds() final override;
+
+        void synchronPos() final override;
+
+        boolList pointInside(pointField pointI) final override;
+
+        bool pointInside(point pointI) final override;
+
+        // Get characteristic particle diameter
+        virtual scalar getDC() = 0;
+
+        void getClosestPointAndNormal
+        (
+            const point& startPoint,
+            const vector& span,
+            point& closestPoint,
+            vector& normal
         ) final override;
 
-        vector getCoM() final override;
-
-        scalar getDC() final override;
-
         // Get processor owner of the particle
-        label getOwner() final override;
+        virtual label getOwner() = 0;
 
         // Get initial mass of the cluster
-        scalar& getM0() final override;
+        virtual scalar& getM0() = 0;
 
-        vector getLVec(const point& toPoint) final override;
+        // Get vector from correct center of mass to toPoint
+        virtual vector getLVec(const point& toPoint) = 0;
 
-        void addBodyToCluster(autoPtr<geomModel>& bodyToAdd)
+        void resetBody(volScalarField& body) final override;
+
+        bool isCluster() const final override
         {
-            ibGeomModelList.append(bodyToAdd);
+            return true;
         }
 
-        bool shouldBeUnclustered();
+        PtrList<geomModel>& getClusterBodies()
+        {
+            return ibGeomModelList;
+        }
 
-        autoPtr<geomModel> getRemGeomModel();
+        List<boundBox*> getBBoxes() final override;
     };
 }
 

@@ -363,6 +363,7 @@ void openHFDIBDEM::preUpdateBodies
 {
     forAll (immersedBodies_,bodyId)
     {
+        Info << "isActive: " << bodyId << " - " << immersedBodies_[bodyId].getIsActive() << endl;
         if (immersedBodies_[bodyId].getIsActive())
         {
             // create body or compute body-fluid coupling and estimate
@@ -507,14 +508,13 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     verletList_.removeBodyFromVList(immersedBodies_[bodyId]);
 
                     scalar thrSurf(readScalar(HFDIBDEMDict_.lookup("surfaceThreshold")));
-                    autoPtr<periodicBody> newClusterBody(new periodicBody(mesh_, thrSurf));
+                    autoPtr<periodicBody> newPeriodicBody(new periodicBody(mesh_, thrSurf));
                     autoPtr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getGeomModel());
                     vector transVec = newPos - iBcopy().getCoM();
                     iBcopy->bodyMovePoints(transVec);
-                    newClusterBody->addBodyToCluster(immersedBodies_[bodyId].getGeomModelPtr());
-                    newClusterBody->addBodyToCluster(iBcopy);
-                    geomModel* clusterGeomModel = newClusterBody.ptr();
-                    immersedBodies_[bodyId].getGeomModelPtr().set(clusterGeomModel);
+                    newPeriodicBody->addBodyToCluster(immersedBodies_[bodyId].getGeomModelPtr());
+                    newPeriodicBody->addBodyToCluster(iBcopy);
+                    immersedBodies_[bodyId].getGeomModelPtr().set(newPeriodicBody.ptr());
 
                     verletList_.addBodyToVList(immersedBodies_[bodyId]);
                 }

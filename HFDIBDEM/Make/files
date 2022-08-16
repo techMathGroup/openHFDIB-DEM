@@ -4,6 +4,7 @@ geomModels/stlBased/convexBody.C
 geomModels/stlBased/nonConvexBody.C
 geomModels/shapeBased/shapeBased.C
 geomModels/shapeBased/sphereBody.C
+geomModels/clusterBased/clusterBody.C
 geomModels/clusterBased/periodicBody.C
 contactModels/materialInfo.C
 contactModels/wallContactVars.C
