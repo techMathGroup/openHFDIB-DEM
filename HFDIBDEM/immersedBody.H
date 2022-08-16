@@ -142,13 +142,6 @@ namespace Foam
         // operation to perform
         int     bodyOperation_;
 
-        // index holder for particle contact list
-        List<List<label>> boundIndList_;
-
-        // bounding points of the surface
-        point minBoundPoint_;
-        point maxBoundPoint_;
-
         // update immersed body info
         void  updateImmersedBody
         (
@@ -214,35 +207,6 @@ namespace Foam
         // Destructors -------------------------------------------------
         ~immersedBody();
 
-        // Public subclasses -------------------------------------------
-        // -- class to keep interpolation data
-        class interpolationInfoOld{
-        public:
-            label surfCell_;
-            DynamicPointList intPoints_;
-            label order_;
-            DynamicLabelList intCells_;
-            DynamicLabelList procWithIntCells_;
-            DynamicVectorList intVec_;
-        };
-
-        // -- class to ask for interpolation data on other processor
-        class intVecRequest
-        {
-            public:
-                label requestLabel_;
-                label vecLabel_;
-                point intPoint_;
-                label intCell_;
-        };
-
-        // Public variables --------------------------------------------
-        // -- interpolation info list
-        List<DynamicList<immersedBody::interpolationInfoOld>>  interpolationInfoOld_;
-
-        // -- interpolation vec request list
-        List<DynamicList<immersedBody::intVecRequest>>      interpolationVecReqs_;
-
         // Public methods ----------------------------------------------
 
         // move immersed body
@@ -250,9 +214,6 @@ namespace Foam
         (
             scalar deltaT = -1.0
         );
-
-        // reset body field
-        void resetBody(volScalarField& body);
 
         //update body movement based on F_ and T_
         void updateMovement
@@ -386,32 +347,11 @@ namespace Foam
             return geomModel_->getInternalCellList();
         };
 
-        const List<DynamicList<immersedBody::intVecRequest>>& getinterpolationVecReqs() const
-        {
-            return interpolationVecReqs_;
-        };
-
-        List<DynamicList<immersedBody::interpolationInfoOld>>& getInterpolationInfo()
-        {
-            return interpolationInfoOld_;
-        };
-
-        List<List<label>>& getBoundIndList()
-        {
-            return boundIndList_;
-        };
-
-        const point& getMinBoundPoint() const
-        {
-            return minBoundPoint_;
-        };
-
-        const point& getMaxBoundPoint() const
-        {
-            return maxBoundPoint_;
-        };
-
-        void postContactUpdateBodyField(volScalarField& body, volScalarField& refineF);
+        void postContactUpdateBodyField
+        (
+            volScalarField& body,
+            volScalarField& refineF
+        );
 
         void recreateBodyField(volScalarField& body, volScalarField& refineF);
 
@@ -434,9 +374,16 @@ namespace Foam
             T_+=TIn;
         }
 
-        void setWallContact(bool inContact){ibContactClass_->setWallContact(inContact);;}
+        void setWallContact(bool inContact)
+        {
+            ibContactClass_->setWallContact(inContact);
+        }
 
-        void postPimpleUpdateImmersedBody(volScalarField& body,volVectorField& f);
+        void postPimpleUpdateImmersedBody
+        (
+            volScalarField& body,
+            volVectorField& f
+        );
 
         // compute the mean and maximal body courant number (based on
         // the body linear velocity)
@@ -513,7 +460,14 @@ namespace Foam
 
         void chceckBodyOp();
 
-        void setRestartSim(vector vel, scalar angVel, vector axisRot, bool setStatic, label timesInContact);
+        void setRestartSim
+        (
+            vector vel,
+            scalar angVel,
+            vector axisRot, 
+            bool setStatic,
+            label timesInContact
+        );
 
         geomModel& getGeomModel()
         {
@@ -548,7 +502,8 @@ namespace Foam
             dict.add("omega",omega_);
             dict.add("Axis",Axis_);
             dict.add("static",bodyOperation_ == 0);
-            dict.add("timeStepsInContWStatic", ibContactClass_->getTimeStepsInContWStatic());
+            dict.add("timeStepsInContWStatic", ibContactClass_
+                ->getTimeStepsInContWStatic());
             geomModel_->writeBodyInfo(bodyId_,dict, path);
         }
 

@@ -93,7 +93,6 @@ rhoF_(transportProperties_.lookup("rho")),
 bodyId_(bodyId),
 updateTorque_(false),
 bodyOperation_(0),
-boundIndList_(3),
 historyCouplingF_(vector::zero),
 historyCouplingT_(vector::zero),
 octreeField_(mesh_.nCells(), 0),
@@ -121,7 +120,12 @@ immersedBody::~immersedBody()
 }
 //---------------------------------------------------------------------------//
 // Create immersed body info
-void immersedBody::createImmersedBody(volScalarField& body, volScalarField& refineF, bool synchCreation)
+void immersedBody::createImmersedBody
+(
+    volScalarField& body,
+    volScalarField& refineF,
+    bool synchCreation
+)
 {
     geomModel_->createImmersedBody(
         body,
@@ -135,9 +139,14 @@ void immersedBody::createImmersedBody(volScalarField& body, volScalarField& refi
     }
 }
 //---------------------------------------------------------------------------//
-void immersedBody::syncCreateImmersedBody(volScalarField& body, volScalarField& refineF)
+void immersedBody::syncCreateImmersedBody
+(
+    volScalarField& body,
+    volScalarField& refineF
+)
 {
-    InfoH << iB_Info << "body: " << bodyId_ << " owner: " << geomModel_->getOwner() << endl;
+    InfoH << iB_Info << "body: " << bodyId_ 
+        << " owner: " << geomModel_->getOwner() << endl;
 
     InfoH << iB_Info << "Computing geometrical properties" << endl;
     geomModel_->calculateGeometricalProperties(body);
@@ -150,12 +159,22 @@ void immersedBody::syncCreateImmersedBody(volScalarField& body, volScalarField& 
 
     const List<DynamicLabelList>& surfCells = geomModel_->getSurfaceCellList();
     DynamicLabelList zeroList(surfCells[Pstream::myProcNo()].size(), 0);
-    constructRefineField(body, refineF, surfCells[Pstream::myProcNo()], zeroList);
+
+    constructRefineField(
+        body,
+        refineF,
+        surfCells[Pstream::myProcNo()],
+        zeroList
+    );
+
     scalarList charCellSizeL(Pstream::nProcs(),1e4);
     forAll (surfCells[Pstream::myProcNo()],sCellI)
     {
         label cellI = surfCells[Pstream::myProcNo()][sCellI];
-        charCellSizeL[Pstream::myProcNo()] = min(charCellSizeL[Pstream::myProcNo()],Foam::pow(mesh_.V()[cellI],0.3333));
+        charCellSizeL[Pstream::myProcNo()] = 
+            min(charCellSizeL[Pstream::myProcNo()],
+                Foam::pow(mesh_.V()[cellI],0.3333)
+            );
     }
     forAll(charCellSizeL,indl)
     {
@@ -166,7 +185,8 @@ void immersedBody::syncCreateImmersedBody(volScalarField& body, volScalarField& 
     }
 
     charCellSize_ = gMax(charCellSizeL);
-    InfoH << iB_Info << "Body characteristic cell size: " << charCellSize_ << endl;
+    InfoH << iB_Info << "Body characteristic cell size: " 
+        << charCellSize_ << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::constructRefineField
@@ -228,20 +248,30 @@ void immersedBody::constructRefineField
                 }
                 else
                 {
-                    label facePatchId(mesh_.boundaryMesh().whichPatch(cellFaces[faceI]));
+                    label facePatchId(mesh_.boundaryMesh().whichPatch(
+                        cellFaces[faceI]
+                    ));
+
                     const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchId];
                     if (cPatch.type() == "processor")
                     {
-                        const processorPolyPatch& procPatch = refCast<const processorPolyPatch>(cPatch);
+                        const processorPolyPatch& procPatch = 
+                            refCast<const processorPolyPatch>(cPatch);
                         if (procPatch.myProcNo() == Pstream::myProcNo())
                         {
-                            cellsToSendToProcs[procPatch.neighbProcNo()].append(cPatch.whichFace(cellFaces[faceI]));
-                            cellsToSendToProcsLevel[procPatch.neighbProcNo()].append(i+1);
+                            cellsToSendToProcs[procPatch.neighbProcNo()].append(
+                                cPatch.whichFace(cellFaces[faceI])
+                            );
+                            cellsToSendToProcsLevel[procPatch.neighbProcNo()]
+                                .append(i+1);
                         }
                         else
                         {
-                            cellsToSendToProcs[procPatch.myProcNo()].append(cPatch.whichFace(cellFaces[faceI]));
-                            cellsToSendToProcsLevel[procPatch.myProcNo()].append(i+1);
+                            cellsToSendToProcs[procPatch.myProcNo()].append(
+                                cPatch.whichFace(cellFaces[faceI])
+                            );
+                            cellsToSendToProcsLevel[procPatch.myProcNo()]
+                                .append(i+1);
                         }
                     }
                 }
@@ -315,9 +345,15 @@ void immersedBody::constructRefineField
     DynamicLabelList newCellsToIterateStartLevel;
 
     // check if some point from other proc is on this processor
-    for (label otherProci = 0; otherProci < facesReceivedFromProcs.size(); otherProci++)
+    for (label otherProci = 0; 
+        otherProci < facesReceivedFromProcs.size(); 
+        otherProci++
+    )
     {
-        for (label faceI = 0; faceI < facesReceivedFromProcs[otherProci].size(); faceI++)
+        for (label faceI = 0; 
+            faceI < facesReceivedFromProcs[otherProci].size(); 
+            faceI++
+        )
         {
             label cellProcI(0);
             forAll (mesh_.boundaryMesh(), patchi)
@@ -325,24 +361,34 @@ void immersedBody::constructRefineField
                 const polyPatch& cPatch = mesh_.boundaryMesh()[patchi];
                 if (cPatch.type() == "processor")
                 {
-                    const processorPolyPatch& procPatch = refCast<const processorPolyPatch>(cPatch);
-                    if (procPatch.myProcNo() == Pstream::myProcNo() && procPatch.neighbProcNo() == otherProci)
+                    const processorPolyPatch& procPatch = 
+                        refCast<const processorPolyPatch>(cPatch);
+
+                    if (procPatch.myProcNo() == Pstream::myProcNo() 
+                        && procPatch.neighbProcNo() == otherProci)
                     {
-                        cellProcI = mesh_.faceOwner()[cPatch.start() + facesReceivedFromProcs[otherProci][faceI]];
+                        cellProcI = mesh_.faceOwner()[cPatch.start() 
+                            + facesReceivedFromProcs[otherProci][faceI]];
                         if(refineF[cellProcI] == 0)
                         {
                             newCellsToIterate.append(cellProcI);
-                            newCellsToIterateStartLevel.append(cellsReceivedFromProcsLevel[otherProci][faceI]);
+                            newCellsToIterateStartLevel.append(
+                                cellsReceivedFromProcsLevel[otherProci][faceI]
+                            );
                         }
                         break;
                     }
-                    else if (procPatch.myProcNo() == otherProci && procPatch.neighbProcNo() == Pstream::myProcNo())
+                    else if (procPatch.myProcNo() == otherProci 
+                        && procPatch.neighbProcNo() == Pstream::myProcNo())
                     {
-                        cellProcI = mesh_.faceOwner()[cPatch.start() + facesReceivedFromProcs[otherProci][faceI]];
+                        cellProcI = mesh_.faceOwner()[cPatch.start() 
+                            + facesReceivedFromProcs[otherProci][faceI]];
                         if(refineF[cellProcI] == 0)
                         {
                             newCellsToIterate.append(cellProcI);
-                            newCellsToIterateStartLevel.append(cellsReceivedFromProcsLevel[otherProci][faceI]);
+                            newCellsToIterateStartLevel.append(
+                                cellsReceivedFromProcsLevel[otherProci][faceI]
+                            );
                         }
                         break;
                     }
@@ -361,7 +407,13 @@ void immersedBody::constructRefineField
 
     if(contBool)
     {
-        constructRefineField(body, refineF, newCellsToIterate, newCellsToIterateStartLevel);
+        constructRefineField
+        (
+            body,
+            refineF,
+            newCellsToIterate,
+            newCellsToIterateStartLevel
+        );
     }
 }
 //---------------------------------------------------------------------------//
@@ -373,10 +425,6 @@ void immersedBody::postPimpleUpdateImmersedBody
 {
     // update Vel_, Axis_ and omega_
     updateCoupling(body,f);
-
-    const uniformDimensionedVectorField& g =
-        mesh_.lookupObject<uniformDimensionedVectorField>("g");
-    vector FG(geomModel_->getM0()*(1.0-rhoF_.value()/geomModel_->getRhoS().value())*g.value());
 
     Vel_ = VelOld_;
     Axis_ = AxisOld_;
@@ -412,7 +460,8 @@ void immersedBody::updateCoupling
             label cellI = intListI[intCell];
 
             FV -=  f[cellI]*mesh_.V()[cellI];
-            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])*mesh_.V()[cellI];
+            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])
+                *mesh_.V()[cellI];
         }
     }
 
@@ -424,7 +473,8 @@ void immersedBody::updateCoupling
             label cellI = surfListI[surfCell];
 
             FV -=  f[cellI]*mesh_.V()[cellI];
-            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])*mesh_.V()[cellI];
+            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])
+                *mesh_.V()[cellI];
         }
     }
 
@@ -471,7 +521,8 @@ void immersedBody::updateMovementComp
 
         const uniformDimensionedVectorField& g =
             mesh_.lookupObject<uniformDimensionedVectorField>("g");
-        vector FG(geomModel_->getM0()*(1.0-rhoF_.value()/geomModel_->getRhoS().value())*g.value());
+        vector FG(geomModel_->getM0()*(1.0-rhoF_.value()
+            /geomModel_->getRhoS().value())*g.value());
 
         if(!case3D)
         {
@@ -511,7 +562,7 @@ void immersedBody::updateMovementComp
             {
                 Axis_ =  Omega/(omega_+SMALL);
                 if (!case3D)
-                {// in 2D, I need to keep only the correct part of the rotation axis
+                {// in 2D, I need to keep only the part of the rotation axis
                     const vector validDirs = (geometricD + vector::one)/2;
                     Axis_ = cmptMultiply(vector::one-validDirs,Axis_);
                 }
@@ -602,16 +653,21 @@ void immersedBody::moveImmersedBody
         // update total rotation matrix
         totRotMatrix_ = rotMatrix & totRotMatrix_;
         vector eulerAngles;
-        scalar sy = Foam::sqrt(totRotMatrix_.xx()*totRotMatrix_.xx() + totRotMatrix_.yy()*totRotMatrix_.yy());
+        scalar sy = Foam::sqrt(totRotMatrix_.xx()*totRotMatrix_.xx() 
+            + totRotMatrix_.yy()*totRotMatrix_.yy());
+
         if (sy > SMALL)
         {
-            eulerAngles.x() = Foam::atan2(totRotMatrix_.zy(),totRotMatrix_.zz());
+            eulerAngles.x() = 
+                Foam::atan2(totRotMatrix_.zy(),totRotMatrix_.zz());
             eulerAngles.y() = Foam::atan2(-totRotMatrix_.zx(),sy);
-            eulerAngles.z() = Foam::atan2(totRotMatrix_.yx(),totRotMatrix_.xx());
+            eulerAngles.z() = 
+                Foam::atan2(totRotMatrix_.yx(),totRotMatrix_.xx());
         }
         else
         {
-            eulerAngles.x() = Foam::atan2(-totRotMatrix_.yz(),totRotMatrix_.yy());
+            eulerAngles.x() = 
+                Foam::atan2(-totRotMatrix_.yz(),totRotMatrix_.yy());
             eulerAngles.y() = Foam::atan2(-totRotMatrix_.zx(),sy);
             eulerAngles.z() = 0.0;
         }
@@ -623,19 +679,24 @@ void immersedBody::moveImmersedBody
     geomModel_->synchronPos();
 
     InfoH << iB_Info;
-    InfoH << "-- body " << bodyId_ << " CoM                  : " << geomModel_->getCoM() << endl;
-    InfoH << "-- body " << bodyId_ << " linear velocity      : " << Vel_ << endl;
-    InfoH << "-- body " << bodyId_ << " angluar velocity     : " << omega_ << endl;
-    InfoH << "-- body " << bodyId_ << " axis of rotation     : " << Axis_ << endl;
-    InfoH << "-- body " << bodyId_ << " total rotation matrix: " << totRotMatrix_ << endl;
-
-    // update bounds of the body
-    boundBox bound(geomModel_->getBounds());
-    minBoundPoint_ = bound.min();
-    maxBoundPoint_ = bound.max();
+    InfoH << "-- body " << bodyId_ << " CoM                  : " 
+        << geomModel_->getCoM() << endl;
+    InfoH << "-- body " << bodyId_ << " linear velocity      : " 
+        << Vel_ << endl;
+    InfoH << "-- body " << bodyId_ << " angluar velocity     : " 
+        << omega_ << endl;
+    InfoH << "-- body " << bodyId_ << " axis of rotation     : " 
+        << Axis_ << endl;
+    InfoH << "-- body " << bodyId_ << " total rotation matrix: " 
+        << totRotMatrix_ << endl;
 }
 //---------------------------------------------------------------------------//
-void immersedBody::updateVectorField(volVectorField& VS, word VName,volScalarField& body)
+void immersedBody::updateVectorField
+(
+    volVectorField& VS,
+    word VName,
+    volScalarField& body
+)
 {
     // check dictionary for parameters (only noSlip allowed)
     word BC = immersedDict_.subDict(VName).lookup("BC");
@@ -710,9 +771,7 @@ void immersedBody::updateVectorField(volVectorField& VS, word VName,volScalarFie
                 }
             }
         }
-
     }
-
 }
 //---------------------------------------------------------------------------//
 // reset body field for this immersed object
@@ -722,10 +781,6 @@ vectorField immersedBody::getUatIbPoints()
     vectorField ibPointsVal(ibPoints.size());
     forAll(ibPoints, pointI)
     {
-        // vector planarVec =  geomModel_->getLVec(ibPoints[pointI])
-        //                     - Axis_*(
-        //                     (geomModel_->getLVec(ibPoints[pointI]))&Axis_);
-
         vector planarVec =  ibPoints[pointI] - geomModel_->getCoM()
                             - Axis_*(
                             (ibPoints[pointI]-geomModel_->getCoM())&Axis_);
@@ -737,28 +792,25 @@ vectorField immersedBody::getUatIbPoints()
     return ibPointsVal;
 }
 //---------------------------------------------------------------------------//
-// reset body field for this immersed object
-void immersedBody::resetBody(volScalarField& body)
-{
-    interpolationInfoOld_[Pstream::myProcNo()].clear();
-    interpolationVecReqs_[Pstream::myProcNo()].clear();
-}
-//---------------------------------------------------------------------------//
 // function to move the body after the contact
-void immersedBody::postContactUpdateBodyField(volScalarField& body, volScalarField& refineF)
+void immersedBody::postContactUpdateBodyField
+(
+    volScalarField& body,
+    volScalarField& refineF
+)
 {
     geomModel_->resetBody(body);
 
-    // move the body due to the contact
-    resetBody(body);
     createImmersedBody(body,refineF,false);
 }
 //---------------------------------------------------------------------------//
-void immersedBody::recreateBodyField(volScalarField& body, volScalarField& refineF)
+void immersedBody::recreateBodyField
+(
+    volScalarField& body, 
+    volScalarField& refineF
+)
 {
     octreeField_ = Field<label>(mesh_.nCells(), 0);
-    interpolationInfoOld_[Pstream::myProcNo()].clear();
-    interpolationVecReqs_[Pstream::myProcNo()].clear();
     geomModel_->getSurfaceCellList()[Pstream::myProcNo()].clear();
     geomModel_->getInternalCellList()[Pstream::myProcNo()].clear();
     createImmersedBody(body,refineF,false);
@@ -854,7 +906,8 @@ void immersedBody::printForcesAndTorques()
 {
     const uniformDimensionedVectorField& g =
         mesh_.lookupObject<uniformDimensionedVectorField>("g");
-    vector FG(geomModel_->getM0()*(1.0-rhoF_.value()/geomModel_->getRhoS().value())*g.value());
+    vector FG(geomModel_->getM0()*(1.0-rhoF_.value()
+        /geomModel_->getRhoS().value())*g.value());
 
     InfoH << iB_Info;
     InfoH << "-- body " << bodyId_ << "     linear force:" << F_
@@ -877,7 +930,7 @@ void immersedBody::switchActiveOff
     isActive_ = false;
 
     // rewrite the body field
-    resetBody(body);
+    geomModel_->resetBody(body);
 }
 //---------------------------------------------------------------------------//
 void immersedBody::initSyncWithFlow(const volVectorField& U)
@@ -917,7 +970,8 @@ void immersedBody::initSyncWithFlow(const volVectorField& U)
             Axis_ = vector::one;
             if (mesh_.nGeometricD() < 3)
             {
-                const vector validDirs = (mesh_.geometricD() + Vector<label>::one)/2;
+                const vector validDirs = 
+                    (mesh_.geometricD() + Vector<label>::one)/2;
                 Axis_ -= validDirs;
             }
         }
@@ -926,7 +980,8 @@ void immersedBody::initSyncWithFlow(const volVectorField& U)
             Axis_ =  Omega/(omega_+SMALL);
             if (mesh_.nGeometricD() < 3)
             {
-                const vector validDirs = (mesh_.geometricD() + Vector<label>::one)/2;
+                const vector validDirs = 
+                    (mesh_.geometricD() + Vector<label>::one)/2;
                 Axis_ = cmptMultiply(vector::one-validDirs,Axis_);
             }
         }
@@ -937,7 +992,8 @@ void immersedBody::initSyncWithFlow(const volVectorField& U)
     omegaOld_   = omega_;
     AxisOld_    = Axis_;
     // print data:
-    InfoH << basic_Info << "-- body " << bodyId_ << "initial movement variables:" << endl;
+    InfoH << basic_Info << "-- body " << bodyId_ 
+        << "initial movement variables:" << endl;
     printStats();
 }
 //---------------------------------------------------------------------------//
@@ -947,8 +1003,8 @@ void immersedBody::pimpleUpdate
     volVectorField& f
 )
 {
-    updateCoupling(body,f);
-    updateMovement(VelOld_,AxisOld_,omegaOld_);
+    updateCoupling(body, f);
+    updateMovement(VelOld_, AxisOld_, omegaOld_);
 }
 //---------------------------------------------------------------------------//
 void immersedBody::checkIfInDomain(volScalarField& body)

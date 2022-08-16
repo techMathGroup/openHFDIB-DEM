@@ -166,23 +166,3 @@ if (mesh_.nGeometricD() < 3)
         wInfos,
         matInterAdh
     ));
-
-    // set sizes for parallel runs
-    interpolationInfoOld_.setSize(Pstream::nProcs());
-    interpolationVecReqs_.setSize(Pstream::nProcs());
-
-    // initialize bounding points
-    boundBox bound(geomModel_->getBounds());
-    minBoundPoint_ = bound.min();
-    maxBoundPoint_ = bound.max();
-
-    // initialize list of labels for bounding points based on bodyID
-    // -> this list holds index of both bounding points for each dimension
-    // -> thanks to this information the update of bounding points positions is more efficient
-    for (label coord = 0; coord < 3; coord = coord + 1)
-    {
-        List<label> labeli(2);
-        labeli[0] = 2 * bodyId_;
-        labeli[1] = 2 * bodyId_ + 1;
-        boundIndList_[coord] = labeli;
-    }
