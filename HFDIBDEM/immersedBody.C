@@ -145,6 +145,7 @@ void immersedBody::syncCreateImmersedBody
     volScalarField& refineF
 )
 {
+    geomModel_->setOwner();
     InfoH << iB_Info << "body: " << bodyId_ 
         << " owner: " << geomModel_->getOwner() << endl;
 

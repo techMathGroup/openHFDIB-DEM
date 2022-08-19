@@ -363,7 +363,6 @@ void openHFDIBDEM::preUpdateBodies
 {
     forAll (immersedBodies_,bodyId)
     {
-        Info << "isActive: " << bodyId << " - " << immersedBodies_[bodyId].getIsActive() << endl;
         if (immersedBodies_[bodyId].getIsActive())
         {
             // create body or compute body-fluid coupling and estimate

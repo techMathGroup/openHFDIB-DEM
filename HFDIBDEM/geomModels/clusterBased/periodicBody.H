@@ -103,6 +103,9 @@ namespace Foam
 
         scalar getDC() final override;
 
+        // Set processor owner of the particle
+        void setOwner() final override;
+
         // Get processor owner of the particle
         label getOwner() final override;
 

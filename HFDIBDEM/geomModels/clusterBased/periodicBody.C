@@ -116,8 +116,13 @@ scalar periodicBody::getDC()
     return dc;
 }
 //---------------------------------------------------------------------------//
-label periodicBody::getOwner()
+void periodicBody::setOwner()
 {
+    forAll(ibGeomModelList, ibI)
+    {
+        ibGeomModelList[ibI].setOwner();
+    }
+
     HashTable<label, label, Hash<label>> frequency;
     forAll(ibGeomModelList, ibI)
     {
@@ -143,7 +148,12 @@ label periodicBody::getOwner()
         }
     }
 
-    return maxProc;
+    owner_ = maxProc;
+}
+//---------------------------------------------------------------------------//
+label periodicBody::getOwner()
+{
+    return owner_;
 }
 //---------------------------------------------------------------------------//
 scalar& periodicBody::getM0()
