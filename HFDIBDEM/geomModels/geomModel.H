@@ -129,14 +129,6 @@ namespace Foam
 
         public:
 
-        static scalar t1;
-        static scalar t2;
-        static scalar t3;
-        static scalar t4;
-        static scalar t5;
-        static scalar t6;
-        static scalar t7;
-
         // Constructors ------------------------------------------------
         geomModel
         (

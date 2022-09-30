@@ -508,6 +508,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
                     scalar thrSurf(readScalar(HFDIBDEMDict_.lookup("surfaceThreshold")));
                     autoPtr<periodicBody> newPeriodicBody(new periodicBody(mesh_, thrSurf));
+                    newPeriodicBody->setRhoS(immersedBodies_[bodyId].getGeomModel().getRhoS());
                     autoPtr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getGeomModel());
                     vector transVec = newPos - iBcopy().getCoM();
                     iBcopy->bodyMovePoints(transVec);
