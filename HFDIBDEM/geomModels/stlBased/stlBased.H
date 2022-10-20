@@ -134,7 +134,7 @@ namespace Foam
 
         boundBox getBounds() final override
         {
-            boundBox bounds(bodySurfMesh_.points());
+            boundBox bounds(bodySurfMesh_.points(), false);
             return bounds;
         }
 
