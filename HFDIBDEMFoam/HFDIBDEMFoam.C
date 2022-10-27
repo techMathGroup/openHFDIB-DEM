@@ -67,8 +67,6 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    clockTime stopWatch;
-
     while (runTime.run())
     {
 
@@ -80,9 +78,7 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        stopWatch.timeIncrement();
         HFDIBDEM.createBodies(lambda,refineF);
-        Info << "Create body time: " << stopWatch.timeIncrement() << endl;
         
         HFDIBDEM.preUpdateBodies(lambda,f);
 
