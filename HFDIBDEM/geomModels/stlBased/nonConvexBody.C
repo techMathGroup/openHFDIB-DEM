@@ -81,6 +81,10 @@ void nonConvexBody::createImmersedBody
     List<labelList>& cellPoints
 )
 {
+    // clear old list contents
+    intCells_[Pstream::myProcNo()].clear();
+    surfCells_[Pstream::myProcNo()].clear();
+
     // reduce computational domain to the body bounding box
     scalar inflFact(2*sqrt(mesh_.magSf()[0]));
 
@@ -120,11 +124,6 @@ void nonConvexBody::createImmersedBody
     const pointField& cp = mesh_.C();
     const pointField fCp = filterField(cp,bBoxCells[Pstream::myProcNo()]);
     boolList fCentersInside = triSurfSearch_().calcInside(fCp);
-
-
-    // clear old list contents
-    intCells_[Pstream::myProcNo()].clear();
-    surfCells_[Pstream::myProcNo()].clear();
 
     // find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;

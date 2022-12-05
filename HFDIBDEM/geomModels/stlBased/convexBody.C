@@ -41,7 +41,13 @@ void convexBody::createImmersedBody
     Field<label>& octreeField,
     List<labelList>& cellPoints
 )
-{
+{    
+    // clear old list contents
+    intCells_[Pstream::myProcNo()].clear();
+    surfCells_[Pstream::myProcNo()].clear();
+    // find the processor with most of this IB inside
+    ibPartialVolume_[Pstream::myProcNo()] = 0;
+
     if(!isBBoxInMesh())
     {
         return;
@@ -53,12 +59,6 @@ void convexBody::createImmersedBody
         return;
     }
 
-    // clear old list contents
-    intCells_[Pstream::myProcNo()].clear();
-    surfCells_[Pstream::myProcNo()].clear();
-    // find the processor with most of this IB inside
-    ibPartialVolume_[Pstream::myProcNo()] = 0;
-    octreeField *= 0;
     // get the list of cell centroids
     const pointField& cp = mesh_.C();
 
