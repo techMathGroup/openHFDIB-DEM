@@ -31,29 +31,28 @@ Contributors
 \*---------------------------------------------------------------------------*/
 #include "wallContactInfo.H"
 
+#include "interAdhesion.H"
+#include "wallMatInfo.H"
+
 using namespace Foam;
 
 //---------------------------------------------------------------------------//
 wallContactInfo::wallContactInfo
 (
     ibContactClass& cClass,
-    ibContactVars& cVars,
-    HashTable<materialInfo,string,Hash<string>>& wInfos,
-    HashTable<scalar,string,Hash<string>>& matInterAdh
+    ibContactVars& cVars
 )
 :
 ibContactClass_(cClass),
-ibContactVars_(cVars),
-wInfos_(wInfos),
-matInterAdh_(matInterAdh)
+ibContactVars_(cVars)
 {
     bodyId_ = cVars.bodyId_;
-    materialInfo& cMatInfo(cClass.getMatInfo());
+    const materialInfo& cMatInfo(cClass.getMatInfo());
 
-    List<string> cntPatches(wInfos.toc());
+    const List<string> cntPatches = wallMatInfo::getWallPatches();
     forAll(cntPatches, patchI)
     {
-        materialInfo& wInfo(wInfos[cntPatches[patchI]]);
+        const materialInfo& wInfo = wallMatInfo::getWallMatInfo()[cntPatches[patchI]];
 
         scalar adhPot = 0;
         string adhPotKey;
@@ -70,9 +69,9 @@ matInterAdh_(matInterAdh)
             adhPotKey += "-";
             adhPotKey += cMatInfo.getMaterial();
         }
-        if(matInterAdh.found(adhPotKey))
+        if(interAdhesion::getInterAdhesion().found(adhPotKey))
         {
-            adhPot = matInterAdh[adhPotKey];
+            adhPot = interAdhesion::getInterAdhesion()[adhPotKey];
         }
 
         // compute mean model parameters
@@ -81,16 +80,16 @@ matInterAdh_(matInterAdh)
         scalar aG = 1/(2*(2 - cMatInfo.getNu())*(1 + cMatInfo.getNu())
             /cMatInfo.getY() + 2*(2 - wInfo.getNu())
             *(1 + wInfo.getNu())/wInfo.getY());
-        scalar aGammaN = aY*(cMatInfo.getGamma()*wInfo.getGamma())
+        scalar aGammaN = (cMatInfo.getGamma()*wInfo.getGamma())
             /(cMatInfo.getGamma()+wInfo.getGamma()+SMALL);
-        scalar aGammat = aG*(cMatInfo.getGamma()*wInfo.getGamma())
+        scalar aGammat = (cMatInfo.getGamma()*wInfo.getGamma())
             /(cMatInfo.getGamma()+wInfo.getGamma()+SMALL);
         scalar aMu = (cMatInfo.getMu()+wInfo.getMu())/2;
         scalar maxAdhN = cMatInfo.getAdhN() + wInfo.getAdhN() - 2*adhPot;
 
         wallMeanPars_.insert(
             cntPatches[patchI],
-            meanContactPar(aY, aG, aGammaN, aGammat, aMu, maxAdhN)
+            physicalProperties(aY, aG,  aGammaN, aGammat, aMu, maxAdhN, 0, 0)
         );
     }
 
@@ -214,7 +213,7 @@ vector wallContactInfo::getFA(wallContactVars& wallCntvar)
 //---------------------------------------------------------------------------//
 vector wallContactInfo::getFNd(wallContactVars& wallCntvar)
 {
-    meanContactPar& meanCntPar(wallCntvar.getMeanCntPar());
+    physicalProperties& meanCntPar(wallCntvar.getMeanCntPar());
     return (meanCntPar.aGammaN_*sqrt(meanCntPar.aY_*reduceM_
         /pow(wallCntvar.Lc_+SMALL,3))*(wallCntvar.contactArea_*wallCntvar.Vn_))
         *wallCntvar.contactNormal_;
@@ -222,7 +221,7 @@ vector wallContactInfo::getFNd(wallContactVars& wallCntvar)
 //---------------------------------------------------------------------------//
 vector wallContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
 {
-    meanContactPar& meanCntPar(wallCntvar.getMeanCntPar());
+    physicalProperties& meanCntPar(wallCntvar.getMeanCntPar());
     // project last Ft into a new direction
     vector FtLastP(wallCntvar.FtPrev_
         - (wallCntvar.FtPrev_ & wallCntvar.contactNormal_)

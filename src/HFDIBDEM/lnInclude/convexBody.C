@@ -1,1 +1,0 @@
-../geomModels/stlBased/convexBody.C

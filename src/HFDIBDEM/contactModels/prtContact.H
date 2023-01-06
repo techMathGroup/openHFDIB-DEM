@@ -64,18 +64,60 @@ namespace contactModel
     typedef DynamicList<vector> DynamicVectorList;
     typedef DynamicList<point>  DynamicPointList;
 
+    void findSubContacts(
+        const fvMesh&   mesh,
+        prtContactInfo& prtcInfo
+    );
+
+    void findSubContacts_Sphere(
+        prtContactInfo& prtcInfo
+    );
+
+    void findSubContacts_Cluster(
+        const fvMesh&   mesh,
+        prtContactInfo& prtcInfo
+    );
+
+    void findSubContacts_ArbShape(
+        const fvMesh&   mesh,
+        prtContactInfo& prtcInfo
+    );
+
+    List<DynamicList<label>> detectContactCells
+    (
+        const fvMesh&   mesh,
+        geomModel& cGeomModel,
+        geomModel& tGeomModel,
+        DynamicLabelList & commonCells
+    );
+
+    bool isCellContactCell
+    (
+        const fvMesh&   mesh,
+        geomModel& cGeomModel,
+        geomModel& tGeomModel,
+        label cellId
+    );
+
     bool detectPrtPrtContact
     (
         const fvMesh& mesh,
         ibContactClass& cClass,
-        ibContactClass& tClass
+        ibContactClass& tClass,
+        prtSubContactInfo& subCInfo
+    );
+
+    void findSubContacts_ArbShape(
+        const fvMesh&   mesh,
+        prtContactInfo& prtcInfo
     );
 
     bool detectPrtPrtContact_ArbShape
     (
         const fvMesh& mesh,
         ibContactClass& cClass,
-        ibContactClass& tClass
+        ibContactClass& tClass,
+        prtSubContactInfo& subCInfo
     );
 
     bool detectPrtPrtContact_Sphere
@@ -89,37 +131,22 @@ namespace contactModel
     (
         const fvMesh& mesh,
         ibContactClass& cClass,
-        ibContactClass& tClass
+        ibContactClass& tClass,
+        prtSubContactInfo& subCInfo
     );
 
     void getPrtContactVars(
         const fvMesh&   mesh,
         ibContactClass& cClass,
         ibContactClass& tClass,
-        prtContactVars& prtCntVars
+        prtSubContactInfo& subCInfo
     );
 
     void getPrtContactVars_ArbShape(
         const fvMesh&   mesh,
         ibContactClass& cClass,
         ibContactClass& tClass,
-        prtContactVars& prtCntVars
-    );
-
-    Tuple2<scalar,vector> get3DcontactVars(
-        const fvMesh&   mesh,
-        DynamicLabelList& commonCells,
-        DynamicVectorList& edgePoints,
-        vector normalVector,
-        vector contactCenter,
-        label owner
-    );
-
-    Tuple2<scalar,vector>  get2DcontactVars(
-        const fvMesh&   mesh,
-        DynamicLabelList& commonCells,
-        vector normalVector,
-        vector contactCenter
+        prtSubContactInfo& subCInfo
     );
 
     void getPrtContactVars_Sphere
@@ -127,7 +154,7 @@ namespace contactModel
         const fvMesh&   mesh,
         ibContactClass& cClass,
         ibContactClass& tClass,
-        prtContactVars& prtCntVars
+        prtSubContactInfo& subCInfo
     );
 
     void getPrtContactVars_Cluster
@@ -135,12 +162,13 @@ namespace contactModel
         const fvMesh&   mesh,
         ibContactClass& cClass,
         ibContactClass& tClass,
-        prtContactVars& prtCntVars
+        prtSubContactInfo& subCInfo
     );
 
     bool solvePrtContact(
         const fvMesh&   mesh,
         prtContactInfo& cInfo,
+        prtSubContactInfo& subCInfo,
         scalar deltaT
     );
 }

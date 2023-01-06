@@ -50,8 +50,6 @@ Contributors
 #include "outputHFDIBDEM.H"
 using namespace outputHFDIBDEM;
 
-#include "clockTime.H"
-
 namespace Foam
 {
     // custom field filtration
@@ -350,7 +348,6 @@ namespace Foam
         const symmTensor& getI()    const
         {
             return I_;
-            
         }
 
         virtual void resetBody(volScalarField& body);

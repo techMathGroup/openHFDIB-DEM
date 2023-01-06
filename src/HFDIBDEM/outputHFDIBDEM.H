@@ -55,17 +55,21 @@ namespace outputHFDIBDEM
         basic_Info,
         iB_Info,
         DEM_Info,
-        addModel_Info
+        addModel_Info,
+        parallelDEM_Info
     };
 
-    class InfoHFDIBDEM
+    class
+    InfoHFDIBDEM
     {
         private:
         bool printBasic;
         bool printIb;
         bool printDEM;
         bool printAddModel;
+        bool printParallelDEM;
         bool print;
+        bool printParDEM;
 
         HashTable<bool, outputType,Hash<label>> outputTable;
 
@@ -77,47 +81,74 @@ namespace outputHFDIBDEM
             printIb = true;
             printDEM = true;
             printAddModel = true;
+            printParallelDEM = true;
             print = true;
+            printParDEM = true;
 
             outputTable.insert(basic_Info, printBasic);
             outputTable.insert(iB_Info, printIb);
             outputTable.insert(DEM_Info, printDEM);
             outputTable.insert(addModel_Info, printAddModel);
+            outputTable.insert(parallelDEM_Info, printParallelDEM);
         }
         // Destructors -----------------------------------------------------
         ~InfoHFDIBDEM(){}
 
-        void setOutput(bool basicB, bool ibB, bool demB, bool addModelB)
+        void setOutput(bool basicB, bool ibB, bool demB, bool addModelB, bool parDEMB)
         {
             outputTable[basic_Info] = basicB;
             outputTable[iB_Info] = ibB;
             outputTable[DEM_Info] = demB;
             outputTable[addModel_Info] = addModelB;
+            outputTable[parallelDEM_Info] = parDEMB;
         }
 
         InfoHFDIBDEM& operator<<(const outputType& data)
         {
-            if(outputTable[data])
+            if(outputTable[data]  && data != parallelDEM_Info )
+            {
                 print = true;
-            else
+                printParDEM = false;
+            }
+            else if (outputTable[data] && data == parallelDEM_Info)
+            {
+                printParDEM = true;
                 print = false;
-
+            }
+            else
+            {
+                print = false;
+                printParDEM = false;
+            }
             return *this;
         }
 
         template<typename T>
         InfoHFDIBDEM& operator<<(const T& data)
         {
-            if(print)
+            if(printParDEM && !print)
+            {
+                Pout << data;
+            }
+            if(print && !printParDEM)
+            {
                 Info << data;
+            }
             return *this;
         }
 
         typedef ostream& (manip)(ostream&);
         InfoHFDIBDEM& operator<<(manip m)
         {
-            if(print)
+            if(print && !printParDEM)
+            {
                 Info << m;
+            }
+
+            if(printParDEM && !print)
+            {
+                Pout << m;
+            }
             return *this;
         }
     };

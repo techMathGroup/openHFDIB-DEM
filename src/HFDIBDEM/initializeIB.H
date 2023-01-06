@@ -145,7 +145,7 @@ if (mesh_.nGeometricD() < 3)
 
     ibContactClass_.set(new ibContactClass(
         geomModel_,
-        materialInfos[material]
+        material
     ));
 
     ibCntVars_.set(new ibContactVars
@@ -162,7 +162,5 @@ if (mesh_.nGeometricD() < 3)
     wallCntInfo_.set(new wallContactInfo
     (
         ibContactClass_(),
-        ibCntVars_(),
-        wInfos,
-        matInterAdh
+        ibCntVars_()
     ));

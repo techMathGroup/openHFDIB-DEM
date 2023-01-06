@@ -36,8 +36,7 @@ Contributors
 #ifndef wallContactVars_H
 #define wallContactVars_H
 
-#include "meanContactPar.H"
-// #include "fvMesh.H"
+#include "physicalProperties.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,7 +55,7 @@ class wallContactVars
     vector contactNormal_;
     scalar contactArea_;
 
-    meanContactPar meanContactPar_;
+    physicalProperties physicalProperties_;
 
     vector lVec_;
     vector Veli_;
@@ -89,12 +88,12 @@ class wallContactVars
     (
         const fvMesh&   mesh,
         DynamicList<Tuple2<label,string>>& contactFaces,
-        HashTable<meanContactPar,string,Hash<string>>& wallMeanPars
+        HashTable<physicalProperties,string,Hash<string>>& wallMeanPars
     );
 
-    meanContactPar& getMeanCntPar()
+    physicalProperties& getMeanCntPar()
     {
-        return meanContactPar_;
+        return physicalProperties_;
     }
 };
 

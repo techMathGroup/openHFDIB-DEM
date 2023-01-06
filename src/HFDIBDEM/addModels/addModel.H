@@ -52,6 +52,9 @@ Contributors
 
 #include "contactModel.H"
 #include "immersedBody.H"
+#include "ibContactVars.H"
+
+#include "virtualMesh.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

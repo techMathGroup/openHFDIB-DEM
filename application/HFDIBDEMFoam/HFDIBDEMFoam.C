@@ -91,11 +91,13 @@ int main(int argc, char *argv[])
         }
 
         Info << "updating HFDIBDEM" << endl;
+
         HFDIBDEM.postUpdateBodies(lambda,f);
 
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
 
         HFDIBDEM.updateDEM(lambda,refineF);
+
         Info << "updated HFDIBDEM" << endl;
 
         runTime.write();
@@ -112,6 +114,7 @@ int main(int argc, char *argv[])
     }
 
     Info<< "End\n" << endl;
+
 
     return 0;
 };

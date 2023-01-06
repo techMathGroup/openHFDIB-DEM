@@ -156,6 +156,7 @@ bool detectWallContact_Sphere(
     List<DynamicLabelList>& surfCells(ibClass.getSurfCells());
     bool inContact = false;
 
+
     // go through all surfCells and check if there is any surfCell whose face is a boundary face
     forAll (surfCells[Pstream::myProcNo()],sCellI)
     {
@@ -220,7 +221,7 @@ bool detectWallContact_Cluster(
         autoPtr<geomModel> cGeomModel(cBodies[cIbI].getGeomModel());
         autoPtr<ibContactClass> cIbClassI(new ibContactClass(
             cGeomModel,
-            ibClass.getMatInfo()
+            ibClass.getMatInfo().getMaterial()
         ));
 
         if(detectWallContact(
@@ -816,13 +817,11 @@ void getWallContactVars_Cluster(
         autoPtr<geomModel> cGeomModel(cBodies[cIbI].getGeomModel());
         autoPtr<ibContactClass> cIbClassI(new ibContactClass(
             cGeomModel,
-            wallCntInfo.getcClass().getMatInfo()
+            wallCntInfo.getcClass().getMatInfo().getMaterial()
         ));
         autoPtr<wallContactInfo> cWallCntI(new wallContactInfo(
             cIbClassI(),
-            wallCntInfo.getcVars(),
-            wallCntInfo.getWInfos(),
-            wallCntInfo.getMatInterAdh()
+            wallCntInfo.getcVars()
         ));
 
         getWallContactVars(
@@ -893,6 +892,11 @@ void solveWallContact
         vector FNd = wallCntInfo.getFNd(wallCntVar);
         InfoH << DEM_Info << "-- Particle-wall contact FNd " << FNd << endl;
 
+        if(mag(F) < mag(FNd))
+        {
+            InfoH << DEM_Info << "-- ALERT DEM Damping is larger than Elastic" << endl;
+        }
+
         F += FNd;
         InfoH << DEM_Info << "-- Particle-wall contact FN " << F << endl;
 
@@ -904,7 +908,7 @@ void solveWallContact
             Ft *= wallCntInfo.getMu(wallCntVar) * mag(F) / mag(Ft);
         }
         InfoH << DEM_Info << "-- Particle-wall contact Ft clamped" << Ft << endl;
-        F += Ft;        
+        F += Ft;
 
         vector FA = wallCntInfo.getFA(wallCntVar);
         InfoH << DEM_Info << "-- Particle-wall contact FA " << FA << endl;

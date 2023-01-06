@@ -1,1 +1,0 @@
-../contactModels/wallContactVars.H

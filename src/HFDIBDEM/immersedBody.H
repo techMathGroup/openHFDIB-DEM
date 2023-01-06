@@ -51,6 +51,7 @@ Contributors
 #include "interpolationInfo.H"
 #include "ibInterpolation.H"
 
+#include "virtualMesh.H"
 namespace Foam
 {
 
@@ -108,7 +109,7 @@ namespace Foam
         // linear velocity
         vector Vel_;
         vector VelOld_;
-
+        vector velBeforeContact_ = vector::zero;
         // linear acceleration
         vector a_;
 
@@ -173,13 +174,13 @@ namespace Foam
         // auxiliary variables
         tensor  totRotMatrix_;
         bool    sdBasedLambda_;
+        bool    isInCollision_ = false;
         scalar  intSpan_;
         scalar  charCellSize_;                                          //characteristic cell size over surface
         label   refineBuffers_;                                         //number of refine buffers around body
         label   recomputeM0_;                                           //how many times rocompute M0_ because of refinement
         label   timesToSetStatic_;
         vector  staticContactPost_;
-
         protected:
 
 
@@ -191,17 +192,13 @@ namespace Foam
         (
             word bodyName,
             const Foam::fvMesh& mesh,
-            const volScalarField& body,
             dictionary& HFDIBDEMDict,
             dictionary& transportProperties,
             label bodyId,
             label recomputeM0,
             geomModel* bodyGeomModel,
             autoPtr<ibInterpolation>& ibIntp,
-            List<labelList>& cellPoints,
-            HashTable<materialInfo,string,Hash<string>>& materialInfos,
-            HashTable<materialInfo,string,Hash<string>>& wInfos,
-            HashTable<scalar,string,Hash<string>>& matInterAdh
+            List<labelList>& cellPoints
         );
 
         // Destructors -------------------------------------------------
@@ -492,6 +489,22 @@ namespace Foam
         wallContactInfo& getWallCntInfo()
         {
             return wallCntInfo_();
+        }
+
+        void setVelocityBeforeContact
+        (
+            vector oldVelocity
+        )
+        {
+            velBeforeContact_ = oldVelocity;
+        }
+
+        void setIsInCollision
+        (
+            bool isInCollision
+        )
+        {
+            isInCollision_ = isInCollision;
         }
 
         void recordBodyInfo(IOdictionary& dict, word path)

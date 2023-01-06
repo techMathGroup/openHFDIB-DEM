@@ -31,20 +31,22 @@ Contributors
 \*---------------------------------------------------------------------------*/
 #include "ibContactClass.H"
 
+#include "materialProperties.H"
+
 using namespace Foam;
 
 //---------------------------------------------------------------------------//
 ibContactClass::ibContactClass
 (
     autoPtr<geomModel>& geomModel,
-    materialInfo& matInfo
+    const string& material
 )
 :
 geomModel_(geomModel),
 isInWallContact_(false),
 inContactWithStatic_(false),
 timeStepsInContWStatic_(0),
-matInfo_(matInfo)
+matInfo_(materialProperties::getMatProps()[material])
 {
 }
 ibContactClass::~ibContactClass()

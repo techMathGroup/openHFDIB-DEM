@@ -31,6 +31,9 @@ Contributors
 \*---------------------------------------------------------------------------*/
 #include "prtContactInfo.H"
 
+#include "interAdhesion.H"
+#include "virtualMeshLevel.H"
+
 using namespace Foam;
 
 //---------------------------------------------------------------------------//
@@ -39,24 +42,21 @@ prtContactInfo::prtContactInfo
     ibContactClass& cClass,
     ibContactVars& cVars,
     ibContactClass& tClass,
-    ibContactVars& tVars,
-    HashTable<scalar,string,Hash<string>>& matInterAdh
+    ibContactVars& tVars
 )
 :
 cIbContactClass_(cClass),
 cContactVars_(cVars),
 tIbContactClass_(tClass),
-tContactVars_(tVars),
-FtPrev_(vector::zero)
+tContactVars_(tVars)
 {
     contactPair_.first() = cVars.bodyId_;
     contactPair_.second() = tVars.bodyId_;
-    materialInfo& cMatInfo(cClass.getMatInfo());
-    materialInfo& tMatInfo(tClass.getMatInfo());
+    const materialInfo& cMatInfo(cClass.getMatInfo());
+    const materialInfo& tMatInfo(tClass.getMatInfo());
 
     scalar adhPot = 0;
     string adhPotKey;
-
     if(cMatInfo.getMaterial() < tMatInfo.getMaterial())
     {
         adhPotKey = cMatInfo.getMaterial();
@@ -69,25 +69,25 @@ FtPrev_(vector::zero)
         adhPotKey += "-";
         adhPotKey += cMatInfo.getMaterial();
     }
-    if(matInterAdh.found(adhPotKey))
+
+    if(interAdhesion::getInterAdhesion().found(adhPotKey))
     {
-        adhPot = matInterAdh[adhPotKey];
+        adhPot = interAdhesion::getInterAdhesion()[adhPotKey];
     }
 
     // compute mean model parameters
-    aY_ = 1/((1 - sqr(cMatInfo.getNu()))/cMatInfo.getY()
+    physicalProperties_.aY_ = 1/((1 - sqr(cMatInfo.getNu()))/cMatInfo.getY()
         + (1 - sqr(tMatInfo.getNu()))/tMatInfo.getY());
-    aG_ = 1/(2*(2 - cMatInfo.getNu())*(1 + cMatInfo.getNu())/cMatInfo.getY()
+    physicalProperties_.aG_ = 1/(2*(2 - cMatInfo.getNu())*(1 + cMatInfo.getNu())/cMatInfo.getY()
         + 2*(2 - tMatInfo.getNu())*(1 + tMatInfo.getNu())/tMatInfo.getY());
-    aGammaN_ = aY_*(cMatInfo.getGamma()*tMatInfo.getGamma())
+    physicalProperties_.aGammaN_ = (cMatInfo.getGamma()*tMatInfo.getGamma())
         /(cMatInfo.getGamma()+tMatInfo.getGamma()+SMALL);
-    aGammat_ = aG_*(cMatInfo.getGamma()*tMatInfo.getGamma())
+    physicalProperties_.aGammat_ = (cMatInfo.getGamma()*tMatInfo.getGamma())
         /(cMatInfo.getGamma()+tMatInfo.getGamma()+SMALL);
-    aMu_ = (cMatInfo.getMu()+tMatInfo.getMu())/2;
-    maxAdhN_ = cMatInfo.getAdhN() + tMatInfo.getAdhN() - 2*adhPot;
-    curAdhN_ = 0;
-
-    reduceM_ =
+    physicalProperties_.aMu_ = (cMatInfo.getMu()+tMatInfo.getMu())/2;
+    physicalProperties_.maxAdhN_ = cMatInfo.getAdhN() + tMatInfo.getAdhN() - 2*adhPot;
+    physicalProperties_.curAdhN_ = 0;
+    physicalProperties_.reduceM_ =
     (
         cIbContactClass_.getGeomModel().getM0()
         *tIbContactClass_.getGeomModel().getM0()
@@ -100,80 +100,185 @@ prtContactInfo::~prtContactInfo()
 {
 }
 //---------------------------------------------------------------------------//
-vector prtContactInfo::getLVec(ibContactClass& contactClass)
+std::shared_ptr<prtSubContactInfo> prtContactInfo::matchSubContact
+(
+    boundBox& bbox,
+    physicalProperties& physicalProperties,
+    Tuple2<label,label>& contactPair
+)
 {
-    return contactClass.getGeomModel().getLVec(prtCntVars_.contactCenter_);
+    for(auto sC : subCList_)
+    {
+        if (!sC->getVMInfo().valid())
+        {
+            continue;
+        }
+
+        if (bbox.contains(sC->getVMInfo()->getStartingPoint()))
+        {
+            return sC;
+        }
+    }
+
+    return std::make_shared<prtSubContactInfo>
+        (contactPair, physicalProperties);
 }
 //---------------------------------------------------------------------------//
-vector prtContactInfo::getVeli(ibContactVars& cVars, vector& lVec)
+void prtContactInfo::setSubContacts_Sphere()
 {
-    return (-((lVec-cVars.Axis_*((lVec) & cVars.Axis_))
-        ^ cVars.Axis_)*cVars.omega_+ cVars.Vel_);
-}
-//---------------------------------------------------------------------------//
-void prtContactInfo::evalVariables()
-{
-    cLVec_ = getLVec(cIbContactClass_);
-    InfoH << DEM_Info << "-- Particle-particle contact cLVec_ " << cLVec_ << endl;
-    tLVec_ = getLVec(tIbContactClass_);
-    InfoH << DEM_Info << "-- Particle-particle contact tLVec_ " << tLVec_ << endl;
-
-    cVeli_ = getVeli(cContactVars_, cLVec_);
-    InfoH << DEM_Info << "-- Particle-particle contact cVeli_ " << cVeli_ << endl;
-    tVeli_ = getVeli(tContactVars_, tLVec_);
-    InfoH << DEM_Info << "-- Particle-particle contact tVeli_ " << tVeli_ << endl;
-
-    Vn_ = -(cVeli_ - tVeli_) & prtCntVars_.contactNormal_;
-    InfoH << DEM_Info << "-- Particle-particle contact Vn_ " << Vn_ << endl;
-    Lc_ = 4*mag(cLVec_)*mag(tLVec_)/(mag(cLVec_) + mag(tLVec_));
-    InfoH << DEM_Info << "-- Particle-particle contact Lc_ " << Lc_ << endl;
-
-    curAdhN_ = min
-    (
-        maxAdhN_,
-        max(curAdhN_, aY_*prtCntVars_.contactVolume_/(sqr(Lc_)*8
-            *Foam::constant::mathematical::pi))
+    newSubCList_.emplace_back(std::make_shared<prtSubContactInfo>
+        (contactPair_, physicalProperties_)
     );
 }
 //---------------------------------------------------------------------------//
-vector prtContactInfo::getFNe()
+void prtContactInfo::setSubContacts_ArbShape
+(
+    const fvMesh& mesh,
+    List<DynamicList<label>> baseSubContactList
+)
 {
-    return (aY_*prtCntVars_.contactVolume_/(Lc_+SMALL))
-        *prtCntVars_.contactNormal_;
-}
-//---------------------------------------------------------------------------//
-vector prtContactInfo::getFA()
-{
-    return ((sqrt(8*Foam::constant::mathematical::pi*aY_
-        *curAdhN_*prtCntVars_.contactVolume_))
-        *prtCntVars_.contactNormal_);
-}
-//---------------------------------------------------------------------------//
-vector prtContactInfo::getFNd()
-{
-    return (aGammaN_*sqrt(aY_*reduceM_/pow(Lc_+SMALL,3))*
-        (prtCntVars_.contactArea_ * Vn_))*prtCntVars_.contactNormal_;
-}
-//---------------------------------------------------------------------------//
-vector prtContactInfo::getFt(scalar deltaT)
-{
-    // project last Ft into a new direction
-    vector FtLastP(FtPrev_ - (FtPrev_ & prtCntVars_.contactNormal_)
-        *prtCntVars_.contactNormal_);
-    // scale projected Ft to have same magnitude as FtLast
-    vector FtLastS(mag(FtPrev_) * (FtLastP/(mag(FtLastP)+SMALL)));
-    // compute relative tangential velocity
-    vector cVeliNorm = cVeli_ - ((cVeli_ & prtCntVars_.contactNormal_)
-        *prtCntVars_.contactNormal_);
+    forAll (baseSubContactList, sC)
+    {
+        scalar charCellSize = 0;
+        pointField subCPoints;
+        forAll (baseSubContactList[sC], cell)
+        {
+            label cellIter = baseSubContactList[sC][cell];
+            const pointField& pp = mesh.points();
+            const labelList& vertexLabels = mesh.cellPoints()[cellIter];
+            subCPoints.append(pointField(pp, vertexLabels));
 
-    vector tVeliNorm = tVeli_ - ((tVeli_ & prtCntVars_.contactNormal_)
-        *prtCntVars_.contactNormal_);
+            charCellSize += pow(mesh.V()[cellIter],0.333333);
+        }
+        charCellSize /= baseSubContactList[sC].size();
 
-    vector Vt(cVeliNorm - tVeliNorm);
-    // compute tangential force
-    vector Ftdi(- aGammat_*sqrt(aG_*reduceM_*Lc_)*Vt);
-    FtPrev_ = FtLastS - aG_*Lc_*Vt*deltaT + Ftdi;
-    return FtPrev_;
+        boundBox subCbBox(subCPoints, false);
+
+        vector subVolumeNVector = vector(
+            ceil((subCbBox.span()[0]/charCellSize))*virtualMeshLevel::getLevelOfDivision(),
+            ceil((subCbBox.span()[1]/charCellSize))*virtualMeshLevel::getLevelOfDivision(),
+            ceil((subCbBox.span()[2]/charCellSize))*virtualMeshLevel::getLevelOfDivision()
+        );
+
+        scalar subVolumeLength = charCellSize/virtualMeshLevel::getLevelOfDivision();
+        vector bBoxShiftVector = (subVolumeNVector*subVolumeLength - subCbBox.span())/2;
+
+        subCbBox.min() -= bBoxShiftVector;
+        subCbBox.max() += bBoxShiftVector;
+
+        scalar subVolumeV = pow(subVolumeLength,3);
+
+        newSubCList_.emplace_back(matchSubContact(subCbBox, physicalProperties_, contactPair_));
+        newSubCList_.back()->setVMInfo(subCbBox,
+            subVolumeNVector,
+            charCellSize,
+            subVolumeV
+        );
+    }
+}
+//---------------------------------------------------------------------------//
+void prtContactInfo::swapSubContactLists()
+{
+    subCList_.swap(newSubCList_);
+
+}
+//---------------------------------------------------------------------------//
+bool prtContactInfo::contactResolved()
+{
+    for(auto sC : subCList_)
+    {
+        if (sC->contactResolved())
+        {
+            return true;
+        }
+    }
+    return false;
+}
+//---------------------------------------------------------------------------//
+void prtContactInfo::syncSubCList()
+{
+    std::vector<std::shared_ptr<prtSubContactInfo>> syncedSubCList;
+    // Sync the sub-contact list going through processors
+    for (label procI = 0; procI < Pstream::nProcs(); procI++)
+    {
+        label numOfSubC = 0;
+        if (procI == Pstream::myProcNo())
+        {
+            numOfSubC = subCList_.size();
+        }
+        reduce(numOfSubC, sumOp<label>());
+
+        for (label i = 0; i < numOfSubC; i++)
+        {
+            bool vmInfoValid = false;
+            if (procI == Pstream::myProcNo())
+            {
+                vmInfoValid = subCList_[i]->getVMInfo().valid();
+            }
+            reduce(vmInfoValid, orOp<bool>());
+
+            if (vmInfoValid)
+            {
+                syncedSubCList.emplace_back(std::make_shared<prtSubContactInfo>
+                    (contactPair_, physicalProperties_)
+                );
+
+                virtualMeshInfo vmInfoToSync;
+                if (procI == Pstream::myProcNo())
+                {
+                    vmInfoToSync = virtualMeshInfo(subCList_[i]->getVMInfo()());
+                }
+                reduce(vmInfoToSync.bBox.min(), sumOp<vector>());
+                reduce(vmInfoToSync.bBox.max(), sumOp<vector>());
+                reduce(vmInfoToSync.subVolumeNVector, sumOp<vector>());
+                reduce(vmInfoToSync.charCellSize, sumOp<scalar>());
+                reduce(vmInfoToSync.subVolumeV, sumOp<scalar>());
+
+                point startPointToReduce = vmInfoToSync.getStartingPoint();
+                if (procI != Pstream::myProcNo())
+                {
+                    startPointToReduce = vector::zero;
+                }
+                reduce(startPointToReduce, sumOp<vector>());
+
+                syncedSubCList.back()->setVMInfo(vmInfoToSync);
+            }
+            else if (procI == 0)
+            {
+                syncedSubCList.emplace_back(std::make_shared<prtSubContactInfo>
+                    (contactPair_, physicalProperties_)
+                );
+            }
+        }
+    }
+
+    subCList_.swap(syncedSubCList);
+}
+//---------------------------------------------------------------------------//
+void prtContactInfo::registerSubContactList(DynamicList<prtSubContactInfo*>& contactList)
+{
+    for(auto sC : subCList_)
+    {
+        contactList.append(sC.get());
+    }
+}
+//---------------------------------------------------------------------------//
+void prtContactInfo::clearData()
+{
+    newSubCList_.clear();
+    for(auto sC : subCList_)
+    {
+        sC->clearOutForces();
+        sC->setResolvedContact(false);
+    }
+}
+//---------------------------------------------------------------------------//
+void prtContactInfo::syncData()
+{
+    for(auto sC : subCList_)
+    {
+        sC->syncData();
+    }
 }
 //---------------------------------------------------------------------------//
 

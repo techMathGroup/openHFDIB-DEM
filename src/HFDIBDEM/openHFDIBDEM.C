@@ -37,10 +37,12 @@ Contributors
 
 #include "interpolationCellPoint.H"
 #include "interpolationCell.H"
-//#include "SVD.H"
+
 #include "scalarMatrices.H"
 #include "OFstream.H"
+#include <iostream>
 #include "defineExternVars.H"
+#include "parameters.H"
 
 #define ORDER 2
 
@@ -78,13 +80,18 @@ prtcInfoTable_(0),
 stepDEM_(readScalar(HFDIBDEMDict_.lookup("stepDEM"))),
 recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 {
+    materialProperties::matProps_insert(
+        "None",
+        materialInfo("None", 1, 1, 1, 1, 1)
+    );
+
     dictionary demDic = HFDIBDEMDict_.subDict("DEM");
     dictionary materialsDic = demDic.subDict("materials");
     List<word> materialsNames = materialsDic.toc();
     forAll(materialsNames, matI)
     {
         dictionary matIDic = materialsDic.subDict(materialsNames[matI]);
-        materialInfos_.insert(
+        materialProperties::matProps_insert(
             materialsNames[matI],
             materialInfo(
                 materialsNames[matI],
@@ -119,7 +126,7 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
                 interKey += interMat[0];
             }
 
-            matInterAdh_.insert(
+            interAdhesion::interAdhesion_insert(
                 interKey,
                 readScalar(interDicI.lookup("value"))
             );
@@ -131,9 +138,9 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     forAll(patchNames, patchI)
     {
         word patchMaterial = patchDic.lookup(patchNames[patchI]);
-        wallInfos_.insert(
+        wallMatInfo::wallMatInfo_insert(
             patchNames[patchI],
-            materialInfos_[patchMaterial]
+            materialProperties::getMatProps()[patchMaterial]
         );
     }
 
@@ -162,6 +169,15 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         }
     }
 
+    if (HFDIBDEMDict_.found("virtMeshDecompositionLevel"))
+	{
+        virtualMeshLevel::setVirtualMeshLevel(readScalar(HFDIBDEMDict_.lookup("virtMeshDecompositionLevel")));
+	}
+    else
+    {
+        virtualMeshLevel::setVirtualMeshLevel(1);
+    }
+
     recordOutDir_ = mesh_.time().rootPath() + "/" + mesh_.time().globalCaseName() + "/bodiesInfo";
 }
 //---------------------------------------------------------------------------//
@@ -185,7 +201,14 @@ void openHFDIBDEM::initialize
         bool iBoutput = readBool(outputDic.lookup("iB"));
         bool DEMoutput = readBool(outputDic.lookup("DEM"));
         bool addModelOutput = readBool(outputDic.lookup("addModel"));
-        InfoH.setOutput(basicOutput,iBoutput,DEMoutput,addModelOutput);
+        bool parallelDEMOutput = readBool(outputDic.lookup("parallelDEM"));
+        InfoH.setOutput(
+            basicOutput,
+            iBoutput,
+            DEMoutput,
+            addModelOutput,
+            parallelDEMOutput
+        );
     }
 
     // get data from HFDIBDEMDict
@@ -290,17 +313,13 @@ void openHFDIBDEM::initialize
                     (
                         bodyName,
                         mesh_,
-                        body,
                         HFDIBDEMDict_,
                         transportProperties_,
                         addIBPos,
                         recomputeM0_,
                         bodyGeomModel.ptr(),
                         ibInterp_,
-                        cellPoints_,
-                        materialInfos_,
-                        wallInfos_,
-                        matInterAdh_
+                        cellPoints_
                     )
                 );
                 immersedBodies_[addIBPos].createImmersedBody(body,refineF);
@@ -468,27 +487,38 @@ void openHFDIBDEM::writeBodiesInfo()
     word curOutDir(recordOutDir_ + "/" + mesh_.time().timeName());
     mkDir(curOutDir);
     mkDir(curOutDir +"/stlFiles");
-
-    wordList bodyNames;
+    DynamicLabelList activeIB;
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            word path(curOutDir + "/body" + std::to_string(immersedBodies_[bodyId].getBodyId()) +".info");
-            OFstream ofStream(path);
-            IOobject outClass
-                (
-                    path,
-                    mesh_,
-                    IOobject::NO_READ,
-                    IOobject::AUTO_WRITE
-                );
-            IOdictionary outDict(outClass);
-
-            outDict.writeHeader(ofStream);
-            immersedBodies_[bodyId].recordBodyInfo(outDict,curOutDir);
-            outDict.writeData(ofStream);
+            activeIB.append(bodyId);
         }
+    }
+    wordList bodyNames;
+    scalar listZize(activeIB.size());
+    label bodiesPerProc = ceil(listZize/Pstream::nProcs());
+    InfoH << basic_Info << "Active IB listZize      : " << listZize<< endl;
+    InfoH << basic_Info << "bodiesPerProc : " << bodiesPerProc<< endl;
+
+
+    for(int assignProc = Pstream::myProcNo()*bodiesPerProc; assignProc < min((Pstream::myProcNo()+1)*bodiesPerProc,activeIB.size()); assignProc++)
+    {
+        const label bodyId(activeIB[assignProc]);
+        word path(curOutDir + "/body" + std::to_string(immersedBodies_[bodyId].getBodyId()) +".info");
+        OFstream ofStream(path);
+        IOobject outClass
+            (
+                path,
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            );
+        IOdictionary outDict(outClass);
+
+        outDict.writeHeader(ofStream);
+        immersedBodies_[bodyId].recordBodyInfo(outDict,curOutDir);
+        outDict.writeData(ofStream);
     }
 }
 //---------------------------------------------------------------------------//
@@ -538,6 +568,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
     scalar deltaTime(mesh_.time().deltaT().value());
     scalar pos(0.0);
     scalar step(stepDEM_);
+    // scalar timeStep(step*deltaTime);
 
     while( pos < 1)
     {
@@ -545,6 +576,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             << " DEM step: " << step << endl;
 
         verletList_.update(immersedBodies_);
+        InfoH << parallelDEM_Info << " DEM - CFD Time: " << mesh_.time().value() + deltaTime*pos << endl;
 
         forAll (immersedBodies_,bodyId)
         {
@@ -591,6 +623,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             }
         }
 
+        DynamicList<prtSubContactInfo*> contactList;
         // check only pairs whose bounding boxes are intersected for the contact
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
         {
@@ -613,44 +646,87 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 if(tStatic)
                     immersedBodies_[cInd].inContactWithStatic(true);
 
-                ibContactClass& cClass(immersedBodies_[cInd].getibContactClass());
-                ibContactClass& tClass(immersedBodies_[tInd].getibContactClass());
+                prtContactInfo& prtcInfo(getPrtcInfo(
+                    cPair)
+                );
 
-                if(detectPrtPrtContact(
+                prtcInfo.clearData();
+                findSubContacts(
                     mesh_,
-                    cClass,
-                    tClass
-                ))
-                {
-                    prtContactInfo& prtcInfo(getPrtcInfo(
-                        cPair)
-                    );
+                    prtcInfo
+                );
 
-                    if(solvePrtContact(
-                        mesh_,
-                        prtcInfo,
-                        deltaTime*step
-                    ))
-                    {
-                        immersedBodies_[cInd].updateFAndT
-                        (
-                            prtcInfo.getOutForce().first().F,
-                            prtcInfo.getOutForce().first().T
-                        );
-                        immersedBodies_[tInd].updateFAndT
-                        (
-                            prtcInfo.getOutForce().second().F,
-                            prtcInfo.getOutForce().second().T
-                        );
-                    }
-                }
-                else
+                prtcInfo.syncSubCList();
+
+                prtcInfo.registerSubContactList(contactList);
+            }
+        }
+
+        if(contactList.size() > 0 )
+        {
+            label contactPerProc(ceil(contactList.size()/Pstream::nProcs()));
+            if( contactList.size() <= Pstream::nProcs())
+            {
+                contactPerProc = 1;
+            }
+
+            for(int assignProc = Pstream::myProcNo()*contactPerProc; assignProc < min((Pstream::myProcNo()+1)*contactPerProc,contactList.size()); assignProc++)
+            {
+                prtSubContactInfo* sCI = contactList[assignProc];
+                const Tuple2<label, label>& cPair = sCI->getCPair();
+
+                ibContactClass& cClass(immersedBodies_[cPair.first()].getibContactClass());
+                ibContactClass& tClass(immersedBodies_[cPair.second()].getibContactClass());
+
+                if(detectPrtPrtContact(mesh_,cClass,tClass,*sCI))
                 {
-                    if(prtcInfoTable_.found(cPair))
-                    {
-                        prtcInfoTable_.erase(cPair);
-                    }
+                    prtContactInfo& prtcInfo(getPrtcInfo(cPair));
+                    sCI->setResolvedContact(solvePrtContact(mesh_, prtcInfo, *sCI, deltaTime*step));
                 }
+            }
+        }
+
+        for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
+        {
+            const Tuple2<label, label>& cPair = it.key();
+            label cInd(cPair.first());
+            label tInd(cPair.second());
+
+            prtContactInfo& prtcInfo(getPrtcInfo(cPair));
+            if(!prtcInfo.contactResolved())
+            {
+                if(prtcInfoTable_.found(cPair))
+                {
+                    prtcInfoTable_.erase(cPair);
+                    immersedBodies_[cInd].setVelocityBeforeContact(immersedBodies_[cInd].getVel());
+                    immersedBodies_[tInd].setVelocityBeforeContact(immersedBodies_[tInd].getVel());
+                    immersedBodies_[cInd].setIsInCollision(false);
+                    immersedBodies_[tInd].setIsInCollision(false);
+                    continue;
+                }
+            }
+
+            immersedBodies_[cInd].setIsInCollision(true);
+            immersedBodies_[tInd].setIsInCollision(true);
+
+            std::vector<std::shared_ptr<prtSubContactInfo>>& subCList
+                = prtcInfo.getPrtSCList();
+
+            for(auto sC : subCList)
+            {
+                sC->syncData();
+
+                immersedBodies_[cInd].updateFAndT
+                (
+                    sC->getOutForce().first().F,
+                    sC->getOutForce().first().T
+                );
+
+                immersedBodies_[tInd].updateFAndT
+                (
+                    sC->getOutForce().second().F,
+                    sC->getOutForce().second().T
+                );
             }
         }
 
@@ -671,16 +747,15 @@ prtContactInfo& openHFDIBDEM::getPrtcInfo(Tuple2<label,label> cPair)
 {
     if(!prtcInfoTable_.found(cPair))
     {
-        prtcInfoTable_.insert(cPair, prtContactInfo(
+        prtcInfoTable_.insert(cPair, autoPtr<prtContactInfo>( new prtContactInfo(
             immersedBodies_[cPair.first()].getibContactClass(),
             immersedBodies_[cPair.first()].getContactVars(),
             immersedBodies_[cPair.second()].getibContactClass(),
-            immersedBodies_[cPair.second()].getContactVars(),
-            matInterAdh_
-        ));
+            immersedBodies_[cPair.second()].getContactVars()
+        )));
     }
 
-    return prtcInfoTable_[cPair];
+    return prtcInfoTable_[cPair]();
 }
 //---------------------------------------------------------------------------//
 // function to either add or remove bodies from the simulation
@@ -722,17 +797,13 @@ void openHFDIBDEM::addRemoveBodies
                     (
                         bodyName,
                         mesh_,
-                        body,
                         HFDIBDEMDict_,
                         transportProperties_,
                         addIBPos,
                         recomputeM0_,
                         bodyGeomModel.ptr(),
                         ibInterp_,
-                        cellPoints_,
-                        materialInfos_,
-                        wallInfos_,
-                        matInterAdh_
+                        cellPoints_
                     )
                 );
 
@@ -864,17 +935,13 @@ void openHFDIBDEM::restartSimulation
             (
                 bodyName,
                 mesh_,
-                body,
                 HFDIBDEMDict_,
                 transportProperties_,
                 addIBPos,
                 recomputeM0_,
                 bodyGeomModel.ptr(),
                 ibInterp_,
-                cellPoints_,
-                materialInfos_,
-                wallInfos_,
-                matInterAdh_
+                cellPoints_
             )
         );
 

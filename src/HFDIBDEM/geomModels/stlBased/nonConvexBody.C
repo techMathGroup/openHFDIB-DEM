@@ -54,7 +54,7 @@ labelList nonConvexBody::getBBoxCellsByOctTree
         label   partCheck(0);
         forAll (bBoxMin,vecI)
         {
-            if (cCenter[vecI] >= bBoxMin[vecI] and cCenter[vecI] <= bBoxMax[vecI])
+            if (cCenter[vecI] >= bBoxMin[vecI] && cCenter[vecI] <= bBoxMax[vecI])
             {
                 partCheck++;
             }
@@ -99,7 +99,7 @@ void nonConvexBody::createImmersedBody
     bool isInsideBB(false);
     labelList nextToCheck(1,0);
     label iterCount(0);label iterMax(mesh_.nCells());
-    while ((nextToCheck.size() > 0 or not isInsideBB) and iterCount < iterMax)
+    while ((nextToCheck.size() > 0 or not isInsideBB) && iterCount < iterMax)
     {
         iterCount++;
         DynamicLabelList auxToCheck;

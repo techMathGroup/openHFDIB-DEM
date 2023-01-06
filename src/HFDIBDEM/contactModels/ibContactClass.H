@@ -56,8 +56,8 @@ namespace Foam
                         Class ibContactClass Declaration
 \*---------------------------------------------------------------------------*/
 struct forces{
-    vector F;
-    vector T;
+    vector F = vector::zero;
+    vector T = vector::zero;
 };
 
 class ibContactClass
@@ -80,7 +80,7 @@ class ibContactClass
 
     label timeStepsInContWStatic_;
 
-    materialInfo& matInfo_;
+    const materialInfo& matInfo_;
 
     public:
 
@@ -88,7 +88,7 @@ class ibContactClass
     ibContactClass
     (
         autoPtr<geomModel>& geomModel,
-        materialInfo& matInfo
+        const string& material
     );
 
     // Destructors -------------------------------------------------
@@ -119,7 +119,7 @@ class ibContactClass
         return geomModel_().getInternalCellList();
     }
 
-    materialInfo& getMatInfo()
+    const materialInfo& getMatInfo()
     {
         return matInfo_;
     }

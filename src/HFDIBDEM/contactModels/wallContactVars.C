@@ -38,39 +38,39 @@ void wallContactVars::setMeanCntPars
 (
     const fvMesh&   mesh,
     DynamicList<Tuple2<label,string>>& contactFaces,
-    HashTable<meanContactPar,string,Hash<string>>& wallMeanPars
+    HashTable<physicalProperties,string,Hash<string>>& wallMeanPars
 )
 {
     scalar overallArea = 0;
-    meanContactPar_.aY_ = 0;
-    meanContactPar_.aG_ = 0;
-    meanContactPar_.aGammaN_ = 0;
-    meanContactPar_.aGammat_ = 0;
-    meanContactPar_.aMu_ = 0;
-    meanContactPar_.maxAdhN_ = 0;
+    physicalProperties_.aY_ = 0;
+    physicalProperties_.aG_ = 0;
+    physicalProperties_.aGammaN_ = 0;
+    physicalProperties_.aGammat_ = 0;
+    physicalProperties_.aMu_ = 0;
+    physicalProperties_.maxAdhN_ = 0;
 
     forAll(contactFaces,faceI)
     {
         scalar area = mesh.magSf()[contactFaces[faceI].first()];
         overallArea += area;
 
-        meanContactPar& cMeanCntPars(
+        physicalProperties& cMeanCntPars(
             wallMeanPars[contactFaces[faceI].second()]
         );
 
-        meanContactPar_.aY_ += (cMeanCntPars.aY_*area);
-        meanContactPar_.aG_ += (cMeanCntPars.aG_*area);
-        meanContactPar_.aGammaN_ += (cMeanCntPars.aGammaN_*area);
-        meanContactPar_.aGammat_ += (cMeanCntPars.aGammat_*area);
-        meanContactPar_.aMu_ += (cMeanCntPars.aMu_*area);
-        meanContactPar_.maxAdhN_ += (cMeanCntPars.maxAdhN_*area);
+        physicalProperties_.aY_ += (cMeanCntPars.aY_*area);
+        physicalProperties_.aG_ += (cMeanCntPars.aG_*area);
+        physicalProperties_.aGammaN_ += (cMeanCntPars.aGammaN_*area);
+        physicalProperties_.aGammat_ += (cMeanCntPars.aGammat_*area);
+        physicalProperties_.aMu_ += (cMeanCntPars.aMu_*area);
+        physicalProperties_.maxAdhN_ += (cMeanCntPars.maxAdhN_*area);
     }
 
-    meanContactPar_.aY_ /= overallArea;
-    meanContactPar_.aG_ /= overallArea;
-    meanContactPar_.aGammaN_ /= overallArea;
-    meanContactPar_.aGammat_ /= overallArea;
-    meanContactPar_.aMu_ /= overallArea;
-    meanContactPar_.maxAdhN_ /= overallArea;
+    physicalProperties_.aY_ /= overallArea;
+    physicalProperties_.aG_ /= overallArea;
+    physicalProperties_.aGammaN_ /= overallArea;
+    physicalProperties_.aGammat_ /= overallArea;
+    physicalProperties_.aMu_ /= overallArea;
+    physicalProperties_.maxAdhN_ /= overallArea;
 }
 //---------------------------------------------------------------------------//

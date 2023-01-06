@@ -344,6 +344,8 @@ geomModel* addModelRepeatRandomPosition::addBody
         geomModel_->bodyScalePoints(scaleStep_);
     }
 
+    geomModel_->bodyScalePoints(1.02);
+
     vector CoM(geomModel_->getCoM());
     point bBoxCenter = cellZoneBounds_.midpoint();
     geomModel_->bodyMovePoints(bBoxCenter - CoM);
@@ -362,6 +364,8 @@ geomModel* addModelRepeatRandomPosition::addBody
     );
 
     bool canAddBodyI = !isBodyInContact(immersedBodies);
+
+    geomModel_->bodyScalePoints(1.0/1.02);
 
     reduce(canAddBodyI, andOp<bool>());
     bodyAdded_ = (canAddBodyI);

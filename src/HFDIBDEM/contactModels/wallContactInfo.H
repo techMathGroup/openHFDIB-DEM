@@ -47,7 +47,7 @@ Contributors
 #include "ibContactClass.H"
 #include "wallContactVars.H"
 #include "materialInfo.H"
-#include "meanContactPar.H"
+#include "physicalProperties.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -67,12 +67,8 @@ class wallContactInfo
     typedef DynamicList<vector> DynamicVectorList;
     typedef DynamicList<point> DynamicPointList;
 
-    protected:
-
     ibContactClass& ibContactClass_;
     ibContactVars& ibContactVars_;
-    HashTable<materialInfo,string,Hash<string>>& wInfos_;
-    HashTable<scalar,string,Hash<string>>& matInterAdh_;
 
     label bodyId_;
 
@@ -82,13 +78,7 @@ class wallContactInfo
     HashTable<wallContactVars,label,Hash<label>> wallcVarsTable_;
 
     // Mean model parameters
-    /*scalar aY_;         // Contact Young modulus
-    scalar aG_;         // Contact shear modulus
-    scalar aGammaN_;    // Contact normal gamma
-    scalar aGammat_;    // Contact tangential gamma
-    scalar aMu_;        // Contact frictional coef
-    scalar maxAdhN_;    // Contact adhesive coef*/
-    HashTable<meanContactPar,string,Hash<string>> wallMeanPars_;
+    HashTable<physicalProperties,string,Hash<string>> wallMeanPars_;
 
     scalar reduceM_;    // Reduced mass
 
@@ -100,9 +90,7 @@ class wallContactInfo
     wallContactInfo
     (
         ibContactClass& cClass,
-        ibContactVars& cVars,
-        HashTable<materialInfo,string,Hash<string>>& wInfos,
-        HashTable<scalar,string,Hash<string>>& matInterAdh
+        ibContactVars& cVars
     );
 
     // Destructors -------------------------------------------------
@@ -116,16 +104,6 @@ class wallContactInfo
     ibContactVars& getcVars()
     {
         return ibContactVars_;
-    }
-
-    HashTable<materialInfo,string,Hash<string>>& getWInfos()
-    {
-        return wInfos_;
-    }
-
-    HashTable<scalar,string,Hash<string>>& getMatInterAdh()
-    {
-        return matInterAdh_;
     }
 
     label getBodyId()
@@ -186,7 +164,7 @@ class wallContactInfo
         return wallMeanPars_.found(patchName);
     }
 
-    HashTable<meanContactPar,string,Hash<string>>& getWallMeanPars()
+    HashTable<physicalProperties,string,Hash<string>>& getWallMeanPars()
     {
         return wallMeanPars_;
     }

@@ -45,13 +45,12 @@ namespace Foam
                       Class prtContactVars Declaration
 \*---------------------------------------------------------------------------*/
 
-class prtContactVars
+struct prtContactVars
 {
-    public:
-    vector contactCenter_;
-    scalar contactVolume_;
-    vector contactNormal_;
-    scalar contactArea_;
+    vector contactCenter_ = vector::zero;
+    scalar contactVolume_ = 0.0f;
+    vector contactNormal_ = vector::zero;
+    scalar contactArea_ = 0.0f;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

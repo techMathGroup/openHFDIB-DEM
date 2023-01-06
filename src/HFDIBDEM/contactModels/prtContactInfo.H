@@ -45,7 +45,11 @@ Contributors
 #include "geomModel.H"
 #include "ibContactVars.H"
 #include "ibContactClass.H"
-#include "prtContactVars.H"
+#include "prtSubContactInfo.H"
+#include "physicalProperties.H"
+
+#include <vector>
+#include <memory>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -65,6 +69,8 @@ class prtContactInfo
     typedef DynamicList<vector> DynamicVectorList;
     typedef DynamicList<point> DynamicPointList;
 
+    // bool isFileCreated_ = true;
+
     protected:
 
     ibContactClass& cIbContactClass_;
@@ -75,31 +81,17 @@ class prtContactInfo
 
     Tuple2<label,label> contactPair_;
 
-    prtContactVars prtCntVars_;
+    std::vector<std::shared_ptr<prtSubContactInfo>> subCList_;
+    std::vector<std::shared_ptr<prtSubContactInfo>> newSubCList_;
 
-    // Mean model parameters
-    scalar aY_;         // Contact Young modulus
-    scalar aG_;         // Contact shear modulus
-    scalar aGammaN_;    // Contact normal gamma
-    scalar aGammat_;    // Contact tangential gamma
-    scalar aMu_;        // Contact frictional coef
-    scalar maxAdhN_;    // Contact adhesive coef
-    scalar curAdhN_;    // Current contact adhesive coef
+    physicalProperties physicalProperties_;
 
-    scalar reduceM_;    // Reduced mass
-
-    vector cLVec_;       // Direction to contact center for body c
-    vector tLVec_;       // Direction to contact center for body t
-
-    vector cVeli_;       // Velocity at contact center for body c
-    vector tVeli_;       // Velocity at contact center for body t
-
-    scalar Vn_;          // Relative velocity in the normal direction
-    scalar Lc_;          // Characteristic length
-
-    vector FtPrev_;     // Tangential force from previous time-step
-
-    Tuple2<forces,forces> outForce_; // Out variable for force
+    std::shared_ptr<prtSubContactInfo> matchSubContact
+    (
+        boundBox& bbox,
+        physicalProperties& physicalProperties,
+        Tuple2<label,label>& contactPair
+    );
 
     public:
 
@@ -109,12 +101,12 @@ class prtContactInfo
         ibContactClass& cClass,
         ibContactVars& cVars,
         ibContactClass& tClass,
-        ibContactVars& tVars,
-        HashTable<scalar,string,Hash<string>>& matInterAdh
+        ibContactVars& tVars
     );
 
     // Destructors -------------------------------------------------
     ~prtContactInfo();
+    //-----------------------------Func-------------------------------//
 
     ibContactClass& getcClass()
     {
@@ -126,49 +118,45 @@ class prtContactInfo
         return tIbContactClass_;
     }
 
-    Tuple2<label,label>& getcPair()
+    ibContactVars& getcVars()
     {
-        return contactPair_;
+        return cContactVars_;
     }
 
-    prtContactVars& getprtCntVars()
+    ibContactVars& gettVars()
     {
-        return prtCntVars_;
+        return tContactVars_;
     }
 
     scalar getMu()
     {
-        return aMu_;
+        return physicalProperties_.aMu_;
     }
 
-    vector getcLVec()
+    void setSubContacts_Sphere();
+
+    void setSubContacts_ArbShape
+    (
+        const fvMesh& mesh,
+        List<DynamicList<label>> baseSubContactList
+    );
+
+    void swapSubContactLists();
+
+    bool contactResolved();
+
+    std::vector<std::shared_ptr<prtSubContactInfo>>& getPrtSCList()
     {
-        return cLVec_;
+        return subCList_;
     }
 
-    vector gettLVec()
-    {
-        return tLVec_;
-    }
+    void syncSubCList();
 
-    vector getLVec(ibContactClass& contactClass);
+    void registerSubContactList(DynamicList<prtSubContactInfo*>& contactList);
 
-    vector getVeli(ibContactVars& cVars, vector& lVec);
+    void clearData();
 
-    void evalVariables();
-
-    vector getFNe();
-
-    vector getFA();
-
-    vector getFNd();
-
-    vector getFt(scalar deltaT);
-
-    Tuple2<forces,forces>& getOutForce()
-    {
-        return outForce_;
-    }
+    void syncData();
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

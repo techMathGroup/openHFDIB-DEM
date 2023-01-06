@@ -57,17 +57,13 @@ immersedBody::immersedBody
 (
     word bodyName,
     const Foam::fvMesh& mesh,
-    const volScalarField& body,
     dictionary& HFDIBDEMDict,
     dictionary& transportProperties,
     label bodyId,
     label recomputeM0,
     geomModel* bodyGeomModel,
     autoPtr<ibInterpolation>& ibIntp,
-    List<labelList>& cellPoints,
-    HashTable<materialInfo,string,Hash<string>>& materialInfos,
-    HashTable<materialInfo,string,Hash<string>>& wInfos,
-    HashTable<scalar,string,Hash<string>>& matInterAdh
+    List<labelList>& cellPoints
 )
 :
 bodyName_(bodyName),
@@ -534,9 +530,21 @@ void immersedBody::updateMovementComp
         if(geomModel_->getM0() > 0)
         {
             // compute current acceleration (assume constant over timeStep)
+
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" ParticelMass  : " << geomModel_->getM0() << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" Acting Force  : " << F_ << endl;
+            if(isInCollision_ && mag(F_*deltaT) > mag(geomModel_->getM0()*velBeforeContact_))
+            {
+                vector fOld = F_;
+                scalar fMagNew= mag(geomModel_->getM0()*velBeforeContact_)*(1/deltaT);
+                vector fNew = F_*(fMagNew/mag(F_))*0.5;
+                F_ = fNew;
+                InfoH << iB_Info << " -- Force was clipped from " << fOld << " to : " << fNew << endl;
+            }
             a_  = F_/(geomModel_->getM0());
             // update body linear velocity
             Vel_ = Vel + deltaT*a_;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" accelaration  : " << a_ << endl;
         }
     };
 
@@ -546,10 +554,16 @@ void immersedBody::updateMovementComp
         {
             // update body angular acceleration
             alpha_ = inv(geomModel_->getI()) & T_;
+            if(mag(alpha_)> 15.0 && isInCollision_)
+            {
+                vector alphaOld(alpha_);
+                alpha_ *=((15.0)/(mag(alphaOld)));
+            }
             // update body angular velocity
             vector Omega(Axis*omega + deltaT*alpha_);
             // split Omega into Axis_ and omega_
             omega_ = mag(Omega);
+
             if (omega_ < SMALL)
             {
                 Axis_ = vector::one;
@@ -782,6 +796,10 @@ vectorField immersedBody::getUatIbPoints()
     vectorField ibPointsVal(ibPoints.size());
     forAll(ibPoints, pointI)
     {
+        // vector planarVec =  geomModel_->getLVec(ibPoints[pointI])
+        //                     - Axis_*(
+        //                     (geomModel_->getLVec(ibPoints[pointI]))&Axis_);
+
         vector planarVec =  ibPoints[pointI] - geomModel_->getCoM()
                             - Axis_*(
                             (ibPoints[pointI]-geomModel_->getCoM())&Axis_);

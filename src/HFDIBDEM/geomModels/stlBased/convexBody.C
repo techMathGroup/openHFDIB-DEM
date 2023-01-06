@@ -47,7 +47,6 @@ void convexBody::createImmersedBody
     surfCells_[Pstream::myProcNo()].clear();
     // find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;
-
     if(!isBBoxInMesh())
     {
         return;

@@ -66,6 +66,8 @@ Contributors
 // #include "contactModel.H"
 #include "leastSquaresInt.H"
 #include "lineInt.H"
+// #include "IOstream.H"
+// #include "virtualMesh.H"
 
 #include "verletList.H"
 
@@ -85,7 +87,7 @@ namespace Foam
     typedef DynamicList<point>  DynamicPointList;
 
     //Basic members
-    const  fvMesh&   mesh_;
+    const  fvMesh&          mesh_;
     IOdictionary            HFDIBDEMDict_;
     dictionary              HFDIBinterpDict_;
     IOdictionary            transportProperties_;
@@ -101,20 +103,13 @@ namespace Foam
     // addModels (how to add the baseObjects)
     PtrList<addModel> addModels_;
 
-    // materialInfo for each material (key is material name)
-    HashTable<materialInfo,string,Hash<string>> materialInfos_;
-    // materialInfo for each contact patch (key is the patch name)
-    HashTable<materialInfo,string,Hash<string>> wallInfos_;
-
-    HashTable<scalar,string,Hash<string>> matInterAdh_;
-
     // List of patches set as cyclic
     wordList cyclicPatches_;
 
     // precalculate cellPoints for better performace
     List<labelList> cellPoints_;
 
-    HashTable<prtContactInfo,Tuple2<label, label>,Hash<Tuple2<label, label>>>
+    HashTable<autoPtr<prtContactInfo>,Tuple2<label, label>,Hash<Tuple2<label, label>>>
         prtcInfoTable_;
 
     // DEM step
@@ -142,6 +137,7 @@ namespace Foam
     ~openHFDIBDEM();
 
     // Public methods --------------------------------------------------
+
     void initialize(volScalarField& body,volVectorField& U,volScalarField& refineF,label recomputeM0, word runTime);
 
     void createBodies
@@ -177,27 +173,11 @@ namespace Foam
         volScalarField& body
     );
 
-    // interpolate scalar field S using Ss for the surface values
-    void interpolateIB
-    (
-        volScalarField& S,
-        volScalarField& Ss,
-        volScalarField& body
-    )
-    {
-        FatalError << "not implemented" << exit(FatalError);
-    }
-
     // save the moved STL files
     void writeBodiesInfo();
 
     // add or remove bodies from the simulation
     void addRemoveBodies(volScalarField& body,volVectorField& U,volScalarField& refineF);
-
-    label findIndOfPairInNeighbourList(
-            DynamicList<Tuple2<label, label>>& listToSearch,
-            Tuple2<label, label> pair
-    );
 
     void restartSimulation
     (

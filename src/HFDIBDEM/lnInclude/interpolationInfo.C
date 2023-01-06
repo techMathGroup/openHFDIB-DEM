@@ -1,1 +1,0 @@
-../ibInterpolation/interpolationInfo.C

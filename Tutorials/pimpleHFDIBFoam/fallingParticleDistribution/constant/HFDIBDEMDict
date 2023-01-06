@@ -26,6 +26,7 @@ surfaceThreshold    1e-4;
 stepDEM     0.02;
 geometricD (1 -1 1);
 recordSimulation true;
+virtMeshDecompositionLevel 2;
 
 outputSetup
 {
@@ -33,6 +34,7 @@ outputSetup
     iB  false;
     DEM false;
     addModel true;
+    parallelDEM false;
 }
 
 DEM
@@ -43,19 +45,19 @@ DEM
         {
             Y       1e7;
             nu      0.3;
-            gamma   5e-6;
+            gamma   20;
             mu      0.05;
             adhN    0;
         }
-        
+
         wall
         {
             Y       1e7;
             nu      0.2;
-            gamma   5e-6;
+            gamma   20;
             mu      0;
             adhN    0;
-        }   
+        }
     }
 
     collisionPatches
@@ -95,14 +97,14 @@ bodyAddition
             fieldName   lambda;                                      //name of the indicator field
             fieldValue	0.05;                                        //minimal field value before addition
         }
-        
+
         addDomain      boundBox;
         boundBoxCoeffs
         {
             minBound (0 -0.001 -0.03);
             maxBound (0.04 0.001 0.03);
         }
-        
+
         scalingMode    noScaling;
         noScalingCoeffs{};
         rotationMode   noRotation;

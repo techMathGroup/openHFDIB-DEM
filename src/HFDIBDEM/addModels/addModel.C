@@ -40,14 +40,22 @@ addModel::~addModel()
 //---------------------------------------------------------------------------//
 bool addModel::isBodyInContact(PtrList<immersedBody>& immersedBodies)
 {
-    autoPtr<materialInfo> cMatInfo(new  materialInfo(
-            "None",
-            0, 0, 0, 0, 0
-    ));
-
     autoPtr<ibContactClass> cIbClass(new ibContactClass(
         geomModel_,
-        cMatInfo()
+        "None"
+    ));
+
+    vector velAxi (vector::zero);
+    scalar helpScalar(0.0);
+
+    autoPtr<ibContactVars> cIbVars(new ibContactVars(
+        immersedBodies.size(),
+        velAxi,
+        helpScalar,
+        velAxi,
+        helpScalar,
+        helpScalar,
+        geomModel_->getRhoS()
     ));
 
     bool inContact = contactModel::detectWallContact(
@@ -81,15 +89,37 @@ bool addModel::isBodyInContact(PtrList<immersedBody>& immersedBodies)
                 continue;
             }
 
-            if(contactModel::detectPrtPrtContact(
-                mesh_,
+            autoPtr<prtContactInfo> prtCInfo (new prtContactInfo(
                 cIbClass(),
-                immersedBodies[ibI].getibContactClass()
-            ))
+                cIbVars(),
+                immersedBodies[ibI].getibContactClass(),
+                immersedBodies[ibI].getContactVars()
+            ));
+
+            contactModel::findSubContacts(
+                mesh_,
+                prtCInfo()
+            );
+
+            DynamicList<prtSubContactInfo*> sCList;
+            prtCInfo->registerSubContactList(sCList);
+            forAll(sCList,sC)
             {
-                inContact = true;
-                break;
+                prtSubContactInfo* prtSCInfo = sCList[sC];
+
+                if(contactModel::detectPrtPrtContact(
+                    mesh_,
+                    cIbClass(),
+                    immersedBodies[ibI].getibContactClass(),
+                    *prtSCInfo
+                ))
+                {
+                    inContact = true;
+                    break;
+                }
+
             }
+
         }
     }
 

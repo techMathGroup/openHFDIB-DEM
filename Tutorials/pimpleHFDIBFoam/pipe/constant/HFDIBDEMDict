@@ -22,11 +22,13 @@ outputSetup
     iB  false;
     DEM false;
     addModel true;
+    parallelDEM false;
 }
 
 surfaceThreshold    1e-4;
 stepDEM     0.02;
 recordSimulation true;
+virtMeshDecompositionLevel 2;
 
 DEM
 {
@@ -36,19 +38,19 @@ DEM
         {
             Y       1e7;
             nu      0.2;
-            gamma   4e-6;
+            gamma   20;
             mu      0;
             adhN    1e-3;
         }
-        
+
         wall
         {
             Y       1e7;
             nu      0.2;
-            gamma   4e-6;
+            gamma   20;
             mu      0.8;
             adhN    0;
-        }   
+        }
     }
 
     interfaceAdh
@@ -98,17 +100,17 @@ bodyAddition
             fieldName   lambda;
             fieldValue	0.05;
         }
-        
+
         addDomain      boundBox;
         boundBoxCoeffs
         {
             minBound (-1e-2 0 -1e-3);
             maxBound (1e-2 2e-2 1e-3);
         }
-        
+
         scalingMode    noScaling;
         noScalingCoeffs{};
-        
+
         rotationMode   noRotation;
         noRotationCoeffs{};
 	}
