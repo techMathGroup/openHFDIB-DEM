@@ -1,15 +1,20 @@
 #!/bin/sh
 
 # compile the library
-cd HFDIBDEM
+cd src/HFDIBDEM
 wclean
 wmake libso
-cd ..
+cd ../..
 
 # compile the solver
-cd pimpleHFDIBFoam
+cd application/pimpleHFDIBFoam
 wclean
 wmake
-cd ..
+cd ../..
+
+cd application/HFDIBDEMFoam
+wclean
+wmake
+cd ../..
 
 exit 0
