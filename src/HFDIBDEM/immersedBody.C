@@ -533,14 +533,6 @@ void immersedBody::updateMovementComp
 
             InfoH << iB_Info <<"-- body "<< bodyId_ <<" ParticelMass  : " << geomModel_->getM0() << endl;
             InfoH << iB_Info <<"-- body "<< bodyId_ <<" Acting Force  : " << F_ << endl;
-            if(isInCollision_ && mag(F_*deltaT) > mag(geomModel_->getM0()*velBeforeContact_))
-            {
-                vector fOld = F_;
-                scalar fMagNew= mag(geomModel_->getM0()*velBeforeContact_)*(1/deltaT);
-                vector fNew = F_*(fMagNew/mag(F_))*0.5;
-                F_ = fNew;
-                InfoH << iB_Info << " -- Force was clipped from " << fOld << " to : " << fNew << endl;
-            }
             a_  = F_/(geomModel_->getM0());
             // update body linear velocity
             Vel_ = Vel + deltaT*a_;
@@ -554,11 +546,6 @@ void immersedBody::updateMovementComp
         {
             // update body angular acceleration
             alpha_ = inv(geomModel_->getI()) & T_;
-            if(mag(alpha_)> 15.0 && isInCollision_)
-            {
-                vector alphaOld(alpha_);
-                alpha_ *=((15.0)/(mag(alphaOld)));
-            }
             // update body angular velocity
             vector Omega(Axis*omega + deltaT*alpha_);
             // split Omega into Axis_ and omega_

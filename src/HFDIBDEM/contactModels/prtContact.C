@@ -740,18 +740,18 @@ bool solvePrtContact(
     InfoH << parallelDEM_Info << "-- Detected Particle-particle contact: -- body "
             << subCInfo.getCPair().first() << " & -- body "
             << subCInfo.getCPair().second() << endl;
-    InfoH << parallelDEM_Info << "-- Particle-particle contact cBody pos: "
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<cInfo.getCPair().first() <<"-"<<cInfo.getCPair().second() << " contact cBody pos: "
             << cInfo.getcClass().getGeomModel().getCoM() << " & tBody pos: "
             << cInfo.gettClass().getGeomModel().getCoM() << endl;
-    InfoH << parallelDEM_Info << "-- Particle-particle contact center "
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<cInfo.getCPair().first() <<"-"<<cInfo.getCPair().second() << " contact center "
             << subCInfo.getprtCntVars().contactCenter_ << endl;
-    InfoH << parallelDEM_Info << "-- Particle-particle contact normal "
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<cInfo.getCPair().first() <<"-"<<cInfo.getCPair().second() << " contact normal "
             << subCInfo.getprtCntVars().contactNormal_ << endl;
-    InfoH << parallelDEM_Info << "-- Particle-particle contact volume "
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<cInfo.getCPair().first() <<"-"<<cInfo.getCPair().second() << " contact volume "
             << subCInfo.getprtCntVars().contactVolume_ << endl;
-    InfoH << parallelDEM_Info << "-- Particle-particle contact area "
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<cInfo.getCPair().first() <<"-"<<cInfo.getCPair().second() << " contact area "
             << subCInfo.getprtCntVars().contactArea_ << endl;
-
+            
     subCInfo.evalVariables(
         cInfo.getcClass().getGeomModel().getCoM(),
         cInfo.gettClass().getGeomModel().getCoM(),
@@ -761,27 +761,29 @@ bool solvePrtContact(
 
     // compute the normal force
     vector F = subCInfo.getFNe();
-    InfoH<< parallelDEM_Info << "-- Particle-particle contact FNe " << F << endl;
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<cInfo.getCPair().first() <<"-"<<cInfo.getCPair().second() << " contact FNe " << F << endl;
 
     vector FNd = subCInfo.getFNd();
-    InfoH<< parallelDEM_Info << "-- Particle-particle contact FNd " << FNd << endl;
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<cInfo.getCPair().first() <<"-"<<cInfo.getCPair().second() << " contact FNd " << FNd << endl;
 
     F += FNd;
-    InfoH << parallelDEM_Info << "-- Particle-particle contact FN " << F << endl;
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<cInfo.getCPair().first() <<"-"<<cInfo.getCPair().second() << " contact FN " << F << endl;
 
     vector Ft = subCInfo.getFt(deltaT);
-    InfoH << parallelDEM_Info << "-- Particle-particle contact Ft " << Ft << endl;
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<cInfo.getCPair().first() <<"-"<<cInfo.getCPair().second() << " contact Ft " << Ft << endl;
 
     if (mag(Ft) > cInfo.getMu() * mag(F))
     {
         Ft *= cInfo.getMu() * mag(F) / mag(Ft);
     }
-    InfoH << parallelDEM_Info << "-- Particle-particle contact Ft clamped " << Ft << endl;
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<cInfo.getCPair().first() <<"-"<<cInfo.getCPair().second() << " contact Ft clamped " << Ft << endl;
     F += Ft;
 
     vector FA = subCInfo.getFA();
-    InfoH << parallelDEM_Info << "-- Particle-particle contact FA " << FA << endl;
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<cInfo.getCPair().first() <<"-"<<cInfo.getCPair().second() << " contact FA " << FA << endl;
     F -= FA;
+
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<cInfo.getCPair().first() <<"-"<<cInfo.getCPair().second() << " contact F " << F << endl;
 
     InfoH << parallelDEM_Info << "-- Resolved Particle-particle contact: -- body "
             << subCInfo.getCPair().first() << " & -- body "
