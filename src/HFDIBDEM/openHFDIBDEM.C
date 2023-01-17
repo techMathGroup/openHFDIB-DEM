@@ -574,9 +574,16 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
     {
         InfoH << DEM_Info << " Start DEM pos: " << pos
             << " DEM step: " << step << endl;
+        InfoH << parallelDEM_Info << " DEM - CFD Time: "
+            << mesh_.time().value() + deltaTime*pos << endl;
+
+        forAll (immersedBodies_,ib)
+        {
+            immersedBodies_[ib].updateMovement(deltaTime*step*0.5);
+            immersedBodies_[ib].moveImmersedBody(deltaTime*step);
+        }
 
         verletList_.update(immersedBodies_);
-        InfoH << parallelDEM_Info << " DEM - CFD Time: " << mesh_.time().value() + deltaTime*pos << endl;
 
         forAll (immersedBodies_,bodyId)
         {
@@ -584,12 +591,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             if (cIb.getIsActive())
             {
                 // set F_ and T_ to zero.
-                cIb.resetForces();
-                // add fluid coupling force to F and T.
-                cIb.updateFAndT(
-                    cIb.getHistoryCouplingF(),
-                    cIb.getHistoryCouplingT()
-                );
+                cIb.resetContactForces();
 
                 if(cIb.getbodyOperation() != 0)
                 {
@@ -613,10 +615,9 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                             deltaTime*step
                         );
 
-                        cIb.updateFAndT
+                        cIb.updateContactForces
                         (
-                            cIb.getWallCntInfo().getOutForce().F,
-                            cIb.getWallCntInfo().getOutForce().T
+                            cIb.getWallCntInfo().getOutForce()
                         );
                     }
                 }
@@ -716,24 +717,21 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             {
                 sC->syncData();
 
-                immersedBodies_[cInd].updateFAndT
+                immersedBodies_[cInd].updateContactForces
                 (
-                    sC->getOutForce().first().F,
-                    sC->getOutForce().first().T
+                    sC->getOutForce().first()
                 );
 
-                immersedBodies_[tInd].updateFAndT
+                immersedBodies_[tInd].updateContactForces
                 (
-                    sC->getOutForce().second().F,
-                    sC->getOutForce().second().T
+                    sC->getOutForce().second()
                 );
             }
         }
 
         forAll (immersedBodies_,ib)
         {
-            immersedBodies_[ib].updateMovement(deltaTime*step);
-            immersedBodies_[ib].moveImmersedBody(deltaTime*step);
+            immersedBodies_[ib].updateMovement(deltaTime*step*0.5);
         }
 
         pos += step;

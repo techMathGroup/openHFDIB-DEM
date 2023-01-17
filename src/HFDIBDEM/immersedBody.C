@@ -82,15 +82,11 @@ VelOld_(vector::zero),
 a_(vector::zero),
 alpha_(vector::zero),
 totalAngle_(vector::zero),
-F_(vector::zero),
-T_(vector::zero),
 CoNum_(0.0),
 rhoF_(transportProperties_.lookup("rho")),
 bodyId_(bodyId),
 updateTorque_(false),
 bodyOperation_(0),
-historyCouplingF_(vector::zero),
-historyCouplingT_(vector::zero),
 octreeField_(mesh_.nCells(), 0),
 cellToStartInCreateIB_(0),
 startSynced_(false),
@@ -142,7 +138,7 @@ void immersedBody::syncCreateImmersedBody
 )
 {
     geomModel_->setOwner();
-    InfoH << iB_Info << "body: " << bodyId_ 
+    InfoH << iB_Info << "body: " << bodyId_
         << " owner: " << geomModel_->getOwner() << endl;
 
     InfoH << iB_Info << "Computing geometrical properties" << endl;
@@ -168,7 +164,7 @@ void immersedBody::syncCreateImmersedBody
     forAll (surfCells[Pstream::myProcNo()],sCellI)
     {
         label cellI = surfCells[Pstream::myProcNo()][sCellI];
-        charCellSizeL[Pstream::myProcNo()] = 
+        charCellSizeL[Pstream::myProcNo()] =
             min(charCellSizeL[Pstream::myProcNo()],
                 Foam::pow(mesh_.V()[cellI],0.3333)
             );
@@ -182,7 +178,7 @@ void immersedBody::syncCreateImmersedBody
     }
 
     charCellSize_ = gMax(charCellSizeL);
-    InfoH << iB_Info << "Body characteristic cell size: " 
+    InfoH << iB_Info << "Body characteristic cell size: "
         << charCellSize_ << endl;
 }
 //---------------------------------------------------------------------------//
@@ -252,7 +248,7 @@ void immersedBody::constructRefineField
                     const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchId];
                     if (cPatch.type() == "processor")
                     {
-                        const processorPolyPatch& procPatch = 
+                        const processorPolyPatch& procPatch =
                             refCast<const processorPolyPatch>(cPatch);
                         if (procPatch.myProcNo() == Pstream::myProcNo())
                         {
@@ -342,13 +338,13 @@ void immersedBody::constructRefineField
     DynamicLabelList newCellsToIterateStartLevel;
 
     // check if some point from other proc is on this processor
-    for (label otherProci = 0; 
-        otherProci < facesReceivedFromProcs.size(); 
+    for (label otherProci = 0;
+        otherProci < facesReceivedFromProcs.size();
         otherProci++
     )
     {
-        for (label faceI = 0; 
-            faceI < facesReceivedFromProcs[otherProci].size(); 
+        for (label faceI = 0;
+            faceI < facesReceivedFromProcs[otherProci].size();
             faceI++
         )
         {
@@ -358,13 +354,13 @@ void immersedBody::constructRefineField
                 const polyPatch& cPatch = mesh_.boundaryMesh()[patchi];
                 if (cPatch.type() == "processor")
                 {
-                    const processorPolyPatch& procPatch = 
+                    const processorPolyPatch& procPatch =
                         refCast<const processorPolyPatch>(cPatch);
 
-                    if (procPatch.myProcNo() == Pstream::myProcNo() 
+                    if (procPatch.myProcNo() == Pstream::myProcNo()
                         && procPatch.neighbProcNo() == otherProci)
                     {
-                        cellProcI = mesh_.faceOwner()[cPatch.start() 
+                        cellProcI = mesh_.faceOwner()[cPatch.start()
                             + facesReceivedFromProcs[otherProci][faceI]];
                         if(refineF[cellProcI] == 0)
                         {
@@ -375,10 +371,10 @@ void immersedBody::constructRefineField
                         }
                         break;
                     }
-                    else if (procPatch.myProcNo() == otherProci 
+                    else if (procPatch.myProcNo() == otherProci
                         && procPatch.neighbProcNo() == Pstream::myProcNo())
                     {
-                        cellProcI = mesh_.faceOwner()[cPatch.start() 
+                        cellProcI = mesh_.faceOwner()[cPatch.start()
                             + facesReceivedFromProcs[otherProci][faceI]];
                         if(refineF[cellProcI] == 0)
                         {
@@ -480,11 +476,7 @@ void immersedBody::updateCoupling
   FV *= rhoF_.value();
   TA *= rhoF_.value();
 
-  historyCouplingF_ = FV;
-  historyCouplingT_ = TA;
-
-  F_ += FV;
-  T_ += TA;
+  FCoupling_ = forces(FV, TA);
 }
 //---------------------------------------------------------------------------//
 // update movement variables of the body
@@ -521,27 +513,31 @@ void immersedBody::updateMovementComp
         vector FG(geomModel_->getM0()*(1.0-rhoF_.value()
             /geomModel_->getRhoS().value())*g.value());
 
+        vector F(FCoupling_.F);
+        F += FContact_.F;
+        Info << "FContact_ : " << FContact_.F << endl;
+        F += FG;
+
         if(!case3D)
         {
-            F_[emptyDim] *= 0;
+            F[emptyDim] *= 0;
             FG[emptyDim] *= 0;
         }
-        F_ += FG;
         if(geomModel_->getM0() > 0)
         {
             // compute current acceleration (assume constant over timeStep)
 
             InfoH << iB_Info <<"-- body "<< bodyId_ <<" ParticelMass  : " << geomModel_->getM0() << endl;
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" Acting Force  : " << F_ << endl;
-            if(isInCollision_ && mag(F_*deltaT) > mag(geomModel_->getM0()*velBeforeContact_))
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" Acting Force  : " << F << endl;
+            if(isInCollision_ && mag(F*deltaT) > mag(geomModel_->getM0()*velBeforeContact_))
             {
-                vector fOld = F_;
+                vector fOld = F;
                 scalar fMagNew= mag(geomModel_->getM0()*velBeforeContact_)*(1/deltaT);
-                vector fNew = F_*(fMagNew/mag(F_))*0.5;
-                F_ = fNew;
+                vector fNew = F*(fMagNew/mag(F))*0.5;
+                F = fNew;
                 InfoH << iB_Info << " -- Force was clipped from " << fOld << " to : " << fNew << endl;
             }
-            a_  = F_/(geomModel_->getM0());
+            a_  = F/(geomModel_->getM0());
             // update body linear velocity
             Vel_ = Vel + deltaT*a_;
             InfoH << iB_Info <<"-- body "<< bodyId_ <<" accelaration  : " << a_ << endl;
@@ -552,8 +548,11 @@ void immersedBody::updateMovementComp
     {
         if(mag(geomModel_->getI()) > 0)
         {
+            vector T(FCoupling_.T);
+            T += FContact_.T;
+
             // update body angular acceleration
-            alpha_ = inv(geomModel_->getI()) & T_;
+            alpha_ = inv(geomModel_->getI()) & T;
             if(mag(alpha_)> 15.0 && isInCollision_)
             {
                 vector alphaOld(alpha_);
@@ -588,8 +587,11 @@ void immersedBody::updateMovementComp
 
     auto updateRotationFixedAxis = [&]()
     {
+        vector T(FCoupling_.T);
+        T += FContact_.T;
+
         // update body angular velocity
-        vector Omega(Axis*omega + deltaT * (inv(geomModel_->getI()) & T_));
+        vector Omega(Axis*omega + deltaT * (inv(geomModel_->getI()) & T));
 
         // split Omega into Axis_ and omega_
         omega_ = mag(Omega);
@@ -600,40 +602,29 @@ void immersedBody::updateMovementComp
 
     if (bodyOperation_ == 0 or bodyOperation_ == 3)
     {
-        F_ *= 0.0;
-        T_ *= 0.0;
         return;
     }
     else if (bodyOperation_ == 1)
     {
         updateRotation();
-
-        F_ *= 0.0;
-        T_ *= 0.0;
         return;
     }
     else if (bodyOperation_ == 2)
     {
         updateTranslation();
-
-        F_ *= 0.0;
-        T_ *= 0.0;
         return;
     }
     else if (bodyOperation_ == 4)
     {
         updateRotationFixedAxis();
-
-        F_ *= 0.0;
-        T_ *= 0.0;
         return;
     }
 
     updateTranslation();
-    if (updateTorque_) updateRotation();
-
-    F_ *= 0.0;
-    T_ *= 0.0;
+    if (updateTorque_)
+    {
+        updateRotation();
+    }
 
     return;
 }
@@ -668,20 +659,20 @@ void immersedBody::moveImmersedBody
         // update total rotation matrix
         totRotMatrix_ = rotMatrix & totRotMatrix_;
         vector eulerAngles;
-        scalar sy = Foam::sqrt(totRotMatrix_.xx()*totRotMatrix_.xx() 
+        scalar sy = Foam::sqrt(totRotMatrix_.xx()*totRotMatrix_.xx()
             + totRotMatrix_.yy()*totRotMatrix_.yy());
 
         if (sy > SMALL)
         {
-            eulerAngles.x() = 
+            eulerAngles.x() =
                 Foam::atan2(totRotMatrix_.zy(),totRotMatrix_.zz());
             eulerAngles.y() = Foam::atan2(-totRotMatrix_.zx(),sy);
-            eulerAngles.z() = 
+            eulerAngles.z() =
                 Foam::atan2(totRotMatrix_.yx(),totRotMatrix_.xx());
         }
         else
         {
-            eulerAngles.x() = 
+            eulerAngles.x() =
                 Foam::atan2(-totRotMatrix_.yz(),totRotMatrix_.yy());
             eulerAngles.y() = Foam::atan2(-totRotMatrix_.zx(),sy);
             eulerAngles.z() = 0.0;
@@ -694,15 +685,15 @@ void immersedBody::moveImmersedBody
     geomModel_->synchronPos();
 
     InfoH << iB_Info;
-    InfoH << "-- body " << bodyId_ << " CoM                  : " 
+    InfoH << "-- body " << bodyId_ << " CoM                  : "
         << geomModel_->getCoM() << endl;
-    InfoH << "-- body " << bodyId_ << " linear velocity      : " 
+    InfoH << "-- body " << bodyId_ << " linear velocity      : "
         << Vel_ << endl;
-    InfoH << "-- body " << bodyId_ << " angluar velocity     : " 
+    InfoH << "-- body " << bodyId_ << " angluar velocity     : "
         << omega_ << endl;
-    InfoH << "-- body " << bodyId_ << " axis of rotation     : " 
+    InfoH << "-- body " << bodyId_ << " axis of rotation     : "
         << Axis_ << endl;
-    InfoH << "-- body " << bodyId_ << " total rotation matrix: " 
+    InfoH << "-- body " << bodyId_ << " total rotation matrix: "
         << totRotMatrix_ << endl;
 }
 //---------------------------------------------------------------------------//
@@ -825,7 +816,7 @@ void immersedBody::postContactUpdateBodyField
 //---------------------------------------------------------------------------//
 void immersedBody::recreateBodyField
 (
-    volScalarField& body, 
+    volScalarField& body,
     volScalarField& refineF
 )
 {
@@ -920,25 +911,6 @@ void immersedBody::printStats()
         << " magnitude: " << mag(Axis_) <<endl;
 }
 //---------------------------------------------------------------------------//
-// print out eulerian forces acting on the body
-void immersedBody::printForcesAndTorques()
-{
-    const uniformDimensionedVectorField& g =
-        mesh_.lookupObject<uniformDimensionedVectorField>("g");
-    vector FG(geomModel_->getM0()*(1.0-rhoF_.value()
-        /geomModel_->getRhoS().value())*g.value());
-
-    InfoH << iB_Info;
-    InfoH << "-- body " << bodyId_ << "     linear force:" << F_
-         << " magnitude: " << mag(F_) <<endl;
-    InfoH << "-- body " << bodyId_ << "   grav/buy force:" << FG
-         << " magnitude: " << mag(FG) <<endl;
-    InfoH << "-- body " << bodyId_ << "    viscous force:" << F_ - FG
-         << " magnitude: " << mag(F_ - FG) <<endl;
-    InfoH << "-- body " << bodyId_ << "           torque:" << T_
-         << " magnitude: " << mag(T_) <<endl;
-}
-//---------------------------------------------------------------------------//
 // switch the particle off (remove it from the simulation)
 void immersedBody::switchActiveOff
 (
@@ -989,7 +961,7 @@ void immersedBody::initSyncWithFlow(const volVectorField& U)
             Axis_ = vector::one;
             if (mesh_.nGeometricD() < 3)
             {
-                const vector validDirs = 
+                const vector validDirs =
                     (mesh_.geometricD() + Vector<label>::one)/2;
                 Axis_ -= validDirs;
             }
@@ -999,7 +971,7 @@ void immersedBody::initSyncWithFlow(const volVectorField& U)
             Axis_ =  Omega/(omega_+SMALL);
             if (mesh_.nGeometricD() < 3)
             {
-                const vector validDirs = 
+                const vector validDirs =
                     (mesh_.geometricD() + Vector<label>::one)/2;
                 Axis_ = cmptMultiply(vector::one-validDirs,Axis_);
             }
@@ -1011,7 +983,7 @@ void immersedBody::initSyncWithFlow(const volVectorField& U)
     omegaOld_   = omega_;
     AxisOld_    = Axis_;
     // print data:
-    InfoH << basic_Info << "-- body " << bodyId_ 
+    InfoH << basic_Info << "-- body " << bodyId_
         << "initial movement variables:" << endl;
     printStats();
 }

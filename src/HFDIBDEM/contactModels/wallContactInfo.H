@@ -48,6 +48,7 @@ Contributors
 #include "wallContactVars.H"
 #include "materialInfo.H"
 #include "physicalProperties.H"
+#include "forces.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

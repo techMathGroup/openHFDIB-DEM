@@ -119,11 +119,11 @@ namespace Foam
         // total Rodrigues angle of the body
         vector totalAngle_;
 
-        // forces acting on the particle
-        vector  F_;
+        // forces acting on the particle due to the fluid
+        forces FCoupling_;
 
-        // total torque acting on the particle
-        vector  T_;
+        // forces acting on the particle due to the contact
+        forces FContact_;
 
         // maximal body Courant number based on its linear velocity
         scalar CoNum_;
@@ -156,13 +156,6 @@ namespace Foam
             volScalarField& body,
             volVectorField& f
         );
-
-        // history variables for contact correction
-        // -- forces acting on the particle
-        vector  historyCouplingF_;
-
-        // -- total torque acting on the particle
-        vector  historyCouplingT_;
 
         // auxiliary octree variables
         Field<label> octreeField_;
@@ -212,7 +205,7 @@ namespace Foam
             scalar deltaT = -1.0
         );
 
-        //update body movement based on F_ and T_
+        //update body movement based on acting forces
         void updateMovement
         (
             scalar deltaT
@@ -294,16 +287,6 @@ namespace Foam
             return Axis_;
         }
 
-        const vector& getF()    const
-        {
-            return F_;
-        }
-
-        const vector& getT()    const
-        {
-            return T_;
-        }
-
         const scalar& getCoNum()   const
         {
             return CoNum_;
@@ -322,16 +305,6 @@ namespace Foam
         const int& getbodyOperation()   const
         {
             return bodyOperation_;
-        }
-
-        const vector& getHistoryCouplingF()   const
-        {
-            return historyCouplingF_;
-        }
-
-        const vector& getHistoryCouplingT()   const
-        {
-            return historyCouplingT_;
         }
 
         List<DynamicLabelList>& getSurfaceCellList()
@@ -360,15 +333,13 @@ namespace Foam
             volScalarField& body
         );
 
-        // update force and torque acting on the body
-        void updateFAndT
+        // update contact forces
+        void updateContactForces
         (
-            vector FIn,
-            vector TIn
+            const forces& F
         )
         {
-            F_+=FIn;
-            T_+=TIn;
+            FContact_ += F;
         }
 
         void setWallContact(bool inContact)
@@ -392,9 +363,6 @@ namespace Foam
         // print out body statistics for control
         void printStats();
 
-        // print out "eulerian" forces acting on the body for control
-        void printForcesAndTorques();
-
         // auxiliary switch to turn off/on torque update
         bool& retUpdateTorque()
         {
@@ -402,10 +370,9 @@ namespace Foam
         }
 
         // initialize variables base to history
-        void resetForces()
+        void resetContactForces()
         {
-            F_*=0.0;
-            T_*=0.0;
+            FContact_.clear();
         }
 
         void switchActiveOff(volScalarField& body);
@@ -461,7 +428,7 @@ namespace Foam
         (
             vector vel,
             scalar angVel,
-            vector axisRot, 
+            vector axisRot,
             bool setStatic,
             label timesInContact
         );
