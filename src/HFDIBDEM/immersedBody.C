@@ -529,14 +529,6 @@ void immersedBody::updateMovementComp
 
             InfoH << iB_Info <<"-- body "<< bodyId_ <<" ParticelMass  : " << geomModel_->getM0() << endl;
             InfoH << iB_Info <<"-- body "<< bodyId_ <<" Acting Force  : " << F << endl;
-            if(isInCollision_ && mag(F*deltaT) > mag(geomModel_->getM0()*velBeforeContact_))
-            {
-                vector fOld = F;
-                scalar fMagNew= mag(geomModel_->getM0()*velBeforeContact_)*(1/deltaT);
-                vector fNew = F*(fMagNew/mag(F))*0.5;
-                F = fNew;
-                InfoH << iB_Info << " -- Force was clipped from " << fOld << " to : " << fNew << endl;
-            }
             a_  = F/(geomModel_->getM0());
             // update body linear velocity
             Vel_ = Vel + deltaT*a_;
@@ -553,11 +545,6 @@ void immersedBody::updateMovementComp
 
             // update body angular acceleration
             alpha_ = inv(geomModel_->getI()) & T;
-            if(mag(alpha_)> 15.0 && isInCollision_)
-            {
-                vector alphaOld(alpha_);
-                alpha_ *=((15.0)/(mag(alphaOld)));
-            }
             // update body angular velocity
             vector Omega(Axis*omega + deltaT*alpha_);
             // split Omega into Axis_ and omega_
@@ -645,7 +632,7 @@ void immersedBody::moveImmersedBody
         scalar angle     = omega_*deltaT - 0.5*mag(alpha_)*deltaT*deltaT;
 
         // translation increment
-        vector transIncr = Vel_*deltaT - 0.5*a_*deltaT*deltaT;
+        vector transIncr = Vel_*deltaT;
 
         // rotation matrix
         tensor rotMatrix(Foam::cos(angle)*tensor::I);
