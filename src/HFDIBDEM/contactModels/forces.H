@@ -28,16 +28,13 @@ InNamspace
 Description
     class for storage of contact variables
 
-SourceFiles
-    ibContactClass.C
-
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef ibContactClass_H
-#define ibContactClass_H
+#ifndef forces_H
+#define forces_H
 
 #include "dictionary.H"
 #include "fvCFD.H"
@@ -53,91 +50,48 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class ibContactClass Declaration
+                        Class forces Declaration
 \*---------------------------------------------------------------------------*/
+struct forces{
+    vector F = vector::zero;
+    vector T = vector::zero;
 
-class ibContactClass
-{
-    private:
+    forces()
+    {}
 
-    typedef DynamicList<label> DynamicLabelList;
-    typedef DynamicList<scalar> DynamicScalarList;
-    typedef DynamicList<vector> DynamicVectorList;
-    typedef DynamicList<point> DynamicPointList;
-
-    protected:
-
-    autoPtr<geomModel>& geomModel_;
-
-    // is the particle in contact with wall
-    bool    isInWallContact_;
-
-    bool inContactWithStatic_;
-
-    label timeStepsInContWStatic_;
-
-    const materialInfo& matInfo_;
-
-    public:
-
-    // Constructors ------------------------------------------------
-    ibContactClass
-    (
-        autoPtr<geomModel>& geomModel,
-        const string& material
-    );
-
-    // Destructors -------------------------------------------------
-    ~ibContactClass();
-
-    geomModel& getGeomModel()
+    forces(const forces& rhs)
     {
-        return geomModel_();
+        F = rhs.F;
+        T = rhs.T;
     }
 
-    const bool& checkWallContact() const
+    forces(const vector& F, const vector& T):
+        F(F),
+        T(T)
+    {}
+
+    void operator=(const forces& rhs)
     {
-        return isInWallContact_;
+        F = rhs.F;
+        T = rhs.T;
     }
 
-    void setWallContact(bool inContact)
+    void operator+=(const forces& rhs)
     {
-        isInWallContact_ = inContact;
+        F += rhs.F;
+        T += rhs.T;
     }
 
-    List<DynamicLabelList>& getSurfCells()
+    void operator-=(const forces& rhs)
     {
-        return geomModel_().getSurfaceCellList();
+        F -= rhs.F;
+        T -= rhs.T;
     }
 
-    List<DynamicLabelList>& getIntCells()
+    void clear()
     {
-        return geomModel_().getInternalCellList();
-    }
-
-    const materialInfo& getMatInfo()
-    {
-        return matInfo_;
-    }
-
-    const bool& checkInContactWithStatic() const
-    {
-        return inContactWithStatic_;
-    }
-
-    void inContactWithStatic(bool inContact)
-    {
-        inContactWithStatic_ = inContact;
-    }
-
-    const label& getTimeStepsInContWStatic() const
-    {
-        return timeStepsInContWStatic_;
-    }
-
-    void setTimeStepsInContWStatic(label setter)
-    {
-        timeStepsInContWStatic_ = setter;
+        F = vector::zero;
+        T = vector::zero;
     }
 };
 

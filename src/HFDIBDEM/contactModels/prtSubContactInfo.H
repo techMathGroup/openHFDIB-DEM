@@ -47,6 +47,7 @@ Contributors
 #include "prtContactVars.H"
 #include "virtualMesh.H"
 #include "physicalProperties.H"
+#include "forces.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
