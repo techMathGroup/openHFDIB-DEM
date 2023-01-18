@@ -645,7 +645,7 @@ void immersedBody::moveImmersedBody
         scalar angle     = omega_*deltaT - 0.5*mag(alpha_)*deltaT*deltaT;
 
         // translation increment
-        vector transIncr = Vel_*deltaT - 0.5*a_*deltaT*deltaT;
+        vector transIncr = Vel_*deltaT;
 
         // rotation matrix
         tensor rotMatrix(Foam::cos(angle)*tensor::I);

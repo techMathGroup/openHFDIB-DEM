@@ -171,11 +171,19 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 
     if (HFDIBDEMDict_.found("virtMeshDecompositionLevel"))
 	{
+        scalar VMLV = readScalar(HFDIBDEMDict_.lookup("virtMeshDecompositionLevel"));
+        Info <<" -- VMLV is set to : "<< VMLV << endl;
         virtualMeshLevel::setVirtualMeshLevel(readScalar(HFDIBDEMDict_.lookup("virtMeshDecompositionLevel")));
+        Info <<" -- VirtMesh Decomposition Level was Found !" << endl;
+        Info <<" -- VirtMesh Decomposition Level is set to : "<< virtualMeshLevel::setVirtualMeshLevel << endl;
+
 	}
     else
     {
         virtualMeshLevel::setVirtualMeshLevel(1);
+        Info <<" -- VirtMesh Decomposition Level not was Found !" << endl;
+        Info <<" -- VirtMesh Decomposition Level is set to : "<< virtualMeshLevel::setVirtualMeshLevel << endl;
+
     }
 
     recordOutDir_ = mesh_.time().rootPath() + "/" + mesh_.time().globalCaseName() + "/bodiesInfo";
@@ -574,9 +582,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
     {
         InfoH << DEM_Info << " Start DEM pos: " << pos
             << " DEM step: " << step << endl;
-        InfoH << parallelDEM_Info << " DEM - CFD Time: "
+        InfoH << basic_Info << " DEM - CFD Time: "
             << mesh_.time().value() + deltaTime*pos << endl;
-
         forAll (immersedBodies_,ib)
         {
             immersedBodies_[ib].updateMovement(deltaTime*step*0.5);
@@ -665,7 +672,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
         if(contactList.size() > 0 )
         {
-            label contactPerProc(ceil(contactList.size()/Pstream::nProcs()));
+            label contactPerProc(ceil(double(contactList.size())/Pstream::nProcs()));
             if( contactList.size() <= Pstream::nProcs())
             {
                 contactPerProc = 1;
@@ -699,16 +706,16 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 if(prtcInfoTable_.found(cPair))
                 {
                     prtcInfoTable_.erase(cPair);
-                    immersedBodies_[cInd].setVelocityBeforeContact(immersedBodies_[cInd].getVel());
-                    immersedBodies_[tInd].setVelocityBeforeContact(immersedBodies_[tInd].getVel());
-                    immersedBodies_[cInd].setIsInCollision(false);
-                    immersedBodies_[tInd].setIsInCollision(false);
+                    // immersedBodies_[cInd].setVelocityBeforeContact(immersedBodies_[cInd].getVel());
+                    // immersedBodies_[tInd].setVelocityBeforeContact(immersedBodies_[tInd].getVel());
+                    // immersedBodies_[cInd].setIsInCollision(false);
+                    // immersedBodies_[tInd].setIsInCollision(false);
                     continue;
                 }
             }
 
-            immersedBodies_[cInd].setIsInCollision(true);
-            immersedBodies_[tInd].setIsInCollision(true);
+            // immersedBodies_[cInd].setIsInCollision(true);
+            // immersedBodies_[tInd].setIsInCollision(true);
 
             std::vector<std::shared_ptr<prtSubContactInfo>>& subCList
                 = prtcInfo.getPrtSCList();

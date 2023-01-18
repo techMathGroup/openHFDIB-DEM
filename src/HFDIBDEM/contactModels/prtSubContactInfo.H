@@ -180,6 +180,11 @@ class prtSubContactInfo
         contactResolved_ = resolved;
     }
 
+    scalar& getLc()
+    {
+        return Lc_;
+    }
+
     void syncData();
 };
 
