@@ -171,18 +171,14 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 
     if (HFDIBDEMDict_.found("virtMeshDecompositionLevel"))
 	{
-        scalar VMLV = readScalar(HFDIBDEMDict_.lookup("virtMeshDecompositionLevel"));
-        Info <<" -- VMLV is set to : "<< VMLV << endl;
         virtualMeshLevel::setVirtualMeshLevel(readScalar(HFDIBDEMDict_.lookup("virtMeshDecompositionLevel")));
-        Info <<" -- VirtMesh Decomposition Level was Found !" << endl;
-        Info <<" -- VirtMesh Decomposition Level is set to : "<< virtualMeshLevel::setVirtualMeshLevel << endl;
+        Info <<" -- VirtMesh Decomposition Level is set to : "<< virtualMeshLevel::getVirtualMeshLevel() << endl;
 
 	}
     else
     {
         virtualMeshLevel::setVirtualMeshLevel(1);
-        Info <<" -- VirtMesh Decomposition Level not was Found !" << endl;
-        Info <<" -- VirtMesh Decomposition Level is set to : "<< virtualMeshLevel::setVirtualMeshLevel << endl;
+        Info <<" -- VirtMesh Decomposition Level is set to : "<< virtualMeshLevel::getVirtualMeshLevel() << endl;
 
     }
 
