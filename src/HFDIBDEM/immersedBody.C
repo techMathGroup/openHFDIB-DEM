@@ -515,7 +515,6 @@ void immersedBody::updateMovementComp
 
         vector F(FCoupling_.F);
         F += FContact_.F;
-        Info << "FContact_ : " << FContact_.F << endl;
         F += FG;
 
         if(!case3D)
