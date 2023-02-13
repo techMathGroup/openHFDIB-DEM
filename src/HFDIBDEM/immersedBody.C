@@ -629,7 +629,7 @@ void immersedBody::moveImmersedBody
 
         // incremental rotation angle
         // scalar angle     = omega_*deltaT - 0.5*mag(alpha_)*deltaT*deltaT;
-        scalar angle     = omega_*deltaT
+        scalar angle     = omega_*deltaT;
 
         // translation increment
         vector transIncr = Vel_*deltaT;
