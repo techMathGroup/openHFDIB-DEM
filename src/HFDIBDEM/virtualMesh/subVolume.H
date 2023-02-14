@@ -28,58 +28,106 @@ InNamspace
 Description
     methods to solve particle-particle contact
 
-SourceFiles
-    virtualMesh.C
-
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef subVolumeProperties_H
-#define subVolumeProperties_H
+#ifndef subVolume_H
+#define subVolume_H
+
+#include "treeBoundBox.H"
+#include "volumeType.H"
+
+#include <memory>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+
+struct ibSubVolumeInfo
+{
+    ibSubVolumeInfo():
+        volumeType_(volumeType::unknown)
+    {}
+
+    ibSubVolumeInfo(volumeType vType)
+    {
+            switch(vType)
+        {
+            case volumeType::unknown:
+            case volumeType::mixed:
+                volumeType_ = volumeType::unknown;
+                break;
+            case volumeType::inside:
+                volumeType_ = volumeType::inside;
+                break;
+            case volumeType::outside:
+                volumeType_ = volumeType::outside;
+                break;
+        }
+    }
+
+    volumeType volumeType_;
+    autoPtr<labelList> shapesIn_;
+};
+
 /*---------------------------------------------------------------------------*\
                         Class ibContactClass Declaration
 \*---------------------------------------------------------------------------*/
-class subVolumeProperties
+class subVolume : public treeBoundBox
 {
+    private:
+
+    std::shared_ptr<subVolume> parentSV_;
+    List<subVolume> childSubVolumes_;
+
+    ibSubVolumeInfo cVolumeInfo_;
+    ibSubVolumeInfo tVolumeInfo_;
+
     public:
 
-    subVolumeProperties(point center):
-    center(center)
-    {}
+    // Constructors ------------------------------------------------
+    subVolume();
 
-    const point center;
-    bool isCBody=false;
-    bool isTBody=false;
-    bool toCheck=true;
-    bool isOnEdge=false;
+    subVolume
+    (
+        const boundBox bb
+    );
 
-    // point pointInMesh;
-    // autoPtr<point> pointInMesh;
+    subVolume
+    (
+        const boundBox bb,
+        const std::shared_ptr<subVolume> parentSV,
+        const volumeType cVolumeType,
+        const volumeType tVolumeType
+    );
 
-    // List<vector> faceNeighbours;
-    // autoPtr<List<vector>> faceNeighbours;
-
-    bool isContact()
-    {
-        return isCBody&&isTBody;
-    };
-
-    bool isInBody()
-    {
-        return  (isCBody||isTBody);
-    }
     // Destructors -------------------------------------------------
-    ~subVolumeProperties(){}
+    ~subVolume();
+
+    // Member Functions --------------------------------------------
+
+    ibSubVolumeInfo& cVolumeInfo();
+    ibSubVolumeInfo& tVolumeInfo();
+
+    List<subVolume>& childSubVolumes();
+
+    std::shared_ptr<subVolume>& parentSV();
+
+    ibSubVolumeInfo& getVolumeInfo(bool cIb);
+    const ibSubVolumeInfo& getVolumeInfo(bool cIb) const;
+
+//-----------------------------operator-------------------------------//
 };
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 } // End namespace Foam
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
 #endif
+
 // ************************************************************************* //

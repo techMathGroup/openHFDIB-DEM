@@ -6,7 +6,7 @@ geomModels/shapeBased/shapeBased.C
 geomModels/shapeBased/sphereBody.C
 geomModels/clusterBased/clusterBody.C
 geomModels/clusterBased/periodicBody.C
-virtualMesh/bbMatrix.C
+virtualMesh/subVolume.C
 virtualMesh/virtualMesh.C
 contactModels/materialInfo.C
 contactModels/wallContactVars.C

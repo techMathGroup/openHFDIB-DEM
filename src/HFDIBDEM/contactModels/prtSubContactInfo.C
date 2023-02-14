@@ -119,23 +119,15 @@ vector prtSubContactInfo::getFt(scalar deltaT)
     return Ftdi;
 }
 //---------------------------------------------------------------------------//
-void prtSubContactInfo::setVMInfo(boundBox& bBox,
-    vector subVolumeNVector,
-    scalar charCellSize,
-    scalar subVolumeV)
+void prtSubContactInfo::setVMInfo(boundBox& bBox, scalar subVolumeV)
 {
     if (!vmInfo_.valid())
     {
-        vmInfo_.set(new virtualMeshInfo(bBox,
-            subVolumeNVector,
-            charCellSize,
-            subVolumeV));
+        vmInfo_.set(new virtualMeshInfo(bBox, subVolumeV));
         return;
     }
 
-    vmInfo_->bBox = bBox;
-    vmInfo_->subVolumeNVector = subVolumeNVector;
-    vmInfo_->charCellSize = charCellSize;
+    vmInfo_->sV = subVolume(bBox);
     vmInfo_->subVolumeV = subVolumeV;
 }
 //---------------------------------------------------------------------------//
@@ -147,9 +139,7 @@ void prtSubContactInfo::setVMInfo(const virtualMeshInfo& vmInfo)
         return;
     }
 
-    vmInfo_->bBox = vmInfo.bBox;
-    vmInfo_->subVolumeNVector = vmInfo.subVolumeNVector;
-    vmInfo_->charCellSize = vmInfo.charCellSize;
+    vmInfo_->sV = vmInfo.sV;
     vmInfo_->subVolumeV = vmInfo.subVolumeV;
     vmInfo_->startingPoint = vmInfo.startingPoint;
 }
