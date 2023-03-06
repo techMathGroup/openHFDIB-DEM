@@ -83,7 +83,9 @@
                     mesh_,
                     startTime0,
                     bodyGeomModel.ptr(),
-                    cellPoints_
+                    cellPoints_,
+                    bodyGeom,
+                    thrSurf
                 )
             );
         }
