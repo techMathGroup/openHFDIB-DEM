@@ -26,15 +26,15 @@ InNamspace
     contactModel
 
 Description
-    Static class for storing virtual mesh level
+    Static class for storing wall material information
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef virtualMeshLevel_H
-#define virtualMeshLevel_H
+#ifndef wallPlaneInfo_H
+#define wallPlaneInfo_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -42,39 +42,32 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class virtualMeshLevel Declaration
+                      Class wallPlaneInfo Declaration
 \*---------------------------------------------------------------------------*/
 
 
-class virtualMeshLevel
+class wallPlaneInfo
 {
     public:
 
-    static void setVirtualMeshLevel(scalar virtualMeshLevel,scalar charCellSize)
+    static const HashTable<List<vector>,string,Hash<string>>& getWallPlaneInfo()
     {
-        virtualMeshLevel_ = virtualMeshLevel;
-        levelOfDivision_ = int(pow(2,virtualMeshLevel_));
-        charCellSize_ = charCellSize;
+        return wallPlaneInfo_;
     }
 
-    static scalar getVirtualMeshLevel()
+    static void wallPlaneInfo_insert
+    (
+        const string& wallPatch,
+        const vector& patchNVec,
+        const vector& planePoint
+    )
     {
-        return virtualMeshLevel_;
-    }
+        List<vector> planeInfo{{patchNVec,planePoint}};
+        wallPlaneInfo_.insert(wallPatch,planeInfo);
+    };
 
-    static scalar getLevelOfDivision()
-    {
-        return levelOfDivision_;
-    }
-
-    static scalar getCharCellSize()
-    {
-        return charCellSize_;
-    }
-
-    static scalar virtualMeshLevel_;
-    static scalar levelOfDivision_;
-    static scalar charCellSize_;
+    //- Hash table for storing wall material information
+    static HashTable<List<vector>,string,Hash<string>> wallPlaneInfo_;
 
 };
 

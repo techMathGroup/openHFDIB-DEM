@@ -67,109 +67,116 @@ namespace contactModel
     bool detectWallContact
     (
         const fvMesh&   mesh,
-        ibContactClass& ibClass
+        ibContactClass& ibClass,
+        wallContactInfo& wallCntInfo
     );
 
     bool detectWallContact_ArbShape
     (
         const fvMesh&   mesh,
-        ibContactClass& ibClass
+        ibContactClass& ibClass,
+        wallContactInfo& wallCntInfo
     );
 
-    bool detectWallContact_Sphere
-    (
-        const fvMesh&   mesh,
-        ibContactClass& ibClass
-    );
+    // bool detectWallContact_Sphere
+    // (
+    //     const fvMesh&   mesh,
+    //     ibContactClass& ibClass
+    // );
 
     bool detectWallContact_Cluster
     (
         const fvMesh&   mesh,
-        ibContactClass& ibClass
+        ibContactClass& ibClass,
+        wallContactInfo& wallCntInfo
     );
 
     void getWallContactVars
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo,
-        const scalar deltaT
+        const scalar deltaT,
+        wallSubContactInfo& sWC
     );
 
     void getWallContactVars_ArbShape
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo,
-        const scalar deltaT
+        const scalar deltaT,
+        wallSubContactInfo& sWC
     );
 
-    void getWallContactVars_Sphere
-    (
-        const fvMesh&   mesh,
-        wallContactInfo& wallCntInfo,
-        const scalar deltaT
-    );
+    // void getWallContactVars_Sphere
+    // (
+    //     const fvMesh&   mesh,
+    //     wallContactInfo& wallCntInfo,
+    //     const scalar deltaT
+    // );
 
     void getWallContactVars_Cluster
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo,
-        const scalar deltaT
+        const scalar deltaT,
+        wallSubContactInfo& sWC
     );
 
-    DynamicList<Tuple2<label,string>> getContactFacesSphere
+    // DynamicList<Tuple2<label,string>> getContactFacesSphere
+    // (
+    //     const fvMesh&   mesh,
+    //     wallContactInfo& wallCntInfo,
+    //     label faceLabel,
+    //     DynamicList<Tuple2<label,string>>& checkedFaces
+    // );
+
+    // DynamicList<Tuple2<label,string>> getContactFacesArbShape
+    // (
+    //     const fvMesh&   mesh,
+    //     wallContactInfo& wallCntInfo,
+    //     label faceLabel,
+    //     DynamicList<Tuple2<label,string>>& checkedFaces,
+    //     HashTable<bool,label,Hash<label>>& pointTable,
+    //     DynamicVectorList& center,
+    //     DynamicVectorList& normal,
+    //     DynamicLabelList& centerPoints,
+    //     DynamicScalarList& area
+    // );
+
+    bool solveWallContact
     (
         const fvMesh&   mesh,
         wallContactInfo& wallCntInfo,
-        label faceLabel,
-        DynamicList<Tuple2<label,string>>& checkedFaces
+        scalar deltaT,
+        wallSubContactInfo& sWC
     );
 
-    DynamicList<Tuple2<label,string>> getContactFacesArbShape
-    (
-        const fvMesh&   mesh,
-        wallContactInfo& wallCntInfo,
-        label faceLabel,
-        DynamicList<Tuple2<label,string>>& checkedFaces,
-        HashTable<bool,label,Hash<label>>& pointTable,
-        DynamicVectorList& center,
-        DynamicVectorList& normal,
-        DynamicLabelList& centerPoints,
-        DynamicScalarList& area
-    );
+    // scalar getInterVolume_ArbShape
+    // (
+    //     const fvMesh&   mesh,
+    //     ibContactClass& cClass,
+    //     ibContactVars& cVars,
+    //     vector nVec,
+    //     vector center
+    // );
 
-    void solveWallContact
-    (
-        const fvMesh&   mesh,
-        wallContactInfo& wallCntInfo,
-        scalar deltaT
-    );
+    // scalar getInterVolume_Sphere
+    // (
+    //     const fvMesh&   mesh,
+    //     ibContactClass& cClass,
+    //     ibContactVars& cVars,
+    //     vector nVec,
+    //     vector center
+    // );
 
-    scalar getInterVolume_ArbShape
-    (
-        const fvMesh&   mesh,
-        ibContactClass& cClass,
-        ibContactVars& cVars,
-        vector nVec,
-        vector center
-    );
-
-    scalar getInterVolume_Sphere
-    (
-        const fvMesh&   mesh,
-        ibContactClass& cClass,
-        ibContactVars& cVars,
-        vector nVec,
-        vector center
-    );
-
-    scalar sphereContactArea
-    (
-        const fvMesh&   mesh,
-        ibContactClass& cClass,
-        ibContactVars& cVars,
-        vector nVec,
-        vector center
-    );
+    // scalar sphereContactArea
+    // (
+    //     const fvMesh&   mesh,
+    //     ibContactClass& cClass,
+    //     ibContactVars& cVars,
+    //     vector nVec,
+    //     vector center
+    // );
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -36,22 +36,96 @@ Contributors
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef bbMatrix_H
-#define bbMatrix_H
+#ifndef virtualMeshWall_H
+#define virtualMeshWall_H
 
 #include "dictionary.H"
 #include "fvCFD.H"
-#include "ibContactClass.H"
+#include "geomModel.H"
+#include "bbMatrix.H"
+#include "clockTime.H"
 #include "subVolumeProperties.H"
+// #include ""
+
+
+// #include "fvMesh.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+struct virtualMeshWallInfo
+{
+    virtualMeshWallInfo():
+    bBox(boundBox()),
+    startingPoint(vector::zero),
+    subVolumeNVector(vector::zero),
+    charCellSize(0),
+    subVolumeV(0)
+
+    {}
+    virtualMeshWallInfo(
+        boundBox bBox,
+        point startingPoint,
+        vector subVolumeNVector,
+        scalar charCellSize,
+        scalar subVolumeV):
+    bBox(bBox),
+    startingPoint(startingPoint),
+    subVolumeNVector(subVolumeNVector),
+    charCellSize(charCellSize),
+    subVolumeV(subVolumeV)
+    {}
+
+    const point& getStartingPoint()
+    {
+        return startingPoint;
+    }
+
+    const scalar& getSVVolume()
+    {
+        return subVolumeV;
+    }
+
+    const scalar& getCharCellSize()
+    {
+        return charCellSize;
+    }
+
+    void shiftBBox
+    (
+        vector shiftVec
+    )
+    {
+        bBox.min() += shiftVec;
+        bBox.max() += shiftVec;
+    }
+
+    boundBox& getbBox()
+    {
+        return bBox;
+    }
+
+    void setStartingPoint
+    (
+        point sPoint
+    )
+    {
+        startingPoint = sPoint;
+    }
+
+    boundBox bBox;
+    point startingPoint;
+    vector subVolumeNVector;
+    scalar charCellSize;
+    scalar subVolumeV;    
+};
+
 /*---------------------------------------------------------------------------*\
-                        Class ibContactClass Declaration
+                        Class virtualMeshWall Declaration
 \*---------------------------------------------------------------------------*/
-class bbMatrix
+class virtualMeshWall
 {
     private:
 
@@ -59,93 +133,59 @@ class bbMatrix
     typedef DynamicList<scalar> DynamicScalarList;
     typedef DynamicList<vector> DynamicVectorList;
     typedef DynamicList<point> DynamicPointList;
+    typedef HashSet<vector,Hash<vector>> vectorHashSet;
 
-    const vector matrixSize_;
-    const boundBox bBox_;
-    const scalar charCellSize_;
-    const scalar subVolumeV_;
-    List<List<List<autoPtr<subVolumeProperties>>>> bbMatrix_;
+    geomModel& cGeomModel_;
+
+    virtualMeshWallInfo& vMeshWallInfo_;
+
+    bbMatrix bbMatrix_;
+
+    DynamicPointList edgeSubVolumesPoints_;
 
     public:
+    
+    vector contactCenter_ = vector::zero;
 
     // Constructors ------------------------------------------------
 
-    bbMatrix
+    virtualMeshWall
     (
-    const vector matrixSize,
-    const boundBox bBox,
-    const scalar& charCellSize,
-    const scalar& subVolumeV
+        virtualMeshWallInfo& vMeshWallInfo,
+        geomModel& cGeomModel
     );
+
 
     // Destructors -------------------------------------------------
-    ~bbMatrix();
+    ~virtualMeshWall();
 
-//-----------------------------operator-------------------------------//
-    subVolumeProperties& operator[](const vector& sVI)
-    {
-        if (!bbMatrix_[sVI[0]][sVI[1]][sVI[2]].valid())
-        {
-            bbMatrix_[sVI[0]][sVI[1]][sVI[2]].set(
-                new subVolumeProperties(getPointInMesh(sVI))
-            );
-        }
+    bool detectFirstContactPoint();
 
-        return bbMatrix_[sVI[0]][sVI[1]][sVI[2]]();
-    }
-//-----------------------------operator-------------------------------//
-//-----------------------------Func-------------------------------//
-    vector getPointInMesh
-    (
-        const vector& subVolumeIndex
-    );
+    scalar evaluateContact();
 
-    vector getSVIndexForPoint
-    (
-        const point& pointInDomain
-    );
+    void checkSubVolume(subVolumeProperties& subVolume);
 
-    vector getSVIndexForPoint_Wall
-    (
-        point pointInDomain
-    );
+    void resetSubVolume(subVolumeProperties& subVolume);
 
-    vector getFirstSubVolumeIndex
-    (
-        point& subVolumePoint,
-        bool& isInMatrix
-    );
-
-    List<vector> faceNeighbourSubVolumes
+    vector shiftEdgeSubVolume
     (
         vector& subVolumeIndex
     );
 
-    List<vector> edgeNeighbourSubVolumes
-    (
-        vector& subVolumeIndex
-    );
+    label getInternalSV();
 
-    List<vector> cornerNeighbourSubVolumes
-    (
-        vector& subVolumeIndex
-    );
-
-    scalar getSubVolumeV()
+    DynamicPointList& getEdgeSVPoints()
     {
-        return subVolumeV_;
+        return edgeSubVolumesPoints_;
     }
 
-    scalar getCharCellSize()
+    vector& getContactCenter()
     {
-        return charCellSize_;
+        return contactCenter_;
     }
 
-    boundBox getBBox()
-    {
-        return bBox_;
-    }
 };
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

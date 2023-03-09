@@ -74,3 +74,43 @@ void wallContactVars::setMeanCntPars
     physicalProperties_.maxAdhN_ /= overallArea;
 }
 //---------------------------------------------------------------------------//
+void wallContactVars::setMeanCntPars_Plane
+(
+    List<scalar>& contactAreas,
+    List<string> contactFaces,
+    HashTable<physicalProperties,string,Hash<string>>& wallMeanPars
+)
+{
+    scalar overallArea = 0;
+    physicalProperties_.aY_ = 0;
+    physicalProperties_.aG_ = 0;
+    physicalProperties_.aGammaN_ = 0;
+    physicalProperties_.aGammat_ = 0;
+    physicalProperties_.aMu_ = 0;
+    physicalProperties_.maxAdhN_ = 0;
+
+    forAll(contactFaces,faceI)
+    {
+        scalar area = contactAreas[faceI];
+        overallArea += area;
+
+        physicalProperties& cMeanCntPars(
+            wallMeanPars[contactFaces[faceI]]
+        );
+
+        physicalProperties_.aY_ += (cMeanCntPars.aY_*area);
+        physicalProperties_.aG_ += (cMeanCntPars.aG_*area);
+        physicalProperties_.aGammaN_ += (cMeanCntPars.aGammaN_*area);
+        physicalProperties_.aGammat_ += (cMeanCntPars.aGammat_*area);
+        physicalProperties_.aMu_ += (cMeanCntPars.aMu_*area);
+        physicalProperties_.maxAdhN_ += (cMeanCntPars.maxAdhN_*area);
+    }
+
+    physicalProperties_.aY_ /= overallArea;
+    physicalProperties_.aG_ /= overallArea;
+    physicalProperties_.aGammaN_ /= overallArea;
+    physicalProperties_.aGammat_ /= overallArea;
+    physicalProperties_.aMu_ /= overallArea;
+    physicalProperties_.maxAdhN_ /= overallArea;
+}
+//---------------------------------------------------------------------------//

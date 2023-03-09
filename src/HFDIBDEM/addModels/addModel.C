@@ -57,10 +57,17 @@ bool addModel::isBodyInContact(PtrList<immersedBody>& immersedBodies)
         helpScalar,
         geomModel_->getRhoS()
     ));
+    
+    autoPtr<wallContactInfo> cIBWallCntI(
+        new wallContactInfo(
+            cIbClass(),
+            cIbVars()
+    ));
 
     bool inContact = contactModel::detectWallContact(
         mesh_,
-        cIbClass()
+        cIbClass(),
+        cIBWallCntI()
     );
 
     if(!inContact)

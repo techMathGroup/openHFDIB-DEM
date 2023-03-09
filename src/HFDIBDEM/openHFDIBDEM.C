@@ -136,8 +136,17 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     dictionary patchDic = demDic.subDict("collisionPatches");
     List<word> patchNames = patchDic.toc();
     forAll(patchNames, patchI)
-    {
-        word patchMaterial = patchDic.lookup(patchNames[patchI]);
+    {   
+        word patchMaterial = patchDic.subDict(patchNames[patchI]).lookup("material");
+        vector patchNVec = patchDic.subDict(patchNames[patchI]).lookup("nVec");
+        vector planePoint = patchDic.subDict(patchNames[patchI]).lookup("planePoint");
+        
+        wallPlaneInfo::wallPlaneInfo_insert(
+            patchNames[patchI],
+            patchNVec,
+            planePoint
+        );
+
         wallMatInfo::wallMatInfo_insert(
             patchNames[patchI],
             materialProperties::getMatProps()[patchMaterial]
@@ -169,16 +178,19 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         }
     }
 
-    if (HFDIBDEMDict_.found("virtMeshDecompositionLevel"))
-	{
-        virtualMeshLevel::setVirtualMeshLevel(readScalar(HFDIBDEMDict_.lookup("virtMeshDecompositionLevel")));
-        Info <<" -- VirtMesh Decomposition Level is set to : "<< virtualMeshLevel::getVirtualMeshLevel() << endl;
+    if (HFDIBDEMDict_.isDict("virtualMesh"))
+    {
+        dictionary vMDic = HFDIBDEMDict_.subDict("virtualMesh");
+        virtualMeshLevel::setVirtualMeshLevel(readScalar(vMDic.lookup("level")),readScalar(vMDic.lookup("charCellSize")));
+        Info <<" -- VirtMesh Decomposition Level is set to        : "<< virtualMeshLevel::getVirtualMeshLevel() << endl;
+        Info <<" -- VirtMesh charCellSize for boundary is set to  : "<< virtualMeshLevel::getCharCellSize() << endl;
 
-	}
+    }
     else
     {
-        virtualMeshLevel::setVirtualMeshLevel(1);
-        Info <<" -- VirtMesh Decomposition Level is set to : "<< virtualMeshLevel::getVirtualMeshLevel() << endl;
+        virtualMeshLevel::setVirtualMeshLevel(1,1);
+        Info <<" -- VirtMesh Decomposition Level is set to        : "<< virtualMeshLevel::getVirtualMeshLevel() << endl;
+        Info <<" -- VirtMesh charCellSize for boundary is set to  : "<< virtualMeshLevel::getCharCellSize() << endl;
 
     }
 
@@ -590,6 +602,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
         verletList_.update(immersedBodies_);
 
+        DynamicLabelList wallContactIB;
+        DynamicList<wallSubContactInfo*> wallContactList;
         forAll (immersedBodies_,bodyId)
         {
             immersedBody& cIb(immersedBodies_[bodyId]);
@@ -604,30 +618,68 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     if(detectWallContact
                     (
                         mesh_,
-                        cIb.getibContactClass()
+                        cIb.getibContactClass(),
+                        cIb.getWallCntInfo() 
                     ))
                     {
                         cIb.getibContactClass().setWallContact(true);
                         cIb.getibContactClass().inContactWithStatic(true);
-                    }
-                    // solve wall contact
-                    if (cIb.checkWallContact())
-                    {
-                        solveWallContact
-                        (
-                            mesh_,
-                            cIb.getWallCntInfo(),
-                            deltaTime*step
-                        );
-
-                        cIb.updateContactForces
-                        (
-                            cIb.getWallCntInfo().getOutForce()
-                        );
+                        wallContactIB.append(bodyId);
+                        cIb.getWallCntInfo().registerSubContactList(wallContactList);
                     }
                 }
             }
         }
+        if(wallContactIB.size() > 0)
+        {
+            InfoH << DEM_Info << " wallContactList SCListSize() " << wallContactList.size() << endl;
+            label wallContactPerProc(ceil(double(wallContactList.size())/Pstream::nProcs()));
+
+            if( wallContactList.size() <= Pstream::nProcs())
+            {
+                wallContactPerProc = 1;
+            }
+            InfoH << DEM_Info << " wallContactList wallContactPerProc " << wallContactPerProc << endl;
+
+            for(int assignProc = Pstream::myProcNo()*wallContactPerProc; assignProc < min((Pstream::myProcNo()+1)*wallContactPerProc,wallContactList.size()); assignProc++)
+            {
+                wallSubContactInfo* sCW = wallContactList[assignProc];
+                immersedBody& cIb(immersedBodies_[sCW->getBodyId()]);
+                sCW->setResolvedContact(solveWallContact(
+                    mesh_,
+                    cIb.getWallCntInfo(),
+                    deltaTime*step,
+                    *sCW
+                    ));
+                Pout <<" assignProc completed " << assignProc << endl;
+            }
+            Pout <<" Survived " << endl;
+            
+            forAll (wallContactIB,iB)
+            {
+                immersedBody& cIb(immersedBodies_[wallContactIB[iB]]);
+                
+                std::vector<std::shared_ptr<wallSubContactInfo>>& subCList
+                    = cIb.getWallCntInfo().getWallSCList();
+
+                for(auto sC : subCList)
+                {
+                    sC->syncContactResolve();
+                    if(sC->getContactResolved())
+                    {
+                        sC->syncData();
+
+                        cIb.updateContactForces(
+                            sC->getOutForce()
+                        );
+                    }
+                }
+                cIb.getWallCntInfo().clearOldContact();
+            }
+            Pout <<" Survived 2 " << endl;
+        }
+        wallContactList.clear();
+        wallContactIB.clear();
 
         DynamicList<prtSubContactInfo*> contactList;
         // check only pairs whose bounding boxes are intersected for the contact
