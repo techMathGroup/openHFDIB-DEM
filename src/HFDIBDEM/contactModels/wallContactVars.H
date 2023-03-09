@@ -91,10 +91,32 @@ class wallContactVars
         HashTable<physicalProperties,string,Hash<string>>& wallMeanPars
     );
 
+    void setMeanCntPars_Plane
+    (
+        List<scalar>& contactAreas,
+        List<string> contactFaces,
+        HashTable<physicalProperties,string,Hash<string>>& wallMeanPars
+    );
+
     physicalProperties& getMeanCntPar()
     {
         return physicalProperties_;
     }
+
+    void clear()
+    {
+        contactCenter_ = vector::zero;
+        contactVolume_ = 0;
+        contactNormal_ = vector::zero;
+        contactArea_ = 0;
+
+        lVec_ = vector::zero;
+        Veli_ = vector::zero;
+        Vn_ = 0;
+        Lc_ = 0;
+        curAdhN_ = 0;
+        FtPrev_ = vector::zero;
+    }    
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

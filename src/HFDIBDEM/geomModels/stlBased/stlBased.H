@@ -210,6 +210,22 @@ namespace Foam
             }
             CoM_/= bSMeshPts.size();
         }
+        
+        pointField getSTLBodyPoints() final override
+        {
+            return bodySurfMesh_.points();       
+        }
+
+        faceList getSTLFaces() final override
+        {
+            return triSurf_().faces();
+        }
+
+        pointField getSTLFacePoint(label faceID) final override
+        {            
+            return triSurf_().faces()[faceID].points(bodySurfMesh_.points());
+        }
+
     };
 }
 #endif

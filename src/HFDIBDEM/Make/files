@@ -13,7 +13,10 @@ contactModels/wallContactVars.C
 contactModels/ibContactClass.C
 contactModels/prtContactInfo.C
 contactModels/prtSubContactInfo.C
+virtualMesh/spectatorMesh.C
+virtualMesh/virtualMeshWall.C
 contactModels/wallContactInfo.C
+contactModels/wallSubContactInfo.C
 contactModels/prtContact.C
 contactModels/wallContact.C
 contactModels/cyclicContact.C

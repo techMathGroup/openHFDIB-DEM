@@ -26,64 +26,48 @@ InNamspace
     contactModel
 
 Description
-    Static class for storing virtual mesh level
+    methods to solve particle-particle contact
+
+SourceFiles
+    spectatorMesh.C
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef virtualMeshLevel_H
-#define virtualMeshLevel_H
+#ifndef sMProperties_H
+#define sMProperties_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
 /*---------------------------------------------------------------------------*\
-                      Class virtualMeshLevel Declaration
+                        Class ibContactClass Declaration
 \*---------------------------------------------------------------------------*/
-
-
-class virtualMeshLevel
+class sMProperties
 {
     public:
 
-    static void setVirtualMeshLevel(scalar virtualMeshLevel,scalar charCellSize)
-    {
-        virtualMeshLevel_ = virtualMeshLevel;
-        levelOfDivision_ = int(pow(2,virtualMeshLevel_));
-        charCellSize_ = charCellSize;
-    }
-
-    static scalar getVirtualMeshLevel()
-    {
-        return virtualMeshLevel_;
-    }
-
-    static scalar getLevelOfDivision()
-    {
-        return levelOfDivision_;
-    }
-
-    static scalar getCharCellSize()
-    {
-        return charCellSize_;
-    }
-
-    static scalar virtualMeshLevel_;
-    static scalar levelOfDivision_;
-    static scalar charCellSize_;
-
+    sMProperties(point center):
+    center(center)
+    {}
+    
+    const point center;
+    point initPoint = vector::zero;
+    bool isCBody = false;
+    bool isMesh  = false;
+    bool toCheck = true;
+    bool isInternal = false;
+    bool stlFound = false;
+    bool initPointSet = false;
+    
+    // Destructors -------------------------------------------------
+    ~sMProperties(){}
 };
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 } // End namespace Foam
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 #endif
-
 // ************************************************************************* //

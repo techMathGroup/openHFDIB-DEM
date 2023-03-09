@@ -382,6 +382,30 @@ namespace Foam
         );
 
         virtual List<boundBox*> getBBoxes();
+
+        virtual pointField getSTLBodyPoints()
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "not cluster model"<<endl;
+            pointField emptyField;
+            return emptyField;            
+        }
+
+        virtual faceList getSTLFaces()
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            faceList emptyList;
+            return emptyList;
+        }
+
+        virtual pointField getSTLFacePoint(label faceID) 
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            pointField nonPointField;
+            return nonPointField;
+        }        
     };
 }
 #endif

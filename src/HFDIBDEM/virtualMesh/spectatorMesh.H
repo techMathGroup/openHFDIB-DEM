@@ -29,20 +29,20 @@ Description
     methods to solve particle-particle contact
 
 SourceFiles
-    virtualMesh.C
+    wallContactInfo.C
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef bbMatrix_H
-#define bbMatrix_H
+#ifndef spectatorMesh_H
+#define spectatorMesh_H
 
 #include "dictionary.H"
 #include "fvCFD.H"
 #include "ibContactClass.H"
-#include "subVolumeProperties.H"
+#include "sMProperties.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -51,7 +51,7 @@ namespace Foam
 /*---------------------------------------------------------------------------*\
                         Class ibContactClass Declaration
 \*---------------------------------------------------------------------------*/
-class bbMatrix
+class spectatorMesh
 {
     private:
 
@@ -60,91 +60,91 @@ class bbMatrix
     typedef DynamicList<vector> DynamicVectorList;
     typedef DynamicList<point> DynamicPointList;
 
+    public:
+    
     const vector matrixSize_;
     const boundBox bBox_;
     const scalar charCellSize_;
-    const scalar subVolumeV_;
-    List<List<List<autoPtr<subVolumeProperties>>>> bbMatrix_;
 
-    public:
-
+    List<List<List<autoPtr<sMProperties>>>> centroidMatrix_;
+    List<List<List<autoPtr<sMProperties>>>> vertexMatrix_;
     // Constructors ------------------------------------------------
 
-    bbMatrix
+    spectatorMesh
     (
     const vector matrixSize,
     const boundBox bBox,
-    const scalar& charCellSize,
-    const scalar& subVolumeV
+    const scalar charCellSize
     );
 
     // Destructors -------------------------------------------------
-    ~bbMatrix();
+    ~spectatorMesh();
 
 //-----------------------------operator-------------------------------//
-    subVolumeProperties& operator[](const vector& sVI)
+    sMProperties& operator[](const vector& sVI)
     {
-        if (!bbMatrix_[sVI[0]][sVI[1]][sVI[2]].valid())
+        if (!centroidMatrix_[sVI[0]][sVI[1]][sVI[2]].valid())
         {
-            bbMatrix_[sVI[0]][sVI[1]][sVI[2]].set(
-                new subVolumeProperties(getPointInMesh(sVI))
+            centroidMatrix_[sVI[0]][sVI[1]][sVI[2]].set(
+                new sMProperties(getCentroidPoint(sVI))
             );
         }
-
-        return bbMatrix_[sVI[0]][sVI[1]][sVI[2]]();
+        return centroidMatrix_[sVI[0]][sVI[1]][sVI[2]]();
+    }
+//-----------------------------operator-------------------------------// 
+   sMProperties& operator()(const vector& sVI)
+    {
+        if (!vertexMatrix_[sVI[0]][sVI[1]][sVI[2]].valid())
+        {
+            vertexMatrix_[sVI[0]][sVI[1]][sVI[2]].set(
+                new sMProperties(getVertexPoint(sVI))
+            );
+        }
+        return vertexMatrix_[sVI[0]][sVI[1]][sVI[2]]();
     }
 //-----------------------------operator-------------------------------//
 //-----------------------------Func-------------------------------//
-    vector getPointInMesh
+    point getCentroidPoint
     (
-        const vector& subVolumeIndex
+        const vector& elementIndex
     );
 
-    vector getSVIndexForPoint
+    point getVertexPoint
+    (
+        const point& elementIndex
+    );
+
+    vector getSMCentroidIndex
     (
         const point& pointInDomain
     );
 
-    vector getSVIndexForPoint_Wall
+    vector getSMVertexIndex
     (
-        point pointInDomain
+        const point& pointInDomain
     );
 
-    vector getFirstSubVolumeIndex
+    List<vector> faceNeighbourElements
     (
-        point& subVolumePoint,
-        bool& isInMatrix
+        vector& elementIndex
+    );    
+
+    List<vector> elementVertexIndexies
+    (
+        vector& elementIndex
     );
 
-    List<vector> faceNeighbourSubVolumes
+    bool isPointInElementBB
     (
-        vector& subVolumeIndex
+        point& pointToCheck,
+        vector& elementIndex
     );
 
-    List<vector> edgeNeighbourSubVolumes
+    boundBox getElementBB
     (
-        vector& subVolumeIndex
+        vector& elementIndex
     );
 
-    List<vector> cornerNeighbourSubVolumes
-    (
-        vector& subVolumeIndex
-    );
-
-    scalar getSubVolumeV()
-    {
-        return subVolumeV_;
-    }
-
-    scalar getCharCellSize()
-    {
-        return charCellSize_;
-    }
-
-    boundBox getBBox()
-    {
-        return bBox_;
-    }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
