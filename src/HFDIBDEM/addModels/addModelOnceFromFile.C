@@ -40,7 +40,9 @@ addModelOnceFromFile::addModelOnceFromFile
     const Foam::fvMesh& mesh,
     const bool startTime0,
     geomModel* bodyGeomModel,
-    List<labelList>& cellPoints
+    List<labelList>& cellPoints,
+    word& bodyGeom,
+    scalar thrSurf
 )
 :
 addModel(mesh, bodyGeomModel, cellPoints),
@@ -49,12 +51,14 @@ addMode_(word(addModelDict_.lookup("addModel"))),
 coeffsDict_(addModelDict_.subDict(addMode_+"Coeffs")),
 bodyAdded_(false),
 fileName_("constant/" + (word(coeffsDict_.lookup("fileName")))),
-ifStream_(fileName_.toAbsolute())
+ifStream_(fileName_.toAbsolute()),
+bodyGeom_(bodyGeom),
+thrSurf_(thrSurf)
 {
     if(!ifStream_.opened())
     {
-        FatalErrorIn("addModelOnceFromFile::addModelOnceFromFile()") 
-        << "Can not open IFstream for file: " 
+        FatalErrorIn("addModelOnceFromFile::addModelOnceFromFile()")
+        << "Can not open IFstream for file: "
         << fileName_.toAbsolute() << nl << exit(FatalError);
     }
 
@@ -68,11 +72,32 @@ addModelOnceFromFile::~addModelOnceFromFile()
 {
 }
 //---------------------------------------------------------------------------//
+void addModelOnceFromFile::addSphere(string& line)
+{
+    IStringStream stringStream(line);
+    vector position(stringStream);
 
+    geomModel_->bodyMovePoints(position - geomModel_->getCoM());
+}
+//---------------------------------------------------------------------------//
+void addModelOnceFromFile::addSTL(string& line)
+{
+    if(bodyGeom_ == "convex")
+    {
+        word stlPath("constant/triSurface/" + line);
+        geomModel_.reset(new convexBody(mesh_, stlPath, thrSurf_));
+    }
+    else
+    {
+        word stlPath("constant/triSurface/" + line);
+        geomModel_.reset(new nonConvexBody(mesh_, stlPath, thrSurf_));
+    }
+}
+//---------------------------------------------------------------------------//
 geomModel* addModelOnceFromFile::addBody
 (
     const volScalarField& body,
-    PtrList<immersedBody>& immersedBodies  
+    PtrList<immersedBody>& immersedBodies
 )
 {
     string line;
@@ -84,21 +109,26 @@ geomModel* addModelOnceFromFile::addBody
         bodyAdded_ = false;
         return geomModel_().getGeomModel();
     }
-    IStringStream stringStream(line);
-    vector position(stringStream);
 
-    geomModel_->bodyMovePoints(position - geomModel_->getCoM());
+    if (bodyGeom_ == "sphere")
+    {
+        addSphere(line);
+    }
+    else
+    {
+        addSTL(line);
+    }
 
-    volScalarField helpBodyField_ = body;
-    geomModel_->createImmersedBody(
-        helpBodyField_,
-        octreeField_,
-        cellPoints_
-    );
+    // volScalarField helpBodyField_ = body;
+    // geomModel_->createImmersedBody(
+    //     helpBodyField_,
+    //     octreeField_,
+    //     cellPoints_
+    // );
 
-    bool canAddBodyI = !isBodyInContact(immersedBodies);
+    // bool canAddBodyI = !isBodyInContact(immersedBodies);
 
-    reduce(canAddBodyI, andOp<bool>());
+    // reduce(canAddBodyI, andOp<bool>());
 
     bodyAdded_ = true;
     return geomModel_().getGeomModel();

@@ -62,6 +62,22 @@ namespace Foam
 
         pointField historyPoints_;
 
+        void getIntersectionPoints
+        (
+            const label index,
+            const treeBoundBox& cubeBb,
+            DynamicPointList& intersectionPoints
+        );
+
+        void intersectBb
+        (
+            const point& p0,
+            const point& p1,
+            const point& p2,
+            const treeBoundBox& cubeBb,
+            DynamicPointList& intersectionPoints
+        );
+
         public:
 
         // Constructors ------------------------------------------------
@@ -159,6 +175,8 @@ namespace Foam
             return returnList[0];
         }
 
+        volumeType getVolumeType(subVolume& sv, bool cIb)  final override;
+
         void getClosestPointAndNormal
         (
             const point& startPoint,
@@ -188,6 +206,13 @@ namespace Foam
                 closestPoint = getCoM();
             }
         }
+
+        bool limitFinalSubVolume
+        (
+            const subVolume& sv,
+            bool cIb,
+            boundBox& limBBox
+        ) final override;
 
         void initVars(pointField surfPoints, scalar thrSurf, scalar intSpan, bool sdBasedLambda)
         {

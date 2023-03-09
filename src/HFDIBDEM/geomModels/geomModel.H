@@ -41,10 +41,10 @@ Contributors
 
 #include "dictionary.H"
 #include "fvCFD.H"
-// #include "fvMesh.H"
 #include "triSurfaceMesh.H"
 
 #include "contactType.H"
+#include "subVolume.H"
 #include "verletPoint.H"
 
 #include "outputHFDIBDEM.H"
@@ -252,6 +252,13 @@ namespace Foam
             return false;
         }
 
+        virtual volumeType getVolumeType(subVolume& sv, bool cIb)
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            return volumeType::unknown;
+        }
+
         virtual scalar getDC()
         {
             return dC_;
@@ -267,6 +274,18 @@ namespace Foam
         {
             InfoH << iB_Info << "-- geomModelMessage-- "
                 << "notIplemented"<<endl;
+        }
+
+        virtual bool limitFinalSubVolume
+        (
+            const subVolume& sv,
+            bool cIb,
+            boundBox& limBBox
+        )
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            return false;
         }
 
         virtual void setCoM()

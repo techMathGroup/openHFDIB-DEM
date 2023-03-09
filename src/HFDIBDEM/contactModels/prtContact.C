@@ -86,32 +86,37 @@ void findSubContacts_ArbShape(
     prtContactInfo& prtcInfo
 )
 {
-    DynamicLabelList    commonCells;
+    // DynamicLabelList    commonCells;
 
-    List<DynamicLabelList> cSurfCells(prtcInfo.getcClass().getSurfCells());
-    List<DynamicLabelList> tSurfCells(prtcInfo.gettClass().getSurfCells());
-
-    // iterate over surfCells to find common cells
-    forAll (cSurfCells[Pstream::myProcNo()],cSCellI)
+    // List<DynamicLabelList> cSurfCells(prtcInfo.getcClass().getSurfCells());
+    if (Pstream::myProcNo() == 0)
     {
-        forAll (tSurfCells[Pstream::myProcNo()],tSCellI)
-        {
-            if (mag(cSurfCells[Pstream::myProcNo()][cSCellI]-tSurfCells[Pstream::myProcNo()][tSCellI]) < SMALL)
-            {
-                commonCells.append(cSurfCells[Pstream::myProcNo()][cSCellI]);
-            }
-        }
+        scalar ranCellVol = mesh.V()[0];
+        prtcInfo.setSubContacts_ArbShape(ranCellVol);
     }
+    // List<DynamicLabelList> tSurfCells(prtcInfo.gettClass().getSurfCells());
 
-    prtcInfo.setSubContacts_ArbShape(
-        mesh,
-        detectContactCells(
-            mesh,
-            prtcInfo.getcClass().getGeomModel(),
-            prtcInfo.gettClass().getGeomModel(),
-            commonCells
-        )
-    );
+    // // iterate over surfCells to find common cells
+    // forAll (cSurfCells[Pstream::myProcNo()],cSCellI)
+    // {
+    //     forAll (tSurfCells[Pstream::myProcNo()],tSCellI)
+    //     {
+    //         if (mag(cSurfCells[Pstream::myProcNo()][cSCellI]-tSurfCells[Pstream::myProcNo()][tSCellI]) < SMALL)
+    //         {
+    //             commonCells.append(cSurfCells[Pstream::myProcNo()][cSCellI]);
+    //         }
+    //     }
+    // }
+
+    // prtcInfo.setSubContacts_ArbShape(
+    //     mesh,
+    //     detectContactCells(
+    //         mesh,
+    //         prtcInfo.getcClass().getGeomModel(),
+    //         prtcInfo.gettClass().getGeomModel(),
+    //         commonCells
+    //     )
+    // );
 }
 //---------------------------------------------------------------------------//
 void findSubContacts_Cluster(
@@ -476,8 +481,6 @@ void getPrtContactVars_ArbShape(
 
     intersectedVolume = virtMesh.evaluateContact();
 
-    virtMesh.identifySurfaceSubVolumes();
-
     if(virtMesh.getEdgeSVPoints().size() <= 4)
     {
         intersectedVolume = 0;
@@ -751,7 +754,7 @@ bool solvePrtContact(
             << subCInfo.getprtCntVars().contactVolume_ << endl;
     InfoH << parallelDEM_Info << "-- Particle-particle " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact area "
             << subCInfo.getprtCntVars().contactArea_ << endl;
-            
+
     subCInfo.evalVariables(
         cInfo.getcClass().getGeomModel().getCoM(),
         cInfo.gettClass().getGeomModel().getCoM(),
@@ -765,6 +768,12 @@ bool solvePrtContact(
 
     vector FNd = subCInfo.getFNd();
     InfoH << parallelDEM_Info << "-- Particle-particle " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact FNd " << FNd << endl;
+
+    // clamp FNd if opposite direction to FNe
+    if ((F & FNd) < 0 && mag(FNd) > mag(F))
+    {
+        FNd *= mag(F) / mag(FNd);
+    }
 
     F += FNd;
     InfoH << parallelDEM_Info << "-- Particle-particle " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact FN " << F << endl;

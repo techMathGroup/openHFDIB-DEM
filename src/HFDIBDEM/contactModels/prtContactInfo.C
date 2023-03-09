@@ -124,6 +124,34 @@ std::shared_ptr<prtSubContactInfo> prtContactInfo::matchSubContact
         (contactPair, physicalProperties);
 }
 //---------------------------------------------------------------------------//
+void prtContactInfo::limitBBox(boundBox& bbox)
+{
+    const boundBox cBBox(cIbContactClass_.getGeomModel().getBounds());
+    const boundBox tBBox(tIbContactClass_.getGeomModel().getBounds());
+    for (label coord = 0; coord < 3; coord++)
+    {
+        if (bbox.min()[coord] < cBBox.min()[coord])
+        {
+            bbox.min()[coord] = cBBox.min()[coord];
+        }
+
+        if (bbox.max()[coord] > cBBox.max()[coord])
+        {
+            bbox.max()[coord] = cBBox.max()[coord];
+        }
+
+        if (bbox.min()[coord] < tBBox.min()[coord])
+        {
+            bbox.min()[coord] = tBBox.min()[coord];
+        }
+
+        if (bbox.max()[coord] > tBBox.max()[coord])
+        {
+            bbox.max()[coord] = tBBox.max()[coord];
+        }
+    }
+}
+//---------------------------------------------------------------------------//
 void prtContactInfo::setSubContacts_Sphere()
 {
     newSubCList_.emplace_back(std::make_shared<prtSubContactInfo>
@@ -133,48 +161,49 @@ void prtContactInfo::setSubContacts_Sphere()
 //---------------------------------------------------------------------------//
 void prtContactInfo::setSubContacts_ArbShape
 (
-    const fvMesh& mesh,
-    List<DynamicList<label>> baseSubContactList
+    scalar cellV
 )
 {
-    forAll (baseSubContactList, sC)
-    {
-        scalar charCellSize = 0;
-        pointField subCPoints;
-        forAll (baseSubContactList[sC], cell)
-        {
-            label cellIter = baseSubContactList[sC][cell];
-            const pointField& pp = mesh.points();
-            const labelList& vertexLabels = mesh.cellPoints()[cellIter];
-            subCPoints.append(pointField(pp, vertexLabels));
+    boundBox subCbBox(
+        cIbContactClass_.getGeomModel().getBounds().min(),
+        cIbContactClass_.getGeomModel().getBounds().max()
+    );
+    limitBBox(subCbBox);
 
-            charCellSize += pow(mesh.V()[cellIter],0.333333);
-        }
-        charCellSize /= baseSubContactList[sC].size();
+    scalar charCellSize = pow(cellV,0.333333);
+    scalar subVolumeLength = charCellSize/virtualMeshLevel::getLevelOfDivision();
+    scalar subVolumeV = pow(subVolumeLength,3);
 
-        boundBox subCbBox(subCPoints, false);
+    newSubCList_.emplace_back(matchSubContact(subCbBox, physicalProperties_, contactPair_));
+    newSubCList_.back()->setVMInfo(subCbBox, subVolumeV);
+    return;
 
-        vector subVolumeNVector = vector(
-            ceil((subCbBox.span()[0]/charCellSize))*virtualMeshLevel::getLevelOfDivision(),
-            ceil((subCbBox.span()[1]/charCellSize))*virtualMeshLevel::getLevelOfDivision(),
-            ceil((subCbBox.span()[2]/charCellSize))*virtualMeshLevel::getLevelOfDivision()
-        );
 
-        scalar subVolumeLength = charCellSize/virtualMeshLevel::getLevelOfDivision();
-        vector bBoxShiftVector = (subVolumeNVector*subVolumeLength - subCbBox.span())/2;
+    // forAll (baseSubContactList, sC)
+    // {
+    //     scalar charCellSize = 0;
+    //     pointField subCPoints;
+    //     forAll (baseSubContactList[sC], cell)
+    //     {
+    //         label cellIter = baseSubContactList[sC][cell];
+    //         const pointField& pp = mesh.points();
+    //         const labelList& vertexLabels = mesh.cellPoints()[cellIter];
+    //         subCPoints.append(pointField(pp, vertexLabels));
 
-        subCbBox.min() -= bBoxShiftVector;
-        subCbBox.max() += bBoxShiftVector;
+    //         charCellSize += pow(mesh.V()[cellIter],0.333333);
+    //     }
+    //     charCellSize /= baseSubContactList[sC].size();
 
-        scalar subVolumeV = pow(subVolumeLength,3);
+    //     boundBox subCbBox(subCPoints, false);
+    //     limitBBox(subCbBox);
 
-        newSubCList_.emplace_back(matchSubContact(subCbBox, physicalProperties_, contactPair_));
-        newSubCList_.back()->setVMInfo(subCbBox,
-            subVolumeNVector,
-            charCellSize,
-            subVolumeV
-        );
-    }
+    //     scalar subVolumeLength = charCellSize/virtualMeshLevel::getLevelOfDivision();
+
+    //     scalar subVolumeV = pow(subVolumeLength,3);
+
+    //     newSubCList_.emplace_back(matchSubContact(subCbBox, physicalProperties_, contactPair_));
+    //     newSubCList_.back()->setVMInfo(subCbBox, subVolumeV);
+    // }
 }
 //---------------------------------------------------------------------------//
 void prtContactInfo::swapSubContactLists()
@@ -228,10 +257,8 @@ void prtContactInfo::syncSubCList()
                 {
                     vmInfoToSync = virtualMeshInfo(subCList_[i]->getVMInfo()());
                 }
-                reduce(vmInfoToSync.bBox.min(), sumOp<vector>());
-                reduce(vmInfoToSync.bBox.max(), sumOp<vector>());
-                reduce(vmInfoToSync.subVolumeNVector, sumOp<vector>());
-                reduce(vmInfoToSync.charCellSize, sumOp<scalar>());
+                reduce(vmInfoToSync.sV.min(), sumOp<vector>());
+                reduce(vmInfoToSync.sV.max(), sumOp<vector>());
                 reduce(vmInfoToSync.subVolumeV, sumOp<scalar>());
 
                 point startPointToReduce = vmInfoToSync.getStartingPoint();

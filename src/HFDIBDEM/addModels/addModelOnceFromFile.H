@@ -64,6 +64,15 @@ class addModelOnceFromFile
     fileName                fileName_;
     IFstream                ifStream_;
 
+    word                    bodyGeom_;
+    scalar                  thrSurf_;
+
+    // Private Member Functions ------------------------------------
+
+    void addSphere(string& line);
+
+    void addSTL(string& line);
+
     public:
 
     // Constructors ------------------------------------------------
@@ -73,7 +82,9 @@ class addModelOnceFromFile
         const Foam::fvMesh& mesh,
         const bool startTime0,
         geomModel* bodyGeomModel,
-        List<labelList>& cellPoints
+        List<labelList>& cellPoints,
+        word& bodyGeom,
+        scalar thrSurf
     );
 
     // Destructors -------------------------------------------------
@@ -88,7 +99,7 @@ class addModelOnceFromFile
 
     geomModel* addBody(
         const volScalarField& body,
-        PtrList<immersedBody>& immersedBodies        
+        PtrList<immersedBody>& immersedBodies
         );
 
     bool getBodyAdded()

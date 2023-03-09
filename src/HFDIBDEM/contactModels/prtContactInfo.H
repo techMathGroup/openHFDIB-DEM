@@ -93,6 +93,8 @@ class prtContactInfo
         Tuple2<label,label>& contactPair
     );
 
+    void limitBBox(boundBox& bbox);
+
     public:
 
     // Constructors ------------------------------------------------
@@ -137,8 +139,7 @@ class prtContactInfo
 
     void setSubContacts_ArbShape
     (
-        const fvMesh& mesh,
-        List<DynamicList<label>> baseSubContactList
+        scalar cellV
     );
 
     void swapSubContactLists();
