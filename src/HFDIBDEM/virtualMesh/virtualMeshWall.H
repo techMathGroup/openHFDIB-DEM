@@ -161,6 +161,8 @@ class virtualMeshWall
 
     bool detectFirstContactPoint();
 
+    bool detectFirstFaceContactPoint();
+
     scalar evaluateContact();
 
     void checkSubVolume(subVolumeProperties& subVolume);

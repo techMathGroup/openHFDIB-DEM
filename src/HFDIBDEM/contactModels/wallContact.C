@@ -301,7 +301,6 @@ void getWallContactVars_ArbShape(
     const List<string>& contactPatches = sCW.getContactPatches();
     //run forAll for all surface Out Of Wall Contact elements get local contactCenters and intersectVolume            // InfoH << DEM_Info << " virtMeshWall.evaluateContact() " << virtMeshWall.evaluateContact() <<endl;
     // InfoH << DEM_Info << " -- WallContact detectVolume VM " << endl;
-
     for(label i = 0; i< vMContactInfoSize; i++)
     {
         autoPtr<virtualMeshWallInfo> vmWInfo = sCW.getVMContactInfo(i);
@@ -321,6 +320,7 @@ void getWallContactVars_ArbShape(
             contactCenters().append(virtMeshWall.getContactCenter());
         }
     }
+    
     //run forAll for all internal Out Of Wall Contact elements get local contactCenters and intersectVolume
     forAll(sCInternalInfo,sCII)
     {
@@ -328,7 +328,8 @@ void getWallContactVars_ArbShape(
         contactCenters().append(sCInternalInfo[sCII].first());
     }
     //run forAll contactPlanes to get contact areas for the givenPatch
-    InfoH << DEM_Info << " -- VM contactVolume_ : " << intersectVolume << endl;
+    // InfoH << DEM_Info << " -- VM contactVolume_ : " << intersectVolume << endl;
+    // InfoH << DEM_Info << " -- VM sVCount : " << intersectVolume/sVV << endl;
     if(intersectVolume>SMALL)
     {
         for(label i = 0; i< vMPlaneInfoSize; i++)
@@ -345,7 +346,7 @@ void getWallContactVars_ArbShape(
             ));
             // InfoH << DEM_Info << " -- VM vmWInfo().BBox() " <<vmWInfo->getbBox() << endl;    
 
-            if(virtMeshPlane->detectFirstContactPoint())
+            if(virtMeshPlane->detectFirstFaceContactPoint())
             {
                 scalar contactAreaLoc = (virtMeshPlane->evaluateContact()/vmWInfo->getSVVolume())*(pow(vmWInfo->getSVVolume(),2.0/3));
                 contactAreas().append(contactAreaLoc);
@@ -358,16 +359,18 @@ void getWallContactVars_ArbShape(
             contactCenter += contactCenters()[cC];
         }
         contactCenter /= contactCenters().size();
+
+        // InfoH << DEM_Info << " -- VM contactAreas() " << contactAreas() << endl;    
         forAll(contactAreas(),cA)
         {
             contactArea += contactAreas()[cA];
         }
-
+        
         forAll(contactPatches,cP)
         {
             contactNormal -= wallPlaneInfo::getWallPlaneInfo()[contactPatches[cP]][0]*contactAreas()[cP];        
         }
-        
+           
         contactNormal /=mag(contactNormal);
 
         InfoH << DEM_Info << " -- VM contactCenter_ : " << contactCenter << endl;

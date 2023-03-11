@@ -131,15 +131,6 @@ void wallContactInfo::constructSM()
         ceil((BB.span()[2]/virtualMeshLevel::getCharCellSize()))
     );
 
-    // vector bBoxShiftVector = (cellNVector*virtualMeshLevel::getCharCellSize() - bodyBB.span())/2;
-
-    // InfoH << DEM_Info << " -- SM bBoxShiftVector  : " << bBoxShiftVector << endl;
-    // InfoH << DEM_Info << " -- SM BB.span()        : " << BB.span() << endl;
-
-    // InfoH << DEM_Info << " -- SM BoundBox     : " << BB.min() <<", " << BB.max() << endl;
-    // InfoH << DEM_Info << " -- SM bodyBB       : " << bodyBB.min() <<", " << bodyBB.max() << endl;
-    // InfoH << DEM_Info << " -- SM cellNVector  : " << cellNVector << endl;
-    // InfoH << DEM_Info << " -- SM charCellSize : " << virtualMeshLevel::getCharCellSize() << endl;
     const scalar charCellSize(virtualMeshLevel::getCharCellSize());
 
     SM_.reset(new spectatorMesh(cellNVector,BB,charCellSize));
@@ -218,13 +209,7 @@ void wallContactInfo::findContactAreas()
     if(contactSTLPoints().size() > SMALL)
     {
         constructSM();
-        // InfoH << DEM_Info << " -- ConstructSM - Is Allive : #1 " << endl;
         List<DynamicList<vector>> possibleSMContact = detectPossibleSMContact(contactSTLPoints(),contactPatches_);
-        // InfoH << DEM_Info << " -- ConstructSM - Is Allive : #2 " << endl;
-        InfoH << DEM_Info <<" -- SM possibleSCList.size() " << possibleSMContact.size() << endl;
-        InfoH << DEM_Info <<" -- SM contactPatches_.size() " << contactPatches_.size() << endl;
-
-        
         forAll(possibleSMContact,SC)
         {
             label emptyCells(0);
@@ -279,13 +264,15 @@ void wallContactInfo::findContactAreas()
                         isPathechInSC[wP]+= true;
                     }
                 }
+                // InfoH << DEM_Info << "-- SM sCBBox "<< sCBBox << endl;
                 if(isPathechInSC[wP])
                 {
+                    
                     cBbox = boundBox(overallContactPoints,false);
                     boundBox planeBox = contactPlaneBBox(constructVMBox(cBbox,contactPatches_[wP]),contactPatches_[wP]);
-
+                    // InfoH << DEM_Info << "-- SM cBbox "<< cBbox << endl;
                     contactPatches.append(contactPatches_[wP]);
-
+                    // InfoH << DEM_Info << "-- SM planeBox #1 "<< planeBox << endl;
                     forAll(contactPatches_,wP2)
                     {
                         if(wP != wP2)
@@ -301,6 +288,7 @@ void wallContactInfo::findContactAreas()
                             if(isPathechInSC[wP2])
                             {
                                 pointField bbPoints = planeBox.points();
+                                // InfoH << DEM_Info << "-- SM planeBox #2 "<< planeBox << endl;
                                 pointField newBBPoints;
                                 forAll(bbPoints,bBP)
                                 {
@@ -308,13 +296,17 @@ void wallContactInfo::findContactAreas()
                                     {
                                         newBBPoints.append(getPlanePoint(bbPoints[bBP],contactPatches_[wP2]));
                                     }
+                                    else
+                                    {
+                                        newBBPoints.append(bbPoints[bBP]);
+                                    }
                                 }
                                 planeBox = boundBox(newBBPoints,false);
                             }
 
                         }
                     }
-                    // InfoH << DEM_Info << "-- SM PlaneBox "<< planeBox << endl;
+                    // InfoH << DEM_Info << "-- SM PlaneBox #2"<< planeBox << endl;
                     Tuple2<point,boundBox> sMPlane(planeBox.midpoint(),planeBox);
                     sMPlaneList.append(sMPlane);                    
                 }

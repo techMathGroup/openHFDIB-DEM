@@ -653,7 +653,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     ));
                 Pout <<" assignProc completed " << assignProc << endl;
             }
-            Pout <<" Survived " << endl;
+            // Pout <<" Survived " << endl;
             
             forAll (wallContactIB,iB)
             {
@@ -676,7 +676,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 }
                 cIb.getWallCntInfo().clearOldContact();
             }
-            Pout <<" Survived 2 " << endl;
+            // Pout <<" Survived 2 " << endl;
         }
         wallContactList.clear();
         wallContactIB.clear();
