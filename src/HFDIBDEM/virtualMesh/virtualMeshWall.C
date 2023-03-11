@@ -93,6 +93,46 @@ bool virtualMeshWall::detectFirstContactPoint()
     }
     return false;
 }
+//---------------------------------------------------------------------------////---------------------------------------------------------------------------//
+bool virtualMeshWall::detectFirstFaceContactPoint()
+{
+    autoPtr<DynamicVectorList> nextToCheck(
+        new DynamicVectorList);
+
+    autoPtr<DynamicVectorList> auxToCheck(
+        new DynamicVectorList);
+
+    nextToCheck->append(bbMatrix_.getSVIndexForPoint_Wall(vMeshWallInfo_.getStartingPoint()));
+    nextToCheck->append(bbMatrix_.faceNeighbourSubVolumes(nextToCheck()[0]));
+    // InfoH << DEM_Info << " -- VM firstSV : " << nextToCheck()[0] << " point " << bbMatrix_[nextToCheck()[0]].center << endl;
+    while (nextToCheck->size() > 0)
+    {
+        auxToCheck->clear();
+        forAll (nextToCheck(),sV)
+        {
+            subVolumeProperties& cSubVolume = bbMatrix_[nextToCheck()[sV]];
+            if (!cSubVolume.toCheck)
+            {
+                continue;
+            }
+            checkSubVolume(cSubVolume);
+
+            if (cSubVolume.isCBody)
+            {
+                vMeshWallInfo_.startingPoint = cSubVolume.center;
+                resetSubVolume(cSubVolume);
+
+                return true;
+
+            }
+            auxToCheck().append(bbMatrix_.faceNeighbourSubVolumes(nextToCheck()[sV]));
+        }
+        const autoPtr<DynamicVectorList> helpPtr(nextToCheck.ptr());
+        nextToCheck.set(auxToCheck.ptr());
+        auxToCheck = helpPtr;
+    }
+    return false;
+}
 //---------------------------------------------------------------------------//
 scalar virtualMeshWall::evaluateContact()
 {
