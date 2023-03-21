@@ -328,8 +328,7 @@ void getWallContactVars_ArbShape(
         contactCenters().append(sCInternalInfo[sCII].first());
     }
     //run forAll contactPlanes to get contact areas for the givenPatch
-    // InfoH << DEM_Info << " -- VM contactVolume_ : " << intersectVolume << endl;
-    // InfoH << DEM_Info << " -- VM sVCount : " << intersectVolume/sVV << endl;
+    InfoH << parallelDEM_Info << " -- VM prtId : "<< " intersectVolume : " <<  intersectVolume << endl;
     if(intersectVolume>SMALL)
     {
         for(label i = 0; i< vMPlaneInfoSize; i++)
@@ -390,7 +389,7 @@ void getWallContactVars_ArbShape(
         wallCntVars.contactArea_   = contactArea;
         wallCntVars.contactVolume_ = intersectVolume;
         wallCntVars.contactNormal_ = contactNormal;
-            
+
         wallCntVars.setMeanCntPars_Plane
         (
             contactAreas(),

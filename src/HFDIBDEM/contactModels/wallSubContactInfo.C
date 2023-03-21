@@ -63,6 +63,21 @@ bodyId_(bodyId)
             floor((contactBBData[cBD].second().span()[1]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision()),
             floor((contactBBData[cBD].second().span()[2]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision())
         );
+        if(cmptMin(subVolumeNVector)<SMALL)
+        {
+            // Pout <<" Trubble with subVolumeNVector "<< subVolumeNVector << endl;
+            for(int i=0;i<3;i++)
+            {
+                if(subVolumeNVector[i] <SMALL)
+                {                
+                    subVolumeNVector[i] = 1;
+                    contactBBData[cBD].second().min()[i] -=virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision()*0.5;
+                    contactBBData[cBD].second().max()[i] +=virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision()*0.5;
+                }  
+            }
+            // Pout <<" Corrected subVolumeNVector "<< subVolumeNVector << endl;
+        }
+     
 
         autoPtr<virtualMeshWallInfo> vmWInfo(
             new virtualMeshWallInfo(
