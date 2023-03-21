@@ -58,11 +58,17 @@ bodyId_(bodyId)
 {
     forAll(contactBBData,cBD)
     {
+        vector subVolumeNVector = vector(
+            floor((contactBBData[cBD].second().span()[0]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision()),
+            floor((contactBBData[cBD].second().span()[1]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision()),
+            floor((contactBBData[cBD].second().span()[2]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision())
+        );
+
         autoPtr<virtualMeshWallInfo> vmWInfo(
             new virtualMeshWallInfo(
                 contactBBData[cBD].second(),
                 contactBBData[cBD].first(),
-                virtualMeshLevel::getLevelOfDivision()*vector::one,
+                subVolumeNVector,
                 virtualMeshLevel::getCharCellSize(),
                 pow(virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision(),3)
             )  
