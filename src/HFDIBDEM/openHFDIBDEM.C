@@ -311,7 +311,7 @@ void openHFDIBDEM::initialize
         while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions)
         {
             InfoH << addModel_Info << "addModel invoked action, trying to add new body" << endl;
-            autoPtr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));
+            std::shared_ptr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));
             cAddition++;
 
             // initialize the immersed bodies
@@ -333,7 +333,7 @@ void openHFDIBDEM::initialize
                         transportProperties_,
                         addIBPos,
                         recomputeM0_,
-                        bodyGeomModel.ptr(),
+                        bodyGeomModel,
                         ibInterp_,
                         cellPoints_
                     )
@@ -547,20 +547,27 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             if (!immersedBodies_[bodyId].getGeomModel().isCluster())
             {
                 vector newPos = vector::zero;
-                bool inContact = detectCyclicContact(mesh_, cyclicPatches_, immersedBodies_[bodyId].getWallCntInfo(), newPos);
-                if (inContact)
+
+                if (detectCyclicContact(
+                    mesh_,
+                    cyclicPatches_,
+                    immersedBodies_[bodyId].getWallCntInfo(),
+                    newPos
+                ))
                 {
                     verletList_.removeBodyFromVList(immersedBodies_[bodyId]);
 
                     scalar thrSurf(readScalar(HFDIBDEMDict_.lookup("surfaceThreshold")));
-                    autoPtr<periodicBody> newPeriodicBody(new periodicBody(mesh_, thrSurf));
+                    std::shared_ptr<periodicBody> newPeriodicBody
+                        = std::make_shared<periodicBody>(mesh_, thrSurf);
+
                     newPeriodicBody->setRhoS(immersedBodies_[bodyId].getGeomModel().getRhoS());
-                    autoPtr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getCopy());
-                    vector transVec = newPos - iBcopy().getCoM();
+                    std::shared_ptr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getCopy());
+                    vector transVec = newPos - iBcopy->getCoM();
                     iBcopy->bodyMovePoints(transVec);
                     newPeriodicBody->addBodyToCluster(immersedBodies_[bodyId].getGeomModelPtr());
                     newPeriodicBody->addBodyToCluster(iBcopy);
-                    immersedBodies_[bodyId].getGeomModelPtr().set(newPeriodicBody.ptr());
+                    immersedBodies_[bodyId].getGeomModelPtr() = newPeriodicBody;
 
                     verletList_.addBodyToVList(immersedBodies_[bodyId]);
                 }
@@ -573,7 +580,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 {
                     verletList_.removeBodyFromVList(immersedBodies_[bodyId]);
 
-                    immersedBodies_[bodyId].getGeomModelPtr().reset(cBody.getRemGeomModel().ptr());
+                    immersedBodies_[bodyId].getGeomModelPtr() = cBody.getRemGeomModel();
 
                     verletList_.addBodyToVList(immersedBodies_[bodyId]);
                 }
@@ -651,7 +658,6 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     deltaTime*step,
                     *sCW
                     ));
-                Pout <<" assignProc completed " << assignProc << endl;
             }
             // Pout <<" Survived " << endl;
 
@@ -824,7 +830,7 @@ void openHFDIBDEM::addRemoveBodies
         while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions)
         {
             InfoH << addModel_Info << "addModel invoked action, trying to add new body" << endl;
-            autoPtr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));
+            std::shared_ptr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));
 
             cAddition++;
 
@@ -849,7 +855,7 @@ void openHFDIBDEM::addRemoveBodies
                         transportProperties_,
                         addIBPos,
                         recomputeM0_,
-                        bodyGeomModel.ptr(),
+                        bodyGeomModel,
                         ibInterp_,
                         cellPoints_
                     )
@@ -927,7 +933,7 @@ void openHFDIBDEM::restartSimulation
         bool isStatic(readBool(bodyDict.lookup("static")));
         label timeStepsInContWStatic(readLabel(bodyDict.lookup("timeStepsInContWStatic")));
 
-        autoPtr<geomModel> bodyGeomModel;
+        std::shared_ptr<geomModel> bodyGeomModel;
         word bodyGeom;
         // check if the immersedDict_ contains bodyGeom
         if (HFDIBDEMDict_.subDict(bodyName).found("bodyGeom"))
@@ -947,19 +953,19 @@ void openHFDIBDEM::restartSimulation
         if(bodyGeom == "convex")
         {
             word stlPath(timePath + "/stlFiles/"+bodyId+".stl");
-            bodyGeomModel.set(new convexBody(mesh_,stlPath,thrSurf));
+            bodyGeomModel = std::make_shared<convexBody>(mesh_,stlPath,thrSurf);
         }
         else if(bodyGeom == "nonConvex")
         {
             word stlPath(timePath + "/stlFiles/"+bodyId+".stl");
-            bodyGeomModel.set(new nonConvexBody(mesh_,stlPath,thrSurf));
+            bodyGeomModel = std::make_shared<nonConvexBody>(mesh_,stlPath,thrSurf);
         }
         else if(bodyGeom == "sphere")
         {
             vector startPosition = bodyDict.subDict("sphere").lookup("position");
             scalar radius = readScalar(bodyDict.subDict("sphere").lookup("radius"));
 
-            bodyGeomModel.set(new sphereBody(mesh_,startPosition,radius,thrSurf));
+            bodyGeomModel = std::make_shared<sphereBody>(mesh_,startPosition,radius,thrSurf);
         }
         else
         {
@@ -967,7 +973,7 @@ void openHFDIBDEM::restartSimulation
             InfoH << iB_Info << "bodyGeom: " << bodyGeom
                 << " not supported, using bodyGeom nonConvex" << endl;
             bodyGeom = "nonConvex";
-            bodyGeomModel.set(new nonConvexBody(mesh_,stlPath,thrSurf));
+            bodyGeomModel = std::make_shared<nonConvexBody>(mesh_,stlPath,thrSurf);
         }
 
         label newIBSize(immersedBodies_.size()+1);
@@ -987,7 +993,7 @@ void openHFDIBDEM::restartSimulation
                 transportProperties_,
                 addIBPos,
                 recomputeM0_,
-                bodyGeomModel.ptr(),
+                bodyGeomModel,
                 ibInterp_,
                 cellPoints_
             )

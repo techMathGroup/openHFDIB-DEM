@@ -77,20 +77,20 @@ class addModel
     const  fvMesh&       mesh_;
     List<labelList>& cellPoints_;
     Field<label> octreeField_;
-    autoPtr<geomModel> geomModel_;
+    std::unique_ptr<geomModel> geomModel_;
 
     public:
 
     // Constructors ------------------------------------------------
     addModel(
         const fvMesh& mesh,
-        geomModel* bodyGeomModel,
+        std::unique_ptr<geomModel> bodyGeomModel,
         List<labelList>& cellPoints
     )
     :
     mesh_(mesh),
     cellPoints_(cellPoints),
-    geomModel_(bodyGeomModel)
+    geomModel_(std::move(bodyGeomModel))
     {
         octreeField_ = Field<label>(mesh_.nCells(), 0);
     }
@@ -121,7 +121,7 @@ class addModel
     // Note: check current conditions in simulation and return
     //       true if a body should be added
 
-    virtual geomModel* addBody(
+    virtual std::shared_ptr<geomModel> addBody(
         const volScalarField& body,
         PtrList<immersedBody>& immersedBodies
         ) = 0;

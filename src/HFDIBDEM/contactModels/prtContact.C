@@ -124,58 +124,48 @@ void findSubContacts_Cluster(
     prtContactInfo& prtcInfo
 )
 {
-    PtrList<geomModel> cBodies(0);
-    PtrList<geomModel> tBodies(0);
+    std::vector<std::shared_ptr<geomModel>> cBodies;
+    std::vector<std::shared_ptr<geomModel>> tBodies;
 
     if(prtcInfo.getcClass().getGeomModel().isCluster())
     {
         periodicBody& cCluster = dynamic_cast<periodicBody&>(prtcInfo.getcClass().getGeomModel());
-        PtrList<geomModel>& cBodiesR = cCluster.getClusterBodies();
-        forAll(cBodiesR, cIbI)
-        {
-            cBodies.append(cBodiesR[cIbI].getCopy());
-        }
+        cBodies = cCluster.getClusterBodies();
     }
     else
     {
-        cBodies.append(prtcInfo.getcClass().getGeomModel().getCopy());
+        cBodies.push_back(prtcInfo.getcClass().getGeomModelPtr());
     }
 
     if(prtcInfo.gettClass().getGeomModel().isCluster())
     {
         periodicBody& tCluster = dynamic_cast<periodicBody&>(prtcInfo.gettClass().getGeomModel());
-        PtrList<geomModel>& tBodiesR = tCluster.getClusterBodies();
-        forAll(tBodiesR, tIbI)
-        {
-            tBodies.append(tBodiesR[tIbI].getCopy());
-        }
+        tBodies = tCluster.getClusterBodies();
     }
     else
     {
-        tBodies.append(prtcInfo.gettClass().getGeomModel().getCopy());
+        tBodies.push_back(prtcInfo.gettClass().getGeomModelPtr());
     }
 
-    forAll(cBodies, cIbI)
+    for(std::shared_ptr<geomModel>& cgModel : cBodies)
     {
-        forAll(tBodies, tIbI)
+        for(std::shared_ptr<geomModel>& tgModel : tBodies)
         {
-            autoPtr<geomModel> cGeomModel(cBodies[cIbI].getCopy());
-            autoPtr<ibContactClass> cIbClassI(new ibContactClass(
-                cGeomModel,
+            ibContactClass cIbClassI(
+                cgModel,
                 prtcInfo.getcClass().getMatInfo().getMaterial()
-            ));
+            );
 
-            autoPtr<geomModel> tGeomModel(tBodies[tIbI].getCopy());
-            autoPtr<ibContactClass> tIbClassI(new ibContactClass(
-                tGeomModel,
+            ibContactClass tIbClassI(
+                tgModel,
                 prtcInfo.gettClass().getMatInfo().getMaterial()
-            ));
+            );
 
             prtContactInfo tmpPrtCntInfo
             (
-                cIbClassI(),
+                cIbClassI,
                 prtcInfo.getcVars(),
-                tIbClassI(),
+                tIbClassI,
                 prtcInfo.gettVars()
             );
 
@@ -394,57 +384,52 @@ bool detectPrtPrtContact_Cluster
     prtSubContactInfo& subCInfo
 )
 {
-    PtrList<geomModel> cBodies(0);
-    PtrList<geomModel> tBodies(0);
+    std::vector<std::shared_ptr<geomModel>> cBodies;
+    std::vector<std::shared_ptr<geomModel>> tBodies;
 
     if(cClass.getGeomModel().isCluster())
     {
         periodicBody& cCluster = dynamic_cast<periodicBody&>(cClass.getGeomModel());
-        PtrList<geomModel>& cBodiesR = cCluster.getClusterBodies();
-        forAll(cBodiesR, cIbI)
-        {
-            cBodies.append(cBodiesR[cIbI].getCopy());
-        }
+        cBodies = cCluster.getClusterBodies();
     }
     else
     {
-        cBodies.append(cClass.getGeomModel().getCopy());
+        cBodies.push_back(cClass.getGeomModelPtr());
     }
 
     if(tClass.getGeomModel().isCluster())
     {
         periodicBody& tCluster = dynamic_cast<periodicBody&>(tClass.getGeomModel());
-        PtrList<geomModel>& tBodiesR = tCluster.getClusterBodies();
-        forAll(tBodiesR, tIbI)
-        {
-            tBodies.append(tBodiesR[tIbI].getCopy());
-        }
+        tBodies = tCluster.getClusterBodies();
     }
     else
     {
-        tBodies.append(tClass.getGeomModel().getCopy());
+        tBodies.push_back(tClass.getGeomModelPtr());
     }
 
-    forAll(cBodies, cIbI)
+    for(std::shared_ptr<geomModel>& cgModel : cBodies)
     {
-        forAll(tBodies, tIbI)
+        for(std::shared_ptr<geomModel>& tgModel : tBodies)
         {
-            autoPtr<geomModel> cGeomModel(cBodies[cIbI].getCopy());
-            autoPtr<ibContactClass> cIbClassI(new ibContactClass(
-                cGeomModel,
+            ibContactClass cIbClassI(
+                cgModel,
                 cClass.getMatInfo().getMaterial()
-            ));
+            );
 
-            autoPtr<geomModel> tGeomModel(tBodies[tIbI].getCopy());
-            autoPtr<ibContactClass> tIbClassI(new ibContactClass(
-                tGeomModel,
+            ibContactClass tIbClassI(
+                tgModel,
                 tClass.getMatInfo().getMaterial()
-            ));
+            );
+
+            prtSubContactInfo tmpSubCInfoI(
+                subCInfo.getCPair(),
+                subCInfo.getPhysicalProperties()
+            );
 
             if (detectPrtPrtContact(
                 mesh,
-                cIbClassI(),
-                tIbClassI(),
+                cIbClassI,
+                tIbClassI,
                 subCInfo
             ))
             {
@@ -606,52 +591,42 @@ void getPrtContactVars_Cluster
     subCInfo.getprtCntVars().contactNormal_ = vector::zero;
     subCInfo.getprtCntVars().contactArea_ = 0;
 
-    PtrList<geomModel> cBodies(0);
-    PtrList<geomModel> tBodies(0);
+    std::vector<std::shared_ptr<geomModel>> cBodies;
+    std::vector<std::shared_ptr<geomModel>> tBodies;
 
     if(cClass.getGeomModel().isCluster())
     {
         periodicBody& cCluster = dynamic_cast<periodicBody&>(cClass.getGeomModel());
-        PtrList<geomModel>& cBodiesR = cCluster.getClusterBodies();
-        forAll(cBodiesR, cIbI)
-        {
-            cBodies.append(cBodiesR[cIbI].getCopy());
-        }
+        cBodies = cCluster.getClusterBodies();
     }
     else
     {
-        cBodies.append(cClass.getGeomModel().getCopy());
+        cBodies.push_back(cClass.getGeomModelPtr());
     }
 
     if(tClass.getGeomModel().isCluster())
     {
         periodicBody& tCluster = dynamic_cast<periodicBody&>(tClass.getGeomModel());
-        PtrList<geomModel>& tBodiesR = tCluster.getClusterBodies();
-        forAll(tBodiesR, tIbI)
-        {
-            tBodies.append(tBodiesR[tIbI].getCopy());
-        }
+        tBodies = tCluster.getClusterBodies();
     }
     else
     {
-        tBodies.append(tClass.getGeomModel().getCopy());
+        tBodies.push_back(tClass.getGeomModelPtr());
     }
 
-    forAll(cBodies, cIbI)
+    for(std::shared_ptr<geomModel>& cgModel : cBodies)
     {
-        forAll(tBodies, tIbI)
+        for(std::shared_ptr<geomModel>& tgModel : tBodies)
         {
-            autoPtr<geomModel> cGeomModel(cBodies[cIbI].getCopy());
-            autoPtr<ibContactClass> cIbClassI(new ibContactClass(
-                cGeomModel,
+            ibContactClass cIbClassI(
+                cgModel,
                 cClass.getMatInfo().getMaterial()
-            ));
+            );
 
-            autoPtr<geomModel> tGeomModel(tBodies[tIbI].getCopy());
-            autoPtr<ibContactClass> tIbClassI(new ibContactClass(
-                tGeomModel,
+            ibContactClass tIbClassI(
+                tgModel,
                 tClass.getMatInfo().getMaterial()
-            ));
+            );
 
             prtSubContactInfo tmpSubCInfoI(
                 subCInfo.getCPair(),
@@ -660,8 +635,8 @@ void getPrtContactVars_Cluster
 
             getPrtContactVars(
                 mesh,
-                cIbClassI(),
-                tIbClassI(),
+                cIbClassI,
+                tIbClassI,
                 tmpSubCInfoI
             );
 

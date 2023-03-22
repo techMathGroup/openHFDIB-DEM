@@ -81,7 +81,7 @@ class addModelOnceFromFile
         const dictionary& addModelDict,
         const Foam::fvMesh& mesh,
         const bool startTime0,
-        geomModel* bodyGeomModel,
+        std::unique_ptr<geomModel> bodyGeomModel,
         List<labelList>& cellPoints,
         word& bodyGeom,
         scalar thrSurf
@@ -97,7 +97,7 @@ class addModelOnceFromFile
         return not ifStream_.eof();
     }
 
-    geomModel* addBody(
+    std::shared_ptr<geomModel> addBody(
         const volScalarField& body,
         PtrList<immersedBody>& immersedBodies
         );

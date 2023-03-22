@@ -68,7 +68,7 @@ class addModelOnce
         const dictionary& addModelDict,
         const Foam::fvMesh& mesh,
         const bool startTime0,
-        geomModel* bodyGeomModel,
+        std::unique_ptr<geomModel> bodyGeomModel,
         List<labelList>& cellPoints
     );
 
@@ -82,10 +82,10 @@ class addModelOnce
         return not bodyAdded_;
     }
 
-    geomModel* addBody(
+    std::shared_ptr<geomModel> addBody(
         const volScalarField& body,
-        PtrList<immersedBody>& immersedBodies        
-        );
+        PtrList<immersedBody>& immersedBodies
+    );
 
     bool getBodyAdded()
     {

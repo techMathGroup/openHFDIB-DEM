@@ -39,11 +39,11 @@ using namespace Foam;
 interpolationInfo::interpolationInfo
 (
     const Foam::fvMesh& mesh,
-    autoPtr<geomModel>& gModel
+    std::shared_ptr<geomModel> gModel
 )
 :
 mesh_(mesh),
-geomModel_(gModel)
+geomModel_(std::move(gModel))
 {}
 
 interpolationInfo::~interpolationInfo()

@@ -103,7 +103,7 @@ namespace Foam
                 << "notIplemented"<<endl;
         }
 
-        virtual geomModel* getCopy() = 0;
+        virtual std::shared_ptr<geomModel> getCopy() = 0;
 
         vector addModelReturnRandomPosition(
             const bool allActiveCellsInMesh,

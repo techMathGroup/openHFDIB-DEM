@@ -83,7 +83,7 @@ namespace Foam
         dictionary&             transportProperties_;
 
         // body geometry
-        autoPtr<geomModel> geomModel_;
+        std::shared_ptr<geomModel> geomModel_;
 
         // Interpolation Info
         autoPtr<interpolationInfo> intpInfo_;
@@ -189,7 +189,7 @@ namespace Foam
             dictionary& transportProperties,
             label bodyId,
             label recomputeM0,
-            geomModel* bodyGeomModel,
+            std::shared_ptr<geomModel> bodyGeomModel,
             autoPtr<ibInterpolation>& ibIntp,
             List<labelList>& cellPoints
         );
@@ -435,10 +435,10 @@ namespace Foam
 
         geomModel& getGeomModel()
         {
-            return geomModel_();
+            return *geomModel_;
         }
 
-        autoPtr<geomModel>& getGeomModelPtr()
+        std::shared_ptr<geomModel> getGeomModelPtr()
         {
             return geomModel_;
         }

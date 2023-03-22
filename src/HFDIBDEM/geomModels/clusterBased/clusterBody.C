@@ -42,9 +42,9 @@ void clusterBody::createImmersedBody
     List<labelList>& cellPoints
 )
 {
-    forAll(ibGeomModelList, ibI)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        ibGeomModelList[ibI].createImmersedBody(
+        gModel->createImmersedBody(
             body,
             octreeField,
             cellPoints
@@ -57,10 +57,10 @@ void clusterBody::updateSurfList()
     surfCells_.clear();
     surfCells_.setSize(Pstream::nProcs());
 
-    forAll(ibGeomModelList, ibI)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
         surfCells_[Pstream::myProcNo()].append(
-            ibGeomModelList[ibI].getSurfaceCellList()[Pstream::myProcNo()]
+            gModel->getSurfaceCellList()[Pstream::myProcNo()]
         );
     }
 }
@@ -70,10 +70,10 @@ void clusterBody::updateIntList()
     intCells_.clear();
     intCells_.setSize(Pstream::nProcs());
 
-    forAll(ibGeomModelList, ibI)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
         intCells_[Pstream::myProcNo()].append(
-            ibGeomModelList[ibI].getInternalCellList()[Pstream::myProcNo()]
+            gModel->getInternalCellList()[Pstream::myProcNo()]
         );
     }
 }
@@ -86,37 +86,37 @@ void clusterBody::calculateGeometricalProperties
     M_      = scalar(0);
     I_      = symmTensor::zero;
 
-    forAll(ibGeomModelList, ibI)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        ibGeomModelList[ibI].calculateGeometricalProperties(body);
-        M_ += ibGeomModelList[ibI].getM();
-        I_ += ibGeomModelList[ibI].getI();
+        gModel->calculateGeometricalProperties(body);
+        M_ += gModel->getM();
+        I_ += gModel->getI();
     }
 }
 //---------------------------------------------------------------------------//
 vector clusterBody::getCoM()
-{    
-    return ibGeomModelList[0].getCoM();
+{
+    return ibGeomModelList[0]->getCoM();
 }
 //---------------------------------------------------------------------------//
 boundBox clusterBody::getBounds()
 {
     DynamicPointList allBounds;
-    forAll(ibGeomModelList, ibI)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        boundBox bBoxI = ibGeomModelList[ibI].getBounds();
+        boundBox bBoxI = gModel->getBounds();
         allBounds.append(bBoxI.min());
         allBounds.append(bBoxI.max());
     }
-    
+
     return boundBox(allBounds);
 }
 //---------------------------------------------------------------------------//
 void clusterBody::synchronPos()
 {
-    forAll(ibGeomModelList, ibI)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        ibGeomModelList[ibI].synchronPos();
+        gModel->synchronPos();
     }
 }
 //---------------------------------------------------------------------------//
@@ -127,9 +127,9 @@ boolList clusterBody::pointInside(pointField pointF)
     forAll(pointF,pointI)
     {
         bool pointInside = false;
-        forAll(ibGeomModelList, ibI)
+        for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
         {
-            pointInside = ibGeomModelList[ibI].pointInside(pointF[pointI]);
+            pointInside = gModel->pointInside(pointF[pointI]);
             if(pointInside)
                 break;
         }
@@ -141,14 +141,12 @@ boolList clusterBody::pointInside(pointField pointF)
 //---------------------------------------------------------------------------//
 bool clusterBody::pointInside(point pointI)
 {
-    bool pointInside = false;
-    forAll(ibGeomModelList, ibI)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        pointInside = ibGeomModelList[ibI].pointInside(pointI);
-        if(pointInside)
-            break;
+        if(gModel->pointInside(pointI))
+            return true;
     }
-    return pointInside;
+    return false;
 }
 //---------------------------------------------------------------------------//
 void clusterBody::getClosestPointAndNormal
@@ -162,9 +160,9 @@ void clusterBody::getClosestPointAndNormal
     List<point> closestPoints(ibGeomModelList.size());
     List<vector> closestNormals(ibGeomModelList.size());
 
-    forAll(ibGeomModelList, ibI)
+    for(size_t ibI = 0; ibI < ibGeomModelList.size(); ++ibI)
     {
-        ibGeomModelList[ibI].getClosestPointAndNormal(
+        ibGeomModelList[ibI]->getClosestPointAndNormal(
             startPoint,
             span,
             closestPoints[ibI],
@@ -176,7 +174,7 @@ void clusterBody::getClosestPointAndNormal
     normal = closestNormals[0];
     for (int i = 1; i < closestPoints.size(); ++i)
     {
-        if(mag(startPoint - closestPoint) 
+        if(mag(startPoint - closestPoint)
             > mag(startPoint - closestPoints[i]))
         {
             closestPoint = closestPoints[i];
@@ -187,18 +185,18 @@ void clusterBody::getClosestPointAndNormal
 //---------------------------------------------------------------------------//
 void clusterBody::resetBody(volScalarField& body)
 {
-    forAll(ibGeomModelList, ibI)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        ibGeomModelList[ibI].resetBody(body);
+        gModel->resetBody(body);
     }
 }
 //---------------------------------------------------------------------------//
 List<boundBox*> clusterBody::getBBoxes()
 {
     List<boundBox*> retList;
-    forAll(ibGeomModelList, ibI)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        List<boundBox*> bBoxI = ibGeomModelList[ibI].getBBoxes();
+        List<boundBox*> bBoxI = gModel->getBBoxes();
         retList.append(bBoxI);
     }
     return retList;

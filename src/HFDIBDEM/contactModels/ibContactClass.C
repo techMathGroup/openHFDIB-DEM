@@ -38,17 +38,28 @@ using namespace Foam;
 //---------------------------------------------------------------------------//
 ibContactClass::ibContactClass
 (
-    autoPtr<geomModel>& geomModel,
+    std::shared_ptr<geomModel> geomModel,
     const string& material
 )
 :
-geomModel_(geomModel),
+geomModel_(std::move(geomModel)),
 isInWallContact_(false),
 inContactWithStatic_(false),
 timeStepsInContWStatic_(0),
 matInfo_(materialProperties::getMatProps()[material])
 {
 }
+
+ibContactClass::ibContactClass(const ibContactClass& other)
+:
+geomModel_(other.geomModel_),
+isInWallContact_(other.isInWallContact_),
+inContactWithStatic_(other.inContactWithStatic_),
+timeStepsInContWStatic_(other.timeStepsInContWStatic_),
+matInfo_(other.matInfo_)
+{
+}
+
 ibContactClass::~ibContactClass()
 {
 }

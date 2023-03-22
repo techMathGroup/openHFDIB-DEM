@@ -53,8 +53,6 @@ Contributors
 #include "virtualMeshWall.H"
 #include "wallSubContactInfo.H"
 
-#include <vector>
-#include <memory>
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -115,7 +113,7 @@ class wallContactInfo
     {
         return wallMeanPars_;
     }
-    
+
     ibContactClass& getcClass()
     {
         return ibContactClass_;
@@ -155,12 +153,12 @@ class wallContactInfo
     );
 
     boundBox getSCBBox
-    (     
+    (
         DynamicVectorList& subContactAreas
     );
 
     boundBox constructVMBox
-    (     
+    (
         boundBox& baseContactAreaBB,
         string& wallName
     );
@@ -172,10 +170,10 @@ class wallContactInfo
     );
 
     void checkSMElement
-    (     
+    (
         vector& index,
         List<string> contactPatches
-    );    
+    );
 
     void checkElement
     (
@@ -183,7 +181,7 @@ class wallContactInfo
         bool& inMesh,
         bool& inBody,
         bool& allInMesh,
-        bool& allInBody  
+        bool& allInBody
     );
 
     boundBox contactPlaneBBox
@@ -204,7 +202,7 @@ class wallContactInfo
         DynamicList<vector> surfaceSMCells,
         DynamicList<vector> internalSMCells,
         label SCID,
-        scalar time    
+        scalar time
     );
 
     void clearOldContact();

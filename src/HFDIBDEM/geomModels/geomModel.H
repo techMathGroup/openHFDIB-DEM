@@ -39,6 +39,9 @@ Contributors
 #ifndef geomModel_H
 #define geomModel_H
 
+#include <vector>
+#include <memory>
+
 #include "dictionary.H"
 #include "fvCFD.H"
 #include "triSurfaceMesh.H"
@@ -149,7 +152,7 @@ namespace Foam
                 << "notIplemented"<<endl;
         }
 
-        virtual geomModel* getCopy() = 0;
+        virtual std::shared_ptr<geomModel> getCopy() = 0;
 
         virtual List<DynamicLabelList>& getSurfaceCellList()
         {

@@ -67,7 +67,7 @@ class ibContactClass
 
     protected:
 
-    autoPtr<geomModel>& geomModel_;
+    std::shared_ptr<geomModel> geomModel_;
 
     // is the particle in contact with wall
     bool    isInWallContact_;
@@ -83,8 +83,13 @@ class ibContactClass
     // Constructors ------------------------------------------------
     ibContactClass
     (
-        autoPtr<geomModel>& geomModel,
+        std::shared_ptr<geomModel> geomModel,
         const string& material
+    );
+
+    ibContactClass
+    (
+        const ibContactClass& other
     );
 
     // Destructors -------------------------------------------------
@@ -92,7 +97,12 @@ class ibContactClass
 
     geomModel& getGeomModel()
     {
-        return geomModel_();
+        return *geomModel_;
+    }
+
+    std::shared_ptr<geomModel> getGeomModelPtr()
+    {
+        return geomModel_;
     }
 
     const bool& checkWallContact() const
@@ -107,12 +117,12 @@ class ibContactClass
 
     List<DynamicLabelList>& getSurfCells()
     {
-        return geomModel_().getSurfaceCellList();
+        return geomModel_->getSurfaceCellList();
     }
 
     List<DynamicLabelList>& getIntCells()
     {
-        return geomModel_().getInternalCellList();
+        return geomModel_->getInternalCellList();
     }
 
     const materialInfo& getMatInfo()

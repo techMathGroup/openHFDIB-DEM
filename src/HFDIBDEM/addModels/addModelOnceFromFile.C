@@ -31,6 +31,8 @@ Contributors
 \*---------------------------------------------------------------------------*/
 #include "addModelOnceFromFile.H"
 
+#include <memory>
+
 using namespace Foam;
 
 //---------------------------------------------------------------------------//
@@ -39,13 +41,13 @@ addModelOnceFromFile::addModelOnceFromFile
     const dictionary& addModelDict,
     const Foam::fvMesh& mesh,
     const bool startTime0,
-    geomModel* bodyGeomModel,
+    std::unique_ptr<geomModel> bodyGeomModel,
     List<labelList>& cellPoints,
     word& bodyGeom,
     scalar thrSurf
 )
 :
-addModel(mesh, bodyGeomModel, cellPoints),
+addModel(mesh, std::move(bodyGeomModel), cellPoints),
 addModelDict_(addModelDict),
 addMode_(word(addModelDict_.lookup("addModel"))),
 coeffsDict_(addModelDict_.subDict(addMode_+"Coeffs")),
@@ -85,16 +87,18 @@ void addModelOnceFromFile::addSTL(string& line)
     if(bodyGeom_ == "convex")
     {
         word stlPath("constant/triSurface/" + line);
-        geomModel_.reset(new convexBody(mesh_, stlPath, thrSurf_));
+        geomModel_ = std::unique_ptr<convexBody>
+            (new convexBody(mesh_, stlPath, thrSurf_));
     }
     else
     {
         word stlPath("constant/triSurface/" + line);
-        geomModel_.reset(new nonConvexBody(mesh_, stlPath, thrSurf_));
+        geomModel_ = std::unique_ptr<nonConvexBody>
+            (new nonConvexBody(mesh_, stlPath, thrSurf_));
     }
 }
 //---------------------------------------------------------------------------//
-geomModel* addModelOnceFromFile::addBody
+std::shared_ptr<geomModel> addModelOnceFromFile::addBody
 (
     const volScalarField& body,
     PtrList<immersedBody>& immersedBodies
@@ -107,7 +111,7 @@ geomModel* addModelOnceFromFile::addBody
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "Skipping empty line at " << ifStream_.lineNumber() - 1 <<endl;
         bodyAdded_ = false;
-        return geomModel_().getCopy();
+        return geomModel_->getCopy();
     }
 
     if (bodyGeom_ == "sphere")
@@ -131,5 +135,5 @@ geomModel* addModelOnceFromFile::addBody
     // reduce(canAddBodyI, andOp<bool>());
 
     bodyAdded_ = true;
-    return geomModel_().getCopy();
+    return geomModel_->getCopy();
 }

@@ -83,6 +83,18 @@ namespace Foam
 
         // Public methods ----------------------------------------------
 
+        std::shared_ptr<geomModel> getCopy() final override
+        {
+            std::shared_ptr<periodicBody> periodicGeomModel = std::make_shared<periodicBody>
+            (
+                mesh_,
+                thrSurf_
+            );
+
+            periodicGeomModel->ibGeomModelList = ibGeomModelList;
+            return periodicGeomModel;
+        }
+
         void getReferencedLists(
             List<DynamicLabelList>& intLists,
             List<DynamicLabelList>& surfLists,
@@ -114,14 +126,14 @@ namespace Foam
 
         vector getLVec(const point& toPoint) final override;
 
-        void addBodyToCluster(autoPtr<geomModel>& bodyToAdd)
+        void addBodyToCluster(std::shared_ptr<geomModel> bodyToAdd)
         {
-            ibGeomModelList.append(bodyToAdd);
+            ibGeomModelList.push_back(std::move(bodyToAdd));
         }
 
         bool shouldBeUnclustered();
 
-        autoPtr<geomModel> getRemGeomModel();
+        std::shared_ptr<geomModel> getRemGeomModel();
     };
 }
 

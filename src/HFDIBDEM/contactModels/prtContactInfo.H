@@ -48,9 +48,6 @@ Contributors
 #include "prtSubContactInfo.H"
 #include "physicalProperties.H"
 
-#include <vector>
-#include <memory>
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam

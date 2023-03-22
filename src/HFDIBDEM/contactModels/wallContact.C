@@ -172,63 +172,51 @@ bool detectWallContact_Cluster(
 )
 {
     periodicBody& cCluster = dynamic_cast<periodicBody&>(ibClass.getGeomModel());
-    PtrList<geomModel>& cBodies = cCluster.getClusterBodies();
-    // label sCSize = wallCntInfo.getWallSCList().size();
-    forAll (cBodies, cIbI)
-    {
-        autoPtr<geomModel> cGeomModel(cBodies[cIbI].getCopy());
-        autoPtr<ibContactClass> cIbClassI(new ibContactClass(
-            cGeomModel,
-            ibClass.getMatInfo().getMaterial()
-        ));
+    std::vector<std::shared_ptr<geomModel>> cBodies = cCluster.getClusterBodies();
 
-        autoPtr<ibContactVars> cIbVars(new ibContactVars(
+    for(std::shared_ptr<geomModel>& cgModel : cBodies)
+    {
+        ibContactClass cIbClassI(
+            cgModel,
+            ibClass.getMatInfo().getMaterial()
+        );
+
+        ibContactVars cIbVars(
             wallCntInfo.getBodyId(),
             wallCntInfo.getcVars().Vel_,
             wallCntInfo.getcVars().omega_,
             wallCntInfo.getcVars().Axis_,
-            cGeomModel->getM0(),
-            cGeomModel->getM(),
-            cGeomModel->getRhoS()
-        ));
+            cgModel->getM0(),
+            cgModel->getM(),
+            cgModel->getRhoS()
+        );
 
-        autoPtr<wallContactInfo> tmpWallCntI(
-        new wallContactInfo(
-            cIbClassI(),
-            cIbVars()
-        ));
+        wallContactInfo tmpWallCntI(
+            cIbClassI,
+            cIbVars
+        );
 
         if (detectWallContact(
             mesh,
-            cIbClassI(),
-            tmpWallCntI()
+            cIbClassI,
+            tmpWallCntI
         ))
         {
-            // label sCSize = tmpWallCntI().getWallSCList().size();
-            // for(label i =0; i<sCSize;i++)
-            // {
-            //     wallCntInfo.getWallSCList().push_back(tmpWallCntI().getWallSCList()[i]);
-            // }
             wallCntInfo.getWallSCList().insert(
                 std::end(wallCntInfo.getWallSCList()),
-                std::begin(tmpWallCntI().getWallSCList()),
-                std::end(tmpWallCntI().getWallSCList())
+                std::begin(tmpWallCntI.getWallSCList()),
+                std::end(tmpWallCntI.getWallSCList())
             );
 
-            cIbClassI->setWallContact(true);
-            cIbClassI->inContactWithStatic(true);
+            cIbClassI.setWallContact(true);
+            cIbClassI.inContactWithStatic(true);
         }
 
-        if(cIbClassI->checkWallContact())
+        if(cIbClassI.checkWallContact())
         {
             return true;
         }
     }
-
-    // if (wallCntInfo.getWallSCList().size() > 0)
-    // {
-    //     return true;
-    // }
 
     return false;
 }
@@ -240,17 +228,6 @@ void getWallContactVars(
     wallSubContactInfo& sWC
 )
 {
-    // if(wallCntInfo.getcClass().getGeomModel().getcType() == sphere)
-    // {
-    //     getWallContactVars_Sphere
-    //     (
-    //         mesh,
-    //         wallCntInfo,
-    //         deltaT,
-    //         sWC
-    //     );
-    //     wallCntInfo.clearWallCntVars();
-    // }
     if(wallCntInfo.getcClass().getGeomModel().getcType() == cluster)
     {
         getWallContactVars_Cluster
@@ -260,7 +237,6 @@ void getWallContactVars(
             deltaT,
             sWC
         );
-        // wallCntInfo.clearWallCntVars();
     }
     else
     {
@@ -748,30 +724,28 @@ void getWallContactVars_Cluster(
 )
 {
     periodicBody& cCluster = dynamic_cast<periodicBody&>(wallCntInfo.getcClass().getGeomModel());
-    PtrList<geomModel>& cBodies = cCluster.getClusterBodies();
+    std::vector<std::shared_ptr<geomModel>> cBodies = cCluster.getClusterBodies();
 
-    forAll(cBodies, cIbI)
+    for(std::shared_ptr<geomModel>& cgModel : cBodies)
     {
-        autoPtr<geomModel> cGeomModel(cBodies[cIbI].getCopy());
-
-        if(!sWC.getsWCBB().overlaps(cGeomModel->getBounds()))
+        if(!sWC.getsWCBB().overlaps(cgModel->getBounds()))
         {
             continue;
         }
 
-        autoPtr<ibContactClass> cIbClassI(new ibContactClass(
-            cGeomModel,
+        ibContactClass cIbClassI(
+            cgModel,
             wallCntInfo.getcClass().getMatInfo().getMaterial()
-        ));
+        );
 
-        autoPtr<wallContactInfo> cWallCntI(new wallContactInfo(
-            cIbClassI(),
+        wallContactInfo cWallCntI(
+            cIbClassI,
             wallCntInfo.getcVars()
-        ));
+        );
 
         getWallContactVars(
             mesh,
-            cWallCntI(),
+            cWallCntI,
             deltaT,
             sWC
         );

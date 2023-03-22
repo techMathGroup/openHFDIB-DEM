@@ -57,7 +57,7 @@ namespace Foam
 
         protected:
 
-        PtrList<geomModel> ibGeomModelList;
+        std::vector<std::shared_ptr<geomModel>> ibGeomModelList;
 
         public:
 
@@ -92,10 +92,7 @@ namespace Foam
             List<labelList>& cellPoints
         ) final override;
 
-        geomModel* getCopy() final override
-        {
-            return this;
-        }
+        virtual std::shared_ptr<geomModel> getCopy() = 0;
 
         // Connect int/surf cells with correct center of mass
         // for fluid-solid interaction
@@ -172,7 +169,7 @@ namespace Foam
             return true;
         }
 
-        PtrList<geomModel>& getClusterBodies()
+        std::vector<std::shared_ptr<geomModel>>& getClusterBodies()
         {
             return ibGeomModelList;
         }

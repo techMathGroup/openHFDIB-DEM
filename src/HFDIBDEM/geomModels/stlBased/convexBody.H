@@ -97,18 +97,18 @@ namespace Foam
             Field<label>& octreeField
         );
 
-        geomModel* getCopy() final override
+        std::shared_ptr<geomModel> getCopy() final override
         {
-            convexBody* convexBodyModel = new convexBody(mesh_,stlPath_,thrSurf_);
-            stlBased* stlBasedModel = convexBodyModel;
-            stlBasedModel->initVars(bodySurfMesh_.points(), thrSurf_, intSpan_, sdBasedLambda_);
-            geomModel* bodyGeomModel = stlBasedModel;
-            bodyGeomModel->setRhoS(rhoS_);
-            bodyGeomModel->setM0(M0_);
-            bodyGeomModel->getSurfaceCellList() = surfCells_;
-            bodyGeomModel->getInternalCellList() = intCells_;
+            std::shared_ptr<convexBody> convexBodyModel =
+                std::make_shared<convexBody>(mesh_,stlPath_,thrSurf_);
 
-            return bodyGeomModel;
+            convexBodyModel->initVars(bodySurfMesh_.points(), thrSurf_, intSpan_, sdBasedLambda_);
+            convexBodyModel->setRhoS(rhoS_);
+            convexBodyModel->setM0(M0_);
+            convexBodyModel->getSurfaceCellList() = surfCells_;
+            convexBodyModel->getInternalCellList() = intCells_;
+
+            return convexBodyModel;
         }
     };
 }

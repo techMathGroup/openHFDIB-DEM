@@ -39,11 +39,11 @@ addModelOnce::addModelOnce
     const dictionary& addModelDict,
     const Foam::fvMesh& mesh,
     const bool startTime0,
-    geomModel* bodyGeomModel,
+    std::unique_ptr<geomModel> bodyGeomModel,
     List<labelList>& cellPoints
 )
 :
-addModel(mesh, bodyGeomModel, cellPoints),
+addModel(mesh, std::move(bodyGeomModel), cellPoints),
 addModelDict_(addModelDict),
 addMode_(word(addModelDict_.lookup("addModel"))),
 bodyAdded_(false)
@@ -57,7 +57,7 @@ addModelOnce::~addModelOnce()
 }
 //---------------------------------------------------------------------------//
 
-geomModel* addModelOnce::addBody
+std::shared_ptr<geomModel> addModelOnce::addBody
 (
     const volScalarField& body,
     PtrList<immersedBody>& immersedBodies
@@ -76,5 +76,5 @@ geomModel* addModelOnce::addBody
 
     //bodyAdded_ = canAddBodyI;
     bodyAdded_ = true;
-    return geomModel_().getCopy();
+    return geomModel_->getCopy();
 }
