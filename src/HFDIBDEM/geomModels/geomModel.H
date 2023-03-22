@@ -149,7 +149,7 @@ namespace Foam
                 << "notIplemented"<<endl;
         }
 
-        virtual geomModel* getGeomModel() = 0;
+        virtual geomModel* getCopy() = 0;
 
         virtual List<DynamicLabelList>& getSurfaceCellList()
         {
@@ -407,7 +407,7 @@ namespace Foam
             InfoH << iB_Info << "-- geomModelMessage-- "
                 << "not cluster model"<<endl;
             pointField emptyField;
-            return emptyField;            
+            return emptyField;
         }
 
         virtual faceList getSTLFaces()
@@ -418,13 +418,13 @@ namespace Foam
             return emptyList;
         }
 
-        virtual pointField getSTLFacePoint(label faceID) 
+        virtual pointField getSTLFacePoint(label faceID)
         {
             InfoH << iB_Info << "-- geomModelMessage-- "
                 << "notIplemented"<<endl;
             pointField nonPointField;
             return nonPointField;
-        }        
+        }
     };
 }
 #endif

@@ -114,7 +114,7 @@ namespace Foam
             Field<label>& octreeField
         );
 
-        geomModel* getGeomModel() final override
+        geomModel* getCopy() final override
         {
             sphereBody* sphereBodyModel = new sphereBody(mesh_,position_,radius_,thrSurf_);
             sphereBodyModel->initVars(intSpan_,sdBasedLambda_);

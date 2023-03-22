@@ -102,7 +102,7 @@ namespace Foam
             Field<label>& octreeField
         );
 
-        geomModel* getGeomModel() final override
+        geomModel* getCopy() final override
         {
             nonConvexBody* convexBodyModel = new nonConvexBody(mesh_,stlPath_,thrSurf_);
             stlBased* stlBasedModel = convexBodyModel;
@@ -112,7 +112,7 @@ namespace Foam
             bodyGeomModel->setM0(M0_);
             bodyGeomModel->getSurfaceCellList() = surfCells_;
             bodyGeomModel->getInternalCellList() = intCells_;
-            
+
             return bodyGeomModel;
         }
     };

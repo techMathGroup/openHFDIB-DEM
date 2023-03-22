@@ -107,7 +107,7 @@ geomModel* addModelOnceFromFile::addBody
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "Skipping empty line at " << ifStream_.lineNumber() - 1 <<endl;
         bodyAdded_ = false;
-        return geomModel_().getGeomModel();
+        return geomModel_().getCopy();
     }
 
     if (bodyGeom_ == "sphere")
@@ -131,5 +131,5 @@ geomModel* addModelOnceFromFile::addBody
     // reduce(canAddBodyI, andOp<bool>());
 
     bodyAdded_ = true;
-    return geomModel_().getGeomModel();
+    return geomModel_().getCopy();
 }

@@ -103,7 +103,7 @@ namespace Foam
                 << "notIplemented"<<endl;
         }
 
-        virtual geomModel* getGeomModel() = 0;
+        virtual geomModel* getCopy() = 0;
 
         vector addModelReturnRandomPosition(
             const bool allActiveCellsInMesh,
@@ -235,10 +235,10 @@ namespace Foam
             }
             CoM_/= bSMeshPts.size();
         }
-        
+
         pointField getSTLBodyPoints() final override
         {
-            return bodySurfMesh_.points();       
+            return bodySurfMesh_.points();
         }
 
         faceList getSTLFaces() final override
@@ -247,7 +247,7 @@ namespace Foam
         }
 
         pointField getSTLFacePoint(label faceID) final override
-        {            
+        {
             return triSurf_().faces()[faceID].points(bodySurfMesh_.points());
         }
 

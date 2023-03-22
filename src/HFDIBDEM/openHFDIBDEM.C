@@ -136,11 +136,11 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     dictionary patchDic = demDic.subDict("collisionPatches");
     List<word> patchNames = patchDic.toc();
     forAll(patchNames, patchI)
-    {   
+    {
         word patchMaterial = patchDic.subDict(patchNames[patchI]).lookup("material");
         vector patchNVec = patchDic.subDict(patchNames[patchI]).lookup("nVec");
         vector planePoint = patchDic.subDict(patchNames[patchI]).lookup("planePoint");
-        
+
         wallPlaneInfo::wallPlaneInfo_insert(
             patchNames[patchI],
             patchNVec,
@@ -555,7 +555,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     scalar thrSurf(readScalar(HFDIBDEMDict_.lookup("surfaceThreshold")));
                     autoPtr<periodicBody> newPeriodicBody(new periodicBody(mesh_, thrSurf));
                     newPeriodicBody->setRhoS(immersedBodies_[bodyId].getGeomModel().getRhoS());
-                    autoPtr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getGeomModel());
+                    autoPtr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getCopy());
                     vector transVec = newPos - iBcopy().getCoM();
                     iBcopy->bodyMovePoints(transVec);
                     newPeriodicBody->addBodyToCluster(immersedBodies_[bodyId].getGeomModelPtr());
@@ -619,7 +619,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     (
                         mesh_,
                         cIb.getibContactClass(),
-                        cIb.getWallCntInfo() 
+                        cIb.getWallCntInfo()
                     ))
                     {
                         cIb.getibContactClass().setWallContact(true);
@@ -654,11 +654,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 Pout <<" assignProc completed " << assignProc << endl;
             }
             // Pout <<" Survived " << endl;
-            
+
             forAll (wallContactIB,iB)
             {
                 immersedBody& cIb(immersedBodies_[wallContactIB[iB]]);
-                
+
                 std::vector<std::shared_ptr<wallSubContactInfo>>& subCList
                     = cIb.getWallCntInfo().getWallSCList();
 

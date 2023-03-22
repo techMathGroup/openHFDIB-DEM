@@ -92,12 +92,12 @@ namespace Foam
             List<labelList>& cellPoints
         ) final override;
 
-        geomModel* getGeomModel() final override
+        geomModel* getCopy() final override
         {
             return this;
         }
 
-        // Connect int/surf cells with correct center of mass 
+        // Connect int/surf cells with correct center of mass
         // for fluid-solid interaction
         virtual void getReferencedLists(
             List<DynamicLabelList>& intLists,

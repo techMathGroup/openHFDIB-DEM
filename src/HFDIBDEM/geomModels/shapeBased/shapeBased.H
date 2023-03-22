@@ -81,7 +81,7 @@ namespace Foam
                 << "notIplemented"<<endl;
         }
 
-        virtual geomModel* getGeomModel() = 0;
+        virtual geomModel* getCopy() = 0;
 
         vector addModelReturnRandomPosition(
             const bool allActiveCellsInMesh,

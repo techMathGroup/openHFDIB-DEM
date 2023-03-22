@@ -64,7 +64,7 @@ bool detectWallContact(
     //         ibClass
     //     );
     // }
-    // else 
+    // else
     if(ibClass.getGeomModel().getcType() == cluster)
     {
         return detectWallContact_Cluster
@@ -176,12 +176,12 @@ bool detectWallContact_Cluster(
     // label sCSize = wallCntInfo.getWallSCList().size();
     forAll (cBodies, cIbI)
     {
-        autoPtr<geomModel> cGeomModel(cBodies[cIbI].getGeomModel());
+        autoPtr<geomModel> cGeomModel(cBodies[cIbI].getCopy());
         autoPtr<ibContactClass> cIbClassI(new ibContactClass(
             cGeomModel,
             ibClass.getMatInfo().getMaterial()
         ));
-        
+
         autoPtr<ibContactVars> cIbVars(new ibContactVars(
             wallCntInfo.getBodyId(),
             wallCntInfo.getcVars().Vel_,
@@ -288,7 +288,7 @@ void getWallContactVars_ArbShape(
 
     autoPtr<DynamicVectorList> contactCenters(
         new DynamicVectorList);
-        
+
     autoPtr<DynamicVectorList> contactPlaneCenters(
         new DynamicVectorList);
 
@@ -320,7 +320,7 @@ void getWallContactVars_ArbShape(
             contactCenters().append(virtMeshWall.getContactCenter());
         }
     }
-    
+
     //run forAll for all internal Out Of Wall Contact elements get local contactCenters and intersectVolume
     forAll(sCInternalInfo,sCII)
     {
@@ -343,7 +343,7 @@ void getWallContactVars_ArbShape(
                 vmWInfo(),
                 wallCntInfo.getcClass().getGeomModel()
             ));
-            // InfoH << DEM_Info << " -- VM vmWInfo().BBox() " <<vmWInfo->getbBox() << endl;    
+            // InfoH << DEM_Info << " -- VM vmWInfo().BBox() " <<vmWInfo->getbBox() << endl;
 
             if(virtMeshPlane->detectFirstFaceContactPoint())
             {
@@ -359,27 +359,27 @@ void getWallContactVars_ArbShape(
         }
         contactCenter /= contactCenters().size();
 
-        // InfoH << DEM_Info << " -- VM contactAreas() " << contactAreas() << endl;    
+        // InfoH << DEM_Info << " -- VM contactAreas() " << contactAreas() << endl;
         forAll(contactAreas(),cA)
         {
             contactArea += contactAreas()[cA];
         }
-        
+
         forAll(contactPatches,cP)
         {
-            contactNormal -= wallPlaneInfo::getWallPlaneInfo()[contactPatches[cP]][0]*contactAreas()[cP];        
+            contactNormal -= wallPlaneInfo::getWallPlaneInfo()[contactPatches[cP]][0]*contactAreas()[cP];
         }
-        InfoH << parallelDEM_Info << " -- VM prtId : "<< sCW.getBodyId()<<" contactAreas() " << contactAreas() << endl;    
+        InfoH << parallelDEM_Info << " -- VM prtId : "<< sCW.getBodyId()<<" contactAreas() " << contactAreas() << endl;
         if (contactAreas().size() < SMALL)
         {
             InfoH << parallelDEM_Info << " -- VM CoM Of Failed Prt  : " << wallCntInfo.getcClass().getGeomModel().getCoM() << endl;
             InfoH << parallelDEM_Info << " -- VM CoM Of ContactArea : " << contactCenter << endl;
-        }            
+        }
         contactNormal /=mag(contactNormal);
 
         InfoH << parallelDEM_Info << " -- VM prtId : "<< sCW.getBodyId()<<" contactCenter_ : " << contactCenter << endl;
         InfoH << parallelDEM_Info << " -- VM prtId : "<< sCW.getBodyId()<<" contactArea_   : " << contactArea << endl;
-        InfoH << parallelDEM_Info << " -- VM prtId : "<< sCW.getBodyId()<<" contactNormal_ : " << contactNormal << endl;        
+        InfoH << parallelDEM_Info << " -- VM prtId : "<< sCW.getBodyId()<<" contactNormal_ : " << contactNormal << endl;
 
         wallCntInfo.getcClass().setWallContact(true);
         wallCntInfo.getcClass().inContactWithStatic(true);
@@ -752,7 +752,7 @@ void getWallContactVars_Cluster(
 
     forAll(cBodies, cIbI)
     {
-        autoPtr<geomModel> cGeomModel(cBodies[cIbI].getGeomModel());
+        autoPtr<geomModel> cGeomModel(cBodies[cIbI].getCopy());
 
         if(!sWC.getsWCBB().overlaps(cGeomModel->getBounds()))
         {

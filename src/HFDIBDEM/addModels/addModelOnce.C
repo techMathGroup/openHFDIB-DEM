@@ -60,7 +60,7 @@ addModelOnce::~addModelOnce()
 geomModel* addModelOnce::addBody
 (
     const volScalarField& body,
-    PtrList<immersedBody>& immersedBodies  
+    PtrList<immersedBody>& immersedBodies
 )
 {
     volScalarField helpBodyField_ = body;
@@ -76,5 +76,5 @@ geomModel* addModelOnce::addBody
 
     //bodyAdded_ = canAddBodyI;
     bodyAdded_ = true;
-    return geomModel_().getGeomModel();
+    return geomModel_().getCopy();
 }

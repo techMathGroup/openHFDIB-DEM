@@ -86,7 +86,7 @@ bool addModelRepeatSamePosition::shouldAddBody(const volScalarField& body)
 geomModel* addModelRepeatSamePosition::addBody
 (
     const volScalarField& body,
-    PtrList<immersedBody>& immersedBodies   
+    PtrList<immersedBody>& immersedBodies
 )
 {
     volScalarField helpBodyField_ = body;
@@ -107,5 +107,5 @@ geomModel* addModelRepeatSamePosition::addBody
     InfoH << addModel_Info << "-- addModelMessage-- "
         << "will try to use the body " << useNTimes_ << " more times" << endl;
 
-    return geomModel_->getGeomModel();
+    return geomModel_->getCopy();
 }

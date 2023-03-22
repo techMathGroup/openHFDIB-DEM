@@ -397,7 +397,7 @@ geomModel* addModelOnceScatter::addBody
 		scaleCorrectionCounter_ = 0;
 	}
 
-    return geomModel_->getGeomModel();
+    return geomModel_->getCopy();
 }
 // MODEL SPECIFIC FUNCTIONS==================================================//
 //---------------------------------------------------------------------------//

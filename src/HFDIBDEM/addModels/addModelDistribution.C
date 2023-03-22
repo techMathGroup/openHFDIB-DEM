@@ -249,7 +249,7 @@ bool addModelDistribution::shouldAddBody(const volScalarField& body)
 geomModel* addModelDistribution::addBody
 (
     const volScalarField& body,
-    PtrList<immersedBody>& immersedBodies   
+    PtrList<immersedBody>& immersedBodies
 )
 {
     bodyAdditionAttemptCounter_++;
@@ -313,7 +313,7 @@ geomModel* addModelDistribution::addBody
 	InfoH << addModel_Info << "-- addModelMessage-- "
         << "bodyAdditionAttemptNr  : " << bodyAdditionAttemptCounter_<< endl;
 
-    return geomModel_->getGeomModel();;
+    return geomModel_->getCopy();;
 }
 // MODEL SPECIFIC FUNCTIONS==================================================//
 //---------------------------------------------------------------------------//

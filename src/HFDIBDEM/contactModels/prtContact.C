@@ -133,12 +133,12 @@ void findSubContacts_Cluster(
         PtrList<geomModel>& cBodiesR = cCluster.getClusterBodies();
         forAll(cBodiesR, cIbI)
         {
-            cBodies.append(cBodiesR[cIbI].getGeomModel());
+            cBodies.append(cBodiesR[cIbI].getCopy());
         }
     }
     else
     {
-        cBodies.append(prtcInfo.getcClass().getGeomModel().getGeomModel());
+        cBodies.append(prtcInfo.getcClass().getGeomModel().getCopy());
     }
 
     if(prtcInfo.gettClass().getGeomModel().isCluster())
@@ -147,25 +147,25 @@ void findSubContacts_Cluster(
         PtrList<geomModel>& tBodiesR = tCluster.getClusterBodies();
         forAll(tBodiesR, tIbI)
         {
-            tBodies.append(tBodiesR[tIbI].getGeomModel());
+            tBodies.append(tBodiesR[tIbI].getCopy());
         }
     }
     else
     {
-        tBodies.append(prtcInfo.gettClass().getGeomModel().getGeomModel());
+        tBodies.append(prtcInfo.gettClass().getGeomModel().getCopy());
     }
 
     forAll(cBodies, cIbI)
     {
         forAll(tBodies, tIbI)
         {
-            autoPtr<geomModel> cGeomModel(cBodies[cIbI].getGeomModel());
+            autoPtr<geomModel> cGeomModel(cBodies[cIbI].getCopy());
             autoPtr<ibContactClass> cIbClassI(new ibContactClass(
                 cGeomModel,
                 prtcInfo.getcClass().getMatInfo().getMaterial()
             ));
 
-            autoPtr<geomModel> tGeomModel(tBodies[tIbI].getGeomModel());
+            autoPtr<geomModel> tGeomModel(tBodies[tIbI].getCopy());
             autoPtr<ibContactClass> tIbClassI(new ibContactClass(
                 tGeomModel,
                 prtcInfo.gettClass().getMatInfo().getMaterial()
@@ -403,12 +403,12 @@ bool detectPrtPrtContact_Cluster
         PtrList<geomModel>& cBodiesR = cCluster.getClusterBodies();
         forAll(cBodiesR, cIbI)
         {
-            cBodies.append(cBodiesR[cIbI].getGeomModel());
+            cBodies.append(cBodiesR[cIbI].getCopy());
         }
     }
     else
     {
-        cBodies.append(cClass.getGeomModel().getGeomModel());
+        cBodies.append(cClass.getGeomModel().getCopy());
     }
 
     if(tClass.getGeomModel().isCluster())
@@ -417,25 +417,25 @@ bool detectPrtPrtContact_Cluster
         PtrList<geomModel>& tBodiesR = tCluster.getClusterBodies();
         forAll(tBodiesR, tIbI)
         {
-            tBodies.append(tBodiesR[tIbI].getGeomModel());
+            tBodies.append(tBodiesR[tIbI].getCopy());
         }
     }
     else
     {
-        tBodies.append(tClass.getGeomModel().getGeomModel());
+        tBodies.append(tClass.getGeomModel().getCopy());
     }
 
     forAll(cBodies, cIbI)
     {
         forAll(tBodies, tIbI)
         {
-            autoPtr<geomModel> cGeomModel(cBodies[cIbI].getGeomModel());
+            autoPtr<geomModel> cGeomModel(cBodies[cIbI].getCopy());
             autoPtr<ibContactClass> cIbClassI(new ibContactClass(
                 cGeomModel,
                 cClass.getMatInfo().getMaterial()
             ));
 
-            autoPtr<geomModel> tGeomModel(tBodies[tIbI].getGeomModel());
+            autoPtr<geomModel> tGeomModel(tBodies[tIbI].getCopy());
             autoPtr<ibContactClass> tIbClassI(new ibContactClass(
                 tGeomModel,
                 tClass.getMatInfo().getMaterial()
@@ -615,12 +615,12 @@ void getPrtContactVars_Cluster
         PtrList<geomModel>& cBodiesR = cCluster.getClusterBodies();
         forAll(cBodiesR, cIbI)
         {
-            cBodies.append(cBodiesR[cIbI].getGeomModel());
+            cBodies.append(cBodiesR[cIbI].getCopy());
         }
     }
     else
     {
-        cBodies.append(cClass.getGeomModel().getGeomModel());
+        cBodies.append(cClass.getGeomModel().getCopy());
     }
 
     if(tClass.getGeomModel().isCluster())
@@ -629,25 +629,25 @@ void getPrtContactVars_Cluster
         PtrList<geomModel>& tBodiesR = tCluster.getClusterBodies();
         forAll(tBodiesR, tIbI)
         {
-            tBodies.append(tBodiesR[tIbI].getGeomModel());
+            tBodies.append(tBodiesR[tIbI].getCopy());
         }
     }
     else
     {
-        tBodies.append(tClass.getGeomModel().getGeomModel());
+        tBodies.append(tClass.getGeomModel().getCopy());
     }
 
     forAll(cBodies, cIbI)
     {
         forAll(tBodies, tIbI)
         {
-            autoPtr<geomModel> cGeomModel(cBodies[cIbI].getGeomModel());
+            autoPtr<geomModel> cGeomModel(cBodies[cIbI].getCopy());
             autoPtr<ibContactClass> cIbClassI(new ibContactClass(
                 cGeomModel,
                 cClass.getMatInfo().getMaterial()
             ));
 
-            autoPtr<geomModel> tGeomModel(tBodies[tIbI].getGeomModel());
+            autoPtr<geomModel> tGeomModel(tBodies[tIbI].getCopy());
             autoPtr<ibContactClass> tIbClassI(new ibContactClass(
                 tGeomModel,
                 tClass.getMatInfo().getMaterial()

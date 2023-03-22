@@ -314,7 +314,7 @@ bool addModelRepeatRandomPosition::shouldAddBody(const volScalarField& body)
 geomModel* addModelRepeatRandomPosition::addBody
 (
     const volScalarField& body,
-    PtrList<immersedBody>& immersedBodies  
+    PtrList<immersedBody>& immersedBodies
 )
 {
     geomModel_->resetBody();
@@ -416,7 +416,7 @@ geomModel* addModelRepeatRandomPosition::addBody
 		scaleCorrectionCounter_ = 0;
 	}
 
-    return geomModel_->getGeomModel();
+    return geomModel_->getCopy();
 }
 // MODEL SPECIFIC FUNCTIONS==================================================//
 //---------------------------------------------------------------------------//
