@@ -305,7 +305,7 @@ void getWallContactVars_ArbShape(
     }
     //run forAll contactPlanes to get contact areas for the givenPatch
     InfoH << parallelDEM_Info << " -- VM prtId : "<< " intersectVolume : " <<  intersectVolume << endl;
-    if(intersectVolume>SMALL)
+    if(intersectVolume>0)
     {
         for(label i = 0; i< vMPlaneInfoSize; i++)
         {
