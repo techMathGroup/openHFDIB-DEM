@@ -136,7 +136,7 @@ namespace Foam
 
         boundBox getBounds() final override;
 
-        void synchronPos() final override;
+        void synchronPos(label owner = -1) final override;
 
         boolList pointInside(pointField pointI) final override;
 
@@ -175,6 +175,12 @@ namespace Foam
         }
 
         List<boundBox*> getBBoxes() final override;
+
+        virtual void writeBodyInfo(label bodyId, IOdictionary& dict, word path)
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "custer body writeBodyInfo notIplemented"<<endl;
+        }
     };
 }
 

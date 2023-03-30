@@ -38,11 +38,11 @@ using namespace Foam;
 //---------------------------------------------------------------------------//
 ibContactClass::ibContactClass
 (
-    std::shared_ptr<geomModel> geomModel,
+    std::shared_ptr<geomModel>& geomModel,
     const string& material
 )
 :
-geomModel_(std::move(geomModel)),
+geomModel_(geomModel),
 isInWallContact_(false),
 inContactWithStatic_(false),
 timeStepsInContWStatic_(0),

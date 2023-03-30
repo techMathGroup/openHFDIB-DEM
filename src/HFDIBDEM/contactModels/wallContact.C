@@ -783,6 +783,10 @@ bool solveWallContact
 
     InfoH << parallelDEM_Info << "-- Detected Particle-wall contact: -- body "
         << sCI.getBodyId() << endl;
+    InfoH << parallelDEM_Info << "-- body "<< sCI.getBodyId() <<"  linear velocity:"
+        << wallCntInfo.getcVars().Vel_ << " magnitude: " << mag(wallCntInfo.getcVars().Vel_) <<endl;
+    InfoH << parallelDEM_Info << "-- body "<< sCI.getBodyId() <<"  angular velocity:"
+        << wallCntInfo.getcVars().omega_ << " magnitude: " << mag(wallCntInfo.getcVars().omega_) <<endl;
     InfoH << parallelDEM_Info << "-- Particle-wall id "<< sCI.getBodyId() <<" contact center "
         << wallCntVar.contactCenter_ << endl;
     InfoH << parallelDEM_Info << "-- Particle-wall id "<< sCI.getBodyId() <<" contact normal "

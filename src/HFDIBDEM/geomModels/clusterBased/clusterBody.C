@@ -112,11 +112,11 @@ boundBox clusterBody::getBounds()
     return boundBox(allBounds);
 }
 //---------------------------------------------------------------------------//
-void clusterBody::synchronPos()
+void clusterBody::synchronPos(label owner)
 {
     for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        gModel->synchronPos();
+        gModel->synchronPos(owner_);
     }
 }
 //---------------------------------------------------------------------------//

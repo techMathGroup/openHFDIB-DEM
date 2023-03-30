@@ -39,10 +39,10 @@ using namespace Foam;
 lineIntInfo::lineIntInfo
 (
     const  fvMesh&   mesh,
-    std::shared_ptr<geomModel> gModel
+    std::shared_ptr<geomModel>& gModel
 )
 :
-interpolationInfo(mesh, std::move(gModel))
+interpolationInfo(mesh, gModel)
 {}
 lineIntInfo::~lineIntInfo()
 {}

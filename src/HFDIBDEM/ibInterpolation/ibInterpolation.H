@@ -71,7 +71,7 @@ namespace Foam
         virtual interpolationInfo* createIntpInfo
         (
             const Foam::fvMesh& mesh,
-            std::shared_ptr<geomModel> gModel
+            std::shared_ptr<geomModel>& gModel
         ) = 0;
     };
 }

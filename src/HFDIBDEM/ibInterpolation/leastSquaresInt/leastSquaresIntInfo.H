@@ -96,7 +96,7 @@ namespace Foam
         leastSquaresIntInfo
         (
             const  fvMesh&   mesh,
-            std::shared_ptr<geomModel> gModel,
+            std::shared_ptr<geomModel>& gModel,
             scalar distFactor,
             scalar radiusFactor,
             scalar angleFactor,

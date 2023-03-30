@@ -107,6 +107,11 @@ class prtContactInfo
     ~prtContactInfo();
     //-----------------------------Func-------------------------------//
 
+    const Tuple2<label, label>& getCPair()
+    {
+        return contactPair_;
+    }
+
     ibContactClass& getcClass()
     {
         return cIbContactClass_;

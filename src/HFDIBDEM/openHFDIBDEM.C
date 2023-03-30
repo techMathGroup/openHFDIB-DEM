@@ -785,10 +785,20 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             }
         }
 
+        scalar maxCoNum = 0;
+        label  bodyId = 0;
         forAll (immersedBodies_,ib)
         {
             immersedBodies_[ib].updateMovement(deltaTime*step*0.5);
+
+            immersedBodies_[ib].computeBodyCoNumber();
+            if (maxCoNum < immersedBodies_[ib].getCoNum())
+            {
+                maxCoNum = immersedBodies_[ib].getCoNum();
+                bodyId = ib;
+            }
         }
+        InfoH << DEM_Info << "Max CoNum = " << maxCoNum << " at body " << bodyId << endl;
 
         pos += step;
 

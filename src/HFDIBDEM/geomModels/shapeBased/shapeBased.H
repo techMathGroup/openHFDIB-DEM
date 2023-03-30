@@ -132,7 +132,7 @@ namespace Foam
             return bound;
         }
 
-        virtual void synchronPos()
+        virtual void synchronPos(label owner)
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "
                 << "notIplemented"<<endl;

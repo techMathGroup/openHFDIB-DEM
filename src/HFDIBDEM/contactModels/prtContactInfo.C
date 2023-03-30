@@ -109,7 +109,7 @@ std::shared_ptr<prtSubContactInfo> prtContactInfo::matchSubContact
 {
     for(auto sC : subCList_)
     {
-        if (!sC->getVMInfo().valid())
+        if (!sC->getVMInfo())
         {
             continue;
         }
@@ -168,6 +168,12 @@ void prtContactInfo::setSubContacts_ArbShape
         cIbContactClass_.getGeomModel().getBounds().min(),
         cIbContactClass_.getGeomModel().getBounds().max()
     );
+
+    if (!subCbBox.overlaps(tIbContactClass_.getGeomModel().getBounds()))
+    {
+        return;
+    }
+
     limitBBox(subCbBox);
 
     scalar charCellSize = pow(cellV,0.333333);
@@ -242,7 +248,7 @@ void prtContactInfo::syncSubCList()
             bool vmInfoValid = false;
             if (procI == Pstream::myProcNo())
             {
-                vmInfoValid = subCList_[i]->getVMInfo().valid();
+                vmInfoValid = subCList_[i]->getVMInfo() ? true : false;
             }
             reduce(vmInfoValid, orOp<bool>());
 
@@ -255,7 +261,7 @@ void prtContactInfo::syncSubCList()
                 virtualMeshInfo vmInfoToSync;
                 if (procI == Pstream::myProcNo())
                 {
-                    vmInfoToSync = virtualMeshInfo(subCList_[i]->getVMInfo()());
+                    vmInfoToSync = virtualMeshInfo(*(subCList_[i]->getVMInfo()));
                 }
                 reduce(vmInfoToSync.sV.min(), sumOp<vector>());
                 reduce(vmInfoToSync.sV.max(), sumOp<vector>());

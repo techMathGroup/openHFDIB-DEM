@@ -124,10 +124,13 @@ void findSubContacts_Cluster(
     prtContactInfo& prtcInfo
 )
 {
+    prtcInfo.swapSubContactLists();
     std::vector<std::shared_ptr<geomModel>> cBodies;
     std::vector<std::shared_ptr<geomModel>> tBodies;
 
-    if(prtcInfo.getcClass().getGeomModel().isCluster())
+    bool cIsCluster = prtcInfo.getcClass().getGeomModel().isCluster();
+
+    if(cIsCluster)
     {
         periodicBody& cCluster = dynamic_cast<periodicBody&>(prtcInfo.getcClass().getGeomModel());
         cBodies = cCluster.getClusterBodies();
@@ -140,7 +143,15 @@ void findSubContacts_Cluster(
     if(prtcInfo.gettClass().getGeomModel().isCluster())
     {
         periodicBody& tCluster = dynamic_cast<periodicBody&>(prtcInfo.gettClass().getGeomModel());
-        tBodies = tCluster.getClusterBodies();
+
+        if (cIsCluster)
+        {
+            tBodies.push_back(tCluster.getClusterBodies()[0]);
+        }
+        else
+        {
+            tBodies = tCluster.getClusterBodies();
+        }
     }
     else
     {
@@ -170,10 +181,18 @@ void findSubContacts_Cluster(
             );
 
             findSubContacts(mesh, tmpPrtCntInfo);
-            tmpPrtCntInfo.swapSubContactLists();
-            prtcInfo.getPrtSCList().swap(tmpPrtCntInfo.getPrtSCList());
+
+            if (tmpPrtCntInfo.getPrtSCList().size() > 0)
+            {
+                prtcInfo.getPrtSCList().insert(
+                    prtcInfo.getPrtSCList().end(),
+                    tmpPrtCntInfo.getPrtSCList().begin(),
+                    tmpPrtCntInfo.getPrtSCList().end()
+                );
+            }
         }
     }
+    prtcInfo.swapSubContactLists();
 }
 //---------------------------------------------------------------------------//
 List<DynamicList<label>> detectContactCells
@@ -342,14 +361,14 @@ bool detectPrtPrtContact_ArbShape(
     prtSubContactInfo& subCInfo
 )
 {
-    autoPtr<virtualMeshInfo>& vmInfo = subCInfo.getVMInfo();
-    if (!vmInfo.valid())
+    std::shared_ptr<virtualMeshInfo>& vmInfo = subCInfo.getVMInfo();
+    if (!vmInfo)
     {
         return false;
     }
 
     virtualMesh virtMesh(
-        vmInfo(),
+        *vmInfo,
         cClass.getGeomModel(),
         tClass.getGeomModel()
     );
@@ -387,7 +406,9 @@ bool detectPrtPrtContact_Cluster
     std::vector<std::shared_ptr<geomModel>> cBodies;
     std::vector<std::shared_ptr<geomModel>> tBodies;
 
-    if(cClass.getGeomModel().isCluster())
+    bool isCCluster = cClass.getGeomModel().isCluster();
+
+    if(isCCluster)
     {
         periodicBody& cCluster = dynamic_cast<periodicBody&>(cClass.getGeomModel());
         cBodies = cCluster.getClusterBodies();
@@ -400,7 +421,14 @@ bool detectPrtPrtContact_Cluster
     if(tClass.getGeomModel().isCluster())
     {
         periodicBody& tCluster = dynamic_cast<periodicBody&>(tClass.getGeomModel());
-        tBodies = tCluster.getClusterBodies();
+        if (isCCluster)
+        {
+            tBodies.push_back(tCluster.getClusterBodies()[0]);
+        }
+        else
+        {
+            tBodies = tCluster.getClusterBodies();
+        }
     }
     else
     {
@@ -447,14 +475,14 @@ void getPrtContactVars_ArbShape(
     prtSubContactInfo& subCInfo
 )
 {
-    autoPtr<virtualMeshInfo>& vmInfo = subCInfo.getVMInfo();
-    if (!vmInfo.valid())
+    std::shared_ptr<virtualMeshInfo>& vmInfo = subCInfo.getVMInfo();
+    if (!vmInfo)
     {
         return;
     }
 
     virtualMesh virtMesh(
-        vmInfo(),
+        *vmInfo,
         cClass.getGeomModel(),
         tClass.getGeomModel()
     );
@@ -594,7 +622,9 @@ void getPrtContactVars_Cluster
     std::vector<std::shared_ptr<geomModel>> cBodies;
     std::vector<std::shared_ptr<geomModel>> tBodies;
 
-    if(cClass.getGeomModel().isCluster())
+    bool isCCluster = cClass.getGeomModel().isCluster();
+
+    if(isCCluster)
     {
         periodicBody& cCluster = dynamic_cast<periodicBody&>(cClass.getGeomModel());
         cBodies = cCluster.getClusterBodies();
@@ -607,7 +637,14 @@ void getPrtContactVars_Cluster
     if(tClass.getGeomModel().isCluster())
     {
         periodicBody& tCluster = dynamic_cast<periodicBody&>(tClass.getGeomModel());
-        tBodies = tCluster.getClusterBodies();
+        if (isCCluster)
+        {
+            tBodies.push_back(tCluster.getClusterBodies()[0]);
+        }
+        else
+        {
+            tBodies = tCluster.getClusterBodies();
+        }
     }
     else
     {
@@ -632,6 +669,11 @@ void getPrtContactVars_Cluster
                 subCInfo.getCPair(),
                 subCInfo.getPhysicalProperties()
             );
+
+            if (subCInfo.getVMInfo())
+            {
+                tmpSubCInfoI.setVMInfo(*(subCInfo.getVMInfo()));
+            }
 
             getPrtContactVars(
                 mesh,
@@ -721,6 +763,14 @@ bool solvePrtContact(
     InfoH << parallelDEM_Info << "-- Particle-particle " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact cBody pos: "
             << cInfo.getcClass().getGeomModel().getCoM() << " & tBody pos: "
             << cInfo.gettClass().getGeomModel().getCoM() << endl;
+    InfoH << parallelDEM_Info << "-- body "<< subCInfo.getCPair().first() <<"  linear velocity:"
+        << cInfo.getcVars().Vel_ << " magnitude: " << mag(cInfo.getcVars().Vel_) <<endl;
+    InfoH << parallelDEM_Info << "-- body "<< subCInfo.getCPair().first() <<"  angular velocity:"
+        << cInfo.getcVars().omega_ << " magnitude: " << mag(cInfo.getcVars().omega_) <<endl;
+    InfoH << parallelDEM_Info << "-- body "<< subCInfo.getCPair().second() <<"  linear velocity:"
+        << cInfo.gettVars().Vel_ << " magnitude: " << mag(cInfo.gettVars().Vel_) <<endl;
+    InfoH << parallelDEM_Info << "-- body "<< subCInfo.getCPair().second() <<"  angular velocity:"
+        << cInfo.gettVars().omega_ << " magnitude: " << mag(cInfo.gettVars().omega_) <<endl;
     InfoH << parallelDEM_Info << "-- Particle-particle " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact center "
             << subCInfo.getprtCntVars().contactCenter_ << endl;
     InfoH << parallelDEM_Info << "-- Particle-particle " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact normal "
@@ -767,17 +817,20 @@ bool solvePrtContact(
     InfoH << parallelDEM_Info << "-- Particle-particle " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact FA " << FA << endl;
     F -= FA;
 
-    InfoH << parallelDEM_Info << "-- Particle-particle " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact F " << F << endl;
-
-    InfoH << parallelDEM_Info << "-- Resolved Particle-particle contact: -- body "
-            << subCInfo.getCPair().first() << " & -- body "
-            << subCInfo.getCPair().second() << endl;
-
     // add the computed force to the affected bodies
     subCInfo.getOutForce().first().F = F;
     subCInfo.getOutForce().first().T = subCInfo.getcLVec() ^  F;
     subCInfo.getOutForce().second().F = -F;
     subCInfo.getOutForce().second().T = subCInfo.gettLVec() ^ -F;
+
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact F " << F << endl;
+
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact T " << subCInfo.getOutForce().first().T << endl;
+
+    InfoH << parallelDEM_Info << "-- Resolved Particle-particle contact: -- body "
+            << subCInfo.getCPair().first() << " & -- body "
+            << subCInfo.getCPair().second() << endl;
+
     return true;
 }
 //---------------------------------------------------------------------------//

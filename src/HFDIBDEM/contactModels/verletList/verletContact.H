@@ -26,26 +26,19 @@ InNamspace
     Foam
 
 Description
-    class for storage of contact variables
-
-SourceFiles
-    ibContactClass.C
+    class for Verlet contact
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef ibContactClass_H
-#define ibContactClass_H
+#ifndef verletContact_H
+#define verletContact_H
 
-#include "dictionary.H"
-#include "fvCFD.H"
+#include "verletPoint.H"
 
-#include "geomModel.H"
-#include "ibContactVars.H"
-#include "wallContactVars.H"
-#include "materialInfo.H"
+#include <vector>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -53,103 +46,81 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class ibContactClass Declaration
+                        Class verletContact Declaration
 \*---------------------------------------------------------------------------*/
 
-class ibContactClass
+class verletContact
 {
     private:
 
-    typedef DynamicList<label> DynamicLabelList;
-    typedef DynamicList<scalar> DynamicScalarList;
-    typedef DynamicList<vector> DynamicVectorList;
-    typedef DynamicList<point> DynamicPointList;
+    label cBodyID_;
+    label tBodyID_;
 
-    protected:
-
-    std::shared_ptr<geomModel>& geomModel_;
-
-    // is the particle in contact with wall
-    bool    isInWallContact_;
-
-    bool inContactWithStatic_;
-
-    label timeStepsInContWStatic_;
-
-    const materialInfo& matInfo_;
+    std::vector<Tuple2<verletPoint*, verletPoint*>> contactPoints_;
 
     public:
 
     // Constructors ------------------------------------------------
-    ibContactClass
+    verletContact
     (
-        std::shared_ptr<geomModel>& geomModel,
-        const string& material
-    );
-
-    ibContactClass
-    (
-        const ibContactClass& other
-    );
+        Tuple2<label, label> cPair
+    )
+    :
+    cBodyID_(cPair.first()),
+    tBodyID_(cPair.second())
+    {};
 
     // Destructors -------------------------------------------------
-    ~ibContactClass();
+    ~verletContact(){};
 
-    geomModel& getGeomModel()
+    void addContactPoint
+    (
+        verletPoint* cPoint,
+        verletPoint* tPoint
+    )
     {
-        return *geomModel_;
+        // Check if the contact point is already in the list
+        for (Tuple2<verletPoint*, verletPoint*>& cP : contactPoints_)
+        {
+            if
+            (
+                cP.first() == cPoint
+             && cP.second() == tPoint
+            )
+            {
+                return;
+            }
+        }
+
+        contactPoints_.push_back(Tuple2<verletPoint*, verletPoint*>(cPoint, tPoint));
     }
 
-    std::shared_ptr<geomModel> getGeomModelPtr()
+    void removeContactPoint
+    (
+        verletPoint* cPoint,
+        verletPoint* tPoint
+    )
     {
-        return geomModel_;
+        for (auto it = contactPoints_.begin(); it != contactPoints_.end(); ++it)
+        {
+            if
+            (
+                it->first() == cPoint
+             && it->second() == tPoint
+            )
+            {
+                contactPoints_.erase(it);
+                return;
+            }
+        }
     }
 
-    const bool& checkWallContact() const
+    std::vector<Tuple2<verletPoint*, verletPoint*>>& getContactPoints()
     {
-        return isInWallContact_;
+        return contactPoints_;
     }
 
-    void setWallContact(bool inContact)
-    {
-        isInWallContact_ = inContact;
-    }
-
-    List<DynamicLabelList>& getSurfCells()
-    {
-        return geomModel_->getSurfaceCellList();
-    }
-
-    List<DynamicLabelList>& getIntCells()
-    {
-        return geomModel_->getInternalCellList();
-    }
-
-    const materialInfo& getMatInfo()
-    {
-        return matInfo_;
-    }
-
-    const bool& checkInContactWithStatic() const
-    {
-        return inContactWithStatic_;
-    }
-
-    void inContactWithStatic(bool inContact)
-    {
-        inContactWithStatic_ = inContact;
-    }
-
-    const label& getTimeStepsInContWStatic() const
-    {
-        return timeStepsInContWStatic_;
-    }
-
-    void setTimeStepsInContWStatic(label setter)
-    {
-        timeStepsInContWStatic_ = setter;
-    }
-};
+}; // End class verletContact
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

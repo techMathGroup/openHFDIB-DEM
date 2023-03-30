@@ -121,9 +121,9 @@ vector prtSubContactInfo::getFt(scalar deltaT)
 //---------------------------------------------------------------------------//
 void prtSubContactInfo::setVMInfo(boundBox& bBox, scalar subVolumeV)
 {
-    if (!vmInfo_.valid())
+    if (!vmInfo_)
     {
-        vmInfo_.set(new virtualMeshInfo(bBox, subVolumeV));
+        vmInfo_ = std::make_shared<virtualMeshInfo>(bBox, subVolumeV);
         return;
     }
 
@@ -133,9 +133,9 @@ void prtSubContactInfo::setVMInfo(boundBox& bBox, scalar subVolumeV)
 //---------------------------------------------------------------------------//
 void prtSubContactInfo::setVMInfo(const virtualMeshInfo& vmInfo)
 {
-    if (!vmInfo_.valid())
+    if (!vmInfo_)
     {
-        vmInfo_.set(new virtualMeshInfo(vmInfo));
+        vmInfo_ = std::make_shared<virtualMeshInfo>(vmInfo);
         return;
     }
 
@@ -144,7 +144,7 @@ void prtSubContactInfo::setVMInfo(const virtualMeshInfo& vmInfo)
     vmInfo_->startingPoint = vmInfo.startingPoint;
 }
 //---------------------------------------------------------------------------//
-autoPtr<virtualMeshInfo>& prtSubContactInfo::getVMInfo()
+std::shared_ptr<virtualMeshInfo>& prtSubContactInfo::getVMInfo()
 {
     return vmInfo_;
 }
@@ -157,7 +157,7 @@ void prtSubContactInfo::syncData()
     reduce(outForce_.second().T, sumOp<vector>());
 
 
-    if (vmInfo_.valid())
+    if (vmInfo_)
     {
         point reducePoint = vector::zero;
 

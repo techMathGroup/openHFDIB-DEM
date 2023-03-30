@@ -158,7 +158,7 @@ namespace Foam
             return bounds;
         }
 
-        void synchronPos() final override;
+        void synchronPos(label owner = -1) final override;
 
         void writeBodyInfo(label bodyId, IOdictionary& dict, word path) final override
         {

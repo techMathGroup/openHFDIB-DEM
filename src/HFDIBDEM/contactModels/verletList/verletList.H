@@ -42,6 +42,7 @@ Contributors
 #include "dictionary.H"
 #include "fvCFD.H"
 #include "verletPoint.H"
+#include "verletContact.H"
 #include "immersedBody.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -62,12 +63,15 @@ class verletList
     typedef DynamicList<vector> DynamicVectorList;
     typedef DynamicList<point> DynamicPointList;
 
-    typedef HashSet<Tuple2<label, label>,Hash<Tuple2<label, label>>> 
+    typedef HashTable<verletContact, Tuple2<label, label>,Hash<Tuple2<label, label>>>
+        cPairHasTable;
+
+    typedef HashSet<Tuple2<label, label>,Hash<Tuple2<label, label>>>
         cPairHasSet;
 
     List<IDLList<verletPoint>> verletLists_;
     // List for pairs of intersected Bodies in specific coordinate
-    List<cPairHasSet> cntNeighList_;
+    List<cPairHasTable> cntNeighList_;
     // List of possible contact du to intersection of bounding boxes.
     // Pair is added to this list when it is present in all 3 cntNeighList_.
     cPairHasSet posCntList_;
@@ -76,7 +80,12 @@ class verletList
 
     void swapVerletPoints(verletPoint* a, verletPoint* b, label coord);
 
-    void addCPairToCntNList(Tuple2<label, label> cPair, label coord);
+    void addCPairToCntNList(
+        Tuple2<label, label> cPair,
+        label coord,
+        verletPoint* a,
+        verletPoint* b
+    );
 
     public:
 

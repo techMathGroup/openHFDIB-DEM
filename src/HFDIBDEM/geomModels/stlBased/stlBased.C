@@ -177,11 +177,13 @@ void stlBased::bodyRotatePoints
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
 }
 //---------------------------------------------------------------------------//
-void stlBased::synchronPos()
+void stlBased::synchronPos(label owner)
 {
     PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
 
-    if (owner_ == Pstream::myProcNo())
+    owner = (owner == -1) ? owner_ : owner;
+
+    if (owner == Pstream::myProcNo())
     {
         for (label proci = 0; proci < Pstream::nProcs(); proci++)
         {
@@ -192,7 +194,7 @@ void stlBased::synchronPos()
 
     pBufs.finishedSends();
     // move body to points calculated by owner_
-    UIPstream recv(owner_, pBufs);
+    UIPstream recv(owner, pBufs);
     pointField bodyPoints (recv);
 
     // move mesh

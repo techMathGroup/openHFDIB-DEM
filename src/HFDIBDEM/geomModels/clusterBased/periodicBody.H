@@ -134,6 +134,11 @@ namespace Foam
         bool shouldBeUnclustered();
 
         std::shared_ptr<geomModel> getRemGeomModel();
+
+        void writeBodyInfo(label bodyId, IOdictionary& dict, word path) final override
+        {
+            ibGeomModelList[0]->writeBodyInfo(bodyId, dict, path);
+        }
     };
 }
 

@@ -72,7 +72,7 @@ class prtSubContactInfo
 
     physicalProperties physicalProperties_;
 
-    autoPtr<virtualMeshInfo> vmInfo_;
+    std::shared_ptr<virtualMeshInfo> vmInfo_;
 
     prtContactVars prtCntVars_;
 
@@ -154,7 +154,7 @@ class prtSubContactInfo
 
     void setVMInfo(const virtualMeshInfo& vmInfo);
 
-    autoPtr<virtualMeshInfo>& getVMInfo();
+    std::shared_ptr<virtualMeshInfo>& getVMInfo();
 
     void clearOutForces()
     {

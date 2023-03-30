@@ -58,7 +58,7 @@ namespace Foam
         // mesh reference
         const Foam::fvMesh& mesh_;
         // geomModel reference
-        std::shared_ptr<geomModel> geomModel_;
+        std::shared_ptr<geomModel>& geomModel_;
 
         autoPtr<List<point>> ibPointsPtr_; // cellIbPoint mapping
         autoPtr<List<vector>> ibNormalsPtr_; // cellIbNormal mapping
@@ -69,7 +69,7 @@ namespace Foam
         interpolationInfo
         (
             const Foam::fvMesh& mesh,
-            std::shared_ptr<geomModel> gModel
+            std::shared_ptr<geomModel>& gModel
         );
 
         // Destructors -------------------------------------------------

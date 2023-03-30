@@ -65,10 +65,7 @@ void periodicBody::bodyMovePoints
 {
     for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        if(gModel->getOwner() == Pstream::myProcNo())
-        {
-            gModel->bodyMovePoints(translVec);
-        }
+        gModel->bodyMovePoints(translVec);
     }
 }
 //---------------------------------------------------------------------------//
@@ -91,10 +88,7 @@ void periodicBody::bodyRotatePoints
 {
     for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        if(gModel->getOwner() == Pstream::myProcNo())
-        {
-            gModel->bodyRotatePoints(rotAngle, axisOfRot);
-        }
+        gModel->bodyRotatePoints(rotAngle, axisOfRot);
     }
 }
 //---------------------------------------------------------------------------//

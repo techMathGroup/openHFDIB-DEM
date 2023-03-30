@@ -61,7 +61,7 @@ void verletList::mergeSortList(IDLList<verletPoint>& listToSort, label coord)
 
         while(listToSort.size() > 0 && secondList.size() > 0)
         {
-            if(listToSort.first()->getPoint()[coord] 
+            if(listToSort.first()->getPoint()[coord]
                 < secondList.first()->getPoint()[coord])
             {
                 resultList.append(listToSort.removeHead());
@@ -91,20 +91,32 @@ void verletList::swapVerletPoints(verletPoint* a, verletPoint* b, label coord)
         if(!a->isMin() && b->isMin())
         {
             Tuple2<label, label> newPair(
-                min(a->getBodyId(), b->getBodyId()), 
+                min(a->getBodyId(), b->getBodyId()),
                 max(a->getBodyId(), b->getBodyId())
             );
-            addCPairToCntNList(newPair, coord);
+            addCPairToCntNList(newPair, coord, a, b);
         }
         else if(a->isMin() && !b->isMin())
         {
             Tuple2<label, label> cPair(
-                min(a->getBodyId(), b->getBodyId()), 
+                min(a->getBodyId(), b->getBodyId()),
                 max(a->getBodyId(), b->getBodyId())
             );
             if(cntNeighList_[coord].found(cPair))
             {
-                cntNeighList_[coord].erase(cPair);
+                if (a->getBodyId() < b->getBodyId())
+                {
+                    cntNeighList_[coord][cPair].removeContactPoint(a, b);
+                }
+                else
+                {
+                    cntNeighList_[coord][cPair].removeContactPoint(b, a);
+                }
+
+                if (cntNeighList_[coord][cPair].getContactPoints().size() == 0)
+                {
+                    cntNeighList_[coord].erase(cPair);
+                }
             }
             if(posCntList_.found(cPair))
             {
@@ -116,14 +128,39 @@ void verletList::swapVerletPoints(verletPoint* a, verletPoint* b, label coord)
     verletLists_[coord].swapDown(a);
 }
 //---------------------------------------------------------------------------//
-void verletList::addCPairToCntNList(Tuple2<label, label> cPair, label coord)
+void verletList::addCPairToCntNList(
+    Tuple2<label, label> cPair,
+    label coord,
+    verletPoint* a,
+    verletPoint* b
+)
 {
     if(!cntNeighList_[coord].found(cPair))
     {
-        cntNeighList_[coord].insert(cPair);
+        verletContact newContact(cPair);
+        if (a->getBodyId() < b->getBodyId())
+        {
+            newContact.addContactPoint(a, b);
+        }
+        else
+        {
+            newContact.addContactPoint(b, a);
+        }
+        cntNeighList_[coord].insert(cPair, newContact);
+    }
+    else
+    {
+        if (a->getBodyId() < b->getBodyId())
+        {
+            cntNeighList_[coord][cPair].addContactPoint(a, b);
+        }
+        else
+        {
+            cntNeighList_[coord][cPair].addContactPoint(b, a);
+        }
     }
 
-    if(!posCntList_.found(cPair) && 
+    if(!posCntList_.found(cPair) &&
         (cntNeighList_[0].found(cPair) || emptyDim == 0) &&
         (cntNeighList_[1].found(cPair) || emptyDim == 1) &&
         (cntNeighList_[2].found(cPair) || emptyDim == 2))
@@ -135,7 +172,6 @@ void verletList::addCPairToCntNList(Tuple2<label, label> cPair, label coord)
 void verletList::addBodyToVList(immersedBody& ib)
 {
     List<boundBox*> bBoxes = ib.getGeomModel().getBBoxes();
-    PtrList<verletPoint> newVerletPoints;
     forAll(bBoxes, bBox)
     {
         forAll(verletLists_, vListI)
@@ -201,8 +237,8 @@ void verletList::initialSorting()
     {
         mergeSortList(verletLists_[coord], coord);
 
-        labelHashSet openedIb;
-        for (auto i = verletLists_[coord].begin(); 
+        HashSet<Tuple2<label, verletPoint*>,Hash<Tuple2<label, verletPoint*>>> openedIb;
+        for (auto i = verletLists_[coord].begin();
             i != verletLists_[coord].end(); ++i)
         {
             if((*i).isMin())
@@ -211,23 +247,27 @@ void verletList::initialSorting()
                 for (auto oIbIter = openedIb.begin();
                     oIbIter != openedIb.end(); ++oIbIter)
                 {
-                    // Create a Tuple2 for bodies that are newly 
-                    // intersected always keep first the body 
+                    // Create a Tuple2 for bodies that are newly
+                    // intersected always keep first the body
                     // with lower bodyID
                     Tuple2<label, label> newPair(
-                        min(curIb, oIbIter.key()), max(curIb, oIbIter.key())
+                        min(curIb, oIbIter.key().first()), max(curIb, oIbIter.key().first())
                     );
-                    addCPairToCntNList(newPair, coord);
+                    addCPairToCntNList(newPair, coord, &(*i), oIbIter.key().second());
                 }
 
-                openedIb.insert(curIb);
+                openedIb.insert(Tuple2<label, verletPoint*>(curIb, &(*i)));
             }
             else
             {
                 label curIb = (*i).getBodyId();
-                if(openedIb.found(curIb))
+                for (auto oIbIter = openedIb.begin();
+                    oIbIter != openedIb.end(); ++oIbIter)
                 {
-                    openedIb.erase(curIb);
+                    if (oIbIter.key().first() == curIb)
+                    {
+                        openedIb.erase(oIbIter);
+                    }
                 }
             }
         }
@@ -252,10 +292,10 @@ void verletList::update(PtrList<immersedBody>& ibs)
             {
                 if(it != verletLists_[coord].first())
                 {
-                    verletPoint* currPoint = 
+                    verletPoint* currPoint =
                         static_cast<verletPoint*>(it);
 
-                    verletPoint* prevPoint = 
+                    verletPoint* prevPoint =
                         static_cast<verletPoint*>(it->prev_);
 
                     if(prevPoint->getPoint()[coord]

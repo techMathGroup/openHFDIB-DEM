@@ -40,8 +40,9 @@ addModel::~addModel()
 //---------------------------------------------------------------------------//
 bool addModel::isBodyInContact(PtrList<immersedBody>& immersedBodies)
 {
+    std::shared_ptr<geomModel> gModel = geomModel_->getCopy();
     ibContactClass cIbClass(
-        geomModel_->getCopy(),
+        gModel,
         "None"
     );
 

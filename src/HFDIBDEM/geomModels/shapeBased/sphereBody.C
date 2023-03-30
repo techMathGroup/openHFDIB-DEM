@@ -126,7 +126,7 @@ void sphereBody::createImmersedBody
     }
     cachedNeighbours_().erase(keyToErase);
 
-    DynamicLabelList potentSurfCells = 
+    DynamicLabelList potentSurfCells =
         getPotentSurfCells(
             body,
             cellInside,
@@ -195,11 +195,13 @@ label sphereBody::getCellInBody
     return -1;
 }
 //---------------------------------------------------------------------------//
-void sphereBody::synchronPos()
+void sphereBody::synchronPos(label owner)
 {
     PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
 
-    if (owner_ == Pstream::myProcNo())
+    owner = (owner == -1) ? owner_ : owner;
+
+    if (owner == Pstream::myProcNo())
     {
         for (label proci = 0; proci < Pstream::nProcs(); proci++)
         {
@@ -210,7 +212,7 @@ void sphereBody::synchronPos()
 
     pBufs.finishedSends();
     // move body to points calculated by owner_
-    UIPstream recv(owner_, pBufs);
+    UIPstream recv(owner, pBufs);
     vector pos (recv);
 
     // move mesh

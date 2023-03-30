@@ -94,7 +94,7 @@ namespace Foam
         lineIntInfo
         (
             const  fvMesh&   mesh,
-            std::shared_ptr<geomModel> gModel
+            std::shared_ptr<geomModel>& gModel
         );
 
         // Destructors -------------------------------------------------

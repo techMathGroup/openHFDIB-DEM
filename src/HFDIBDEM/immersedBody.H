@@ -109,7 +109,6 @@ namespace Foam
         // linear velocity
         vector Vel_;
         vector VelOld_;
-        // vector velBeforeContact_ = vector::zero;
         // linear acceleration
         vector a_;
 
@@ -438,7 +437,7 @@ namespace Foam
             return *geomModel_;
         }
 
-        std::shared_ptr<geomModel> getGeomModelPtr()
+        std::shared_ptr<geomModel>& getGeomModelPtr()
         {
             return geomModel_;
         }
@@ -457,22 +456,6 @@ namespace Foam
         {
             return wallCntInfo_();
         }
-
-        // void setVelocityBeforeContact
-        // (
-        //     vector oldVelocity
-        // )
-        // {
-        //     velBeforeContact_ = oldVelocity;
-        // }
-
-        // void setIsInCollision
-        // (
-        //     bool isInCollision
-        // )
-        // {
-        //     isInCollision_ = isInCollision;
-        // }
 
         void recordBodyInfo(IOdictionary& dict, word path)
         {

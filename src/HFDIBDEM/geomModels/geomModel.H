@@ -229,7 +229,7 @@ namespace Foam
             return bound;
         }
 
-        virtual void synchronPos()
+        virtual void synchronPos(label owner = -1)
         {
             InfoH << iB_Info << "-- geomModelMessage-- "
                 << "notIplemented"<<endl;
