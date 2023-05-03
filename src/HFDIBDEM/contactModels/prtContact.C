@@ -86,37 +86,11 @@ void findSubContacts_ArbShape(
     prtContactInfo& prtcInfo
 )
 {
-    // DynamicLabelList    commonCells;
-
-    // List<DynamicLabelList> cSurfCells(prtcInfo.getcClass().getSurfCells());
     if (Pstream::myProcNo() == 0)
     {
         scalar ranCellVol = mesh.V()[0];
         prtcInfo.setSubContacts_ArbShape(ranCellVol);
     }
-    // List<DynamicLabelList> tSurfCells(prtcInfo.gettClass().getSurfCells());
-
-    // // iterate over surfCells to find common cells
-    // forAll (cSurfCells[Pstream::myProcNo()],cSCellI)
-    // {
-    //     forAll (tSurfCells[Pstream::myProcNo()],tSCellI)
-    //     {
-    //         if (mag(cSurfCells[Pstream::myProcNo()][cSCellI]-tSurfCells[Pstream::myProcNo()][tSCellI]) < SMALL)
-    //         {
-    //             commonCells.append(cSurfCells[Pstream::myProcNo()][cSCellI]);
-    //         }
-    //     }
-    // }
-
-    // prtcInfo.setSubContacts_ArbShape(
-    //     mesh,
-    //     detectContactCells(
-    //         mesh,
-    //         prtcInfo.getcClass().getGeomModel(),
-    //         prtcInfo.gettClass().getGeomModel(),
-    //         commonCells
-    //     )
-    // );
 }
 //---------------------------------------------------------------------------//
 void findSubContacts_Cluster(
@@ -193,117 +167,6 @@ void findSubContacts_Cluster(
         }
     }
     prtcInfo.swapSubContactLists();
-}
-//---------------------------------------------------------------------------//
-List<DynamicList<label>> detectContactCells
-(
-    const fvMesh&   mesh,
-    geomModel& cGeomModel,
-    geomModel& tGeomModel,
-    DynamicLabelList & commonCells
-)
-{
-    labelHashSet checkedOctreeCells;
-
-    autoPtr<DynamicLabelList> nextToCheck(
-            new DynamicLabelList);
-
-    autoPtr<DynamicLabelList> auxToCheck(
-            new DynamicLabelList);
-
-    DynamicLabelList subContactCells;
-
-    List<DynamicLabelList> baseSubContactList;
-
-    label iterMax(mesh.nCells());
-    label iterCount(0);
-
-    while((commonCells.size() > SMALL) && iterCount++ < iterMax)
-    {
-        label iterCount2(0);
-        nextToCheck().clear();
-        subContactCells.clear();
-
-        nextToCheck().append(commonCells[0]);
-
-        while ((nextToCheck().size() > 0) && iterCount2++ < iterMax)
-        {
-            auxToCheck().clear();
-            forAll(nextToCheck(), nCell)
-            {
-                if (!checkedOctreeCells.found(nextToCheck()[nCell]))
-                {
-                    checkedOctreeCells.insert(nextToCheck()[nCell]);
-                    if(isCellContactCell(
-                        mesh,
-                        cGeomModel,
-                        tGeomModel,
-                        nextToCheck()[nCell]))
-                    {
-                        subContactCells.append(nextToCheck()[nCell]);
-                        auxToCheck().append(mesh.cellCells()[nextToCheck()[nCell]]);
-                    }
-                }
-            }
-            const autoPtr<DynamicLabelList> helpPtr(nextToCheck.ptr());
-            nextToCheck.set(auxToCheck.ptr());
-            auxToCheck = helpPtr;
-        }
-
-        if(subContactCells.size() > 0)
-        {
-            baseSubContactList.append(subContactCells);
-        }
-
-        // Remove checked cells from commonCells
-        for (auto it = commonCells.begin(); it != commonCells.end();)
-        {
-            if (checkedOctreeCells.found(*it))
-            {
-                it = commonCells.erase(it);
-            }
-            else
-            {
-                ++it;
-            }
-        }
-    }
-
-    return baseSubContactList;
-}
-//---------------------------------------------------------------------------//
-bool isCellContactCell
-(
-    const fvMesh&   mesh,
-    geomModel& cGeomModel,
-    geomModel& tGeomModel,
-    label cellId
-)
-{
-    const pointField& pp = mesh.points();
-
-    const labelList& vertexLabels = mesh.cellPoints()[cellId];
-    const pointField vertexPoints(pp,vertexLabels);
-
-    const boolList cvertexesInside = cGeomModel.pointInside(vertexPoints);
-    const boolList tvertexesInside = tGeomModel.pointInside(vertexPoints);
-
-    bool tBody(false);
-    bool cBody(false);
-
-    forAll(tvertexesInside,vertexId)
-    {
-        if(tvertexesInside[vertexId])
-        {
-            tBody = true;
-        }
-        if(cvertexesInside[vertexId])
-        {
-            cBody = true;
-        }
-
-    }
-    return tBody && cBody;
 }
 //---------------------------------------------------------------------------//
 bool detectPrtPrtContact(
