@@ -78,11 +78,12 @@ namespace contactModel
         wallContactInfo& wallCntInfo
     );
 
-    // bool detectWallContact_Sphere
-    // (
-    //     const fvMesh&   mesh,
-    //     ibContactClass& ibClass
-    // );
+    bool detectWallContact_Sphere
+    (
+        const fvMesh&   mesh,
+        ibContactClass& ibClass,
+        wallContactInfo& wallCntInfo
+    );
 
     bool detectWallContact_Cluster
     (
@@ -107,12 +108,13 @@ namespace contactModel
         wallSubContactInfo& sWC
     );
 
-    // void getWallContactVars_Sphere
-    // (
-    //     const fvMesh&   mesh,
-    //     wallContactInfo& wallCntInfo,
-    //     const scalar deltaT
-    // );
+    void getWallContactVars_Sphere
+    (
+        const fvMesh&   mesh,
+        wallContactInfo& wallCntInfo,
+        const scalar deltaT,
+        wallSubContactInfo& sCW
+    );
 
     void getWallContactVars_Cluster
     (
@@ -122,13 +124,13 @@ namespace contactModel
         wallSubContactInfo& sWC
     );
 
-    // DynamicList<Tuple2<label,string>> getContactFacesSphere
-    // (
-    //     const fvMesh&   mesh,
-    //     wallContactInfo& wallCntInfo,
-    //     label faceLabel,
-    //     DynamicList<Tuple2<label,string>>& checkedFaces
-    // );
+    DynamicList<Tuple2<label,string>> getContactFacesSphere
+    (
+        const fvMesh&   mesh,
+        wallContactInfo& wallCntInfo,
+        label faceLabel,
+        DynamicList<Tuple2<label,string>>& checkedFaces
+    );
 
     // DynamicList<Tuple2<label,string>> getContactFacesArbShape
     // (
@@ -160,23 +162,21 @@ namespace contactModel
     //     vector center
     // );
 
-    // scalar getInterVolume_Sphere
-    // (
-    //     const fvMesh&   mesh,
-    //     ibContactClass& cClass,
-    //     ibContactVars& cVars,
-    //     vector nVec,
-    //     vector center
-    // );
+    scalar getInterVolume_Sphere
+    (
+        const fvMesh&   mesh,
+        ibContactClass& cClass,
+        ibContactVars& cVars,
+        plane& cPlane
+    );
 
-    // scalar sphereContactArea
-    // (
-    //     const fvMesh&   mesh,
-    //     ibContactClass& cClass,
-    //     ibContactVars& cVars,
-    //     vector nVec,
-    //     vector center
-    // );
+    scalar sphereContactArea
+    (
+        const fvMesh&   mesh,
+        ibContactClass& cClass,
+        ibContactVars& cVars,
+        plane& cPlane
+    );
 }
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

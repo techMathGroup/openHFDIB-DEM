@@ -77,11 +77,6 @@ class wallContactInfo
 
     label bodyId_;
 
-    // contacts with walls
-    DynamicLabelList curUsedHashes_;
-    DynamicLabelList wallCntHashes_;
-    HashTable<wallContactVars,label,Hash<label>> wallcVarsTable_;
-
     // Mean model parameters
     HashTable<physicalProperties,string,Hash<string>> wallMeanPars_;
 
@@ -221,6 +216,11 @@ class wallContactInfo
     }
 
     void registerSubContactList(DynamicList<wallSubContactInfo*>& contactList);
+
+    List<string>& getContactPatches()
+    {
+        return contactPatches_;
+    }
 
     // void addSCToEnd
     // (

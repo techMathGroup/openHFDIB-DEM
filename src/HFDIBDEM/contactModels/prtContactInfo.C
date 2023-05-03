@@ -154,6 +154,16 @@ void prtContactInfo::limitBBox(boundBox& bbox)
 //---------------------------------------------------------------------------//
 void prtContactInfo::setSubContacts_Sphere()
 {
+    if
+    (
+        mag(cIbContactClass_.getGeomModel().getCoM()-tIbContactClass_.getGeomModel().getCoM())
+        >=
+        ((cIbContactClass_.getGeomModel().getDC() / 2) + (tIbContactClass_.getGeomModel().getDC() / 2))
+    )
+    {
+        return;
+    }
+
     newSubCList_.emplace_back(std::make_shared<prtSubContactInfo>
         (contactPair_, physicalProperties_)
     );

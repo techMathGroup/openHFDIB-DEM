@@ -56,15 +56,16 @@ bool detectWallContact(
 {
     ibClass.setWallContact(false);
 
-    // if(ibClass.getGeomModel().getcType() == sphere)
-    // {
-    //     return detectWallContact_Sphere
-    //     (
-    //         mesh,
-    //         ibClass
-    //     );
-    // }
-    // else
+    if(ibClass.getGeomModel().getcType() == sphere)
+    {
+        return detectWallContact_Sphere
+        (
+            mesh,
+            ibClass,
+            wallCntInfo
+        );
+    }
+    else
     if(ibClass.getGeomModel().getcType() == cluster)
     {
         return detectWallContact_Cluster
@@ -100,70 +101,31 @@ bool detectWallContact_ArbShape(
     return(isContact);
 }
 //---------------------------------------------------------------------------//
-// bool detectWallContact_Sphere(
-//     const fvMesh&   mesh,
-//     ibContactClass& ibClass
-// )
-// {
-//     scalar cRadius(ibClass.getGeomModel().getDC() / 2);
-//     vector cCenter(ibClass.getGeomModel().getCoM());
+bool detectWallContact_Sphere(
+    const fvMesh&   mesh,
+    ibContactClass& ibClass,
+    wallContactInfo& wallCntInfo
+)
+{
+    if (wallCntInfo.detectWallContact())
+    {
+        wallCntInfo.getWallSCList().emplace_back(
+            std::make_shared<wallSubContactInfo>(
+                List<Tuple2<point,boundBox>>(),
+                List<Tuple2<point,boundBox>>(),
+                wallCntInfo.getContactPatches(),
+                List<Tuple2<point,boundBox>>(),
+                wallCntInfo.getWallMeanPars(),
+                ibClass.getGeomModel().getBounds(),
+                wallCntInfo.getBodyId()
+            )
+        );
 
-//     label nCells = mesh.nCells();
+        return true;
+    }
 
-//     List<DynamicLabelList>& surfCells(ibClass.getSurfCells());
-//     bool inContact = false;
-
-
-//     // go through all surfCells and check if there is any surfCell whose face is a boundary face
-//     forAll (surfCells[Pstream::myProcNo()],sCellI)
-//     {
-//         label cCell(surfCells[Pstream::myProcNo()][sCellI]);
-//         if(cCell < nCells)
-//         {
-//             const labelList& cFaces = mesh.cells()[cCell];
-//             forAll (cFaces,faceI)
-//             {
-//                 if (!mesh.isInternalFace(cFaces[faceI]))
-//                 {
-//                     // get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
-//                     label facePatchId = mesh.boundaryMesh().whichPatch(cFaces[faceI]);
-//                     const polyPatch& cPatch = mesh.boundaryMesh()[facePatchId];
-//                     if (cPatch.type()=="wall")
-//                     {
-//                         vector nVec(-mesh.Sf()[cFaces[faceI]]/mag(mesh.Sf()[cFaces[faceI]]));
-
-//                         if(!case3D)
-//                         {
-//                             if(mag(emptyDir - nVec) < 1e-4 || mag(emptyDir - (-1)*nVec) < 1e-4)
-//                             {
-//                                 continue;
-//                             }
-//                         }
-
-//                         face currentFace = mesh.faces()[cFaces[faceI]];
-//                         pointHit pointH = currentFace.nearestPoint(cCenter,mesh.points());
-//                         if(mag(pointH.rawPoint() - cCenter) < cRadius)
-//                         {
-//                             inContact = true;
-//                         }
-//                     }
-//                 }
-//                 if(inContact)
-//                     break;
-//             }
-//         }
-//         if(inContact)
-//             break;
-//     }
-
-//     reduce(inContact, orOp<bool>());
-
-//     if(inContact)
-//     {
-//         return true;
-//     }
-//     return false;
-// }
+    return false;
+}
 //---------------------------------------------------------------------------//
 bool detectWallContact_Cluster(
     const fvMesh&   mesh,
@@ -171,6 +133,8 @@ bool detectWallContact_Cluster(
     wallContactInfo& wallCntInfo
 )
 {
+    wallCntInfo.getContactPatches().clear();
+
     periodicBody& cCluster = dynamic_cast<periodicBody&>(ibClass.getGeomModel());
     std::vector<std::shared_ptr<geomModel>> cBodies = cCluster.getClusterBodies();
 
@@ -208,6 +172,10 @@ bool detectWallContact_Cluster(
                 std::end(tmpWallCntI.getWallSCList())
             );
 
+            wallCntInfo.getContactPatches().append(
+                tmpWallCntI.getContactPatches()
+            );
+
             cIbClassI.setWallContact(true);
             cIbClassI.inContactWithStatic(true);
         }
@@ -228,7 +196,17 @@ void getWallContactVars(
     wallSubContactInfo& sWC
 )
 {
-    if(wallCntInfo.getcClass().getGeomModel().getcType() == cluster)
+    if (wallCntInfo.getcClass().getGeomModel().getcType() == sphere)
+    {
+        getWallContactVars_Sphere
+        (
+            mesh,
+            wallCntInfo,
+            deltaT,
+            sWC
+        );
+    }
+    else if(wallCntInfo.getcClass().getGeomModel().getcType() == cluster)
     {
         getWallContactVars_Cluster
         (
@@ -275,8 +253,7 @@ void getWallContactVars_ArbShape(
     label vMPlaneInfoSize  = sCW.getVMPlaneSize();
     const List<Tuple2<point,boundBox>>& sCInternalInfo = sCW.getInternalElements();
     const List<string>& contactPatches = sCW.getContactPatches();
-    //run forAll for all surface Out Of Wall Contact elements get local contactCenters and intersectVolume            // InfoH << DEM_Info << " virtMeshWall.evaluateContact() " << virtMeshWall.evaluateContact() <<endl;
-    // InfoH << DEM_Info << " -- WallContact detectVolume VM " << endl;
+
     for(label i = 0; i< vMContactInfoSize; i++)
     {
         autoPtr<virtualMeshWallInfo> vmWInfo = sCW.getVMContactInfo(i);
@@ -297,14 +274,12 @@ void getWallContactVars_ArbShape(
         }
     }
 
-    //run forAll for all internal Out Of Wall Contact elements get local contactCenters and intersectVolume
     forAll(sCInternalInfo,sCII)
     {
         intersectVolume += sCInternalInfo[sCII].second().volume();
         contactCenters().append(sCInternalInfo[sCII].first());
     }
-    //run forAll contactPlanes to get contact areas for the givenPatch
-    InfoH << parallelDEM_Info << " -- VM prtId : "<< " intersectVolume : " <<  intersectVolume << endl;
+
     if(intersectVolume>0)
     {
         for(label i = 0; i< vMPlaneInfoSize; i++)
@@ -319,7 +294,6 @@ void getWallContactVars_ArbShape(
                 vmWInfo(),
                 wallCntInfo.getcClass().getGeomModel()
             ));
-            // InfoH << DEM_Info << " -- VM vmWInfo().BBox() " <<vmWInfo->getbBox() << endl;
 
             if(virtMeshPlane->detectFirstFaceContactPoint())
             {
@@ -335,7 +309,6 @@ void getWallContactVars_ArbShape(
         }
         contactCenter /= contactCenters().size();
 
-        // InfoH << DEM_Info << " -- VM contactAreas() " << contactAreas() << endl;
         forAll(contactAreas(),cA)
         {
             contactArea += contactAreas()[cA];
@@ -345,17 +318,8 @@ void getWallContactVars_ArbShape(
         {
             contactNormal -= wallPlaneInfo::getWallPlaneInfo()[contactPatches[cP]][0]*contactAreas()[cP];
         }
-        InfoH << parallelDEM_Info << " -- VM prtId : "<< sCW.getBodyId()<<" contactAreas() " << contactAreas() << endl;
-        if (contactAreas().size() < SMALL)
-        {
-            InfoH << parallelDEM_Info << " -- VM CoM Of Failed Prt  : " << wallCntInfo.getcClass().getGeomModel().getCoM() << endl;
-            InfoH << parallelDEM_Info << " -- VM CoM Of ContactArea : " << contactCenter << endl;
-        }
-        contactNormal /=mag(contactNormal);
 
-        InfoH << parallelDEM_Info << " -- VM prtId : "<< sCW.getBodyId()<<" contactCenter_ : " << contactCenter << endl;
-        InfoH << parallelDEM_Info << " -- VM prtId : "<< sCW.getBodyId()<<" contactArea_   : " << contactArea << endl;
-        InfoH << parallelDEM_Info << " -- VM prtId : "<< sCW.getBodyId()<<" contactNormal_ : " << contactNormal << endl;
+        contactNormal /=mag(contactNormal);
 
         wallCntInfo.getcClass().setWallContact(true);
         wallCntInfo.getcClass().inContactWithStatic(true);
@@ -375,347 +339,77 @@ void getWallContactVars_ArbShape(
     }
 }
 // //---------------------------------------------------------------------------//
-// DynamicList<Tuple2<label,string>> getContactFacesArbShape
-// (
-//     const fvMesh&   mesh,
-//     wallContactInfo& wallCntInfo,
-//     label faceLabel,
-//     DynamicList<Tuple2<label,string>>& checkedFaces,
-//     HashTable<bool,label,Hash<label>>& pointTable,
-//     DynamicVectorList& center,
-//     DynamicVectorList& normal,
-//     DynamicLabelList& centerPoints,
-//     DynamicScalarList& area
-// )
-// {
-//     DynamicList<Tuple2<label,string>> facesReturnList;
+void getWallContactVars_Sphere(
+    const fvMesh&   mesh,
+    wallContactInfo& wallCntInfo,
+    const scalar deltaT,
+    wallSubContactInfo& sCW
+)
+{
+    vector cCenter(wallCntInfo.getcClass().getGeomModel().getCoM());
 
-//     labelList faceEdges = mesh.faceEdges()[faceLabel];
-//     forAll(faceEdges,edge)
-//     {
-//         labelList edgeFaces = mesh.edgeFaces()[faceEdges[edge]];
-//         forAll(edgeFaces,faceI)
-//         {
-//             if (!mesh.isInternalFace(edgeFaces[faceI]))
-//             {
-//                 // get reference to the patch which is in contact with IB.
-//                 // There is contact only if the patch is marked as a wall
-//                 label facePatchId = mesh.boundaryMesh().whichPatch(edgeFaces[faceI]);
-//                 const polyPatch& cPatch = mesh.boundaryMesh()[facePatchId];
-//                 if (wallCntInfo.isContactPatch(cPatch.name()))
-//                 {
-//                     vector nVec(-mesh.Sf()[edgeFaces[faceI]]/mag(mesh.Sf()[edgeFaces[faceI]]));
+    List<string>& contactPatches = wallCntInfo.getContactPatches();
 
-//                     if(!case3D)
-//                     {
-//                         if(mag(emptyDir - nVec) < 1e-4 || mag(emptyDir - (-1)*nVec) < 1e-4)
-//                             continue;
-//                     }
+    List<wallContactVars> wallCntVarsList;
+    forAll(contactPatches, patchI)
+    {
+        List<vector> planeInfo = wallPlaneInfo::getWallPlaneInfo()[contactPatches[patchI]];
+        plane p(planeInfo[1], planeInfo[0]);
+        point nearestPoint = p.nearestPoint(cCenter);
 
-//                     bool cont = false;
+        vector nVec = (cCenter - nearestPoint)/mag(cCenter - nearestPoint);
 
-//                     forAll(checkedFaces,face)
-//                     {
-//                         if(checkedFaces[face].first() == edgeFaces[faceI])
-//                         {
-//                             cont = true;
-//                             break;
-//                         }
-//                     }
+        wallCntVarsList.append(wallContactVars());
 
-//                     if(cont)
-//                         continue;
+        wallCntVarsList.last().contactCenter_ = nearestPoint;
+        wallCntVarsList.last().contactNormal_ = nVec;
+        wallCntVarsList.last().contactArea_ = sphereContactArea
+        (
+            mesh,
+            wallCntInfo.getcClass(),
+            wallCntInfo.getcVars(),
+            p
+        );
 
-//                     labelList facePoints(mesh.faces()[edgeFaces[faceI]]);//list of vertex indicies
-//                     label numOfPoints = 0;
+        wallCntVarsList.last().contactVolume_ = getInterVolume_Sphere
+        (
+            mesh,
+            wallCntInfo.getcClass(),
+            wallCntInfo.getcVars(),
+            p
+        );
+    }
 
-//                     forAll(facePoints,pointI)
-//                     {
-//                         if(pointTable.found(facePoints[pointI]))
-//                         {
-//                             if(pointTable[facePoints[pointI]])
-//                             {
-//                                 numOfPoints++;
-//                                 center.last() += mesh.points()[facePoints[pointI]];
-//                                 normal.last() += nVec;
-//                             }
-//                         }
-//                         else
-//                         {
-//                             if(wallCntInfo.getcClass().getGeomModel().pointInside(mesh.points()[facePoints[pointI]]))
-//                             {
-//                                 numOfPoints++;
-//                                 center.last() += mesh.points()[facePoints[pointI]];
-//                                 normal.last() += nVec;
-//                                 pointTable.insert(facePoints[pointI], true);
-//                             }
-//                             else
-//                             {
-//                                 pointTable.insert(facePoints[pointI], false);
-//                             }
-//                         }
-//                     }
+    wallContactVars& wallCntVars = sCW.getWallCntVars();
 
-//                     if(numOfPoints > 0)
-//                     {
-//                         centerPoints.last() += numOfPoints;
-//                         area.last() += mag(mesh.Sf()[edgeFaces[faceI]])
-//                             *numOfPoints/facePoints.size();
-//                         facesReturnList.append(Tuple2<label,string>
-//                         (
-//                             edgeFaces[faceI],
-//                             cPatch.name()
-//                         ));
-//                     }
-//                 }
-//             }
-//         }
-//     }
+    List<scalar> contactAreas;
 
-//     return facesReturnList;
-// }
+    for (int i = 0; i < wallCntVarsList.size(); ++i)
+    {
+        wallCntVars.contactCenter_ += wallCntVarsList[i].contactCenter_ * wallCntVarsList[i].contactVolume_;
+        wallCntVars.contactNormal_ += wallCntVarsList[i].contactNormal_ * wallCntVarsList[i].contactVolume_;
+        wallCntVars.contactArea_ += wallCntVarsList[i].contactArea_;
+        contactAreas.append(wallCntVarsList[i].contactArea_);
+        wallCntVars.contactVolume_ += wallCntVarsList[i].contactVolume_;
+    }
+
+    wallCntVars.contactCenter_ /= wallCntVars.contactVolume_;
+    wallCntVars.contactNormal_ /= wallCntVars.contactVolume_;
+
+    wallCntVars.setMeanCntPars_Plane
+    (
+        contactAreas,
+        contactPatches,
+        wallCntInfo.getWallMeanPars()
+    );
+
+    if(wallCntVars.contactVolume_ > 0)
+    {
+        wallCntInfo.getcClass().setWallContact(true);
+        wallCntInfo.getcClass().inContactWithStatic(true);
+    }
+}
 //---------------------------------------------------------------------------//
-// void getWallContactVars_Sphere(
-//     const fvMesh&   mesh,
-//     wallContactInfo& wallCntInfo,
-//     const scalar deltaT,
-//     label sWC
-// )
-// {
-//     scalar cRadius(wallCntInfo.getcClass().getGeomModel().getDC() / 2);
-//     vector cCenter(wallCntInfo.getcClass().getGeomModel().getCoM());
-
-//     label nCells = mesh.nCells();
-
-//     // Tuple: first() = face label; second() = patch name
-//     List<DynamicList<Tuple2<label,string>>> contactFaces;
-
-//     DynamicVectorList center(Pstream::nProcs(),vector::zero);
-//     DynamicVectorList normal(Pstream::nProcs(),vector::zero);
-
-//     List<DynamicLabelList>& surfCells(wallCntInfo.getcClass().getSurfCells());
-
-//     // go through all surfCells and check if there is any surfCell whose face is a boundary face
-//     forAll (surfCells[Pstream::myProcNo()],sCellI)
-//     {
-//         label cCell(surfCells[Pstream::myProcNo()][sCellI]);
-//         if(cCell < nCells)
-//         {
-//             const labelList& cFaces = mesh.cells()[cCell];
-//             forAll (cFaces,faceI)
-//             {
-//                 if (!mesh.isInternalFace(cFaces[faceI]))
-//                 {
-//                     // get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
-//                     label facePatchId = mesh.boundaryMesh().whichPatch(cFaces[faceI]);
-//                     const polyPatch& cPatch = mesh.boundaryMesh()[facePatchId];
-//                     if (wallCntInfo.isContactPatch(cPatch.name()))
-//                     {
-//                         vector nVec(-mesh.Sf()[cFaces[faceI]]/mag(mesh.Sf()[cFaces[faceI]]));
-
-//                         if(!case3D)
-//                         {
-//                             if(mag(emptyDir - nVec) < 1e-4 || mag(emptyDir - (-1)*nVec) < 1e-4)
-//                             {
-//                                 continue;
-//                             }
-//                         }
-
-//                         bool cont = false;
-//                         forAll(contactFaces,list)
-//                         {
-//                             forAll(contactFaces[list],face)
-//                             {
-//                                 if(contactFaces[list][face].first() == cFaces[faceI])
-//                                 {
-//                                     cont = true;
-//                                     break;
-//                                 }
-//                             }
-//                             if(cont)
-//                                 break;
-//                         }
-//                         if(cont)
-//                             continue;
-
-//                         face currentFace = mesh.faces()[cFaces[faceI]];
-//                         pointHit pointH = currentFace.nearestPoint(cCenter,mesh.points());
-//                         if(mag(pointH.rawPoint() - cCenter) < cRadius)
-//                         {
-//                             DynamicList<Tuple2<label,string>> newContactFaces(
-//                                 1,
-//                                 Tuple2<label,string>(cFaces[faceI], cPatch.name())
-//                             );
-
-//                             labelList nextToCheck(1,cFaces[faceI]);
-
-//                             while (nextToCheck.size() > 0)
-//                             {
-//                                 DynamicLabelList auxToCheck;
-
-//                                 forAll (nextToCheck,faceToCheck)
-//                                 {
-//                                     DynamicList<Tuple2<label,string>> newfaces =
-//                                     getContactFacesSphere(
-//                                                 mesh,
-//                                                 wallCntInfo,
-//                                                 nextToCheck[faceToCheck],
-//                                                 newContactFaces
-//                                     );
-
-//                                     forAll(newfaces,face)
-//                                     {
-//                                         newContactFaces.append(newfaces[face]);
-//                                         auxToCheck.append(newfaces[face].first());
-//                                     }
-//                                 }
-//                                 nextToCheck = auxToCheck;
-//                             }
-
-//                             contactFaces.append(newContactFaces);
-//                         }
-//                     }
-//                 }
-//             }
-//         }
-//     }
-
-//     bool inContact = false;
-
-//     forAll(contactFaces,list)
-//     {
-//         bool firstFace = true;
-//         point bPoint = vector::zero;
-//         forAll(contactFaces[list],faceI)
-//         {
-//             face currentFace = mesh.faces()[contactFaces[list][faceI].first()];
-//             pointHit pointH = currentFace.nearestPoint(cCenter,mesh.points());
-//             if(mag(pointH.rawPoint() - cCenter) < mag(bPoint - cCenter) || firstFace)
-//             {
-//                 bPoint = pointH.rawPoint();
-//                 firstFace = false;
-//             }
-//         }
-
-//         vector nVec = (cCenter - bPoint)/mag(cCenter - bPoint);
-
-//         wallContactVars& wallCntVars(wallCntInfo.getWallCntVars(
-//             bPoint,
-//             nVec,
-//             deltaT
-//         ));
-
-//         wallCntVars.contactCenter_ = bPoint;
-//         wallCntVars.contactNormal_ = nVec;
-//         wallCntVars.contactArea_ = sphereContactArea
-//         (
-//             mesh,
-//             wallCntInfo.getcClass(),
-//             wallCntInfo.getcVars(),
-//             nVec,
-//             bPoint
-//         );
-//         wallCntVars.contactVolume_ = getInterVolume_Sphere
-//         (
-//             mesh,
-//             wallCntInfo.getcClass(),
-//             wallCntInfo.getcVars(),
-//             nVec,
-//             bPoint
-//         );
-
-//         wallCntVars.setMeanCntPars
-//         (
-//             mesh,
-//             contactFaces[list],
-//             wallCntInfo.getWallMeanPars()
-//         );
-
-//         if(wallCntVars.contactVolume_ > 0)
-//         {
-//             inContact = true;
-//         }
-//     }
-
-//     reduce(inContact, orOp<bool>());
-
-//     if(inContact)
-//     {
-//         wallCntInfo.getcClass().setWallContact(true);
-//         wallCntInfo.getcClass().inContactWithStatic(true);
-//     }
-// }
-// //---------------------------------------------------------------------------//
-// DynamicList<Tuple2<label,string>> getContactFacesSphere
-// (
-//     const fvMesh&   mesh,
-//     wallContactInfo& wallCntInfo,
-//     label faceLabel,
-//     DynamicList<Tuple2<label,string>>& checkedFaces
-// )
-// {
-//     scalar cRadius(wallCntInfo.getcClass().getGeomModel().getDC() / 2);
-//     vector cCenter(wallCntInfo.getcClass().getGeomModel().getCoM());
-
-//     DynamicList<Tuple2<label,string>> facesReturnList;
-
-//     labelList faceEdges = mesh.faceEdges()[faceLabel];
-//     forAll(faceEdges,edge)
-//     {
-//         labelList edgeFaces = mesh.edgeFaces()[faceEdges[edge]];
-//         forAll(edgeFaces,faceI)
-//         {
-//             if (!mesh.isInternalFace(edgeFaces[faceI]))
-//             {
-//                 // get reference to the patch which is in contact with IB.
-//                 // There is contact only if the patch is marked as a wall
-//                 label facePatchId = mesh.boundaryMesh().whichPatch(edgeFaces[faceI]);
-//                 const polyPatch& cPatch = mesh.boundaryMesh()[facePatchId];
-//                 if (wallCntInfo.isContactPatch(cPatch.name()))
-//                 {
-//                     vector nVec(-mesh.Sf()[edgeFaces[faceI]]/mag(mesh.Sf()[edgeFaces[faceI]]));
-
-//                     if(!case3D)
-//                     {
-//                         if(mag(emptyDir - nVec) < 1e-4 || mag(emptyDir - (-1)*nVec) < 1e-4)
-//                         {
-//                             continue;
-//                         }
-//                     }
-
-//                     bool cont = false;
-
-//                     forAll(checkedFaces,face)
-//                     {
-//                         if(checkedFaces[face].first() == edgeFaces[faceI])
-//                         {
-//                             cont = true;
-//                             break;
-//                         }
-//                     }
-
-//                     if(cont)
-//                     {
-//                         continue;
-//                     }
-
-//                     face currentFace = mesh.faces()[edgeFaces[faceI]];
-//                     pointHit pointH = currentFace.nearestPoint(cCenter,mesh.points());
-//                     if(mag(pointH.rawPoint() - cCenter) < cRadius)
-//                     {
-//                         facesReturnList.append(Tuple2<label,string>(
-//                             edgeFaces[faceI],
-//                             cPatch.name()
-//                         ));
-//                     }
-//                 }
-//             }
-//         }
-//     }
-
-//     return facesReturnList;
-// }
-// //---------------------------------------------------------------------------//
 void getWallContactVars_Cluster(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo,
@@ -743,6 +437,8 @@ void getWallContactVars_Cluster(
             wallCntInfo.getcVars()
         );
 
+        cWallCntI.getContactPatches() = wallCntInfo.getContactPatches();
+
         getWallContactVars(
             mesh,
             cWallCntI,
@@ -751,7 +447,7 @@ void getWallContactVars_Cluster(
         );
     }
 }
-// //---------------------------------------------------------------------------//
+//---------------------------------------------------------------------------//
 bool solveWallContact
 (
     const fvMesh&   mesh,
@@ -834,79 +530,63 @@ bool solveWallContact
     return true;
 }
 // //---------------------------------------------------------------------------//
-// scalar getInterVolume_ArbShape(
-//     const fvMesh&   mesh,
-//     ibContactClass& cClass,
-//     ibContactVars& cVars,
-//     vector nVec,
-//     vector center
-// )
-// {
-//     return (cVars.M0_-cVars.M_)/(cVars.rhoS_.value() + SMALL);
-// }
-// //---------------------------------------------------------------------------//
-// scalar getInterVolume_Sphere(
-//     const fvMesh&   mesh,
-//     ibContactClass& cClass,
-//     ibContactVars& cVars,
-//     vector nVec,
-//     vector center
-// )
-// {
-//     scalar cRadius(cClass.getGeomModel().getDC() / 2);
-//     vector cCenter(cClass.getGeomModel().getCoM());
+scalar getInterVolume_Sphere(
+    const fvMesh&   mesh,
+    ibContactClass& cClass,
+    ibContactVars& cVars,
+    plane& cPlane
+)
+{
+    scalar cRadius(cClass.getGeomModel().getDC() / 2);
+    vector cCenter(cClass.getGeomModel().getCoM());
 
-//     plane contPlane(center, nVec);
-//     scalar dist = contPlane.distance(cCenter);
-//     scalar xH = cRadius - dist;
+    scalar dist = cPlane.distance(cCenter);
+    scalar xH = cRadius - dist;
 
-//     if(case3D)
-//     {
-//         return (Foam::constant::mathematical::pi*sqr(xH)*(3*cRadius - xH)) / 3;
-//     }
-//     else
-//     {
-//         boundBox meshBounds = mesh.bounds();
-//         scalar emptyLength = meshBounds.max()[emptyDim]
-//                             - meshBounds.min()[emptyDim];
+    if(case3D)
+    {
+        return (Foam::constant::mathematical::pi*sqr(xH)*(3*cRadius - xH)) / 3;
+    }
+    else
+    {
+        boundBox meshBounds = mesh.bounds();
+        scalar emptyLength = meshBounds.max()[emptyDim]
+                            - meshBounds.min()[emptyDim];
 
-//         scalar cCirSeg = sqr(cRadius)*acos((dist)/cRadius)
-//                          - (dist)*sqrt(sqr(cRadius) - sqr(dist));
-//         return cCirSeg*emptyLength;
-//     }
-// }
-// //---------------------------------------------------------------------------//
-// scalar sphereContactArea
-// (
-//     const fvMesh&   mesh,
-//     ibContactClass& cClass,
-//     ibContactVars& cVars,
-//     vector nVec,
-//     vector center
-// )
-// {
-//     scalar cRadius(cClass.getGeomModel().getDC() / 2);
-//     vector cCenter(cClass.getGeomModel().getCoM());
+        scalar cCirSeg = sqr(cRadius)*acos((dist)/cRadius)
+                         - (dist)*sqrt(sqr(cRadius) - sqr(dist));
+        return cCirSeg*emptyLength;
+    }
+}
+//---------------------------------------------------------------------------//
+scalar sphereContactArea
+(
+    const fvMesh&   mesh,
+    ibContactClass& cClass,
+    ibContactVars& cVars,
+    plane& cPlane
+)
+{
+    scalar cRadius(cClass.getGeomModel().getDC() / 2);
+    vector cCenter(cClass.getGeomModel().getCoM());
 
-//     plane contPlane(center, nVec);
+    scalar dist = cPlane.distance(cCenter);
+    scalar contactRad = sqrt(sqr(cRadius) - sqr(dist));
 
-//     scalar dist = contPlane.distance(cCenter);
-//     scalar contactRad = sqrt(sqr(cRadius) - sqr(dist));
+    if(case3D)
+    {
+        return Foam::constant::mathematical::pi*sqr(contactRad);
+    }
+    else
+    {
+        boundBox meshBounds = mesh.bounds();
+        scalar emptyLength = meshBounds.max()[emptyDim]
+                            - meshBounds.min()[emptyDim];
 
-//     if(case3D)
-//     {
-//         return Foam::constant::mathematical::pi*sqr(contactRad);
-//     }
-//     else
-//     {
-//         boundBox meshBounds = mesh.bounds();
-//         scalar emptyLength = meshBounds.max()[emptyDim]
-//                             - meshBounds.min()[emptyDim];
-
-//         return contactRad*emptyLength;
-//     }
-// }
-// //---------------------------------------------------------------------------//
+        return contactRad*emptyLength;
+    }
+}
+//---------------------------------------------------------------------------//
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace contactModel

@@ -798,7 +798,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 bodyId = ib;
             }
         }
-        InfoH << DEM_Info << "Max CoNum = " << maxCoNum << " at body " << bodyId << endl;
+        InfoH << basic_Info << "Max CoNum = " << maxCoNum << " at body " << bodyId << endl;
 
         pos += step;
 

@@ -111,7 +111,7 @@ boundBox wallContactInfo::constructBoundBox
     vector maxPoint = bodyBB.max();
 
     for(int i=0;i<3;i++)
-    {    
+    {
         minPoint[i] = floor(minPoint[i]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getCharCellSize();
         maxPoint[i] = ceil(maxPoint[i]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getCharCellSize();
     }
@@ -122,7 +122,7 @@ boundBox wallContactInfo::constructBoundBox
 void wallContactInfo::constructSM()
 {
     boundBox bodyBB = ibContactClass_.getGeomModel().getBounds();
-    
+
     boundBox BB = constructBoundBox(bodyBB);
 
     vector cellNVector = vector(
@@ -183,15 +183,15 @@ bool wallContactInfo::detectWallContact()
 
     return bBContact;
 
-}    
+}
 //---------------------------------------------------------------------------//
 void wallContactInfo::findContactAreas()
 {
     autoPtr<DynamicVectorList> contactSTLPoints(
         new DynamicVectorList);
 
-    // InfoH << DEM_Info <<" -- SM bbBoxIsInContact " << endl;        
-    // InfoH << DEM_Info <<" -- SM contactPatches_.size() "<< contactPatches_.size() << endl;        
+    // InfoH << DEM_Info <<" -- SM bbBoxIsInContact " << endl;
+    // InfoH << DEM_Info <<" -- SM contactPatches_.size() "<< contactPatches_.size() << endl;
     pointField bodyPoints = ibContactClass_.getGeomModel().getSTLBodyPoints();
     forAll(bodyPoints,bP)
     {
@@ -219,7 +219,7 @@ void wallContactInfo::findContactAreas()
             List<Tuple2<point,boundBox>> sMExportList;
             List<Tuple2<point,boundBox>> sMPlaneList;
             List<Tuple2<point,boundBox>> sMInternal;
-            
+
             boundBox cBbox;
             forAll(possibleSMContact[SC],item)
             {
@@ -241,7 +241,7 @@ void wallContactInfo::findContactAreas()
                         else
                         {
                             sMInternal.append(sMExport);
-                        }                    
+                        }
                         break;
                     }
                     else
@@ -267,7 +267,7 @@ void wallContactInfo::findContactAreas()
                 // InfoH << DEM_Info << "-- SM sCBBox "<< sCBBox << endl;
                 if(isPathechInSC[wP])
                 {
-                    
+
                     cBbox = boundBox(overallContactPoints,false);
                     boundBox planeBox = contactPlaneBBox(constructVMBox(cBbox,contactPatches_[wP]),contactPatches_[wP]);
                     // InfoH << DEM_Info << "-- SM cBbox "<< cBbox << endl;
@@ -308,16 +308,16 @@ void wallContactInfo::findContactAreas()
                     }
                     // InfoH << DEM_Info << "-- SM PlaneBox #2"<< planeBox << endl;
                     Tuple2<point,boundBox> sMPlane(planeBox.midpoint(),planeBox);
-                    sMPlaneList.append(sMPlane);                    
+                    sMPlaneList.append(sMPlane);
                 }
 
-            }                
+            }
             // InfoH << DEM_Info <<" -- SM planeBoxList.size() : " << sMPlaneList.size() << endl;
             // InfoH << DEM_Info <<" -- SM sMExportList.size() : " << sMExportList.size() << endl;
             // InfoH << DEM_Info <<" -- SM sMInternal.size()   : " << sMInternal.size() << endl;
             // InfoH << DEM_Info <<" -- SM emptyCells.size()   : " << emptyCells << endl;
             setNewSubContact(sMExportList,sMPlaneList,contactPatches,sMInternal,cBbox);
-        }               
+        }
     }
 }
 //---------------------------------------------------------------------------//
@@ -370,7 +370,7 @@ List<DynamicList<vector>> wallContactInfo::detectPossibleSMContact
         nextToCheck().append(contactElements()[0]);
         // nextToCheck().append(edgeFaceNeighbours(mesh,commonFaces[0]));
         while ((nextToCheck().size() > 0) and iterCount++ < iterMax)
-        {  	
+        {
             auxToCheck().clear();
             forAll(nextToCheck(),cE)
             {
@@ -385,7 +385,7 @@ List<DynamicList<vector>> wallContactInfo::detectPossibleSMContact
                     if(isInBody && isInMesh)
                     {
                         if(!allInMesh)
-                        {   
+                        {
                             subContactElements().append(nextToCheck()[cE]);
                             auxToCheck().append(SM_().faceNeighbourElements(nextToCheck()[cE]));
                             checkedOctreeFaces.insert(nextToCheck()[cE]);
@@ -394,7 +394,7 @@ List<DynamicList<vector>> wallContactInfo::detectPossibleSMContact
                                 SM_()[nextToCheck()[cE]].isInternal = allInBody;
                             }
                         }
-                    }                    
+                    }
                     if((isInBody && !isInMesh)|| SM_()[nextToCheck()[cE]].stlFound)
                     {
                         subContactElements().append(nextToCheck()[cE]);
@@ -431,7 +431,7 @@ List<DynamicList<vector>> wallContactInfo::detectPossibleSMContact
 }
 //---------------------------------------------------------------------------//
 boundBox wallContactInfo::getSCBBox
-(     
+(
     DynamicVectorList& subContactAreas
 )
 {
@@ -449,7 +449,7 @@ boundBox wallContactInfo::getSCBBox
 }
 //---------------------------------------------------------------------------//
 boundBox wallContactInfo::constructVMBox
-(     
+(
     boundBox& baseContactAreaBB,
     string& wallName
 )
@@ -481,7 +481,7 @@ vector wallContactInfo::getPlanePoint
     const vector& normalVector = wallPlaneInfo::getWallPlaneInfo()[wallName][0];
     const vector& centerPoint = wallPlaneInfo::getWallPlaneInfo()[wallName][1];
     //contactPlane Data
-    
+
     scalar fracI = normalVector & (centerPoint - pointInDomain);
     scalar fracII = magSqr(normalVector);
     // scalar fracI = normalVector[0]*(centerPoint[0]-pointInDomain[0])+
@@ -489,11 +489,11 @@ vector wallContactInfo::getPlanePoint
     //                 normalVector[2]*(centerPoint[2]-pointInDomain[2]);
     // scalar fracII = pow(normalVector[0],2) + pow(normalVector[1],2) + pow(normalVector[2],2);
 
-    return pointInDomain + (fracI/fracII)*normalVector;  
+    return pointInDomain + (fracI/fracII)*normalVector;
 }
 //---------------------------------------------------------------------------//
 void wallContactInfo::checkSMElement
-(     
+(
     vector& index,
     List<string> contactPatches
 )
@@ -507,7 +507,7 @@ void wallContactInfo::checkSMElement
         bool isMeshLocC(true);
         while(iC < contactPatches.size() and !SM_()[index].isMesh)
         {
-            
+
             isMeshLocC *= isInsidePlane(centroidPoint,contactPatches[iC]);
             iC++;
         }
@@ -517,7 +517,7 @@ void wallContactInfo::checkSMElement
         const List<vector> verticesLabels = SM_().elementVertexIndexies(index);
         forAll(verticesLabels, vL)
         {
-            iC = 0;       
+            iC = 0;
             if(SM_()(verticesLabels[vL]).toCheck)
             {
                 point vertexPoint = SM_()(verticesLabels[vL]).center;
@@ -541,7 +541,7 @@ void wallContactInfo::checkElement
     bool& inMesh,
     bool& inBody,
     bool& allInMesh,
-    bool& allInBody  
+    bool& allInBody
 )
 {
     bool inMeshLocal(false);
@@ -561,7 +561,7 @@ void wallContactInfo::checkElement
     const List<vector> verticesLabels = SM_().elementVertexIndexies(index);
 
     forAll(verticesLabels, vL)
-    {     
+    {
         inMeshLocal =  inMeshLocal || SM_()(verticesLabels[vL]).isMesh;
         allInMeshLocal *= SM_()(verticesLabels[vL]).isMesh;
         inBodyLocal =  inBodyLocal || SM_()(verticesLabels[vL]).isCBody;
@@ -571,12 +571,12 @@ void wallContactInfo::checkElement
             SM_()[index].initPoint = SM_()(verticesLabels[vL]).center;
             SM_()[index].initPointSet = true;
         }
-    }  
+    }
 
     inMesh = inMeshLocal;
     inBody = inBodyLocal;
     allInMesh = allInMeshLocal;
-    allInBody = allInBodyLocal; 
+    allInBody = allInBodyLocal;
 }
 //---------------------------------------------------------------------------//
 boundBox wallContactInfo::contactPlaneBBox
@@ -610,7 +610,7 @@ boundBox wallContactInfo::correctSMBBforWall
         }
         else
         {
-           newBB.append(elementBBPoints[bBP]); 
+           newBB.append(elementBBPoints[bBP]);
         }
     }
     return boundBox(newBB,false);
