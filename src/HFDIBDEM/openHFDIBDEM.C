@@ -715,14 +715,14 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 );
 
                 prtcInfo.clearData();
-                findSubContacts(
+                getContacts(
                     mesh_,
                     prtcInfo
                 );
 
-                prtcInfo.syncSubCList();
+                prtcInfo.syncContactList();
 
-                prtcInfo.registerSubContactList(contactList);
+                prtcInfo.registerContactList(contactList);
             }
         }
 

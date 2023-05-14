@@ -45,7 +45,7 @@ namespace contactModel
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 //---------------------------------------------------------------------------//
-void findSubContacts(
+void getContacts(
     const fvMesh&   mesh,
     prtContactInfo& prtcInfo
 )
@@ -56,7 +56,7 @@ void findSubContacts(
         prtcInfo.gettClass().getGeomModel().getcType() == sphere
         )
     {
-        findSubContacts_Sphere(prtcInfo);
+        prtcInfo.getContacts_Sphere();
     }
     else if (
         prtcInfo.getcClass().getGeomModel().getcType() == cluster
@@ -64,41 +64,26 @@ void findSubContacts(
         prtcInfo.gettClass().getGeomModel().getcType() == cluster
         )
     {
-        findSubContacts_Cluster(mesh, prtcInfo);
+        getContacts_Cluster(mesh, prtcInfo);
     }
     else
     {
-        findSubContacts_ArbShape(mesh, prtcInfo);
+        if (Pstream::myProcNo() == 0)
+        {
+            scalar ranCellVol = mesh.V()[0];
+            prtcInfo.getContacts_ArbShape(ranCellVol);
+        }
     }
 
-    prtcInfo.swapSubContactLists();
+    prtcInfo.swapContactLists();
 }
 //---------------------------------------------------------------------------//
-void findSubContacts_Sphere(
-    prtContactInfo& prtcInfo
-)
-{
-    prtcInfo.setSubContacts_Sphere();
-}
-//---------------------------------------------------------------------------//
-void findSubContacts_ArbShape(
+void getContacts_Cluster(
     const fvMesh&   mesh,
     prtContactInfo& prtcInfo
 )
 {
-    if (Pstream::myProcNo() == 0)
-    {
-        scalar ranCellVol = mesh.V()[0];
-        prtcInfo.setSubContacts_ArbShape(ranCellVol);
-    }
-}
-//---------------------------------------------------------------------------//
-void findSubContacts_Cluster(
-    const fvMesh&   mesh,
-    prtContactInfo& prtcInfo
-)
-{
-    prtcInfo.swapSubContactLists();
+    prtcInfo.swapContactLists();
     std::vector<std::shared_ptr<geomModel>> cBodies;
     std::vector<std::shared_ptr<geomModel>> tBodies;
 
@@ -154,7 +139,7 @@ void findSubContacts_Cluster(
                 prtcInfo.gettVars()
             );
 
-            findSubContacts(mesh, tmpPrtCntInfo);
+            getContacts(mesh, tmpPrtCntInfo);
 
             if (tmpPrtCntInfo.getPrtSCList().size() > 0)
             {
@@ -166,7 +151,7 @@ void findSubContacts_Cluster(
             }
         }
     }
-    prtcInfo.swapSubContactLists();
+    prtcInfo.swapContactLists();
 }
 //---------------------------------------------------------------------------//
 bool detectPrtPrtContact(

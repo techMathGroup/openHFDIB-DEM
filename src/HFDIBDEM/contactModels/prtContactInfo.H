@@ -78,8 +78,8 @@ class prtContactInfo
 
     Tuple2<label,label> contactPair_;
 
-    std::vector<std::shared_ptr<prtSubContactInfo>> subCList_;
-    std::vector<std::shared_ptr<prtSubContactInfo>> newSubCList_;
+    std::vector<std::shared_ptr<prtSubContactInfo>> contactList_;
+    std::vector<std::shared_ptr<prtSubContactInfo>> newContactList_;
 
     physicalProperties physicalProperties_;
 
@@ -137,25 +137,25 @@ class prtContactInfo
         return physicalProperties_.aMu_;
     }
 
-    void setSubContacts_Sphere();
+    void getContacts_Sphere();
 
-    void setSubContacts_ArbShape
+    void getContacts_ArbShape
     (
         scalar cellV
     );
 
-    void swapSubContactLists();
+    void swapContactLists();
 
     bool contactResolved();
 
     std::vector<std::shared_ptr<prtSubContactInfo>>& getPrtSCList()
     {
-        return subCList_;
+        return contactList_;
     }
 
-    void syncSubCList();
+    void syncContactList();
 
-    void registerSubContactList(DynamicList<prtSubContactInfo*>& contactList);
+    void registerContactList(DynamicList<prtSubContactInfo*>& contactList);
 
     void clearData();
 

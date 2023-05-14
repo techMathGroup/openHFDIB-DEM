@@ -103,13 +103,13 @@ bool addModel::isBodyInContact(PtrList<immersedBody>& immersedBodies)
                 immersedBodies[ibI].getContactVars()
             );
 
-            contactModel::findSubContacts(
+            contactModel::getContacts(
                 mesh_,
                 prtCInfo
             );
 
             DynamicList<prtSubContactInfo*> sCList;
-            prtCInfo.registerSubContactList(sCList);
+            prtCInfo.registerContactList(sCList);
             forAll(sCList,sC)
             {
                 prtSubContactInfo* prtSCInfo = sCList[sC];
