@@ -25,39 +25,64 @@ License
 InNamspace
     Foam
 
-Description
-    Enum to distinguish between different types of contacts
-
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
+#include "subContact.H"
 
-#ifndef contactType_H
-#define contactType_H
+using namespace Foam;
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+//---------------------------------------------------------------------------//
+subContact::subContact()
+{}
 
-namespace Foam
+subContact::~subContact()
+{}
+//---------------------------------------------------------------------------//
+void subContact::addSubVolume(std::shared_ptr<subVolume> sV)
 {
+    if (subVolumes_.size() == 0)
+    {
+        boundBox_ = *sV;
+    }
 
-/*---------------------------------------------------------------------------*\
-                         Enum contactType Declaration
-\*---------------------------------------------------------------------------*/
-enum contactType
+    subVolumes_.push_back(sV);
+    tmp<pointField> points = boundBox_.points();
+    points->append(sV->points());
+    boundBox_ = boundBox(points);
+    volume_ += sV->volume();
+}
+//---------------------------------------------------------------------------//
+bool subContact::canCombine(subVolume& sV)
 {
-    convex,
-    nonConvex,
-    cluster,
-    sphere
-};
+    if (!boundBox_.overlaps(sV))
+    {
+        return false;
+    }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+    for (auto& subVolume : subVolumes_)
+    {
+        if (subVolume->overlaps(sV))
+        {
+            return true;
+        }
+    }
 
-} // End namespace Foam
+    return false;
+}
+//---------------------------------------------------------------------------//
+DynamicList<point> subContact::getEdgePoints() const
+{
+    DynamicList<point> edgePoints;
+    for (auto& subVolume : subVolumes_)
+    {
+        if (subVolume->isEdge())
+        {
+            edgePoints.append(subVolume->midpoint());
+        }
+    }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
-
-// ************************************************************************* //
+    return edgePoints;
+}
+//---------------------------------------------------------------------------//

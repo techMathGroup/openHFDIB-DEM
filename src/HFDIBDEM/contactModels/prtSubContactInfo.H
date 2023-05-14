@@ -43,6 +43,7 @@ Contributors
 #include "fvCFD.H"
 
 #include "geomModel.H"
+#include "ibContactClass.H"
 #include "ibContactVars.H"
 #include "prtContactVars.H"
 #include "virtualMesh.H"
@@ -89,8 +90,6 @@ class prtSubContactInfo
 
     bool contactResolved_ = false;
 
-    vector getLVec(const point& CoM);
-
     vector getVeli(ibContactVars& cVars, vector& lVec);
 
     public:
@@ -121,8 +120,8 @@ class prtSubContactInfo
     }
 
     void evalVariables(
-        const point& cCoM,
-        const point& tCoM,
+        ibContactClass& cCoM,
+        ibContactClass& tCoM,
         ibContactVars& cVars,
         ibContactVars& tVars
     );

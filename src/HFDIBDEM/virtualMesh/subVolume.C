@@ -61,7 +61,8 @@ subVolume::subVolume
 treeBoundBox(bb),
 parentSV_(parentSV),
 cVolumeInfo_(cVolumeType),
-tVolumeInfo_(tVolumeType)
+tVolumeInfo_(tVolumeType),
+isEdge_(false)
 {
 }
 
@@ -81,9 +82,9 @@ ibSubVolumeInfo& subVolume::tVolumeInfo()
 //---------------------------------------------------------------------------//
 List<subVolume>& subVolume::childSubVolumes()
 {
-    std::shared_ptr<subVolume> parentSV = std::make_shared<subVolume>(*this);
     if (childSubVolumes_.size() == 0)
     {
+        std::shared_ptr<subVolume> parentSV = std::make_shared<subVolume>(*this);
         for (direction octant = 0; octant < 8; octant++)
         {
             childSubVolumes_.append
@@ -100,6 +101,11 @@ List<subVolume>& subVolume::childSubVolumes()
     }
 
     return childSubVolumes_;
+}
+//---------------------------------------------------------------------------//
+bool subVolume::hasChildSubVolumes() const
+{
+    return childSubVolumes_.size() > 0;
 }
 //---------------------------------------------------------------------------//
 std::shared_ptr<subVolume>& subVolume::parentSV()
@@ -129,5 +135,15 @@ const ibSubVolumeInfo& subVolume::getVolumeInfo(bool cIb) const
     {
         return tVolumeInfo_;
     }
+}
+//---------------------------------------------------------------------------//
+void subVolume::setAsEdge()
+{
+    isEdge_ = true;
+}
+//---------------------------------------------------------------------------//
+bool subVolume::isEdge() const
+{
+    return isEdge_;
 }
 //---------------------------------------------------------------------------//

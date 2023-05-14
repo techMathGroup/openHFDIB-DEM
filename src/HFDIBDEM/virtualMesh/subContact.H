@@ -26,104 +26,68 @@ InNamspace
     contactModel
 
 Description
-    methods to solve particle-particle contact
+    cass storing subContact information
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef subVolume_H
-#define subVolume_H
+#ifndef subContact_H
+#define subContact_H
 
-#include "treeBoundBox.H"
-#include "volumeType.H"
+#include "subVolume.H"
 
 #include <memory>
+#include <vector>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-struct ibSubVolumeInfo
-{
-    ibSubVolumeInfo():
-        volumeType_(volumeType::unknown)
-    {}
-
-    ibSubVolumeInfo(volumeType vType)
-    {
-        switch(vType)
-        {
-            case volumeType::unknown:
-            case volumeType::mixed:
-                volumeType_ = volumeType::unknown;
-                break;
-            case volumeType::inside:
-                volumeType_ = volumeType::inside;
-                break;
-            case volumeType::outside:
-                volumeType_ = volumeType::outside;
-                break;
-        }
-    }
-
-    volumeType volumeType_;
-    autoPtr<labelList> shapesIn_;
-};
-
 /*---------------------------------------------------------------------------*\
-                        Class subVolume Declaration
+                        Class subContact Declaration
 \*---------------------------------------------------------------------------*/
-class subVolume : public treeBoundBox
+class subContact
 {
     private:
 
-    std::shared_ptr<subVolume> parentSV_;
-    List<subVolume> childSubVolumes_;
+    std::vector<std::shared_ptr<subVolume>> subVolumes_;
 
-    ibSubVolumeInfo cVolumeInfo_;
-    ibSubVolumeInfo tVolumeInfo_;
-
-    bool isEdge_;
+    boundBox boundBox_;
+    scalar volume_;
 
     public:
 
     // Constructors ------------------------------------------------
-    subVolume();
-
-    subVolume
-    (
-        const boundBox bb
-    );
-
-    subVolume
-    (
-        const boundBox bb,
-        const std::shared_ptr<subVolume> parentSV,
-        const volumeType cVolumeType,
-        const volumeType tVolumeType
-    );
+    subContact();
 
     // Destructors -------------------------------------------------
-    ~subVolume();
+    ~subContact();
 
     // Member Functions --------------------------------------------
 
-    ibSubVolumeInfo& cVolumeInfo();
-    ibSubVolumeInfo& tVolumeInfo();
+    void addSubVolume(std::shared_ptr<subVolume> sV);
 
-    List<subVolume>& childSubVolumes();
-    bool hasChildSubVolumes() const;
+    bool canCombine(subVolume& sV);
 
-    std::shared_ptr<subVolume>& parentSV();
+    const boundBox& getBounds() const
+    {
+        return boundBox_;
+    }
 
-    ibSubVolumeInfo& getVolumeInfo(bool cIb);
-    const ibSubVolumeInfo& getVolumeInfo(bool cIb) const;
+    scalar getVolume() const
+    {
+        return volume_;
+    }
 
-    void setAsEdge();
-    bool isEdge() const;
+    const std::vector<std::shared_ptr<subVolume>>& getSubVolumes() const
+    {
+        return subVolumes_;
+    }
+
+    DynamicList<point> getEdgePoints() const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

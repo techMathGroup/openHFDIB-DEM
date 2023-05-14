@@ -7,6 +7,7 @@ geomModels/shapeBased/sphereBody.C
 geomModels/clusterBased/clusterBody.C
 geomModels/clusterBased/periodicBody.C
 virtualMesh/bbMatrix.C
+virtualMesh/subContact.C
 virtualMesh/subVolume.C
 virtualMesh/virtualMesh.C
 virtualMesh/spectatorMesh.C

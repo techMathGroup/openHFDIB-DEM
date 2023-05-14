@@ -107,7 +107,7 @@ std::shared_ptr<prtSubContactInfo> prtContactInfo::matchSubContact
     Tuple2<label,label>& contactPair
 )
 {
-    for(auto sC : subCList_)
+    for(auto sC : contactList_)
     {
         if (!sC->getVMInfo())
         {
@@ -152,7 +152,7 @@ void prtContactInfo::limitBBox(boundBox& bbox)
     }
 }
 //---------------------------------------------------------------------------//
-void prtContactInfo::setSubContacts_Sphere()
+void prtContactInfo::getContacts_Sphere()
 {
     if
     (
@@ -164,12 +164,12 @@ void prtContactInfo::setSubContacts_Sphere()
         return;
     }
 
-    newSubCList_.emplace_back(std::make_shared<prtSubContactInfo>
+    newContactList_.emplace_back(std::make_shared<prtSubContactInfo>
         (contactPair_, physicalProperties_)
     );
 }
 //---------------------------------------------------------------------------//
-void prtContactInfo::setSubContacts_ArbShape
+void prtContactInfo::getContacts_ArbShape
 (
     scalar cellV
 )
@@ -190,47 +190,20 @@ void prtContactInfo::setSubContacts_ArbShape
     scalar subVolumeLength = charCellSize/virtualMeshLevel::getLevelOfDivision();
     scalar subVolumeV = pow(subVolumeLength,3);
 
-    newSubCList_.emplace_back(matchSubContact(subCbBox, physicalProperties_, contactPair_));
-    newSubCList_.back()->setVMInfo(subCbBox, subVolumeV);
+    newContactList_.emplace_back(matchSubContact(subCbBox, physicalProperties_, contactPair_));
+    newContactList_.back()->setVMInfo(subCbBox, subVolumeV);
     return;
-
-
-    // forAll (baseSubContactList, sC)
-    // {
-    //     scalar charCellSize = 0;
-    //     pointField subCPoints;
-    //     forAll (baseSubContactList[sC], cell)
-    //     {
-    //         label cellIter = baseSubContactList[sC][cell];
-    //         const pointField& pp = mesh.points();
-    //         const labelList& vertexLabels = mesh.cellPoints()[cellIter];
-    //         subCPoints.append(pointField(pp, vertexLabels));
-
-    //         charCellSize += pow(mesh.V()[cellIter],0.333333);
-    //     }
-    //     charCellSize /= baseSubContactList[sC].size();
-
-    //     boundBox subCbBox(subCPoints, false);
-    //     limitBBox(subCbBox);
-
-    //     scalar subVolumeLength = charCellSize/virtualMeshLevel::getLevelOfDivision();
-
-    //     scalar subVolumeV = pow(subVolumeLength,3);
-
-    //     newSubCList_.emplace_back(matchSubContact(subCbBox, physicalProperties_, contactPair_));
-    //     newSubCList_.back()->setVMInfo(subCbBox, subVolumeV);
-    // }
 }
 //---------------------------------------------------------------------------//
-void prtContactInfo::swapSubContactLists()
+void prtContactInfo::swapContactLists()
 {
-    subCList_.swap(newSubCList_);
+    contactList_.swap(newContactList_);
 
 }
 //---------------------------------------------------------------------------//
 bool prtContactInfo::contactResolved()
 {
-    for(auto sC : subCList_)
+    for(auto sC : contactList_)
     {
         if (sC->contactResolved())
         {
@@ -240,38 +213,38 @@ bool prtContactInfo::contactResolved()
     return false;
 }
 //---------------------------------------------------------------------------//
-void prtContactInfo::syncSubCList()
+void prtContactInfo::syncContactList()
 {
-    std::vector<std::shared_ptr<prtSubContactInfo>> syncedSubCList;
+    std::vector<std::shared_ptr<prtSubContactInfo>> syncedContactList;
     // Sync the sub-contact list going through processors
     for (label procI = 0; procI < Pstream::nProcs(); procI++)
     {
-        label numOfSubC = 0;
+        label numOfCnts = 0;
         if (procI == Pstream::myProcNo())
         {
-            numOfSubC = subCList_.size();
+            numOfCnts = contactList_.size();
         }
-        reduce(numOfSubC, sumOp<label>());
+        reduce(numOfCnts, sumOp<label>());
 
-        for (label i = 0; i < numOfSubC; i++)
+        for (label i = 0; i < numOfCnts; i++)
         {
             bool vmInfoValid = false;
             if (procI == Pstream::myProcNo())
             {
-                vmInfoValid = subCList_[i]->getVMInfo() ? true : false;
+                vmInfoValid = contactList_[i]->getVMInfo() ? true : false;
             }
             reduce(vmInfoValid, orOp<bool>());
 
             if (vmInfoValid)
             {
-                syncedSubCList.emplace_back(std::make_shared<prtSubContactInfo>
+                syncedContactList.emplace_back(std::make_shared<prtSubContactInfo>
                     (contactPair_, physicalProperties_)
                 );
 
                 virtualMeshInfo vmInfoToSync;
                 if (procI == Pstream::myProcNo())
                 {
-                    vmInfoToSync = virtualMeshInfo(*(subCList_[i]->getVMInfo()));
+                    vmInfoToSync = virtualMeshInfo(*(contactList_[i]->getVMInfo()));
                 }
                 reduce(vmInfoToSync.sV.min(), sumOp<vector>());
                 reduce(vmInfoToSync.sV.max(), sumOp<vector>());
@@ -284,23 +257,23 @@ void prtContactInfo::syncSubCList()
                 }
                 reduce(startPointToReduce, sumOp<vector>());
 
-                syncedSubCList.back()->setVMInfo(vmInfoToSync);
+                syncedContactList.back()->setVMInfo(vmInfoToSync);
             }
             else if (procI == 0)
             {
-                syncedSubCList.emplace_back(std::make_shared<prtSubContactInfo>
+                syncedContactList.emplace_back(std::make_shared<prtSubContactInfo>
                     (contactPair_, physicalProperties_)
                 );
             }
         }
     }
 
-    subCList_.swap(syncedSubCList);
+    contactList_.swap(syncedContactList);
 }
 //---------------------------------------------------------------------------//
-void prtContactInfo::registerSubContactList(DynamicList<prtSubContactInfo*>& contactList)
+void prtContactInfo::registerContactList(DynamicList<prtSubContactInfo*>& contactList)
 {
-    for(auto sC : subCList_)
+    for(auto sC : contactList_)
     {
         contactList.append(sC.get());
     }
@@ -308,8 +281,8 @@ void prtContactInfo::registerSubContactList(DynamicList<prtSubContactInfo*>& con
 //---------------------------------------------------------------------------//
 void prtContactInfo::clearData()
 {
-    newSubCList_.clear();
-    for(auto sC : subCList_)
+    newContactList_.clear();
+    for(auto sC : contactList_)
     {
         sC->clearOutForces();
         sC->setResolvedContact(false);
@@ -318,7 +291,7 @@ void prtContactInfo::clearData()
 //---------------------------------------------------------------------------//
 void prtContactInfo::syncData()
 {
-    for(auto sC : subCList_)
+    for(auto sC : contactList_)
     {
         sC->syncData();
     }
