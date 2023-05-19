@@ -29,15 +29,15 @@ Description
     class for storage of contact variables
 
 SourceFiles
-    wallContactInfo.C
+    wallSubContactInfo.C
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef wallContactInfo_H
-#define wallContactInfo_H
+#ifndef wallSubContactInfo_H
+#define wallSubContactInfo_H
 
 #include "dictionary.H"
 #include "fvCFD.H"
@@ -51,7 +51,7 @@ Contributors
 #include "forces.H"
 #include "spectatorMesh.H"
 #include "virtualMeshWall.H"
-#include "wallSubContactInfo.H"
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -59,10 +59,10 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class wallContactInfo Declaration
+                      Class wallSubContactInfo Declaration
 \*---------------------------------------------------------------------------*/
 
-class wallContactInfo
+class wallSubContactInfo
 {
     private:
 
@@ -70,165 +70,165 @@ class wallContactInfo
     typedef DynamicList<scalar> DynamicScalarList;
     typedef DynamicList<vector> DynamicVectorList;
     typedef DynamicList<point> DynamicPointList;
-    typedef HashSet<vector,Hash<vector>> vectorHashSet;
+    // list of collision pathes 
+    List<string> contactPatches_;
 
-    ibContactClass& ibContactClass_;
-    ibContactVars& ibContactVars_;
-
-    label bodyId_;
+    //bool list for internal SM elements
+    List<Tuple2<point,boundBox>> internalBBData_;
 
     // Mean model parameters
     HashTable<physicalProperties,string,Hash<string>> wallMeanPars_;
 
-    std::vector<std::shared_ptr<wallSubContactInfo>> subCList_;
+    boundBox BB_;
+
+    label bodyId_;
+
+    wallContactVars wallCntvar_;
 
     scalar reduceM_;    // Reduced mass
 
     forces outForce_; // Out variable for force
 
-    autoPtr<spectatorMesh> SM_;
+    List<autoPtr<virtualMeshWallInfo>> vmWInfoList_; 
 
-    autoPtr<virtualMeshWallInfo> vmwInfo_;
+    List<autoPtr<virtualMeshWallInfo>> vmPlaneInfoList_;
 
-    List<string> contactPatches_;
+    bool contactResolved_ = false;
 
     public:
 
     // Constructors ------------------------------------------------
-    wallContactInfo
+    wallSubContactInfo
     (
-        ibContactClass& cClass,
-        ibContactVars& cVars
+    List<Tuple2<point,boundBox>> contactBBData,
+    List<Tuple2<point,boundBox>> planeBBData,
+    List<string> contactPatches,
+    List<Tuple2<point,boundBox>> internalBBData,
+    HashTable<physicalProperties,string,Hash<string>> wallMeanPars,
+    boundBox BB,
+    label bodyId
     );
 
     // Destructors -------------------------------------------------
-    ~wallContactInfo();
+    ~wallSubContactInfo();
+
+    label getVMContactSize()
+    {
+        return vmWInfoList_.size();
+    }
+    
+    label getVMPlaneSize()
+    {
+        return vmPlaneInfoList_.size();
+    }
+
+    autoPtr<virtualMeshWallInfo>& getVMContactInfo
+    (
+        label ID
+    );
+
+    autoPtr<virtualMeshWallInfo>& getVMPlaneInfo
+    (
+        label ID
+    );
+
+    wallContactVars& getWallCntVars()
+    {
+        return wallCntvar_;
+    }
+
+    void clearWallCntVars();
+
+    scalar getMu(wallContactVars& wallCntvar)
+    {
+        return wallCntvar.getMeanCntPar().aMu_;
+    }
+
+    vector getLVec
+    (
+        wallContactVars& wallCntvar,
+        ibContactClass ibCClass
+    );
+
+    vector getVeli
+    (
+        wallContactVars& wallCntvar,
+        ibContactVars& cVars
+    );
+
+    void evalVariables
+    (
+        wallContactVars& wallCntvar,
+        ibContactClass& ibCClass,
+        ibContactVars& cVars
+    );
+
+    vector getFNe(wallContactVars& wallCntvar);
+
+    vector getFA(wallContactVars& wallCntvar);
+
+    vector getFNd(wallContactVars& wallCntvar);
+
+    vector getFt(wallContactVars& wallCntvar, scalar deltaT);
+
+    forces& getOutForce()
+    {
+        return outForce_;
+    }
+
+    void setResolvedContact(bool resolved)
+    {
+        contactResolved_ = resolved;
+    }
+
+    bool getContactResolved()
+    {
+        return contactResolved_;
+    }
+
+    bool isContactPatch(string patchName)
+    {
+        return wallMeanPars_.found(patchName);
+    }
 
     HashTable<physicalProperties,string,Hash<string>>& getWallMeanPars()
     {
         return wallMeanPars_;
     }
 
-    ibContactClass& getcClass()
+    List<autoPtr<virtualMeshWallInfo>>& getVMContactInfo()
     {
-        return ibContactClass_;
+        return vmWInfoList_;
     }
 
-    ibContactVars& getcVars()
+    List<autoPtr<virtualMeshWallInfo>>& getVMPlaneInfo()
     {
-        return ibContactVars_;
+        return vmPlaneInfoList_;
     }
 
-    label getBodyId()
+    const List<Tuple2<point,boundBox>>& getInternalElements()
     {
-        return bodyId_;
+        return internalBBData_;
     }
 
-    boundBox constructBoundBox
-    (
-        boundBox& bodyBB
-    );
-
-    void constructSM();
-
-    bool isInsidePlane
-    (
-        vector checkedPoint,
-        string wallName
-    );
-
-    bool detectWallContact();
-
-    void findContactAreas();
-
-    List<DynamicList<vector>> detectPossibleSMContact
-    (
-        DynamicVectorList& contactPoints,
-        List<string>& contactPatches
-    );
-
-    boundBox getSCBBox
-    (
-        DynamicVectorList& subContactAreas
-    );
-
-    boundBox constructVMBox
-    (
-        boundBox& baseContactAreaBB,
-        string& wallName
-    );
-
-    vector getPlanePoint
-    (
-        vector pointInDomain,
-        string wallName
-    );
-
-    void checkSMElement
-    (
-        vector& index,
-        List<string> contactPatches
-    );
-
-    void checkElement
-    (
-        vector& index,
-        bool& inMesh,
-        bool& inBody,
-        bool& allInMesh,
-        bool& allInBody
-    );
-
-    boundBox contactPlaneBBox
-    (
-        boundBox contactBoundBox,
-        string wallName
-    );
-
-    boundBox correctSMBBforWall
-    (
-        boundBox bB,
-        string wallName
-    );
-
-    void recoredResults
-    (
-        DynamicList<vector> contactPoints,
-        DynamicList<vector> surfaceSMCells,
-        DynamicList<vector> internalSMCells,
-        label SCID,
-        scalar time
-    );
-
-    void clearOldContact();
-
-    void setNewSubContact(
-        const List<Tuple2<point,boundBox>>& contactBBData,
-        const List<Tuple2<point,boundBox>>& planeBBData,
-        const List<string>& contactPatches,
-        const List<Tuple2<point,boundBox>>& isInternal,
-        boundBox BB
-    );
-
-    std::vector<std::shared_ptr<wallSubContactInfo>>& getWallSCList()
-    {
-        return subCList_;
-    }
-
-    void registerSubContactList(DynamicList<wallSubContactInfo*>& contactList);
-
-    List<string>& getContactPatches()
+    const List<string>& getContactPatches()
     {
         return contactPatches_;
     }
 
-    // void addSCToEnd
-    // (
-    //     std::vector<std::shared_ptr<wallSubContactInfo>>& sCW
-    // )
-    // {
-    //     subCList_.push_back(sCW);
-    // }
+    void syncData();
+
+    void syncContactResolve();
+
+    label& getBodyId()
+    {
+        return bodyId_;
+    }
+
+    boundBox& getsWCBB()
+    {
+        return BB_;
+    }
 
 };
 

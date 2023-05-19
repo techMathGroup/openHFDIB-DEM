@@ -29,89 +29,29 @@ Description
     methods to solve particle-particle contact
 
 SourceFiles
-    virtualMesh.C
+    wallContactInfo.C
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef virtualMesh_H
-#define virtualMesh_H
+#ifndef spectatorMesh_H
+#define spectatorMesh_H
 
 #include "dictionary.H"
 #include "fvCFD.H"
-#include "geomModel.H"
-#include "clockTime.H"
-#include "subVolume.H"
-
-
-// #include "fvMesh.H"
-
+#include "ibContactClass.H"
+#include "sMProperties.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-struct virtualMeshInfo
-{
-    virtualMeshInfo():
-    sV(boundBox()),
-    subVolumeV(0)
-    {}
-
-    virtualMeshInfo(const virtualMeshInfo& vMeshInfo):
-    sV(vMeshInfo.sV),
-    subVolumeV(vMeshInfo.subVolumeV)
-    {
-        if (vMeshInfo.startingPoint.valid())
-        {
-            startingPoint.set(new point(vMeshInfo.startingPoint()));
-        }
-    }
-
-    virtualMeshInfo(
-        boundBox& bBox,
-        scalar subVolumeV):
-    sV(bBox),
-    subVolumeV(subVolumeV)
-    {}
-
-    void operator= (const virtualMeshInfo& vMeshInfo)
-    {
-        sV = vMeshInfo.sV;
-        subVolumeV = vMeshInfo.subVolumeV;
-
-        if (vMeshInfo.startingPoint.valid())
-        {
-            startingPoint.reset(new point(vMeshInfo.startingPoint()));
-        }
-    }
-
-    const point& getStartingPoint()
-    {
-        if (!startingPoint.valid())
-        {
-            startingPoint.set(new point(sV.midpoint()));
-        }
-
-        return startingPoint();
-    }
-
-    subVolume& getSubVolume()
-    {
-        return sV;
-    }
-
-    subVolume sV;
-    scalar subVolumeV;
-    autoPtr<point> startingPoint;
-};
-
 /*---------------------------------------------------------------------------*\
-                        Class virtualMesh Declaration
+                        Class ibContactClass Declaration
 \*---------------------------------------------------------------------------*/
-class virtualMesh
+class spectatorMesh
 {
     private:
 
@@ -119,64 +59,93 @@ class virtualMesh
     typedef DynamicList<scalar> DynamicScalarList;
     typedef DynamicList<vector> DynamicVectorList;
     typedef DynamicList<point> DynamicPointList;
-    typedef HashSet<vector,Hash<vector>> vectorHashSet;
-
-    geomModel& cGeomModel_;
-    geomModel& tGeomModel_;
-
-    virtualMeshInfo& vMeshInfo_;
-
-    point contactCenter_;
-    DynamicPointList edgeSubVolumesPoints_;
 
     public:
+    
+    const vector matrixSize_;
+    const boundBox bBox_;
+    const scalar charCellSize_;
 
-
+    List<List<List<autoPtr<sMProperties>>>> centroidMatrix_;
+    List<List<List<autoPtr<sMProperties>>>> vertexMatrix_;
     // Constructors ------------------------------------------------
 
-    virtualMesh
+    spectatorMesh
     (
-        virtualMeshInfo& vMeshInfo,
-        geomModel& cGeomModel_,
-        geomModel& tGeomModel_
+    const vector matrixSize,
+    const boundBox bBox,
+    const scalar charCellSize
     );
-
 
     // Destructors -------------------------------------------------
-    ~virtualMesh();
+    ~spectatorMesh();
 
-    bool detectFirstContactPoint();
-
-    // Get contact subVolume
-    bool detectFirstVolumeInContact
+//-----------------------------operator-------------------------------//
+    sMProperties& operator[](const vector& sVI)
+    {
+        if (!centroidMatrix_[sVI[0]][sVI[1]][sVI[2]].valid())
+        {
+            centroidMatrix_[sVI[0]][sVI[1]][sVI[2]].set(
+                new sMProperties(getCentroidPoint(sVI))
+            );
+        }
+        return centroidMatrix_[sVI[0]][sVI[1]][sVI[2]]();
+    }
+//-----------------------------operator-------------------------------// 
+   sMProperties& operator()(const vector& sVI)
+    {
+        if (!vertexMatrix_[sVI[0]][sVI[1]][sVI[2]].valid())
+        {
+            vertexMatrix_[sVI[0]][sVI[1]][sVI[2]].set(
+                new sMProperties(getVertexPoint(sVI))
+            );
+        }
+        return vertexMatrix_[sVI[0]][sVI[1]][sVI[2]]();
+    }
+//-----------------------------operator-------------------------------//
+//-----------------------------Func-------------------------------//
+    point getCentroidPoint
     (
-        subVolume& sV,
-        bool& startPointFound
+        const vector& elementIndex
     );
 
-    scalar evaluateContact();
-
-    void inspectSubVolume(
-        subVolume& subVolume,
-        scalar& contactVolume,
-        vector& contactCenter,
-        DynamicPointList& edgePoints
+    point getVertexPoint
+    (
+        const point& elementIndex
     );
 
-    DynamicPointList& getEdgeSVPoints()
-    {
-        return edgeSubVolumesPoints_;
-    }
+    vector getSMCentroidIndex
+    (
+        const point& pointInDomain
+    );
 
-    point& getContactCenter()
-    {
-        vMeshInfo_.startingPoint() = contactCenter_;
-        return contactCenter_;
-    }
+    vector getSMVertexIndex
+    (
+        const point& pointInDomain
+    );
 
-    Tuple2<scalar,vector> get3DcontactNormalAndSurface();
+    List<vector> faceNeighbourElements
+    (
+        vector& elementIndex
+    );    
+
+    List<vector> elementVertexIndexies
+    (
+        vector& elementIndex
+    );
+
+    bool isPointInElementBB
+    (
+        point& pointToCheck,
+        vector& elementIndex
+    );
+
+    boundBox getElementBB
+    (
+        vector& elementIndex
+    );
+
 };
-
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

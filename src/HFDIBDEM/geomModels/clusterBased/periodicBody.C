@@ -45,16 +45,16 @@ void periodicBody::getReferencedLists
     surfLists.resize(ibGeomModelList.size());
     referenceCoM.resize(ibGeomModelList.size());
 
-    forAll(ibGeomModelList, ibI)
+    for(size_t ibI = 0; ibI < ibGeomModelList.size(); ++ibI)
     {
-        intLists[ibI] = 
-            ibGeomModelList[ibI].getInternalCellList()[Pstream::myProcNo()];
-        
-        surfLists[ibI] = 
-            ibGeomModelList[ibI].getSurfaceCellList()[Pstream::myProcNo()];
+        intLists[ibI] =
+            ibGeomModelList[ibI]->getInternalCellList()[Pstream::myProcNo()];
 
-        referenceCoM[ibI] = 
-            ibGeomModelList[ibI].getCoM();
+        surfLists[ibI] =
+            ibGeomModelList[ibI]->getSurfaceCellList()[Pstream::myProcNo()];
+
+        referenceCoM[ibI] =
+            ibGeomModelList[ibI]->getCoM();
     }
 }
 //---------------------------------------------------------------------------//
@@ -63,12 +63,9 @@ void periodicBody::bodyMovePoints
     vector translVec
 )
 {
-    forAll(ibGeomModelList, ibI)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        if(ibGeomModelList[ibI].getOwner() == Pstream::myProcNo())
-        {
-            ibGeomModelList[ibI].bodyMovePoints(translVec);
-        }
+        gModel->bodyMovePoints(translVec);
     }
 }
 //---------------------------------------------------------------------------//
@@ -77,9 +74,9 @@ void periodicBody::bodyScalePoints
     scalar scaleFac
 )
 {
-    forAll(ibGeomModelList, ibI)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        ibGeomModelList[ibI].bodyScalePoints(scaleFac);
+        gModel->bodyScalePoints(scaleFac);
     }
 }
 //---------------------------------------------------------------------------//
@@ -89,28 +86,25 @@ void periodicBody::bodyRotatePoints
     vector axisOfRot
 )
 {
-    forAll(ibGeomModelList, ibI)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        if(ibGeomModelList[ibI].getOwner() == Pstream::myProcNo())
-        {
-            ibGeomModelList[ibI].bodyRotatePoints(rotAngle, axisOfRot);
-        }
+        gModel->bodyRotatePoints(rotAngle, axisOfRot);
     }
 }
 //---------------------------------------------------------------------------//
 vector periodicBody::getCoM()
-{    
-    return ibGeomModelList[0].getCoM();
+{
+    return ibGeomModelList[0]->getCoM();
 }
 //---------------------------------------------------------------------------//
 scalar periodicBody::getDC()
 {
-    scalar dc = ibGeomModelList[0].getDC();
-    for(int i = 1; i < ibGeomModelList.size(); ++i)
+    scalar dc = ibGeomModelList[0]->getDC();
+    for(size_t ibI = 0; ibI < ibGeomModelList.size(); ++ibI)
     {
-        if(dc < ibGeomModelList[i].getDC())
+        if(dc < ibGeomModelList[ibI]->getDC())
         {
-            dc = ibGeomModelList[i].getDC();
+            dc = ibGeomModelList[ibI]->getDC();
         }
     }
     return dc;
@@ -118,23 +112,18 @@ scalar periodicBody::getDC()
 //---------------------------------------------------------------------------//
 void periodicBody::setOwner()
 {
-    forAll(ibGeomModelList, ibI)
-    {
-        ibGeomModelList[ibI].setOwner();
-    }
-
     HashTable<label, label, Hash<label>> frequency;
-    forAll(ibGeomModelList, ibI)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        label ownerI = ibGeomModelList[ibI].getOwner();
+        gModel->setOwner();
+
+        label ownerI = gModel->getOwner();
         if(!frequency.found(ownerI))
         {
-            frequency.insert(ownerI, 1);
+            frequency.insert(ownerI, 0);
         }
-        else
-        {
-            frequency[ownerI]++;
-        }
+
+        frequency[ownerI]++;
     }
 
     label maxFreq = 0;
@@ -158,7 +147,7 @@ label periodicBody::getOwner()
 //---------------------------------------------------------------------------//
 scalar& periodicBody::getM0()
 {
-    return ibGeomModelList[0].getM0();
+    return ibGeomModelList[0]->getM0();
 }
 //---------------------------------------------------------------------------//
 vector periodicBody::getLVec(const point& toPoint)
@@ -166,11 +155,11 @@ vector periodicBody::getLVec(const point& toPoint)
     List<point> closestPoints(ibGeomModelList.size());
     List<vector> closestNormals(ibGeomModelList.size());
 
-    forAll(ibGeomModelList, ibI)
+    for(size_t ibI = 0; ibI < ibGeomModelList.size(); ++ibI)
     {
-        ibGeomModelList[ibI].getClosestPointAndNormal(
+        ibGeomModelList[ibI]->getClosestPointAndNormal(
             toPoint,
-            (ibGeomModelList[ibI].getCoM() - toPoint),
+            (ibGeomModelList[ibI]->getCoM() - toPoint),
             closestPoints[ibI],
             closestNormals[ibI]
         );
@@ -181,7 +170,7 @@ vector periodicBody::getLVec(const point& toPoint)
 
     for(int i = 1; i < closestPoints.size(); ++i)
     {
-        if(mag(toPoint - closestPoint) 
+        if(mag(toPoint - closestPoint)
             > mag(toPoint - closestPoints[i]))
         {
             closestPoint = closestPoints[i];
@@ -189,37 +178,35 @@ vector periodicBody::getLVec(const point& toPoint)
         }
     }
 
-    return toPoint - ibGeomModelList[cGModel].getCoM();
+    return toPoint - ibGeomModelList[cGModel]->getCoM();
 }
 //---------------------------------------------------------------------------//
 bool periodicBody::shouldBeUnclustered()
 {
     int remBodies = 0;
-    forAll(ibGeomModelList, ibI)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        if(ibGeomModelList[ibI].getM() > 0)
+        if(gModel->getM() > 0)
         {
             ++remBodies;
         }
     }
 
-    if(remBodies == 1)
-    {
-        return true;
-    }
-    return false;
+    return remBodies == 1;
 }
 //---------------------------------------------------------------------------//
-autoPtr<geomModel> periodicBody::getRemGeomModel()
+std::shared_ptr<geomModel> periodicBody::getRemGeomModel()
 {
-    forAll(ibGeomModelList, ibI)
-    {
-        if(ibGeomModelList[ibI].getM() > 0)
-        {
-            return ibGeomModelList.set(ibI, nullptr);
-        }
-    }
+    auto iter = find_if(ibGeomModelList.begin(), ibGeomModelList.end(),
+        [] (const std::shared_ptr<geomModel>& gP) { return gP->getM() > 0; } );
 
-    return ibGeomModelList.set(0, nullptr);
+    if (iter != ibGeomModelList.end())
+    {
+        return *iter;
+    }
+    else
+    {
+        return ibGeomModelList[0];
+    }
 }
 //---------------------------------------------------------------------------//

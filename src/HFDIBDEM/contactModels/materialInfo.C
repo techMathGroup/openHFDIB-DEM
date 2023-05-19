@@ -52,6 +52,18 @@ mu_(mu),
 adhN_(adhN)
 {
 }
+
+materialInfo::materialInfo(const materialInfo& mi)
+:
+material_(mi.material_),
+Y_(mi.Y_),
+nu_(mi.nu_),
+gamma_(mi.gamma_),
+mu_(mi.mu_),
+adhN_(mi.adhN_)
+{
+}
+
 materialInfo::~materialInfo()
 {
 }

@@ -64,39 +64,14 @@ namespace contactModel
     typedef DynamicList<vector> DynamicVectorList;
     typedef DynamicList<point>  DynamicPointList;
 
-    void findSubContacts(
+    void getContacts(
         const fvMesh&   mesh,
         prtContactInfo& prtcInfo
     );
 
-    void findSubContacts_Sphere(
-        prtContactInfo& prtcInfo
-    );
-
-    void findSubContacts_Cluster(
+    void getContacts_Cluster(
         const fvMesh&   mesh,
         prtContactInfo& prtcInfo
-    );
-
-    void findSubContacts_ArbShape(
-        const fvMesh&   mesh,
-        prtContactInfo& prtcInfo
-    );
-
-    List<DynamicList<label>> detectContactCells
-    (
-        const fvMesh&   mesh,
-        geomModel& cGeomModel,
-        geomModel& tGeomModel,
-        DynamicLabelList & commonCells
-    );
-
-    bool isCellContactCell
-    (
-        const fvMesh&   mesh,
-        geomModel& cGeomModel,
-        geomModel& tGeomModel,
-        label cellId
     );
 
     bool detectPrtPrtContact
@@ -107,7 +82,7 @@ namespace contactModel
         prtSubContactInfo& subCInfo
     );
 
-    void findSubContacts_ArbShape(
+    void getContacts_ArbShape(
         const fvMesh&   mesh,
         prtContactInfo& prtcInfo
     );

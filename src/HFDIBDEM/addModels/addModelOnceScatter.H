@@ -127,7 +127,7 @@ class addModelOnceScatter
         const dictionary& addModelDict,
         const Foam::fvMesh& mesh,
         const bool startTime0,
-        geomModel* bodyGeomModel,
+        std::unique_ptr<geomModel> bodyGeomModel,
         List<labelList>& cellPoints
     );
 
@@ -143,25 +143,16 @@ class addModelOnceScatter
 
     bool shouldAddBody(const volScalarField& body);
 
-    geomModel* addBody(
+    std::shared_ptr<geomModel> addBody(
         const volScalarField& body,
-        PtrList<immersedBody>& immersedBodies        
-        );
+        PtrList<immersedBody>& immersedBodies
+    );
 
 	scalar returnRandomAngle();
 
 	scalar returnRandomScale();
 
     vector returnRandomRotationAxis();
-
-	vector computeCoM(const triSurfaceMesh& bodySurfMesh);
-
-	bool isBodyInBoundBox
-    (
-        vector minBound_,
-        vector maxBound_,
-        const triSurfaceMesh& bodySurfMesh
-    );
 
 	void initializeCellZone();
 

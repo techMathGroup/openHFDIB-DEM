@@ -104,7 +104,7 @@ namespace Foam
         interpolationInfo* createIntpInfo
         (
             const Foam::fvMesh& mesh,
-            autoPtr<geomModel>& gModel
+            std::shared_ptr<geomModel>& gModel
         ) override
         {
             return new lineIntInfo

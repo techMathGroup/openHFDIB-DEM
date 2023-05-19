@@ -38,11 +38,11 @@ addModelRepeatSamePosition::addModelRepeatSamePosition
 (
     const dictionary& addModelDict,
     const Foam::fvMesh& mesh,
-    geomModel* bodyGeomModel,
+    std::unique_ptr<geomModel> bodyGeomModel,
     List<labelList>& cellPoints
 )
 :
-addModel(mesh, bodyGeomModel, cellPoints),
+addModel(mesh, std::move(bodyGeomModel), cellPoints),
 addModelDict_(addModelDict),
 addMode_(word(addModelDict_.lookup("addModel"))),
 bodyAdded_(false),
@@ -83,10 +83,10 @@ bool addModelRepeatSamePosition::shouldAddBody(const volScalarField& body)
     return (tmLevelOk and useNTimes_ > 0 and addedOnTimeLevel_ == 0);
 }
 
-geomModel* addModelRepeatSamePosition::addBody
+std::shared_ptr<geomModel> addModelRepeatSamePosition::addBody
 (
     const volScalarField& body,
-    PtrList<immersedBody>& immersedBodies   
+    PtrList<immersedBody>& immersedBodies
 )
 {
     volScalarField helpBodyField_ = body;
@@ -107,5 +107,5 @@ geomModel* addModelRepeatSamePosition::addBody
     InfoH << addModel_Info << "-- addModelMessage-- "
         << "will try to use the body " << useNTimes_ << " more times" << endl;
 
-    return geomModel_->getGeomModel();
+    return geomModel_->getCopy();
 }

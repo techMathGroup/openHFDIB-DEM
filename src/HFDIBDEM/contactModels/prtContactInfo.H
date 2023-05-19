@@ -48,9 +48,6 @@ Contributors
 #include "prtSubContactInfo.H"
 #include "physicalProperties.H"
 
-#include <vector>
-#include <memory>
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -81,8 +78,8 @@ class prtContactInfo
 
     Tuple2<label,label> contactPair_;
 
-    std::vector<std::shared_ptr<prtSubContactInfo>> subCList_;
-    std::vector<std::shared_ptr<prtSubContactInfo>> newSubCList_;
+    std::vector<std::shared_ptr<prtSubContactInfo>> contactList_;
+    std::vector<std::shared_ptr<prtSubContactInfo>> newContactList_;
 
     physicalProperties physicalProperties_;
 
@@ -92,6 +89,8 @@ class prtContactInfo
         physicalProperties& physicalProperties,
         Tuple2<label,label>& contactPair
     );
+
+    void limitBBox(boundBox& bbox);
 
     public:
 
@@ -107,6 +106,11 @@ class prtContactInfo
     // Destructors -------------------------------------------------
     ~prtContactInfo();
     //-----------------------------Func-------------------------------//
+
+    const Tuple2<label, label>& getCPair()
+    {
+        return contactPair_;
+    }
 
     ibContactClass& getcClass()
     {
@@ -133,26 +137,25 @@ class prtContactInfo
         return physicalProperties_.aMu_;
     }
 
-    void setSubContacts_Sphere();
+    void getContacts_Sphere();
 
-    void setSubContacts_ArbShape
+    void getContacts_ArbShape
     (
-        const fvMesh& mesh,
-        List<DynamicList<label>> baseSubContactList
+        scalar cellV
     );
 
-    void swapSubContactLists();
+    void swapContactLists();
 
     bool contactResolved();
 
     std::vector<std::shared_ptr<prtSubContactInfo>>& getPrtSCList()
     {
-        return subCList_;
+        return contactList_;
     }
 
-    void syncSubCList();
+    void syncContactList();
 
-    void registerSubContactList(DynamicList<prtSubContactInfo*>& contactList);
+    void registerContactList(DynamicList<prtSubContactInfo*>& contactList);
 
     void clearData();
 

@@ -40,15 +40,16 @@ addModel::~addModel()
 //---------------------------------------------------------------------------//
 bool addModel::isBodyInContact(PtrList<immersedBody>& immersedBodies)
 {
-    autoPtr<ibContactClass> cIbClass(new ibContactClass(
-        geomModel_,
+    std::shared_ptr<geomModel> gModel = geomModel_->getCopy();
+    ibContactClass cIbClass(
+        gModel,
         "None"
-    ));
+    );
 
     vector velAxi (vector::zero);
     scalar helpScalar(0.0);
 
-    autoPtr<ibContactVars> cIbVars(new ibContactVars(
+    ibContactVars cIbVars(
         immersedBodies.size(),
         velAxi,
         helpScalar,
@@ -56,11 +57,17 @@ bool addModel::isBodyInContact(PtrList<immersedBody>& immersedBodies)
         helpScalar,
         helpScalar,
         geomModel_->getRhoS()
-    ));
+    );
+
+    wallContactInfo cIBWallCntI(
+            cIbClass,
+            cIbVars
+    );
 
     bool inContact = contactModel::detectWallContact(
         mesh_,
-        cIbClass()
+        cIbClass,
+        cIBWallCntI
     );
 
     if(!inContact)
@@ -89,27 +96,27 @@ bool addModel::isBodyInContact(PtrList<immersedBody>& immersedBodies)
                 continue;
             }
 
-            autoPtr<prtContactInfo> prtCInfo (new prtContactInfo(
-                cIbClass(),
-                cIbVars(),
+            prtContactInfo prtCInfo (
+                cIbClass,
+                cIbVars,
                 immersedBodies[ibI].getibContactClass(),
                 immersedBodies[ibI].getContactVars()
-            ));
+            );
 
-            contactModel::findSubContacts(
+            contactModel::getContacts(
                 mesh_,
-                prtCInfo()
+                prtCInfo
             );
 
             DynamicList<prtSubContactInfo*> sCList;
-            prtCInfo->registerSubContactList(sCList);
+            prtCInfo.registerContactList(sCList);
             forAll(sCList,sC)
             {
                 prtSubContactInfo* prtSCInfo = sCList[sC];
 
                 if(contactModel::detectPrtPrtContact(
                     mesh_,
-                    cIbClass(),
+                    cIbClass,
                     immersedBodies[ibI].getibContactClass(),
                     *prtSCInfo
                 ))

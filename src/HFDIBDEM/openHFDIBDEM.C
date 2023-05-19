@@ -137,7 +137,16 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     List<word> patchNames = patchDic.toc();
     forAll(patchNames, patchI)
     {
-        word patchMaterial = patchDic.lookup(patchNames[patchI]);
+        word patchMaterial = patchDic.subDict(patchNames[patchI]).lookup("material");
+        vector patchNVec = patchDic.subDict(patchNames[patchI]).lookup("nVec");
+        vector planePoint = patchDic.subDict(patchNames[patchI]).lookup("planePoint");
+
+        wallPlaneInfo::wallPlaneInfo_insert(
+            patchNames[patchI],
+            patchNVec,
+            planePoint
+        );
+
         wallMatInfo::wallMatInfo_insert(
             patchNames[patchI],
             materialProperties::getMatProps()[patchMaterial]
@@ -169,16 +178,19 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         }
     }
 
-    if (HFDIBDEMDict_.found("virtMeshDecompositionLevel"))
-	{
-        virtualMeshLevel::setVirtualMeshLevel(readScalar(HFDIBDEMDict_.lookup("virtMeshDecompositionLevel")));
-        Info <<" -- VirtMesh Decomposition Level is set to : "<< virtualMeshLevel::getVirtualMeshLevel() << endl;
+    if (HFDIBDEMDict_.isDict("virtualMesh"))
+    {
+        dictionary vMDic = HFDIBDEMDict_.subDict("virtualMesh");
+        virtualMeshLevel::setVirtualMeshLevel(readScalar(vMDic.lookup("level")),readScalar(vMDic.lookup("charCellSize")));
+        Info <<" -- VirtMesh Decomposition Level is set to        : "<< virtualMeshLevel::getVirtualMeshLevel() << endl;
+        Info <<" -- VirtMesh charCellSize for boundary is set to  : "<< virtualMeshLevel::getCharCellSize() << endl;
 
-	}
+    }
     else
     {
-        virtualMeshLevel::setVirtualMeshLevel(1);
-        Info <<" -- VirtMesh Decomposition Level is set to : "<< virtualMeshLevel::getVirtualMeshLevel() << endl;
+        virtualMeshLevel::setVirtualMeshLevel(1,1);
+        Info <<" -- VirtMesh Decomposition Level is set to        : "<< virtualMeshLevel::getVirtualMeshLevel() << endl;
+        Info <<" -- VirtMesh charCellSize for boundary is set to  : "<< virtualMeshLevel::getCharCellSize() << endl;
 
     }
 
@@ -299,7 +311,7 @@ void openHFDIBDEM::initialize
         while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions)
         {
             InfoH << addModel_Info << "addModel invoked action, trying to add new body" << endl;
-            autoPtr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));
+            std::shared_ptr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));
             cAddition++;
 
             // initialize the immersed bodies
@@ -321,7 +333,7 @@ void openHFDIBDEM::initialize
                         transportProperties_,
                         addIBPos,
                         recomputeM0_,
-                        bodyGeomModel.ptr(),
+                        bodyGeomModel,
                         ibInterp_,
                         cellPoints_
                     )
@@ -535,20 +547,27 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             if (!immersedBodies_[bodyId].getGeomModel().isCluster())
             {
                 vector newPos = vector::zero;
-                bool inContact = detectCyclicContact(mesh_, cyclicPatches_, immersedBodies_[bodyId].getWallCntInfo(), newPos);
-                if (inContact)
+
+                if (detectCyclicContact(
+                    mesh_,
+                    cyclicPatches_,
+                    immersedBodies_[bodyId].getWallCntInfo(),
+                    newPos
+                ))
                 {
                     verletList_.removeBodyFromVList(immersedBodies_[bodyId]);
 
                     scalar thrSurf(readScalar(HFDIBDEMDict_.lookup("surfaceThreshold")));
-                    autoPtr<periodicBody> newPeriodicBody(new periodicBody(mesh_, thrSurf));
+                    std::shared_ptr<periodicBody> newPeriodicBody
+                        = std::make_shared<periodicBody>(mesh_, thrSurf);
+
                     newPeriodicBody->setRhoS(immersedBodies_[bodyId].getGeomModel().getRhoS());
-                    autoPtr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getGeomModel());
-                    vector transVec = newPos - iBcopy().getCoM();
+                    std::shared_ptr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getCopy());
+                    vector transVec = newPos - iBcopy->getCoM();
                     iBcopy->bodyMovePoints(transVec);
                     newPeriodicBody->addBodyToCluster(immersedBodies_[bodyId].getGeomModelPtr());
                     newPeriodicBody->addBodyToCluster(iBcopy);
-                    immersedBodies_[bodyId].getGeomModelPtr().set(newPeriodicBody.ptr());
+                    immersedBodies_[bodyId].getGeomModelPtr() = newPeriodicBody;
 
                     verletList_.addBodyToVList(immersedBodies_[bodyId]);
                 }
@@ -561,7 +580,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 {
                     verletList_.removeBodyFromVList(immersedBodies_[bodyId]);
 
-                    immersedBodies_[bodyId].getGeomModelPtr().reset(cBody.getRemGeomModel().ptr());
+                    immersedBodies_[bodyId].getGeomModelPtr() = cBody.getRemGeomModel();
 
                     verletList_.addBodyToVList(immersedBodies_[bodyId]);
                 }
@@ -590,6 +609,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
         verletList_.update(immersedBodies_);
 
+        DynamicLabelList wallContactIB;
+        DynamicList<wallSubContactInfo*> wallContactList;
         forAll (immersedBodies_,bodyId)
         {
             immersedBody& cIb(immersedBodies_[bodyId]);
@@ -604,30 +625,67 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     if(detectWallContact
                     (
                         mesh_,
-                        cIb.getibContactClass()
+                        cIb.getibContactClass(),
+                        cIb.getWallCntInfo()
                     ))
                     {
                         cIb.getibContactClass().setWallContact(true);
                         cIb.getibContactClass().inContactWithStatic(true);
-                    }
-                    // solve wall contact
-                    if (cIb.checkWallContact())
-                    {
-                        solveWallContact
-                        (
-                            mesh_,
-                            cIb.getWallCntInfo(),
-                            deltaTime*step
-                        );
-
-                        cIb.updateContactForces
-                        (
-                            cIb.getWallCntInfo().getOutForce()
-                        );
+                        wallContactIB.append(bodyId);
+                        cIb.getWallCntInfo().registerSubContactList(wallContactList);
                     }
                 }
             }
         }
+        if(wallContactIB.size() > 0)
+        {
+            InfoH << DEM_Info << " wallContactList SCListSize() " << wallContactList.size() << endl;
+            label wallContactPerProc(ceil(double(wallContactList.size())/Pstream::nProcs()));
+
+            if( wallContactList.size() <= Pstream::nProcs())
+            {
+                wallContactPerProc = 1;
+            }
+            InfoH << DEM_Info << " wallContactList wallContactPerProc " << wallContactPerProc << endl;
+
+            for(int assignProc = Pstream::myProcNo()*wallContactPerProc; assignProc < min((Pstream::myProcNo()+1)*wallContactPerProc,wallContactList.size()); assignProc++)
+            {
+                wallSubContactInfo* sCW = wallContactList[assignProc];
+                immersedBody& cIb(immersedBodies_[sCW->getBodyId()]);
+                sCW->setResolvedContact(solveWallContact(
+                    mesh_,
+                    cIb.getWallCntInfo(),
+                    deltaTime*step,
+                    *sCW
+                    ));
+            }
+            // Pout <<" Survived " << endl;
+
+            forAll (wallContactIB,iB)
+            {
+                immersedBody& cIb(immersedBodies_[wallContactIB[iB]]);
+
+                std::vector<std::shared_ptr<wallSubContactInfo>>& subCList
+                    = cIb.getWallCntInfo().getWallSCList();
+
+                for(auto sC : subCList)
+                {
+                    sC->syncContactResolve();
+                    if(sC->getContactResolved())
+                    {
+                        sC->syncData();
+
+                        cIb.updateContactForces(
+                            sC->getOutForce()
+                        );
+                    }
+                }
+                cIb.getWallCntInfo().clearOldContact();
+            }
+            // Pout <<" Survived 2 " << endl;
+        }
+        wallContactList.clear();
+        wallContactIB.clear();
 
         DynamicList<prtSubContactInfo*> contactList;
         // check only pairs whose bounding boxes are intersected for the contact
@@ -657,14 +715,14 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 );
 
                 prtcInfo.clearData();
-                findSubContacts(
+                getContacts(
                     mesh_,
                     prtcInfo
                 );
 
-                prtcInfo.syncSubCList();
+                prtcInfo.syncContactList();
 
-                prtcInfo.registerSubContactList(contactList);
+                prtcInfo.registerContactList(contactList);
             }
         }
 
@@ -727,10 +785,20 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             }
         }
 
+        scalar maxCoNum = 0;
+        label  bodyId = 0;
         forAll (immersedBodies_,ib)
         {
             immersedBodies_[ib].updateMovement(deltaTime*step*0.5);
+
+            immersedBodies_[ib].computeBodyCoNumber();
+            if (maxCoNum < immersedBodies_[ib].getCoNum())
+            {
+                maxCoNum = immersedBodies_[ib].getCoNum();
+                bodyId = ib;
+            }
         }
+        InfoH << basic_Info << "Max CoNum = " << maxCoNum << " at body " << bodyId << endl;
 
         pos += step;
 
@@ -772,7 +840,7 @@ void openHFDIBDEM::addRemoveBodies
         while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions)
         {
             InfoH << addModel_Info << "addModel invoked action, trying to add new body" << endl;
-            autoPtr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));
+            std::shared_ptr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));
 
             cAddition++;
 
@@ -797,7 +865,7 @@ void openHFDIBDEM::addRemoveBodies
                         transportProperties_,
                         addIBPos,
                         recomputeM0_,
-                        bodyGeomModel.ptr(),
+                        bodyGeomModel,
                         ibInterp_,
                         cellPoints_
                     )
@@ -875,7 +943,7 @@ void openHFDIBDEM::restartSimulation
         bool isStatic(readBool(bodyDict.lookup("static")));
         label timeStepsInContWStatic(readLabel(bodyDict.lookup("timeStepsInContWStatic")));
 
-        autoPtr<geomModel> bodyGeomModel;
+        std::shared_ptr<geomModel> bodyGeomModel;
         word bodyGeom;
         // check if the immersedDict_ contains bodyGeom
         if (HFDIBDEMDict_.subDict(bodyName).found("bodyGeom"))
@@ -895,19 +963,19 @@ void openHFDIBDEM::restartSimulation
         if(bodyGeom == "convex")
         {
             word stlPath(timePath + "/stlFiles/"+bodyId+".stl");
-            bodyGeomModel.set(new convexBody(mesh_,stlPath,thrSurf));
+            bodyGeomModel = std::make_shared<convexBody>(mesh_,stlPath,thrSurf);
         }
         else if(bodyGeom == "nonConvex")
         {
             word stlPath(timePath + "/stlFiles/"+bodyId+".stl");
-            bodyGeomModel.set(new nonConvexBody(mesh_,stlPath,thrSurf));
+            bodyGeomModel = std::make_shared<nonConvexBody>(mesh_,stlPath,thrSurf);
         }
         else if(bodyGeom == "sphere")
         {
             vector startPosition = bodyDict.subDict("sphere").lookup("position");
             scalar radius = readScalar(bodyDict.subDict("sphere").lookup("radius"));
 
-            bodyGeomModel.set(new sphereBody(mesh_,startPosition,radius,thrSurf));
+            bodyGeomModel = std::make_shared<sphereBody>(mesh_,startPosition,radius,thrSurf);
         }
         else
         {
@@ -915,7 +983,7 @@ void openHFDIBDEM::restartSimulation
             InfoH << iB_Info << "bodyGeom: " << bodyGeom
                 << " not supported, using bodyGeom nonConvex" << endl;
             bodyGeom = "nonConvex";
-            bodyGeomModel.set(new nonConvexBody(mesh_,stlPath,thrSurf));
+            bodyGeomModel = std::make_shared<nonConvexBody>(mesh_,stlPath,thrSurf);
         }
 
         label newIBSize(immersedBodies_.size()+1);
@@ -935,7 +1003,7 @@ void openHFDIBDEM::restartSimulation
                 transportProperties_,
                 addIBPos,
                 recomputeM0_,
-                bodyGeomModel.ptr(),
+                bodyGeomModel,
                 ibInterp_,
                 cellPoints_
             )

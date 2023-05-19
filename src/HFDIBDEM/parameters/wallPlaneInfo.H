@@ -23,23 +23,18 @@ License
     along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
 
 InNamspace
-    Foam
+    contactModel
 
 Description
-    class for addition and removal of immersedBodies
-
-SourceFiles
-    addModelOnce.C
+    Static class for storing wall material information
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef addModelOnce_H
-#define addModelOnce_H
-
-#include "addModel.H"
+#ifndef wallPlaneInfo_H
+#define wallPlaneInfo_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,50 +42,33 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class addModelOnce Declaration
+                      Class wallPlaneInfo Declaration
 \*---------------------------------------------------------------------------*/
 
-class addModelOnce
-:
-    public addModel
+
+class wallPlaneInfo
 {
-
-    private:
-    const dictionary&       addModelDict_;
-    word                    addMode_;
-    bool                    bodyAdded_;
-
     public:
 
-    // Constructors ------------------------------------------------
-    addModelOnce
+    static const HashTable<List<vector>,string,Hash<string>>& getWallPlaneInfo()
+    {
+        return wallPlaneInfo_;
+    }
+
+    static void wallPlaneInfo_insert
     (
-        const dictionary& addModelDict,
-        const Foam::fvMesh& mesh,
-        const bool startTime0,
-        std::unique_ptr<geomModel> bodyGeomModel,
-        List<labelList>& cellPoints
-    );
-
-    // Destructors -------------------------------------------------
-    ~addModelOnce();
-
-    // Public methods ----------------------------------------------
-
-    bool shouldAddBody(const volScalarField& body)
+        const string& wallPatch,
+        const vector& patchNVec,
+        const vector& planePoint
+    )
     {
-        return not bodyAdded_;
-    }
+        List<vector> planeInfo{{patchNVec,planePoint}};
+        wallPlaneInfo_.insert(wallPatch,planeInfo);
+    };
 
-    std::shared_ptr<geomModel> addBody(
-        const volScalarField& body,
-        PtrList<immersedBody>& immersedBodies
-    );
+    //- Hash table for storing wall material information
+    static HashTable<List<vector>,string,Hash<string>> wallPlaneInfo_;
 
-    bool getBodyAdded()
-    {
-        return bodyAdded_;
-    }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

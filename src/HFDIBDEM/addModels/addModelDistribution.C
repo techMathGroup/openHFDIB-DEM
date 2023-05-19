@@ -39,11 +39,11 @@ addModelDistribution::addModelDistribution
 (
     const dictionary& addModelDict,
     const Foam::fvMesh& mesh,
-    geomModel* bodyGeomModel,
+    std::unique_ptr<geomModel> bodyGeomModel,
     List<labelList>& cellPoints
 )
 :
-addModel(mesh, bodyGeomModel, cellPoints),
+addModel(mesh, std::move(bodyGeomModel), cellPoints),
 addModelDict_(addModelDict),
 addMode_(word(addModelDict_.lookup("addModel"))),
 bodyAdded_(false),
@@ -246,10 +246,10 @@ bool addModelDistribution::shouldAddBody(const volScalarField& body)
 
 }
 //---------------------------------------------------------------------------//
-geomModel* addModelDistribution::addBody
+std::shared_ptr<geomModel> addModelDistribution::addBody
 (
     const volScalarField& body,
-    PtrList<immersedBody>& immersedBodies   
+    PtrList<immersedBody>& immersedBodies
 )
 {
     bodyAdditionAttemptCounter_++;
@@ -313,7 +313,7 @@ geomModel* addModelDistribution::addBody
 	InfoH << addModel_Info << "-- addModelMessage-- "
         << "bodyAdditionAttemptNr  : " << bodyAdditionAttemptCounter_<< endl;
 
-    return geomModel_->getGeomModel();;
+    return geomModel_->getCopy();;
 }
 // MODEL SPECIFIC FUNCTIONS==================================================//
 //---------------------------------------------------------------------------//

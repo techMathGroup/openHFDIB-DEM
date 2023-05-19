@@ -50,10 +50,11 @@ class virtualMeshLevel
 {
     public:
 
-    static void setVirtualMeshLevel(scalar virtualMeshLevel)
+    static void setVirtualMeshLevel(scalar virtualMeshLevel,scalar charCellSize)
     {
         virtualMeshLevel_ = virtualMeshLevel;
         levelOfDivision_ = int(pow(2,virtualMeshLevel_));
+        charCellSize_ = charCellSize;
     }
 
     static scalar getVirtualMeshLevel()
@@ -66,8 +67,14 @@ class virtualMeshLevel
         return levelOfDivision_;
     }
 
+    static scalar getCharCellSize()
+    {
+        return charCellSize_;
+    }
+
     static scalar virtualMeshLevel_;
     static scalar levelOfDivision_;
+    static scalar charCellSize_;
 
 };
 

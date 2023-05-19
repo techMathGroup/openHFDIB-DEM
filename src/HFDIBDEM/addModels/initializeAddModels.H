@@ -12,7 +12,7 @@
         dictionary addModelDict(HFDIBDEMDict_.subDict(bodyName).subDict("bodyAddition"));
         word howToAdd(word(addModelDict.lookup("addModel")));
         word bodyGeom;
-        autoPtr<geomModel> bodyGeomModel;
+        std::unique_ptr<geomModel> bodyGeomModel;
         // check if the immersedDict_ contains bodyGeom
         if (HFDIBDEMDict_.subDict(bodyName).found("bodyGeom"))
         {
@@ -31,19 +31,22 @@
         if(bodyGeom == "convex")
         {
             word stlPath("constant/triSurface/"+bodyName+".stl");
-            bodyGeomModel.set(new convexBody(mesh_,stlPath,thrSurf));
+            bodyGeomModel = std::unique_ptr<convexBody>(
+                new convexBody(mesh_,stlPath,thrSurf));
         }
         else if(bodyGeom == "nonConvex")
         {
             word stlPath("constant/triSurface/"+bodyName+".stl");
-            bodyGeomModel.set(new nonConvexBody(mesh_,stlPath,thrSurf));
+            bodyGeomModel = std::unique_ptr<nonConvexBody>(
+                new nonConvexBody(mesh_,stlPath,thrSurf));
         }
         else if(bodyGeom == "sphere")
         {
             vector startPosition = HFDIBDEMDict_.subDict(bodyName).subDict("sphere").lookup("startPosition");
             scalar radius = readScalar(HFDIBDEMDict_.subDict(bodyName).subDict("sphere").lookup("radius"));
 
-            bodyGeomModel.set(new sphereBody(mesh_,startPosition,radius,thrSurf));
+            bodyGeomModel = std::unique_ptr<sphereBody>(
+                new sphereBody(mesh_,startPosition,radius,thrSurf));
         }
         else
         {
@@ -51,7 +54,8 @@
             InfoH << iB_Info << "bodyGeom: " << bodyGeom
                 << " not supported, using bodyGeom nonConvex" << endl;
             bodyGeom = "nonConvex";
-            bodyGeomModel.set(new nonConvexBody(mesh_,stlPath,thrSurf));
+            bodyGeomModel = std::unique_ptr<nonConvexBody>(
+                new nonConvexBody(mesh_,stlPath,thrSurf));
         }
 
         InfoH << addModel_Info << "-- addModelMessage-- "
@@ -67,7 +71,7 @@
                     addModelDict,
                     mesh_,
                     startTime0,
-                    bodyGeomModel.ptr(),
+                    std::move(bodyGeomModel),
                     cellPoints_
                 )
             );
@@ -82,8 +86,10 @@
                     addModelDict,
                     mesh_,
                     startTime0,
-                    bodyGeomModel.ptr(),
-                    cellPoints_
+                    std::move(bodyGeomModel),
+                    cellPoints_,
+                    bodyGeom,
+                    thrSurf
                 )
             );
         }
@@ -97,7 +103,7 @@
                     addModelDict,
                     mesh_,
                     startTime0,
-                    bodyGeomModel.ptr(),
+                    std::move(bodyGeomModel),
                     cellPoints_
                 )
             );
@@ -111,7 +117,7 @@
                 (
                     addModelDict,
                     mesh_,
-                    bodyGeomModel.ptr(),
+                    std::move(bodyGeomModel),
                     cellPoints_
                 )
             );
@@ -125,7 +131,7 @@
                 (
                     addModelDict,
                     mesh_,
-                    bodyGeomModel.ptr(),
+                    std::move(bodyGeomModel),
                     cellPoints_
                 )
             );
@@ -139,7 +145,7 @@
                 (
                     addModelDict,
                     mesh_,
-                    bodyGeomModel.ptr(),
+                    std::move(bodyGeomModel),
                     cellPoints_
                 )
             );
@@ -158,7 +164,7 @@
                     addModelDict,
                     mesh_,
                     startTime0,
-                    bodyGeomModel.ptr(),
+                    std::move(bodyGeomModel),
                     cellPoints_
                 )
             );

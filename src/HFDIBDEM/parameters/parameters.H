@@ -41,6 +41,7 @@ Contributors
 #include "materialProperties.H"
 #include "interAdhesion.H"
 #include "wallMatInfo.H"
+#include "wallPlaneInfo.H"
 #include "virtualMeshLevel.H"
 
 namespace Foam
@@ -59,8 +60,12 @@ HashTable<scalar,string,Hash<string>> interAdhesion::matInterAdh_ =
 HashTable<materialInfo,string,Hash<string>> wallMatInfo::wallMatInfo_ =
     HashTable<materialInfo,string,Hash<string>>();
 
+HashTable<List<vector>,string,Hash<string>> wallPlaneInfo::wallPlaneInfo_ =
+    HashTable<List<vector>,string,Hash<string>>();
+
 scalar virtualMeshLevel::virtualMeshLevel_ = 1;
 scalar virtualMeshLevel::levelOfDivision_ = 1;
+scalar virtualMeshLevel::charCellSize_ = 1;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

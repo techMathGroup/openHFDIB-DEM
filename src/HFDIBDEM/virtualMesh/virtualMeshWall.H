@@ -36,14 +36,16 @@ Contributors
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef virtualMesh_H
-#define virtualMesh_H
+#ifndef virtualMeshWall_H
+#define virtualMeshWall_H
 
 #include "dictionary.H"
 #include "fvCFD.H"
 #include "geomModel.H"
+#include "bbMatrix.H"
 #include "clockTime.H"
-#include "subVolume.H"
+#include "subVolumeProperties.H"
+// #include ""
 
 
 // #include "fvMesh.H"
@@ -53,65 +55,77 @@ Contributors
 namespace Foam
 {
 
-struct virtualMeshInfo
+struct virtualMeshWallInfo
 {
-    virtualMeshInfo():
-    sV(boundBox()),
+    virtualMeshWallInfo():
+    bBox(boundBox()),
+    startingPoint(vector::zero),
+    subVolumeNVector(vector::zero),
+    charCellSize(0),
     subVolumeV(0)
+
     {}
-
-    virtualMeshInfo(const virtualMeshInfo& vMeshInfo):
-    sV(vMeshInfo.sV),
-    subVolumeV(vMeshInfo.subVolumeV)
-    {
-        if (vMeshInfo.startingPoint.valid())
-        {
-            startingPoint.set(new point(vMeshInfo.startingPoint()));
-        }
-    }
-
-    virtualMeshInfo(
-        boundBox& bBox,
+    virtualMeshWallInfo(
+        boundBox bBox,
+        point startingPoint,
+        vector subVolumeNVector,
+        scalar charCellSize,
         scalar subVolumeV):
-    sV(bBox),
+    bBox(bBox),
+    startingPoint(startingPoint),
+    subVolumeNVector(subVolumeNVector),
+    charCellSize(charCellSize),
     subVolumeV(subVolumeV)
     {}
 
-    void operator= (const virtualMeshInfo& vMeshInfo)
-    {
-        sV = vMeshInfo.sV;
-        subVolumeV = vMeshInfo.subVolumeV;
-
-        if (vMeshInfo.startingPoint.valid())
-        {
-            startingPoint.reset(new point(vMeshInfo.startingPoint()));
-        }
-    }
-
     const point& getStartingPoint()
     {
-        if (!startingPoint.valid())
-        {
-            startingPoint.set(new point(sV.midpoint()));
-        }
-
-        return startingPoint();
+        return startingPoint;
     }
 
-    subVolume& getSubVolume()
+    const scalar& getSVVolume()
     {
-        return sV;
+        return subVolumeV;
     }
 
-    subVolume sV;
-    scalar subVolumeV;
-    autoPtr<point> startingPoint;
+    const scalar& getCharCellSize()
+    {
+        return charCellSize;
+    }
+
+    void shiftBBox
+    (
+        vector shiftVec
+    )
+    {
+        bBox.min() += shiftVec;
+        bBox.max() += shiftVec;
+    }
+
+    boundBox& getbBox()
+    {
+        return bBox;
+    }
+
+    void setStartingPoint
+    (
+        point sPoint
+    )
+    {
+        startingPoint = sPoint;
+    }
+
+    boundBox bBox;
+    point startingPoint;
+    vector subVolumeNVector;
+    scalar charCellSize;
+    scalar subVolumeV;    
 };
 
 /*---------------------------------------------------------------------------*\
-                        Class virtualMesh Declaration
+                        Class virtualMeshWall Declaration
 \*---------------------------------------------------------------------------*/
-class virtualMesh
+class virtualMeshWall
 {
     private:
 
@@ -122,59 +136,56 @@ class virtualMesh
     typedef HashSet<vector,Hash<vector>> vectorHashSet;
 
     geomModel& cGeomModel_;
-    geomModel& tGeomModel_;
 
-    virtualMeshInfo& vMeshInfo_;
+    virtualMeshWallInfo& vMeshWallInfo_;
 
-    point contactCenter_;
+    bbMatrix bbMatrix_;
+
     DynamicPointList edgeSubVolumesPoints_;
 
     public:
-
+    
+    vector contactCenter_ = vector::zero;
 
     // Constructors ------------------------------------------------
 
-    virtualMesh
+    virtualMeshWall
     (
-        virtualMeshInfo& vMeshInfo,
-        geomModel& cGeomModel_,
-        geomModel& tGeomModel_
+        virtualMeshWallInfo& vMeshWallInfo,
+        geomModel& cGeomModel
     );
 
 
     // Destructors -------------------------------------------------
-    ~virtualMesh();
+    ~virtualMeshWall();
 
     bool detectFirstContactPoint();
 
-    // Get contact subVolume
-    bool detectFirstVolumeInContact
-    (
-        subVolume& sV,
-        bool& startPointFound
-    );
+    bool detectFirstFaceContactPoint();
 
     scalar evaluateContact();
 
-    void inspectSubVolume(
-        subVolume& subVolume,
-        scalar& contactVolume,
-        vector& contactCenter,
-        DynamicPointList& edgePoints
+    void checkSubVolume(subVolumeProperties& subVolume);
+
+    void resetSubVolume(subVolumeProperties& subVolume);
+
+    vector shiftEdgeSubVolume
+    (
+        vector& subVolumeIndex
     );
+
+    label getInternalSV();
 
     DynamicPointList& getEdgeSVPoints()
     {
         return edgeSubVolumesPoints_;
     }
 
-    point& getContactCenter()
+    vector& getContactCenter()
     {
-        vMeshInfo_.startingPoint() = contactCenter_;
         return contactCenter_;
     }
 
-    Tuple2<scalar,vector> get3DcontactNormalAndSurface();
 };
 
 

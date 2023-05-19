@@ -62,6 +62,22 @@ namespace Foam
 
         pointField historyPoints_;
 
+        void getIntersectionPoints
+        (
+            const label index,
+            const treeBoundBox& cubeBb,
+            DynamicPointList& intersectionPoints
+        );
+
+        void intersectBb
+        (
+            const point& p0,
+            const point& p1,
+            const point& p2,
+            const treeBoundBox& cubeBb,
+            DynamicPointList& intersectionPoints
+        );
+
         public:
 
         // Constructors ------------------------------------------------
@@ -87,7 +103,7 @@ namespace Foam
                 << "notIplemented"<<endl;
         }
 
-        virtual geomModel* getGeomModel() = 0;
+        virtual std::shared_ptr<geomModel> getCopy() = 0;
 
         vector addModelReturnRandomPosition(
             const bool allActiveCellsInMesh,
@@ -138,7 +154,7 @@ namespace Foam
             return bounds;
         }
 
-        void synchronPos() final override;
+        void synchronPos(label owner = -1) final override;
 
         void writeBodyInfo(label bodyId, IOdictionary& dict, word path) final override
         {
@@ -158,6 +174,8 @@ namespace Foam
             boolList returnList = triSurfSearch_().calcInside( points);
             return returnList[0];
         }
+
+        volumeType getVolumeType(subVolume& sv, bool cIb)  final override;
 
         void getClosestPointAndNormal
         (
@@ -189,6 +207,13 @@ namespace Foam
             }
         }
 
+        bool limitFinalSubVolume
+        (
+            const subVolume& sv,
+            bool cIb,
+            boundBox& limBBox
+        ) final override;
+
         void initVars(pointField surfPoints, scalar thrSurf, scalar intSpan, bool sdBasedLambda)
         {
             bodySurfMesh_.movePoints(surfPoints);
@@ -210,6 +235,22 @@ namespace Foam
             }
             CoM_/= bSMeshPts.size();
         }
+
+        pointField getSTLBodyPoints() final override
+        {
+            return bodySurfMesh_.points();
+        }
+
+        faceList getSTLFaces() final override
+        {
+            return triSurf_().faces();
+        }
+
+        pointField getSTLFacePoint(label faceID) final override
+        {
+            return triSurf_().faces()[faceID].points(bodySurfMesh_.points());
+        }
+
     };
 }
 #endif

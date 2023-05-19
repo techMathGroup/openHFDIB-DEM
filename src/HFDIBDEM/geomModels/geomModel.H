@@ -39,12 +39,15 @@ Contributors
 #ifndef geomModel_H
 #define geomModel_H
 
+#include <vector>
+#include <memory>
+
 #include "dictionary.H"
 #include "fvCFD.H"
-// #include "fvMesh.H"
 #include "triSurfaceMesh.H"
 
 #include "contactType.H"
+#include "subVolume.H"
 #include "verletPoint.H"
 
 #include "outputHFDIBDEM.H"
@@ -149,7 +152,7 @@ namespace Foam
                 << "notIplemented"<<endl;
         }
 
-        virtual geomModel* getGeomModel() = 0;
+        virtual std::shared_ptr<geomModel> getCopy() = 0;
 
         virtual List<DynamicLabelList>& getSurfaceCellList()
         {
@@ -226,7 +229,7 @@ namespace Foam
             return bound;
         }
 
-        virtual void synchronPos()
+        virtual void synchronPos(label owner = -1)
         {
             InfoH << iB_Info << "-- geomModelMessage-- "
                 << "notIplemented"<<endl;
@@ -252,6 +255,13 @@ namespace Foam
             return false;
         }
 
+        virtual volumeType getVolumeType(subVolume& sv, bool cIb)
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            return volumeType::unknown;
+        }
+
         virtual scalar getDC()
         {
             return dC_;
@@ -267,6 +277,18 @@ namespace Foam
         {
             InfoH << iB_Info << "-- geomModelMessage-- "
                 << "notIplemented"<<endl;
+        }
+
+        virtual bool limitFinalSubVolume
+        (
+            const subVolume& sv,
+            bool cIb,
+            boundBox& limBBox
+        )
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            return false;
         }
 
         virtual void setCoM()
@@ -382,6 +404,30 @@ namespace Foam
         );
 
         virtual List<boundBox*> getBBoxes();
+
+        virtual pointField getSTLBodyPoints()
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "not cluster model"<<endl;
+            pointField emptyField;
+            return emptyField;
+        }
+
+        virtual faceList getSTLFaces()
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            faceList emptyList;
+            return emptyList;
+        }
+
+        virtual pointField getSTLFacePoint(label faceID)
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            pointField nonPointField;
+            return nonPointField;
+        }
     };
 }
 #endif

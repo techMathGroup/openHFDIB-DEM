@@ -23,82 +23,51 @@ License
     along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
 
 InNamspace
-    Foam
+    contactModel
 
 Description
-    class for addition and removal of immersedBodies
+    methods to solve particle-particle contact
 
 SourceFiles
-    addModelOnce.C
+    spectatorMesh.C
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef addModelOnce_H
-#define addModelOnce_H
-
-#include "addModel.H"
+#ifndef sMProperties_H
+#define sMProperties_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
-
 /*---------------------------------------------------------------------------*\
-                        Class addModelOnce Declaration
+                        Class ibContactClass Declaration
 \*---------------------------------------------------------------------------*/
-
-class addModelOnce
-:
-    public addModel
+class sMProperties
 {
-
-    private:
-    const dictionary&       addModelDict_;
-    word                    addMode_;
-    bool                    bodyAdded_;
-
     public:
 
-    // Constructors ------------------------------------------------
-    addModelOnce
-    (
-        const dictionary& addModelDict,
-        const Foam::fvMesh& mesh,
-        const bool startTime0,
-        std::unique_ptr<geomModel> bodyGeomModel,
-        List<labelList>& cellPoints
-    );
-
+    sMProperties(point center):
+    center(center)
+    {}
+    
+    const point center;
+    point initPoint = vector::zero;
+    bool isCBody = false;
+    bool isMesh  = false;
+    bool toCheck = true;
+    bool isInternal = false;
+    bool stlFound = false;
+    bool initPointSet = false;
+    
     // Destructors -------------------------------------------------
-    ~addModelOnce();
-
-    // Public methods ----------------------------------------------
-
-    bool shouldAddBody(const volScalarField& body)
-    {
-        return not bodyAdded_;
-    }
-
-    std::shared_ptr<geomModel> addBody(
-        const volScalarField& body,
-        PtrList<immersedBody>& immersedBodies
-    );
-
-    bool getBodyAdded()
-    {
-        return bodyAdded_;
-    }
+    ~sMProperties(){}
 };
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 } // End namespace Foam
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
 #endif
-
 // ************************************************************************* //

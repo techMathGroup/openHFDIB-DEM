@@ -61,7 +61,7 @@ immersedBody::immersedBody
     dictionary& transportProperties,
     label bodyId,
     label recomputeM0,
-    geomModel* bodyGeomModel,
+    std::shared_ptr<geomModel> bodyGeomModel,
     autoPtr<ibInterpolation>& ibIntp,
     List<labelList>& cellPoints
 )
@@ -71,7 +71,7 @@ isActive_(true),
 immersedDict_(HFDIBDEMDict.subDict(bodyName_)),
 mesh_(mesh),
 transportProperties_(transportProperties),
-geomModel_(bodyGeomModel),
+geomModel_(std::move(bodyGeomModel)),
 cellPoints_(cellPoints),
 Axis_(vector::one),
 AxisOld_(vector::one),
@@ -628,7 +628,6 @@ void immersedBody::moveImmersedBody
         if (mag(deltaT + 1.0) < SMALL) deltaT = mesh_.time().deltaT().value();
 
         // incremental rotation angle
-        // scalar angle     = omega_*deltaT - 0.5*mag(alpha_)*deltaT*deltaT;
         scalar angle     = omega_*deltaT;
 
         // translation increment

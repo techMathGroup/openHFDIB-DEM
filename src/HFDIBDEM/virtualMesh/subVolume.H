@@ -28,98 +28,96 @@ InNamspace
 Description
     methods to solve particle-particle contact
 
-SourceFiles
-    virtualMesh.C
-
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef subContactProperties_H
-#define subContactProperties_H
+#ifndef subVolume_H
+#define subVolume_H
 
-#include "subVolumeProperties.H"
-#include "bbMatrix.H"
+#include "treeBoundBox.H"
+#include "volumeType.H"
+
+#include <memory>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
+struct ibSubVolumeInfo
+{
+    ibSubVolumeInfo():
+        volumeType_(volumeType::unknown)
+    {}
+
+    ibSubVolumeInfo(volumeType vType)
+    {
+            switch(vType)
+        {
+            case volumeType::unknown:
+            case volumeType::mixed:
+                volumeType_ = volumeType::unknown;
+                break;
+            case volumeType::inside:
+                volumeType_ = volumeType::inside;
+                break;
+            case volumeType::outside:
+                volumeType_ = volumeType::outside;
+                break;
+        }
+    }
+
+    volumeType volumeType_;
+    autoPtr<labelList> shapesIn_;
+};
+
 /*---------------------------------------------------------------------------*\
                         Class ibContactClass Declaration
 \*---------------------------------------------------------------------------*/
-class subContactProperties
+class subVolume : public treeBoundBox
 {
     private:
 
-    typedef DynamicList<label> DynamicLabelList;
-    typedef DynamicList<scalar> DynamicScalarList;
-    typedef DynamicList<vector> DynamicVectorList;
-    typedef DynamicList<point> DynamicPointList;
-    typedef HashSet<vector,Hash<vector>> vectorHashSet;
+    std::shared_ptr<subVolume> parentSV_;
+    List<subVolume> childSubVolumes_;
+
+    ibSubVolumeInfo cVolumeInfo_;
+    ibSubVolumeInfo tVolumeInfo_;
 
     public:
 
-    label contactID_;
+    // Constructors ------------------------------------------------
+    subVolume();
 
-    labelHashSet oldContactFaces_;
+    subVolume
+    (
+        const boundBox bb
+    );
 
-    vectorHashSet contactEdgePoints_;
+    subVolume
+    (
+        const boundBox bb,
+        const std::shared_ptr<subVolume> parentSV,
+        const volumeType cVolumeType,
+        const volumeType tVolumeType
+    );
 
-    bool isContact_;
+    // Destructors -------------------------------------------------
+    ~subVolume();
 
-    autoPtr<bbMatrix> bbMatrix_;
+    // Member Functions --------------------------------------------
 
-    vector contactCenter_;
+    ibSubVolumeInfo& cVolumeInfo();
+    ibSubVolumeInfo& tVolumeInfo();
 
-    DynamicLabelList boundaryCells_;
+    List<subVolume>& childSubVolumes();
 
-    DynamicLabelList boundaryFaces_;
+    std::shared_ptr<subVolume>& parentSV();
 
-    DynamicLabelList firstContactFaces_;
-
-    DynamicVectorList firstContactPoints_;
-
-    DynamicVectorList contactSubVolumesCOMRecord_;
-
-    DynamicVectorList edgeSubVolumesCOMrecord_;
-
-    DynamicVectorList searchedPoints_;
-
-    point firstContactSubVolume_;
-
-    scalar contactVolume_;
-
-    scalar contactArea_;
-
-    vector contactNormal_;
-
-    label questionsAsked_;
-
-    labelHashSet checkedVertexLabels_;
-
-    string patchName_;
-
-    void clear()
-    {
-        boundaryCells_.clear();
-        boundaryFaces_.clear();
-        contactSubVolumesCOMRecord_.clear();
-        edgeSubVolumesCOMrecord_.clear();
-        contactCenter_ = vector::zero;
-        contactVolume_ =0.0;
-        contactArea_ = 0.0;
-        contactNormal_ = vector::zero;
-        isContact_ = false;
-        searchedPoints_.clear();
-        checkedVertexLabels_.clear();
-        contactEdgePoints_.clear();
-        oldContactFaces_.clear();
-
-    }
-
+    ibSubVolumeInfo& getVolumeInfo(bool cIb);
+    const ibSubVolumeInfo& getVolumeInfo(bool cIb) const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

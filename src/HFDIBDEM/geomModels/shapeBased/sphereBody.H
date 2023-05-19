@@ -114,17 +114,18 @@ namespace Foam
             Field<label>& octreeField
         );
 
-        geomModel* getGeomModel() final override
+        std::shared_ptr<geomModel> getCopy() final override
         {
-            sphereBody* sphereBodyModel = new sphereBody(mesh_,position_,radius_,thrSurf_);
-            sphereBodyModel->initVars(intSpan_,sdBasedLambda_);
-            geomModel* bodyGeomModel = sphereBodyModel;
-            bodyGeomModel->setRhoS(rhoS_);
-            bodyGeomModel->setM0(M0_);
-            bodyGeomModel->getSurfaceCellList() = surfCells_;
-            bodyGeomModel->getInternalCellList() = intCells_;
+            std::shared_ptr<sphereBody> sphereBodyModel =
+                std::make_shared<sphereBody>(mesh_,position_,radius_,thrSurf_);
 
-            return bodyGeomModel;
+            sphereBodyModel->initVars(intSpan_,sdBasedLambda_);
+            sphereBodyModel->setRhoS(rhoS_);
+            sphereBodyModel->setM0(M0_);
+            sphereBodyModel->getSurfaceCellList() = surfCells_;
+            sphereBodyModel->getInternalCellList() = intCells_;
+
+            return sphereBodyModel;
         }
 
         void bodyMovePoints(vector translVec) final override
@@ -157,7 +158,7 @@ namespace Foam
             return bounds;
         }
 
-        void synchronPos() final override;
+        void synchronPos(label owner = -1) final override;
 
         void writeBodyInfo(label bodyId, IOdictionary& dict, word path) final override
         {

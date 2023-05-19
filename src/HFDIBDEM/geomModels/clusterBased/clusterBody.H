@@ -57,7 +57,7 @@ namespace Foam
 
         protected:
 
-        PtrList<geomModel> ibGeomModelList;
+        std::vector<std::shared_ptr<geomModel>> ibGeomModelList;
 
         public:
 
@@ -92,12 +92,9 @@ namespace Foam
             List<labelList>& cellPoints
         ) final override;
 
-        geomModel* getGeomModel() final override
-        {
-            return this;
-        }
+        virtual std::shared_ptr<geomModel> getCopy() = 0;
 
-        // Connect int/surf cells with correct center of mass 
+        // Connect int/surf cells with correct center of mass
         // for fluid-solid interaction
         virtual void getReferencedLists(
             List<DynamicLabelList>& intLists,
@@ -139,7 +136,7 @@ namespace Foam
 
         boundBox getBounds() final override;
 
-        void synchronPos() final override;
+        void synchronPos(label owner = -1) final override;
 
         boolList pointInside(pointField pointI) final override;
 
@@ -172,12 +169,18 @@ namespace Foam
             return true;
         }
 
-        PtrList<geomModel>& getClusterBodies()
+        std::vector<std::shared_ptr<geomModel>>& getClusterBodies()
         {
             return ibGeomModelList;
         }
 
         List<boundBox*> getBBoxes() final override;
+
+        virtual void writeBodyInfo(label bodyId, IOdictionary& dict, word path)
+        {
+            InfoH << iB_Info << "-- geomModelMessage-- "
+                << "custer body writeBodyInfo notIplemented"<<endl;
+        }
     };
 }
 

@@ -92,6 +92,11 @@ class materialInfo
         scalar adhN
     );
 
+    materialInfo
+    (
+        const materialInfo& mi
+    );
+
     // Destructors -------------------------------------------------
     ~materialInfo();
 

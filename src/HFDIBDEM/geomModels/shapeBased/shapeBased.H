@@ -81,7 +81,7 @@ namespace Foam
                 << "notIplemented"<<endl;
         }
 
-        virtual geomModel* getGeomModel() = 0;
+        virtual std::shared_ptr<geomModel> getCopy() = 0;
 
         vector addModelReturnRandomPosition(
             const bool allActiveCellsInMesh,
@@ -132,7 +132,7 @@ namespace Foam
             return bound;
         }
 
-        virtual void synchronPos()
+        virtual void synchronPos(label owner)
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "
                 << "notIplemented"<<endl;

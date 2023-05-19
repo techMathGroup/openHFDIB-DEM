@@ -87,6 +87,31 @@ vector bbMatrix::getSVIndexForPoint
     return subVolumeIndex;
 }
 //---------------------------------------------------------------------------//
+vector bbMatrix::getSVIndexForPoint_Wall
+(
+    point pointInDomain
+)
+{
+    for(label i = 0;i<3;i++)
+    {
+        if(mag(pointInDomain[i])<SMALL)
+        {
+            pointInDomain[i] = 0.0;
+        }
+    } 
+    vector subVolumeIndex(vector::zero);
+    for(label i = 0;i<3;i++)
+    {
+        subVolumeIndex[i] = floor((pointInDomain[i]-bBox_.min()[i])/charCellSize_*virtualMeshLevel::getLevelOfDivision());
+        if(subVolumeIndex[i] >= matrixSize_[i] || subVolumeIndex[i] < 0 )
+        {
+            return(getSVIndexForPoint(bBox_.midpoint()));
+            break;
+        }
+    }
+    return subVolumeIndex;
+}
+//---------------------------------------------------------------------------//
 vector bbMatrix::getFirstSubVolumeIndex
 (
     point& subVolumePoint,

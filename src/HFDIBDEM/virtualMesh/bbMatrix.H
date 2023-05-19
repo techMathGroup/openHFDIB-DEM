@@ -105,6 +105,11 @@ class bbMatrix
         const point& pointInDomain
     );
 
+    vector getSVIndexForPoint_Wall
+    (
+        point pointInDomain
+    );
+
     vector getFirstSubVolumeIndex
     (
         point& subVolumePoint,
@@ -134,6 +139,11 @@ class bbMatrix
     scalar getCharCellSize()
     {
         return charCellSize_;
+    }
+
+    boundBox getBBox()
+    {
+        return bBox_;
     }
 };
 

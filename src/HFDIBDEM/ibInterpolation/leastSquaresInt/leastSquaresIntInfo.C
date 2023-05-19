@@ -38,7 +38,7 @@ using namespace Foam;
 leastSquaresIntInfo::leastSquaresIntInfo
 (
     const  fvMesh&   mesh,
-    autoPtr<geomModel>& gModel,
+    std::shared_ptr<geomModel>& gModel,
     scalar distFactor,
     scalar radiusFactor,
     scalar angleFactor,

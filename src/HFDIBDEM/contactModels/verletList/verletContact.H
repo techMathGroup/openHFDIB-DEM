@@ -26,20 +26,19 @@ InNamspace
     Foam
 
 Description
-    class for addition and removal of immersedBodies
-
-SourceFiles
-    addModelOnce.C
+    class for Verlet contact
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef addModelOnce_H
-#define addModelOnce_H
+#ifndef verletContact_H
+#define verletContact_H
 
-#include "addModel.H"
+#include "verletPoint.H"
+
+#include <vector>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -47,51 +46,81 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                        Class addModelOnce Declaration
+                        Class verletContact Declaration
 \*---------------------------------------------------------------------------*/
 
-class addModelOnce
-:
-    public addModel
+class verletContact
 {
-
     private:
-    const dictionary&       addModelDict_;
-    word                    addMode_;
-    bool                    bodyAdded_;
+
+    label cBodyID_;
+    label tBodyID_;
+
+    std::vector<Tuple2<verletPoint*, verletPoint*>> contactPoints_;
 
     public:
 
     // Constructors ------------------------------------------------
-    addModelOnce
+    verletContact
     (
-        const dictionary& addModelDict,
-        const Foam::fvMesh& mesh,
-        const bool startTime0,
-        std::unique_ptr<geomModel> bodyGeomModel,
-        List<labelList>& cellPoints
-    );
+        Tuple2<label, label> cPair
+    )
+    :
+    cBodyID_(cPair.first()),
+    tBodyID_(cPair.second())
+    {};
 
     // Destructors -------------------------------------------------
-    ~addModelOnce();
+    ~verletContact(){};
 
-    // Public methods ----------------------------------------------
-
-    bool shouldAddBody(const volScalarField& body)
+    void addContactPoint
+    (
+        verletPoint* cPoint,
+        verletPoint* tPoint
+    )
     {
-        return not bodyAdded_;
+        // Check if the contact point is already in the list
+        for (Tuple2<verletPoint*, verletPoint*>& cP : contactPoints_)
+        {
+            if
+            (
+                cP.first() == cPoint
+             && cP.second() == tPoint
+            )
+            {
+                return;
+            }
+        }
+
+        contactPoints_.push_back(Tuple2<verletPoint*, verletPoint*>(cPoint, tPoint));
     }
 
-    std::shared_ptr<geomModel> addBody(
-        const volScalarField& body,
-        PtrList<immersedBody>& immersedBodies
-    );
-
-    bool getBodyAdded()
+    void removeContactPoint
+    (
+        verletPoint* cPoint,
+        verletPoint* tPoint
+    )
     {
-        return bodyAdded_;
+        for (auto it = contactPoints_.begin(); it != contactPoints_.end(); ++it)
+        {
+            if
+            (
+                it->first() == cPoint
+             && it->second() == tPoint
+            )
+            {
+                contactPoints_.erase(it);
+                return;
+            }
+        }
     }
-};
+
+    std::vector<Tuple2<verletPoint*, verletPoint*>>& getContactPoints()
+    {
+        return contactPoints_;
+    }
+
+}; // End class verletContact
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
