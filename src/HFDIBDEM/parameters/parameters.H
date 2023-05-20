@@ -43,6 +43,7 @@ Contributors
 #include "wallMatInfo.H"
 #include "wallPlaneInfo.H"
 #include "virtualMeshLevel.H"
+#include "cyclicPlaneInfo.H"
 
 namespace Foam
 {
@@ -62,6 +63,12 @@ HashTable<materialInfo,string,Hash<string>> wallMatInfo::wallMatInfo_ =
 
 HashTable<List<vector>,string,Hash<string>> wallPlaneInfo::wallPlaneInfo_ =
     HashTable<List<vector>,string,Hash<string>>();
+
+HashTable<List<vector>,string,Hash<string>> cyclicPlaneInfo::cyclicPlaneInfo_ =
+    HashTable<List<vector>,string,Hash<string>>();
+
+std::map<string, string> cyclicPlaneInfo::cyclicPatchPairs_ =
+    std::map<string, string>();
 
 scalar virtualMeshLevel::virtualMeshLevel_ = 1;
 scalar virtualMeshLevel::levelOfDivision_ = 1;

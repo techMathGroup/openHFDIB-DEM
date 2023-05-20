@@ -155,7 +155,21 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 
     if(demDic.found("cyclicPatches"))
     {
-        cyclicPatches_ = wordList(demDic.lookup("cyclicPatches"));
+        dictionary cyclicPatchDic = demDic.subDict("cyclicPatches");
+        List<word> cyclicPatchNames = cyclicPatchDic.toc();
+        forAll(cyclicPatchNames, patchI)
+        {
+            vector patchNVec = cyclicPatchDic.subDict(cyclicPatchNames[patchI]).lookup("nVec");
+            vector planePoint = cyclicPatchDic.subDict(cyclicPatchNames[patchI]).lookup("planePoint");
+            word neighbourPatch = cyclicPatchDic.subDict(cyclicPatchNames[patchI]).lookup("neighbourPatch");
+
+            cyclicPlaneInfo::insert(
+                cyclicPatchNames[patchI],
+                patchNVec,
+                planePoint,
+                neighbourPatch
+            );
+        }
     }
 
     if (HFDIBDEMDict_.found("geometricD"))
@@ -540,19 +554,17 @@ void openHFDIBDEM::writeBodiesInfo()
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 {
-    if (cyclicPatches_.size() > 0)
+    if (cyclicPlaneInfo::getCyclicPlaneInfo().size() > 0)
     {
         forAll (immersedBodies_,bodyId)
         {
             if (!immersedBodies_[bodyId].getGeomModel().isCluster())
             {
-                vector newPos = vector::zero;
+                vector transVec = vector::zero;
 
                 if (detectCyclicContact(
-                    mesh_,
-                    cyclicPatches_,
                     immersedBodies_[bodyId].getWallCntInfo(),
-                    newPos
+                    transVec
                 ))
                 {
                     verletList_.removeBodyFromVList(immersedBodies_[bodyId]);
@@ -563,13 +575,14 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
                     newPeriodicBody->setRhoS(immersedBodies_[bodyId].getGeomModel().getRhoS());
                     std::shared_ptr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getCopy());
-                    vector transVec = newPos - iBcopy->getCoM();
+                    Info << "Translating body " << bodyId << " by " << transVec << endl;
                     iBcopy->bodyMovePoints(transVec);
                     newPeriodicBody->addBodyToCluster(immersedBodies_[bodyId].getGeomModelPtr());
                     newPeriodicBody->addBodyToCluster(iBcopy);
                     immersedBodies_[bodyId].getGeomModelPtr() = newPeriodicBody;
 
                     verletList_.addBodyToVList(immersedBodies_[bodyId]);
+                    Info << "Periodic body created for body " << bodyId << endl;
                 }
             }
             else
@@ -583,6 +596,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     immersedBodies_[bodyId].getGeomModelPtr() = cBody.getRemGeomModel();
 
                     verletList_.addBodyToVList(immersedBodies_[bodyId]);
+                    Info << "Periodic body unclustered for body " << bodyId << endl;
                 }
             }
         }

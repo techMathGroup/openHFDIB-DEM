@@ -31,6 +31,8 @@ Contributors
 \*---------------------------------------------------------------------------*/
 #include "cyclicContact.H"
 
+#include "cyclicPlaneInfo.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -44,77 +46,72 @@ namespace contactModel
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 //---------------------------------------------------------------------------//
 bool detectCyclicContact(
-    const fvMesh&   mesh,
-    wordList& cyclicPatches,
     wallContactInfo& wallCntInfo,
     vector& transVec
 )
 {
-    bool inContact = false;
-    int numOfContact = 0;
+    // bool inContact = false;
+    // int numOfContact = 0;
 
-    label nCells = mesh.nCells();
-    List<DynamicLabelList>& surfCells(wallCntInfo.getcClass().getSurfCells());
-    // go through all surfCells and check if there is any surfCell whose face is a boundary face
-    forAll (surfCells[Pstream::myProcNo()],sCellI)
+    // label nCells = mesh.nCells();
+    // List<DynamicLabelList>& surfCells(wallCntInfo.getcClass().getSurfCells());
+    // // go through all surfCells and check if there is any surfCell whose face is a boundary face
+    // forAll (surfCells[Pstream::myProcNo()],sCellI)
+    // {
+    //     label cCell(surfCells[Pstream::myProcNo()][sCellI]);
+    //     if(cCell < nCells)
+    //     {
+    //         const labelList& cFaces = mesh.cells()[cCell];
+    //         forAll (cFaces,faceI)
+    //         {
+    //             if (!mesh.isInternalFace(cFaces[faceI]))
+    //             {
+    //                 // get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
+    //                 label facePatchId = mesh.boundaryMesh().whichPatch(cFaces[faceI]);
+    //                 const polyPatch& cPatch = mesh.boundaryMesh()[facePatchId];
+    //                 if (cPatch.type()=="cyclic")
+    //                 {
+    //                     forAll (cyclicPatches, patchI)
+    //                     {
+    //                         if (cyclicPatches[patchI] == cPatch.name())
+    //                         {
+    //                             const cyclicPolyPatch& cyclicPatch = refCast<const cyclicPolyPatch>(cPatch);
+    //                             transVec = cyclicPatch.transform().invTransformPosition(wallCntInfo.getcClass().getGeomModel().getCoM());
+    //                             inContact = true;
+    //                             numOfContact = 1;
+    //                             break;
+    //                         }
+    //                     }
+    //                 }
+    //                 else if(cPatch.type()=="processorCyclic")
+    //                 {
+    //                     forAll (cyclicPatches, patchI)
+    //                     {
+    //                         if(cPatch.name().find(cyclicPatches[patchI]) != string::npos)
+    //                         {
+    //                             const coupledPolyPatch& cyclicPatch = refCast<const coupledPolyPatch>(cPatch);
+    //                             transVec = cyclicPatch.transform().invTransformPosition(wallCntInfo.getcClass().getGeomModel().getCoM());
+    //                             inContact = true;
+    //                             numOfContact = 1;
+    //                             break;
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //             if(inContact)
+    //                 break;
+    //         }
+    //     }
+    //     if(inContact)
+    //         break;
+    // }
+
+    if (wallCntInfo.detectWallContact(cyclicPlaneInfo::getCyclicPlaneInfo()))
     {
-        label cCell(surfCells[Pstream::myProcNo()][sCellI]);
-        if(cCell < nCells)
-        {
-            const labelList& cFaces = mesh.cells()[cCell];
-            forAll (cFaces,faceI)
-            {
-                if (!mesh.isInternalFace(cFaces[faceI]))
-                {
-                    // get reference to the patch which is in contact with IB. There is contact only if the patch is marked as a wall
-                    label facePatchId = mesh.boundaryMesh().whichPatch(cFaces[faceI]);
-                    const polyPatch& cPatch = mesh.boundaryMesh()[facePatchId];
-                    if (cPatch.type()=="cyclic")
-                    {
-                        forAll (cyclicPatches, patchI)
-                        {
-                            if (cyclicPatches[patchI] == cPatch.name())
-                            {
-                                const cyclicPolyPatch& cyclicPatch = refCast<const cyclicPolyPatch>(cPatch);
-                                transVec = cyclicPatch.transform().invTransformPosition(wallCntInfo.getcClass().getGeomModel().getCoM());
-                                inContact = true;
-                                numOfContact = 1;
-                                break;
-                            }
-                        }
-                    }
-                    else if(cPatch.type()=="processorCyclic")
-                    {
-                        forAll (cyclicPatches, patchI)
-                        {
-                            if(cPatch.name().find(cyclicPatches[patchI]) != string::npos)
-                            {
-                                const coupledPolyPatch& cyclicPatch = refCast<const coupledPolyPatch>(cPatch);
-                                transVec = cyclicPatch.transform().invTransformPosition(wallCntInfo.getcClass().getGeomModel().getCoM());
-                                inContact = true;
-                                numOfContact = 1;
-                                break;
-                            }
-                        }
-                    }
-                }
-                if(inContact)
-                    break;
-            }
-        }
-        if(inContact)
-            break;
-    }
-
-    reduce(inContact, orOp<bool>());
-
-    if(inContact)
-    {
-        reduce(transVec, sumOp<vector>());
-        reduce(numOfContact, sumOp<int>());
-        transVec /= numOfContact;
+        transVec = cyclicPlaneInfo::getCyclicTransVec(wallCntInfo.getContactPatches()[0]);
         return true;
     }
+
     return false;
 }
 //---------------------------------------------------------------------------//
