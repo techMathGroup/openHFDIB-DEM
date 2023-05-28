@@ -120,7 +120,7 @@ namespace Foam
         symmTensor  I_;
 
         //Boundbox of the particle
-        boundBox bBox_;
+        std::shared_ptr<boundBox> bBox_;
 
         //characteristic diameter of the body
         scalar  dC_;
@@ -403,7 +403,7 @@ namespace Foam
             List<labelList>& cellPoints
         );
 
-        virtual List<boundBox*> getBBoxes();
+        virtual List<std::shared_ptr<boundBox>> getBBoxes();
 
         virtual pointField getSTLBodyPoints()
         {

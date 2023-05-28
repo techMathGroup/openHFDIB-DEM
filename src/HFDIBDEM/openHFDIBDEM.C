@@ -575,7 +575,6 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
                     newPeriodicBody->setRhoS(immersedBodies_[bodyId].getGeomModel().getRhoS());
                     std::shared_ptr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getCopy());
-                    Info << "Translating body " << bodyId << " by " << transVec << endl;
                     iBcopy->bodyMovePoints(transVec);
                     newPeriodicBody->addBodyToCluster(immersedBodies_[bodyId].getGeomModelPtr());
                     newPeriodicBody->addBodyToCluster(iBcopy);
@@ -653,14 +652,12 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         }
         if(wallContactIB.size() > 0)
         {
-            InfoH << DEM_Info << " wallContactList SCListSize() " << wallContactList.size() << endl;
             label wallContactPerProc(ceil(double(wallContactList.size())/Pstream::nProcs()));
 
             if( wallContactList.size() <= Pstream::nProcs())
             {
                 wallContactPerProc = 1;
             }
-            InfoH << DEM_Info << " wallContactList wallContactPerProc " << wallContactPerProc << endl;
 
             for(int assignProc = Pstream::myProcNo()*wallContactPerProc; assignProc < min((Pstream::myProcNo()+1)*wallContactPerProc,wallContactList.size()); assignProc++)
             {
@@ -705,7 +702,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         // check only pairs whose bounding boxes are intersected for the contact
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
         {
-            const Tuple2<label, label>& cPair = it.key();
+            const Tuple2<label, label> cPair = Tuple2<label, label>(it->first, it->second);
 
             label cInd(cPair.first());
             bool cStatic(immersedBodies_[cInd].getbodyOperation() == 0);
@@ -766,7 +763,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
         {
-            const Tuple2<label, label>& cPair = it.key();
+            const Tuple2<label, label> cPair = Tuple2<label, label>(it->first, it->second);
             label cInd(cPair.first());
             label tInd(cPair.second());
 
