@@ -41,6 +41,8 @@ Contributors
 #include "fvCFD.H"
 #include "geomModel.H"
 
+#include <memory>
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -50,15 +52,16 @@ namespace Foam
                         Class verletPoint Declaration
 \*---------------------------------------------------------------------------*/
 
+class verletBox;
+
 class verletPoint
-:
-    public IDLList<verletPoint>::link
 {
     private:
 
     label bodyID_;
+    std::shared_ptr<verletBox> parentBox_;
 
-    point& pointLoc_;
+    point& vPoint_;
     const bool isMin_;
 
     public:
@@ -67,12 +70,14 @@ class verletPoint
     verletPoint
     (
         label bodyID,
-        point& pointLoc,
+        std::shared_ptr<verletBox> parentBox,
+        point& vPoint,
         const bool isMin
     )
     :
     bodyID_(bodyID),
-    pointLoc_(pointLoc),
+    parentBox_(parentBox),
+    vPoint_(vPoint),
     isMin_(isMin)
     {};
 
@@ -86,7 +91,7 @@ class verletPoint
 
     point& getPoint()
     {
-        return pointLoc_;
+        return vPoint_;
     }
 
     label getBodyId()
@@ -94,9 +99,76 @@ class verletPoint
         return bodyID_;
     }
 
-    autoPtr<verletPoint> clone() const
+    std::shared_ptr<verletBox> getParentBox()
     {
-        return autoPtr<verletPoint>(new verletPoint(*this));
+        return parentBox_;
+    }
+};
+
+class verletBox
+: public std::enable_shared_from_this<verletBox>
+{
+    private:
+
+    label bodyID_;
+    std::shared_ptr<boundBox> bBox_;
+
+    std::shared_ptr<verletPoint> minPoint_;
+    std::shared_ptr<verletPoint> maxPoint_;
+
+    // Constructors ------------------------------------------------
+    verletBox
+    (
+        label bodyID,
+        std::shared_ptr<boundBox> bBox
+    )
+    :
+    bodyID_(bodyID),
+    bBox_(bBox)
+    {};
+
+    public:
+
+    std::shared_ptr<verletBox> getptr()
+    {
+        return shared_from_this();
+    }
+    // No public constructor, only a factory function,
+    // so there's no way to have getptr return nullptr.
+    [[nodiscard]] static std::shared_ptr<verletBox> create
+    (
+        label bodyID,
+        std::shared_ptr<boundBox> bBox
+    )
+    {
+        // Not using std::make_shared<Best> because the c'tor is private.
+        return std::shared_ptr<verletBox>(new verletBox(bodyID, bBox));
+    }
+
+    std::shared_ptr<boundBox>& getBBox()
+    {
+        return bBox_;
+    }
+
+    label getBodyId()
+    {
+        return bodyID_;
+    }
+
+    void setVerletPoints()
+    {
+        minPoint_ = std::make_shared<verletPoint>(bodyID_, shared_from_this(), bBox_->min(), true);
+        maxPoint_ = std::make_shared<verletPoint>(bodyID_, shared_from_this(), bBox_->max(), false);
+    }
+
+    std::shared_ptr<verletPoint> getMinPoint()
+    {
+        return minPoint_;
+    }
+
+    std::shared_ptr<verletPoint> getMaxPoint()
+    {
+        return maxPoint_;
     }
 };
 

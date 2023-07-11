@@ -34,8 +34,6 @@ Contributors
 #include "subVolume.H"
 #include "virtualMeshLevel.H"
 
-#include "clockTime.H"
-
 using namespace Foam;
 
 //---------------------------------------------------------------------------//
@@ -52,8 +50,7 @@ vMeshInfo_(vMeshInfo)
 {}
 
 virtualMesh::~virtualMesh()
-{
-}
+{}
 //---------------------------------------------------------------------------//
 bool virtualMesh::detectFirstContactPoint()
 {
@@ -220,6 +217,7 @@ void virtualMesh::inspectSubVolume(
             if (cVolumeTypeMixed)
             {
                 edgePoints.append(sV.midpoint());
+                sV.setAsEdge();
             }
 
             sV.tVolumeInfo().volumeType_ = tGeomModel_.limitFinalSubVolume(
@@ -293,10 +291,50 @@ void virtualMesh::inspectSubVolume(
     if (sV.cVolumeInfo().volumeType_ == volumeType::mixed && sV.tVolumeInfo().volumeType_ == volumeType::mixed)
     {
         edgePoints.append(sV.midpoint());
+        sV.setAsEdge();
     }
 }
 //---------------------------------------------------------------------------//
-Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface()
+Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(bool nonConvex)
+{
+    if (nonConvex)
+    {
+        std::vector<subContact> sCS = findsubContacts(vMeshInfo_.sV);
+        Tuple2<scalar,vector> contactNormalAndSurface
+            = Tuple2<scalar,vector>(0.0,vector::zero);
+
+        scalar totalVolume = 0;
+
+        for (subContact& sC : sCS)
+        {
+            DynamicPointList edgeSubContactPoints = sC.getEdgePoints();
+            Tuple2<scalar,vector> cNormalAndSurf
+                = get3DcontactNormalAndSurface(edgeSubContactPoints);
+
+            if (cNormalAndSurf.first() > 0)
+            {
+                contactNormalAndSurface.first() += cNormalAndSurf.first();
+                contactNormalAndSurface.second()
+                    += cNormalAndSurf.second() * sC.getVolume();
+                totalVolume += sC.getVolume();
+            }
+        }
+
+        if (contactNormalAndSurface.first() > 0)
+        {
+            contactNormalAndSurface.second()
+                /= totalVolume;
+        }
+
+        return contactNormalAndSurface;
+    }
+    else
+    {
+        return get3DcontactNormalAndSurface(edgeSubVolumesPoints_);
+    }
+}
+//---------------------------------------------------------------------------//
+Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList edgeSubVolumesPoints)
 {
 // This function is taken from prtContact and just adjustated for higher accuracy
     scalar area(0.0);
@@ -304,24 +342,32 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface()
     scalar tDC(tGeomModel_.getDC());
     vector normalVector = vector::zero;
     point closestPoint = vector::zero;
+
+    point subContactCenter = vector::zero;
+    forAll (edgeSubVolumesPoints,cell)
+    {
+        subContactCenter += edgeSubVolumesPoints[cell];
+    }
+    subContactCenter /= edgeSubVolumesPoints.size();
+
     tGeomModel_.getClosestPointAndNormal
     (
-        contactCenter_,
+        subContactCenter,
         vector::one * tDC,
         closestPoint,
         normalVector
     );
 
-    if (edgeSubVolumesPoints_.size() >= 3)
+    if (edgeSubVolumesPoints.size() >= 3)
     {
         bool normOk(false);
         vector center(vector::zero);
 
-        forAll (edgeSubVolumesPoints_,cell)
+        forAll (edgeSubVolumesPoints,cell)
         {
-            center += edgeSubVolumesPoints_[cell];
+            center += edgeSubVolumesPoints[cell];
         }
-        center /= edgeSubVolumesPoints_.size();
+        center /= edgeSubVolumesPoints.size();
 
         scalar xx(0);
         scalar xy(0);
@@ -330,9 +376,9 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface()
         scalar yz(0);
         scalar zz(0);
 
-        forAll (edgeSubVolumesPoints_,cell)
+        forAll (edgeSubVolumesPoints,cell)
         {
-            vector subPoint(edgeSubVolumesPoints_[cell] - center);
+            vector subPoint(edgeSubVolumesPoints[cell] - center);
             if(subPoint != vector::zero)
                 subPoint = subPoint/mag(subPoint);
             xx += subPoint[0] * subPoint[0];
@@ -343,12 +389,12 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface()
             zz += subPoint[2] * subPoint[2];
         }
 
-        xx /= edgeSubVolumesPoints_.size();
-        xy /= edgeSubVolumesPoints_.size();
-        xz /= edgeSubVolumesPoints_.size();
-        yy /= edgeSubVolumesPoints_.size();
-        yz /= edgeSubVolumesPoints_.size();
-        zz /= edgeSubVolumesPoints_.size();
+        xx /= edgeSubVolumesPoints.size();
+        xy /= edgeSubVolumesPoints.size();
+        xz /= edgeSubVolumesPoints.size();
+        yy /= edgeSubVolumesPoints.size();
+        yz /= edgeSubVolumesPoints.size();
+        zz /= edgeSubVolumesPoints.size();
 
         vector weightedDir(vector::zero);
 
@@ -385,9 +431,9 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface()
         plane bestFitPlane(contactCenter_, normalVec);
         normalVec = bestFitPlane.normal();
         DynamicPointList commCellsPosInPlane;
-        forAll (edgeSubVolumesPoints_,cell)
+        forAll (edgeSubVolumesPoints,cell)
         {
-            commCellsPosInPlane.append(bestFitPlane.nearestPoint(edgeSubVolumesPoints_[cell]));
+            commCellsPosInPlane.append(bestFitPlane.nearestPoint(edgeSubVolumesPoints[cell]));
 		}
 
         vector q1(1.0, 0.0, 0.0);
@@ -478,6 +524,93 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface()
     Tuple2<scalar,vector> returnValue(area,normalVec);
 
     return returnValue;
+}
+//---------------------------------------------------------------------------//
+std::vector<subContact> virtualMesh::findsubContacts(subVolume& sV)
+{
+    if (sV.hasChildSubVolumes())
+    {
+        std::vector<subContact> childsSubContacts;
+        for (subVolume& child : sV.childSubVolumes())
+        {
+            std::vector<subContact> childSubContacts(findsubContacts(child));
+            std::move(childSubContacts.begin(), childSubContacts.end(), std::back_inserter(childsSubContacts));
+        }
+
+        if (childsSubContacts.size() == 0)
+        {
+            return {};
+        }
+
+        std::vector<subContact> returnValue;
+        returnValue.push_back(childsSubContacts.back());
+        childsSubContacts.pop_back();
+
+        while (childsSubContacts.size() > 0)
+        {
+            bool found = false;
+            auto childSCIter = childsSubContacts.begin();
+            while (childSCIter != childsSubContacts.end())
+            {
+                if (canCombineSubContacts(
+                    returnValue.back(),
+                    *childSCIter
+                ))
+                {
+                    subContact& childSC = *childSCIter;
+                    for (auto& sV : childSC.getSubVolumes())
+                    {
+                        returnValue.back().addSubVolume(sV);
+                    }
+
+                    childsSubContacts.erase(childSCIter);
+                    found = true;
+                    break;
+                }
+
+                ++childSCIter;
+            }
+
+            if (!found)
+            {
+                returnValue.push_back(childsSubContacts.back());
+                childsSubContacts.pop_back();
+            }
+        }
+
+        return returnValue;
+    }
+
+    std::vector<subContact> returnValue;
+    if (sV.cVolumeInfo().volumeType_ != volumeType::outside
+        && sV.tVolumeInfo().volumeType_ != volumeType::outside)
+    {
+        returnValue.push_back(subContact());
+        returnValue.back().addSubVolume(std::make_shared<subVolume>(sV));
+    }
+
+    return returnValue;
+}
+//---------------------------------------------------------------------------//
+bool virtualMesh::canCombineSubContacts(
+    subContact& main,
+    subContact& comp
+) const
+{
+    if (!main.getBounds().overlaps(comp.getBounds()))
+    {
+        return false;
+    }
+
+    for (const auto& sV : comp.getSubVolumes())
+    {
+        if (main.canCombine(*sV))
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 //---------------------------------------------------------------------------//
 // ************************************************************************* //

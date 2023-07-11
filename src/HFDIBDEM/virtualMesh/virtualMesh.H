@@ -44,6 +44,7 @@ Contributors
 #include "geomModel.H"
 #include "clockTime.H"
 #include "subVolume.H"
+#include "subContact.H"
 
 
 // #include "fvMesh.H"
@@ -174,7 +175,16 @@ class virtualMesh
         return contactCenter_;
     }
 
-    Tuple2<scalar,vector> get3DcontactNormalAndSurface();
+    Tuple2<scalar,vector> get3DcontactNormalAndSurface(bool nonConvex);
+
+    Tuple2<scalar,vector> get3DcontactNormalAndSurface(DynamicPointList edgeSubVolumesPoints);
+
+    std::vector<subContact> findsubContacts(subVolume& sV);
+
+    bool canCombineSubContacts(
+        subContact& main,
+        subContact& comp
+    ) const;
 };
 
 

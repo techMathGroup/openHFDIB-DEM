@@ -52,6 +52,7 @@ Contributors
 #include "spectatorMesh.H"
 #include "virtualMeshWall.H"
 #include "wallSubContactInfo.H"
+#include "wallPlaneInfo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -134,10 +135,13 @@ class wallContactInfo
     bool isInsidePlane
     (
         vector checkedPoint,
-        string wallName
+        const string& wall,
+        const HashTable<List<vector>,string,Hash<string>>& wallPatches = wallPlaneInfo::getWallPlaneInfo()
     );
 
-    bool detectWallContact();
+    bool detectWallContact(
+        const HashTable<List<vector>,string,Hash<string>>& wallPatches = wallPlaneInfo::getWallPlaneInfo()
+    );
 
     void findContactAreas();
 
@@ -189,15 +193,6 @@ class wallContactInfo
     (
         boundBox bB,
         string wallName
-    );
-
-    void recoredResults
-    (
-        DynamicList<vector> contactPoints,
-        DynamicList<vector> surfaceSMCells,
-        DynamicList<vector> internalSMCells,
-        label SCID,
-        scalar time
     );
 
     void clearOldContact();

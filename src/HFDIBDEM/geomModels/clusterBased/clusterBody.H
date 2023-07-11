@@ -174,7 +174,7 @@ namespace Foam
             return ibGeomModelList;
         }
 
-        List<boundBox*> getBBoxes() final override;
+        List<std::shared_ptr<boundBox>> getBBoxes() final override;
 
         virtual void writeBodyInfo(label bodyId, IOdictionary& dict, word path)
         {

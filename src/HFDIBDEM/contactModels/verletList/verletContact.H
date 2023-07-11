@@ -38,7 +38,8 @@ Contributors
 
 #include "verletPoint.H"
 
-#include <vector>
+#include <list>
+#include <memory>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -56,68 +57,60 @@ class verletContact
     label cBodyID_;
     label tBodyID_;
 
-    std::vector<Tuple2<verletPoint*, verletPoint*>> contactPoints_;
+    std::list<std::pair<std::shared_ptr<verletBox>, std::shared_ptr<verletBox>>> contactBoxes_;
 
     public:
 
     // Constructors ------------------------------------------------
+    verletContact():
+    cBodyID_(-1),
+    tBodyID_(-1)
+    {};
+
     verletContact
     (
-        Tuple2<label, label> cPair
+        std::pair<label, label> cPair
     )
     :
-    cBodyID_(cPair.first()),
-    tBodyID_(cPair.second())
+    cBodyID_(cPair.first),
+    tBodyID_(cPair.second)
     {};
 
     // Destructors -------------------------------------------------
     ~verletContact(){};
 
-    void addContactPoint
+    void addContactBox
     (
-        verletPoint* cPoint,
-        verletPoint* tPoint
+        std::shared_ptr<verletBox> cBox,
+        std::shared_ptr<verletBox> tBox
     )
     {
         // Check if the contact point is already in the list
-        for (Tuple2<verletPoint*, verletPoint*>& cP : contactPoints_)
+        for (std::pair<std::shared_ptr<verletBox>, std::shared_ptr<verletBox>>& cB : contactBoxes_)
         {
-            if
-            (
-                cP.first() == cPoint
-             && cP.second() == tPoint
-            )
+            if (cB.first == cBox && cB.second == tBox)
             {
                 return;
             }
         }
 
-        contactPoints_.push_back(Tuple2<verletPoint*, verletPoint*>(cPoint, tPoint));
+        contactBoxes_.push_back(std::make_pair(cBox, tBox));
     }
 
-    void removeContactPoint
+    void removeContactBox
     (
-        verletPoint* cPoint,
-        verletPoint* tPoint
+        std::shared_ptr<verletBox> cBox,
+        std::shared_ptr<verletBox> tBox
     )
     {
-        for (auto it = contactPoints_.begin(); it != contactPoints_.end(); ++it)
-        {
-            if
-            (
-                it->first() == cPoint
-             && it->second() == tPoint
-            )
-            {
-                contactPoints_.erase(it);
-                return;
-            }
-        }
+        contactBoxes_.remove_if(
+            [&cBox, &tBox] (const std::pair<std::shared_ptr<verletBox>, std::shared_ptr<verletBox>>& cB)
+            { return cB.first == cBox && cB.second == tBox; });
     }
 
-    std::vector<Tuple2<verletPoint*, verletPoint*>>& getContactPoints()
+    std::list<std::pair<std::shared_ptr<verletBox>, std::shared_ptr<verletBox>>>& getContactBoxes()
     {
-        return contactPoints_;
+        return contactBoxes_;
     }
 
 }; // End class verletContact

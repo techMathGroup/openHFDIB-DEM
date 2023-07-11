@@ -42,55 +42,17 @@ cntNeighList_(3)
 verletList::~verletList()
 {}
 //---------------------------------------------------------------------------//
-void verletList::mergeSortList(IDLList<verletPoint>& listToSort, label coord)
-{
-    if(listToSort.size() > 1)
-    {
-        label half = floor(listToSort.size() / 2);
-        IDLList<verletPoint> secondList;
-
-        for (label i = 0; i < half; ++i)
-        {
-            secondList.append(listToSort.removeHead());
-        }
-
-        mergeSortList(listToSort, coord);
-        mergeSortList(secondList, coord);
-
-        IDLList<verletPoint> resultList;
-
-        while(listToSort.size() > 0 && secondList.size() > 0)
-        {
-            if(listToSort.first()->getPoint()[coord]
-                < secondList.first()->getPoint()[coord])
-            {
-                resultList.append(listToSort.removeHead());
-            }
-            else
-            {
-                resultList.append(secondList.removeHead());
-            }
-        }
-
-        while(listToSort.size() > 0)
-        {
-            resultList.append(listToSort.removeHead());
-        }
-        while(secondList.size() > 0)
-        {
-            resultList.append(secondList.removeHead());
-        }
-        listToSort = resultList;
-    }
-}
-//---------------------------------------------------------------------------//
-void verletList::swapVerletPoints(verletPoint* a, verletPoint* b, label coord)
+void verletList::swapVerletPoints(
+    std::shared_ptr<verletPoint> a,
+    std::shared_ptr<verletPoint> b,
+    label coord
+)
 {
     if(a->getBodyId() != b->getBodyId())
     {
         if(!a->isMin() && b->isMin())
         {
-            Tuple2<label, label> newPair(
+            cPair newPair(
                 min(a->getBodyId(), b->getBodyId()),
                 max(a->getBodyId(), b->getBodyId())
             );
@@ -98,72 +60,76 @@ void verletList::swapVerletPoints(verletPoint* a, verletPoint* b, label coord)
         }
         else if(a->isMin() && !b->isMin())
         {
-            Tuple2<label, label> cPair(
+            cPair cPair(
                 min(a->getBodyId(), b->getBodyId()),
                 max(a->getBodyId(), b->getBodyId())
             );
-            if(cntNeighList_[coord].found(cPair))
+
+            if(cntNeighList_[coord].find(cPair) != cntNeighList_[coord].end())
             {
                 if (a->getBodyId() < b->getBodyId())
                 {
-                    cntNeighList_[coord][cPair].removeContactPoint(a, b);
+                    cntNeighList_[coord][cPair].removeContactBox(a->getParentBox(), b->getParentBox());
                 }
                 else
                 {
-                    cntNeighList_[coord][cPair].removeContactPoint(b, a);
+                    cntNeighList_[coord][cPair].removeContactBox(b->getParentBox(), a->getParentBox());
                 }
 
-                if (cntNeighList_[coord][cPair].getContactPoints().size() == 0)
+                if (cntNeighList_[coord][cPair].getContactBoxes().size() == 0)
                 {
                     cntNeighList_[coord].erase(cPair);
                 }
             }
-            if(posCntList_.found(cPair))
+
+            if(posCntList_.find(cPair) != posCntList_.end() &&
+                ((cntNeighList_[0].find(cPair) == cntNeighList_[0].end() && emptyDim != 0) ||
+                (cntNeighList_[1].find(cPair) == cntNeighList_[1].end() && emptyDim != 1) ||
+                (cntNeighList_[2].find(cPair) == cntNeighList_[2].end() && emptyDim != 2)))
             {
                 posCntList_.erase(cPair);
             }
         }
     }
-
-    verletLists_[coord].swapDown(a);
 }
 //---------------------------------------------------------------------------//
 void verletList::addCPairToCntNList(
-    Tuple2<label, label> cPair,
+    cPair cPair,
     label coord,
-    verletPoint* a,
-    verletPoint* b
+    std::shared_ptr<verletPoint> a,
+    std::shared_ptr<verletPoint> b
 )
 {
-    if(!cntNeighList_[coord].found(cPair))
+    if(cntNeighList_[coord].find(cPair) == cntNeighList_[coord].end())
     {
         verletContact newContact(cPair);
         if (a->getBodyId() < b->getBodyId())
         {
-            newContact.addContactPoint(a, b);
+            newContact.addContactBox(a->getParentBox(), b->getParentBox());
         }
         else
         {
-            newContact.addContactPoint(b, a);
+            newContact.addContactBox(b->getParentBox(), a->getParentBox());
         }
-        cntNeighList_[coord].insert(cPair, newContact);
+
+        cntNeighList_[coord].insert({cPair, newContact});
     }
     else
     {
         if (a->getBodyId() < b->getBodyId())
         {
-            cntNeighList_[coord][cPair].addContactPoint(a, b);
+            cntNeighList_[coord][cPair].addContactBox(a->getParentBox(), b->getParentBox());
         }
         else
         {
-            cntNeighList_[coord][cPair].addContactPoint(b, a);
+            cntNeighList_[coord][cPair].addContactBox(b->getParentBox(), a->getParentBox());
         }
     }
 
-    if(!posCntList_.found(cPair) &&
-        (cntNeighList_[0].found(cPair) || emptyDim == 0) &&
-        (cntNeighList_[1].found(cPair) || emptyDim == 1) &&
-        (cntNeighList_[2].found(cPair) || emptyDim == 2))
+    if(posCntList_.find(cPair) == posCntList_.end() &&
+        (cntNeighList_[0].find(cPair) != cntNeighList_[0].end() || emptyDim == 0) &&
+        (cntNeighList_[1].find(cPair) != cntNeighList_[1].end() || emptyDim == 1) &&
+        (cntNeighList_[2].find(cPair) != cntNeighList_[2].end() || emptyDim == 2))
     {
         posCntList_.insert(cPair);
     }
@@ -171,24 +137,28 @@ void verletList::addCPairToCntNList(
 //---------------------------------------------------------------------------//
 void verletList::addBodyToVList(immersedBody& ib)
 {
-    List<boundBox*> bBoxes = ib.getGeomModel().getBBoxes();
+    List<std::shared_ptr<boundBox>> bBoxes = ib.getGeomModel().getBBoxes();
+
     forAll(bBoxes, bBox)
     {
+        verletBoxes_.push_back(verletBox::create(
+            ib.getBodyId(),
+            bBoxes[bBox]
+        ));
+
+        verletBoxes_.back()->setVerletPoints();
+
         forAll(verletLists_, vListI)
         {
             if(vListI != emptyDim)
             {
-                verletLists_[vListI].append(new verletPoint(
-                    ib.getBodyId(),
-                    bBoxes[bBox]->min(),
-                    true
-                ));
+                verletLists_[vListI].push_back(
+                    verletBoxes_.back()->getMinPoint()
+                );
 
-                verletLists_[vListI].append(new verletPoint(
-                    ib.getBodyId(),
-                    bBoxes[bBox]->max(),
-                    false
-                ));
+                verletLists_[vListI].push_back(
+                    verletBoxes_.back()->getMaxPoint()
+                );
             }
         }
     }
@@ -198,35 +168,47 @@ void verletList::removeBodyFromVList(immersedBody& ib)
 {
     forAll (verletLists_, coordI)
     {
-        for (auto it = verletLists_[coordI].begin();
-            it != verletLists_[coordI].end(); ++it)
-        {
-            if ((*it).getBodyId() == ib.getBodyId())
+        verletLists_[coordI].remove_if(
+            [&ib](std::shared_ptr<verletPoint>& vPoint)
             {
-                delete(verletLists_[coordI].remove(it));
+                return vPoint->getBodyId() == ib.getBodyId();
             }
-        }
+        );
 
         for (auto it = cntNeighList_[coordI].begin();
-            it != cntNeighList_[coordI].end(); ++it)
+            it != cntNeighList_[coordI].end();)
         {
-            if (it.key().first() == ib.getBodyId()
+            if (it->first.first == ib.getBodyId()
                 ||
-                it.key().second() == ib.getBodyId())
+                it->first.second == ib.getBodyId())
             {
-                cntNeighList_[coordI].erase(it);
+                it = cntNeighList_[coordI].erase(it);
+            }
+            else
+            {
+                ++it;
             }
         }
     }
 
-    for (auto it = posCntList_.begin();
-        it != posCntList_.end(); ++it)
-    {
-        if (it.key().first() == ib.getBodyId()
-            ||
-            it.key().second() == ib.getBodyId())
+    verletBoxes_.remove_if(
+        [&ib](std::shared_ptr<verletBox>& vBox)
         {
-            posCntList_.erase(it);
+            return vBox->getBodyId() == ib.getBodyId();
+        }
+    );
+
+    for (auto iter = posCntList_.begin(); iter != posCntList_.end();)
+    {
+        if (iter->first == ib.getBodyId()
+            ||
+            iter->second == ib.getBodyId())
+        {
+            iter = posCntList_.erase(iter);
+        }
+        else
+        {
+            ++iter;
         }
     }
 }
@@ -235,40 +217,40 @@ void verletList::initialSorting()
 {
     for (label coord = 0; coord < 3; ++coord)
     {
-        mergeSortList(verletLists_[coord], coord);
-
-        HashSet<Tuple2<label, verletPoint*>,Hash<Tuple2<label, verletPoint*>>> openedIb;
-        for (auto i = verletLists_[coord].begin();
-            i != verletLists_[coord].end(); ++i)
+        verletLists_[coord].sort([&coord](
+            std::shared_ptr<verletPoint>& vPoint1,
+            std::shared_ptr<verletPoint>& vPoint2)
         {
-            if((*i).isMin())
+            return vPoint1->getPoint()[coord] < vPoint2->getPoint()[coord];
+        });
+
+        std::list<std::shared_ptr<verletPoint>> openedIb;
+        for (auto iter = verletLists_[coord].begin();
+            iter != verletLists_[coord].end(); ++iter)
+        {
+            if((*iter)->isMin())
             {
-                label curIb = (*i).getBodyId();
+                label curIb = (*iter)->getBodyId();
                 for (auto oIbIter = openedIb.begin();
                     oIbIter != openedIb.end(); ++oIbIter)
                 {
-                    // Create a Tuple2 for bodies that are newly
-                    // intersected always keep first the body
-                    // with lower bodyID
-                    Tuple2<label, label> newPair(
-                        min(curIb, oIbIter.key().first()), max(curIb, oIbIter.key().first())
+                    cPair newPair(
+                        min(curIb, (*oIbIter)->getBodyId()), max(curIb, (*oIbIter)->getBodyId())
                     );
-                    addCPairToCntNList(newPair, coord, &(*i), oIbIter.key().second());
+                    addCPairToCntNList(newPair, coord, *iter, *oIbIter);
                 }
 
-                openedIb.insert(Tuple2<label, verletPoint*>(curIb, &(*i)));
+                openedIb.push_back(*iter);
             }
             else
             {
-                label curIb = (*i).getBodyId();
-                for (auto oIbIter = openedIb.begin();
-                    oIbIter != openedIb.end(); ++oIbIter)
-                {
-                    if (oIbIter.key().first() == curIb)
+                label curIb = (*iter)->getBodyId();
+                openedIb.remove_if(
+                    [&curIb](std::shared_ptr<verletPoint>& vPoint)
                     {
-                        openedIb.erase(oIbIter);
+                        return vPoint->getBodyId() == curIb;
                     }
-                }
+                );
             }
         }
     }
@@ -287,26 +269,28 @@ void verletList::update(PtrList<immersedBody>& ibs)
     {
         if (!verletLists_[coord].empty())
         {
-            IDLList<verletPoint>::link* it = verletLists_[coord].first();
-            while(it != verletLists_[coord].last())
+            auto it2 = verletLists_[coord].begin();
+            auto it1 = it2++;
+
+            while(true)
             {
-                if(it != verletLists_[coord].first())
+                if((*it1)->getPoint()[coord]
+                    > (*it2)->getPoint()[coord])
                 {
-                    verletPoint* currPoint =
-                        static_cast<verletPoint*>(it);
+                    swapVerletPoints(*it1, *it2, coord);
+                    std::swap(*it1, *it2);
 
-                    verletPoint* prevPoint =
-                        static_cast<verletPoint*>(it->prev_);
-
-                    if(prevPoint->getPoint()[coord]
-                        > currPoint->getPoint()[coord])
+                    if (it1 != verletLists_[coord].begin())
                     {
-                        swapVerletPoints(prevPoint, currPoint, coord);
-                        it = it->prev_;
+                        it2 = it1--;
+                        continue;
                     }
                 }
-
-                it = it->next_;
+                it1 = it2++;
+                if (it2 == verletLists_[coord].end())
+                {
+                    break;
+                }
             }
         }
     }

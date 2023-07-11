@@ -70,7 +70,7 @@ namespace Foam
         stlBased
         (
             mesh,
-            arbShape,
+            convex,
             stlPath,
             thrSurf
         ){}

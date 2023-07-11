@@ -23,56 +23,66 @@ License
     along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
 
 InNamspace
-    contactModel
-
-Description
-    methods to solve particle-particle contact
-
-SourceFiles
-    cyclicContact.C
+    Foam
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
+#include "subContact.H"
 
-#ifndef cyclicContact_H
-#define cyclicContact_H
+using namespace Foam;
 
-#include "dictionary.H"
-#include "fvCFD.H"
+//---------------------------------------------------------------------------//
+subContact::subContact()
+{}
 
-#include "wallContactInfo.H"
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-namespace Foam
+subContact::~subContact()
+{}
+//---------------------------------------------------------------------------//
+void subContact::addSubVolume(std::shared_ptr<subVolume> sV)
 {
+    if (subVolumes_.size() == 0)
+    {
+        boundBox_ = *sV;
+    }
 
-/*---------------------------------------------------------------------------*\
-                 Namespace contactModel functions Declaration
-\*---------------------------------------------------------------------------*/
-
-namespace contactModel
-{
-    typedef DynamicList<label>  DynamicLabelList;
-    typedef DynamicList<scalar> DynamicScalarList;
-    typedef DynamicList<vector> DynamicVectorList;
-    typedef DynamicList<point>  DynamicPointList;
-
-    bool detectCyclicContact
-    (
-        wallContactInfo& wallCntInfo,
-        vector& transVec
-    );
+    subVolumes_.push_back(sV);
+    tmp<pointField> points = boundBox_.points();
+    points->append(sV->points());
+    boundBox_ = boundBox(points);
+    volume_ += sV->volume();
 }
+//---------------------------------------------------------------------------//
+bool subContact::canCombine(subVolume& sV)
+{
+    if (!boundBox_.overlaps(sV))
+    {
+        return false;
+    }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+    for (auto& subVolume : subVolumes_)
+    {
+        if (subVolume->overlaps(sV))
+        {
+            return true;
+        }
+    }
 
-} // End namespace Foam
+    return false;
+}
+//---------------------------------------------------------------------------//
+DynamicList<point> subContact::getEdgePoints() const
+{
+    DynamicList<point> edgePoints;
+    for (auto& subVolume : subVolumes_)
+    {
+        if (subVolume->isEdge())
+        {
+            edgePoints.append(subVolume->midpoint());
+        }
+    }
 
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#endif
-
-// ************************************************************************* //
+    return edgePoints;
+}
+//---------------------------------------------------------------------------//

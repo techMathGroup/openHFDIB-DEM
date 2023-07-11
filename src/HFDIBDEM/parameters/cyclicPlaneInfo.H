@@ -26,104 +26,73 @@ InNamspace
     contactModel
 
 Description
-    methods to solve particle-particle contact
+    Static class for storing wall material information
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef subVolume_H
-#define subVolume_H
+#ifndef cyclicPlaneInfo_H
+#define cyclicPlaneInfo_H
 
-#include "treeBoundBox.H"
-#include "volumeType.H"
-
-#include <memory>
+#include <map>
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
 
-struct ibSubVolumeInfo
-{
-    ibSubVolumeInfo():
-        volumeType_(volumeType::unknown)
-    {}
-
-    ibSubVolumeInfo(volumeType vType)
-    {
-        switch(vType)
-        {
-            case volumeType::unknown:
-            case volumeType::mixed:
-                volumeType_ = volumeType::unknown;
-                break;
-            case volumeType::inside:
-                volumeType_ = volumeType::inside;
-                break;
-            case volumeType::outside:
-                volumeType_ = volumeType::outside;
-                break;
-        }
-    }
-
-    volumeType volumeType_;
-    autoPtr<labelList> shapesIn_;
-};
-
 /*---------------------------------------------------------------------------*\
-                        Class subVolume Declaration
+                      Class wallPlaneInfo Declaration
 \*---------------------------------------------------------------------------*/
-class subVolume : public treeBoundBox
+
+
+class cyclicPlaneInfo
 {
-    private:
-
-    std::shared_ptr<subVolume> parentSV_;
-    List<subVolume> childSubVolumes_;
-
-    ibSubVolumeInfo cVolumeInfo_;
-    ibSubVolumeInfo tVolumeInfo_;
-
-    bool isEdge_;
-
     public:
 
-    // Constructors ------------------------------------------------
-    subVolume();
+    static const HashTable<List<vector>,string,Hash<string>>& getCyclicPlaneInfo()
+    {
+        return cyclicPlaneInfo_;
+    }
 
-    subVolume
+    static const vector getCyclicTransVec(const string& cyclicPatch)
+    {
+        const string& cyclicPatchNeighbour = cyclicPatchPairs_[cyclicPatch];
+
+        vector transVec = cyclicPlaneInfo_[cyclicPatchNeighbour][1] - cyclicPlaneInfo_[cyclicPatch][1];
+
+        Info << "transVec1: " << transVec << endl;
+
+        transVec = cyclicPlaneInfo_[cyclicPatch][0] * (transVec & cyclicPlaneInfo_[cyclicPatch][0]);
+
+        Info << "transVec2: " << transVec << endl;
+
+        return transVec;
+    }
+
+    static void insert
     (
-        const boundBox bb
-    );
+        const string& cyclicPatch,
+        const vector& patchNVec,
+        const vector& planePoint,
+        const string& cyclicPatchNeighbour
+    )
+    {
+        List<vector> planeInfo{{patchNVec / mag(patchNVec),planePoint}};
+        cyclicPlaneInfo_.insert(cyclicPatch,planeInfo);
 
-    subVolume
-    (
-        const boundBox bb,
-        const std::shared_ptr<subVolume> parentSV,
-        const volumeType cVolumeType,
-        const volumeType tVolumeType
-    );
+        if (cyclicPatchPairs_.find(cyclicPatch) == cyclicPatchPairs_.end())
+        {
+            cyclicPatchPairs_.insert(std::pair<string,string>(cyclicPatch,cyclicPatchNeighbour));
+        }
+    };
 
-    // Destructors -------------------------------------------------
-    ~subVolume();
+    //- Hash table for storing wall material information
+    static HashTable<List<vector>,string,Hash<string>> cyclicPlaneInfo_;
+    static std::map<string, string> cyclicPatchPairs_;
 
-    // Member Functions --------------------------------------------
-
-    ibSubVolumeInfo& cVolumeInfo();
-    ibSubVolumeInfo& tVolumeInfo();
-
-    List<subVolume>& childSubVolumes();
-    bool hasChildSubVolumes() const;
-
-    std::shared_ptr<subVolume>& parentSV();
-
-    ibSubVolumeInfo& getVolumeInfo(bool cIb);
-    const ibSubVolumeInfo& getVolumeInfo(bool cIb) const;
-
-    void setAsEdge();
-    bool isEdge() const;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

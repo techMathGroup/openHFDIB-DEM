@@ -54,6 +54,7 @@ M_(0.0),
 M0_(0.0),
 CoM_(vector::zero),
 I_(symmTensor::zero),
+bBox_(std::make_shared<boundBox>()),
 dC_(0.0),
 rhoS_("rho",dimensionSet(1,-3,0,0,0,0,0),1.0)
 {
@@ -219,7 +220,7 @@ void geomModel::correctSurfCells
 {
     HashTable<bool, label, Hash<label>> verticesStatus(potentSurfCells.size()*6);
     forAll(potentSurfCells, cellLabel)
-    {    
+    {
         label cCell = potentSurfCells[cellLabel];
         scalar cBody(0);
 
@@ -272,14 +273,14 @@ void geomModel::correctSurfCells
     }
 }
 //---------------------------------------------------------------------------//
-List<boundBox*> geomModel::getBBoxes()
-{   
+List<std::shared_ptr<boundBox>> geomModel::getBBoxes()
+{
     boundBox cBBox = getBounds();
-    bBox_.min() = cBBox.min();
-    bBox_.max() = cBBox.max();
+    bBox_->min() = cBBox.min();
+    bBox_->max() = cBBox.max();
 
-    List<boundBox*> retList(1);
-    retList[0] = &bBox_;
+    List<std::shared_ptr<boundBox>> retList(1);
+    retList[0] = bBox_;
     return retList;
 }
 //---------------------------------------------------------------------------//

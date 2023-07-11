@@ -191,12 +191,12 @@ void clusterBody::resetBody(volScalarField& body)
     }
 }
 //---------------------------------------------------------------------------//
-List<boundBox*> clusterBody::getBBoxes()
+List<std::shared_ptr<boundBox>> clusterBody::getBBoxes()
 {
-    List<boundBox*> retList;
+    List<std::shared_ptr<boundBox>> retList;
     for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
-        List<boundBox*> bBoxI = gModel->getBBoxes();
+        List<std::shared_ptr<boundBox>> bBoxI = gModel->getBBoxes();
         retList.append(bBoxI);
     }
     return retList;

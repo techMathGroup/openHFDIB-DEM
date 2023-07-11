@@ -47,11 +47,6 @@ physicalProperties_(physicalProperties)
 prtSubContactInfo::~prtSubContactInfo()
 {}
 //---------------------------------------------------------------------------//
-vector prtSubContactInfo::getLVec(const point& CoM)
-{
-    return prtCntVars_.contactCenter_ - CoM;
-}
-//---------------------------------------------------------------------------//
 vector prtSubContactInfo::getVeli(ibContactVars& cVars, vector& lVec)
 {
     return (-((lVec-cVars.Axis_*((lVec) & cVars.Axis_))
@@ -59,14 +54,14 @@ vector prtSubContactInfo::getVeli(ibContactVars& cVars, vector& lVec)
 }
 //---------------------------------------------------------------------------//
 void prtSubContactInfo::evalVariables(
-    const point& cCoM,
-    const point& tCoM,
+    ibContactClass& cIb,
+    ibContactClass& tIb,
     ibContactVars& cVars,
     ibContactVars& tVars
 )
 {
-    cLVec_ = getLVec(cCoM);
-    tLVec_ = getLVec(tCoM);
+    cLVec_ = cIb.getGeomModel().getLVec(prtCntVars_.contactCenter_);
+    tLVec_ = tIb.getGeomModel().getLVec(prtCntVars_.contactCenter_);
 
     cVeli_ = getVeli(cVars, cLVec_);
     tVeli_ = getVeli(tVars, tLVec_);

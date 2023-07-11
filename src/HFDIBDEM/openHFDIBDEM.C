@@ -155,7 +155,21 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 
     if(demDic.found("cyclicPatches"))
     {
-        cyclicPatches_ = wordList(demDic.lookup("cyclicPatches"));
+        dictionary cyclicPatchDic = demDic.subDict("cyclicPatches");
+        List<word> cyclicPatchNames = cyclicPatchDic.toc();
+        forAll(cyclicPatchNames, patchI)
+        {
+            vector patchNVec = cyclicPatchDic.subDict(cyclicPatchNames[patchI]).lookup("nVec");
+            vector planePoint = cyclicPatchDic.subDict(cyclicPatchNames[patchI]).lookup("planePoint");
+            word neighbourPatch = cyclicPatchDic.subDict(cyclicPatchNames[patchI]).lookup("neighbourPatch");
+
+            cyclicPlaneInfo::insert(
+                cyclicPatchNames[patchI],
+                patchNVec,
+                planePoint,
+                neighbourPatch
+            );
+        }
     }
 
     if (HFDIBDEMDict_.found("geometricD"))
@@ -198,8 +212,7 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 }
 //---------------------------------------------------------------------------//
 openHFDIBDEM::~openHFDIBDEM()
-{
-}
+{}
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::initialize
 (
@@ -540,19 +553,17 @@ void openHFDIBDEM::writeBodiesInfo()
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 {
-    if (cyclicPatches_.size() > 0)
+    if (cyclicPlaneInfo::getCyclicPlaneInfo().size() > 0)
     {
         forAll (immersedBodies_,bodyId)
         {
             if (!immersedBodies_[bodyId].getGeomModel().isCluster())
             {
-                vector newPos = vector::zero;
+                vector transVec = vector::zero;
 
                 if (detectCyclicContact(
-                    mesh_,
-                    cyclicPatches_,
                     immersedBodies_[bodyId].getWallCntInfo(),
-                    newPos
+                    transVec
                 ))
                 {
                     verletList_.removeBodyFromVList(immersedBodies_[bodyId]);
@@ -563,13 +574,13 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
                     newPeriodicBody->setRhoS(immersedBodies_[bodyId].getGeomModel().getRhoS());
                     std::shared_ptr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getCopy());
-                    vector transVec = newPos - iBcopy->getCoM();
                     iBcopy->bodyMovePoints(transVec);
                     newPeriodicBody->addBodyToCluster(immersedBodies_[bodyId].getGeomModelPtr());
                     newPeriodicBody->addBodyToCluster(iBcopy);
                     immersedBodies_[bodyId].getGeomModelPtr() = newPeriodicBody;
 
                     verletList_.addBodyToVList(immersedBodies_[bodyId]);
+                    Info << "Periodic body created for body " << bodyId << endl;
                 }
             }
             else
@@ -583,6 +594,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     immersedBodies_[bodyId].getGeomModelPtr() = cBody.getRemGeomModel();
 
                     verletList_.addBodyToVList(immersedBodies_[bodyId]);
+                    Info << "Periodic body unclustered for body " << bodyId << endl;
                 }
             }
         }
@@ -639,14 +651,12 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         }
         if(wallContactIB.size() > 0)
         {
-            InfoH << DEM_Info << " wallContactList SCListSize() " << wallContactList.size() << endl;
             label wallContactPerProc(ceil(double(wallContactList.size())/Pstream::nProcs()));
 
             if( wallContactList.size() <= Pstream::nProcs())
             {
                 wallContactPerProc = 1;
             }
-            InfoH << DEM_Info << " wallContactList wallContactPerProc " << wallContactPerProc << endl;
 
             for(int assignProc = Pstream::myProcNo()*wallContactPerProc; assignProc < min((Pstream::myProcNo()+1)*wallContactPerProc,wallContactList.size()); assignProc++)
             {
@@ -691,7 +701,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         // check only pairs whose bounding boxes are intersected for the contact
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
         {
-            const Tuple2<label, label>& cPair = it.key();
+            const Tuple2<label, label> cPair = Tuple2<label, label>(it->first, it->second);
 
             label cInd(cPair.first());
             bool cStatic(immersedBodies_[cInd].getbodyOperation() == 0);
@@ -752,7 +762,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
         {
-            const Tuple2<label, label>& cPair = it.key();
+            const Tuple2<label, label> cPair = Tuple2<label, label>(it->first, it->second);
             label cInd(cPair.first());
             label tInd(cPair.second());
 

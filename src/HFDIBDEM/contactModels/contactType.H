@@ -46,7 +46,8 @@ namespace Foam
 \*---------------------------------------------------------------------------*/
 enum contactType
 {
-    arbShape,
+    convex,
+    nonConvex,
     cluster,
     sphere
 };

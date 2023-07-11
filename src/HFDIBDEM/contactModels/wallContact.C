@@ -483,20 +483,20 @@ bool solveWallContact
         << wallCntInfo.getcVars().Vel_ << " magnitude: " << mag(wallCntInfo.getcVars().Vel_) <<endl;
     InfoH << parallelDEM_Info << "-- body "<< sCI.getBodyId() <<"  angular velocity:"
         << wallCntInfo.getcVars().omega_ << " magnitude: " << mag(wallCntInfo.getcVars().omega_) <<endl;
-    InfoH << parallelDEM_Info << "-- Particle-wall id "<< sCI.getBodyId() <<" contact center "
+    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact center "
         << wallCntVar.contactCenter_ << endl;
-    InfoH << parallelDEM_Info << "-- Particle-wall id "<< sCI.getBodyId() <<" contact normal "
+    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact normal "
         << wallCntVar.contactNormal_ << endl;
-    InfoH << parallelDEM_Info << "-- Particle-wall id "<< sCI.getBodyId() <<" contact volume "
+    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact volume "
         << wallCntVar.contactVolume_ << endl;
-    InfoH << parallelDEM_Info << "-- Particle-wall id "<< sCI.getBodyId() <<" contact area "
+    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact area "
         << wallCntVar.contactArea_ << endl;
 
     vector F = sCI.getFNe(wallCntVar);
-    InfoH << parallelDEM_Info << "-- Particle-wall id "<< sCI.getBodyId() <<" contact FNe " << F << endl;
+    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FNe " << F << endl;
 
     vector FNd = sCI.getFNd(wallCntVar);
-    InfoH << parallelDEM_Info << "-- Particle-wall id "<< sCI.getBodyId() <<" contact FNd " << FNd << endl;
+    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FNd " << FNd << endl;
 
     if ((F & FNd) < 0 && mag(FNd) > mag(F))
     {
@@ -505,20 +505,20 @@ bool solveWallContact
     }
 
     F += FNd;
-    InfoH << parallelDEM_Info << "-- Particle-wall id "<< sCI.getBodyId() <<" contact FN " << F << endl;
+    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FN " << F << endl;
 
     vector Ft = sCI.getFt(wallCntVar, deltaT);
-    InfoH << parallelDEM_Info << "-- Particle-wall id "<< sCI.getBodyId() <<" contact Ft " << Ft << endl;
+    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact Ft " << Ft << endl;
 
     if (mag(Ft) > sCI.getMu(wallCntVar) * mag(F))
     {
         Ft *= sCI.getMu(wallCntVar) * mag(F) / mag(Ft);
     }
-    InfoH << parallelDEM_Info << "-- Particle-wall id "<< sCI.getBodyId() <<" contact Ft clamped" << Ft << endl;
+    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact Ft clamped" << Ft << endl;
     F += Ft;
 
     vector FA = sCI.getFA(wallCntVar);
-    InfoH << parallelDEM_Info << "-- Particle-wall id "<< sCI.getBodyId() <<" contact FA " << FA << endl;
+    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FA " << FA << endl;
     F -= FA;
 
     outF += F;

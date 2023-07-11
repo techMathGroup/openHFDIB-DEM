@@ -103,9 +103,6 @@ namespace Foam
     // addModels (how to add the baseObjects)
     PtrList<addModel> addModels_;
 
-    // List of patches set as cyclic
-    wordList cyclicPatches_;
-
     // precalculate cellPoints for better performace
     List<labelList> cellPoints_;
 

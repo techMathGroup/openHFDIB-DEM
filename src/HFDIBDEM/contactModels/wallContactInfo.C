@@ -35,7 +35,6 @@ Contributors
 #include "wallMatInfo.H"
 
 #include "virtualMeshLevel.H"
-#include "wallPlaneInfo.H"
 
 using namespace Foam;
 //---------------------------------------------------------------------------//
@@ -138,11 +137,12 @@ void wallContactInfo::constructSM()
 //---------------------------------------------------------------------------//
 bool wallContactInfo::isInsidePlane(
     vector checkedPoint,
-    string wallName
+    const string& wall,
+    const HashTable<List<vector>,string,Hash<string>>& wallPatches
 )
 {
-    const vector& normalVector = wallPlaneInfo::getWallPlaneInfo()[wallName][0];
-    const vector& centerPoint = wallPlaneInfo::getWallPlaneInfo()[wallName][1];
+    const vector& normalVector = wallPatches[wall][0];
+    const vector& centerPoint = wallPatches[wall][1];
     vector testVector = checkedPoint - centerPoint;
     if((testVector & normalVector) < 0)
     {
@@ -151,21 +151,23 @@ bool wallContactInfo::isInsidePlane(
     return false;
 }
 //---------------------------------------------------------------------------//
-bool wallContactInfo::detectWallContact()
+bool wallContactInfo::detectWallContact(
+    const HashTable<List<vector>,string,Hash<string>>& wallPatches
+)
 {
     contactPatches_.clear();
     clearOldContact();
     boundBox bodyBB = ibContactClass_.getGeomModel().getBounds();
     pointField bBpoints = bodyBB.points();
-    const List<string> wallPatches = wallMatInfo::getWallPatches();
     List<bool> isPatchInContact;
-    isPatchInContact.setSize(wallPatches.size(),false);
+    const stringList wallPatchNames = wallPatches.toc();
+    isPatchInContact.setSize(wallPatchNames.size(),false);
     bool bBContact(false);
     forAll (bBpoints,bBP)
     {
-        forAll(wallPatches,wP)
+        forAll(wallPatchNames,wP)
         {
-            if(!isInsidePlane(bBpoints[bBP],wallPatches[wP]))
+            if(!isInsidePlane(bBpoints[bBP], wallPatchNames[wP], wallPatches))
             {
                 isPatchInContact[wP] = true;
                 bBContact = true;
@@ -177,7 +179,7 @@ bool wallContactInfo::detectWallContact()
     {
         if(isPatchInContact[wP])
         {
-            contactPatches_.append(wallPatches[wP]);
+            contactPatches_.append(wallPatchNames[wP]);
         }
     }
 

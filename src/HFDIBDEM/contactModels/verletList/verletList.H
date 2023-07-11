@@ -45,10 +45,22 @@ Contributors
 #include "verletContact.H"
 #include "immersedBody.H"
 
+#include <list>
+#include <map>
+#include <unordered_set>
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
 {
+
+struct hashFunction
+{
+  size_t operator()(const std::pair<label, label> &x) const
+  {
+    return x.first ^ x.second;
+  }
+};
 
 /*---------------------------------------------------------------------------*\
                         Class verletList Declaration
@@ -63,28 +75,32 @@ class verletList
     typedef DynamicList<vector> DynamicVectorList;
     typedef DynamicList<point> DynamicPointList;
 
-    typedef HashTable<verletContact, Tuple2<label, label>,Hash<Tuple2<label, label>>>
-        cPairHasTable;
+    typedef std::pair<label, label> cPair;
+    typedef std::map<cPair, verletContact> cPairVcontactMap;
 
-    typedef HashSet<Tuple2<label, label>,Hash<Tuple2<label, label>>>
-        cPairHasSet;
+    typedef std::unordered_set<cPair, hashFunction> cPairHasSet;
 
-    List<IDLList<verletPoint>> verletLists_;
+    // List of all verlet boxes
+    std::list<std::shared_ptr<verletBox>> verletBoxes_;
+
+    List<std::list<std::shared_ptr<verletPoint>>> verletLists_;
     // List for pairs of intersected Bodies in specific coordinate
-    List<cPairHasTable> cntNeighList_;
+    List<cPairVcontactMap> cntNeighList_;
     // List of possible contact du to intersection of bounding boxes.
     // Pair is added to this list when it is present in all 3 cntNeighList_.
     cPairHasSet posCntList_;
 
-    void mergeSortList(IDLList<verletPoint>& listToSort, label coord);
-
-    void swapVerletPoints(verletPoint* a, verletPoint* b, label coord);
+    void swapVerletPoints(
+        std::shared_ptr<verletPoint> a,
+        std::shared_ptr<verletPoint> b,
+        label coord
+    );
 
     void addCPairToCntNList(
-        Tuple2<label, label> cPair,
+        cPair cPair,
         label coord,
-        verletPoint* a,
-        verletPoint* b
+        std::shared_ptr<verletPoint> a,
+        std::shared_ptr<verletPoint> b
     );
 
     public:

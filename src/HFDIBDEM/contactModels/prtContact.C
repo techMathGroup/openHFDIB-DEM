@@ -349,7 +349,13 @@ void getPrtContactVars_ArbShape(
 
     if (intersectedVolume > 0)
     {
-        Tuple2<scalar,vector> surfaceAndNormal = virtMesh.get3DcontactNormalAndSurface();
+        Tuple2<scalar,vector> surfaceAndNormal =
+            virtMesh.get3DcontactNormalAndSurface
+            (
+                cClass.getGeomModel().getcType() == nonConvex
+                ||
+                tClass.getGeomModel().getcType() == nonConvex
+            );
         contactArea = surfaceAndNormal.first();
         normalVector = surfaceAndNormal.second();
         contactCenter = virtMesh.getContactCenter();
@@ -615,6 +621,7 @@ bool solvePrtContact(
         << cInfo.getcVars().Vel_ << " magnitude: " << mag(cInfo.getcVars().Vel_) <<endl;
     InfoH << parallelDEM_Info << "-- body "<< subCInfo.getCPair().first() <<"  angular velocity:"
         << cInfo.getcVars().omega_ << " magnitude: " << mag(cInfo.getcVars().omega_) <<endl;
+
     InfoH << parallelDEM_Info << "-- body "<< subCInfo.getCPair().second() <<"  linear velocity:"
         << cInfo.gettVars().Vel_ << " magnitude: " << mag(cInfo.gettVars().Vel_) <<endl;
     InfoH << parallelDEM_Info << "-- body "<< subCInfo.getCPair().second() <<"  angular velocity:"
@@ -629,8 +636,8 @@ bool solvePrtContact(
             << subCInfo.getprtCntVars().contactArea_ << endl;
 
     subCInfo.evalVariables(
-        cInfo.getcClass().getGeomModel().getCoM(),
-        cInfo.gettClass().getGeomModel().getCoM(),
+        cInfo.getcClass(),
+        cInfo.gettClass(),
         cInfo.getcVars(),
         cInfo.gettVars()
     );
