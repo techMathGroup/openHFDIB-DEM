@@ -67,6 +67,12 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
+    if(HFDIBDEM.getRecordFirstTime())
+    {
+        HFDIBDEM.setRecordFirstTime(false);
+        HFDIBDEM.writeBodiesInfo();
+    }
+
     while (runTime.run())
     {
 

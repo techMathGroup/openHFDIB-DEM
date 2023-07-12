@@ -85,6 +85,11 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         materialInfo("None", 1, 1, 1, 1, 1)
     );
 
+    if(HFDIBDEMDict_.found("recordFirstTimeStep"))
+    {
+        recordFirstTimeStep_ = readBool(HFDIBDEMDict_.lookup("recordFirstTimeStep"));
+    }
+
     dictionary demDic = HFDIBDEMDict_.subDict("DEM");
     dictionary materialsDic = demDic.subDict("materials");
     List<word> materialsNames = materialsDic.toc();
@@ -514,41 +519,46 @@ void openHFDIBDEM::writeBodiesInfo()
         return;
 
     word curOutDir(recordOutDir_ + "/" + mesh_.time().timeName());
-    mkDir(curOutDir);
-    mkDir(curOutDir +"/stlFiles");
-    DynamicLabelList activeIB;
-    forAll (immersedBodies_,bodyId)
+
+    if(!isDir(curOutDir))
     {
-        if (immersedBodies_[bodyId].getIsActive())
+        mkDir(curOutDir);
+        mkDir(curOutDir +"/stlFiles");
+        DynamicLabelList activeIB;
+        forAll (immersedBodies_,bodyId)
         {
-            activeIB.append(bodyId);
+            if (immersedBodies_[bodyId].getIsActive())
+            {
+                activeIB.append(bodyId);
+            }
+        }
+        wordList bodyNames;
+        scalar listZize(activeIB.size());
+        label bodiesPerProc = ceil(listZize/Pstream::nProcs());
+        InfoH << basic_Info << "Active IB listZize      : " << listZize<< endl;
+        InfoH << basic_Info << "bodiesPerProc : " << bodiesPerProc<< endl;
+
+
+        for(int assignProc = Pstream::myProcNo()*bodiesPerProc; assignProc < min((Pstream::myProcNo()+1)*bodiesPerProc,activeIB.size()); assignProc++)
+        {
+            const label bodyId(activeIB[assignProc]);
+            word path(curOutDir + "/body" + std::to_string(immersedBodies_[bodyId].getBodyId()) +".info");
+            OFstream ofStream(path);
+            IOobject outClass
+                (
+                    path,
+                    mesh_,
+                    IOobject::NO_READ,
+                    IOobject::AUTO_WRITE
+                );
+            IOdictionary outDict(outClass);
+
+            outDict.writeHeader(ofStream);
+            immersedBodies_[bodyId].recordBodyInfo(outDict,curOutDir);
+            outDict.writeData(ofStream);
         }
     }
-    wordList bodyNames;
-    scalar listZize(activeIB.size());
-    label bodiesPerProc = ceil(listZize/Pstream::nProcs());
-    InfoH << basic_Info << "Active IB listZize      : " << listZize<< endl;
-    InfoH << basic_Info << "bodiesPerProc : " << bodiesPerProc<< endl;
-
-
-    for(int assignProc = Pstream::myProcNo()*bodiesPerProc; assignProc < min((Pstream::myProcNo()+1)*bodiesPerProc,activeIB.size()); assignProc++)
-    {
-        const label bodyId(activeIB[assignProc]);
-        word path(curOutDir + "/body" + std::to_string(immersedBodies_[bodyId].getBodyId()) +".info");
-        OFstream ofStream(path);
-        IOobject outClass
-            (
-                path,
-                mesh_,
-                IOobject::NO_READ,
-                IOobject::AUTO_WRITE
-            );
-        IOdictionary outDict(outClass);
-
-        outDict.writeHeader(ofStream);
-        immersedBodies_[bodyId].recordBodyInfo(outDict,curOutDir);
-        outDict.writeData(ofStream);
-    }
+    
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
