@@ -75,6 +75,12 @@ int main(int argc, char *argv[])
     openHFDIBDEM  HFDIBDEM(mesh);
     HFDIBDEM.initialize(lambda,U,refineF,maxRefinementLevel,runTime.timeName());
     #include "initialMeshRefinement.H"
+    
+    if(HFDIBDEM.getRecordFirstTime())
+    {
+        HFDIBDEM.setRecordFirstTime(false);
+        HFDIBDEM.writeBodiesInfo();
+    }
 
     Info<< "\nStarting time loop\n" << endl;
 

@@ -9,7 +9,7 @@ tmp<fvVectorMatrix> tUEqn
   + turbulence->divDevSigma(U)
  ==
     fvOptions(U)
-  + g
+
 );
 fvVectorMatrix& UEqn = tUEqn.ref();
 

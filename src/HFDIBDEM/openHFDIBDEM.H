@@ -123,6 +123,7 @@ namespace Foam
 
     //record simulation for start from lastTime possibility
     bool recordSimulation_;
+    bool recordFirstTimeStep_ = false;
     word recordOutDir_;
 
     public:
@@ -184,6 +185,17 @@ namespace Foam
     );
 
     void preCalculateCellPoints();
+
+    bool getRecordFirstTime()
+    {
+        return recordFirstTimeStep_;
+    }
+
+    void setRecordFirstTime( bool setUp)
+    {
+        recordFirstTimeStep_ = setUp;
+    }
+
  };
 }
 
