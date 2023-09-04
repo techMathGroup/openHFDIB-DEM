@@ -186,9 +186,12 @@ vector wallSubContactInfo::getFA(wallContactVars& wallCntvar)
 vector wallSubContactInfo::getFNd(wallContactVars& wallCntvar)
 {
     physicalProperties& meanCntPar(wallCntvar.getMeanCntPar());
-    return (meanCntPar.aGammaN_*sqrt(meanCntPar.aY_*reduceM_
-        /pow(wallCntvar.Lc_+SMALL,3))*(wallCntvar.contactArea_*wallCntvar.Vn_))
-        *wallCntvar.contactNormal_;
+    // return (meanCntPar.aGammaN_*sqrt(meanCntPar.aY_*reduceM_
+    //     /pow(wallCntvar.Lc_+SMALL,3))*(wallCntvar.contactArea_*wallCntvar.Vn_))
+    //     *wallCntvar.contactNormal_;
+    return (meanCntPar.reduceBeta_*sqrt(meanCntPar.aY_
+        *meanCntPar.reduceM_*wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL))*
+        wallCntvar.Vn_)*wallCntvar.contactNormal_;
 }
 //---------------------------------------------------------------------------//
 vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)

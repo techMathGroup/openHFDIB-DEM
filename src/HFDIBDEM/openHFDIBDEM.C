@@ -82,7 +82,7 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 {
     materialProperties::matProps_insert(
         "None",
-        materialInfo("None", 1, 1, 1, 1, 1)
+        materialInfo("None", 1, 1, 1, 1, 1, 1)
     );
 
     if(HFDIBDEMDict_.found("recordFirstTimeStep"))
@@ -104,7 +104,8 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
                 readScalar(matIDic.lookup("nu")),
                 readScalar(matIDic.lookup("gamma")),
                 readScalar(matIDic.lookup("mu")),
-                readScalar(matIDic.lookup("adhN"))
+                readScalar(matIDic.lookup("adhN")),
+                readScalar(matIDic.lookup("eps"))
             )
         );
     }

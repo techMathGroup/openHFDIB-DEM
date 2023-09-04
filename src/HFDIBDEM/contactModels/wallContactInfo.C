@@ -87,10 +87,15 @@ ibContactVars_(cVars)
             /(cMatInfo.getGamma()+wInfo.getGamma()+SMALL);
         scalar aMu = (cMatInfo.getMu()+wInfo.getMu())/2;
         scalar maxAdhN = cMatInfo.getAdhN() + wInfo.getAdhN() - 2*adhPot;
-
+        scalar reduceBeta =
+        (
+            log((0.5*(cMatInfo.getEps()+wInfo.getEps())))/
+            (sqrt(sqr(log(cMatInfo.getEps()+wInfo.getEps()))+
+            sqr(Foam::constant::mathematical::pi)))
+        );
         wallMeanPars_.insert(
             cntPatches[patchI],
-            physicalProperties(aY, aG,  aGammaN, aGammat, aMu, maxAdhN, 0, 0)
+            physicalProperties(aY, aG,  aGammaN, aGammat, aMu, maxAdhN, 0, 0, reduceBeta)
         );
     }
 

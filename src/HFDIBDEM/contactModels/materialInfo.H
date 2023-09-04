@@ -79,6 +79,9 @@ class materialInfo
         // adhesion coefficient for normal contact force
         scalar adhN_;
 
+        //coeffitient of restitution for normal force
+        scalar eps_;
+
     public:
 
     // Constructors ------------------------------------------------
@@ -89,7 +92,8 @@ class materialInfo
         scalar nu,
         scalar gamma,
         scalar mu,
-        scalar adhN
+        scalar adhN,
+        scalar eps
     );
 
     materialInfo
@@ -128,6 +132,11 @@ class materialInfo
     const scalar& getAdhN()   const
     {
         return adhN_;
+    }
+
+    const scalar& getEps()   const
+    {
+        return eps_;
     }
 };
 

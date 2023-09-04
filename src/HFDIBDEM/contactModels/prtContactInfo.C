@@ -94,6 +94,12 @@ tContactVars_(tVars)
         /(cIbContactClass_.getGeomModel().getM0()
         +tIbContactClass_.getGeomModel().getM0())
     );
+    physicalProperties_.reduceBeta_ =
+    (
+       log((0.5*(cMatInfo.getEps()+tMatInfo.getEps())))/
+       (sqrt(sqr(log(cMatInfo.getEps()+tMatInfo.getEps()))+
+       sqr(Foam::constant::mathematical::pi)))
+    );
 }
 
 prtContactInfo::~prtContactInfo()
