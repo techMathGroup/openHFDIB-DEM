@@ -36,7 +36,7 @@ Contributors
 
 #include "virtualMeshLevel.H"
 #include "wallPlaneInfo.H"
-
+#include "contactModelInfo.H"
 using namespace Foam;
 //---------------------------------------------------------------------------//
 wallSubContactInfo::wallSubContactInfo
@@ -157,7 +157,7 @@ void wallSubContactInfo::evalVariables(
     wallCntvar.Veli_ = getVeli(wallCntvar, cVars);
 
     wallCntvar.Vn_ = -(wallCntvar.Veli_ - vector::zero) & wallCntvar.contactNormal_;
-    wallCntvar.Lc_ = 4*mag(wallCntvar.lVec_)*mag(wallCntvar.lVec_)
+    wallCntvar.Lc_ = (contactModelInfo::getLcCoeff())*mag(wallCntvar.lVec_)*mag(wallCntvar.lVec_)
         /(mag(wallCntvar.lVec_) + mag(wallCntvar.lVec_));
 
     wallCntvar.curAdhN_ = min
@@ -186,12 +186,23 @@ vector wallSubContactInfo::getFA(wallContactVars& wallCntvar)
 vector wallSubContactInfo::getFNd(wallContactVars& wallCntvar)
 {
     physicalProperties& meanCntPar(wallCntvar.getMeanCntPar());
-    // return (meanCntPar.aGammaN_*sqrt(meanCntPar.aY_*reduceM_
-    //     /pow(wallCntvar.Lc_+SMALL,3))*(wallCntvar.contactArea_*wallCntvar.Vn_))
-    //     *wallCntvar.contactNormal_;
-    return (meanCntPar.reduceBeta_*sqrt(meanCntPar.aY_
-        *meanCntPar.reduceM_*wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL))*
-        wallCntvar.Vn_)*wallCntvar.contactNormal_;
+    if(contactModelInfo::getContactModel())
+    {
+        return (meanCntPar.aGammaN_*sqrt(meanCntPar.aY_*reduceM_
+            /pow(wallCntvar.Lc_+SMALL,3))*(wallCntvar.contactArea_*wallCntvar.Vn_))
+            *wallCntvar.contactNormal_;
+
+    }
+    else
+    {
+        return ((meanCntPar.reduceBeta_*sqrt(meanCntPar.aY_
+            *reduceM_*wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL))*
+            wallCntvar.Vn_)*wallCntvar.contactNormal_);
+    }
+    // Info << "effective beta : "<< meanCntPar.reduceBeta_ << endl;
+    // Info << "effective gamma : "<< meanCntPar.reduceGamma_ << endl;
+
+
 }
 //---------------------------------------------------------------------------//
 vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
@@ -202,7 +213,7 @@ vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
         - (wallCntvar.FtPrev_ & wallCntvar.contactNormal_)
         *wallCntvar.contactNormal_);
     // scale projected Ft to have same magnitude as FtLast
-    vector FtLastS(mag(wallCntvar.FtPrev_) * (FtLastP/(mag(FtLastP)+SMALL)));
+    // vector FtLastS(mag(wallCntvar.FtPrev_) * (FtLastP/(mag(FtLastP)+SMALL)));
     // compute relative tangential velocity
     vector cVeliNorm = wallCntvar.Veli_
         - ((wallCntvar.Veli_ & wallCntvar.contactNormal_)
@@ -212,6 +223,7 @@ vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
     // compute tangential force
     vector Ftdi(- meanCntPar.aGammat_*sqrt(meanCntPar.aG_*reduceM_*wallCntvar.Lc_)*Vt);
     wallCntvar.FtPrev_ = FtLastS - meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT + Ftdi;
+    // wallCntvar.FtPrev_ =  - meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT + Ftdi;
     return wallCntvar.FtPrev_;
 }
 //---------------------------------------------------------------------------//

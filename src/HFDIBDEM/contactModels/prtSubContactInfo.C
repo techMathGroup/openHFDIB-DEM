@@ -30,6 +30,7 @@ Contributors
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "prtSubContactInfo.H"
+#include "contactModelInfo.H"
 
 using namespace Foam;
 
@@ -67,7 +68,7 @@ void prtSubContactInfo::evalVariables(
     tVeli_ = getVeli(tVars, tLVec_);
 
     Vn_ = -(cVeli_ - tVeli_) & prtCntVars_.contactNormal_;
-    Lc_ = 4*mag(cLVec_)*mag(tLVec_)/(mag(cLVec_) + mag(tLVec_));
+    Lc_ = (contactModelInfo::getLcCoeff())*mag(cLVec_)*mag(tLVec_)/(mag(cLVec_) + mag(tLVec_));
 
     physicalProperties_.curAdhN_ = min
     (
@@ -92,12 +93,18 @@ vector prtSubContactInfo::getFA()
 //---------------------------------------------------------------------------//
 vector prtSubContactInfo::getFNd()
 {
-    // return (physicalProperties_.aGammaN_*sqrt(physicalProperties_.aY_
-    //     *physicalProperties_.reduceM_/pow(Lc_+SMALL,3))*
-    //     (prtCntVars_.contactArea_ * Vn_))*prtCntVars_.contactNormal_;
-    return (physicalProperties_.reduceBeta_*sqrt(physicalProperties_.aY_
-        *physicalProperties_.reduceM_*prtCntVars_.contactArea_/(Lc_+SMALL))*
-        Vn_)*prtCntVars_.contactNormal_;
+    if(!contactModelInfo::getContactModel())
+    {
+        return (physicalProperties_.aGammaN_*sqrt(physicalProperties_.aY_
+            *physicalProperties_.reduceM_/pow(Lc_+SMALL,3))*
+            (prtCntVars_.contactArea_ * Vn_))*prtCntVars_.contactNormal_;
+    }
+    else:
+    {
+        return (physicalProperties_.reduceBeta_*sqrt(physicalProperties_.aY_
+            *physicalProperties_.reduceM_*prtCntVars_.contactArea_/(Lc_+SMALL))*
+            Vn_)*prtCntVars_.contactNormal_;
+    }
 }
 //---------------------------------------------------------------------------//
 vector prtSubContactInfo::getFt(scalar deltaT)

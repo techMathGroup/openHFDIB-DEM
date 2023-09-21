@@ -33,6 +33,7 @@ Contributors
 
 #include "interAdhesion.H"
 #include "virtualMeshLevel.H"
+#include "contactModelInfo.H"
 
 using namespace Foam;
 
@@ -96,7 +97,7 @@ tContactVars_(tVars)
     );
     physicalProperties_.reduceBeta_ =
     (
-       log((0.5*(cMatInfo.getEps()+tMatInfo.getEps())))/
+       (-1)*sqrt(contactModelInfo::getBetaCoeff())*log((0.5*(cMatInfo.getEps()+tMatInfo.getEps())))/
        (sqrt(sqr(log(cMatInfo.getEps()+tMatInfo.getEps()))+
        sqr(Foam::constant::mathematical::pi)))
     );

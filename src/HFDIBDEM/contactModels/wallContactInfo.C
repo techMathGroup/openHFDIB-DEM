@@ -35,6 +35,7 @@ Contributors
 #include "wallMatInfo.H"
 
 #include "virtualMeshLevel.H"
+#include "contactModelInfo.H"
 
 using namespace Foam;
 //---------------------------------------------------------------------------//
@@ -89,7 +90,7 @@ ibContactVars_(cVars)
         scalar maxAdhN = cMatInfo.getAdhN() + wInfo.getAdhN() - 2*adhPot;
         scalar reduceBeta =
         (
-            log((0.5*(cMatInfo.getEps()+wInfo.getEps())))/
+            (-1*sqrt(contactModelInfo::getBetaCoeff()))*log((0.5*(cMatInfo.getEps()+wInfo.getEps())))/
             (sqrt(sqr(log(cMatInfo.getEps()+wInfo.getEps()))+
             sqr(Foam::constant::mathematical::pi)))
         );
@@ -97,8 +98,15 @@ ibContactVars_(cVars)
             cntPatches[patchI],
             physicalProperties(aY, aG,  aGammaN, aGammat, aMu, maxAdhN, 0, 0, reduceBeta)
         );
+        // Info << "reduceBeta " <<reduceBeta <<endl;
+        // Info << "sqrt(5) "<< sqrt(5) <<endl;
     }
-
+    
+    // forAll(cntPatches, patchI)
+    // {
+    //     physicalProperties& cMeanCntPars(wallMeanPars_[cntPatches[patchI]]);
+    //     Info << "Info reduceBeta WallMeanPar" << cntPatches[patchI] << " : "<< cMeanCntPars.reduceBeta_ <<endl;
+    // }
     reduceM_ = 0;
 }
 

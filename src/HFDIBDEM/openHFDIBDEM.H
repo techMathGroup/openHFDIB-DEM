@@ -196,6 +196,8 @@ namespace Foam
         recordFirstTimeStep_ = setUp;
     }
 
+    void writeFirtsTimeBodiesInfo();
+
  };
 }
 

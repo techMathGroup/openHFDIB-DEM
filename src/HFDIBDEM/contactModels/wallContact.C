@@ -301,41 +301,56 @@ void getWallContactVars_ArbShape(
                 contactAreas().append(contactAreaLoc);
                 contactPlaneCenters().append(virtMeshPlane->getContactCenter());
             }
+            else
+            {
+                contactAreas().append((intersectVolume/vmWInfo->getSVVolume())*(pow(vmWInfo->getSVVolume(),2.0/3)));
+                contactPlaneCenters().append(virtMeshPlane->getContactCenter());
+            }
         }
 
         forAll(contactCenters(),cC)
         {
             contactCenter += contactCenters()[cC];
         }
+        // Pout << "contactCenter " << contactCenter.size() << endl;
         contactCenter /= contactCenters().size();
-
+        // Pout << "Survived #0 " << endl;
+        // Pout << "contactAreas() " << contactAreas() << endl;
         forAll(contactAreas(),cA)
         {
             contactArea += contactAreas()[cA];
         }
 
+        if(contactArea == 0)
+        {
+            return;
+        }
+        // Pout << "contactArea " << contactArea << endl;
+        // Pout << "Survived #0.5 " << endl;
         forAll(contactPatches,cP)
         {
             contactNormal -= wallPlaneInfo::getWallPlaneInfo()[contactPatches[cP]][0]*contactAreas()[cP];
         }
-
+        // Pout << "contactNormal " << mag(contactNormal) << endl;
         contactNormal /=mag(contactNormal);
-
+        // Pout << "contactNormal " << contactNormal << endl;
         wallCntInfo.getcClass().setWallContact(true);
         wallCntInfo.getcClass().inContactWithStatic(true);
-
+        // Pout << "Survived #1 " << endl;
         wallContactVars& wallCntVars = sCW.getWallCntVars();
+        // Pout << "Survived #2 " << endl;
         wallCntVars.contactCenter_ = contactCenter;
         wallCntVars.contactArea_   = contactArea;
         wallCntVars.contactVolume_ = intersectVolume;
         wallCntVars.contactNormal_ = contactNormal;
-
+        // Pout << "Survived #3 " << endl;
         wallCntVars.setMeanCntPars_Plane
         (
             contactAreas(),
             contactPatches,
             wallCntInfo.getWallMeanPars()
         );
+        // Pout << "Survived #4 " << endl;
     }
 }
 // //---------------------------------------------------------------------------//

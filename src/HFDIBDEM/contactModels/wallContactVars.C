@@ -48,6 +48,7 @@ void wallContactVars::setMeanCntPars
     physicalProperties_.aGammat_ = 0;
     physicalProperties_.aMu_ = 0;
     physicalProperties_.maxAdhN_ = 0;
+    physicalProperties_.reduceBeta_ = 0;
 
     forAll(contactFaces,faceI)
     {
@@ -64,6 +65,7 @@ void wallContactVars::setMeanCntPars
         physicalProperties_.aGammat_ += (cMeanCntPars.aGammat_*area);
         physicalProperties_.aMu_ += (cMeanCntPars.aMu_*area);
         physicalProperties_.maxAdhN_ += (cMeanCntPars.maxAdhN_*area);
+        physicalProperties_.reduceBeta_ += (cMeanCntPars.reduceBeta_*area);
     }
 
     physicalProperties_.aY_ /= overallArea;
@@ -72,6 +74,7 @@ void wallContactVars::setMeanCntPars
     physicalProperties_.aGammat_ /= overallArea;
     physicalProperties_.aMu_ /= overallArea;
     physicalProperties_.maxAdhN_ /= overallArea;
+    physicalProperties_.reduceBeta_ /= overallArea;
 }
 //---------------------------------------------------------------------------//
 void wallContactVars::setMeanCntPars_Plane
@@ -88,6 +91,7 @@ void wallContactVars::setMeanCntPars_Plane
     physicalProperties_.aGammat_ = 0;
     physicalProperties_.aMu_ = 0;
     physicalProperties_.maxAdhN_ = 0;
+    physicalProperties_.reduceBeta_ = 0;
 
     forAll(contactFaces,faceI)
     {
@@ -104,6 +108,7 @@ void wallContactVars::setMeanCntPars_Plane
         physicalProperties_.aGammat_ += (cMeanCntPars.aGammat_*area);
         physicalProperties_.aMu_ += (cMeanCntPars.aMu_*area);
         physicalProperties_.maxAdhN_ += (cMeanCntPars.maxAdhN_*area);
+        physicalProperties_.reduceBeta_ += (cMeanCntPars.reduceBeta_*area);
     }
 
     physicalProperties_.aY_ /= overallArea;
@@ -112,5 +117,6 @@ void wallContactVars::setMeanCntPars_Plane
     physicalProperties_.aGammat_ /= overallArea;
     physicalProperties_.aMu_ /= overallArea;
     physicalProperties_.maxAdhN_ /= overallArea;
+    physicalProperties_.reduceBeta_ /= overallArea;
 }
 //---------------------------------------------------------------------------//

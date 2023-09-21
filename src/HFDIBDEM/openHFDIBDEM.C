@@ -139,6 +139,43 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         }
     }
 
+    if(demDic.found("LcCoeff"))
+    {
+        contactModelInfo::setLcCoeff(readScalar(demDic.lookup("LcCoeff")));
+        // Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
+    }
+    else
+    {
+        contactModelInfo::setLcCoeff(4.0);
+        // Info <<" -- Coefficient for characteristic Lenght Lc is set to : 4.0"<< endl;
+    }
+
+    if(demDic.found("betaCoeff"))
+    {
+        contactModelInfo::setBetaCoeff(readScalar(demDic.lookup("betaCoeff")));
+        // Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
+    }
+    else
+    {
+        contactModelInfo::setBetaCoeff(5.0);
+        // Info <<" -- Coefficient for characteristic Lenght Lc is set to : 4.0"<< endl;
+    }
+    
+    if(demDic.found("useNewModel"))
+    {
+        contactModelInfo::setContactModel(readBool(demDic.lookup("useNewModel")));
+        // Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
+    }
+    else
+    {
+        contactModelInfo::setContactModel(true);
+        // Info <<" -- Coefficient for characteristic Lenght Lc is set to : 4.0"<< endl;
+    }
+    
+
+    Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
+    Info <<" -- Coefficient for beta disipation term is set to  : "<< contactModelInfo::getBetaCoeff() << endl;
+
     dictionary patchDic = demDic.subDict("collisionPatches");
     List<word> patchNames = patchDic.toc();
     forAll(patchNames, patchI)
@@ -521,45 +558,44 @@ void openHFDIBDEM::writeBodiesInfo()
 
     word curOutDir(recordOutDir_ + "/" + mesh_.time().timeName());
 
-    if(!isDir(curOutDir))
+
+    mkDir(curOutDir);
+    mkDir(curOutDir +"/stlFiles");
+    DynamicLabelList activeIB;
+    forAll (immersedBodies_,bodyId)
     {
-        mkDir(curOutDir);
-        mkDir(curOutDir +"/stlFiles");
-        DynamicLabelList activeIB;
-        forAll (immersedBodies_,bodyId)
+        if (immersedBodies_[bodyId].getIsActive())
         {
-            if (immersedBodies_[bodyId].getIsActive())
-            {
-                activeIB.append(bodyId);
-            }
-        }
-        wordList bodyNames;
-        scalar listZize(activeIB.size());
-        label bodiesPerProc = ceil(listZize/Pstream::nProcs());
-        InfoH << basic_Info << "Active IB listZize      : " << listZize<< endl;
-        InfoH << basic_Info << "bodiesPerProc : " << bodiesPerProc<< endl;
-
-
-        for(int assignProc = Pstream::myProcNo()*bodiesPerProc; assignProc < min((Pstream::myProcNo()+1)*bodiesPerProc,activeIB.size()); assignProc++)
-        {
-            const label bodyId(activeIB[assignProc]);
-            word path(curOutDir + "/body" + std::to_string(immersedBodies_[bodyId].getBodyId()) +".info");
-            OFstream ofStream(path);
-            IOobject outClass
-                (
-                    path,
-                    mesh_,
-                    IOobject::NO_READ,
-                    IOobject::AUTO_WRITE
-                );
-            IOdictionary outDict(outClass);
-
-            outDict.writeHeader(ofStream);
-            immersedBodies_[bodyId].recordBodyInfo(outDict,curOutDir);
-            outDict.writeData(ofStream);
+            activeIB.append(bodyId);
         }
     }
-    
+    wordList bodyNames;
+    scalar listZize(activeIB.size());
+    label bodiesPerProc = ceil(listZize/Pstream::nProcs());
+    InfoH << basic_Info << "Active IB listZize      : " << listZize<< endl;
+    InfoH << basic_Info << "bodiesPerProc : " << bodiesPerProc<< endl;
+    // Pout << "Processor "<< Pstream::myProcNo() << endl;
+
+    for(int assignProc = Pstream::myProcNo()*bodiesPerProc; assignProc < min((Pstream::myProcNo()+1)*bodiesPerProc,activeIB.size()); assignProc++)
+    {
+        const label bodyId(activeIB[assignProc]);
+        // Pout <<"Processor "<< Pstream::myProcNo() << " writes Body " << bodyId << endl;
+        word path(curOutDir + "/body" + std::to_string(immersedBodies_[bodyId].getBodyId()) +".info");
+        OFstream ofStream(path);
+        IOobject outClass
+            (
+                path,
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            );
+        IOdictionary outDict(outClass);
+
+        outDict.writeHeader(ofStream);
+        immersedBodies_[bodyId].recordBodyInfo(outDict,curOutDir);
+        outDict.writeData(ofStream);
+    }
+
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
@@ -663,7 +699,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         if(wallContactIB.size() > 0)
         {
             label wallContactPerProc(ceil(double(wallContactList.size())/Pstream::nProcs()));
-
+            // Info <<" wallContactPerProc : "<< wallContactPerProc << endl;
             if( wallContactList.size() <= Pstream::nProcs())
             {
                 wallContactPerProc = 1;
@@ -671,6 +707,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
             for(int assignProc = Pstream::myProcNo()*wallContactPerProc; assignProc < min((Pstream::myProcNo()+1)*wallContactPerProc,wallContactList.size()); assignProc++)
             {
+                // Pout << "Running wall contact solver for " << assignProc << " / " << wallContactList.size() << endl;
                 wallSubContactInfo* sCW = wallContactList[assignProc];
                 immersedBody& cIb(immersedBodies_[sCW->getBodyId()]);
                 sCW->setResolvedContact(solveWallContact(
@@ -707,7 +744,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         }
         wallContactList.clear();
         wallContactIB.clear();
-
+        // Pout <<" Survived 3 " << endl;
         DynamicList<prtSubContactInfo*> contactList;
         // check only pairs whose bounding boxes are intersected for the contact
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
@@ -1052,3 +1089,55 @@ void openHFDIBDEM::preCalculateCellPoints()
     }
 }
 //---------------------------------------------------------------------------//
+void openHFDIBDEM::writeFirtsTimeBodiesInfo()
+{
+    word curOutDir(recordOutDir_ + "/" + mesh_.time().timeName());
+    bool checkExistance(false);
+    if(!recordSimulation_ || isDir(curOutDir))
+        return;
+
+    if(Pstream::myProcNo() == 0)
+    {
+        mkDir(curOutDir);
+    }
+
+    reduce(checkExistance,orOp<bool>());
+
+    
+    mkDir(curOutDir +"/stlFiles");
+    DynamicLabelList activeIB;
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            activeIB.append(bodyId);
+        }
+    }
+    wordList bodyNames;
+    scalar listZize(activeIB.size());
+    label bodiesPerProc = ceil(listZize/Pstream::nProcs());
+    InfoH << basic_Info << "Active IB listZize      : " << listZize<< endl;
+    InfoH << basic_Info << "bodiesPerProc : " << bodiesPerProc<< endl;
+    Pout << "Processor "<< Pstream::myProcNo() << endl;
+
+    for(int assignProc = Pstream::myProcNo()*bodiesPerProc; assignProc < min((Pstream::myProcNo()+1)*bodiesPerProc,activeIB.size()); assignProc++)
+    {
+        const label bodyId(activeIB[assignProc]);
+        Pout <<"Processor "<< Pstream::myProcNo() << " writes Body " << bodyId << endl;
+        word path(curOutDir + "/body" + std::to_string(immersedBodies_[bodyId].getBodyId()) +".info");
+        OFstream ofStream(path);
+        IOobject outClass
+            (
+                path,
+                mesh_,
+                IOobject::NO_READ,
+                IOobject::AUTO_WRITE
+            );
+        IOdictionary outDict(outClass);
+
+        outDict.writeHeader(ofStream);
+        immersedBodies_[bodyId].recordBodyInfo(outDict,curOutDir);
+        outDict.writeData(ofStream);
+    }
+
+}

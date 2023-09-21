@@ -52,6 +52,7 @@ sdBasedLambda_(false),
 curMeshBounds_(mesh_.points(),false),
 M_(0.0),
 M0_(0.0),
+nCells_(0),
 CoM_(vector::zero),
 I_(symmTensor::zero),
 bBox_(std::make_shared<boundBox>()),
@@ -76,15 +77,20 @@ void geomModel::calculateGeometricalProperties
     setCoM();
     I_      = symmTensor::zero;
     //vector tmpCom(vector::zero);
+    //reset cellCount
+    nCells_ = label(0);
 
     addToMAndI(body,surfCells_[Pstream::myProcNo()]);
     addToMAndI(body,intCells_[Pstream::myProcNo()]);
+    //Get CellCount At Each SubDomain
+    nCells_ = intCells_[Pstream::myProcNo()].size() + surfCells_[Pstream::myProcNo()].size();
 
     // collect from processors
     reduce(M_, sumOp<scalar>());
     //reduce(tmpCom,  sumOp<vector>());
     reduce(I_,  sumOp<symmTensor>());
-
+    //collect cellCount actros processors
+    reduce(nCells_, sumOp<label>());
     /*if(M_ > 0)
     {
         CoM_ = tmpCom / M_;

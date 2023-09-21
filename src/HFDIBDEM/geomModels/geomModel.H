@@ -112,6 +112,7 @@ namespace Foam
         //body mass
         scalar M_;
         scalar M0_;                                                     //initial mass (at addition)
+        label nCells_;
 
         //location of center of mass
         vector CoM_;
@@ -148,7 +149,7 @@ namespace Foam
             List<labelList>& cellPoints
         )
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "1-- geomModelMessage-- "
                 << "notIplemented"<<endl;
         }
 
@@ -181,20 +182,20 @@ namespace Foam
             Random&         randGen
         )
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "2-- geomModelMessage-- "
                 << "notIplemented"<<endl;
             return vector::zero;
         }
 
         virtual void bodyMovePoints(vector translVec)
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "3-- geomModelMessage-- "
                 << "notIplemented"<<endl;
         }
 
         virtual void bodyScalePoints(scalar scaleFac)
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "4-- geomModelMessage-- "
                 << "notIplemented"<<endl;
         }
 
@@ -204,26 +205,26 @@ namespace Foam
             vector axisOfRot
         )
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "5-- geomModelMessage-- "
                 << "notIplemented"<<endl;
         }
 
         virtual void resetBody()
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "6-- geomModelMessage-- "
                 << "notIplemented"<<endl;
         }
 
         virtual vector getCoM()
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "7-- geomModelMessage-- "
                 << "notIplemented"<<endl;
             return vector::zero;
         }
 
         virtual boundBox getBounds()
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "8-- geomModelMessage-- "
                 << "notIplemented"<<endl;
             boundBox bound;
             return bound;
@@ -231,33 +232,33 @@ namespace Foam
 
         virtual void synchronPos(label owner = -1)
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "9-- geomModelMessage-- "
                 << "notIplemented"<<endl;
         }
 
         virtual void writeBodyInfo(label bodyId, IOdictionary& dict, word path)
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "10-- geomModelMessage-- "
                 << "notIplemented"<<endl;
         }
 
         virtual boolList pointInside(pointField pointI)
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "11-- geomModelMessage-- "
                 << "notIplemented"<<endl;
             return {false};
         }
 
         virtual bool pointInside(point pointI)
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "12-- geomModelMessage-- "
                 << "notIplemented"<<endl;
             return false;
         }
 
         virtual volumeType getVolumeType(subVolume& sv, bool cIb)
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "13-- geomModelMessage-- "
                 << "notIplemented"<<endl;
             return volumeType::unknown;
         }
@@ -275,7 +276,7 @@ namespace Foam
             vector& normal
         )
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "14-- geomModelMessage-- "
                 << "notIplemented"<<endl;
         }
 
@@ -286,14 +287,14 @@ namespace Foam
             boundBox& limBBox
         )
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "15-- geomModelMessage-- "
                 << "notIplemented"<<endl;
             return false;
         }
 
         virtual void setCoM()
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "16-- geomModelMessage-- "
                 << "notIplemented"<<endl;
         }
 
@@ -357,6 +358,11 @@ namespace Foam
             return M_;
         }
 
+        label& getNCells()
+        {
+            return nCells_;
+        }
+
         const dimensionedScalar getRhoS()    const
         {
             return rhoS_;
@@ -381,7 +387,7 @@ namespace Foam
 
         virtual bool checkCluster()
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "17-- geomModelMessage-- "
                 << "not cluster model"<<endl;
                 return false;
         }
@@ -407,7 +413,7 @@ namespace Foam
 
         virtual pointField getSTLBodyPoints()
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "18-- geomModelMessage-- "
                 << "not cluster model"<<endl;
             pointField emptyField;
             return emptyField;
@@ -415,7 +421,7 @@ namespace Foam
 
         virtual faceList getSTLFaces()
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "19-- geomModelMessage-- "
                 << "notIplemented"<<endl;
             faceList emptyList;
             return emptyList;
@@ -423,7 +429,7 @@ namespace Foam
 
         virtual pointField getSTLFacePoint(label faceID)
         {
-            InfoH << iB_Info << "-- geomModelMessage-- "
+            InfoH << iB_Info << "20-- geomModelMessage-- "
                 << "notIplemented"<<endl;
             pointField nonPointField;
             return nonPointField;

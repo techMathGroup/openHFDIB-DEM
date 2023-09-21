@@ -26,56 +26,64 @@ InNamspace
     contactModel
 
 Description
-    DEM parameters
+    Static class for storing virtual mesh level
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef parameters_H
-#define parameters_H
+#ifndef contactModelInfo_H
+#define contactModelInfo_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#include "materialProperties.H"
-#include "interAdhesion.H"
-#include "wallMatInfo.H"
-#include "wallPlaneInfo.H"
-#include "virtualMeshLevel.H"
-#include "cyclicPlaneInfo.H"
-#include "contactModelInfo.H"
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                            Parameters Definition
+                      Class virtualMeshLevel Declaration
 \*---------------------------------------------------------------------------*/
 
-HashTable<materialInfo,string,Hash<string>> materialProperties::materialProps_ =
-    HashTable<materialInfo,string,Hash<string>>();
 
-HashTable<scalar,string,Hash<string>> interAdhesion::matInterAdh_ =
-    HashTable<scalar,string,Hash<string>>();
+class contactModelInfo
+{
+    public:
 
-HashTable<materialInfo,string,Hash<string>> wallMatInfo::wallMatInfo_ =
-    HashTable<materialInfo,string,Hash<string>>();
+    static void setLcCoeff(scalar LcCoeff)
+    {
+        LcCoeff_ = LcCoeff;
+    }
+    static void setBetaCoeff(scalar betaCoeff)
+    {
+        betaCoeff_ = betaCoeff;
+    }
 
-HashTable<List<vector>,string,Hash<string>> wallPlaneInfo::wallPlaneInfo_ =
-    HashTable<List<vector>,string,Hash<string>>();
+    static void setContactModel(bool contactModel)
+    {
+        contactModel_ = contactModel;
+    }
 
-HashTable<List<vector>,string,Hash<string>> cyclicPlaneInfo::cyclicPlaneInfo_ =
-    HashTable<List<vector>,string,Hash<string>>();
+    static scalar getLcCoeff()
+    {
+        return LcCoeff_;
+    }
 
-std::map<string, string> cyclicPlaneInfo::cyclicPatchPairs_ =
-    std::map<string, string>();
+    static scalar getBetaCoeff()
+    {
+        return betaCoeff_;
+    }
 
-scalar virtualMeshLevel::virtualMeshLevel_ = 1;
-scalar virtualMeshLevel::levelOfDivision_ = 1;
-scalar virtualMeshLevel::charCellSize_ = 1;
-scalar contactModelInfo::LcCoeff_ = 4.0;
-scalar contactModelInfo::betaCoeff_ = 5.0;
+    static bool getContactModel()
+    {
+        return contactModel_;
+    }
+
+    static scalar LcCoeff_;
+    static scalar betaCoeff_;
+    bool contactModel_;
+
+};
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

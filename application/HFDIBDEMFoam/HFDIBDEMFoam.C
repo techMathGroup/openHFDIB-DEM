@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
     if(HFDIBDEM.getRecordFirstTime())
     {
         HFDIBDEM.setRecordFirstTime(false);
-        HFDIBDEM.writeBodiesInfo();
+        HFDIBDEM.writeFirtsTimeBodiesInfo();
     }
 
     while (runTime.run())
