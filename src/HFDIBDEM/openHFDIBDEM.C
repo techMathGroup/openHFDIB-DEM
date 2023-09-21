@@ -161,9 +161,9 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         // Info <<" -- Coefficient for characteristic Lenght Lc is set to : 4.0"<< endl;
     }
     
-    if(demDic.found("useNewModel"))
+    if(demDic.found("useOldModel"))
     {
-        contactModelInfo::setContactModel(readBool(demDic.lookup("useNewModel")));
+        contactModelInfo::setContactModel(readBool(demDic.lookup("useOldModel")));
         // Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
     }
     else
