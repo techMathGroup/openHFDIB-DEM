@@ -99,7 +99,7 @@ vector prtSubContactInfo::getFNd()
             *physicalProperties_.reduceM_/pow(Lc_+SMALL,3))*
             (prtCntVars_.contactArea_ * Vn_))*prtCntVars_.contactNormal_;
     }
-    else:
+    else
     {
         return (physicalProperties_.reduceBeta_*sqrt(physicalProperties_.aY_
             *physicalProperties_.reduceM_*prtCntVars_.contactArea_/(Lc_+SMALL))*

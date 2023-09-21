@@ -222,8 +222,8 @@ vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
     vector Vt(cVeliNorm - vector::zero);
     // compute tangential force
     vector Ftdi(- meanCntPar.aGammat_*sqrt(meanCntPar.aG_*reduceM_*wallCntvar.Lc_)*Vt);
-    wallCntvar.FtPrev_ = FtLastS - meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT + Ftdi;
-    // wallCntvar.FtPrev_ =  - meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT + Ftdi;
+    // wallCntvar.FtPrev_ = FtLastS - meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT + Ftdi;
+    wallCntvar.FtPrev_ =  - meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT + Ftdi;
     return wallCntvar.FtPrev_;
 }
 //---------------------------------------------------------------------------//

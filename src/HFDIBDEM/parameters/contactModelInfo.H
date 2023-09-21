@@ -81,7 +81,7 @@ class contactModelInfo
 
     static scalar LcCoeff_;
     static scalar betaCoeff_;
-    bool contactModel_;
+    static bool contactModel_;
 
 };
 
