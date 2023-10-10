@@ -175,6 +175,16 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 
     Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
     Info <<" -- Coefficient for beta disipation term is set to  : "<< contactModelInfo::getBetaCoeff() << endl;
+    if(contactModelInfo::getContactModel())
+    {
+        Info <<" -- Old dissipation term with gamma term is active : "<< endl;
+    }
+    else
+    {
+        Info <<" -- New dissipation term with Coefficient of resttution is active : "<< endl;
+    }
+    
+    
 
     dictionary patchDic = demDic.subDict("collisionPatches");
     List<word> patchNames = patchDic.toc();

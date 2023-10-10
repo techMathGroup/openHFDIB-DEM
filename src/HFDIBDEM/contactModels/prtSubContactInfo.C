@@ -93,7 +93,7 @@ vector prtSubContactInfo::getFA()
 //---------------------------------------------------------------------------//
 vector prtSubContactInfo::getFNd()
 {
-    if(!contactModelInfo::getContactModel())
+    if(contactModelInfo::getContactModel())
     {
         return (physicalProperties_.aGammaN_*sqrt(physicalProperties_.aY_
             *physicalProperties_.reduceM_/pow(Lc_+SMALL,3))*

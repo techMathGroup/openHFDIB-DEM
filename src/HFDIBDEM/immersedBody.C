@@ -995,7 +995,12 @@ void immersedBody::checkIfInDomain(volScalarField& body)
     InfoH << iB_Info << "-- body " << bodyId_ << " current M/M0: "
         << geomModel_->getM()/geomModel_->getM0() << endl;
     // if only 1% of the initial particle mass remains in the domain, switch it off
-    if (geomModel_->getM()/(geomModel_->getM0()+SMALL) < 1e-2)
+    if (geomModel_->getM()/(geomModel_->getM0()+SMALL) < 1e-2 && case3D)
+    {
+        switchActiveOff(body);
+        geomModel_->resetBody(body);
+    }
+    else if (!case3D && geomModel_->getNCells() <= 1)
     {
         switchActiveOff(body);
         geomModel_->resetBody(body);
