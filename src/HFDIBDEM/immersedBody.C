@@ -1000,10 +1000,11 @@ void immersedBody::checkIfInDomain(volScalarField& body)
         switchActiveOff(body);
         geomModel_->resetBody(body);
     }
-    else if (!case3D && geomModel_->getNCells() <= 1)
+    else if (!case3D && geomModel_->getNCells() <= 1 && !geomModel_->isCluster())
     {
         switchActiveOff(body);
         geomModel_->resetBody(body);
+        InfoH << iB_Info << "-- body " << bodyId_ << " switched off" << endl;
     }
 }
 //---------------------------------------------------------------------------//

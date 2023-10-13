@@ -208,6 +208,7 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 
     if(demDic.found("cyclicPatches"))
     {
+        Info << "CyclicPatches Found " << endl;
         dictionary cyclicPatchDic = demDic.subDict("cyclicPatches");
         List<word> cyclicPatchNames = cyclicPatchDic.toc();
         forAll(cyclicPatchNames, patchI)
@@ -223,8 +224,9 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
                 neighbourPatch
             );
         }
+        Info << "CyclicPatches  " <<  cyclicPatchNames <<endl;
     }
-
+    
     if (HFDIBDEMDict_.found("geometricD"))
     {
         geometricD = HFDIBDEMDict_.lookup("geometricD");
