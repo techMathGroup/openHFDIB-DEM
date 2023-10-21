@@ -77,6 +77,7 @@ scalar virtualMeshLevel::charCellSize_ = 1;
 scalar contactModelInfo::LcCoeff_ = 4.0;
 scalar contactModelInfo::betaCoeff_ = 5.0;
 bool   contactModelInfo::contactModel_ = true;
+label  contactModelInfo::nSolidsTreshnold_ = 1000;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
