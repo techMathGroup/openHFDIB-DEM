@@ -1,0 +1,27 @@
+digraph "Foam::virtualMeshWall::detectFirstContactPoint"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="Foam::virtualMeshWall\l::detectFirstContactPoint",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="Foam::virtualMeshWall\l::checkSubVolume",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1virtualMeshWall.html#a00c17609d545a8eaa4116b0dc8a97a2a",tooltip=" "];
+  Node2 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="Foam::geomModel::pointInside",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1geomModel.html#a9f26fe62858c0b9da399f2c5823ea0a5",tooltip=" "];
+  Node1 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="Foam::bbMatrix::cornerNeighbour\lSubVolumes",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1bbMatrix.html#adc78aadf304850e42bb5f49d0de8188a",tooltip=" "];
+  Node4 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="forAll",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$addModels_2initializeAddModels_8H.html#adcd69a620b2d93c893cbf0e92bb7c5d7",tooltip=" "];
+  Node5 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="thrSurf",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$addModels_2initializeAddModels_8H.html#a12947c9cf4cff46d3d0a324e3e718f45",tooltip=" "];
+  Node1 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node1 -> Node7 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="Foam::virtualMeshWallInfo\l::getStartingPoint",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structFoam_1_1virtualMeshWallInfo.html#ac2a279eaaf9cb23b9019b33bb71c69a6",tooltip=" "];
+  Node1 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="Foam::bbMatrix::getSVIndex\lForPoint_Wall",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1bbMatrix.html#a17f37ee48a2af9a679c0e642d8df8135",tooltip=" "];
+  Node8 -> Node9 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node9 [label="Foam::virtualMeshLevel\l::getLevelOfDivision",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1virtualMeshLevel.html#a1eb892ba729b2ba4c733d6157a1236e6",tooltip=" "];
+  Node1 -> Node10 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node10 [label="Foam::virtualMeshWall\l::resetSubVolume",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1virtualMeshWall.html#a4975e48fa6b4666c3dd16faa43103229",tooltip=" "];
+}

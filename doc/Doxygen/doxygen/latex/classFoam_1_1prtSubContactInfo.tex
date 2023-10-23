@@ -1,0 +1,1109 @@
+\hypertarget{classFoam_1_1prtSubContactInfo}{}\doxysection{Foam\+::prt\+Sub\+Contact\+Info Class Reference}
+\label{classFoam_1_1prtSubContactInfo}\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+
+
+{\ttfamily \#include $<$prt\+Sub\+Contact\+Info.\+H$>$}
+
+
+
+Collaboration diagram for Foam\+::prt\+Sub\+Contact\+Info\+:
+% FIG 0
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a04a459f20c490266e96c3d7877e9f67d}{prt\+Sub\+Contact\+Info}} (const Tuple2$<$ label, label $>$ \&contact\+Pair, const \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}} \&\mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}})
+\item 
+\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a9ff73f358b047b849bdf0e34ec4d47a9}{$\sim$prt\+Sub\+Contact\+Info}} ()
+\item 
+const Tuple2$<$ label, label $>$ \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3110f964059fad119ddc7e985aa68628}{get\+C\+Pair}} ()
+\item 
+\mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}} \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a35f19b1b38f4960dbadf20f6c8b57c4e}{get\+Physical\+Properties}} ()
+\item 
+\mbox{\hyperlink{structFoam_1_1prtContactVars}{prt\+Contact\+Vars}} \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a201ca399e8b41c4187f6269d935d12ce}{getprt\+Cnt\+Vars}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a8066d18d19eccd82ab137456048567d5}{eval\+Variables}} (\mbox{\hyperlink{classFoam_1_1ibContactClass}{ib\+Contact\+Class}} \&c\+CoM, \mbox{\hyperlink{classFoam_1_1ibContactClass}{ib\+Contact\+Class}} \&t\+CoM, \mbox{\hyperlink{classFoam_1_1ibContactVars}{ib\+Contact\+Vars}} \&c\+Vars, \mbox{\hyperlink{classFoam_1_1ibContactVars}{ib\+Contact\+Vars}} \&t\+Vars)
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_abaafb01298a28b189617d3ab484c398a}{getc\+L\+Vec}} ()
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a7dee8c52bed3c27f9a1d4282422d7225}{gett\+L\+Vec}} ()
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a213e078c86343ef8b101060f0749d968}{get\+F\+Ne}} ()
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_acea579ea890ee37ad7470e1e8f9f3869}{get\+FA}} ()
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_ae9eb51b19ba531bd31027f6b2e254f35}{get\+F\+Nd}} ()
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_abf8b5c789a71026d816d199aee7e541e}{get\+Ft}} (scalar deltaT)
+\item 
+Tuple2$<$ \mbox{\hyperlink{structFoam_1_1forces}{forces}}, \mbox{\hyperlink{structFoam_1_1forces}{forces}} $>$ \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aee6f4fe2eb4923bb6bb775206fd164df}{get\+Out\+Force}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a401e4a43c78b4cd7e2c41dc84fe29fec}{set\+V\+M\+Info}} (bound\+Box \&b\+Box, scalar sub\+VolumeV)
+\item 
+void \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a9fd4c6198d24e428e25c68cad6569180}{set\+V\+M\+Info}} (const \mbox{\hyperlink{structFoam_1_1virtualMeshInfo}{virtual\+Mesh\+Info}} \&vm\+Info)
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structFoam_1_1virtualMeshInfo}{virtual\+Mesh\+Info}} $>$ \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_ad065e090dd795e2cb28a289a6d2141de}{get\+V\+M\+Info}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a257a46121032b49998d458f3319f9025}{clear\+Out\+Forces}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_af70892dcb7d3e2efad43448f8ca4f03d}{contact\+Resolved}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a5ffac91c0407e600021489e81c00b48b}{set\+Resolved\+Contact}} (bool resolved)
+\item 
+scalar \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a5a019123148b5e91eceb29eb3ed640d0}{get\+Lc}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3b6a3b67d9b39918b44ae96967d853c7}{sync\+Data}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a8881684196665008a06fd778eb744408}{prt\+Sub\+Contact\+Info}} (const Tuple2$<$ label, label $>$ \&contact\+Pair, const \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}} \&\mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}})
+\item 
+\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a441b2ace71de1b09ed8dd7a68c4dc073}{$\sim$prt\+Sub\+Contact\+Info}} ()
+\item 
+const Tuple2$<$ label, label $>$ \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3110f964059fad119ddc7e985aa68628}{get\+C\+Pair}} ()
+\item 
+\mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}} \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a35f19b1b38f4960dbadf20f6c8b57c4e}{get\+Physical\+Properties}} ()
+\item 
+\mbox{\hyperlink{structFoam_1_1prtContactVars}{prt\+Contact\+Vars}} \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a201ca399e8b41c4187f6269d935d12ce}{getprt\+Cnt\+Vars}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a5b68e7c4d006db6b26795ad06e31e44c}{eval\+Variables}} (\mbox{\hyperlink{classFoam_1_1ibContactClass}{ib\+Contact\+Class}} \&c\+CoM, \mbox{\hyperlink{classFoam_1_1ibContactClass}{ib\+Contact\+Class}} \&t\+CoM, \mbox{\hyperlink{classFoam_1_1ibContactVars}{ib\+Contact\+Vars}} \&c\+Vars, \mbox{\hyperlink{classFoam_1_1ibContactVars}{ib\+Contact\+Vars}} \&t\+Vars)
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_abaafb01298a28b189617d3ab484c398a}{getc\+L\+Vec}} ()
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a7dee8c52bed3c27f9a1d4282422d7225}{gett\+L\+Vec}} ()
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_afe77d1248d0924be1e5be52d7c44c79f}{get\+F\+Ne}} ()
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a8a77941a370a84dcaa15246a26745299}{get\+FA}} ()
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a72c5e40e952c8fdf9aa2d775ceb03a0e}{get\+F\+Nd}} ()
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_af2905b97a369b56fe590d3701838b5ac}{get\+Ft}} (scalar deltaT)
+\item 
+Tuple2$<$ \mbox{\hyperlink{structFoam_1_1forces}{forces}}, \mbox{\hyperlink{structFoam_1_1forces}{forces}} $>$ \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aee6f4fe2eb4923bb6bb775206fd164df}{get\+Out\+Force}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a903f198fb1da65705efbab2efc702a03}{set\+V\+M\+Info}} (bound\+Box \&b\+Box, scalar sub\+VolumeV)
+\item 
+void \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a7225e24433c9d19d16ba2997cb79e344}{set\+V\+M\+Info}} (const \mbox{\hyperlink{structFoam_1_1virtualMeshInfo}{virtual\+Mesh\+Info}} \&vm\+Info)
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structFoam_1_1virtualMeshInfo}{virtual\+Mesh\+Info}} $>$ \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a4b4cc026ea5bdddf9ce7c2dd38d5e870}{get\+V\+M\+Info}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a257a46121032b49998d458f3319f9025}{clear\+Out\+Forces}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_af70892dcb7d3e2efad43448f8ca4f03d}{contact\+Resolved}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a5ffac91c0407e600021489e81c00b48b}{set\+Resolved\+Contact}} (bool resolved)
+\item 
+scalar \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a5a019123148b5e91eceb29eb3ed640d0}{get\+Lc}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a59ff02d5ba734a257f5f2e882e9462d3}{sync\+Data}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a44572a139c67350e20b984837eb53099}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a0999221548c7010e25ac6df6b23df3c5}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_abe912e517123ade5271d8426c2146667}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a670b0674957d4c6049e028cf25330f33}{Dynamic\+Point\+List}}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a44572a139c67350e20b984837eb53099}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a0999221548c7010e25ac6df6b23df3c5}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_abe912e517123ade5271d8426c2146667}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a670b0674957d4c6049e028cf25330f33}{Dynamic\+Point\+List}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_acca8f424d37c5c40e8d7ec95337b96d4}{get\+Veli}} (\mbox{\hyperlink{classFoam_1_1ibContactVars}{ib\+Contact\+Vars}} \&c\+Vars, vector \&l\+Vec)
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a289a27eac7fc323a895a41940bd1a3fb}{get\+Veli}} (\mbox{\hyperlink{classFoam_1_1ibContactVars}{ib\+Contact\+Vars}} \&c\+Vars, vector \&l\+Vec)
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+Tuple2$<$ label, label $>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a883e6c940787cc6097eb2197b5abf0b7}{contact\+Pair\+\_\+}}
+\item 
+\mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physical\+Properties\+\_\+}}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structFoam_1_1virtualMeshInfo}{virtual\+Mesh\+Info}} $>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}{vm\+Info\+\_\+}}
+\item 
+\mbox{\hyperlink{structFoam_1_1prtContactVars}{prt\+Contact\+Vars}} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prt\+Cnt\+Vars\+\_\+}}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a23fc2e480e0478b1addb390cd1d958fb}{c\+L\+Vec\+\_\+}}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a6b823e3f3ca0a7941f96ab739b3acbe5}{t\+L\+Vec\+\_\+}}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a9eb390b634c4421bf2d9fc3b702f7a42}{c\+Veli\+\_\+}}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_ad51203bc240f0e562027da0799c0f0c3}{t\+Veli\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_ae45d1adb3bb23a747efdb5a5f9d72683}{Vn\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a92adfaf4e02c1ae1529092fe9f634e18}{Lc\+\_\+}}
+\item 
+Tuple2$<$ \mbox{\hyperlink{structFoam_1_1forces}{forces}}, \mbox{\hyperlink{structFoam_1_1forces}{forces}} $>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{out\+Force\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_acb63422aa99b283d9fe97309eaeeef8b}{contact\+Resolved\+\_\+}} = false
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 63 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a44572a139c67350e20b984837eb53099}\label{classFoam_1_1prtSubContactInfo_a44572a139c67350e20b984837eb53099}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a44572a139c67350e20b984837eb53099}{Foam\+::prt\+Sub\+Contact\+Info\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 67 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a44572a139c67350e20b984837eb53099}\label{classFoam_1_1prtSubContactInfo_a44572a139c67350e20b984837eb53099}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a44572a139c67350e20b984837eb53099}{Foam\+::prt\+Sub\+Contact\+Info\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 67 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a670b0674957d4c6049e028cf25330f33}\label{classFoam_1_1prtSubContactInfo_a670b0674957d4c6049e028cf25330f33}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a670b0674957d4c6049e028cf25330f33}{Foam\+::prt\+Sub\+Contact\+Info\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 70 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a670b0674957d4c6049e028cf25330f33}\label{classFoam_1_1prtSubContactInfo_a670b0674957d4c6049e028cf25330f33}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a670b0674957d4c6049e028cf25330f33}{Foam\+::prt\+Sub\+Contact\+Info\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 70 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a0999221548c7010e25ac6df6b23df3c5}\label{classFoam_1_1prtSubContactInfo_a0999221548c7010e25ac6df6b23df3c5}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a0999221548c7010e25ac6df6b23df3c5}{Foam\+::prt\+Sub\+Contact\+Info\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 68 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a0999221548c7010e25ac6df6b23df3c5}\label{classFoam_1_1prtSubContactInfo_a0999221548c7010e25ac6df6b23df3c5}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a0999221548c7010e25ac6df6b23df3c5}{Foam\+::prt\+Sub\+Contact\+Info\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 68 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_abe912e517123ade5271d8426c2146667}\label{classFoam_1_1prtSubContactInfo_abe912e517123ade5271d8426c2146667}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_abe912e517123ade5271d8426c2146667}{Foam\+::prt\+Sub\+Contact\+Info\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 69 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_abe912e517123ade5271d8426c2146667}\label{classFoam_1_1prtSubContactInfo_abe912e517123ade5271d8426c2146667}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_abe912e517123ade5271d8426c2146667}{Foam\+::prt\+Sub\+Contact\+Info\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 69 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a04a459f20c490266e96c3d7877e9f67d}\label{classFoam_1_1prtSubContactInfo_a04a459f20c490266e96c3d7877e9f67d}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!prtSubContactInfo@{prtSubContactInfo}}
+\index{prtSubContactInfo@{prtSubContactInfo}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{prtSubContactInfo()}{prtSubContactInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily prt\+Sub\+Contact\+Info\+::prt\+Sub\+Contact\+Info (\begin{DoxyParamCaption}\item[{const Tuple2$<$ label, label $>$ \&}]{contact\+Pair,  }\item[{const \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}} \&}]{physical\+Properties }\end{DoxyParamCaption})}
+
+
+
+Definition at line 39 of file prt\+Sub\+Contact\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{43 :}
+\DoxyCodeLine{44 \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a883e6c940787cc6097eb2197b5abf0b7}{contactPair\_}}(contactPair),}
+\DoxyCodeLine{45 \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}(\mbox{\hyperlink{structFoam_1_1physicalProperties}{physicalProperties}})}
+\DoxyCodeLine{46 \{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a9ff73f358b047b849bdf0e34ec4d47a9}\label{classFoam_1_1prtSubContactInfo_a9ff73f358b047b849bdf0e34ec4d47a9}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!````~prtSubContactInfo@{$\sim$prtSubContactInfo}}
+\index{````~prtSubContactInfo@{$\sim$prtSubContactInfo}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{$\sim$prtSubContactInfo()}{~prtSubContactInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily prt\+Sub\+Contact\+Info\+::$\sim$prt\+Sub\+Contact\+Info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 48 of file prt\+Sub\+Contact\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{49 \{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a8881684196665008a06fd778eb744408}\label{classFoam_1_1prtSubContactInfo_a8881684196665008a06fd778eb744408}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!prtSubContactInfo@{prtSubContactInfo}}
+\index{prtSubContactInfo@{prtSubContactInfo}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{prtSubContactInfo()}{prtSubContactInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::prt\+Sub\+Contact\+Info\+::prt\+Sub\+Contact\+Info (\begin{DoxyParamCaption}\item[{const Tuple2$<$ label, label $>$ \&}]{contact\+Pair,  }\item[{const \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}} \&}]{physical\+Properties }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a441b2ace71de1b09ed8dd7a68c4dc073}\label{classFoam_1_1prtSubContactInfo_a441b2ace71de1b09ed8dd7a68c4dc073}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!````~prtSubContactInfo@{$\sim$prtSubContactInfo}}
+\index{````~prtSubContactInfo@{$\sim$prtSubContactInfo}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{$\sim$prtSubContactInfo()}{~prtSubContactInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::prt\+Sub\+Contact\+Info\+::$\sim$prt\+Sub\+Contact\+Info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a257a46121032b49998d458f3319f9025}\label{classFoam_1_1prtSubContactInfo_a257a46121032b49998d458f3319f9025}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!clearOutForces@{clearOutForces}}
+\index{clearOutForces@{clearOutForces}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{clearOutForces()}{clearOutForces()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::prt\+Sub\+Contact\+Info\+::clear\+Out\+Forces (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 158 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{159     \{}
+\DoxyCodeLine{160         \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{outForce\_}}.first().F = vector::zero;}
+\DoxyCodeLine{161         \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{outForce\_}}.first().T = vector::zero;}
+\DoxyCodeLine{162         \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{outForce\_}}.second().F = vector::zero;}
+\DoxyCodeLine{163         \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{outForce\_}}.second().T = vector::zero;}
+\DoxyCodeLine{164     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a257a46121032b49998d458f3319f9025}\label{classFoam_1_1prtSubContactInfo_a257a46121032b49998d458f3319f9025}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!clearOutForces@{clearOutForces}}
+\index{clearOutForces@{clearOutForces}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{clearOutForces()}{clearOutForces()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::prt\+Sub\+Contact\+Info\+::clear\+Out\+Forces (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 158 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{159     \{}
+\DoxyCodeLine{160         \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{outForce\_}}.first().F = vector::zero;}
+\DoxyCodeLine{161         \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{outForce\_}}.first().T = vector::zero;}
+\DoxyCodeLine{162         \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{outForce\_}}.second().F = vector::zero;}
+\DoxyCodeLine{163         \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{outForce\_}}.second().T = vector::zero;}
+\DoxyCodeLine{164     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_af70892dcb7d3e2efad43448f8ca4f03d}\label{classFoam_1_1prtSubContactInfo_af70892dcb7d3e2efad43448f8ca4f03d}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!contactResolved@{contactResolved}}
+\index{contactResolved@{contactResolved}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{contactResolved()}{contactResolved()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Foam\+::prt\+Sub\+Contact\+Info\+::contact\+Resolved (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 166 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{167     \{}
+\DoxyCodeLine{168         \textcolor{keywordtype}{bool} reduceBool = \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_acb63422aa99b283d9fe97309eaeeef8b}{contactResolved\_}};}
+\DoxyCodeLine{169         reduce(reduceBool,orOp<bool>());}
+\DoxyCodeLine{170 }
+\DoxyCodeLine{171         \textcolor{keywordflow}{return} reduceBool;}
+\DoxyCodeLine{172     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_af70892dcb7d3e2efad43448f8ca4f03d}\label{classFoam_1_1prtSubContactInfo_af70892dcb7d3e2efad43448f8ca4f03d}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!contactResolved@{contactResolved}}
+\index{contactResolved@{contactResolved}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{contactResolved()}{contactResolved()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Foam\+::prt\+Sub\+Contact\+Info\+::contact\+Resolved (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 166 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{167     \{}
+\DoxyCodeLine{168         \textcolor{keywordtype}{bool} reduceBool = \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_acb63422aa99b283d9fe97309eaeeef8b}{contactResolved\_}};}
+\DoxyCodeLine{169         reduce(reduceBool,orOp<bool>());}
+\DoxyCodeLine{170 }
+\DoxyCodeLine{171         \textcolor{keywordflow}{return} reduceBool;}
+\DoxyCodeLine{172     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a8066d18d19eccd82ab137456048567d5}\label{classFoam_1_1prtSubContactInfo_a8066d18d19eccd82ab137456048567d5}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!evalVariables@{evalVariables}}
+\index{evalVariables@{evalVariables}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{evalVariables()}{evalVariables()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void prt\+Sub\+Contact\+Info\+::eval\+Variables (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1ibContactClass}{ib\+Contact\+Class}} \&}]{c\+CoM,  }\item[{\mbox{\hyperlink{classFoam_1_1ibContactClass}{ib\+Contact\+Class}} \&}]{t\+CoM,  }\item[{\mbox{\hyperlink{classFoam_1_1ibContactVars}{ib\+Contact\+Vars}} \&}]{c\+Vars,  }\item[{\mbox{\hyperlink{classFoam_1_1ibContactVars}{ib\+Contact\+Vars}} \&}]{t\+Vars }\end{DoxyParamCaption})}
+
+
+
+Definition at line 57 of file prt\+Sub\+Contact\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{63 \{}
+\DoxyCodeLine{64     \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a23fc2e480e0478b1addb390cd1d958fb}{cLVec\_}} = cIb.getGeomModel().getLVec(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a8e00807f2ed9214a6606ed70bad9eac7}{contactCenter\_}});}
+\DoxyCodeLine{65     \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a6b823e3f3ca0a7941f96ab739b3acbe5}{tLVec\_}} = tIb.getGeomModel().getLVec(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a8e00807f2ed9214a6606ed70bad9eac7}{contactCenter\_}});}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67     \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a9eb390b634c4421bf2d9fc3b702f7a42}{cVeli\_}} = \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_acca8f424d37c5c40e8d7ec95337b96d4}{getVeli}}(cVars, \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a23fc2e480e0478b1addb390cd1d958fb}{cLVec\_}});}
+\DoxyCodeLine{68     \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_ad51203bc240f0e562027da0799c0f0c3}{tVeli\_}} = \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_acca8f424d37c5c40e8d7ec95337b96d4}{getVeli}}(tVars, \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a6b823e3f3ca0a7941f96ab739b3acbe5}{tLVec\_}});}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70     \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_ae45d1adb3bb23a747efdb5a5f9d72683}{Vn\_}} = -\/(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a9eb390b634c4421bf2d9fc3b702f7a42}{cVeli\_}} -\/ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_ad51203bc240f0e562027da0799c0f0c3}{tVeli\_}}) \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a5ee53f6c2dccac1de3be6309ba1e161a}{contactNormal\_}};}
+\DoxyCodeLine{71     \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a92adfaf4e02c1ae1529092fe9f634e18}{Lc\_}} = (\mbox{\hyperlink{classFoam_1_1contactModelInfo_a6109f94d18a60ba2e9ce553302e086ca}{contactModelInfo::getLcCoeff}}())*mag(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a23fc2e480e0478b1addb390cd1d958fb}{cLVec\_}})*mag(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a6b823e3f3ca0a7941f96ab739b3acbe5}{tLVec\_}})/(mag(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a23fc2e480e0478b1addb390cd1d958fb}{cLVec\_}}) + mag(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a6b823e3f3ca0a7941f96ab739b3acbe5}{tLVec\_}}));}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73     \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_ab572c6d8ce186c623bfe512fc1bfcd59}{curAdhN\_}} = min}
+\DoxyCodeLine{74     (}
+\DoxyCodeLine{75         \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a15cb166e7036ec2e09cf9cd743eede98}{maxAdhN\_}},}
+\DoxyCodeLine{76         max(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_ab572c6d8ce186c623bfe512fc1bfcd59}{curAdhN\_}}, \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_abf0755a856468cbd935a2f80d5e88170}{aY\_}}*\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a68ac442dd547cb4b1dfeb1ee4b13f887}{contactVolume\_}}/(sqr(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a92adfaf4e02c1ae1529092fe9f634e18}{Lc\_}})*8}
+\DoxyCodeLine{77             *Foam::constant::mathematical::pi))}
+\DoxyCodeLine{78     );}
+\DoxyCodeLine{79 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 1
+Here is the caller graph for this function\+:
+% FIG 2
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a5b68e7c4d006db6b26795ad06e31e44c}\label{classFoam_1_1prtSubContactInfo_a5b68e7c4d006db6b26795ad06e31e44c}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!evalVariables@{evalVariables}}
+\index{evalVariables@{evalVariables}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{evalVariables()}{evalVariables()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::prt\+Sub\+Contact\+Info\+::eval\+Variables (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1ibContactClass}{ib\+Contact\+Class}} \&}]{c\+CoM,  }\item[{\mbox{\hyperlink{classFoam_1_1ibContactClass}{ib\+Contact\+Class}} \&}]{t\+CoM,  }\item[{\mbox{\hyperlink{classFoam_1_1ibContactVars}{ib\+Contact\+Vars}} \&}]{c\+Vars,  }\item[{\mbox{\hyperlink{classFoam_1_1ibContactVars}{ib\+Contact\+Vars}} \&}]{t\+Vars }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_abaafb01298a28b189617d3ab484c398a}\label{classFoam_1_1prtSubContactInfo_abaafb01298a28b189617d3ab484c398a}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getcLVec@{getcLVec}}
+\index{getcLVec@{getcLVec}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getcLVec()}{getcLVec()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector Foam\+::prt\+Sub\+Contact\+Info\+::getc\+L\+Vec (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 129 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{130     \{}
+\DoxyCodeLine{131         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a23fc2e480e0478b1addb390cd1d958fb}{cLVec\_}};}
+\DoxyCodeLine{132     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 3
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_abaafb01298a28b189617d3ab484c398a}\label{classFoam_1_1prtSubContactInfo_abaafb01298a28b189617d3ab484c398a}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getcLVec@{getcLVec}}
+\index{getcLVec@{getcLVec}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getcLVec()}{getcLVec()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector Foam\+::prt\+Sub\+Contact\+Info\+::getc\+L\+Vec (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 129 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{130     \{}
+\DoxyCodeLine{131         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a23fc2e480e0478b1addb390cd1d958fb}{cLVec\_}};}
+\DoxyCodeLine{132     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a3110f964059fad119ddc7e985aa68628}\label{classFoam_1_1prtSubContactInfo_a3110f964059fad119ddc7e985aa68628}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getCPair@{getCPair}}
+\index{getCPair@{getCPair}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getCPair()}{getCPair()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily const Tuple2$<$label, label$>$\& Foam\+::prt\+Sub\+Contact\+Info\+::get\+C\+Pair (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 107 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{108     \{}
+\DoxyCodeLine{109         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a883e6c940787cc6097eb2197b5abf0b7}{contactPair\_}};}
+\DoxyCodeLine{110     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 4
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a3110f964059fad119ddc7e985aa68628}\label{classFoam_1_1prtSubContactInfo_a3110f964059fad119ddc7e985aa68628}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getCPair@{getCPair}}
+\index{getCPair@{getCPair}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getCPair()}{getCPair()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily const Tuple2$<$label, label$>$\& Foam\+::prt\+Sub\+Contact\+Info\+::get\+C\+Pair (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 107 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{108     \{}
+\DoxyCodeLine{109         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a883e6c940787cc6097eb2197b5abf0b7}{contactPair\_}};}
+\DoxyCodeLine{110     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_acea579ea890ee37ad7470e1e8f9f3869}\label{classFoam_1_1prtSubContactInfo_acea579ea890ee37ad7470e1e8f9f3869}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getFA@{getFA}}
+\index{getFA@{getFA}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getFA()}{getFA()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector prt\+Sub\+Contact\+Info\+::get\+FA (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 87 of file prt\+Sub\+Contact\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{88 \{}
+\DoxyCodeLine{89     \textcolor{keywordflow}{return} ((sqrt(8*Foam::constant::mathematical::pi*\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_abf0755a856468cbd935a2f80d5e88170}{aY\_}}}
+\DoxyCodeLine{90         *\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_ab572c6d8ce186c623bfe512fc1bfcd59}{curAdhN\_}}*\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a68ac442dd547cb4b1dfeb1ee4b13f887}{contactVolume\_}}))}
+\DoxyCodeLine{91         *\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a5ee53f6c2dccac1de3be6309ba1e161a}{contactNormal\_}});}
+\DoxyCodeLine{92 \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 5
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a8a77941a370a84dcaa15246a26745299}\label{classFoam_1_1prtSubContactInfo_a8a77941a370a84dcaa15246a26745299}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getFA@{getFA}}
+\index{getFA@{getFA}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getFA()}{getFA()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector Foam\+::prt\+Sub\+Contact\+Info\+::get\+FA (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_ae9eb51b19ba531bd31027f6b2e254f35}\label{classFoam_1_1prtSubContactInfo_ae9eb51b19ba531bd31027f6b2e254f35}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getFNd@{getFNd}}
+\index{getFNd@{getFNd}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getFNd()}{getFNd()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector prt\+Sub\+Contact\+Info\+::get\+F\+Nd (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 94 of file prt\+Sub\+Contact\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{95 \{}
+\DoxyCodeLine{96     \textcolor{keywordflow}{if}(\mbox{\hyperlink{classFoam_1_1contactModelInfo_a8fbc27febc474d47e6c4d4e24519cb75}{contactModelInfo::getContactModel}}())}
+\DoxyCodeLine{97     \{}
+\DoxyCodeLine{98         \textcolor{keywordflow}{return} (\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_af8c6d3e0a6a5e8ec3a42fcf2278e4cbd}{aGammaN\_}}*sqrt(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_abf0755a856468cbd935a2f80d5e88170}{aY\_}}}
+\DoxyCodeLine{99             *\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a0969ed3d22085936b08c98b08a7ce1ea}{reduceM\_}}/pow(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a92adfaf4e02c1ae1529092fe9f634e18}{Lc\_}}+SMALL,3))*}
+\DoxyCodeLine{100             (\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a93aed0ace8c649d279c88fb5f97a78f8}{contactArea\_}} * \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_ae45d1adb3bb23a747efdb5a5f9d72683}{Vn\_}}))*\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a5ee53f6c2dccac1de3be6309ba1e161a}{contactNormal\_}};}
+\DoxyCodeLine{101     \}}
+\DoxyCodeLine{102     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{103     \{}
+\DoxyCodeLine{104         \textcolor{keywordflow}{return} (\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a141ee9b743a0d7459cf4bf82ea4d8064}{reduceBeta\_}}*sqrt(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_abf0755a856468cbd935a2f80d5e88170}{aY\_}}}
+\DoxyCodeLine{105             *\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a0969ed3d22085936b08c98b08a7ce1ea}{reduceM\_}}*\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a93aed0ace8c649d279c88fb5f97a78f8}{contactArea\_}}/(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a92adfaf4e02c1ae1529092fe9f634e18}{Lc\_}}+SMALL))*}
+\DoxyCodeLine{106             \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_ae45d1adb3bb23a747efdb5a5f9d72683}{Vn\_}})*\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a5ee53f6c2dccac1de3be6309ba1e161a}{contactNormal\_}};}
+\DoxyCodeLine{107     \}}
+\DoxyCodeLine{108 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 6
+Here is the caller graph for this function\+:
+% FIG 7
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a72c5e40e952c8fdf9aa2d775ceb03a0e}\label{classFoam_1_1prtSubContactInfo_a72c5e40e952c8fdf9aa2d775ceb03a0e}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getFNd@{getFNd}}
+\index{getFNd@{getFNd}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getFNd()}{getFNd()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector Foam\+::prt\+Sub\+Contact\+Info\+::get\+F\+Nd (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a213e078c86343ef8b101060f0749d968}\label{classFoam_1_1prtSubContactInfo_a213e078c86343ef8b101060f0749d968}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getFNe@{getFNe}}
+\index{getFNe@{getFNe}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getFNe()}{getFNe()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector prt\+Sub\+Contact\+Info\+::get\+F\+Ne (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 81 of file prt\+Sub\+Contact\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{82 \{}
+\DoxyCodeLine{83     \textcolor{keywordflow}{return} (\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_abf0755a856468cbd935a2f80d5e88170}{aY\_}}*\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a68ac442dd547cb4b1dfeb1ee4b13f887}{contactVolume\_}}/(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a92adfaf4e02c1ae1529092fe9f634e18}{Lc\_}}+SMALL))}
+\DoxyCodeLine{84         *\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a5ee53f6c2dccac1de3be6309ba1e161a}{contactNormal\_}};}
+\DoxyCodeLine{85 \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 8
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_afe77d1248d0924be1e5be52d7c44c79f}\label{classFoam_1_1prtSubContactInfo_afe77d1248d0924be1e5be52d7c44c79f}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getFNe@{getFNe}}
+\index{getFNe@{getFNe}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getFNe()}{getFNe()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector Foam\+::prt\+Sub\+Contact\+Info\+::get\+F\+Ne (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_abf8b5c789a71026d816d199aee7e541e}\label{classFoam_1_1prtSubContactInfo_abf8b5c789a71026d816d199aee7e541e}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getFt@{getFt}}
+\index{getFt@{getFt}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getFt()}{getFt()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector prt\+Sub\+Contact\+Info\+::get\+Ft (\begin{DoxyParamCaption}\item[{scalar}]{deltaT }\end{DoxyParamCaption})}
+
+
+
+Definition at line 110 of file prt\+Sub\+Contact\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{111 \{}
+\DoxyCodeLine{112     \textcolor{comment}{// compute relative tangential velocity}}
+\DoxyCodeLine{113     vector cVeliNorm = \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a9eb390b634c4421bf2d9fc3b702f7a42}{cVeli\_}} -\/ ((\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a9eb390b634c4421bf2d9fc3b702f7a42}{cVeli\_}} \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a5ee53f6c2dccac1de3be6309ba1e161a}{contactNormal\_}})}
+\DoxyCodeLine{114         *\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a5ee53f6c2dccac1de3be6309ba1e161a}{contactNormal\_}});}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{116     vector tVeliNorm = \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_ad51203bc240f0e562027da0799c0f0c3}{tVeli\_}} -\/ ((\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_ad51203bc240f0e562027da0799c0f0c3}{tVeli\_}} \& \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a5ee53f6c2dccac1de3be6309ba1e161a}{contactNormal\_}})}
+\DoxyCodeLine{117         *\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}}.\mbox{\hyperlink{structFoam_1_1prtContactVars_a5ee53f6c2dccac1de3be6309ba1e161a}{contactNormal\_}});}
+\DoxyCodeLine{118 }
+\DoxyCodeLine{119     vector Vt(cVeliNorm -\/ tVeliNorm);}
+\DoxyCodeLine{120     \textcolor{comment}{// compute tangential force}}
+\DoxyCodeLine{121     vector Ftdi(-\/ \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_ae480f2d8716989dec5d09b2f9bf26ec8}{aGammat\_}}}
+\DoxyCodeLine{122         *sqrt(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a95d80a2168618ca4635c274916f243f2}{aG\_}}*\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a0969ed3d22085936b08c98b08a7ce1ea}{reduceM\_}}*\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a92adfaf4e02c1ae1529092fe9f634e18}{Lc\_}})*Vt);}
+\DoxyCodeLine{123     Ftdi -\/= \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a95d80a2168618ca4635c274916f243f2}{aG\_}}*\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a92adfaf4e02c1ae1529092fe9f634e18}{Lc\_}}*Vt*deltaT;}
+\DoxyCodeLine{124     \textcolor{keywordflow}{return} Ftdi;}
+\DoxyCodeLine{125 \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 9
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_af2905b97a369b56fe590d3701838b5ac}\label{classFoam_1_1prtSubContactInfo_af2905b97a369b56fe590d3701838b5ac}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getFt@{getFt}}
+\index{getFt@{getFt}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getFt()}{getFt()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector Foam\+::prt\+Sub\+Contact\+Info\+::get\+Ft (\begin{DoxyParamCaption}\item[{scalar}]{deltaT }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a5a019123148b5e91eceb29eb3ed640d0}\label{classFoam_1_1prtSubContactInfo_a5a019123148b5e91eceb29eb3ed640d0}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getLc@{getLc}}
+\index{getLc@{getLc}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getLc()}{getLc()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily scalar\& Foam\+::prt\+Sub\+Contact\+Info\+::get\+Lc (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 179 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{180     \{}
+\DoxyCodeLine{181         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a92adfaf4e02c1ae1529092fe9f634e18}{Lc\_}};}
+\DoxyCodeLine{182     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a5a019123148b5e91eceb29eb3ed640d0}\label{classFoam_1_1prtSubContactInfo_a5a019123148b5e91eceb29eb3ed640d0}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getLc@{getLc}}
+\index{getLc@{getLc}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getLc()}{getLc()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily scalar\& Foam\+::prt\+Sub\+Contact\+Info\+::get\+Lc (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 179 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{180     \{}
+\DoxyCodeLine{181         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a92adfaf4e02c1ae1529092fe9f634e18}{Lc\_}};}
+\DoxyCodeLine{182     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_aee6f4fe2eb4923bb6bb775206fd164df}\label{classFoam_1_1prtSubContactInfo_aee6f4fe2eb4923bb6bb775206fd164df}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getOutForce@{getOutForce}}
+\index{getOutForce@{getOutForce}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getOutForce()}{getOutForce()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Tuple2$<$\mbox{\hyperlink{structFoam_1_1forces}{forces}},\mbox{\hyperlink{structFoam_1_1forces}{forces}}$>$\& Foam\+::prt\+Sub\+Contact\+Info\+::get\+Out\+Force (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 147 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{148     \{}
+\DoxyCodeLine{149         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{outForce\_}};}
+\DoxyCodeLine{150     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_aee6f4fe2eb4923bb6bb775206fd164df}\label{classFoam_1_1prtSubContactInfo_aee6f4fe2eb4923bb6bb775206fd164df}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getOutForce@{getOutForce}}
+\index{getOutForce@{getOutForce}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getOutForce()}{getOutForce()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Tuple2$<$\mbox{\hyperlink{structFoam_1_1forces}{forces}},\mbox{\hyperlink{structFoam_1_1forces}{forces}}$>$\& Foam\+::prt\+Sub\+Contact\+Info\+::get\+Out\+Force (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 147 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{148     \{}
+\DoxyCodeLine{149         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{outForce\_}};}
+\DoxyCodeLine{150     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 10
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a35f19b1b38f4960dbadf20f6c8b57c4e}\label{classFoam_1_1prtSubContactInfo_a35f19b1b38f4960dbadf20f6c8b57c4e}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getPhysicalProperties@{getPhysicalProperties}}
+\index{getPhysicalProperties@{getPhysicalProperties}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getPhysicalProperties()}{getPhysicalProperties()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}}\& Foam\+::prt\+Sub\+Contact\+Info\+::get\+Physical\+Properties (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 112 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{113     \{}
+\DoxyCodeLine{114         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}};}
+\DoxyCodeLine{115     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a35f19b1b38f4960dbadf20f6c8b57c4e}\label{classFoam_1_1prtSubContactInfo_a35f19b1b38f4960dbadf20f6c8b57c4e}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getPhysicalProperties@{getPhysicalProperties}}
+\index{getPhysicalProperties@{getPhysicalProperties}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getPhysicalProperties()}{getPhysicalProperties()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}}\& Foam\+::prt\+Sub\+Contact\+Info\+::get\+Physical\+Properties (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 112 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{113     \{}
+\DoxyCodeLine{114         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}{physicalProperties\_}};}
+\DoxyCodeLine{115     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 11
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a201ca399e8b41c4187f6269d935d12ce}\label{classFoam_1_1prtSubContactInfo_a201ca399e8b41c4187f6269d935d12ce}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getprtCntVars@{getprtCntVars}}
+\index{getprtCntVars@{getprtCntVars}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getprtCntVars()}{getprtCntVars()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structFoam_1_1prtContactVars}{prt\+Contact\+Vars}}\& Foam\+::prt\+Sub\+Contact\+Info\+::getprt\+Cnt\+Vars (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 117 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{118     \{}
+\DoxyCodeLine{119         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}};}
+\DoxyCodeLine{120     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 12
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a201ca399e8b41c4187f6269d935d12ce}\label{classFoam_1_1prtSubContactInfo_a201ca399e8b41c4187f6269d935d12ce}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getprtCntVars@{getprtCntVars}}
+\index{getprtCntVars@{getprtCntVars}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getprtCntVars()}{getprtCntVars()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structFoam_1_1prtContactVars}{prt\+Contact\+Vars}}\& Foam\+::prt\+Sub\+Contact\+Info\+::getprt\+Cnt\+Vars (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 117 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{118     \{}
+\DoxyCodeLine{119         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}{prtCntVars\_}};}
+\DoxyCodeLine{120     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a7dee8c52bed3c27f9a1d4282422d7225}\label{classFoam_1_1prtSubContactInfo_a7dee8c52bed3c27f9a1d4282422d7225}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!gettLVec@{gettLVec}}
+\index{gettLVec@{gettLVec}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{gettLVec()}{gettLVec()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector Foam\+::prt\+Sub\+Contact\+Info\+::gett\+L\+Vec (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 134 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{135     \{}
+\DoxyCodeLine{136         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a6b823e3f3ca0a7941f96ab739b3acbe5}{tLVec\_}};}
+\DoxyCodeLine{137     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a7dee8c52bed3c27f9a1d4282422d7225}\label{classFoam_1_1prtSubContactInfo_a7dee8c52bed3c27f9a1d4282422d7225}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!gettLVec@{gettLVec}}
+\index{gettLVec@{gettLVec}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{gettLVec()}{gettLVec()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector Foam\+::prt\+Sub\+Contact\+Info\+::gett\+L\+Vec (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 134 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{135     \{}
+\DoxyCodeLine{136         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a6b823e3f3ca0a7941f96ab739b3acbe5}{tLVec\_}};}
+\DoxyCodeLine{137     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 13
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_acca8f424d37c5c40e8d7ec95337b96d4}\label{classFoam_1_1prtSubContactInfo_acca8f424d37c5c40e8d7ec95337b96d4}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getVeli@{getVeli}}
+\index{getVeli@{getVeli}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getVeli()}{getVeli()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector prt\+Sub\+Contact\+Info\+::get\+Veli (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1ibContactVars}{ib\+Contact\+Vars}} \&}]{c\+Vars,  }\item[{vector \&}]{l\+Vec }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 51 of file prt\+Sub\+Contact\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{52 \{}
+\DoxyCodeLine{53     \textcolor{keywordflow}{return} (-\/((lVec-\/cVars.\mbox{\hyperlink{classFoam_1_1ibContactVars_a8c6e07ec3f602c61a8ba69851e4c75de}{Axis\_}}*((lVec) \& cVars.\mbox{\hyperlink{classFoam_1_1ibContactVars_a8c6e07ec3f602c61a8ba69851e4c75de}{Axis\_}}))}
+\DoxyCodeLine{54         \string^ cVars.\mbox{\hyperlink{classFoam_1_1ibContactVars_a8c6e07ec3f602c61a8ba69851e4c75de}{Axis\_}})*cVars.\mbox{\hyperlink{classFoam_1_1ibContactVars_a94455812267279bc48d23714841d1d68}{omega\_}}+ cVars.\mbox{\hyperlink{classFoam_1_1ibContactVars_abcf7fc359ee5a7841353bbeaefe54bb6}{Vel\_}});}
+\DoxyCodeLine{55 \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 14
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a289a27eac7fc323a895a41940bd1a3fb}\label{classFoam_1_1prtSubContactInfo_a289a27eac7fc323a895a41940bd1a3fb}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getVeli@{getVeli}}
+\index{getVeli@{getVeli}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getVeli()}{getVeli()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector Foam\+::prt\+Sub\+Contact\+Info\+::get\+Veli (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1ibContactVars}{ib\+Contact\+Vars}} \&}]{c\+Vars,  }\item[{vector \&}]{l\+Vec }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a4b4cc026ea5bdddf9ce7c2dd38d5e870}\label{classFoam_1_1prtSubContactInfo_a4b4cc026ea5bdddf9ce7c2dd38d5e870}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getVMInfo@{getVMInfo}}
+\index{getVMInfo@{getVMInfo}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getVMInfo()}{getVMInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{structFoam_1_1virtualMeshInfo}{virtual\+Mesh\+Info}}$>$\& Foam\+::prt\+Sub\+Contact\+Info\+::get\+V\+M\+Info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_ad065e090dd795e2cb28a289a6d2141de}\label{classFoam_1_1prtSubContactInfo_ad065e090dd795e2cb28a289a6d2141de}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!getVMInfo@{getVMInfo}}
+\index{getVMInfo@{getVMInfo}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{getVMInfo()}{getVMInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structFoam_1_1virtualMeshInfo}{virtual\+Mesh\+Info}} $>$ \& prt\+Sub\+Contact\+Info\+::get\+V\+M\+Info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 152 of file prt\+Sub\+Contact\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{153 \{}
+\DoxyCodeLine{154     \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}{vmInfo\_}};}
+\DoxyCodeLine{155 \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 15
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a5ffac91c0407e600021489e81c00b48b}\label{classFoam_1_1prtSubContactInfo_a5ffac91c0407e600021489e81c00b48b}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!setResolvedContact@{setResolvedContact}}
+\index{setResolvedContact@{setResolvedContact}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{setResolvedContact()}{setResolvedContact()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::prt\+Sub\+Contact\+Info\+::set\+Resolved\+Contact (\begin{DoxyParamCaption}\item[{bool}]{resolved }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 174 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{175     \{}
+\DoxyCodeLine{176         \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_acb63422aa99b283d9fe97309eaeeef8b}{contactResolved\_}} = resolved;}
+\DoxyCodeLine{177     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 16
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a5ffac91c0407e600021489e81c00b48b}\label{classFoam_1_1prtSubContactInfo_a5ffac91c0407e600021489e81c00b48b}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!setResolvedContact@{setResolvedContact}}
+\index{setResolvedContact@{setResolvedContact}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{setResolvedContact()}{setResolvedContact()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::prt\+Sub\+Contact\+Info\+::set\+Resolved\+Contact (\begin{DoxyParamCaption}\item[{bool}]{resolved }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 174 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{175     \{}
+\DoxyCodeLine{176         \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_acb63422aa99b283d9fe97309eaeeef8b}{contactResolved\_}} = resolved;}
+\DoxyCodeLine{177     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a903f198fb1da65705efbab2efc702a03}\label{classFoam_1_1prtSubContactInfo_a903f198fb1da65705efbab2efc702a03}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!setVMInfo@{setVMInfo}}
+\index{setVMInfo@{setVMInfo}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{setVMInfo()}{setVMInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily void Foam\+::prt\+Sub\+Contact\+Info\+::set\+V\+M\+Info (\begin{DoxyParamCaption}\item[{bound\+Box \&}]{b\+Box,  }\item[{scalar}]{sub\+VolumeV }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a401e4a43c78b4cd7e2c41dc84fe29fec}\label{classFoam_1_1prtSubContactInfo_a401e4a43c78b4cd7e2c41dc84fe29fec}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!setVMInfo@{setVMInfo}}
+\index{setVMInfo@{setVMInfo}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{setVMInfo()}{setVMInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily void prt\+Sub\+Contact\+Info\+::set\+V\+M\+Info (\begin{DoxyParamCaption}\item[{bound\+Box \&}]{b\+Box,  }\item[{scalar}]{sub\+VolumeV }\end{DoxyParamCaption})}
+
+
+
+Definition at line 127 of file prt\+Sub\+Contact\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{128 \{}
+\DoxyCodeLine{129     \textcolor{keywordflow}{if} (!\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}{vmInfo\_}})}
+\DoxyCodeLine{130     \{}
+\DoxyCodeLine{131         \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}{vmInfo\_}} = std::make\_shared<virtualMeshInfo>(bBox, subVolumeV);}
+\DoxyCodeLine{132         \textcolor{keywordflow}{return};}
+\DoxyCodeLine{133     \}}
+\DoxyCodeLine{134 }
+\DoxyCodeLine{135     \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}{vmInfo\_}}-\/>sV = \mbox{\hyperlink{classFoam_1_1subVolume}{subVolume}}(bBox);}
+\DoxyCodeLine{136     \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}{vmInfo\_}}-\/>subVolumeV = subVolumeV;}
+\DoxyCodeLine{137 \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 17
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a9fd4c6198d24e428e25c68cad6569180}\label{classFoam_1_1prtSubContactInfo_a9fd4c6198d24e428e25c68cad6569180}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!setVMInfo@{setVMInfo}}
+\index{setVMInfo@{setVMInfo}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{setVMInfo()}{setVMInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily void prt\+Sub\+Contact\+Info\+::set\+V\+M\+Info (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structFoam_1_1virtualMeshInfo}{virtual\+Mesh\+Info}} \&}]{vm\+Info }\end{DoxyParamCaption})}
+
+
+
+Definition at line 139 of file prt\+Sub\+Contact\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{140 \{}
+\DoxyCodeLine{141     \textcolor{keywordflow}{if} (!\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}{vmInfo\_}})}
+\DoxyCodeLine{142     \{}
+\DoxyCodeLine{143         \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}{vmInfo\_}} = std::make\_shared<virtualMeshInfo>(vmInfo);}
+\DoxyCodeLine{144         \textcolor{keywordflow}{return};}
+\DoxyCodeLine{145     \}}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{147     \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}{vmInfo\_}}-\/>sV = vmInfo.\mbox{\hyperlink{structFoam_1_1virtualMeshInfo_af5203cb59a9ca5a8e3fa241004965371}{sV}};}
+\DoxyCodeLine{148     \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}{vmInfo\_}}-\/>subVolumeV = vmInfo.\mbox{\hyperlink{structFoam_1_1virtualMeshInfo_a082c7c0a9583592fc6aff87312cd247e}{subVolumeV}};}
+\DoxyCodeLine{149     \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}{vmInfo\_}}-\/>startingPoint = vmInfo.\mbox{\hyperlink{structFoam_1_1virtualMeshInfo_ab9d3ebd49ea5251b463d53eb7768b571}{startingPoint}};}
+\DoxyCodeLine{150 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a7225e24433c9d19d16ba2997cb79e344}\label{classFoam_1_1prtSubContactInfo_a7225e24433c9d19d16ba2997cb79e344}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!setVMInfo@{setVMInfo}}
+\index{setVMInfo@{setVMInfo}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{setVMInfo()}{setVMInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily void Foam\+::prt\+Sub\+Contact\+Info\+::set\+V\+M\+Info (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{structFoam_1_1virtualMeshInfo}{virtual\+Mesh\+Info}} \&}]{vm\+Info }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a59ff02d5ba734a257f5f2e882e9462d3}\label{classFoam_1_1prtSubContactInfo_a59ff02d5ba734a257f5f2e882e9462d3}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!syncData@{syncData}}
+\index{syncData@{syncData}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{syncData()}{syncData()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::prt\+Sub\+Contact\+Info\+::sync\+Data (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a3b6a3b67d9b39918b44ae96967d853c7}\label{classFoam_1_1prtSubContactInfo_a3b6a3b67d9b39918b44ae96967d853c7}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!syncData@{syncData}}
+\index{syncData@{syncData}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{syncData()}{syncData()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void prt\+Sub\+Contact\+Info\+::sync\+Data (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 157 of file prt\+Sub\+Contact\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{158 \{}
+\DoxyCodeLine{159     reduce(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{outForce\_}}.first().F, sumOp<vector>());}
+\DoxyCodeLine{160     reduce(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{outForce\_}}.first().T, sumOp<vector>());}
+\DoxyCodeLine{161     reduce(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{outForce\_}}.second().F, sumOp<vector>());}
+\DoxyCodeLine{162     reduce(\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}{outForce\_}}.second().T, sumOp<vector>());}
+\DoxyCodeLine{163 }
+\DoxyCodeLine{164 }
+\DoxyCodeLine{165     \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}{vmInfo\_}})}
+\DoxyCodeLine{166     \{}
+\DoxyCodeLine{167         point reducePoint = vector::zero;}
+\DoxyCodeLine{168 }
+\DoxyCodeLine{169         \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1prtSubContactInfo_acb63422aa99b283d9fe97309eaeeef8b}{contactResolved\_}})}
+\DoxyCodeLine{170         \{}
+\DoxyCodeLine{171             reducePoint = \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}{vmInfo\_}}-\/>getStartingPoint();}
+\DoxyCodeLine{172         \}}
+\DoxyCodeLine{173 }
+\DoxyCodeLine{174         reduce(reducePoint, sumOp<vector>());}
+\DoxyCodeLine{175         \mbox{\hyperlink{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}{vmInfo\_}}-\/>startingPoint.reset(\textcolor{keyword}{new} point(reducePoint));}
+\DoxyCodeLine{176     \}}
+\DoxyCodeLine{177 \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a23fc2e480e0478b1addb390cd1d958fb}\label{classFoam_1_1prtSubContactInfo_a23fc2e480e0478b1addb390cd1d958fb}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!cLVec\_@{cLVec\_}}
+\index{cLVec\_@{cLVec\_}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{cLVec\_}{cLVec\_}}
+{\footnotesize\ttfamily vector Foam\+::prt\+Sub\+Contact\+Info\+::c\+L\+Vec\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 80 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a883e6c940787cc6097eb2197b5abf0b7}\label{classFoam_1_1prtSubContactInfo_a883e6c940787cc6097eb2197b5abf0b7}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!contactPair\_@{contactPair\_}}
+\index{contactPair\_@{contactPair\_}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{contactPair\_}{contactPair\_}}
+{\footnotesize\ttfamily Tuple2$<$ label, label $>$ Foam\+::prt\+Sub\+Contact\+Info\+::contact\+Pair\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 72 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_acb63422aa99b283d9fe97309eaeeef8b}\label{classFoam_1_1prtSubContactInfo_acb63422aa99b283d9fe97309eaeeef8b}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!contactResolved\_@{contactResolved\_}}
+\index{contactResolved\_@{contactResolved\_}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{contactResolved\_}{contactResolved\_}}
+{\footnotesize\ttfamily bool Foam\+::prt\+Sub\+Contact\+Info\+::contact\+Resolved\+\_\+ = false\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 91 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a9eb390b634c4421bf2d9fc3b702f7a42}\label{classFoam_1_1prtSubContactInfo_a9eb390b634c4421bf2d9fc3b702f7a42}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!cVeli\_@{cVeli\_}}
+\index{cVeli\_@{cVeli\_}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{cVeli\_}{cVeli\_}}
+{\footnotesize\ttfamily vector Foam\+::prt\+Sub\+Contact\+Info\+::c\+Veli\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 83 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a92adfaf4e02c1ae1529092fe9f634e18}\label{classFoam_1_1prtSubContactInfo_a92adfaf4e02c1ae1529092fe9f634e18}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!Lc\_@{Lc\_}}
+\index{Lc\_@{Lc\_}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{Lc\_}{Lc\_}}
+{\footnotesize\ttfamily scalar Foam\+::prt\+Sub\+Contact\+Info\+::\+Lc\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 87 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}\label{classFoam_1_1prtSubContactInfo_a3a08b1bae766ad42c21a77d999f9a8d7}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!outForce\_@{outForce\_}}
+\index{outForce\_@{outForce\_}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{outForce\_}{outForce\_}}
+{\footnotesize\ttfamily Tuple2$<$ \mbox{\hyperlink{structFoam_1_1forces}{forces}}, \mbox{\hyperlink{structFoam_1_1forces}{forces}} $>$ Foam\+::prt\+Sub\+Contact\+Info\+::out\+Force\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 89 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}\label{classFoam_1_1prtSubContactInfo_a044075ae32b49965b38d3411fd0f920c}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!physicalProperties\_@{physicalProperties\_}}
+\index{physicalProperties\_@{physicalProperties\_}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{physicalProperties\_}{physicalProperties\_}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}} Foam\+::prt\+Sub\+Contact\+Info\+::physical\+Properties\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 74 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}\label{classFoam_1_1prtSubContactInfo_a90ec9205b3fc8054cf7019982ef98b6c}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!prtCntVars\_@{prtCntVars\_}}
+\index{prtCntVars\_@{prtCntVars\_}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{prtCntVars\_}{prtCntVars\_}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structFoam_1_1prtContactVars}{prt\+Contact\+Vars}} Foam\+::prt\+Sub\+Contact\+Info\+::prt\+Cnt\+Vars\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 78 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_a6b823e3f3ca0a7941f96ab739b3acbe5}\label{classFoam_1_1prtSubContactInfo_a6b823e3f3ca0a7941f96ab739b3acbe5}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!tLVec\_@{tLVec\_}}
+\index{tLVec\_@{tLVec\_}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{tLVec\_}{tLVec\_}}
+{\footnotesize\ttfamily vector Foam\+::prt\+Sub\+Contact\+Info\+::t\+L\+Vec\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 81 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_ad51203bc240f0e562027da0799c0f0c3}\label{classFoam_1_1prtSubContactInfo_ad51203bc240f0e562027da0799c0f0c3}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!tVeli\_@{tVeli\_}}
+\index{tVeli\_@{tVeli\_}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{tVeli\_}{tVeli\_}}
+{\footnotesize\ttfamily vector Foam\+::prt\+Sub\+Contact\+Info\+::t\+Veli\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 84 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}\label{classFoam_1_1prtSubContactInfo_aafd805e5066753e562d27cd6f2aedfd9}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!vmInfo\_@{vmInfo\_}}
+\index{vmInfo\_@{vmInfo\_}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{vmInfo\_}{vmInfo\_}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{structFoam_1_1virtualMeshInfo}{virtual\+Mesh\+Info}} $>$ Foam\+::prt\+Sub\+Contact\+Info\+::vm\+Info\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 76 of file prt\+Sub\+Contact\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1prtSubContactInfo_ae45d1adb3bb23a747efdb5a5f9d72683}\label{classFoam_1_1prtSubContactInfo_ae45d1adb3bb23a747efdb5a5f9d72683}} 
+\index{Foam::prtSubContactInfo@{Foam::prtSubContactInfo}!Vn\_@{Vn\_}}
+\index{Vn\_@{Vn\_}!Foam::prtSubContactInfo@{Foam::prtSubContactInfo}}
+\doxysubsubsection{\texorpdfstring{Vn\_}{Vn\_}}
+{\footnotesize\ttfamily scalar Foam\+::prt\+Sub\+Contact\+Info\+::\+Vn\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 86 of file prt\+Sub\+Contact\+Info.\+H.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/contact\+Models/\mbox{\hyperlink{contactModels_2prtSubContactInfo_8H}{prt\+Sub\+Contact\+Info.\+H}}\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/contact\+Models/\mbox{\hyperlink{contactModels_2prtSubContactInfo_8C}{prt\+Sub\+Contact\+Info.\+C}}\end{DoxyCompactItemize}

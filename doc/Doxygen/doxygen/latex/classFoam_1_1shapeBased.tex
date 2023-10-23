@@ -1,0 +1,2902 @@
+\hypertarget{classFoam_1_1shapeBased}{}\doxysection{Foam\+::shape\+Based Class Reference}
+\label{classFoam_1_1shapeBased}\index{Foam::shapeBased@{Foam::shapeBased}}
+
+
+{\ttfamily \#include $<$shape\+Based.\+H$>$}
+
+
+
+Inheritance diagram for Foam\+::shape\+Based\+:
+% FIG 0
+
+
+Collaboration diagram for Foam\+::shape\+Based\+:
+% FIG 1
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classFoam_1_1shapeBased_a480a9b3343aaa1dbcad71bef89a9fb4a}{shape\+Based}} (const fv\+Mesh \&mesh, const \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}} c\+Type, scalar \mbox{\hyperlink{lnInclude_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}{thr\+Surf}})
+\item 
+virtual \mbox{\hyperlink{classFoam_1_1shapeBased_abbbec930c1cc393774a49ba14166ca2b}{$\sim$shape\+Based}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a934599c44ee5787b668b6046c9a76b59}{create\+Immersed\+Body}} (vol\+Scalar\+Field \&body, Field$<$ label $>$ \&octree\+Field, List$<$ label\+List $>$ \&cell\+Points)
+\item 
+virtual std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \mbox{\hyperlink{classFoam_1_1shapeBased_a7d885e33b082f9c8d5d9a9b53464248b}{get\+Copy}} ()=0
+\item 
+vector \mbox{\hyperlink{classFoam_1_1shapeBased_a4f97e65316cb5abc431e94529510886c}{add\+Model\+Return\+Random\+Position}} (const bool all\+Active\+Cells\+In\+Mesh, const bound\+Box cell\+Zone\+Bounds, Random \&rand\+Gen) final override
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a45c07bbc31e1d5309b68593c48be791f}{body\+Move\+Points}} (vector transl\+Vec)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a00c17c836f1c5312c78cf41845403ced}{body\+Scale\+Points}} (scalar scale\+Fac)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a5ebd1728ea3d3eb237bf4c51cb7036e3}{body\+Rotate\+Points}} (scalar rot\+Angle, vector axis\+Of\+Rot)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a83d7fdac25cbf1d791d8a85de57146d1}{reset\+Body}} ()
+\item 
+virtual vector \mbox{\hyperlink{classFoam_1_1shapeBased_af20f26ce993bda2d59619412ded73042}{get\+CoM}} ()
+\item 
+virtual bound\+Box \mbox{\hyperlink{classFoam_1_1shapeBased_a77b011131f23d48a46c4c1a6e3966273}{get\+Bounds}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a637493c1022ef17515cf95ed80d06602}{synchron\+Pos}} (label owner)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a36ec438fd6f025c45c0aa1e4e3ba7a28}{write\+Body\+Info}} (label body\+Id, I\+Odictionary \&dict, word path)
+\item 
+virtual bool\+List \mbox{\hyperlink{classFoam_1_1shapeBased_a2e6b99970ff7d3cfced8ec5ba6a0ccfc}{point\+Inside}} (point\+Field pointI)
+\item 
+virtual bool \mbox{\hyperlink{classFoam_1_1shapeBased_a6922cc91b294545330333eeb4befbba9}{point\+Inside}} (point pointI)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a9fafd187df8cb61d18d46dbdcde31cdf}{get\+Closest\+Point\+And\+Normal}} (const point \&start\+Point, const vector \&span, point \&closest\+Point, vector \&normal)
+\item 
+virtual point\+Field \mbox{\hyperlink{classFoam_1_1shapeBased_af4c6359819520cca433396cdad9fa3bf}{sample\+Surface\+Points}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a32ca76641283bc6ea3318417d2654ade}{set\+CoM}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1shapeBased_a8ae7e36bf634572cfb68bdbfc47ef753}{shape\+Based}} (const fv\+Mesh \&mesh, const \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}} c\+Type, scalar \mbox{\hyperlink{lnInclude_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}{thr\+Surf}})
+\item 
+virtual \mbox{\hyperlink{classFoam_1_1shapeBased_abbbec930c1cc393774a49ba14166ca2b}{$\sim$shape\+Based}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a934599c44ee5787b668b6046c9a76b59}{create\+Immersed\+Body}} (vol\+Scalar\+Field \&body, Field$<$ label $>$ \&octree\+Field, List$<$ label\+List $>$ \&cell\+Points)
+\item 
+virtual std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \mbox{\hyperlink{classFoam_1_1shapeBased_a7d885e33b082f9c8d5d9a9b53464248b}{get\+Copy}} ()=0
+\item 
+vector \mbox{\hyperlink{classFoam_1_1shapeBased_a922aeacfed27d9eb577186879fb22089}{add\+Model\+Return\+Random\+Position}} (const bool all\+Active\+Cells\+In\+Mesh, const bound\+Box cell\+Zone\+Bounds, Random \&rand\+Gen) final override
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a45c07bbc31e1d5309b68593c48be791f}{body\+Move\+Points}} (vector transl\+Vec)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a00c17c836f1c5312c78cf41845403ced}{body\+Scale\+Points}} (scalar scale\+Fac)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a5ebd1728ea3d3eb237bf4c51cb7036e3}{body\+Rotate\+Points}} (scalar rot\+Angle, vector axis\+Of\+Rot)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a83d7fdac25cbf1d791d8a85de57146d1}{reset\+Body}} ()
+\item 
+virtual vector \mbox{\hyperlink{classFoam_1_1shapeBased_af20f26ce993bda2d59619412ded73042}{get\+CoM}} ()
+\item 
+virtual bound\+Box \mbox{\hyperlink{classFoam_1_1shapeBased_a77b011131f23d48a46c4c1a6e3966273}{get\+Bounds}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a637493c1022ef17515cf95ed80d06602}{synchron\+Pos}} (label owner)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a36ec438fd6f025c45c0aa1e4e3ba7a28}{write\+Body\+Info}} (label body\+Id, I\+Odictionary \&dict, word path)
+\item 
+virtual bool\+List \mbox{\hyperlink{classFoam_1_1shapeBased_a2e6b99970ff7d3cfced8ec5ba6a0ccfc}{point\+Inside}} (point\+Field pointI)
+\item 
+virtual bool \mbox{\hyperlink{classFoam_1_1shapeBased_a6922cc91b294545330333eeb4befbba9}{point\+Inside}} (point pointI)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a9fafd187df8cb61d18d46dbdcde31cdf}{get\+Closest\+Point\+And\+Normal}} (const point \&start\+Point, const vector \&span, point \&closest\+Point, vector \&normal)
+\item 
+virtual point\+Field \mbox{\hyperlink{classFoam_1_1shapeBased_af4c6359819520cca433396cdad9fa3bf}{sample\+Surface\+Points}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1shapeBased_a32ca76641283bc6ea3318417d2654ade}{set\+CoM}} ()
+\item 
+virtual List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ \& \mbox{\hyperlink{classFoam_1_1geomModel_aadb30406567a7931b05aae7827630988}{get\+Surface\+Cell\+List}} ()
+\item 
+virtual List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ \& \mbox{\hyperlink{classFoam_1_1geomModel_aadb30406567a7931b05aae7827630988}{get\+Surface\+Cell\+List}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1geomModel_affb6ff5e0f0b8435f13da1b2e61c05fc}{get\+Referenced\+Lists}} (List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ \&int\+Lists, List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ \&surf\+Lists, \mbox{\hyperlink{classFoam_1_1geomModel_afef2012b13fe4bca42f3ca4f3fef43c9}{Dynamic\+Vector\+List}} \&reference\+CoM)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1geomModel_affb6ff5e0f0b8435f13da1b2e61c05fc}{get\+Referenced\+Lists}} (List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ \&int\+Lists, List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ \&surf\+Lists, \mbox{\hyperlink{classFoam_1_1geomModel_afef2012b13fe4bca42f3ca4f3fef43c9}{Dynamic\+Vector\+List}} \&reference\+CoM)
+\item 
+virtual List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ \& \mbox{\hyperlink{classFoam_1_1geomModel_aad5ad5cd92fca2079533e7cd9f9596c6}{get\+Internal\+Cell\+List}} ()
+\item 
+virtual List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ \& \mbox{\hyperlink{classFoam_1_1geomModel_aad5ad5cd92fca2079533e7cd9f9596c6}{get\+Internal\+Cell\+List}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1geomModel_a4e0b05c4c79a7155bd2d890cc1805ad2}{reset\+Body}} (vol\+Scalar\+Field \&body)
+\item 
+virtual volume\+Type \mbox{\hyperlink{classFoam_1_1geomModel_ab177b3ff0fb1f3443ef7344b02f1a5c5}{get\+Volume\+Type}} (\mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&sv, bool c\+Ib)
+\item 
+virtual volume\+Type \mbox{\hyperlink{classFoam_1_1geomModel_ab177b3ff0fb1f3443ef7344b02f1a5c5}{get\+Volume\+Type}} (\mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&sv, bool c\+Ib)
+\item 
+virtual scalar \mbox{\hyperlink{classFoam_1_1geomModel_a4a544cd34b3b6a9963fb311c4d9938fb}{get\+DC}} ()
+\item 
+virtual scalar \mbox{\hyperlink{classFoam_1_1geomModel_a4a544cd34b3b6a9963fb311c4d9938fb}{get\+DC}} ()
+\item 
+virtual bool \mbox{\hyperlink{classFoam_1_1geomModel_ab697fc599a50c583d12d5a0397cecbcd}{limit\+Final\+Sub\+Volume}} (const \mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&sv, bool c\+Ib, bound\+Box \&lim\+B\+Box)
+\item 
+virtual bool \mbox{\hyperlink{classFoam_1_1geomModel_ab697fc599a50c583d12d5a0397cecbcd}{limit\+Final\+Sub\+Volume}} (const \mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&sv, bool c\+Ib, bound\+Box \&lim\+B\+Box)
+\item 
+constexpr \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}} \mbox{\hyperlink{classFoam_1_1geomModel_aad4760c95591b65260efb023cdbbe862}{getc\+Type}} ()
+\item 
+constexpr \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}} \mbox{\hyperlink{classFoam_1_1geomModel_aad4760c95591b65260efb023cdbbe862}{getc\+Type}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1geomModel_aea6f262abe8aecc315fce91ccd253cdd}{set\+Owner}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1geomModel_aea6f262abe8aecc315fce91ccd253cdd}{set\+Owner}} ()
+\item 
+virtual label \mbox{\hyperlink{classFoam_1_1geomModel_a1796ccc4e6f0619ba90526e15a42242e}{get\+Owner}} ()
+\item 
+virtual label \mbox{\hyperlink{classFoam_1_1geomModel_a1796ccc4e6f0619ba90526e15a42242e}{get\+Owner}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_ad19f0d607ed84fec9e970babbdc65c69}{set\+Int\+Span}} (scalar int\+Span)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_ad19f0d607ed84fec9e970babbdc65c69}{set\+Int\+Span}} (scalar int\+Span)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_ae706c318abc2f5e3235079dc5e7ac589}{set\+Sd\+Based\+Lambda}} (bool sd\+Based\+Lambda)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_ae706c318abc2f5e3235079dc5e7ac589}{set\+Sd\+Based\+Lambda}} (bool sd\+Based\+Lambda)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a3775030dc1986b062cb970ee223fefbc}{reset\+Hash\+Table}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a3775030dc1986b062cb970ee223fefbc}{reset\+Hash\+Table}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1geomModel_abf9695a07f2526a7f82876f187064ddd}{set\+RhoS}} (dimensioned\+Scalar rhoS)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1geomModel_abf9695a07f2526a7f82876f187064ddd}{set\+RhoS}} (dimensioned\+Scalar rhoS)
+\item 
+dimensioned\+Scalar \mbox{\hyperlink{classFoam_1_1geomModel_a229602a6b70a689ef42cf29ff4acf562}{get\+RhoS}} ()
+\item 
+const dimensioned\+Scalar \mbox{\hyperlink{classFoam_1_1geomModel_ac1f313551c2851a6e1768d14655f72a7}{get\+RhoS}} () const
+\item 
+dimensioned\+Scalar \mbox{\hyperlink{classFoam_1_1geomModel_a229602a6b70a689ef42cf29ff4acf562}{get\+RhoS}} ()
+\item 
+const dimensioned\+Scalar \mbox{\hyperlink{classFoam_1_1geomModel_ac1f313551c2851a6e1768d14655f72a7}{get\+RhoS}} () const
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1geomModel_a4b52faf7083a8ee52fc6a7b6c4c43439}{calculate\+Geometrical\+Properties}} (vol\+Scalar\+Field \&body)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1geomModel_a134e4649f7334c02ce7ccd1d59112f41}{calculate\+Geometrical\+Properties}} (vol\+Scalar\+Field \&body)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a78b35514e8fb42ef184151793fc682ae}{add\+To\+M\+AndI}} (vol\+Scalar\+Field \&body, \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \&label\+Cell\+Lst)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a0988d518013ea7bf538c0bb3e1101dc8}{add\+To\+M\+AndI}} (vol\+Scalar\+Field \&body, \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \&label\+Cell\+Lst)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a042ae896c576123625e3e95f7d5d9d12}{compute\+Body\+Char\+Pars}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_aa70f4110771a869f21150381c7a23ae2}{compute\+Body\+Char\+Pars}} ()
+\item 
+virtual scalar \& \mbox{\hyperlink{classFoam_1_1geomModel_a129fc60db3ccccaae26eb12e5a9fd4c0}{get\+M0}} ()
+\item 
+virtual scalar \& \mbox{\hyperlink{classFoam_1_1geomModel_a129fc60db3ccccaae26eb12e5a9fd4c0}{get\+M0}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a190730c769a08da099c0b3e6431f8e49}{set\+M0}} (scalar M0)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a190730c769a08da099c0b3e6431f8e49}{set\+M0}} (scalar M0)
+\item 
+scalar \& \mbox{\hyperlink{classFoam_1_1geomModel_afd93801223f4b6e952aa04998d40a071}{getM}} ()
+\item 
+scalar \& \mbox{\hyperlink{classFoam_1_1geomModel_afd93801223f4b6e952aa04998d40a071}{getM}} ()
+\item 
+label \& \mbox{\hyperlink{classFoam_1_1geomModel_a7e89b7437f109aa4b4b35beafd652e36}{get\+N\+Cells}} ()
+\item 
+label \& \mbox{\hyperlink{classFoam_1_1geomModel_a7e89b7437f109aa4b4b35beafd652e36}{get\+N\+Cells}} ()
+\item 
+virtual vector \mbox{\hyperlink{classFoam_1_1geomModel_a957190734d7273343704825943621512}{get\+L\+Vec}} (const point \&to\+Point)
+\item 
+virtual vector \mbox{\hyperlink{classFoam_1_1geomModel_a957190734d7273343704825943621512}{get\+L\+Vec}} (const point \&to\+Point)
+\item 
+const symm\+Tensor \& \mbox{\hyperlink{classFoam_1_1geomModel_a0c1d8add88e024a00e7c06bba1759d0d}{getI}} () const
+\item 
+const symm\+Tensor \& \mbox{\hyperlink{classFoam_1_1geomModel_a0c1d8add88e024a00e7c06bba1759d0d}{getI}} () const
+\item 
+virtual bool \mbox{\hyperlink{classFoam_1_1geomModel_a52273797dd78b8e0e679350270a436fd}{is\+Cluster}} () const
+\item 
+virtual bool \mbox{\hyperlink{classFoam_1_1geomModel_a52273797dd78b8e0e679350270a436fd}{is\+Cluster}} () const
+\item 
+virtual bool \mbox{\hyperlink{classFoam_1_1geomModel_ab16c2f0c72731bd72b5ef986caa59aca}{check\+Cluster}} ()
+\item 
+virtual bool \mbox{\hyperlink{classFoam_1_1geomModel_ab16c2f0c72731bd72b5ef986caa59aca}{check\+Cluster}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1geomModel_ae19a2a210bb56448efd7a13deb57d2de}{is\+B\+Box\+In\+Mesh}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1geomModel_a5eafedc05ddd80d72bdfa9b3a51348ff}{is\+B\+Box\+In\+Mesh}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \mbox{\hyperlink{classFoam_1_1geomModel_ad70ce9fe3e452b1533ca8d3b2a7cfd91}{get\+Potent\+Surf\+Cells}} (vol\+Scalar\+Field \&body, Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&cell\+Inside, List$<$ label\+List $>$ \&cell\+Points)
+\item 
+\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \mbox{\hyperlink{classFoam_1_1geomModel_adac6a242f418325a86bac3808e05b9b0}{get\+Potent\+Surf\+Cells}} (vol\+Scalar\+Field \&body, Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&cell\+Inside, List$<$ label\+List $>$ \&cell\+Points)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a1604b32ba5ccb8eb76504f02adeebb11}{correct\+Surf\+Cells}} (vol\+Scalar\+Field \&body, \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \&potent\+Surf\+Cells, Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&cell\+Inside, List$<$ label\+List $>$ \&cell\+Points)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a8ea6becb3a92ac731f4995e163ee12ed}{correct\+Surf\+Cells}} (vol\+Scalar\+Field \&body, \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \&potent\+Surf\+Cells, Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&cell\+Inside, List$<$ label\+List $>$ \&cell\+Points)
+\item 
+virtual List$<$ std\+::shared\+\_\+ptr$<$ bound\+Box $>$ $>$ \mbox{\hyperlink{classFoam_1_1geomModel_a478b20dd5156a461e6699383bd2b23af}{get\+B\+Boxes}} ()
+\item 
+virtual List$<$ std\+::shared\+\_\+ptr$<$ bound\+Box $>$ $>$ \mbox{\hyperlink{classFoam_1_1geomModel_a4851e601561f944a7440e8beb55d06f1}{get\+B\+Boxes}} ()
+\item 
+virtual point\+Field \mbox{\hyperlink{classFoam_1_1geomModel_a21fdbb9bd4dbc303d044e9f27b0550b1}{get\+S\+T\+L\+Body\+Points}} ()
+\item 
+virtual point\+Field \mbox{\hyperlink{classFoam_1_1geomModel_a21fdbb9bd4dbc303d044e9f27b0550b1}{get\+S\+T\+L\+Body\+Points}} ()
+\item 
+virtual face\+List \mbox{\hyperlink{classFoam_1_1geomModel_a79bdd5bab087e4be43e7ad0e7c2a64d9}{get\+S\+T\+L\+Faces}} ()
+\item 
+virtual face\+List \mbox{\hyperlink{classFoam_1_1geomModel_a79bdd5bab087e4be43e7ad0e7c2a64d9}{get\+S\+T\+L\+Faces}} ()
+\item 
+virtual point\+Field \mbox{\hyperlink{classFoam_1_1geomModel_ab73ae4069d204dc18f9dedfab029744e}{get\+S\+T\+L\+Face\+Point}} (label face\+ID)
+\item 
+virtual point\+Field \mbox{\hyperlink{classFoam_1_1geomModel_ab73ae4069d204dc18f9dedfab029744e}{get\+S\+T\+L\+Face\+Point}} (label face\+ID)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const fv\+Mesh \& \mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\+\_\+}}
+\item 
+List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surf\+Cells\+\_\+}}
+\item 
+List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{int\+Cells\+\_\+}}
+\item 
+\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ib\+Partial\+Volume\+\_\+}}
+\item 
+label \mbox{\hyperlink{classFoam_1_1geomModel_a6beec229c26dadc133ad0514ed0898f7}{owner\+\_\+}}
+\item 
+label \mbox{\hyperlink{classFoam_1_1geomModel_afba8bac78aa8199c348d643fb6ab6606}{cell\+To\+Start\+In\+Create\+I\+B\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1geomModel_aec695437242a0c3e79ddd50ea51478dd}{thr\+Surf\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1geomModel_a220b3e2c2a2e5dd60115dad2bff40a85}{int\+Span\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1geomModel_ae983de88f0feab99a34a6a6d1af8d744}{sd\+Based\+Lambda\+\_\+}}
+\item 
+bound\+Box \mbox{\hyperlink{classFoam_1_1geomModel_ac9646442904ddf5e6eeefbf6c640dc83}{cur\+Mesh\+Bounds\+\_\+}}
+\item 
+auto\+Ptr$<$ Hash\+Table$<$ const label\+List \&, label, Hash$<$ label $>$ $>$ $>$ \mbox{\hyperlink{classFoam_1_1geomModel_a11167d3f48311fa265c662e4880d1de2}{cached\+Neighbours\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}{M\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1geomModel_ab0cbe345c5e98c54e43e868a5b2f0f92}{M0\+\_\+}}
+\item 
+label \mbox{\hyperlink{classFoam_1_1geomModel_a164a9b5ae11beefcf8af797f331e2b1e}{n\+Cells\+\_\+}}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}{Co\+M\+\_\+}}
+\item 
+symm\+Tensor \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\+\_\+}}
+\item 
+std\+::shared\+\_\+ptr$<$ bound\+Box $>$ \mbox{\hyperlink{classFoam_1_1geomModel_a393b0094bd325f353d7b9ca518da6c76}{b\+Box\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1geomModel_a5038a5a3ebb7cb4992c894387203bc4d}{d\+C\+\_\+}}
+\item 
+dimensioned\+Scalar \mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rho\+S\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1shapeBased_ac6c8e6433b764664bd76b2c9856c4b11}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1shapeBased_a832927b74ed0ff223478e54627218c1c}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1shapeBased_a86bf7a31c4ba5b68d70ff1d121cb2aac}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1shapeBased_a22f6b64c93f50e0dc5d679eb03d1d627}{Dynamic\+Point\+List}}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1shapeBased_ac6c8e6433b764664bd76b2c9856c4b11}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1shapeBased_a832927b74ed0ff223478e54627218c1c}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1shapeBased_a86bf7a31c4ba5b68d70ff1d121cb2aac}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1shapeBased_a22f6b64c93f50e0dc5d679eb03d1d627}{Dynamic\+Point\+List}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}} \mbox{\hyperlink{classFoam_1_1geomModel_ad88bb1c51f58fe353e3899e175dca2b9}{contact\+Type\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 47 of file shape\+Based.\+H.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_ac6c8e6433b764664bd76b2c9856c4b11}\label{classFoam_1_1shapeBased_ac6c8e6433b764664bd76b2c9856c4b11}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1shapeBased_ac6c8e6433b764664bd76b2c9856c4b11}{Foam\+::shape\+Based\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 53 of file shape\+Based.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1shapeBased_ac6c8e6433b764664bd76b2c9856c4b11}\label{classFoam_1_1shapeBased_ac6c8e6433b764664bd76b2c9856c4b11}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1shapeBased_ac6c8e6433b764664bd76b2c9856c4b11}{Foam\+::shape\+Based\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 53 of file shape\+Based.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a22f6b64c93f50e0dc5d679eb03d1d627}\label{classFoam_1_1shapeBased_a22f6b64c93f50e0dc5d679eb03d1d627}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1shapeBased_a22f6b64c93f50e0dc5d679eb03d1d627}{Foam\+::shape\+Based\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 56 of file shape\+Based.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a22f6b64c93f50e0dc5d679eb03d1d627}\label{classFoam_1_1shapeBased_a22f6b64c93f50e0dc5d679eb03d1d627}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1shapeBased_a22f6b64c93f50e0dc5d679eb03d1d627}{Foam\+::shape\+Based\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 56 of file shape\+Based.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a832927b74ed0ff223478e54627218c1c}\label{classFoam_1_1shapeBased_a832927b74ed0ff223478e54627218c1c}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1shapeBased_a832927b74ed0ff223478e54627218c1c}{Foam\+::shape\+Based\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 54 of file shape\+Based.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a832927b74ed0ff223478e54627218c1c}\label{classFoam_1_1shapeBased_a832927b74ed0ff223478e54627218c1c}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1shapeBased_a832927b74ed0ff223478e54627218c1c}{Foam\+::shape\+Based\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 54 of file shape\+Based.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a86bf7a31c4ba5b68d70ff1d121cb2aac}\label{classFoam_1_1shapeBased_a86bf7a31c4ba5b68d70ff1d121cb2aac}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1shapeBased_a86bf7a31c4ba5b68d70ff1d121cb2aac}{Foam\+::shape\+Based\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 55 of file shape\+Based.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a86bf7a31c4ba5b68d70ff1d121cb2aac}\label{classFoam_1_1shapeBased_a86bf7a31c4ba5b68d70ff1d121cb2aac}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1shapeBased_a86bf7a31c4ba5b68d70ff1d121cb2aac}{Foam\+::shape\+Based\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 55 of file shape\+Based.\+H.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a480a9b3343aaa1dbcad71bef89a9fb4a}\label{classFoam_1_1shapeBased_a480a9b3343aaa1dbcad71bef89a9fb4a}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!shapeBased@{shapeBased}}
+\index{shapeBased@{shapeBased}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{shapeBased()}{shapeBased()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily shape\+Based\+::shape\+Based (\begin{DoxyParamCaption}\item[{const fv\+Mesh \&}]{mesh,  }\item[{const \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}}}]{c\+Type,  }\item[{scalar}]{thr\+Surf }\end{DoxyParamCaption})}
+
+
+
+Definition at line 38 of file shape\+Based.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{43 :}
+\DoxyCodeLine{44 \mbox{\hyperlink{classFoam_1_1geomModel_aaf29ab4440de5f0c71ac340d7b03257d}{geomModel}}(mesh,cType,\mbox{\hyperlink{addModels_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}{thrSurf}})}
+\DoxyCodeLine{45 \{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_abbbec930c1cc393774a49ba14166ca2b}\label{classFoam_1_1shapeBased_abbbec930c1cc393774a49ba14166ca2b}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!````~shapeBased@{$\sim$shapeBased}}
+\index{````~shapeBased@{$\sim$shapeBased}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{$\sim$shapeBased()}{~shapeBased()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual Foam\+::shape\+Based\+::$\sim$shape\+Based (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line 71 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{71 \{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a8ae7e36bf634572cfb68bdbfc47ef753}\label{classFoam_1_1shapeBased_a8ae7e36bf634572cfb68bdbfc47ef753}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!shapeBased@{shapeBased}}
+\index{shapeBased@{shapeBased}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{shapeBased()}{shapeBased()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::shape\+Based\+::shape\+Based (\begin{DoxyParamCaption}\item[{const fv\+Mesh \&}]{mesh,  }\item[{const \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}}}]{c\+Type,  }\item[{scalar}]{thr\+Surf }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1shapeBased_abbbec930c1cc393774a49ba14166ca2b}\label{classFoam_1_1shapeBased_abbbec930c1cc393774a49ba14166ca2b}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!````~shapeBased@{$\sim$shapeBased}}
+\index{````~shapeBased@{$\sim$shapeBased}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{$\sim$shapeBased()}{~shapeBased()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual Foam\+::shape\+Based\+::$\sim$shape\+Based (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line 71 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{71 \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a4f97e65316cb5abc431e94529510886c}\label{classFoam_1_1shapeBased_a4f97e65316cb5abc431e94529510886c}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!addModelReturnRandomPosition@{addModelReturnRandomPosition}}
+\index{addModelReturnRandomPosition@{addModelReturnRandomPosition}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{addModelReturnRandomPosition()}{addModelReturnRandomPosition()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector shape\+Based\+::add\+Model\+Return\+Random\+Position (\begin{DoxyParamCaption}\item[{const bool}]{all\+Active\+Cells\+In\+Mesh,  }\item[{const bound\+Box}]{cell\+Zone\+Bounds,  }\item[{Random \&}]{rand\+Gen }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_ab42cfec6996dae0cf24014076ca6d9d0}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 48 of file shape\+Based.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{53 \{}
+\DoxyCodeLine{54     vector ranVec(vector::zero);}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56     meshSearch searchEng(\mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}});}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58     \textcolor{comment}{// get its center of mass}}
+\DoxyCodeLine{59     vector CoM(\mbox{\hyperlink{classFoam_1_1shapeBased_af20f26ce993bda2d59619412ded73042}{getCoM}}());}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61     \textcolor{keyword}{const} vector validDirs = (\mbox{\hyperlink{namespaceFoam_a4dafe227f98b98cc477682efd8e86a41}{geometricD}} + vector::one)/2;}
+\DoxyCodeLine{62     vector dirCorr(cmptMultiply((vector::one -\/ validDirs),CoM));}
+\DoxyCodeLine{63     dirCorr += cmptMultiply((vector::one -\/ validDirs),0.5*(\mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}}.bounds().max() + \mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}}.bounds().min()));}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{65     \textcolor{comment}{// get the body boundBox}}
+\DoxyCodeLine{66     boundBox bodyBounds(\mbox{\hyperlink{classFoam_1_1shapeBased_a77b011131f23d48a46c4c1a6e3966273}{getBounds}}());}
+\DoxyCodeLine{67     \textcolor{comment}{// compute the max scales to stay in active bounding box}}
+\DoxyCodeLine{68     vector maxScales(cellZoneBounds.max() -\/ bodyBounds.max());}
+\DoxyCodeLine{69     maxScales -\/= cellZoneBounds.min() -\/ bodyBounds.min();}
+\DoxyCodeLine{70     maxScales *= 0.5*0.9;\textcolor{comment}{//0.Y is there just to be sure}}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72     \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{73         << \textcolor{stringliteral}{"acceptable movements: "} << maxScales << endl;}
+\DoxyCodeLine{74 }
+\DoxyCodeLine{75     scalar ranNum = 0;}
+\DoxyCodeLine{76     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i=0;i<3;i++)}
+\DoxyCodeLine{77     \{}
+\DoxyCodeLine{78         ranNum = 2.0*maxScales[i]*randGen.scalar01() -\/ 1.0*maxScales[i];}
+\DoxyCodeLine{79         ranVec[i] = ranNum;}
+\DoxyCodeLine{80     \}}
+\DoxyCodeLine{81 }
+\DoxyCodeLine{82     ranVec = cmptMultiply(validDirs,ranVec);                            \textcolor{comment}{//translate only with respect to valid directions}}
+\DoxyCodeLine{83     ranVec += dirCorr;}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85     \textcolor{keywordflow}{return} ranVec;}
+\DoxyCodeLine{86 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a922aeacfed27d9eb577186879fb22089}\label{classFoam_1_1shapeBased_a922aeacfed27d9eb577186879fb22089}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!addModelReturnRandomPosition@{addModelReturnRandomPosition}}
+\index{addModelReturnRandomPosition@{addModelReturnRandomPosition}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{addModelReturnRandomPosition()}{addModelReturnRandomPosition()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector Foam\+::shape\+Based\+::add\+Model\+Return\+Random\+Position (\begin{DoxyParamCaption}\item[{const bool}]{all\+Active\+Cells\+In\+Mesh,  }\item[{const bound\+Box}]{cell\+Zone\+Bounds,  }\item[{Random \&}]{rand\+Gen }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_ab42cfec6996dae0cf24014076ca6d9d0}{Foam\+::geom\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a78b35514e8fb42ef184151793fc682ae}\label{classFoam_1_1geomModel_a78b35514e8fb42ef184151793fc682ae}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!addToMAndI@{addToMAndI}}
+\index{addToMAndI@{addToMAndI}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{addToMAndI()}{addToMAndI()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void geom\+Model\+::add\+To\+M\+AndI (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \&}]{label\+Cell\+Lst }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 101 of file geom\+Model.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{105 \{}
+\DoxyCodeLine{106     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (labelCellLst,cell)}
+\DoxyCodeLine{107     \{}
+\DoxyCodeLine{108         label cellI  = labelCellLst[cell];}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{110         scalar Mi    = body[cellI]*\mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rhoS\_}}.value()*\mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}}.V()[cellI];}
+\DoxyCodeLine{111         \textcolor{comment}{// add to M\_}}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{113         \mbox{\hyperlink{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}{M\_}}      += Mi;}
+\DoxyCodeLine{114         scalar xLoc = \mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}}.C()[cellI].x() -\/ \mbox{\hyperlink{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}{CoM\_}}.x();}
+\DoxyCodeLine{115         scalar yLoc = \mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}}.C()[cellI].y() -\/ \mbox{\hyperlink{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}{CoM\_}}.y();}
+\DoxyCodeLine{116         scalar zLoc = \mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}}.C()[cellI].z() -\/ \mbox{\hyperlink{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}{CoM\_}}.z();}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118         \textcolor{comment}{// add to I\_}}
+\DoxyCodeLine{119         \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}}.xx() += Mi*(yLoc*yLoc + zLoc*zLoc);}
+\DoxyCodeLine{120         \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}}.yy() += Mi*(xLoc*xLoc + zLoc*zLoc);}
+\DoxyCodeLine{121         \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}}.zz() += Mi*(xLoc*xLoc + yLoc*yLoc);}
+\DoxyCodeLine{122 }
+\DoxyCodeLine{123         \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}}.xy() -\/= Mi*(xLoc*yLoc);}
+\DoxyCodeLine{124         \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}}.xz() -\/= Mi*(xLoc*zLoc);}
+\DoxyCodeLine{125         \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}}.yz() -\/= Mi*(yLoc*zLoc);}
+\DoxyCodeLine{126     \}}
+\DoxyCodeLine{127 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 2
+\mbox{\Hypertarget{classFoam_1_1geomModel_a0988d518013ea7bf538c0bb3e1101dc8}\label{classFoam_1_1geomModel_a0988d518013ea7bf538c0bb3e1101dc8}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!addToMAndI@{addToMAndI}}
+\index{addToMAndI@{addToMAndI}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{addToMAndI()}{addToMAndI()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::add\+To\+M\+AndI (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \&}]{label\+Cell\+Lst }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a45c07bbc31e1d5309b68593c48be791f}\label{classFoam_1_1shapeBased_a45c07bbc31e1d5309b68593c48be791f}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!bodyMovePoints@{bodyMovePoints}}
+\index{bodyMovePoints@{bodyMovePoints}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{bodyMovePoints()}{bodyMovePoints()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::body\+Move\+Points (\begin{DoxyParamCaption}\item[{vector}]{transl\+Vec }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a5f6349911633893b3f76299a71f26807}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_ad5dd820a5d9f6488d8ef3adfdaa4e434}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_ad5dd820a5d9f6488d8ef3adfdaa4e434}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 92 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{93         \{}
+\DoxyCodeLine{94             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{95                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{96         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a45c07bbc31e1d5309b68593c48be791f}\label{classFoam_1_1shapeBased_a45c07bbc31e1d5309b68593c48be791f}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!bodyMovePoints@{bodyMovePoints}}
+\index{bodyMovePoints@{bodyMovePoints}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{bodyMovePoints()}{bodyMovePoints()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::body\+Move\+Points (\begin{DoxyParamCaption}\item[{vector}]{transl\+Vec }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a5f6349911633893b3f76299a71f26807}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_ad5dd820a5d9f6488d8ef3adfdaa4e434}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_ad5dd820a5d9f6488d8ef3adfdaa4e434}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 92 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{93         \{}
+\DoxyCodeLine{94             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{95                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{96         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a5ebd1728ea3d3eb237bf4c51cb7036e3}\label{classFoam_1_1shapeBased_a5ebd1728ea3d3eb237bf4c51cb7036e3}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!bodyRotatePoints@{bodyRotatePoints}}
+\index{bodyRotatePoints@{bodyRotatePoints}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{bodyRotatePoints()}{bodyRotatePoints()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::body\+Rotate\+Points (\begin{DoxyParamCaption}\item[{scalar}]{rot\+Angle,  }\item[{vector}]{axis\+Of\+Rot }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a74554e38ac7afbc3f9e4a045cc612cca}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a6484fb960bca84d741631691a464ec39}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a6484fb960bca84d741631691a464ec39}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 105 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{109         \{}
+\DoxyCodeLine{110             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{111                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{112         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a5ebd1728ea3d3eb237bf4c51cb7036e3}\label{classFoam_1_1shapeBased_a5ebd1728ea3d3eb237bf4c51cb7036e3}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!bodyRotatePoints@{bodyRotatePoints}}
+\index{bodyRotatePoints@{bodyRotatePoints}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{bodyRotatePoints()}{bodyRotatePoints()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::body\+Rotate\+Points (\begin{DoxyParamCaption}\item[{scalar}]{rot\+Angle,  }\item[{vector}]{axis\+Of\+Rot }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a74554e38ac7afbc3f9e4a045cc612cca}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a6484fb960bca84d741631691a464ec39}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a6484fb960bca84d741631691a464ec39}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 105 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{109         \{}
+\DoxyCodeLine{110             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{111                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{112         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a00c17c836f1c5312c78cf41845403ced}\label{classFoam_1_1shapeBased_a00c17c836f1c5312c78cf41845403ced}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!bodyScalePoints@{bodyScalePoints}}
+\index{bodyScalePoints@{bodyScalePoints}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{bodyScalePoints()}{bodyScalePoints()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::body\+Scale\+Points (\begin{DoxyParamCaption}\item[{scalar}]{scale\+Fac }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a8d104747251fab06bb31caefe0a90bc6}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_aea5c89f9cd3464ca48b23442b3eed922}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_aea5c89f9cd3464ca48b23442b3eed922}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 98 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{99         \{}
+\DoxyCodeLine{100             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{101                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{102         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a00c17c836f1c5312c78cf41845403ced}\label{classFoam_1_1shapeBased_a00c17c836f1c5312c78cf41845403ced}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!bodyScalePoints@{bodyScalePoints}}
+\index{bodyScalePoints@{bodyScalePoints}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{bodyScalePoints()}{bodyScalePoints()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::body\+Scale\+Points (\begin{DoxyParamCaption}\item[{scalar}]{scale\+Fac }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a8d104747251fab06bb31caefe0a90bc6}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_aea5c89f9cd3464ca48b23442b3eed922}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_aea5c89f9cd3464ca48b23442b3eed922}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 98 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{99         \{}
+\DoxyCodeLine{100             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{101                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{102         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a4b52faf7083a8ee52fc6a7b6c4c43439}\label{classFoam_1_1geomModel_a4b52faf7083a8ee52fc6a7b6c4c43439}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!calculateGeometricalProperties@{calculateGeometricalProperties}}
+\index{calculateGeometricalProperties@{calculateGeometricalProperties}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{calculateGeometricalProperties()}{calculateGeometricalProperties()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void geom\+Model\+::calculate\+Geometrical\+Properties (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_acca6e9371fc30897701508ddbfda3814}{Foam\+::cluster\+Body}}, and \mbox{\hyperlink{classFoam_1_1clusterBody_a273d13edbdc81432b858b824f7712512}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 70 of file geom\+Model.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{73 \{}
+\DoxyCodeLine{74     \textcolor{comment}{//vector CoMOld  = CoM\_;}}
+\DoxyCodeLine{75     \mbox{\hyperlink{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}{M\_}}      = scalar(0);}
+\DoxyCodeLine{76     \textcolor{comment}{//CoM\_    = vector::zero;}}
+\DoxyCodeLine{77     \mbox{\hyperlink{classFoam_1_1geomModel_a17bd0e3467c49d455a0791e05a569c7e}{setCoM}}();}
+\DoxyCodeLine{78     \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}}      = symmTensor::zero;}
+\DoxyCodeLine{79     \textcolor{comment}{//vector tmpCom(vector::zero);}}
+\DoxyCodeLine{80     \textcolor{comment}{//reset cellCount}}
+\DoxyCodeLine{81     \mbox{\hyperlink{classFoam_1_1geomModel_a164a9b5ae11beefcf8af797f331e2b1e}{nCells\_}} = label(0);}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83     \mbox{\hyperlink{classFoam_1_1geomModel_a78b35514e8fb42ef184151793fc682ae}{addToMAndI}}(body,\mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}[Pstream::myProcNo()]);}
+\DoxyCodeLine{84     \mbox{\hyperlink{classFoam_1_1geomModel_a78b35514e8fb42ef184151793fc682ae}{addToMAndI}}(body,\mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}}[Pstream::myProcNo()]);}
+\DoxyCodeLine{85     \textcolor{comment}{//Get CellCount At Each SubDomain}}
+\DoxyCodeLine{86     \mbox{\hyperlink{classFoam_1_1geomModel_a164a9b5ae11beefcf8af797f331e2b1e}{nCells\_}} = \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}}[Pstream::myProcNo()].size() + \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}[Pstream::myProcNo()].size();}
+\DoxyCodeLine{87 }
+\DoxyCodeLine{88     \textcolor{comment}{// collect from processors}}
+\DoxyCodeLine{89     reduce(\mbox{\hyperlink{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}{M\_}}, sumOp<scalar>());}
+\DoxyCodeLine{90     \textcolor{comment}{//reduce(tmpCom,  sumOp<vector>());}}
+\DoxyCodeLine{91     reduce(\mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}},  sumOp<symmTensor>());}
+\DoxyCodeLine{92     \textcolor{comment}{//collect cellCount actros processors}}
+\DoxyCodeLine{93     reduce(\mbox{\hyperlink{classFoam_1_1geomModel_a164a9b5ae11beefcf8af797f331e2b1e}{nCells\_}}, sumOp<label>());}
+\DoxyCodeLine{94     \textcolor{comment}{/*if(M\_ > 0)}}
+\DoxyCodeLine{95 \textcolor{comment}{    \{}}
+\DoxyCodeLine{96 \textcolor{comment}{        CoM\_ = tmpCom / M\_;}}
+\DoxyCodeLine{97 \textcolor{comment}{    \}*/}}
+\DoxyCodeLine{98 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a134e4649f7334c02ce7ccd1d59112f41}\label{classFoam_1_1geomModel_a134e4649f7334c02ce7ccd1d59112f41}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!calculateGeometricalProperties@{calculateGeometricalProperties}}
+\index{calculateGeometricalProperties@{calculateGeometricalProperties}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{calculateGeometricalProperties()}{calculateGeometricalProperties()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::geom\+Model\+::calculate\+Geometrical\+Properties (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_acca6e9371fc30897701508ddbfda3814}{Foam\+::cluster\+Body}}, and \mbox{\hyperlink{classFoam_1_1clusterBody_a273d13edbdc81432b858b824f7712512}{Foam\+::cluster\+Body}}.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab16c2f0c72731bd72b5ef986caa59aca}\label{classFoam_1_1geomModel_ab16c2f0c72731bd72b5ef986caa59aca}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!checkCluster@{checkCluster}}
+\index{checkCluster@{checkCluster}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{checkCluster()}{checkCluster()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual bool Foam\+::geom\+Model\+::check\+Cluster (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 388 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{389         \{}
+\DoxyCodeLine{390             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"17-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{391                 << \textcolor{stringliteral}{"not cluster model"}<<endl;}
+\DoxyCodeLine{392                 \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{393         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab16c2f0c72731bd72b5ef986caa59aca}\label{classFoam_1_1geomModel_ab16c2f0c72731bd72b5ef986caa59aca}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!checkCluster@{checkCluster}}
+\index{checkCluster@{checkCluster}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{checkCluster()}{checkCluster()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual bool Foam\+::geom\+Model\+::check\+Cluster (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 388 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{389         \{}
+\DoxyCodeLine{390             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"17-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{391                 << \textcolor{stringliteral}{"not cluster model"}<<endl;}
+\DoxyCodeLine{392                 \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{393         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a042ae896c576123625e3e95f7d5d9d12}\label{classFoam_1_1geomModel_a042ae896c576123625e3e95f7d5d9d12}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!computeBodyCharPars@{computeBodyCharPars}}
+\index{computeBodyCharPars@{computeBodyCharPars}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{computeBodyCharPars()}{computeBodyCharPars()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void geom\+Model\+::compute\+Body\+Char\+Pars (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 129 of file geom\+Model.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{130 \{}
+\DoxyCodeLine{131     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (\mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}[Pstream::myProcNo()],sCellI)}
+\DoxyCodeLine{132     \{}
+\DoxyCodeLine{133         label cellI = \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}[Pstream::myProcNo()][sCellI];}
+\DoxyCodeLine{134         \mbox{\hyperlink{classFoam_1_1geomModel_a5038a5a3ebb7cb4992c894387203bc4d}{dC\_}} = max(\mbox{\hyperlink{classFoam_1_1geomModel_a5038a5a3ebb7cb4992c894387203bc4d}{dC\_}},mag(\mbox{\hyperlink{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}{CoM\_}}-\/\mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}}.C()[cellI]));}
+\DoxyCodeLine{135     \}}
+\DoxyCodeLine{136     \mbox{\hyperlink{classFoam_1_1geomModel_ab0cbe345c5e98c54e43e868a5b2f0f92}{M0\_}} = \mbox{\hyperlink{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}{M\_}};}
+\DoxyCodeLine{137     reduce(\mbox{\hyperlink{classFoam_1_1geomModel_a5038a5a3ebb7cb4992c894387203bc4d}{dC\_}}, maxOp<scalar>());}
+\DoxyCodeLine{138 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 3
+\mbox{\Hypertarget{classFoam_1_1geomModel_aa70f4110771a869f21150381c7a23ae2}\label{classFoam_1_1geomModel_aa70f4110771a869f21150381c7a23ae2}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!computeBodyCharPars@{computeBodyCharPars}}
+\index{computeBodyCharPars@{computeBodyCharPars}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{computeBodyCharPars()}{computeBodyCharPars()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::compute\+Body\+Char\+Pars (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a1604b32ba5ccb8eb76504f02adeebb11}\label{classFoam_1_1geomModel_a1604b32ba5ccb8eb76504f02adeebb11}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!correctSurfCells@{correctSurfCells}}
+\index{correctSurfCells@{correctSurfCells}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{correctSurfCells()}{correctSurfCells()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void geom\+Model\+::correct\+Surf\+Cells (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \&}]{potent\+Surf\+Cells,  }\item[{Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&}]{cell\+Inside,  }\item[{List$<$ label\+List $>$ \&}]{cell\+Points }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 220 of file geom\+Model.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{226 \{}
+\DoxyCodeLine{227     HashTable<bool, label, Hash<label>> verticesStatus(potentSurfCells.size()*6);}
+\DoxyCodeLine{228     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(potentSurfCells, cellLabel)}
+\DoxyCodeLine{229     \{}
+\DoxyCodeLine{230         label cCell = potentSurfCells[cellLabel];}
+\DoxyCodeLine{231         scalar cBody(0);}
+\DoxyCodeLine{232 }
+\DoxyCodeLine{233         \textcolor{keywordflow}{if}(cellInside[cCell])}
+\DoxyCodeLine{234         \{}
+\DoxyCodeLine{235             cBody += 0.5;}
+\DoxyCodeLine{236         \}}
+\DoxyCodeLine{237 }
+\DoxyCodeLine{238         \textcolor{keyword}{const} labelList\& cVerts = cellPoints[cCell];}
+\DoxyCodeLine{239         scalar rVInSize(0.5/cVerts.size());}
+\DoxyCodeLine{240         \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(cVerts, vertI)}
+\DoxyCodeLine{241         \{}
+\DoxyCodeLine{242             \textcolor{keywordflow}{if}(!verticesStatus.found(cVerts[vertI]))}
+\DoxyCodeLine{243             \{}
+\DoxyCodeLine{244                 \textcolor{keywordtype}{bool} vertexInside = \mbox{\hyperlink{classFoam_1_1geomModel_a9f26fe62858c0b9da399f2c5823ea0a5}{pointInside}}(\mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}}.points()[cVerts[vertI]]);}
+\DoxyCodeLine{245                 verticesStatus.insert}
+\DoxyCodeLine{246                 (}
+\DoxyCodeLine{247                     cVerts[vertI],}
+\DoxyCodeLine{248                     vertexInside}
+\DoxyCodeLine{249                 );}
+\DoxyCodeLine{250 }
+\DoxyCodeLine{251                 \textcolor{keywordflow}{if}(vertexInside)}
+\DoxyCodeLine{252                 \{}
+\DoxyCodeLine{253                     cBody += rVInSize;}
+\DoxyCodeLine{254                 \}}
+\DoxyCodeLine{255             \}}
+\DoxyCodeLine{256             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(verticesStatus[cVerts[vertI]])}
+\DoxyCodeLine{257             \{}
+\DoxyCodeLine{258                 cBody += rVInSize;}
+\DoxyCodeLine{259             \}}
+\DoxyCodeLine{260         \}}
+\DoxyCodeLine{261 }
+\DoxyCodeLine{262         \textcolor{keywordflow}{if} (cBody > \mbox{\hyperlink{classFoam_1_1geomModel_aec695437242a0c3e79ddd50ea51478dd}{thrSurf\_}})}
+\DoxyCodeLine{263         \{}
+\DoxyCodeLine{264             \textcolor{keywordflow}{if} (cBody > (1.0-\/\mbox{\hyperlink{classFoam_1_1geomModel_aec695437242a0c3e79ddd50ea51478dd}{thrSurf\_}}))}
+\DoxyCodeLine{265             \{}
+\DoxyCodeLine{266                 \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}}[Pstream::myProcNo()].append(cCell);}
+\DoxyCodeLine{267             \}}
+\DoxyCodeLine{268             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{269             \{}
+\DoxyCodeLine{270                 \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}[Pstream::myProcNo()].append(cCell);}
+\DoxyCodeLine{271             \}}
+\DoxyCodeLine{272             \mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ibPartialVolume\_}}[Pstream::myProcNo()] += 1;}
+\DoxyCodeLine{273 }
+\DoxyCodeLine{274             body[cCell] += cBody;}
+\DoxyCodeLine{275 }
+\DoxyCodeLine{276             \textcolor{comment}{// clip the body field values}}
+\DoxyCodeLine{277             body[cCell] = min(max(0.0,body[cCell]),1.0);}
+\DoxyCodeLine{278         \}}
+\DoxyCodeLine{279     \}}
+\DoxyCodeLine{280 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 4
+\mbox{\Hypertarget{classFoam_1_1geomModel_a8ea6becb3a92ac731f4995e163ee12ed}\label{classFoam_1_1geomModel_a8ea6becb3a92ac731f4995e163ee12ed}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!correctSurfCells@{correctSurfCells}}
+\index{correctSurfCells@{correctSurfCells}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{correctSurfCells()}{correctSurfCells()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::correct\+Surf\+Cells (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \&}]{potent\+Surf\+Cells,  }\item[{Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&}]{cell\+Inside,  }\item[{List$<$ label\+List $>$ \&}]{cell\+Points }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a934599c44ee5787b668b6046c9a76b59}\label{classFoam_1_1shapeBased_a934599c44ee5787b668b6046c9a76b59}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!createImmersedBody@{createImmersedBody}}
+\index{createImmersedBody@{createImmersedBody}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{createImmersedBody()}{createImmersedBody()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::create\+Immersed\+Body (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{Field$<$ label $>$ \&}]{octree\+Field,  }\item[{List$<$ label\+List $>$ \&}]{cell\+Points }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_ac874ea568607e9927040cb9c6012274b}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_aa9b84a1ef51ba44110bff654ddb29821}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_af36b174039759323bb9850fa16f3c551}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 74 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{79         \{}
+\DoxyCodeLine{80             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{81                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{82         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a934599c44ee5787b668b6046c9a76b59}\label{classFoam_1_1shapeBased_a934599c44ee5787b668b6046c9a76b59}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!createImmersedBody@{createImmersedBody}}
+\index{createImmersedBody@{createImmersedBody}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{createImmersedBody()}{createImmersedBody()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::create\+Immersed\+Body (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{Field$<$ label $>$ \&}]{octree\+Field,  }\item[{List$<$ label\+List $>$ \&}]{cell\+Points }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_ac874ea568607e9927040cb9c6012274b}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_aa9b84a1ef51ba44110bff654ddb29821}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_af36b174039759323bb9850fa16f3c551}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 74 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{79         \{}
+\DoxyCodeLine{80             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{81                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{82         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a478b20dd5156a461e6699383bd2b23af}\label{classFoam_1_1geomModel_a478b20dd5156a461e6699383bd2b23af}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getBBoxes@{getBBoxes}}
+\index{getBBoxes@{getBBoxes}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getBBoxes()}{getBBoxes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily List$<$ std\+::shared\+\_\+ptr$<$ bound\+Box $>$ $>$ geom\+Model\+::get\+B\+Boxes (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_a312681bc1e1646b4375d7c00a7dd01e9}{Foam\+::cluster\+Body}}, and \mbox{\hyperlink{classFoam_1_1clusterBody_a74f3b902bd4e8d1661834288ed9ce0e2}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 282 of file geom\+Model.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{283 \{}
+\DoxyCodeLine{284     boundBox cBBox = \mbox{\hyperlink{classFoam_1_1geomModel_a3e96ac9daa9bf49715d933c93f1f817a}{getBounds}}();}
+\DoxyCodeLine{285     \mbox{\hyperlink{classFoam_1_1geomModel_a393b0094bd325f353d7b9ca518da6c76}{bBox\_}}-\/>min() = cBBox.min();}
+\DoxyCodeLine{286     \mbox{\hyperlink{classFoam_1_1geomModel_a393b0094bd325f353d7b9ca518da6c76}{bBox\_}}-\/>max() = cBBox.max();}
+\DoxyCodeLine{287 }
+\DoxyCodeLine{288     List<std::shared\_ptr<boundBox>> retList(1);}
+\DoxyCodeLine{289     retList[0] = \mbox{\hyperlink{classFoam_1_1geomModel_a393b0094bd325f353d7b9ca518da6c76}{bBox\_}};}
+\DoxyCodeLine{290     \textcolor{keywordflow}{return} retList;}
+\DoxyCodeLine{291 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 5
+Here is the caller graph for this function\+:
+% FIG 6
+\mbox{\Hypertarget{classFoam_1_1geomModel_a4851e601561f944a7440e8beb55d06f1}\label{classFoam_1_1geomModel_a4851e601561f944a7440e8beb55d06f1}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getBBoxes@{getBBoxes}}
+\index{getBBoxes@{getBBoxes}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getBBoxes()}{getBBoxes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual List$<$std\+::shared\+\_\+ptr$<$bound\+Box$>$ $>$ Foam\+::geom\+Model\+::get\+B\+Boxes (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_a312681bc1e1646b4375d7c00a7dd01e9}{Foam\+::cluster\+Body}}, and \mbox{\hyperlink{classFoam_1_1clusterBody_a74f3b902bd4e8d1661834288ed9ce0e2}{Foam\+::cluster\+Body}}.
+
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a77b011131f23d48a46c4c1a6e3966273}\label{classFoam_1_1shapeBased_a77b011131f23d48a46c4c1a6e3966273}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getBounds@{getBounds}}
+\index{getBounds@{getBounds}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getBounds()}{getBounds()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual bound\+Box Foam\+::shape\+Based\+::get\+Bounds (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a3e96ac9daa9bf49715d933c93f1f817a}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a0fd5a667d9b8389c38e368ecff995a66}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a0fd5a667d9b8389c38e368ecff995a66}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 127 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{128         \{}
+\DoxyCodeLine{129             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{130                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{131             boundBox bound;}
+\DoxyCodeLine{132             \textcolor{keywordflow}{return} bound;}
+\DoxyCodeLine{133         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a77b011131f23d48a46c4c1a6e3966273}\label{classFoam_1_1shapeBased_a77b011131f23d48a46c4c1a6e3966273}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getBounds@{getBounds}}
+\index{getBounds@{getBounds}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getBounds()}{getBounds()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual bound\+Box Foam\+::shape\+Based\+::get\+Bounds (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a3e96ac9daa9bf49715d933c93f1f817a}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a0fd5a667d9b8389c38e368ecff995a66}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a0fd5a667d9b8389c38e368ecff995a66}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 127 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{128         \{}
+\DoxyCodeLine{129             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{130                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{131             boundBox bound;}
+\DoxyCodeLine{132             \textcolor{keywordflow}{return} bound;}
+\DoxyCodeLine{133         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a9fafd187df8cb61d18d46dbdcde31cdf}\label{classFoam_1_1shapeBased_a9fafd187df8cb61d18d46dbdcde31cdf}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getClosestPointAndNormal@{getClosestPointAndNormal}}
+\index{getClosestPointAndNormal@{getClosestPointAndNormal}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getClosestPointAndNormal()}{getClosestPointAndNormal()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::get\+Closest\+Point\+And\+Normal (\begin{DoxyParamCaption}\item[{const point \&}]{start\+Point,  }\item[{const vector \&}]{span,  }\item[{point \&}]{closest\+Point,  }\item[{vector \&}]{normal }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a09ee36e63d1216365f01ae39eb2c995c}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_abc84caafb09ec9a31e20079a438e81a8}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_abc84caafb09ec9a31e20079a438e81a8}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 163 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{169         \{}
+\DoxyCodeLine{170             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{171                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{172         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a9fafd187df8cb61d18d46dbdcde31cdf}\label{classFoam_1_1shapeBased_a9fafd187df8cb61d18d46dbdcde31cdf}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getClosestPointAndNormal@{getClosestPointAndNormal}}
+\index{getClosestPointAndNormal@{getClosestPointAndNormal}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getClosestPointAndNormal()}{getClosestPointAndNormal()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::get\+Closest\+Point\+And\+Normal (\begin{DoxyParamCaption}\item[{const point \&}]{start\+Point,  }\item[{const vector \&}]{span,  }\item[{point \&}]{closest\+Point,  }\item[{vector \&}]{normal }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a09ee36e63d1216365f01ae39eb2c995c}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_abc84caafb09ec9a31e20079a438e81a8}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_abc84caafb09ec9a31e20079a438e81a8}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 163 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{169         \{}
+\DoxyCodeLine{170             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{171                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{172         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_af20f26ce993bda2d59619412ded73042}\label{classFoam_1_1shapeBased_af20f26ce993bda2d59619412ded73042}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getCoM@{getCoM}}
+\index{getCoM@{getCoM}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getCoM()}{getCoM()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual vector Foam\+::shape\+Based\+::get\+CoM (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a17f5482e38b671fd424704393e4db210}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a239557a455f3556e136263ad8d6973ee}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a239557a455f3556e136263ad8d6973ee}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 120 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{121         \{}
+\DoxyCodeLine{122             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{123                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{124             \textcolor{keywordflow}{return} vector::zero;}
+\DoxyCodeLine{125         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_af20f26ce993bda2d59619412ded73042}\label{classFoam_1_1shapeBased_af20f26ce993bda2d59619412ded73042}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getCoM@{getCoM}}
+\index{getCoM@{getCoM}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getCoM()}{getCoM()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual vector Foam\+::shape\+Based\+::get\+CoM (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a17f5482e38b671fd424704393e4db210}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a239557a455f3556e136263ad8d6973ee}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a239557a455f3556e136263ad8d6973ee}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 120 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{121         \{}
+\DoxyCodeLine{122             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{123                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{124             \textcolor{keywordflow}{return} vector::zero;}
+\DoxyCodeLine{125         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a7d885e33b082f9c8d5d9a9b53464248b}\label{classFoam_1_1shapeBased_a7d885e33b082f9c8d5d9a9b53464248b}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getCopy@{getCopy}}
+\index{getCopy@{getCopy}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getCopy()}{getCopy()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}}$>$ Foam\+::shape\+Based\+::get\+Copy (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1geomModel_a7655e5c9c87580a8af844ae0771ceeed}{Foam\+::geom\+Model}}.
+
+
+
+Implemented in \mbox{\hyperlink{classFoam_1_1sphereBody_ac2f165e32eaef52aec0fef4aecb03b22}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_ac2f165e32eaef52aec0fef4aecb03b22}{Foam\+::sphere\+Body}}.
+
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a7d885e33b082f9c8d5d9a9b53464248b}\label{classFoam_1_1shapeBased_a7d885e33b082f9c8d5d9a9b53464248b}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getCopy@{getCopy}}
+\index{getCopy@{getCopy}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getCopy()}{getCopy()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}}$>$ Foam\+::shape\+Based\+::get\+Copy (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1geomModel_a7655e5c9c87580a8af844ae0771ceeed}{Foam\+::geom\+Model}}.
+
+
+
+Implemented in \mbox{\hyperlink{classFoam_1_1sphereBody_ac2f165e32eaef52aec0fef4aecb03b22}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_ac2f165e32eaef52aec0fef4aecb03b22}{Foam\+::sphere\+Body}}.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_aad4760c95591b65260efb023cdbbe862}\label{classFoam_1_1geomModel_aad4760c95591b65260efb023cdbbe862}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getcType@{getcType}}
+\index{getcType@{getcType}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getcType()}{getcType()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily constexpr \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}} Foam\+::geom\+Model\+::getc\+Type (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 301 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{302         \{\textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_ad88bb1c51f58fe353e3899e175dca2b9}{contactType\_}};\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_aad4760c95591b65260efb023cdbbe862}\label{classFoam_1_1geomModel_aad4760c95591b65260efb023cdbbe862}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getcType@{getcType}}
+\index{getcType@{getcType}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getcType()}{getcType()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily constexpr \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}} Foam\+::geom\+Model\+::getc\+Type (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 301 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{302         \{\textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_ad88bb1c51f58fe353e3899e175dca2b9}{contactType\_}};\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 7
+\mbox{\Hypertarget{classFoam_1_1geomModel_a4a544cd34b3b6a9963fb311c4d9938fb}\label{classFoam_1_1geomModel_a4a544cd34b3b6a9963fb311c4d9938fb}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getDC@{getDC}}
+\index{getDC@{getDC}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getDC()}{getDC()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual scalar Foam\+::geom\+Model\+::get\+DC (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_adb525274f0cfec53b773c2ebd315fb40}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1clusterBody_adb525274f0cfec53b773c2ebd315fb40}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1sphereBody_a5994586a0a66c2bd3d89aede33be7fa4}{Foam\+::sphere\+Body}}, \mbox{\hyperlink{classFoam_1_1sphereBody_a5994586a0a66c2bd3d89aede33be7fa4}{Foam\+::sphere\+Body}}, \mbox{\hyperlink{classFoam_1_1periodicBody_a095ac8571f648f17f79f561eaf199069}{Foam\+::periodic\+Body}}, and \mbox{\hyperlink{classFoam_1_1periodicBody_a83c922830b0eff3a9c37e12ce79f7df3}{Foam\+::periodic\+Body}}.
+
+
+
+Definition at line 266 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{267         \{}
+\DoxyCodeLine{268             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a5038a5a3ebb7cb4992c894387203bc4d}{dC\_}};}
+\DoxyCodeLine{269         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 8
+\mbox{\Hypertarget{classFoam_1_1geomModel_a4a544cd34b3b6a9963fb311c4d9938fb}\label{classFoam_1_1geomModel_a4a544cd34b3b6a9963fb311c4d9938fb}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getDC@{getDC}}
+\index{getDC@{getDC}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getDC()}{getDC()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual scalar Foam\+::geom\+Model\+::get\+DC (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_adb525274f0cfec53b773c2ebd315fb40}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1clusterBody_adb525274f0cfec53b773c2ebd315fb40}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1sphereBody_a5994586a0a66c2bd3d89aede33be7fa4}{Foam\+::sphere\+Body}}, \mbox{\hyperlink{classFoam_1_1sphereBody_a5994586a0a66c2bd3d89aede33be7fa4}{Foam\+::sphere\+Body}}, \mbox{\hyperlink{classFoam_1_1periodicBody_a095ac8571f648f17f79f561eaf199069}{Foam\+::periodic\+Body}}, and \mbox{\hyperlink{classFoam_1_1periodicBody_a83c922830b0eff3a9c37e12ce79f7df3}{Foam\+::periodic\+Body}}.
+
+
+
+Definition at line 266 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{267         \{}
+\DoxyCodeLine{268             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a5038a5a3ebb7cb4992c894387203bc4d}{dC\_}};}
+\DoxyCodeLine{269         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a0c1d8add88e024a00e7c06bba1759d0d}\label{classFoam_1_1geomModel_a0c1d8add88e024a00e7c06bba1759d0d}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getI@{getI}}
+\index{getI@{getI}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getI()}{getI()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily const symm\+Tensor\& Foam\+::geom\+Model\+::getI (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 376 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{377         \{}
+\DoxyCodeLine{378             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}};}
+\DoxyCodeLine{379         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a0c1d8add88e024a00e7c06bba1759d0d}\label{classFoam_1_1geomModel_a0c1d8add88e024a00e7c06bba1759d0d}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getI@{getI}}
+\index{getI@{getI}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getI()}{getI()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily const symm\+Tensor\& Foam\+::geom\+Model\+::getI (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 376 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{377         \{}
+\DoxyCodeLine{378             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}};}
+\DoxyCodeLine{379         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_aad5ad5cd92fca2079533e7cd9f9596c6}\label{classFoam_1_1geomModel_aad5ad5cd92fca2079533e7cd9f9596c6}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getInternalCellList@{getInternalCellList}}
+\index{getInternalCellList@{getInternalCellList}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getInternalCellList()}{getInternalCellList()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual List$<$\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}}$>$\& Foam\+::geom\+Model\+::get\+Internal\+Cell\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_ad93c55a4c082d9396f911fcece14724c}{Foam\+::cluster\+Body}}, and \mbox{\hyperlink{classFoam_1_1clusterBody_ad93c55a4c082d9396f911fcece14724c}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 174 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{175         \{}
+\DoxyCodeLine{176             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}};}
+\DoxyCodeLine{177         \};}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_aad5ad5cd92fca2079533e7cd9f9596c6}\label{classFoam_1_1geomModel_aad5ad5cd92fca2079533e7cd9f9596c6}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getInternalCellList@{getInternalCellList}}
+\index{getInternalCellList@{getInternalCellList}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getInternalCellList()}{getInternalCellList()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual List$<$\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}}$>$\& Foam\+::geom\+Model\+::get\+Internal\+Cell\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_ad93c55a4c082d9396f911fcece14724c}{Foam\+::cluster\+Body}}, and \mbox{\hyperlink{classFoam_1_1clusterBody_ad93c55a4c082d9396f911fcece14724c}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 174 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{175         \{}
+\DoxyCodeLine{176             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}};}
+\DoxyCodeLine{177         \};}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a957190734d7273343704825943621512}\label{classFoam_1_1geomModel_a957190734d7273343704825943621512}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getLVec@{getLVec}}
+\index{getLVec@{getLVec}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getLVec()}{getLVec()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual vector Foam\+::geom\+Model\+::get\+L\+Vec (\begin{DoxyParamCaption}\item[{const point \&}]{to\+Point }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_a70035496d5471cf0b82e634366d9fb57}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1clusterBody_a70035496d5471cf0b82e634366d9fb57}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1periodicBody_a3fd44174d25cfadf11cc943973e8e2e5}{Foam\+::periodic\+Body}}, and \mbox{\hyperlink{classFoam_1_1periodicBody_a4bbc2c6a72b6e090dbf9f4099764c19d}{Foam\+::periodic\+Body}}.
+
+
+
+Definition at line 371 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{372         \{}
+\DoxyCodeLine{373             \textcolor{keywordflow}{return} toPoint -\/ \mbox{\hyperlink{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}{CoM\_}};}
+\DoxyCodeLine{374         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a957190734d7273343704825943621512}\label{classFoam_1_1geomModel_a957190734d7273343704825943621512}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getLVec@{getLVec}}
+\index{getLVec@{getLVec}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getLVec()}{getLVec()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual vector Foam\+::geom\+Model\+::get\+L\+Vec (\begin{DoxyParamCaption}\item[{const point \&}]{to\+Point }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_a70035496d5471cf0b82e634366d9fb57}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1clusterBody_a70035496d5471cf0b82e634366d9fb57}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1periodicBody_a3fd44174d25cfadf11cc943973e8e2e5}{Foam\+::periodic\+Body}}, and \mbox{\hyperlink{classFoam_1_1periodicBody_a4bbc2c6a72b6e090dbf9f4099764c19d}{Foam\+::periodic\+Body}}.
+
+
+
+Definition at line 371 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{372         \{}
+\DoxyCodeLine{373             \textcolor{keywordflow}{return} toPoint -\/ \mbox{\hyperlink{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}{CoM\_}};}
+\DoxyCodeLine{374         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 9
+\mbox{\Hypertarget{classFoam_1_1geomModel_afd93801223f4b6e952aa04998d40a071}\label{classFoam_1_1geomModel_afd93801223f4b6e952aa04998d40a071}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getM@{getM}}
+\index{getM@{getM}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getM()}{getM()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily scalar\& Foam\+::geom\+Model\+::getM (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 356 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{357         \{}
+\DoxyCodeLine{358             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}{M\_}};}
+\DoxyCodeLine{359         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_afd93801223f4b6e952aa04998d40a071}\label{classFoam_1_1geomModel_afd93801223f4b6e952aa04998d40a071}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getM@{getM}}
+\index{getM@{getM}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getM()}{getM()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily scalar\& Foam\+::geom\+Model\+::getM (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 356 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{357         \{}
+\DoxyCodeLine{358             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}{M\_}};}
+\DoxyCodeLine{359         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a129fc60db3ccccaae26eb12e5a9fd4c0}\label{classFoam_1_1geomModel_a129fc60db3ccccaae26eb12e5a9fd4c0}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getM0@{getM0}}
+\index{getM0@{getM0}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getM0()}{getM0()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual scalar\& Foam\+::geom\+Model\+::get\+M0 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_aa247c0d687d771767403f4ad3e1890f8}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1clusterBody_aa247c0d687d771767403f4ad3e1890f8}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1sphereBody_a7e79e7db12a5382d3455d61f3114416b}{Foam\+::sphere\+Body}}, \mbox{\hyperlink{classFoam_1_1sphereBody_a7e79e7db12a5382d3455d61f3114416b}{Foam\+::sphere\+Body}}, \mbox{\hyperlink{classFoam_1_1periodicBody_a54bd030a0a01eff1112454824a01e3a9}{Foam\+::periodic\+Body}}, and \mbox{\hyperlink{classFoam_1_1periodicBody_a45223418d020ca3f861de732e4630387}{Foam\+::periodic\+Body}}.
+
+
+
+Definition at line 346 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{347         \{}
+\DoxyCodeLine{348             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_ab0cbe345c5e98c54e43e868a5b2f0f92}{M0\_}};}
+\DoxyCodeLine{349         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 10
+\mbox{\Hypertarget{classFoam_1_1geomModel_a129fc60db3ccccaae26eb12e5a9fd4c0}\label{classFoam_1_1geomModel_a129fc60db3ccccaae26eb12e5a9fd4c0}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getM0@{getM0}}
+\index{getM0@{getM0}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getM0()}{getM0()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual scalar\& Foam\+::geom\+Model\+::get\+M0 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_aa247c0d687d771767403f4ad3e1890f8}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1clusterBody_aa247c0d687d771767403f4ad3e1890f8}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1sphereBody_a7e79e7db12a5382d3455d61f3114416b}{Foam\+::sphere\+Body}}, \mbox{\hyperlink{classFoam_1_1sphereBody_a7e79e7db12a5382d3455d61f3114416b}{Foam\+::sphere\+Body}}, \mbox{\hyperlink{classFoam_1_1periodicBody_a54bd030a0a01eff1112454824a01e3a9}{Foam\+::periodic\+Body}}, and \mbox{\hyperlink{classFoam_1_1periodicBody_a45223418d020ca3f861de732e4630387}{Foam\+::periodic\+Body}}.
+
+
+
+Definition at line 346 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{347         \{}
+\DoxyCodeLine{348             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_ab0cbe345c5e98c54e43e868a5b2f0f92}{M0\_}};}
+\DoxyCodeLine{349         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a7e89b7437f109aa4b4b35beafd652e36}\label{classFoam_1_1geomModel_a7e89b7437f109aa4b4b35beafd652e36}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getNCells@{getNCells}}
+\index{getNCells@{getNCells}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getNCells()}{getNCells()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily label\& Foam\+::geom\+Model\+::get\+N\+Cells (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 361 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{362         \{}
+\DoxyCodeLine{363             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a164a9b5ae11beefcf8af797f331e2b1e}{nCells\_}};}
+\DoxyCodeLine{364         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a7e89b7437f109aa4b4b35beafd652e36}\label{classFoam_1_1geomModel_a7e89b7437f109aa4b4b35beafd652e36}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getNCells@{getNCells}}
+\index{getNCells@{getNCells}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getNCells()}{getNCells()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily label\& Foam\+::geom\+Model\+::get\+N\+Cells (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 361 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{362         \{}
+\DoxyCodeLine{363             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a164a9b5ae11beefcf8af797f331e2b1e}{nCells\_}};}
+\DoxyCodeLine{364         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a1796ccc4e6f0619ba90526e15a42242e}\label{classFoam_1_1geomModel_a1796ccc4e6f0619ba90526e15a42242e}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getOwner@{getOwner}}
+\index{getOwner@{getOwner}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getOwner()}{getOwner()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual label Foam\+::geom\+Model\+::get\+Owner (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_ae58e7d11ad6d14d8c090e77eddc50c6d}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1clusterBody_ae58e7d11ad6d14d8c090e77eddc50c6d}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1periodicBody_ac986b1b29da68eb89eb991e79a8a3d32}{Foam\+::periodic\+Body}}, and \mbox{\hyperlink{classFoam_1_1periodicBody_a3df7b0f90e66e4219cd2b4508cf76ca8}{Foam\+::periodic\+Body}}.
+
+
+
+Definition at line 319 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{320         \{}
+\DoxyCodeLine{321             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a6beec229c26dadc133ad0514ed0898f7}{owner\_}};}
+\DoxyCodeLine{322         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a1796ccc4e6f0619ba90526e15a42242e}\label{classFoam_1_1geomModel_a1796ccc4e6f0619ba90526e15a42242e}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getOwner@{getOwner}}
+\index{getOwner@{getOwner}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getOwner()}{getOwner()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual label Foam\+::geom\+Model\+::get\+Owner (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_ae58e7d11ad6d14d8c090e77eddc50c6d}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1clusterBody_ae58e7d11ad6d14d8c090e77eddc50c6d}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1periodicBody_ac986b1b29da68eb89eb991e79a8a3d32}{Foam\+::periodic\+Body}}, and \mbox{\hyperlink{classFoam_1_1periodicBody_a3df7b0f90e66e4219cd2b4508cf76ca8}{Foam\+::periodic\+Body}}.
+
+
+
+Definition at line 319 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{320         \{}
+\DoxyCodeLine{321             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a6beec229c26dadc133ad0514ed0898f7}{owner\_}};}
+\DoxyCodeLine{322         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_adac6a242f418325a86bac3808e05b9b0}\label{classFoam_1_1geomModel_adac6a242f418325a86bac3808e05b9b0}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getPotentSurfCells@{getPotentSurfCells}}
+\index{getPotentSurfCells@{getPotentSurfCells}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getPotentSurfCells()}{getPotentSurfCells()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} Foam\+::geom\+Model\+::get\+Potent\+Surf\+Cells (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&}]{cell\+Inside,  }\item[{List$<$ label\+List $>$ \&}]{cell\+Points }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_ad70ce9fe3e452b1533ca8d3b2a7cfd91}\label{classFoam_1_1geomModel_ad70ce9fe3e452b1533ca8d3b2a7cfd91}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getPotentSurfCells@{getPotentSurfCells}}
+\index{getPotentSurfCells@{getPotentSurfCells}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getPotentSurfCells()}{getPotentSurfCells()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Dynamic\+List$<$ label $>$ geom\+Model\+::get\+Potent\+Surf\+Cells (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&}]{cell\+Inside,  }\item[{List$<$ label\+List $>$ \&}]{cell\+Points }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 174 of file geom\+Model.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{179 \{}
+\DoxyCodeLine{180     \textcolor{keyword}{const} labelList foundCells = cellInside.toc();}
+\DoxyCodeLine{181     \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{DynamicLabelList}} potentSurfCells(foundCells.size()/2);}
+\DoxyCodeLine{182     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(foundCells, cellI)}
+\DoxyCodeLine{183     \{}
+\DoxyCodeLine{184         label cCell = foundCells[cellI];}
+\DoxyCodeLine{185 }
+\DoxyCodeLine{186         \textcolor{keywordflow}{if}(cellInside[cCell])}
+\DoxyCodeLine{187         \{}
+\DoxyCodeLine{188             \textcolor{keyword}{const} labelList\& neigh = \mbox{\hyperlink{classFoam_1_1geomModel_a11167d3f48311fa265c662e4880d1de2}{cachedNeighbours\_}}()[cCell];}
+\DoxyCodeLine{189 }
+\DoxyCodeLine{190             \textcolor{keywordtype}{bool} anyOutside = \textcolor{keyword}{false};}
+\DoxyCodeLine{191             \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(neigh, neighI)}
+\DoxyCodeLine{192             \{}
+\DoxyCodeLine{193                 \textcolor{keywordflow}{if}(!cellInside[neigh[neighI]])}
+\DoxyCodeLine{194                 \{}
+\DoxyCodeLine{195                     anyOutside = \textcolor{keyword}{true};}
+\DoxyCodeLine{196                     \textcolor{keywordflow}{break};}
+\DoxyCodeLine{197                 \}}
+\DoxyCodeLine{198             \}}
+\DoxyCodeLine{199 }
+\DoxyCodeLine{200             \textcolor{keywordflow}{if}(anyOutside)}
+\DoxyCodeLine{201             \{}
+\DoxyCodeLine{202                 potentSurfCells.append(cCell);}
+\DoxyCodeLine{203             \}}
+\DoxyCodeLine{204             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{205             \{}
+\DoxyCodeLine{206                 \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}}[Pstream::myProcNo()].append(cCell);}
+\DoxyCodeLine{207                 \mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ibPartialVolume\_}}[Pstream::myProcNo()] += 1;}
+\DoxyCodeLine{208                 body[cCell] = 1.0;}
+\DoxyCodeLine{209             \}}
+\DoxyCodeLine{210         \}}
+\DoxyCodeLine{211         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{212         \{}
+\DoxyCodeLine{213             potentSurfCells.append(cCell);}
+\DoxyCodeLine{214         \}}
+\DoxyCodeLine{215     \}}
+\DoxyCodeLine{216     \textcolor{keywordflow}{return} potentSurfCells;}
+\DoxyCodeLine{217 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 11
+\mbox{\Hypertarget{classFoam_1_1geomModel_affb6ff5e0f0b8435f13da1b2e61c05fc}\label{classFoam_1_1geomModel_affb6ff5e0f0b8435f13da1b2e61c05fc}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getReferencedLists@{getReferencedLists}}
+\index{getReferencedLists@{getReferencedLists}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getReferencedLists()}{getReferencedLists()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::geom\+Model\+::get\+Referenced\+Lists (\begin{DoxyParamCaption}\item[{List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ \&}]{int\+Lists,  }\item[{List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ \&}]{surf\+Lists,  }\item[{\mbox{\hyperlink{classFoam_1_1geomModel_afef2012b13fe4bca42f3ca4f3fef43c9}{Dynamic\+Vector\+List}} \&}]{reference\+CoM }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_a9842e695082959dbab91d2c2fd7c4132}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1clusterBody_a9842e695082959dbab91d2c2fd7c4132}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1periodicBody_a44e877e183e974b673ace242a7a6db23}{Foam\+::periodic\+Body}}, and \mbox{\hyperlink{classFoam_1_1periodicBody_a95f4674344e0339219d4067e001c9f75}{Foam\+::periodic\+Body}}.
+
+
+
+Definition at line 163 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{168         \{}
+\DoxyCodeLine{169             intLists.resize(1, \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}}[Pstream::myProcNo()]);}
+\DoxyCodeLine{170             surfLists.resize(1, \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}[Pstream::myProcNo()]);}
+\DoxyCodeLine{171             referenceCoM.resize(1, \mbox{\hyperlink{classFoam_1_1geomModel_a17f5482e38b671fd424704393e4db210}{getCoM}}());}
+\DoxyCodeLine{172         \};}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_affb6ff5e0f0b8435f13da1b2e61c05fc}\label{classFoam_1_1geomModel_affb6ff5e0f0b8435f13da1b2e61c05fc}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getReferencedLists@{getReferencedLists}}
+\index{getReferencedLists@{getReferencedLists}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getReferencedLists()}{getReferencedLists()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::geom\+Model\+::get\+Referenced\+Lists (\begin{DoxyParamCaption}\item[{List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ \&}]{int\+Lists,  }\item[{List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ \&}]{surf\+Lists,  }\item[{\mbox{\hyperlink{classFoam_1_1geomModel_afef2012b13fe4bca42f3ca4f3fef43c9}{Dynamic\+Vector\+List}} \&}]{reference\+CoM }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_a9842e695082959dbab91d2c2fd7c4132}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1clusterBody_a9842e695082959dbab91d2c2fd7c4132}{Foam\+::cluster\+Body}}, \mbox{\hyperlink{classFoam_1_1periodicBody_a44e877e183e974b673ace242a7a6db23}{Foam\+::periodic\+Body}}, and \mbox{\hyperlink{classFoam_1_1periodicBody_a95f4674344e0339219d4067e001c9f75}{Foam\+::periodic\+Body}}.
+
+
+
+Definition at line 163 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{168         \{}
+\DoxyCodeLine{169             intLists.resize(1, \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}}[Pstream::myProcNo()]);}
+\DoxyCodeLine{170             surfLists.resize(1, \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}[Pstream::myProcNo()]);}
+\DoxyCodeLine{171             referenceCoM.resize(1, \mbox{\hyperlink{classFoam_1_1geomModel_a17f5482e38b671fd424704393e4db210}{getCoM}}());}
+\DoxyCodeLine{172         \};}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a229602a6b70a689ef42cf29ff4acf562}\label{classFoam_1_1geomModel_a229602a6b70a689ef42cf29ff4acf562}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getRhoS@{getRhoS}}
+\index{getRhoS@{getRhoS}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getRhoS()}{getRhoS()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily dimensioned\+Scalar Foam\+::geom\+Model\+::get\+RhoS (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 331 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{331 \{\textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rhoS\_}};\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a229602a6b70a689ef42cf29ff4acf562}\label{classFoam_1_1geomModel_a229602a6b70a689ef42cf29ff4acf562}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getRhoS@{getRhoS}}
+\index{getRhoS@{getRhoS}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getRhoS()}{getRhoS()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily dimensioned\+Scalar Foam\+::geom\+Model\+::get\+RhoS (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 331 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{331 \{\textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rhoS\_}};\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ac1f313551c2851a6e1768d14655f72a7}\label{classFoam_1_1geomModel_ac1f313551c2851a6e1768d14655f72a7}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getRhoS@{getRhoS}}
+\index{getRhoS@{getRhoS}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getRhoS()}{getRhoS()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily const dimensioned\+Scalar Foam\+::geom\+Model\+::get\+RhoS (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 366 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{367         \{}
+\DoxyCodeLine{368             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rhoS\_}};}
+\DoxyCodeLine{369         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ac1f313551c2851a6e1768d14655f72a7}\label{classFoam_1_1geomModel_ac1f313551c2851a6e1768d14655f72a7}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getRhoS@{getRhoS}}
+\index{getRhoS@{getRhoS}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getRhoS()}{getRhoS()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily const dimensioned\+Scalar Foam\+::geom\+Model\+::get\+RhoS (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 366 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{367         \{}
+\DoxyCodeLine{368             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rhoS\_}};}
+\DoxyCodeLine{369         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a21fdbb9bd4dbc303d044e9f27b0550b1}\label{classFoam_1_1geomModel_a21fdbb9bd4dbc303d044e9f27b0550b1}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getSTLBodyPoints@{getSTLBodyPoints}}
+\index{getSTLBodyPoints@{getSTLBodyPoints}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getSTLBodyPoints()}{getSTLBodyPoints()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual point\+Field Foam\+::geom\+Model\+::get\+S\+T\+L\+Body\+Points (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_ae7350280b736833df5544f4e53ee718d}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_ae7350280b736833df5544f4e53ee718d}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 414 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{415         \{}
+\DoxyCodeLine{416             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"18-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{417                 << \textcolor{stringliteral}{"not cluster model"}<<endl;}
+\DoxyCodeLine{418             pointField emptyField;}
+\DoxyCodeLine{419             \textcolor{keywordflow}{return} emptyField;}
+\DoxyCodeLine{420         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 12
+\mbox{\Hypertarget{classFoam_1_1geomModel_a21fdbb9bd4dbc303d044e9f27b0550b1}\label{classFoam_1_1geomModel_a21fdbb9bd4dbc303d044e9f27b0550b1}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getSTLBodyPoints@{getSTLBodyPoints}}
+\index{getSTLBodyPoints@{getSTLBodyPoints}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getSTLBodyPoints()}{getSTLBodyPoints()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual point\+Field Foam\+::geom\+Model\+::get\+S\+T\+L\+Body\+Points (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_ae7350280b736833df5544f4e53ee718d}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_ae7350280b736833df5544f4e53ee718d}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 414 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{415         \{}
+\DoxyCodeLine{416             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"18-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{417                 << \textcolor{stringliteral}{"not cluster model"}<<endl;}
+\DoxyCodeLine{418             pointField emptyField;}
+\DoxyCodeLine{419             \textcolor{keywordflow}{return} emptyField;}
+\DoxyCodeLine{420         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab73ae4069d204dc18f9dedfab029744e}\label{classFoam_1_1geomModel_ab73ae4069d204dc18f9dedfab029744e}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getSTLFacePoint@{getSTLFacePoint}}
+\index{getSTLFacePoint@{getSTLFacePoint}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getSTLFacePoint()}{getSTLFacePoint()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual point\+Field Foam\+::geom\+Model\+::get\+S\+T\+L\+Face\+Point (\begin{DoxyParamCaption}\item[{label}]{face\+ID }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_afef756b17a533816653d6aacc204e9c5}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_afef756b17a533816653d6aacc204e9c5}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 430 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{431         \{}
+\DoxyCodeLine{432             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"20-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{433                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{434             pointField nonPointField;}
+\DoxyCodeLine{435             \textcolor{keywordflow}{return} nonPointField;}
+\DoxyCodeLine{436         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab73ae4069d204dc18f9dedfab029744e}\label{classFoam_1_1geomModel_ab73ae4069d204dc18f9dedfab029744e}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getSTLFacePoint@{getSTLFacePoint}}
+\index{getSTLFacePoint@{getSTLFacePoint}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getSTLFacePoint()}{getSTLFacePoint()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual point\+Field Foam\+::geom\+Model\+::get\+S\+T\+L\+Face\+Point (\begin{DoxyParamCaption}\item[{label}]{face\+ID }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_afef756b17a533816653d6aacc204e9c5}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_afef756b17a533816653d6aacc204e9c5}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 430 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{431         \{}
+\DoxyCodeLine{432             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"20-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{433                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{434             pointField nonPointField;}
+\DoxyCodeLine{435             \textcolor{keywordflow}{return} nonPointField;}
+\DoxyCodeLine{436         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a79bdd5bab087e4be43e7ad0e7c2a64d9}\label{classFoam_1_1geomModel_a79bdd5bab087e4be43e7ad0e7c2a64d9}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getSTLFaces@{getSTLFaces}}
+\index{getSTLFaces@{getSTLFaces}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getSTLFaces()}{getSTLFaces()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual face\+List Foam\+::geom\+Model\+::get\+S\+T\+L\+Faces (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_a96f2f1725022225d7609cdeb2c1c96cb}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_a96f2f1725022225d7609cdeb2c1c96cb}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 422 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{423         \{}
+\DoxyCodeLine{424             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"19-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{425                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{426             faceList emptyList;}
+\DoxyCodeLine{427             \textcolor{keywordflow}{return} emptyList;}
+\DoxyCodeLine{428         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a79bdd5bab087e4be43e7ad0e7c2a64d9}\label{classFoam_1_1geomModel_a79bdd5bab087e4be43e7ad0e7c2a64d9}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getSTLFaces@{getSTLFaces}}
+\index{getSTLFaces@{getSTLFaces}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getSTLFaces()}{getSTLFaces()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual face\+List Foam\+::geom\+Model\+::get\+S\+T\+L\+Faces (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_a96f2f1725022225d7609cdeb2c1c96cb}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_a96f2f1725022225d7609cdeb2c1c96cb}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 422 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{423         \{}
+\DoxyCodeLine{424             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"19-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{425                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{426             faceList emptyList;}
+\DoxyCodeLine{427             \textcolor{keywordflow}{return} emptyList;}
+\DoxyCodeLine{428         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_aadb30406567a7931b05aae7827630988}\label{classFoam_1_1geomModel_aadb30406567a7931b05aae7827630988}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getSurfaceCellList@{getSurfaceCellList}}
+\index{getSurfaceCellList@{getSurfaceCellList}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getSurfaceCellList()}{getSurfaceCellList()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual List$<$\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}}$>$\& Foam\+::geom\+Model\+::get\+Surface\+Cell\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_a09de9c5ee58ee18c05907d45c0ad26c9}{Foam\+::cluster\+Body}}, and \mbox{\hyperlink{classFoam_1_1clusterBody_a09de9c5ee58ee18c05907d45c0ad26c9}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 158 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{159         \{}
+\DoxyCodeLine{160             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}};}
+\DoxyCodeLine{161         \};}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_aadb30406567a7931b05aae7827630988}\label{classFoam_1_1geomModel_aadb30406567a7931b05aae7827630988}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getSurfaceCellList@{getSurfaceCellList}}
+\index{getSurfaceCellList@{getSurfaceCellList}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getSurfaceCellList()}{getSurfaceCellList()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual List$<$\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}}$>$\& Foam\+::geom\+Model\+::get\+Surface\+Cell\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_a09de9c5ee58ee18c05907d45c0ad26c9}{Foam\+::cluster\+Body}}, and \mbox{\hyperlink{classFoam_1_1clusterBody_a09de9c5ee58ee18c05907d45c0ad26c9}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 158 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{159         \{}
+\DoxyCodeLine{160             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}};}
+\DoxyCodeLine{161         \};}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab177b3ff0fb1f3443ef7344b02f1a5c5}\label{classFoam_1_1geomModel_ab177b3ff0fb1f3443ef7344b02f1a5c5}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getVolumeType@{getVolumeType}}
+\index{getVolumeType@{getVolumeType}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getVolumeType()}{getVolumeType()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual volume\+Type Foam\+::geom\+Model\+::get\+Volume\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&}]{sv,  }\item[{bool}]{c\+Ib }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_a4b04aacec1e47cd9ddacf83ef98d9f2d}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_aa10bd5af88189f9d219a2e08ddd694a7}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 259 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{260         \{}
+\DoxyCodeLine{261             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"13-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{262                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{263             \textcolor{keywordflow}{return} volumeType::unknown;}
+\DoxyCodeLine{264         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab177b3ff0fb1f3443ef7344b02f1a5c5}\label{classFoam_1_1geomModel_ab177b3ff0fb1f3443ef7344b02f1a5c5}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!getVolumeType@{getVolumeType}}
+\index{getVolumeType@{getVolumeType}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{getVolumeType()}{getVolumeType()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual volume\+Type Foam\+::geom\+Model\+::get\+Volume\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&}]{sv,  }\item[{bool}]{c\+Ib }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_a4b04aacec1e47cd9ddacf83ef98d9f2d}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_aa10bd5af88189f9d219a2e08ddd694a7}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 259 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{260         \{}
+\DoxyCodeLine{261             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"13-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{262                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{263             \textcolor{keywordflow}{return} volumeType::unknown;}
+\DoxyCodeLine{264         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 13
+\mbox{\Hypertarget{classFoam_1_1geomModel_a5eafedc05ddd80d72bdfa9b3a51348ff}\label{classFoam_1_1geomModel_a5eafedc05ddd80d72bdfa9b3a51348ff}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!isBBoxInMesh@{isBBoxInMesh}}
+\index{isBBoxInMesh@{isBBoxInMesh}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{isBBoxInMesh()}{isBBoxInMesh()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Foam\+::geom\+Model\+::is\+B\+Box\+In\+Mesh (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_ae19a2a210bb56448efd7a13deb57d2de}\label{classFoam_1_1geomModel_ae19a2a210bb56448efd7a13deb57d2de}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!isBBoxInMesh@{isBBoxInMesh}}
+\index{isBBoxInMesh@{isBBoxInMesh}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{isBBoxInMesh()}{isBBoxInMesh()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool geom\+Model\+::is\+B\+Box\+In\+Mesh (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 155 of file geom\+Model.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{156 \{}
+\DoxyCodeLine{157     boundBox ibBound(\mbox{\hyperlink{classFoam_1_1geomModel_a3e96ac9daa9bf49715d933c93f1f817a}{getBounds}}());}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{159     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(\mbox{\hyperlink{namespaceFoam_a4dafe227f98b98cc477682efd8e86a41}{geometricD}},dir)}
+\DoxyCodeLine{160     \{}
+\DoxyCodeLine{161         \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespaceFoam_a4dafe227f98b98cc477682efd8e86a41}{geometricD}}[dir] == 1)}
+\DoxyCodeLine{162         \{}
+\DoxyCodeLine{163             \textcolor{keywordflow}{if}(!(\mbox{\hyperlink{classFoam_1_1geomModel_ac9646442904ddf5e6eeefbf6c640dc83}{curMeshBounds\_}}.max()[dir] >= ibBound.min()[dir]}
+\DoxyCodeLine{164                 \&\& \mbox{\hyperlink{classFoam_1_1geomModel_ac9646442904ddf5e6eeefbf6c640dc83}{curMeshBounds\_}}.min()[dir] <= ibBound.max()[dir]))}
+\DoxyCodeLine{165             \{}
+\DoxyCodeLine{166                 \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{167             \}}
+\DoxyCodeLine{168         \}}
+\DoxyCodeLine{169     \}}
+\DoxyCodeLine{170     \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{171 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 14
+\mbox{\Hypertarget{classFoam_1_1geomModel_a52273797dd78b8e0e679350270a436fd}\label{classFoam_1_1geomModel_a52273797dd78b8e0e679350270a436fd}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!isCluster@{isCluster}}
+\index{isCluster@{isCluster}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{isCluster()}{isCluster()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual bool Foam\+::geom\+Model\+::is\+Cluster (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_a31148673e1624bd4beb163feceb71ce4}{Foam\+::cluster\+Body}}, and \mbox{\hyperlink{classFoam_1_1clusterBody_a31148673e1624bd4beb163feceb71ce4}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 383 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{384         \{}
+\DoxyCodeLine{385             \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{386         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a52273797dd78b8e0e679350270a436fd}\label{classFoam_1_1geomModel_a52273797dd78b8e0e679350270a436fd}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!isCluster@{isCluster}}
+\index{isCluster@{isCluster}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{isCluster()}{isCluster()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual bool Foam\+::geom\+Model\+::is\+Cluster (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_a31148673e1624bd4beb163feceb71ce4}{Foam\+::cluster\+Body}}, and \mbox{\hyperlink{classFoam_1_1clusterBody_a31148673e1624bd4beb163feceb71ce4}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 383 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{384         \{}
+\DoxyCodeLine{385             \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{386         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 15
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab697fc599a50c583d12d5a0397cecbcd}\label{classFoam_1_1geomModel_ab697fc599a50c583d12d5a0397cecbcd}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!limitFinalSubVolume@{limitFinalSubVolume}}
+\index{limitFinalSubVolume@{limitFinalSubVolume}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{limitFinalSubVolume()}{limitFinalSubVolume()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual bool Foam\+::geom\+Model\+::limit\+Final\+Sub\+Volume (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&}]{sv,  }\item[{bool}]{c\+Ib,  }\item[{bound\+Box \&}]{lim\+B\+Box }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_aa49ed0e960396e3d3966db5be408b85e}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_a4333ff336de5409d9ac49f2018b975fa}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 284 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{289         \{}
+\DoxyCodeLine{290             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"15-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{291                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{292             \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{293         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 16
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab697fc599a50c583d12d5a0397cecbcd}\label{classFoam_1_1geomModel_ab697fc599a50c583d12d5a0397cecbcd}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!limitFinalSubVolume@{limitFinalSubVolume}}
+\index{limitFinalSubVolume@{limitFinalSubVolume}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{limitFinalSubVolume()}{limitFinalSubVolume()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual bool Foam\+::geom\+Model\+::limit\+Final\+Sub\+Volume (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&}]{sv,  }\item[{bool}]{c\+Ib,  }\item[{bound\+Box \&}]{lim\+B\+Box }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_aa49ed0e960396e3d3966db5be408b85e}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_a4333ff336de5409d9ac49f2018b975fa}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 284 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{289         \{}
+\DoxyCodeLine{290             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"15-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{291                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{292             \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{293         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a6922cc91b294545330333eeb4befbba9}\label{classFoam_1_1shapeBased_a6922cc91b294545330333eeb4befbba9}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!pointInside@{pointInside}}
+\index{pointInside@{pointInside}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{pointInside()}{pointInside()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily virtual bool Foam\+::shape\+Based\+::point\+Inside (\begin{DoxyParamCaption}\item[{point}]{pointI }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_af0414777a0565560f378ec980ad8781a}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a255db176c88d52392bf5fd522da45ab6}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a8ec7e97911147772bc712e2ef9258c6f}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 155 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{156         \{}
+\DoxyCodeLine{157             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{158                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{159             \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{160         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a6922cc91b294545330333eeb4befbba9}\label{classFoam_1_1shapeBased_a6922cc91b294545330333eeb4befbba9}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!pointInside@{pointInside}}
+\index{pointInside@{pointInside}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{pointInside()}{pointInside()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily virtual bool Foam\+::shape\+Based\+::point\+Inside (\begin{DoxyParamCaption}\item[{point}]{pointI }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_af0414777a0565560f378ec980ad8781a}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a255db176c88d52392bf5fd522da45ab6}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a8ec7e97911147772bc712e2ef9258c6f}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 155 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{156         \{}
+\DoxyCodeLine{157             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{158                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{159             \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{160         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a2e6b99970ff7d3cfced8ec5ba6a0ccfc}\label{classFoam_1_1shapeBased_a2e6b99970ff7d3cfced8ec5ba6a0ccfc}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!pointInside@{pointInside}}
+\index{pointInside@{pointInside}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{pointInside()}{pointInside()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily virtual bool\+List Foam\+::shape\+Based\+::point\+Inside (\begin{DoxyParamCaption}\item[{point\+Field}]{pointI }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a9f26fe62858c0b9da399f2c5823ea0a5}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a8162264ae726d65c89946afb511a49c5}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a98fa33054f081d2883c599ebac08db43}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 147 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{148         \{}
+\DoxyCodeLine{149             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{150                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{151             \textcolor{keywordflow}{return} \{\textcolor{keyword}{false}\};}
+\DoxyCodeLine{152         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a2e6b99970ff7d3cfced8ec5ba6a0ccfc}\label{classFoam_1_1shapeBased_a2e6b99970ff7d3cfced8ec5ba6a0ccfc}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!pointInside@{pointInside}}
+\index{pointInside@{pointInside}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{pointInside()}{pointInside()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily virtual bool\+List Foam\+::shape\+Based\+::point\+Inside (\begin{DoxyParamCaption}\item[{point\+Field}]{pointI }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a9f26fe62858c0b9da399f2c5823ea0a5}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a8162264ae726d65c89946afb511a49c5}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a98fa33054f081d2883c599ebac08db43}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 147 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{148         \{}
+\DoxyCodeLine{149             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{150                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{151             \textcolor{keywordflow}{return} \{\textcolor{keyword}{false}\};}
+\DoxyCodeLine{152         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a83d7fdac25cbf1d791d8a85de57146d1}\label{classFoam_1_1shapeBased_a83d7fdac25cbf1d791d8a85de57146d1}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!resetBody@{resetBody}}
+\index{resetBody@{resetBody}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{resetBody()}{resetBody()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::reset\+Body (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a6cda919dd59a8c7b1fbc012a7c8d58de}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a5d051933b6288e41013b742f400b3328}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a5d051933b6288e41013b742f400b3328}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 114 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{115         \{}
+\DoxyCodeLine{116             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{117                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{118         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a83d7fdac25cbf1d791d8a85de57146d1}\label{classFoam_1_1shapeBased_a83d7fdac25cbf1d791d8a85de57146d1}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!resetBody@{resetBody}}
+\index{resetBody@{resetBody}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{resetBody()}{resetBody()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::reset\+Body (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a6cda919dd59a8c7b1fbc012a7c8d58de}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a5d051933b6288e41013b742f400b3328}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a5d051933b6288e41013b742f400b3328}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 114 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{115         \{}
+\DoxyCodeLine{116             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{117                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{118         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a4e0b05c4c79a7155bd2d890cc1805ad2}\label{classFoam_1_1geomModel_a4e0b05c4c79a7155bd2d890cc1805ad2}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!resetBody@{resetBody}}
+\index{resetBody@{resetBody}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{resetBody()}{resetBody()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily void geom\+Model\+::reset\+Body (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1clusterBody_a0ac4f028dd85e3e490875ada874bc9c7}{Foam\+::cluster\+Body}}, and \mbox{\hyperlink{classFoam_1_1clusterBody_a4207fb37a3127a55f38b0dc965c82ca4}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 140 of file geom\+Model.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{141 \{}
+\DoxyCodeLine{142     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (\mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}}[Pstream::myProcNo()],cellI)}
+\DoxyCodeLine{143     \{}
+\DoxyCodeLine{144         body[\mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}}[Pstream::myProcNo()][cellI]] = 0;}
+\DoxyCodeLine{145     \}}
+\DoxyCodeLine{146     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (\mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}[Pstream::myProcNo()],cellI)}
+\DoxyCodeLine{147     \{}
+\DoxyCodeLine{148         body[\mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}[Pstream::myProcNo()][cellI]] = 0;}
+\DoxyCodeLine{149     \}}
+\DoxyCodeLine{150 }
+\DoxyCodeLine{151     \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}[Pstream::myProcNo()].clear();}
+\DoxyCodeLine{152     \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}}[Pstream::myProcNo()].clear();}
+\DoxyCodeLine{153     \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 17
+\mbox{\Hypertarget{classFoam_1_1geomModel_a3775030dc1986b062cb970ee223fefbc}\label{classFoam_1_1geomModel_a3775030dc1986b062cb970ee223fefbc}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!resetHashTable@{resetHashTable}}
+\index{resetHashTable@{resetHashTable}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{resetHashTable()}{resetHashTable()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::reset\+Hash\+Table (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 328 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{328 \{\mbox{\hyperlink{classFoam_1_1geomModel_a11167d3f48311fa265c662e4880d1de2}{cachedNeighbours\_}}.clear();\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a3775030dc1986b062cb970ee223fefbc}\label{classFoam_1_1geomModel_a3775030dc1986b062cb970ee223fefbc}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!resetHashTable@{resetHashTable}}
+\index{resetHashTable@{resetHashTable}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{resetHashTable()}{resetHashTable()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::reset\+Hash\+Table (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 328 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{328 \{\mbox{\hyperlink{classFoam_1_1geomModel_a11167d3f48311fa265c662e4880d1de2}{cachedNeighbours\_}}.clear();\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_af4c6359819520cca433396cdad9fa3bf}\label{classFoam_1_1shapeBased_af4c6359819520cca433396cdad9fa3bf}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!sampleSurfacePoints@{sampleSurfacePoints}}
+\index{sampleSurfacePoints@{sampleSurfacePoints}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{sampleSurfacePoints()}{sampleSurfacePoints()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual point\+Field Foam\+::shape\+Based\+::sample\+Surface\+Points (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a4e5f65dff62c37fbf25ca562974a259c}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a7f6a1b1be9c87579ef093b40ec4d3a84}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 174 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{175         \{}
+\DoxyCodeLine{176             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{177                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{178             pointField returnField;}
+\DoxyCodeLine{179             \textcolor{keywordflow}{return} returnField;}
+\DoxyCodeLine{180         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_af4c6359819520cca433396cdad9fa3bf}\label{classFoam_1_1shapeBased_af4c6359819520cca433396cdad9fa3bf}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!sampleSurfacePoints@{sampleSurfacePoints}}
+\index{sampleSurfacePoints@{sampleSurfacePoints}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{sampleSurfacePoints()}{sampleSurfacePoints()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual point\+Field Foam\+::shape\+Based\+::sample\+Surface\+Points (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a4e5f65dff62c37fbf25ca562974a259c}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a7f6a1b1be9c87579ef093b40ec4d3a84}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 174 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{175         \{}
+\DoxyCodeLine{176             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{177                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{178             pointField returnField;}
+\DoxyCodeLine{179             \textcolor{keywordflow}{return} returnField;}
+\DoxyCodeLine{180         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a32ca76641283bc6ea3318417d2654ade}\label{classFoam_1_1shapeBased_a32ca76641283bc6ea3318417d2654ade}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!setCoM@{setCoM}}
+\index{setCoM@{setCoM}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{setCoM()}{setCoM()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::set\+CoM (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a17bd0e3467c49d455a0791e05a569c7e}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a41c12cbbc0ec3b6e99041258efb160c9}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a41c12cbbc0ec3b6e99041258efb160c9}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 182 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{183         \{}
+\DoxyCodeLine{184             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{185                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{186         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a32ca76641283bc6ea3318417d2654ade}\label{classFoam_1_1shapeBased_a32ca76641283bc6ea3318417d2654ade}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!setCoM@{setCoM}}
+\index{setCoM@{setCoM}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{setCoM()}{setCoM()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::set\+CoM (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a17bd0e3467c49d455a0791e05a569c7e}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a41c12cbbc0ec3b6e99041258efb160c9}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a41c12cbbc0ec3b6e99041258efb160c9}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 182 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{183         \{}
+\DoxyCodeLine{184             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{185                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{186         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ad19f0d607ed84fec9e970babbdc65c69}\label{classFoam_1_1geomModel_ad19f0d607ed84fec9e970babbdc65c69}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!setIntSpan@{setIntSpan}}
+\index{setIntSpan@{setIntSpan}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{setIntSpan()}{setIntSpan()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::set\+Int\+Span (\begin{DoxyParamCaption}\item[{scalar}]{int\+Span }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 324 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{324 \{\mbox{\hyperlink{classFoam_1_1geomModel_a220b3e2c2a2e5dd60115dad2bff40a85}{intSpan\_}} = intSpan;\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ad19f0d607ed84fec9e970babbdc65c69}\label{classFoam_1_1geomModel_ad19f0d607ed84fec9e970babbdc65c69}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!setIntSpan@{setIntSpan}}
+\index{setIntSpan@{setIntSpan}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{setIntSpan()}{setIntSpan()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::set\+Int\+Span (\begin{DoxyParamCaption}\item[{scalar}]{int\+Span }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 324 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{324 \{\mbox{\hyperlink{classFoam_1_1geomModel_a220b3e2c2a2e5dd60115dad2bff40a85}{intSpan\_}} = intSpan;\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a190730c769a08da099c0b3e6431f8e49}\label{classFoam_1_1geomModel_a190730c769a08da099c0b3e6431f8e49}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!setM0@{setM0}}
+\index{setM0@{setM0}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{setM0()}{setM0()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::set\+M0 (\begin{DoxyParamCaption}\item[{scalar}]{M0 }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 351 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{352         \{}
+\DoxyCodeLine{353             \mbox{\hyperlink{classFoam_1_1geomModel_ab0cbe345c5e98c54e43e868a5b2f0f92}{M0\_}} = M0;}
+\DoxyCodeLine{354         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a190730c769a08da099c0b3e6431f8e49}\label{classFoam_1_1geomModel_a190730c769a08da099c0b3e6431f8e49}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!setM0@{setM0}}
+\index{setM0@{setM0}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{setM0()}{setM0()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::set\+M0 (\begin{DoxyParamCaption}\item[{scalar}]{M0 }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 351 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{352         \{}
+\DoxyCodeLine{353             \mbox{\hyperlink{classFoam_1_1geomModel_ab0cbe345c5e98c54e43e868a5b2f0f92}{M0\_}} = M0;}
+\DoxyCodeLine{354         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_aea6f262abe8aecc315fce91ccd253cdd}\label{classFoam_1_1geomModel_aea6f262abe8aecc315fce91ccd253cdd}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!setOwner@{setOwner}}
+\index{setOwner@{setOwner}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{setOwner()}{setOwner()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::geom\+Model\+::set\+Owner (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1periodicBody_ac0696cc1839d589fb0c6ca07bd662e7f}{Foam\+::periodic\+Body}}, and \mbox{\hyperlink{classFoam_1_1periodicBody_a5a0e674b6b9ddb72956cb64f8252918d}{Foam\+::periodic\+Body}}.
+
+
+
+Definition at line 304 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{305         \{}
+\DoxyCodeLine{306             Pstream::gatherList(\mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ibPartialVolume\_}}, 0);}
+\DoxyCodeLine{307             Pstream::scatter(\mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ibPartialVolume\_}}, 0);}
+\DoxyCodeLine{308             \textcolor{keywordflow}{for} (label i = 0; i < \mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ibPartialVolume\_}}.size(); i++)}
+\DoxyCodeLine{309             \{}
+\DoxyCodeLine{310                 \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ibPartialVolume\_}}[i] == max(\mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ibPartialVolume\_}}))}
+\DoxyCodeLine{311                 \{}
+\DoxyCodeLine{312                     \textcolor{comment}{//set owner of the IB which will move this IB}}
+\DoxyCodeLine{313                     \mbox{\hyperlink{classFoam_1_1geomModel_a6beec229c26dadc133ad0514ed0898f7}{owner\_}} = i;}
+\DoxyCodeLine{314                     \textcolor{keywordflow}{break};}
+\DoxyCodeLine{315                 \}}
+\DoxyCodeLine{316             \}}
+\DoxyCodeLine{317         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_aea6f262abe8aecc315fce91ccd253cdd}\label{classFoam_1_1geomModel_aea6f262abe8aecc315fce91ccd253cdd}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!setOwner@{setOwner}}
+\index{setOwner@{setOwner}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{setOwner()}{setOwner()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::geom\+Model\+::set\+Owner (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1periodicBody_ac0696cc1839d589fb0c6ca07bd662e7f}{Foam\+::periodic\+Body}}, and \mbox{\hyperlink{classFoam_1_1periodicBody_a5a0e674b6b9ddb72956cb64f8252918d}{Foam\+::periodic\+Body}}.
+
+
+
+Definition at line 304 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{305         \{}
+\DoxyCodeLine{306             Pstream::gatherList(\mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ibPartialVolume\_}}, 0);}
+\DoxyCodeLine{307             Pstream::scatter(\mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ibPartialVolume\_}}, 0);}
+\DoxyCodeLine{308             \textcolor{keywordflow}{for} (label i = 0; i < \mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ibPartialVolume\_}}.size(); i++)}
+\DoxyCodeLine{309             \{}
+\DoxyCodeLine{310                 \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ibPartialVolume\_}}[i] == max(\mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ibPartialVolume\_}}))}
+\DoxyCodeLine{311                 \{}
+\DoxyCodeLine{312                     \textcolor{comment}{//set owner of the IB which will move this IB}}
+\DoxyCodeLine{313                     \mbox{\hyperlink{classFoam_1_1geomModel_a6beec229c26dadc133ad0514ed0898f7}{owner\_}} = i;}
+\DoxyCodeLine{314                     \textcolor{keywordflow}{break};}
+\DoxyCodeLine{315                 \}}
+\DoxyCodeLine{316             \}}
+\DoxyCodeLine{317         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_abf9695a07f2526a7f82876f187064ddd}\label{classFoam_1_1geomModel_abf9695a07f2526a7f82876f187064ddd}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!setRhoS@{setRhoS}}
+\index{setRhoS@{setRhoS}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{setRhoS()}{setRhoS()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::geom\+Model\+::set\+RhoS (\begin{DoxyParamCaption}\item[{dimensioned\+Scalar}]{rhoS }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_ab0180d6c1180033b6c82eafac45f5a2d}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_ab0180d6c1180033b6c82eafac45f5a2d}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 330 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{330 \{\mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rhoS\_}} = rhoS;\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_abf9695a07f2526a7f82876f187064ddd}\label{classFoam_1_1geomModel_abf9695a07f2526a7f82876f187064ddd}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!setRhoS@{setRhoS}}
+\index{setRhoS@{setRhoS}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{setRhoS()}{setRhoS()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::geom\+Model\+::set\+RhoS (\begin{DoxyParamCaption}\item[{dimensioned\+Scalar}]{rhoS }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_ab0180d6c1180033b6c82eafac45f5a2d}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_ab0180d6c1180033b6c82eafac45f5a2d}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 330 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{330 \{\mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rhoS\_}} = rhoS;\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 18
+\mbox{\Hypertarget{classFoam_1_1geomModel_ae706c318abc2f5e3235079dc5e7ac589}\label{classFoam_1_1geomModel_ae706c318abc2f5e3235079dc5e7ac589}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!setSdBasedLambda@{setSdBasedLambda}}
+\index{setSdBasedLambda@{setSdBasedLambda}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{setSdBasedLambda()}{setSdBasedLambda()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::set\+Sd\+Based\+Lambda (\begin{DoxyParamCaption}\item[{bool}]{sd\+Based\+Lambda }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 326 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{326 \{\mbox{\hyperlink{classFoam_1_1geomModel_ae983de88f0feab99a34a6a6d1af8d744}{sdBasedLambda\_}} = sdBasedLambda;\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ae706c318abc2f5e3235079dc5e7ac589}\label{classFoam_1_1geomModel_ae706c318abc2f5e3235079dc5e7ac589}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!setSdBasedLambda@{setSdBasedLambda}}
+\index{setSdBasedLambda@{setSdBasedLambda}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{setSdBasedLambda()}{setSdBasedLambda()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::set\+Sd\+Based\+Lambda (\begin{DoxyParamCaption}\item[{bool}]{sd\+Based\+Lambda }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 326 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{326 \{\mbox{\hyperlink{classFoam_1_1geomModel_ae983de88f0feab99a34a6a6d1af8d744}{sdBasedLambda\_}} = sdBasedLambda;\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a637493c1022ef17515cf95ed80d06602}\label{classFoam_1_1shapeBased_a637493c1022ef17515cf95ed80d06602}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!synchronPos@{synchronPos}}
+\index{synchronPos@{synchronPos}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{synchronPos()}{synchronPos()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::synchron\+Pos (\begin{DoxyParamCaption}\item[{label}]{owner }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a8095734d9ef4a2f4589d4793693a9924}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_ab3f06feec28a7613d9f2ad9aa3356d05}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a9650eb19a86f23e82ae1f4b8a69bb3b3}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 135 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{136         \{}
+\DoxyCodeLine{137             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{138                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{139         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a637493c1022ef17515cf95ed80d06602}\label{classFoam_1_1shapeBased_a637493c1022ef17515cf95ed80d06602}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!synchronPos@{synchronPos}}
+\index{synchronPos@{synchronPos}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{synchronPos()}{synchronPos()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::synchron\+Pos (\begin{DoxyParamCaption}\item[{label}]{owner }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a8095734d9ef4a2f4589d4793693a9924}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_ab3f06feec28a7613d9f2ad9aa3356d05}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a9650eb19a86f23e82ae1f4b8a69bb3b3}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 135 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{136         \{}
+\DoxyCodeLine{137             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{138                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{139         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a36ec438fd6f025c45c0aa1e4e3ba7a28}\label{classFoam_1_1shapeBased_a36ec438fd6f025c45c0aa1e4e3ba7a28}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!writeBodyInfo@{writeBodyInfo}}
+\index{writeBodyInfo@{writeBodyInfo}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{writeBodyInfo()}{writeBodyInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::write\+Body\+Info (\begin{DoxyParamCaption}\item[{label}]{body\+Id,  }\item[{I\+Odictionary \&}]{dict,  }\item[{word}]{path }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a9448a21b9a7d1aa36463728d6ad525d0}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a59c4a07c1d0e312db9adc54854ca4073}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a59c4a07c1d0e312db9adc54854ca4073}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 141 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{142         \{}
+\DoxyCodeLine{143             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{144                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{145         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1shapeBased_a36ec438fd6f025c45c0aa1e4e3ba7a28}\label{classFoam_1_1shapeBased_a36ec438fd6f025c45c0aa1e4e3ba7a28}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!writeBodyInfo@{writeBodyInfo}}
+\index{writeBodyInfo@{writeBodyInfo}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{writeBodyInfo()}{writeBodyInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::shape\+Based\+::write\+Body\+Info (\begin{DoxyParamCaption}\item[{label}]{body\+Id,  }\item[{I\+Odictionary \&}]{dict,  }\item[{word}]{path }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a9448a21b9a7d1aa36463728d6ad525d0}{Foam\+::geom\+Model}}.
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a59c4a07c1d0e312db9adc54854ca4073}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_a59c4a07c1d0e312db9adc54854ca4073}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 141 of file shape\+Based.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{142         \{}
+\DoxyCodeLine{143             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"-\/-\/ shapeModelMessage-\/-\/ "}}
+\DoxyCodeLine{144                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{145         \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a393b0094bd325f353d7b9ca518da6c76}\label{classFoam_1_1geomModel_a393b0094bd325f353d7b9ca518da6c76}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!bBox\_@{bBox\_}}
+\index{bBox\_@{bBox\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{bBox\_}{bBox\_}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$ bound\+Box $>$ Foam\+::geom\+Model\+::b\+Box\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 124 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a11167d3f48311fa265c662e4880d1de2}\label{classFoam_1_1geomModel_a11167d3f48311fa265c662e4880d1de2}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!cachedNeighbours\_@{cachedNeighbours\_}}
+\index{cachedNeighbours\_@{cachedNeighbours\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{cachedNeighbours\_}{cachedNeighbours\_}}
+{\footnotesize\ttfamily auto\+Ptr$<$ Hash\+Table$<$ const label\+List \&, label, Hash$<$ label $>$ $>$ $>$ Foam\+::geom\+Model\+::cached\+Neighbours\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 110 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_afba8bac78aa8199c348d643fb6ab6606}\label{classFoam_1_1geomModel_afba8bac78aa8199c348d643fb6ab6606}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!cellToStartInCreateIB\_@{cellToStartInCreateIB\_}}
+\index{cellToStartInCreateIB\_@{cellToStartInCreateIB\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{cellToStartInCreateIB\_}{cellToStartInCreateIB\_}}
+{\footnotesize\ttfamily label Foam\+::geom\+Model\+::cell\+To\+Start\+In\+Create\+I\+B\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 104 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}\label{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!CoM\_@{CoM\_}}
+\index{CoM\_@{CoM\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{CoM\_}{CoM\_}}
+{\footnotesize\ttfamily vector Foam\+::geom\+Model\+::\+Co\+M\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 118 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_ad88bb1c51f58fe353e3899e175dca2b9}\label{classFoam_1_1geomModel_ad88bb1c51f58fe353e3899e175dca2b9}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!contactType\_@{contactType\_}}
+\index{contactType\_@{contactType\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{contactType\_}{contactType\_}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}} Foam\+::geom\+Model\+::contact\+Type\+\_\+\hspace{0.3cm}{\ttfamily [private]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 88 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_ac9646442904ddf5e6eeefbf6c640dc83}\label{classFoam_1_1geomModel_ac9646442904ddf5e6eeefbf6c640dc83}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!curMeshBounds\_@{curMeshBounds\_}}
+\index{curMeshBounds\_@{curMeshBounds\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{curMeshBounds\_}{curMeshBounds\_}}
+{\footnotesize\ttfamily bound\+Box Foam\+::geom\+Model\+::cur\+Mesh\+Bounds\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 109 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a5038a5a3ebb7cb4992c894387203bc4d}\label{classFoam_1_1geomModel_a5038a5a3ebb7cb4992c894387203bc4d}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!dC\_@{dC\_}}
+\index{dC\_@{dC\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{dC\_}{dC\_}}
+{\footnotesize\ttfamily scalar Foam\+::geom\+Model\+::d\+C\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 127 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}\label{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!I\_@{I\_}}
+\index{I\_@{I\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{I\_}{I\_}}
+{\footnotesize\ttfamily symm\+Tensor Foam\+::geom\+Model\+::\+I\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 121 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}\label{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!ibPartialVolume\_@{ibPartialVolume\_}}
+\index{ibPartialVolume\_@{ibPartialVolume\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{ibPartialVolume\_}{ibPartialVolume\_}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} Foam\+::geom\+Model\+::ib\+Partial\+Volume\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 101 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}\label{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!intCells\_@{intCells\_}}
+\index{intCells\_@{intCells\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{intCells\_}{intCells\_}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ Foam\+::geom\+Model\+::int\+Cells\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 98 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a220b3e2c2a2e5dd60115dad2bff40a85}\label{classFoam_1_1geomModel_a220b3e2c2a2e5dd60115dad2bff40a85}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!intSpan\_@{intSpan\_}}
+\index{intSpan\_@{intSpan\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{intSpan\_}{intSpan\_}}
+{\footnotesize\ttfamily scalar Foam\+::geom\+Model\+::int\+Span\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 107 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab0cbe345c5e98c54e43e868a5b2f0f92}\label{classFoam_1_1geomModel_ab0cbe345c5e98c54e43e868a5b2f0f92}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!M0\_@{M0\_}}
+\index{M0\_@{M0\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{M0\_}{M0\_}}
+{\footnotesize\ttfamily scalar Foam\+::geom\+Model\+::\+M0\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 114 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}\label{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!M\_@{M\_}}
+\index{M\_@{M\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{M\_}{M\_}}
+{\footnotesize\ttfamily scalar Foam\+::geom\+Model\+::\+M\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 113 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}\label{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!mesh\_@{mesh\_}}
+\index{mesh\_@{mesh\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{mesh\_}{mesh\_}}
+{\footnotesize\ttfamily const fv\+Mesh \& Foam\+::geom\+Model\+::mesh\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 92 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a164a9b5ae11beefcf8af797f331e2b1e}\label{classFoam_1_1geomModel_a164a9b5ae11beefcf8af797f331e2b1e}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!nCells\_@{nCells\_}}
+\index{nCells\_@{nCells\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{nCells\_}{nCells\_}}
+{\footnotesize\ttfamily label Foam\+::geom\+Model\+::n\+Cells\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 115 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a6beec229c26dadc133ad0514ed0898f7}\label{classFoam_1_1geomModel_a6beec229c26dadc133ad0514ed0898f7}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!owner\_@{owner\_}}
+\index{owner\_@{owner\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{owner\_}{owner\_}}
+{\footnotesize\ttfamily label Foam\+::geom\+Model\+::owner\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 102 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}\label{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!rhoS\_@{rhoS\_}}
+\index{rhoS\_@{rhoS\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{rhoS\_}{rhoS\_}}
+{\footnotesize\ttfamily dimensioned\+Scalar Foam\+::geom\+Model\+::rho\+S\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 130 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_ae983de88f0feab99a34a6a6d1af8d744}\label{classFoam_1_1geomModel_ae983de88f0feab99a34a6a6d1af8d744}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!sdBasedLambda\_@{sdBasedLambda\_}}
+\index{sdBasedLambda\_@{sdBasedLambda\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{sdBasedLambda\_}{sdBasedLambda\_}}
+{\footnotesize\ttfamily bool Foam\+::geom\+Model\+::sd\+Based\+Lambda\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 108 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}\label{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!surfCells\_@{surfCells\_}}
+\index{surfCells\_@{surfCells\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{surfCells\_}{surfCells\_}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} $>$ Foam\+::geom\+Model\+::surf\+Cells\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 95 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_aec695437242a0c3e79ddd50ea51478dd}\label{classFoam_1_1geomModel_aec695437242a0c3e79ddd50ea51478dd}} 
+\index{Foam::shapeBased@{Foam::shapeBased}!thrSurf\_@{thrSurf\_}}
+\index{thrSurf\_@{thrSurf\_}!Foam::shapeBased@{Foam::shapeBased}}
+\doxysubsubsection{\texorpdfstring{thrSurf\_}{thrSurf\_}}
+{\footnotesize\ttfamily scalar Foam\+::geom\+Model\+::thr\+Surf\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 105 of file geom\+Model.\+H.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/geom\+Models/shape\+Based/\mbox{\hyperlink{geomModels_2shapeBased_2shapeBased_8H}{shape\+Based.\+H}}\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/geom\+Models/shape\+Based/\mbox{\hyperlink{geomModels_2shapeBased_2shapeBased_8C}{shape\+Based.\+C}}\end{DoxyCompactItemize}

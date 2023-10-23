@@ -1,0 +1,203 @@
+\hypertarget{addModels_2initializeAddModels_8H}{}\doxysection{src/\+H\+F\+D\+I\+B\+D\+E\+M/add\+Models/initialize\+Add\+Models.H File Reference}
+\label{addModels_2initializeAddModels_8H}\index{src/HFDIBDEM/addModels/initializeAddModels.H@{src/HFDIBDEM/addModels/initializeAddModels.H}}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+scalar \mbox{\hyperlink{addModels_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}{thr\+Surf}} (read\+Scalar(H\+F\+D\+I\+B\+D\+E\+M\+Dict\+\_\+.\+lookup(\char`\"{}surface\+Threshold\char`\"{})))
+\item 
+\mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{for\+All}} (body\+Names\+\_\+, nameI)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}\label{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}} 
+\index{initializeAddModels.H@{initializeAddModels.H}!forAll@{forAll}}
+\index{forAll@{forAll}!initializeAddModels.H@{initializeAddModels.H}}
+\doxysubsubsection{\texorpdfstring{forAll()}{forAll()}}
+{\footnotesize\ttfamily for\+All (\begin{DoxyParamCaption}\item[{body\+Names\+\_\+}]{,  }\item[{nameI}]{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 5 of file initialize\+Add\+Models.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{6     \{}
+\DoxyCodeLine{7         word bodyName(bodyNames\_[nameI]);}
+\DoxyCodeLine{8         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{9             << \textcolor{stringliteral}{"Creating addition model for body: "} << bodyName << endl;}
+\DoxyCodeLine{10 }
+\DoxyCodeLine{11         \textcolor{comment}{// initialize the addition models}}
+\DoxyCodeLine{12         dictionary addModelDict(HFDIBDEMDict\_.subDict(bodyName).subDict(\textcolor{stringliteral}{"bodyAddition"}));}
+\DoxyCodeLine{13         word howToAdd(word(addModelDict.lookup(\textcolor{stringliteral}{"addModel"})));}
+\DoxyCodeLine{14         word bodyGeom;}
+\DoxyCodeLine{15         std::unique\_ptr<geomModel> bodyGeomModel;}
+\DoxyCodeLine{16         \textcolor{comment}{// check if the immersedDict\_ contains bodyGeom}}
+\DoxyCodeLine{17         \textcolor{keywordflow}{if} (HFDIBDEMDict\_.subDict(bodyName).found(\textcolor{stringliteral}{"bodyGeom"}))}
+\DoxyCodeLine{18         \{}
+\DoxyCodeLine{19             word input = HFDIBDEMDict\_.subDict(bodyName).lookup(\textcolor{stringliteral}{"bodyGeom"});}
+\DoxyCodeLine{20             bodyGeom = input;}
+\DoxyCodeLine{21             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"Found bodyGeom for "} << bodyName}
+\DoxyCodeLine{22                 << \textcolor{stringliteral}{", the body is: "} << bodyGeom << endl;}
+\DoxyCodeLine{23         \}}
+\DoxyCodeLine{24         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{25         \{}
+\DoxyCodeLine{26             bodyGeom = \textcolor{stringliteral}{"convex"};}
+\DoxyCodeLine{27             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"Did not find bodyGeom for "}}
+\DoxyCodeLine{28                 << bodyName << \textcolor{stringliteral}{", using bodyGeom: "} << bodyGeom << endl;}
+\DoxyCodeLine{29         \}}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31         \textcolor{keywordflow}{if}(bodyGeom == \textcolor{stringliteral}{"convex"})}
+\DoxyCodeLine{32         \{}
+\DoxyCodeLine{33             word stlPath(\textcolor{stringliteral}{"constant/triSurface/"}+bodyName+\textcolor{stringliteral}{".stl"});}
+\DoxyCodeLine{34             bodyGeomModel = std::unique\_ptr<convexBody>(}
+\DoxyCodeLine{35                 \textcolor{keyword}{new} convexBody(mesh\_,stlPath,\mbox{\hyperlink{addModels_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}{thrSurf}}));}
+\DoxyCodeLine{36         \}}
+\DoxyCodeLine{37         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(bodyGeom == \textcolor{stringliteral}{"nonConvex"})}
+\DoxyCodeLine{38         \{}
+\DoxyCodeLine{39             word stlPath(\textcolor{stringliteral}{"constant/triSurface/"}+bodyName+\textcolor{stringliteral}{".stl"});}
+\DoxyCodeLine{40             bodyGeomModel = std::unique\_ptr<nonConvexBody>(}
+\DoxyCodeLine{41                 \textcolor{keyword}{new} nonConvexBody(mesh\_,stlPath,\mbox{\hyperlink{addModels_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}{thrSurf}}));}
+\DoxyCodeLine{42         \}}
+\DoxyCodeLine{43         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(bodyGeom == \textcolor{stringliteral}{"sphere"})}
+\DoxyCodeLine{44         \{}
+\DoxyCodeLine{45             vector startPosition = HFDIBDEMDict\_.subDict(bodyName).subDict(\textcolor{stringliteral}{"sphere"}).lookup(\textcolor{stringliteral}{"startPosition"});}
+\DoxyCodeLine{46             scalar radius = readScalar(HFDIBDEMDict\_.subDict(bodyName).subDict(\textcolor{stringliteral}{"sphere"}).lookup(\textcolor{stringliteral}{"radius"}));}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48             bodyGeomModel = std::unique\_ptr<sphereBody>(}
+\DoxyCodeLine{49                 \textcolor{keyword}{new} sphereBody(mesh\_,startPosition,radius,\mbox{\hyperlink{addModels_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}{thrSurf}}));}
+\DoxyCodeLine{50         \}}
+\DoxyCodeLine{51         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{52         \{}
+\DoxyCodeLine{53             word stlPath(\textcolor{stringliteral}{"constant/triSurface/"}+bodyName+\textcolor{stringliteral}{".stl"});}
+\DoxyCodeLine{54             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"bodyGeom: "} << bodyGeom}
+\DoxyCodeLine{55                 << \textcolor{stringliteral}{" not supported, using bodyGeom nonConvex"} << endl;}
+\DoxyCodeLine{56             bodyGeom = \textcolor{stringliteral}{"nonConvex"};}
+\DoxyCodeLine{57             bodyGeomModel = std::unique\_ptr<nonConvexBody>(}
+\DoxyCodeLine{58                 \textcolor{keyword}{new} nonConvexBody(mesh\_,stlPath,\mbox{\hyperlink{addModels_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}{thrSurf}}));}
+\DoxyCodeLine{59         \}}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{62             << \textcolor{stringliteral}{"trying to set addModel: "} << howToAdd << endl;}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64         \textcolor{keywordflow}{if} (howToAdd == \textcolor{stringliteral}{"once"})}
+\DoxyCodeLine{65         \{}
+\DoxyCodeLine{66             addModels\_.set}
+\DoxyCodeLine{67             (}
+\DoxyCodeLine{68                 nameI,}
+\DoxyCodeLine{69                 \textcolor{keyword}{new} addModelOnce}
+\DoxyCodeLine{70                 (}
+\DoxyCodeLine{71                     addModelDict,}
+\DoxyCodeLine{72                     mesh\_,}
+\DoxyCodeLine{73                     startTime0,}
+\DoxyCodeLine{74                     std::move(bodyGeomModel),}
+\DoxyCodeLine{75                     cellPoints\_}
+\DoxyCodeLine{76                 )}
+\DoxyCodeLine{77             );}
+\DoxyCodeLine{78         \}}
+\DoxyCodeLine{79         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (howToAdd == \textcolor{stringliteral}{"onceFromFile"})}
+\DoxyCodeLine{80         \{}
+\DoxyCodeLine{81             addModels\_.set}
+\DoxyCodeLine{82             (}
+\DoxyCodeLine{83                 nameI,}
+\DoxyCodeLine{84                 \textcolor{keyword}{new} addModelOnceFromFile}
+\DoxyCodeLine{85                 (}
+\DoxyCodeLine{86                     addModelDict,}
+\DoxyCodeLine{87                     mesh\_,}
+\DoxyCodeLine{88                     startTime0,}
+\DoxyCodeLine{89                     std::move(bodyGeomModel),}
+\DoxyCodeLine{90                     cellPoints\_,}
+\DoxyCodeLine{91                     bodyGeom,}
+\DoxyCodeLine{92                     \mbox{\hyperlink{addModels_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}{thrSurf}}}
+\DoxyCodeLine{93                 )}
+\DoxyCodeLine{94             );}
+\DoxyCodeLine{95         \}}
+\DoxyCodeLine{96         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (howToAdd == \textcolor{stringliteral}{"onceScatter"})}
+\DoxyCodeLine{97         \{}
+\DoxyCodeLine{98             addModels\_.set}
+\DoxyCodeLine{99             (}
+\DoxyCodeLine{100                 nameI,}
+\DoxyCodeLine{101                 \textcolor{keyword}{new} addModelOnceScatter}
+\DoxyCodeLine{102                 (}
+\DoxyCodeLine{103                     addModelDict,}
+\DoxyCodeLine{104                     mesh\_,}
+\DoxyCodeLine{105                     startTime0,}
+\DoxyCodeLine{106                     std::move(bodyGeomModel),}
+\DoxyCodeLine{107                     cellPoints\_}
+\DoxyCodeLine{108                 )}
+\DoxyCodeLine{109             );}
+\DoxyCodeLine{110         \}}
+\DoxyCodeLine{111         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (howToAdd == \textcolor{stringliteral}{"repeatSamePosition"})}
+\DoxyCodeLine{112         \{}
+\DoxyCodeLine{113             addModels\_.set}
+\DoxyCodeLine{114             (}
+\DoxyCodeLine{115                 nameI,}
+\DoxyCodeLine{116                 \textcolor{keyword}{new} addModelRepeatSamePosition}
+\DoxyCodeLine{117                 (}
+\DoxyCodeLine{118                     addModelDict,}
+\DoxyCodeLine{119                     mesh\_,}
+\DoxyCodeLine{120                     std::move(bodyGeomModel),}
+\DoxyCodeLine{121                     cellPoints\_}
+\DoxyCodeLine{122                 )}
+\DoxyCodeLine{123             );}
+\DoxyCodeLine{124         \}}
+\DoxyCodeLine{125         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (howToAdd == \textcolor{stringliteral}{"repeatRandomPosition"})}
+\DoxyCodeLine{126         \{}
+\DoxyCodeLine{127             addModels\_.set}
+\DoxyCodeLine{128             (}
+\DoxyCodeLine{129                 nameI,}
+\DoxyCodeLine{130                 \textcolor{keyword}{new} addModelRepeatRandomPosition}
+\DoxyCodeLine{131                 (}
+\DoxyCodeLine{132                     addModelDict,}
+\DoxyCodeLine{133                     mesh\_,}
+\DoxyCodeLine{134                     std::move(bodyGeomModel),}
+\DoxyCodeLine{135                     cellPoints\_}
+\DoxyCodeLine{136                 )}
+\DoxyCodeLine{137             );}
+\DoxyCodeLine{138         \}}
+\DoxyCodeLine{139         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (howToAdd == \textcolor{stringliteral}{"distribution"})}
+\DoxyCodeLine{140         \{}
+\DoxyCodeLine{141             addModels\_.set}
+\DoxyCodeLine{142             (}
+\DoxyCodeLine{143                 nameI,}
+\DoxyCodeLine{144                 \textcolor{keyword}{new} addModelDistribution}
+\DoxyCodeLine{145                 (}
+\DoxyCodeLine{146                     addModelDict,}
+\DoxyCodeLine{147                     mesh\_,}
+\DoxyCodeLine{148                     std::move(bodyGeomModel),}
+\DoxyCodeLine{149                     cellPoints\_}
+\DoxyCodeLine{150                 )}
+\DoxyCodeLine{151             );}
+\DoxyCodeLine{152         \}}
+\DoxyCodeLine{153         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{154         \{}
+\DoxyCodeLine{155             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{156                 << \textcolor{stringliteral}{"No addition model specified, defaulting to addModelOnce"}}
+\DoxyCodeLine{157                 << endl;}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{159             addModels\_.set}
+\DoxyCodeLine{160             (}
+\DoxyCodeLine{161                 nameI,}
+\DoxyCodeLine{162                 \textcolor{keyword}{new} addModelOnce}
+\DoxyCodeLine{163                 (}
+\DoxyCodeLine{164                     addModelDict,}
+\DoxyCodeLine{165                     mesh\_,}
+\DoxyCodeLine{166                     startTime0,}
+\DoxyCodeLine{167                     std::move(bodyGeomModel),}
+\DoxyCodeLine{168                     cellPoints\_}
+\DoxyCodeLine{169                 )}
+\DoxyCodeLine{170             );}
+\DoxyCodeLine{171         \}}
+\DoxyCodeLine{172     \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 0
+\mbox{\Hypertarget{addModels_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}\label{addModels_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}} 
+\index{initializeAddModels.H@{initializeAddModels.H}!thrSurf@{thrSurf}}
+\index{thrSurf@{thrSurf}!initializeAddModels.H@{initializeAddModels.H}}
+\doxysubsubsection{\texorpdfstring{thrSurf()}{thrSurf()}}
+{\footnotesize\ttfamily scalar thr\+Surf (\begin{DoxyParamCaption}\item[{read\+Scalar(H\+F\+D\+I\+B\+D\+E\+M\+Dict\+\_\+.\+lookup(\char`\"{}surface\+Threshold\char`\"{}))}]{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+% FIG 1

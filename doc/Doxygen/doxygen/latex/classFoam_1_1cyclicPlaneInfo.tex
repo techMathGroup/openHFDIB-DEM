@@ -1,0 +1,223 @@
+\hypertarget{classFoam_1_1cyclicPlaneInfo}{}\doxysection{Foam\+::cyclic\+Plane\+Info Class Reference}
+\label{classFoam_1_1cyclicPlaneInfo}\index{Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}}
+
+
+{\ttfamily \#include $<$cyclic\+Plane\+Info.\+H$>$}
+
+
+
+Collaboration diagram for Foam\+::cyclic\+Plane\+Info\+:
+% FIG 0
+\doxysubsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static const Hash\+Table$<$ List$<$ vector $>$, string, Hash$<$ string $>$ $>$ \& \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a87a61ffb221e710cd0f7612db5bda725}{get\+Cyclic\+Plane\+Info}} ()
+\item 
+static const vector \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a034f17a8a1070ec2dd53051388f6ef69}{get\+Cyclic\+Trans\+Vec}} (const string \&cyclic\+Patch)
+\item 
+static void \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_ae4ab4fbca401fb44f2cd23f91fa726db}{insert}} (const string \&cyclic\+Patch, const vector \&patch\+N\+Vec, const vector \&plane\+Point, const string \&cyclic\+Patch\+Neighbour)
+\item 
+static const Hash\+Table$<$ List$<$ vector $>$, string, Hash$<$ string $>$ $>$ \& \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a87a61ffb221e710cd0f7612db5bda725}{get\+Cyclic\+Plane\+Info}} ()
+\item 
+static const vector \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a034f17a8a1070ec2dd53051388f6ef69}{get\+Cyclic\+Trans\+Vec}} (const string \&cyclic\+Patch)
+\item 
+static void \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_ae4ab4fbca401fb44f2cd23f91fa726db}{insert}} (const string \&cyclic\+Patch, const vector \&patch\+N\+Vec, const vector \&plane\+Point, const string \&cyclic\+Patch\+Neighbour)
+\end{DoxyCompactItemize}
+\doxysubsection*{Static Public Attributes}
+\begin{DoxyCompactItemize}
+\item 
+static Hash\+Table$<$ List$<$ vector $>$, string, Hash$<$ string $>$ $>$ \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}{cyclic\+Plane\+Info\+\_\+}}
+\item 
+static std\+::map$<$ string, string $>$ \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a4c2bfacc5521e1990e0b42d8a709de29}{cyclic\+Patch\+Pairs\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 51 of file cyclic\+Plane\+Info.\+H.
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classFoam_1_1cyclicPlaneInfo_a87a61ffb221e710cd0f7612db5bda725}\label{classFoam_1_1cyclicPlaneInfo_a87a61ffb221e710cd0f7612db5bda725}} 
+\index{Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}!getCyclicPlaneInfo@{getCyclicPlaneInfo}}
+\index{getCyclicPlaneInfo@{getCyclicPlaneInfo}!Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}}
+\doxysubsubsection{\texorpdfstring{getCyclicPlaneInfo()}{getCyclicPlaneInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily static const Hash\+Table$<$List$<$vector$>$,string,Hash$<$string$>$ $>$\& Foam\+::cyclic\+Plane\+Info\+::get\+Cyclic\+Plane\+Info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line 55 of file cyclic\+Plane\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{56     \{}
+\DoxyCodeLine{57         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}{cyclicPlaneInfo\_}};}
+\DoxyCodeLine{58     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 1
+\mbox{\Hypertarget{classFoam_1_1cyclicPlaneInfo_a87a61ffb221e710cd0f7612db5bda725}\label{classFoam_1_1cyclicPlaneInfo_a87a61ffb221e710cd0f7612db5bda725}} 
+\index{Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}!getCyclicPlaneInfo@{getCyclicPlaneInfo}}
+\index{getCyclicPlaneInfo@{getCyclicPlaneInfo}!Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}}
+\doxysubsubsection{\texorpdfstring{getCyclicPlaneInfo()}{getCyclicPlaneInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily static const Hash\+Table$<$List$<$vector$>$,string,Hash$<$string$>$ $>$\& Foam\+::cyclic\+Plane\+Info\+::get\+Cyclic\+Plane\+Info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line 55 of file cyclic\+Plane\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{56     \{}
+\DoxyCodeLine{57         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}{cyclicPlaneInfo\_}};}
+\DoxyCodeLine{58     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1cyclicPlaneInfo_a034f17a8a1070ec2dd53051388f6ef69}\label{classFoam_1_1cyclicPlaneInfo_a034f17a8a1070ec2dd53051388f6ef69}} 
+\index{Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}!getCyclicTransVec@{getCyclicTransVec}}
+\index{getCyclicTransVec@{getCyclicTransVec}!Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}}
+\doxysubsubsection{\texorpdfstring{getCyclicTransVec()}{getCyclicTransVec()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily static const vector Foam\+::cyclic\+Plane\+Info\+::get\+Cyclic\+Trans\+Vec (\begin{DoxyParamCaption}\item[{const string \&}]{cyclic\+Patch }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line 60 of file cyclic\+Plane\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{61     \{}
+\DoxyCodeLine{62         \textcolor{keyword}{const} \textcolor{keywordtype}{string}\& cyclicPatchNeighbour = \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a4c2bfacc5521e1990e0b42d8a709de29}{cyclicPatchPairs\_}}[cyclicPatch];}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64         vector transVec = \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}{cyclicPlaneInfo\_}}[cyclicPatchNeighbour][1] -\/ \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}{cyclicPlaneInfo\_}}[cyclicPatch][1];}
+\DoxyCodeLine{65 }
+\DoxyCodeLine{66         Info << \textcolor{stringliteral}{"transVec1: "} << transVec << endl;}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68         transVec = \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}{cyclicPlaneInfo\_}}[cyclicPatch][0] * (transVec \& \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}{cyclicPlaneInfo\_}}[cyclicPatch][0]);}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70         Info << \textcolor{stringliteral}{"transVec2: "} << transVec << endl;}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72         \textcolor{keywordflow}{return} transVec;}
+\DoxyCodeLine{73     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1cyclicPlaneInfo_a034f17a8a1070ec2dd53051388f6ef69}\label{classFoam_1_1cyclicPlaneInfo_a034f17a8a1070ec2dd53051388f6ef69}} 
+\index{Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}!getCyclicTransVec@{getCyclicTransVec}}
+\index{getCyclicTransVec@{getCyclicTransVec}!Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}}
+\doxysubsubsection{\texorpdfstring{getCyclicTransVec()}{getCyclicTransVec()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily static const vector Foam\+::cyclic\+Plane\+Info\+::get\+Cyclic\+Trans\+Vec (\begin{DoxyParamCaption}\item[{const string \&}]{cyclic\+Patch }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line 60 of file cyclic\+Plane\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{61     \{}
+\DoxyCodeLine{62         \textcolor{keyword}{const} \textcolor{keywordtype}{string}\& cyclicPatchNeighbour = \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a4c2bfacc5521e1990e0b42d8a709de29}{cyclicPatchPairs\_}}[cyclicPatch];}
+\DoxyCodeLine{63 }
+\DoxyCodeLine{64         vector transVec = \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}{cyclicPlaneInfo\_}}[cyclicPatchNeighbour][1] -\/ \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}{cyclicPlaneInfo\_}}[cyclicPatch][1];}
+\DoxyCodeLine{65 }
+\DoxyCodeLine{66         Info << \textcolor{stringliteral}{"transVec1: "} << transVec << endl;}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68         transVec = \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}{cyclicPlaneInfo\_}}[cyclicPatch][0] * (transVec \& \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}{cyclicPlaneInfo\_}}[cyclicPatch][0]);}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70         Info << \textcolor{stringliteral}{"transVec2: "} << transVec << endl;}
+\DoxyCodeLine{71 }
+\DoxyCodeLine{72         \textcolor{keywordflow}{return} transVec;}
+\DoxyCodeLine{73     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 2
+\mbox{\Hypertarget{classFoam_1_1cyclicPlaneInfo_ae4ab4fbca401fb44f2cd23f91fa726db}\label{classFoam_1_1cyclicPlaneInfo_ae4ab4fbca401fb44f2cd23f91fa726db}} 
+\index{Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}!insert@{insert}}
+\index{insert@{insert}!Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}}
+\doxysubsubsection{\texorpdfstring{insert()}{insert()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily static void Foam\+::cyclic\+Plane\+Info\+::insert (\begin{DoxyParamCaption}\item[{const string \&}]{cyclic\+Patch,  }\item[{const vector \&}]{patch\+N\+Vec,  }\item[{const vector \&}]{plane\+Point,  }\item[{const string \&}]{cyclic\+Patch\+Neighbour }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line 76 of file cyclic\+Plane\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{82     \{}
+\DoxyCodeLine{83         List<vector> planeInfo\{\{patchNVec / mag(patchNVec),planePoint\}\};}
+\DoxyCodeLine{84         \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}{cyclicPlaneInfo\_}}.insert(cyclicPatch,planeInfo);}
+\DoxyCodeLine{85 }
+\DoxyCodeLine{86         \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a4c2bfacc5521e1990e0b42d8a709de29}{cyclicPatchPairs\_}}.find(cyclicPatch) == \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a4c2bfacc5521e1990e0b42d8a709de29}{cyclicPatchPairs\_}}.end())}
+\DoxyCodeLine{87         \{}
+\DoxyCodeLine{88             \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a4c2bfacc5521e1990e0b42d8a709de29}{cyclicPatchPairs\_}}.insert(std::pair<string,string>(cyclicPatch,cyclicPatchNeighbour));}
+\DoxyCodeLine{89         \}}
+\DoxyCodeLine{90     \};}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 3
+\mbox{\Hypertarget{classFoam_1_1cyclicPlaneInfo_ae4ab4fbca401fb44f2cd23f91fa726db}\label{classFoam_1_1cyclicPlaneInfo_ae4ab4fbca401fb44f2cd23f91fa726db}} 
+\index{Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}!insert@{insert}}
+\index{insert@{insert}!Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}}
+\doxysubsubsection{\texorpdfstring{insert()}{insert()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily static void Foam\+::cyclic\+Plane\+Info\+::insert (\begin{DoxyParamCaption}\item[{const string \&}]{cyclic\+Patch,  }\item[{const vector \&}]{patch\+N\+Vec,  }\item[{const vector \&}]{plane\+Point,  }\item[{const string \&}]{cyclic\+Patch\+Neighbour }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [static]}}
+
+
+
+Definition at line 76 of file cyclic\+Plane\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{82     \{}
+\DoxyCodeLine{83         List<vector> planeInfo\{\{patchNVec / mag(patchNVec),planePoint\}\};}
+\DoxyCodeLine{84         \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}{cyclicPlaneInfo\_}}.insert(cyclicPatch,planeInfo);}
+\DoxyCodeLine{85 }
+\DoxyCodeLine{86         \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a4c2bfacc5521e1990e0b42d8a709de29}{cyclicPatchPairs\_}}.find(cyclicPatch) == \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a4c2bfacc5521e1990e0b42d8a709de29}{cyclicPatchPairs\_}}.end())}
+\DoxyCodeLine{87         \{}
+\DoxyCodeLine{88             \mbox{\hyperlink{classFoam_1_1cyclicPlaneInfo_a4c2bfacc5521e1990e0b42d8a709de29}{cyclicPatchPairs\_}}.insert(std::pair<string,string>(cyclicPatch,cyclicPatchNeighbour));}
+\DoxyCodeLine{89         \}}
+\DoxyCodeLine{90     \};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{classFoam_1_1cyclicPlaneInfo_a4c2bfacc5521e1990e0b42d8a709de29}\label{classFoam_1_1cyclicPlaneInfo_a4c2bfacc5521e1990e0b42d8a709de29}} 
+\index{Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}!cyclicPatchPairs\_@{cyclicPatchPairs\_}}
+\index{cyclicPatchPairs\_@{cyclicPatchPairs\_}!Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}}
+\doxysubsubsection{\texorpdfstring{cyclicPatchPairs\_}{cyclicPatchPairs\_}}
+{\footnotesize\ttfamily std\+::map$<$ string, string $>$ Foam\+::cyclic\+Plane\+Info\+::cyclic\+Patch\+Pairs\+\_\+\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{    std::map<string, string>()}
+
+\end{DoxyCode}
+
+
+Definition at line 94 of file cyclic\+Plane\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}\label{classFoam_1_1cyclicPlaneInfo_a8f41a30872d48b11248827f0cba3aaa4}} 
+\index{Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}!cyclicPlaneInfo\_@{cyclicPlaneInfo\_}}
+\index{cyclicPlaneInfo\_@{cyclicPlaneInfo\_}!Foam::cyclicPlaneInfo@{Foam::cyclicPlaneInfo}}
+\doxysubsubsection{\texorpdfstring{cyclicPlaneInfo\_}{cyclicPlaneInfo\_}}
+{\footnotesize\ttfamily Hash\+Table$<$ List$<$ vector $>$, string, Hash$<$ string $>$ $>$ Foam\+::cyclic\+Plane\+Info\+::cyclic\+Plane\+Info\+\_\+\hspace{0.3cm}{\ttfamily [static]}}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{=}
+\DoxyCodeLine{    HashTable<List<vector>,string,Hash<string>>()}
+
+\end{DoxyCode}
+
+
+Definition at line 90 of file cyclic\+Plane\+Info.\+H.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/ln\+Include/\mbox{\hyperlink{lnInclude_2cyclicPlaneInfo_8H}{cyclic\+Plane\+Info.\+H}}\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/ln\+Include/\mbox{\hyperlink{lnInclude_2parameters_8H}{parameters.\+H}}\end{DoxyCompactItemize}

@@ -1,0 +1,30 @@
+digraph "Foam::virtualMesh::detectFirstContactPoint"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="Foam::virtualMesh::\ldetectFirstContactPoint",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid"];
+  Node2 [label="Foam::virtualMesh::\ldetectFirstVolumeInContact",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1virtualMesh.html#a0f7f62ab08aea15f43f265fa5a9d60ba",tooltip=" "];
+  Node2 -> Node3 [color="midnightblue",fontsize="10",style="solid"];
+  Node3 [label="Foam::subVolume::childSub\lVolumes",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1subVolume.html#a7d5a37765ab19e606f30a29c53ecb4c6",tooltip=" "];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
+  Node4 [label="Foam::subVolume::parentSV",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1subVolume.html#add59543c709c38accaa892effd8551fb",tooltip=" "];
+  Node2 -> Node5 [color="midnightblue",fontsize="10",style="solid"];
+  Node5 [label="Foam::subVolume::cVolumeInfo",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1subVolume.html#a8c23e8432056b3a8e31bee18a462d6f2",tooltip=" "];
+  Node2 -> Node6 [color="midnightblue",fontsize="10",style="solid"];
+  Node6 [label="forAll",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$addModels_2initializeAddModels_8H.html#adcd69a620b2d93c893cbf0e92bb7c5d7",tooltip=" "];
+  Node6 -> Node7 [color="midnightblue",fontsize="10",style="solid"];
+  Node7 [label="thrSurf",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$addModels_2initializeAddModels_8H.html#a12947c9cf4cff46d3d0a324e3e718f45",tooltip=" "];
+  Node2 -> Node8 [color="midnightblue",fontsize="10",style="solid"];
+  Node8 [label="Foam::virtualMeshInfo\l::getStartingPoint",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structFoam_1_1virtualMeshInfo.html#a1cc1db4f0ab27675c826cd5158b5e5be",tooltip=" "];
+  Node2 -> Node9 [color="midnightblue",fontsize="10",style="solid"];
+  Node9 [label="Foam::geomModel::getVolumeType",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1geomModel.html#ab177b3ff0fb1f3443ef7344b02f1a5c5",tooltip=" "];
+  Node2 -> Node10 [color="midnightblue",fontsize="10",style="solid"];
+  Node10 [label="Foam::geomModel::limitFinal\lSubVolume",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1geomModel.html#ab697fc599a50c583d12d5a0397cecbcd",tooltip=" "];
+  Node2 -> Node11 [color="midnightblue",fontsize="10",style="solid"];
+  Node11 [label="Foam::subVolume::tVolumeInfo",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1subVolume.html#afb452a6f36fa797ed63f1ccdfd4532f9",tooltip=" "];
+  Node1 -> Node12 [color="midnightblue",fontsize="10",style="solid"];
+  Node12 [label="Foam::virtualMeshInfo\l::getSubVolume",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structFoam_1_1virtualMeshInfo.html#afcfe37715251da66a52189630a4ce75c",tooltip=" "];
+}

@@ -1,0 +1,595 @@
+\hypertarget{classFoam_1_1materialInfo}{}\doxysection{Foam\+::material\+Info Class Reference}
+\label{classFoam_1_1materialInfo}\index{Foam::materialInfo@{Foam::materialInfo}}
+
+
+{\ttfamily \#include $<$material\+Info.\+H$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classFoam_1_1materialInfo_a9008b2a9d32503d51f322c46e65d9178}{material\+Info}} (string \mbox{\hyperlink{lnInclude_2initializeIB_8H_a636af450f3ee8ba2a5bb1adcd5cf8348}{material}}, scalar Y, scalar nu, scalar gamma, scalar mu, scalar adhN, scalar eps)
+\item 
+\mbox{\hyperlink{classFoam_1_1materialInfo_a9a029d569023dbe6cac911adff14dfad}{material\+Info}} (const \mbox{\hyperlink{classFoam_1_1materialInfo}{material\+Info}} \&mi)
+\item 
+\mbox{\hyperlink{classFoam_1_1materialInfo_af5c9f88ac2642f524c333ee86f3e6a5c}{$\sim$material\+Info}} ()
+\item 
+const string \& \mbox{\hyperlink{classFoam_1_1materialInfo_af4ad397d31f9fbfa3f1740d921c7364c}{get\+Material}} () const
+\item 
+const scalar \& \mbox{\hyperlink{classFoam_1_1materialInfo_ac5a08c04149d57be061719adc2791b55}{getY}} () const
+\item 
+const scalar \& \mbox{\hyperlink{classFoam_1_1materialInfo_af9767d1b9fd507bfaaa66526e4dccbc7}{get\+Nu}} () const
+\item 
+const scalar \& \mbox{\hyperlink{classFoam_1_1materialInfo_a502b6b0be6f3d3e617de8462daf5d615}{get\+Gamma}} () const
+\item 
+const scalar \& \mbox{\hyperlink{classFoam_1_1materialInfo_a2e57fb67d78d2917e2a09b1ebd613633}{get\+Mu}} () const
+\item 
+const scalar \& \mbox{\hyperlink{classFoam_1_1materialInfo_ad1d957f78d4309faf87d8c846f27ea15}{get\+AdhN}} () const
+\item 
+const scalar \& \mbox{\hyperlink{classFoam_1_1materialInfo_a483e009d2fc807adc2df8c39a1ffdd1c}{get\+Eps}} () const
+\item 
+\mbox{\hyperlink{classFoam_1_1materialInfo_a3ac8e77240fb9e80b13b441a2b84b545}{material\+Info}} (string \mbox{\hyperlink{lnInclude_2initializeIB_8H_a636af450f3ee8ba2a5bb1adcd5cf8348}{material}}, scalar Y, scalar nu, scalar gamma, scalar mu, scalar adhN, scalar eps)
+\item 
+\mbox{\hyperlink{classFoam_1_1materialInfo_a3adf7580ab9053b5a84dbdee928c528d}{material\+Info}} (const \mbox{\hyperlink{classFoam_1_1materialInfo}{material\+Info}} \&mi)
+\item 
+\mbox{\hyperlink{classFoam_1_1materialInfo_a5a9e978d79427c910552647ef21754ef}{$\sim$material\+Info}} ()
+\item 
+const string \& \mbox{\hyperlink{classFoam_1_1materialInfo_af4ad397d31f9fbfa3f1740d921c7364c}{get\+Material}} () const
+\item 
+const scalar \& \mbox{\hyperlink{classFoam_1_1materialInfo_ac5a08c04149d57be061719adc2791b55}{getY}} () const
+\item 
+const scalar \& \mbox{\hyperlink{classFoam_1_1materialInfo_af9767d1b9fd507bfaaa66526e4dccbc7}{get\+Nu}} () const
+\item 
+const scalar \& \mbox{\hyperlink{classFoam_1_1materialInfo_a502b6b0be6f3d3e617de8462daf5d615}{get\+Gamma}} () const
+\item 
+const scalar \& \mbox{\hyperlink{classFoam_1_1materialInfo_a2e57fb67d78d2917e2a09b1ebd613633}{get\+Mu}} () const
+\item 
+const scalar \& \mbox{\hyperlink{classFoam_1_1materialInfo_ad1d957f78d4309faf87d8c846f27ea15}{get\+AdhN}} () const
+\item 
+const scalar \& \mbox{\hyperlink{classFoam_1_1materialInfo_a483e009d2fc807adc2df8c39a1ffdd1c}{get\+Eps}} () const
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+string \mbox{\hyperlink{classFoam_1_1materialInfo_aa02b55a7b76a513f2c2467381d8c99a9}{material\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1materialInfo_a8a00f4d039042842e184818bd9e442d6}{Y\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1materialInfo_a005a0d45ddbe84cc1fb61e6477967e47}{nu\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1materialInfo_a8636f48add1411841910368781ad201d}{gamma\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1materialInfo_a16863264954a97dd081712ab0af5cae1}{mu\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1materialInfo_a03bef8619556abea13817913aff04ba1}{adh\+N\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1materialInfo_a7a5f2205f6902d75d56e2179123919a7}{eps\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1materialInfo_a0dc51dc4d9ddde32b07e0f2a55722b23}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1materialInfo_aa61d1b22c5ad910d83f1d09452ba51d4}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1materialInfo_a242740b94eefc9077340949dc6358196}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1materialInfo_ac7fe07f8c64e30535e981deba570aaa5}{Dynamic\+Point\+List}}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1materialInfo_a0dc51dc4d9ddde32b07e0f2a55722b23}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1materialInfo_aa61d1b22c5ad910d83f1d09452ba51d4}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1materialInfo_a242740b94eefc9077340949dc6358196}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1materialInfo_ac7fe07f8c64e30535e981deba570aaa5}{Dynamic\+Point\+List}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 54 of file material\+Info.\+H.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a0dc51dc4d9ddde32b07e0f2a55722b23}\label{classFoam_1_1materialInfo_a0dc51dc4d9ddde32b07e0f2a55722b23}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1materialInfo_a0dc51dc4d9ddde32b07e0f2a55722b23}{Foam\+::material\+Info\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 58 of file material\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a0dc51dc4d9ddde32b07e0f2a55722b23}\label{classFoam_1_1materialInfo_a0dc51dc4d9ddde32b07e0f2a55722b23}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1materialInfo_a0dc51dc4d9ddde32b07e0f2a55722b23}{Foam\+::material\+Info\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 58 of file material\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_ac7fe07f8c64e30535e981deba570aaa5}\label{classFoam_1_1materialInfo_ac7fe07f8c64e30535e981deba570aaa5}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1materialInfo_ac7fe07f8c64e30535e981deba570aaa5}{Foam\+::material\+Info\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 61 of file material\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_ac7fe07f8c64e30535e981deba570aaa5}\label{classFoam_1_1materialInfo_ac7fe07f8c64e30535e981deba570aaa5}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1materialInfo_ac7fe07f8c64e30535e981deba570aaa5}{Foam\+::material\+Info\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 61 of file material\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_aa61d1b22c5ad910d83f1d09452ba51d4}\label{classFoam_1_1materialInfo_aa61d1b22c5ad910d83f1d09452ba51d4}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1materialInfo_aa61d1b22c5ad910d83f1d09452ba51d4}{Foam\+::material\+Info\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 59 of file material\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_aa61d1b22c5ad910d83f1d09452ba51d4}\label{classFoam_1_1materialInfo_aa61d1b22c5ad910d83f1d09452ba51d4}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1materialInfo_aa61d1b22c5ad910d83f1d09452ba51d4}{Foam\+::material\+Info\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 59 of file material\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a242740b94eefc9077340949dc6358196}\label{classFoam_1_1materialInfo_a242740b94eefc9077340949dc6358196}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1materialInfo_a242740b94eefc9077340949dc6358196}{Foam\+::material\+Info\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 60 of file material\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a242740b94eefc9077340949dc6358196}\label{classFoam_1_1materialInfo_a242740b94eefc9077340949dc6358196}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1materialInfo_a242740b94eefc9077340949dc6358196}{Foam\+::material\+Info\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 60 of file material\+Info.\+H.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a9008b2a9d32503d51f322c46e65d9178}\label{classFoam_1_1materialInfo_a9008b2a9d32503d51f322c46e65d9178}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!materialInfo@{materialInfo}}
+\index{materialInfo@{materialInfo}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{materialInfo()}{materialInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily material\+Info\+::material\+Info (\begin{DoxyParamCaption}\item[{string}]{material,  }\item[{scalar}]{Y,  }\item[{scalar}]{nu,  }\item[{scalar}]{gamma,  }\item[{scalar}]{mu,  }\item[{scalar}]{adhN,  }\item[{scalar}]{eps }\end{DoxyParamCaption})}
+
+
+
+Definition at line 38 of file material\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{47 :}
+\DoxyCodeLine{48 \mbox{\hyperlink{classFoam_1_1materialInfo_aa02b55a7b76a513f2c2467381d8c99a9}{material\_}}(\mbox{\hyperlink{initializeIB_8H_a636af450f3ee8ba2a5bb1adcd5cf8348}{material}}),}
+\DoxyCodeLine{49 \mbox{\hyperlink{classFoam_1_1materialInfo_a8a00f4d039042842e184818bd9e442d6}{Y\_}}(Y),}
+\DoxyCodeLine{50 \mbox{\hyperlink{classFoam_1_1materialInfo_a005a0d45ddbe84cc1fb61e6477967e47}{nu\_}}(nu),}
+\DoxyCodeLine{51 \mbox{\hyperlink{classFoam_1_1materialInfo_a8636f48add1411841910368781ad201d}{gamma\_}}(gamma),}
+\DoxyCodeLine{52 \mbox{\hyperlink{classFoam_1_1materialInfo_a16863264954a97dd081712ab0af5cae1}{mu\_}}(mu),}
+\DoxyCodeLine{53 \mbox{\hyperlink{classFoam_1_1materialInfo_a03bef8619556abea13817913aff04ba1}{adhN\_}}(adhN),}
+\DoxyCodeLine{54 \mbox{\hyperlink{classFoam_1_1materialInfo_a7a5f2205f6902d75d56e2179123919a7}{eps\_}}(eps)}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56 \{}
+\DoxyCodeLine{57 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a9a029d569023dbe6cac911adff14dfad}\label{classFoam_1_1materialInfo_a9a029d569023dbe6cac911adff14dfad}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!materialInfo@{materialInfo}}
+\index{materialInfo@{materialInfo}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{materialInfo()}{materialInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily material\+Info\+::material\+Info (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classFoam_1_1materialInfo}{material\+Info}} \&}]{mi }\end{DoxyParamCaption})}
+
+
+
+Definition at line 59 of file material\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{60 :}
+\DoxyCodeLine{61 \mbox{\hyperlink{classFoam_1_1materialInfo_aa02b55a7b76a513f2c2467381d8c99a9}{material\_}}(mi.\mbox{\hyperlink{classFoam_1_1materialInfo_aa02b55a7b76a513f2c2467381d8c99a9}{material\_}}),}
+\DoxyCodeLine{62 \mbox{\hyperlink{classFoam_1_1materialInfo_a8a00f4d039042842e184818bd9e442d6}{Y\_}}(mi.\mbox{\hyperlink{classFoam_1_1materialInfo_a8a00f4d039042842e184818bd9e442d6}{Y\_}}),}
+\DoxyCodeLine{63 \mbox{\hyperlink{classFoam_1_1materialInfo_a005a0d45ddbe84cc1fb61e6477967e47}{nu\_}}(mi.\mbox{\hyperlink{classFoam_1_1materialInfo_a005a0d45ddbe84cc1fb61e6477967e47}{nu\_}}),}
+\DoxyCodeLine{64 \mbox{\hyperlink{classFoam_1_1materialInfo_a8636f48add1411841910368781ad201d}{gamma\_}}(mi.\mbox{\hyperlink{classFoam_1_1materialInfo_a8636f48add1411841910368781ad201d}{gamma\_}}),}
+\DoxyCodeLine{65 \mbox{\hyperlink{classFoam_1_1materialInfo_a16863264954a97dd081712ab0af5cae1}{mu\_}}(mi.\mbox{\hyperlink{classFoam_1_1materialInfo_a16863264954a97dd081712ab0af5cae1}{mu\_}}),}
+\DoxyCodeLine{66 \mbox{\hyperlink{classFoam_1_1materialInfo_a03bef8619556abea13817913aff04ba1}{adhN\_}}(mi.\mbox{\hyperlink{classFoam_1_1materialInfo_a03bef8619556abea13817913aff04ba1}{adhN\_}}),}
+\DoxyCodeLine{67 \mbox{\hyperlink{classFoam_1_1materialInfo_a7a5f2205f6902d75d56e2179123919a7}{eps\_}}(mi.\mbox{\hyperlink{classFoam_1_1materialInfo_a7a5f2205f6902d75d56e2179123919a7}{eps\_}})}
+\DoxyCodeLine{68 \{}
+\DoxyCodeLine{69 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1materialInfo_af5c9f88ac2642f524c333ee86f3e6a5c}\label{classFoam_1_1materialInfo_af5c9f88ac2642f524c333ee86f3e6a5c}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!````~materialInfo@{$\sim$materialInfo}}
+\index{````~materialInfo@{$\sim$materialInfo}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{$\sim$materialInfo()}{~materialInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily material\+Info\+::$\sim$material\+Info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 71 of file material\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{72 \{}
+\DoxyCodeLine{73 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a3ac8e77240fb9e80b13b441a2b84b545}\label{classFoam_1_1materialInfo_a3ac8e77240fb9e80b13b441a2b84b545}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!materialInfo@{materialInfo}}
+\index{materialInfo@{materialInfo}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{materialInfo()}{materialInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily Foam\+::material\+Info\+::material\+Info (\begin{DoxyParamCaption}\item[{string}]{material,  }\item[{scalar}]{Y,  }\item[{scalar}]{nu,  }\item[{scalar}]{gamma,  }\item[{scalar}]{mu,  }\item[{scalar}]{adhN,  }\item[{scalar}]{eps }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a3adf7580ab9053b5a84dbdee928c528d}\label{classFoam_1_1materialInfo_a3adf7580ab9053b5a84dbdee928c528d}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!materialInfo@{materialInfo}}
+\index{materialInfo@{materialInfo}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{materialInfo()}{materialInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily Foam\+::material\+Info\+::material\+Info (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classFoam_1_1materialInfo}{material\+Info}} \&}]{mi }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a5a9e978d79427c910552647ef21754ef}\label{classFoam_1_1materialInfo_a5a9e978d79427c910552647ef21754ef}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!````~materialInfo@{$\sim$materialInfo}}
+\index{````~materialInfo@{$\sim$materialInfo}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{$\sim$materialInfo()}{~materialInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::material\+Info\+::$\sim$material\+Info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classFoam_1_1materialInfo_ad1d957f78d4309faf87d8c846f27ea15}\label{classFoam_1_1materialInfo_ad1d957f78d4309faf87d8c846f27ea15}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!getAdhN@{getAdhN}}
+\index{getAdhN@{getAdhN}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{getAdhN()}{getAdhN()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily const scalar\& Foam\+::material\+Info\+::get\+AdhN (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 132 of file material\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{133     \{}
+\DoxyCodeLine{134         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1materialInfo_a03bef8619556abea13817913aff04ba1}{adhN\_}};}
+\DoxyCodeLine{135     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 0
+\mbox{\Hypertarget{classFoam_1_1materialInfo_ad1d957f78d4309faf87d8c846f27ea15}\label{classFoam_1_1materialInfo_ad1d957f78d4309faf87d8c846f27ea15}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!getAdhN@{getAdhN}}
+\index{getAdhN@{getAdhN}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{getAdhN()}{getAdhN()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily const scalar\& Foam\+::material\+Info\+::get\+AdhN (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 132 of file material\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{133     \{}
+\DoxyCodeLine{134         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1materialInfo_a03bef8619556abea13817913aff04ba1}{adhN\_}};}
+\DoxyCodeLine{135     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a483e009d2fc807adc2df8c39a1ffdd1c}\label{classFoam_1_1materialInfo_a483e009d2fc807adc2df8c39a1ffdd1c}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!getEps@{getEps}}
+\index{getEps@{getEps}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{getEps()}{getEps()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily const scalar\& Foam\+::material\+Info\+::get\+Eps (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 137 of file material\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{138     \{}
+\DoxyCodeLine{139         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1materialInfo_a7a5f2205f6902d75d56e2179123919a7}{eps\_}};}
+\DoxyCodeLine{140     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 1
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a483e009d2fc807adc2df8c39a1ffdd1c}\label{classFoam_1_1materialInfo_a483e009d2fc807adc2df8c39a1ffdd1c}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!getEps@{getEps}}
+\index{getEps@{getEps}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{getEps()}{getEps()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily const scalar\& Foam\+::material\+Info\+::get\+Eps (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 137 of file material\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{138     \{}
+\DoxyCodeLine{139         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1materialInfo_a7a5f2205f6902d75d56e2179123919a7}{eps\_}};}
+\DoxyCodeLine{140     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a502b6b0be6f3d3e617de8462daf5d615}\label{classFoam_1_1materialInfo_a502b6b0be6f3d3e617de8462daf5d615}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!getGamma@{getGamma}}
+\index{getGamma@{getGamma}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{getGamma()}{getGamma()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily const scalar\& Foam\+::material\+Info\+::get\+Gamma (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 122 of file material\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{123     \{}
+\DoxyCodeLine{124         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1materialInfo_a8636f48add1411841910368781ad201d}{gamma\_}};}
+\DoxyCodeLine{125     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a502b6b0be6f3d3e617de8462daf5d615}\label{classFoam_1_1materialInfo_a502b6b0be6f3d3e617de8462daf5d615}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!getGamma@{getGamma}}
+\index{getGamma@{getGamma}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{getGamma()}{getGamma()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily const scalar\& Foam\+::material\+Info\+::get\+Gamma (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 122 of file material\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{123     \{}
+\DoxyCodeLine{124         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1materialInfo_a8636f48add1411841910368781ad201d}{gamma\_}};}
+\DoxyCodeLine{125     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 2
+\mbox{\Hypertarget{classFoam_1_1materialInfo_af4ad397d31f9fbfa3f1740d921c7364c}\label{classFoam_1_1materialInfo_af4ad397d31f9fbfa3f1740d921c7364c}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!getMaterial@{getMaterial}}
+\index{getMaterial@{getMaterial}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{getMaterial()}{getMaterial()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily const string\& Foam\+::material\+Info\+::get\+Material (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 107 of file material\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{108     \{}
+\DoxyCodeLine{109         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1materialInfo_aa02b55a7b76a513f2c2467381d8c99a9}{material\_}};}
+\DoxyCodeLine{110     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1materialInfo_af4ad397d31f9fbfa3f1740d921c7364c}\label{classFoam_1_1materialInfo_af4ad397d31f9fbfa3f1740d921c7364c}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!getMaterial@{getMaterial}}
+\index{getMaterial@{getMaterial}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{getMaterial()}{getMaterial()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily const string\& Foam\+::material\+Info\+::get\+Material (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 107 of file material\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{108     \{}
+\DoxyCodeLine{109         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1materialInfo_aa02b55a7b76a513f2c2467381d8c99a9}{material\_}};}
+\DoxyCodeLine{110     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 3
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a2e57fb67d78d2917e2a09b1ebd613633}\label{classFoam_1_1materialInfo_a2e57fb67d78d2917e2a09b1ebd613633}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!getMu@{getMu}}
+\index{getMu@{getMu}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{getMu()}{getMu()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily const scalar\& Foam\+::material\+Info\+::get\+Mu (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 127 of file material\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{128     \{}
+\DoxyCodeLine{129         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1materialInfo_a16863264954a97dd081712ab0af5cae1}{mu\_}};}
+\DoxyCodeLine{130     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 4
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a2e57fb67d78d2917e2a09b1ebd613633}\label{classFoam_1_1materialInfo_a2e57fb67d78d2917e2a09b1ebd613633}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!getMu@{getMu}}
+\index{getMu@{getMu}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{getMu()}{getMu()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily const scalar\& Foam\+::material\+Info\+::get\+Mu (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 127 of file material\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{128     \{}
+\DoxyCodeLine{129         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1materialInfo_a16863264954a97dd081712ab0af5cae1}{mu\_}};}
+\DoxyCodeLine{130     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1materialInfo_af9767d1b9fd507bfaaa66526e4dccbc7}\label{classFoam_1_1materialInfo_af9767d1b9fd507bfaaa66526e4dccbc7}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!getNu@{getNu}}
+\index{getNu@{getNu}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{getNu()}{getNu()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily const scalar\& Foam\+::material\+Info\+::get\+Nu (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 117 of file material\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{118     \{}
+\DoxyCodeLine{119         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1materialInfo_a005a0d45ddbe84cc1fb61e6477967e47}{nu\_}};}
+\DoxyCodeLine{120     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1materialInfo_af9767d1b9fd507bfaaa66526e4dccbc7}\label{classFoam_1_1materialInfo_af9767d1b9fd507bfaaa66526e4dccbc7}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!getNu@{getNu}}
+\index{getNu@{getNu}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{getNu()}{getNu()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily const scalar\& Foam\+::material\+Info\+::get\+Nu (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 117 of file material\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{118     \{}
+\DoxyCodeLine{119         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1materialInfo_a005a0d45ddbe84cc1fb61e6477967e47}{nu\_}};}
+\DoxyCodeLine{120     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 5
+\mbox{\Hypertarget{classFoam_1_1materialInfo_ac5a08c04149d57be061719adc2791b55}\label{classFoam_1_1materialInfo_ac5a08c04149d57be061719adc2791b55}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!getY@{getY}}
+\index{getY@{getY}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{getY()}{getY()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily const scalar\& Foam\+::material\+Info\+::getY (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 112 of file material\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{113     \{}
+\DoxyCodeLine{114         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1materialInfo_a8a00f4d039042842e184818bd9e442d6}{Y\_}};}
+\DoxyCodeLine{115     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 6
+\mbox{\Hypertarget{classFoam_1_1materialInfo_ac5a08c04149d57be061719adc2791b55}\label{classFoam_1_1materialInfo_ac5a08c04149d57be061719adc2791b55}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!getY@{getY}}
+\index{getY@{getY}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{getY()}{getY()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily const scalar\& Foam\+::material\+Info\+::getY (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 112 of file material\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{113     \{}
+\DoxyCodeLine{114         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1materialInfo_a8a00f4d039042842e184818bd9e442d6}{Y\_}};}
+\DoxyCodeLine{115     \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a03bef8619556abea13817913aff04ba1}\label{classFoam_1_1materialInfo_a03bef8619556abea13817913aff04ba1}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!adhN\_@{adhN\_}}
+\index{adhN\_@{adhN\_}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{adhN\_}{adhN\_}}
+{\footnotesize\ttfamily scalar Foam\+::material\+Info\+::adh\+N\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 80 of file material\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a7a5f2205f6902d75d56e2179123919a7}\label{classFoam_1_1materialInfo_a7a5f2205f6902d75d56e2179123919a7}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!eps\_@{eps\_}}
+\index{eps\_@{eps\_}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{eps\_}{eps\_}}
+{\footnotesize\ttfamily scalar Foam\+::material\+Info\+::eps\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 83 of file material\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a8636f48add1411841910368781ad201d}\label{classFoam_1_1materialInfo_a8636f48add1411841910368781ad201d}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!gamma\_@{gamma\_}}
+\index{gamma\_@{gamma\_}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{gamma\_}{gamma\_}}
+{\footnotesize\ttfamily scalar Foam\+::material\+Info\+::gamma\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 74 of file material\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_aa02b55a7b76a513f2c2467381d8c99a9}\label{classFoam_1_1materialInfo_aa02b55a7b76a513f2c2467381d8c99a9}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!material\_@{material\_}}
+\index{material\_@{material\_}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{material\_}{material\_}}
+{\footnotesize\ttfamily string Foam\+::material\+Info\+::material\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 65 of file material\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a16863264954a97dd081712ab0af5cae1}\label{classFoam_1_1materialInfo_a16863264954a97dd081712ab0af5cae1}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!mu\_@{mu\_}}
+\index{mu\_@{mu\_}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{mu\_}{mu\_}}
+{\footnotesize\ttfamily scalar Foam\+::material\+Info\+::mu\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 77 of file material\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a005a0d45ddbe84cc1fb61e6477967e47}\label{classFoam_1_1materialInfo_a005a0d45ddbe84cc1fb61e6477967e47}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!nu\_@{nu\_}}
+\index{nu\_@{nu\_}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{nu\_}{nu\_}}
+{\footnotesize\ttfamily scalar Foam\+::material\+Info\+::nu\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 71 of file material\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1materialInfo_a8a00f4d039042842e184818bd9e442d6}\label{classFoam_1_1materialInfo_a8a00f4d039042842e184818bd9e442d6}} 
+\index{Foam::materialInfo@{Foam::materialInfo}!Y\_@{Y\_}}
+\index{Y\_@{Y\_}!Foam::materialInfo@{Foam::materialInfo}}
+\doxysubsubsection{\texorpdfstring{Y\_}{Y\_}}
+{\footnotesize\ttfamily scalar Foam\+::material\+Info\+::\+Y\+\_\+\hspace{0.3cm}{\ttfamily [protected]}}
+
+
+
+Definition at line 68 of file material\+Info.\+H.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/contact\+Models/\mbox{\hyperlink{contactModels_2materialInfo_8H}{material\+Info.\+H}}\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/contact\+Models/\mbox{\hyperlink{contactModels_2materialInfo_8C}{material\+Info.\+C}}\end{DoxyCompactItemize}

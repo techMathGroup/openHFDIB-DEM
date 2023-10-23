@@ -1,0 +1,291 @@
+\hypertarget{classFoam_1_1ibInterpolation}{}\doxysection{Foam\+::ib\+Interpolation Class Reference}
+\label{classFoam_1_1ibInterpolation}\index{Foam::ibInterpolation@{Foam::ibInterpolation}}
+
+
+{\ttfamily \#include $<$ib\+Interpolation.\+H$>$}
+
+
+
+Inheritance diagram for Foam\+::ib\+Interpolation\+:
+% FIG 0
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classFoam_1_1ibInterpolation_ad8f1aa29a4a239a4f8f10965c047414d}{ib\+Interpolation}} ()
+\item 
+virtual \mbox{\hyperlink{classFoam_1_1ibInterpolation_a73e96fe14d4dacdc173778ad403e2169}{$\sim$ib\+Interpolation}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1ibInterpolation_a650a40d8855b3d928ad78d07e35034d8}{reset\+Interpolator}} (vol\+Vector\+Field \&V)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1ibInterpolation_a4860a918e1b887367228bf768379542d}{ib\+Interpolate}} (\mbox{\hyperlink{classFoam_1_1interpolationInfo}{interpolation\+Info}} \&intp\+Info, vol\+Vector\+Field \&Ui, vector\+Field ib\+Points\+Val, const Foam\+::fv\+Mesh \&mesh)=0
+\item 
+virtual \mbox{\hyperlink{classFoam_1_1interpolationInfo}{interpolation\+Info}} $\ast$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_af5a0512ae5da4a0091d5dc9fe291c09b}{create\+Intp\+Info}} (const Foam\+::fv\+Mesh \&mesh, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \&g\+Model)=0
+\item 
+\mbox{\hyperlink{classFoam_1_1ibInterpolation_ad8f1aa29a4a239a4f8f10965c047414d}{ib\+Interpolation}} ()
+\item 
+virtual \mbox{\hyperlink{classFoam_1_1ibInterpolation_a73e96fe14d4dacdc173778ad403e2169}{$\sim$ib\+Interpolation}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1ibInterpolation_a650a40d8855b3d928ad78d07e35034d8}{reset\+Interpolator}} (vol\+Vector\+Field \&V)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1ibInterpolation_a4860a918e1b887367228bf768379542d}{ib\+Interpolate}} (\mbox{\hyperlink{classFoam_1_1interpolationInfo}{interpolation\+Info}} \&intp\+Info, vol\+Vector\+Field \&Ui, vector\+Field ib\+Points\+Val, const Foam\+::fv\+Mesh \&mesh)=0
+\item 
+virtual \mbox{\hyperlink{classFoam_1_1interpolationInfo}{interpolation\+Info}} $\ast$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_af5a0512ae5da4a0091d5dc9fe291c09b}{create\+Intp\+Info}} (const Foam\+::fv\+Mesh \&mesh, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \&g\+Model)=0
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a89c81b1de47570c6c1370c17e26a917b}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a1c734d2752916b83c8e6a0eeaee7df8c}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a688517b7a68f72a2c0a849afe986df2f}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a6ccb32a852fdc6825b74215c28f98b45}{Dynamic\+Point\+List}}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a89c81b1de47570c6c1370c17e26a917b}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a1c734d2752916b83c8e6a0eeaee7df8c}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a688517b7a68f72a2c0a849afe986df2f}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a6ccb32a852fdc6825b74215c28f98b45}{Dynamic\+Point\+List}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 47 of file ib\+Interpolation.\+H.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_a89c81b1de47570c6c1370c17e26a917b}\label{classFoam_1_1ibInterpolation_a89c81b1de47570c6c1370c17e26a917b}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a89c81b1de47570c6c1370c17e26a917b}{Foam\+::ib\+Interpolation\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 49 of file ib\+Interpolation.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_a89c81b1de47570c6c1370c17e26a917b}\label{classFoam_1_1ibInterpolation_a89c81b1de47570c6c1370c17e26a917b}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a89c81b1de47570c6c1370c17e26a917b}{Foam\+::ib\+Interpolation\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 49 of file ib\+Interpolation.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_a6ccb32a852fdc6825b74215c28f98b45}\label{classFoam_1_1ibInterpolation_a6ccb32a852fdc6825b74215c28f98b45}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a6ccb32a852fdc6825b74215c28f98b45}{Foam\+::ib\+Interpolation\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 52 of file ib\+Interpolation.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_a6ccb32a852fdc6825b74215c28f98b45}\label{classFoam_1_1ibInterpolation_a6ccb32a852fdc6825b74215c28f98b45}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a6ccb32a852fdc6825b74215c28f98b45}{Foam\+::ib\+Interpolation\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 52 of file ib\+Interpolation.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_a1c734d2752916b83c8e6a0eeaee7df8c}\label{classFoam_1_1ibInterpolation_a1c734d2752916b83c8e6a0eeaee7df8c}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a1c734d2752916b83c8e6a0eeaee7df8c}{Foam\+::ib\+Interpolation\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 50 of file ib\+Interpolation.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_a1c734d2752916b83c8e6a0eeaee7df8c}\label{classFoam_1_1ibInterpolation_a1c734d2752916b83c8e6a0eeaee7df8c}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a1c734d2752916b83c8e6a0eeaee7df8c}{Foam\+::ib\+Interpolation\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 50 of file ib\+Interpolation.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_a688517b7a68f72a2c0a849afe986df2f}\label{classFoam_1_1ibInterpolation_a688517b7a68f72a2c0a849afe986df2f}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a688517b7a68f72a2c0a849afe986df2f}{Foam\+::ib\+Interpolation\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 51 of file ib\+Interpolation.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_a688517b7a68f72a2c0a849afe986df2f}\label{classFoam_1_1ibInterpolation_a688517b7a68f72a2c0a849afe986df2f}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1ibInterpolation_a688517b7a68f72a2c0a849afe986df2f}{Foam\+::ib\+Interpolation\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 51 of file ib\+Interpolation.\+H.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_ad8f1aa29a4a239a4f8f10965c047414d}\label{classFoam_1_1ibInterpolation_ad8f1aa29a4a239a4f8f10965c047414d}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!ibInterpolation@{ibInterpolation}}
+\index{ibInterpolation@{ibInterpolation}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{ibInterpolation()}{ibInterpolation()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Foam\+::ib\+Interpolation\+::ib\+Interpolation (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 57 of file ib\+Interpolation.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{57 \{\};}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_a73e96fe14d4dacdc173778ad403e2169}\label{classFoam_1_1ibInterpolation_a73e96fe14d4dacdc173778ad403e2169}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!````~ibInterpolation@{$\sim$ibInterpolation}}
+\index{````~ibInterpolation@{$\sim$ibInterpolation}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{$\sim$ibInterpolation()}{~ibInterpolation()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual Foam\+::ib\+Interpolation\+::$\sim$ib\+Interpolation (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line 60 of file ib\+Interpolation.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{60 \{\};}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_ad8f1aa29a4a239a4f8f10965c047414d}\label{classFoam_1_1ibInterpolation_ad8f1aa29a4a239a4f8f10965c047414d}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!ibInterpolation@{ibInterpolation}}
+\index{ibInterpolation@{ibInterpolation}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{ibInterpolation()}{ibInterpolation()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::ib\+Interpolation\+::ib\+Interpolation (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 57 of file ib\+Interpolation.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{57 \{\};}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_a73e96fe14d4dacdc173778ad403e2169}\label{classFoam_1_1ibInterpolation_a73e96fe14d4dacdc173778ad403e2169}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!````~ibInterpolation@{$\sim$ibInterpolation}}
+\index{````~ibInterpolation@{$\sim$ibInterpolation}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{$\sim$ibInterpolation()}{~ibInterpolation()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual Foam\+::ib\+Interpolation\+::$\sim$ib\+Interpolation (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Definition at line 60 of file ib\+Interpolation.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{60 \{\};}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_af5a0512ae5da4a0091d5dc9fe291c09b}\label{classFoam_1_1ibInterpolation_af5a0512ae5da4a0091d5dc9fe291c09b}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!createIntpInfo@{createIntpInfo}}
+\index{createIntpInfo@{createIntpInfo}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{createIntpInfo()}{createIntpInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual \mbox{\hyperlink{classFoam_1_1interpolationInfo}{interpolation\+Info}}$\ast$ Foam\+::ib\+Interpolation\+::create\+Intp\+Info (\begin{DoxyParamCaption}\item[{const Foam\+::fv\+Mesh \&}]{mesh,  }\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \&}]{g\+Model }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classFoam_1_1lineInt_abf90ed5a8a657c14d542b5d22be7fa59}{Foam\+::line\+Int}}, \mbox{\hyperlink{classFoam_1_1lineInt_abf90ed5a8a657c14d542b5d22be7fa59}{Foam\+::line\+Int}}, \mbox{\hyperlink{classFoam_1_1leastSquaresInt_a66af2b16a046e2152c84d79388a5857c}{Foam\+::least\+Squares\+Int}}, and \mbox{\hyperlink{classFoam_1_1leastSquaresInt_a66af2b16a046e2152c84d79388a5857c}{Foam\+::least\+Squares\+Int}}.
+
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_af5a0512ae5da4a0091d5dc9fe291c09b}\label{classFoam_1_1ibInterpolation_af5a0512ae5da4a0091d5dc9fe291c09b}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!createIntpInfo@{createIntpInfo}}
+\index{createIntpInfo@{createIntpInfo}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{createIntpInfo()}{createIntpInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual \mbox{\hyperlink{classFoam_1_1interpolationInfo}{interpolation\+Info}}$\ast$ Foam\+::ib\+Interpolation\+::create\+Intp\+Info (\begin{DoxyParamCaption}\item[{const Foam\+::fv\+Mesh \&}]{mesh,  }\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \&}]{g\+Model }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classFoam_1_1lineInt_abf90ed5a8a657c14d542b5d22be7fa59}{Foam\+::line\+Int}}, \mbox{\hyperlink{classFoam_1_1lineInt_abf90ed5a8a657c14d542b5d22be7fa59}{Foam\+::line\+Int}}, \mbox{\hyperlink{classFoam_1_1leastSquaresInt_a66af2b16a046e2152c84d79388a5857c}{Foam\+::least\+Squares\+Int}}, and \mbox{\hyperlink{classFoam_1_1leastSquaresInt_a66af2b16a046e2152c84d79388a5857c}{Foam\+::least\+Squares\+Int}}.
+
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_a4860a918e1b887367228bf768379542d}\label{classFoam_1_1ibInterpolation_a4860a918e1b887367228bf768379542d}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!ibInterpolate@{ibInterpolate}}
+\index{ibInterpolate@{ibInterpolate}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{ibInterpolate()}{ibInterpolate()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::ib\+Interpolation\+::ib\+Interpolate (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1interpolationInfo}{interpolation\+Info}} \&}]{intp\+Info,  }\item[{vol\+Vector\+Field \&}]{Ui,  }\item[{vector\+Field}]{ib\+Points\+Val,  }\item[{const Foam\+::fv\+Mesh \&}]{mesh }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classFoam_1_1lineInt_a9535245d7ab3c0698c5bb2674e811517}{Foam\+::line\+Int}}, \mbox{\hyperlink{classFoam_1_1lineInt_a4c71a333a13cfe22bd047e6ef0c41336}{Foam\+::line\+Int}}, \mbox{\hyperlink{classFoam_1_1leastSquaresInt_aed56b98eae2e26499c72a978a8fe73c5}{Foam\+::least\+Squares\+Int}}, and \mbox{\hyperlink{classFoam_1_1leastSquaresInt_a4a3347114425959c9a430572ce03ad21}{Foam\+::least\+Squares\+Int}}.
+
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_a4860a918e1b887367228bf768379542d}\label{classFoam_1_1ibInterpolation_a4860a918e1b887367228bf768379542d}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!ibInterpolate@{ibInterpolate}}
+\index{ibInterpolate@{ibInterpolate}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{ibInterpolate()}{ibInterpolate()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::ib\+Interpolation\+::ib\+Interpolate (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1interpolationInfo}{interpolation\+Info}} \&}]{intp\+Info,  }\item[{vol\+Vector\+Field \&}]{Ui,  }\item[{vector\+Field}]{ib\+Points\+Val,  }\item[{const Foam\+::fv\+Mesh \&}]{mesh }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Implemented in \mbox{\hyperlink{classFoam_1_1lineInt_a9535245d7ab3c0698c5bb2674e811517}{Foam\+::line\+Int}}, \mbox{\hyperlink{classFoam_1_1lineInt_a4c71a333a13cfe22bd047e6ef0c41336}{Foam\+::line\+Int}}, \mbox{\hyperlink{classFoam_1_1leastSquaresInt_aed56b98eae2e26499c72a978a8fe73c5}{Foam\+::least\+Squares\+Int}}, and \mbox{\hyperlink{classFoam_1_1leastSquaresInt_a4a3347114425959c9a430572ce03ad21}{Foam\+::least\+Squares\+Int}}.
+
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_a650a40d8855b3d928ad78d07e35034d8}\label{classFoam_1_1ibInterpolation_a650a40d8855b3d928ad78d07e35034d8}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!resetInterpolator@{resetInterpolator}}
+\index{resetInterpolator@{resetInterpolator}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{resetInterpolator()}{resetInterpolator()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::ib\+Interpolation\+::reset\+Interpolator (\begin{DoxyParamCaption}\item[{vol\+Vector\+Field \&}]{V }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1lineInt_ad5460e4aaed6ef13cdf31ca7c1700421}{Foam\+::line\+Int}}, and \mbox{\hyperlink{classFoam_1_1lineInt_ad5460e4aaed6ef13cdf31ca7c1700421}{Foam\+::line\+Int}}.
+
+
+
+Definition at line 62 of file ib\+Interpolation.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{62 \{\};}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1ibInterpolation_a650a40d8855b3d928ad78d07e35034d8}\label{classFoam_1_1ibInterpolation_a650a40d8855b3d928ad78d07e35034d8}} 
+\index{Foam::ibInterpolation@{Foam::ibInterpolation}!resetInterpolator@{resetInterpolator}}
+\index{resetInterpolator@{resetInterpolator}!Foam::ibInterpolation@{Foam::ibInterpolation}}
+\doxysubsubsection{\texorpdfstring{resetInterpolator()}{resetInterpolator()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::ib\+Interpolation\+::reset\+Interpolator (\begin{DoxyParamCaption}\item[{vol\+Vector\+Field \&}]{V }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1lineInt_ad5460e4aaed6ef13cdf31ca7c1700421}{Foam\+::line\+Int}}, and \mbox{\hyperlink{classFoam_1_1lineInt_ad5460e4aaed6ef13cdf31ca7c1700421}{Foam\+::line\+Int}}.
+
+
+
+Definition at line 62 of file ib\+Interpolation.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{62 \{\};}
+
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/ib\+Interpolation/\mbox{\hyperlink{ibInterpolation_2ibInterpolation_8H}{ib\+Interpolation.\+H}}\end{DoxyCompactItemize}

@@ -1,0 +1,431 @@
+\hypertarget{initializeIB_8H}{}\doxysection{src/\+H\+F\+D\+I\+B\+D\+E\+M/initialize\+IB.H File Reference}
+\label{initializeIB_8H}\index{src/HFDIBDEM/initializeIB.H@{src/HFDIBDEM/initializeIB.H}}
+This graph shows which files directly or indirectly include this file\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{initializeIB_8H_a33f396164117366e6681646f17ee68bb}{if}} (mesh\+\_\+.\+n\+GeometricD()$<$ 3)
+\item 
+\mbox{\hyperlink{initializeIB_8H_a785181862767ade860cfc5539520eaff}{if}} (immersed\+Dict\+\_\+.\+found(\char`\"{}static\+Body\char`\"{}))
+\item 
+\mbox{\hyperlink{lnInclude_2initializeIB_8H_a0544c3fe466e421738dae463968b70ba}{else}} \mbox{\hyperlink{initializeIB_8H_af733d4e14383a04015a594128b204371}{if}} (immersed\+Dict\+\_\+.\+found(\char`\"{}prescribed\+Trans\+Body\char`\"{}))
+\item 
+\mbox{\hyperlink{lnInclude_2initializeIB_8H_a0544c3fe466e421738dae463968b70ba}{else}} \mbox{\hyperlink{initializeIB_8H_a69092f696ba4141b6651b05499432542}{if}} (immersed\+Dict\+\_\+.\+found(\char`\"{}prescribed\+Rot\+Body\char`\"{}))
+\item 
+\mbox{\hyperlink{lnInclude_2initializeIB_8H_a0544c3fe466e421738dae463968b70ba}{else}} \mbox{\hyperlink{initializeIB_8H_ab9bd148e8d96b2db9979c05bbd4bf3d1}{if}} (immersed\+Dict\+\_\+.\+found(\char`\"{}prescribed\+Trans\+Rot\+Body\char`\"{}))
+\item 
+\mbox{\hyperlink{lnInclude_2initializeIB_8H_a0544c3fe466e421738dae463968b70ba}{else}} \mbox{\hyperlink{initializeIB_8H_ae028c8a04aaa004dbc1072cd66acf07a}{if}} (immersed\+Dict\+\_\+.\+found(\char`\"{}prescribed\+Trans\+Fixed\+Axis\+Rot\+Body\char`\"{}))
+\item 
+\mbox{\hyperlink{lnInclude_2initializeIB_8H_a0544c3fe466e421738dae463968b70ba}{else}} \mbox{\hyperlink{initializeIB_8H_ae98ca01f600856c10db43a33b5691827}{if}} (immersed\+Dict\+\_\+.\+found(\char`\"{}fully\+Coupled\+Body\char`\"{}))
+\item 
+\mbox{\hyperlink{initializeIB_8H_a736bcc8a088686cf53a03d033c61de2f}{if}} (immersed\+Dict\+\_\+.\+found(\char`\"{}update\+Torque\char`\"{}))
+\item 
+\mbox{\hyperlink{initializeIB_8H_adcef3a13d73f74f15946ac0bb8887599}{if}} (immersed\+Dict\+\_\+.\+found(\char`\"{}start\+Synced\char`\"{}))
+\item 
+\mbox{\hyperlink{initializeIB_8H_a84fd6ae64dac9536be0c91c5ed7f1116}{if}} (immersed\+Dict\+\_\+.\+found(\char`\"{}sd\+Based\+Lambda\char`\"{}))
+\item 
+\mbox{\hyperlink{initializeIB_8H_a22dd649267a42273ff6f0304b838e5fd}{if}} (immersed\+Dict\+\_\+.\+found(\char`\"{}interface\+Span\char`\"{}))
+\item 
+\mbox{\hyperlink{initializeIB_8H_ac43173ff473383bba9c453b965e6ec8a}{if}} (immersed\+Dict\+\_\+.\+found(\char`\"{}refine\+Buffers\char`\"{}))
+\item 
+\mbox{\hyperlink{initializeIB_8H_a968355c372b9478eb68e297dc9168a34}{if}} (immersed\+Dict\+\_\+.\+found(\char`\"{}times\+To\+Set\+Static\char`\"{}))
+\item 
+geom\+Model\+\_\+ \mbox{\hyperlink{initializeIB_8H_a189cd6d372a0452d1c24ef72f2441880}{set\+Int\+Span}} (int\+Span\+\_\+)
+\item 
+geom\+Model\+\_\+ \mbox{\hyperlink{initializeIB_8H_ab97f6a70ac543468c8b63f1b955b8385}{set\+Sd\+Based\+Lambda}} (sd\+Based\+Lambda\+\_\+)
+\item 
+geom\+Model\+\_\+ \mbox{\hyperlink{initializeIB_8H_a77e151dbc7905c3fa7c331cc5aa30257}{set\+RhoS}} (immersed\+Dict\+\_\+.\+lookup(\char`\"{}rho\char`\"{}))
+\item 
+\mbox{\hyperlink{initializeIB_8H_a47b91759dc064c0926967d298a14f9fb}{if}} (ib\+Intp.\+valid())
+\item 
+ib\+Contact\+Class\+\_\+ \mbox{\hyperlink{initializeIB_8H_a0a046c169331b4dff8ad5d79c7c0e947}{set}} (new ib\+Contact\+Class(geom\+Model\+\_\+, \mbox{\hyperlink{lnInclude_2initializeIB_8H_a636af450f3ee8ba2a5bb1adcd5cf8348}{material}}))
+\item 
+ib\+Cnt\+Vars\+\_\+ \mbox{\hyperlink{initializeIB_8H_a992c9cbd3816d7bf8f2d7ae08e704008}{set}} (new ib\+Contact\+Vars(body\+Id\+\_\+, Vel\+\_\+, omega\+\_\+, \mbox{\hyperlink{lnInclude_2initializeIB_8H_a5645b3c037fdcef22f8f7c346e27a1cb}{Axis\+\_\+}}, geom\+Model\+\_\+-\/$>$get\+M0(), geom\+Model\+\_\+-\/$>$getM(), geom\+Model\+\_\+-\/$>$get\+RhoS()))
+\item 
+wall\+Cnt\+Info\+\_\+ \mbox{\hyperlink{initializeIB_8H_a238d1afe7bbf66ca506b36b8de561555}{set}} (new wall\+Contact\+Info(ib\+Contact\+Class\+\_\+(), ib\+Cnt\+Vars\+\_\+()))
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{initializeIB_8H_a5645b3c037fdcef22f8f7c346e27a1cb}{Axis\+\_\+}} = mag(Axis\+\_\+)
+\item 
+\mbox{\hyperlink{initializeIB_8H_a0544c3fe466e421738dae463968b70ba}{else}}
+\item 
+string \mbox{\hyperlink{initializeIB_8H_a636af450f3ee8ba2a5bb1adcd5cf8348}{material}} = word(immersed\+Dict\+\_\+.\+lookup(\char`\"{}material\char`\"{}))
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{initializeIB_8H_a47b91759dc064c0926967d298a14f9fb}\label{initializeIB_8H_a47b91759dc064c0926967d298a14f9fb}} 
+\index{initializeIB.H@{initializeIB.H}!if@{if}}
+\index{if@{if}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [1/14]}}
+{\footnotesize\ttfamily if (\begin{DoxyParamCaption}\item[{ib\+Intp.}]{valid() }\end{DoxyParamCaption})}
+
+
+
+Definition at line 138 of file initialize\+I\+B.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{139     \{}
+\DoxyCodeLine{140         intpInfo\_.set(ibIntp().createIntpInfo(}
+\DoxyCodeLine{141             mesh\_,}
+\DoxyCodeLine{142             geomModel\_}
+\DoxyCodeLine{143         ));}
+\DoxyCodeLine{144     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{initializeIB_8H_ae98ca01f600856c10db43a33b5691827}\label{initializeIB_8H_ae98ca01f600856c10db43a33b5691827}} 
+\index{initializeIB.H@{initializeIB.H}!if@{if}}
+\index{if@{if}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [2/14]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{lnInclude_2initializeIB_8H_a0544c3fe466e421738dae463968b70ba}{else}} if (\begin{DoxyParamCaption}\item[{immersed\+Dict\+\_\+.}]{found\char`\"{}fully\+Coupled\+Body\char`\"{} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 54 of file initialize\+I\+B.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{55     \{}
+\DoxyCodeLine{56         bodyOperation\_ = 5;}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58         \textcolor{keywordflow}{if} (immersedDict\_.isDict(\textcolor{stringliteral}{"fullyCoupledBody"}))}
+\DoxyCodeLine{59         \{}
+\DoxyCodeLine{60             \textcolor{keywordflow}{if}(immersedDict\_.subDict(\textcolor{stringliteral}{"fullyCoupledBody"}).found(\textcolor{stringliteral}{"velocity"}))}
+\DoxyCodeLine{61             \{}
+\DoxyCodeLine{62                 Vel\_ = immersedDict\_.subDict(\textcolor{stringliteral}{"fullyCoupledBody"}).lookup(\textcolor{stringliteral}{"velocity"});}
+\DoxyCodeLine{63             \}}
+\DoxyCodeLine{64             \textcolor{keywordflow}{if}(immersedDict\_.subDict(\textcolor{stringliteral}{"fullyCoupledBody"}).found(\textcolor{stringliteral}{"axis"}))}
+\DoxyCodeLine{65             \{            }
+\DoxyCodeLine{66                 \mbox{\hyperlink{initializeIB_8H_a5645b3c037fdcef22f8f7c346e27a1cb}{Axis\_}} = immersedDict\_.subDict(\textcolor{stringliteral}{"fullyCoupledBody"}).lookup(\textcolor{stringliteral}{"axis"});}
+\DoxyCodeLine{67             \}}
+\DoxyCodeLine{68             \textcolor{keywordflow}{if}(immersedDict\_.subDict(\textcolor{stringliteral}{"fullyCoupledBody"}).found(\textcolor{stringliteral}{"omega"}))}
+\DoxyCodeLine{69             \{}
+\DoxyCodeLine{70                 omega\_  = readScalar(}
+\DoxyCodeLine{71                     immersedDict\_.subDict(\textcolor{stringliteral}{"fullyCoupledBody"}).lookup(\textcolor{stringliteral}{"omega"})}
+\DoxyCodeLine{72                 );}
+\DoxyCodeLine{73             \}}
+\DoxyCodeLine{74         \}}
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << bodyName\_ << \textcolor{stringliteral}{" is fully coupled with fluid phase."} << endl;}
+\DoxyCodeLine{77     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{initializeIB_8H_a22dd649267a42273ff6f0304b838e5fd}\label{initializeIB_8H_a22dd649267a42273ff6f0304b838e5fd}} 
+\index{initializeIB.H@{initializeIB.H}!if@{if}}
+\index{if@{if}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [3/14]}}
+{\footnotesize\ttfamily if (\begin{DoxyParamCaption}\item[{immersed\+Dict\+\_\+.}]{found\char`\"{}interface\+Span\char`\"{} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 118 of file initialize\+I\+B.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{119     \{}
+\DoxyCodeLine{120         intSpan\_ = readScalar(immersedDict\_.lookup(\textcolor{stringliteral}{"interfaceSpan"}));}
+\DoxyCodeLine{121     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{initializeIB_8H_a69092f696ba4141b6651b05499432542}\label{initializeIB_8H_a69092f696ba4141b6651b05499432542}} 
+\index{initializeIB.H@{initializeIB.H}!if@{if}}
+\index{if@{if}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [4/14]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{lnInclude_2initializeIB_8H_a0544c3fe466e421738dae463968b70ba}{else}} if (\begin{DoxyParamCaption}\item[{immersed\+Dict\+\_\+.}]{found\char`\"{}prescribed\+Rot\+Body\char`\"{} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 22 of file initialize\+I\+B.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{23     \{}
+\DoxyCodeLine{24         bodyOperation\_ = 2;}
+\DoxyCodeLine{25 }
+\DoxyCodeLine{26         \mbox{\hyperlink{initializeIB_8H_a5645b3c037fdcef22f8f7c346e27a1cb}{Axis\_}} = immersedDict\_.subDict(\textcolor{stringliteral}{"prescribedRotBody"}).lookup(\textcolor{stringliteral}{"axis"});}
+\DoxyCodeLine{27         omega\_  = readScalar(}
+\DoxyCodeLine{28                     immersedDict\_.subDict(\textcolor{stringliteral}{"prescribedRotBody"}).lookup(\textcolor{stringliteral}{"omega"})}
+\DoxyCodeLine{29                 );}
+\DoxyCodeLine{30 }
+\DoxyCodeLine{31         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << bodyName\_ << \textcolor{stringliteral}{" is a freely moving body with prescribed rotation."} << endl;}
+\DoxyCodeLine{32     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{initializeIB_8H_af733d4e14383a04015a594128b204371}\label{initializeIB_8H_af733d4e14383a04015a594128b204371}} 
+\index{initializeIB.H@{initializeIB.H}!if@{if}}
+\index{if@{if}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [5/14]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{lnInclude_2initializeIB_8H_a0544c3fe466e421738dae463968b70ba}{else}} if (\begin{DoxyParamCaption}\item[{immersed\+Dict\+\_\+.}]{found\char`\"{}prescribed\+Trans\+Body\char`\"{} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 14 of file initialize\+I\+B.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{15     \{}
+\DoxyCodeLine{16         bodyOperation\_ = 1;}
+\DoxyCodeLine{17 }
+\DoxyCodeLine{18         Vel\_   = immersedDict\_.subDict(\textcolor{stringliteral}{"prescribedTransBody"}).lookup(\textcolor{stringliteral}{"velocity"});}
+\DoxyCodeLine{19 }
+\DoxyCodeLine{20         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << bodyName\_ << \textcolor{stringliteral}{" is a freely rotating body with prescribed linear velocity."} << endl;}
+\DoxyCodeLine{21     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{initializeIB_8H_ae028c8a04aaa004dbc1072cd66acf07a}\label{initializeIB_8H_ae028c8a04aaa004dbc1072cd66acf07a}} 
+\index{initializeIB.H@{initializeIB.H}!if@{if}}
+\index{if@{if}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [6/14]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{lnInclude_2initializeIB_8H_a0544c3fe466e421738dae463968b70ba}{else}} if (\begin{DoxyParamCaption}\item[{immersed\+Dict\+\_\+.}]{found\char`\"{}prescribed\+Trans\+Fixed\+Axis\+Rot\+Body\char`\"{} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 45 of file initialize\+I\+B.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{46     \{}
+\DoxyCodeLine{47         bodyOperation\_ = 4;}
+\DoxyCodeLine{48 }
+\DoxyCodeLine{49         Vel\_   = immersedDict\_.subDict(\textcolor{stringliteral}{"prescribedTransFixedAxisRotBody"}).lookup(\textcolor{stringliteral}{"velocity"});}
+\DoxyCodeLine{50         \mbox{\hyperlink{initializeIB_8H_a5645b3c037fdcef22f8f7c346e27a1cb}{Axis\_}} = immersedDict\_.subDict(\textcolor{stringliteral}{"prescribedTransFixedAxisRotBody"}).lookup(\textcolor{stringliteral}{"axis"});}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << bodyName\_ << \textcolor{stringliteral}{" has prescribed movement and axis of rotation."} << endl;}
+\DoxyCodeLine{53     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{initializeIB_8H_ab9bd148e8d96b2db9979c05bbd4bf3d1}\label{initializeIB_8H_ab9bd148e8d96b2db9979c05bbd4bf3d1}} 
+\index{initializeIB.H@{initializeIB.H}!if@{if}}
+\index{if@{if}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [7/14]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{lnInclude_2initializeIB_8H_a0544c3fe466e421738dae463968b70ba}{else}} if (\begin{DoxyParamCaption}\item[{immersed\+Dict\+\_\+.}]{found\char`\"{}prescribed\+Trans\+Rot\+Body\char`\"{} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 33 of file initialize\+I\+B.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{34     \{}
+\DoxyCodeLine{35         bodyOperation\_ = 3;}
+\DoxyCodeLine{36 }
+\DoxyCodeLine{37         Vel\_   = immersedDict\_.subDict(\textcolor{stringliteral}{"prescribedTransRotBody"}).lookup(\textcolor{stringliteral}{"velocity"});}
+\DoxyCodeLine{38         \mbox{\hyperlink{initializeIB_8H_a5645b3c037fdcef22f8f7c346e27a1cb}{Axis\_}} = immersedDict\_.subDict(\textcolor{stringliteral}{"prescribedTransRotBody"}).lookup(\textcolor{stringliteral}{"axis"});}
+\DoxyCodeLine{39         omega\_  = readScalar(}
+\DoxyCodeLine{40                     immersedDict\_.subDict(\textcolor{stringliteral}{"prescribedTransRotBody"}).lookup(\textcolor{stringliteral}{"omega"})}
+\DoxyCodeLine{41                 );}
+\DoxyCodeLine{42 }
+\DoxyCodeLine{43         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << bodyName\_ << \textcolor{stringliteral}{" has prescribed both movement and rotation."} << endl;}
+\DoxyCodeLine{44     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{initializeIB_8H_ac43173ff473383bba9c453b965e6ec8a}\label{initializeIB_8H_ac43173ff473383bba9c453b965e6ec8a}} 
+\index{initializeIB.H@{initializeIB.H}!if@{if}}
+\index{if@{if}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [8/14]}}
+{\footnotesize\ttfamily if (\begin{DoxyParamCaption}\item[{immersed\+Dict\+\_\+.}]{found\char`\"{}refine\+Buffers\char`\"{} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 122 of file initialize\+I\+B.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{123     \{}
+\DoxyCodeLine{124         refineBuffers\_ = readLabel(immersedDict\_.lookup(\textcolor{stringliteral}{"refineBuffers"}));}
+\DoxyCodeLine{125     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{initializeIB_8H_a84fd6ae64dac9536be0c91c5ed7f1116}\label{initializeIB_8H_a84fd6ae64dac9536be0c91c5ed7f1116}} 
+\index{initializeIB.H@{initializeIB.H}!if@{if}}
+\index{if@{if}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [9/14]}}
+{\footnotesize\ttfamily if (\begin{DoxyParamCaption}\item[{immersed\+Dict\+\_\+.}]{found\char`\"{}sd\+Based\+Lambda\char`\"{} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 114 of file initialize\+I\+B.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{115     \{}
+\DoxyCodeLine{116         sdBasedLambda\_ = readBool(immersedDict\_.lookup(\textcolor{stringliteral}{"sdBasedLambda"}));}
+\DoxyCodeLine{117     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{initializeIB_8H_adcef3a13d73f74f15946ac0bb8887599}\label{initializeIB_8H_adcef3a13d73f74f15946ac0bb8887599}} 
+\index{initializeIB.H@{initializeIB.H}!if@{if}}
+\index{if@{if}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [10/14]}}
+{\footnotesize\ttfamily if (\begin{DoxyParamCaption}\item[{immersed\+Dict\+\_\+.}]{found\char`\"{}start\+Synced\char`\"{} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 96 of file initialize\+I\+B.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{97     \{}
+\DoxyCodeLine{98         startSynced\_ = readBool(immersedDict\_.lookup(\textcolor{stringliteral}{"startSynced"}));}
+\DoxyCodeLine{99         \textcolor{keywordflow}{if} (startSynced\_)}
+\DoxyCodeLine{100         \{}
+\DoxyCodeLine{101             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"Will try to sync the body with the flow upon creation"} << endl;}
+\DoxyCodeLine{102         \}}
+\DoxyCodeLine{103         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{104         \{}
+\DoxyCodeLine{105             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"The body will be created as static"} << endl;}
+\DoxyCodeLine{106         \}}
+\DoxyCodeLine{107     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{initializeIB_8H_a785181862767ade860cfc5539520eaff}\label{initializeIB_8H_a785181862767ade860cfc5539520eaff}} 
+\index{initializeIB.H@{initializeIB.H}!if@{if}}
+\index{if@{if}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [11/14]}}
+{\footnotesize\ttfamily if (\begin{DoxyParamCaption}\item[{immersed\+Dict\+\_\+.}]{found\char`\"{}static\+Body\char`\"{} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 9 of file initialize\+I\+B.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{10     \{}
+\DoxyCodeLine{11         bodyOperation\_ = 0;}
+\DoxyCodeLine{12         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << bodyName\_ << \textcolor{stringliteral}{" is a static body."} << endl;}
+\DoxyCodeLine{13     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{initializeIB_8H_a968355c372b9478eb68e297dc9168a34}\label{initializeIB_8H_a968355c372b9478eb68e297dc9168a34}} 
+\index{initializeIB.H@{initializeIB.H}!if@{if}}
+\index{if@{if}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [12/14]}}
+{\footnotesize\ttfamily if (\begin{DoxyParamCaption}\item[{immersed\+Dict\+\_\+.}]{found\char`\"{}times\+To\+Set\+Static\char`\"{} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 126 of file initialize\+I\+B.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{127     \{}
+\DoxyCodeLine{128         timesToSetStatic\_ = readLabel(immersedDict\_.lookup(\textcolor{stringliteral}{"timesToSetStatic"}));}
+\DoxyCodeLine{129     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{initializeIB_8H_a736bcc8a088686cf53a03d033c61de2f}\label{initializeIB_8H_a736bcc8a088686cf53a03d033c61de2f}} 
+\index{initializeIB.H@{initializeIB.H}!if@{if}}
+\index{if@{if}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [13/14]}}
+{\footnotesize\ttfamily if (\begin{DoxyParamCaption}\item[{immersed\+Dict\+\_\+.}]{found\char`\"{}update\+Torque\char`\"{} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 85 of file initialize\+I\+B.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{86     \{}
+\DoxyCodeLine{87         updateTorque\_ = readBool(immersedDict\_.lookup(\textcolor{stringliteral}{"updateTorque"}));}
+\DoxyCodeLine{88         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"Found updateTorque: "} << updateTorque\_ << endl;}
+\DoxyCodeLine{89     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{initializeIB_8H_a33f396164117366e6681646f17ee68bb}\label{initializeIB_8H_a33f396164117366e6681646f17ee68bb}} 
+\index{initializeIB.H@{initializeIB.H}!if@{if}}
+\index{if@{if}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [14/14]}}
+{\footnotesize\ttfamily if (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1 of file initialize\+I\+B.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{2     \{}
+\DoxyCodeLine{3         \textcolor{keyword}{const} vector validDirs = (mesh\_.geometricD() + Vector<label>::one)/2;}
+\DoxyCodeLine{4         \mbox{\hyperlink{initializeIB_8H_a5645b3c037fdcef22f8f7c346e27a1cb}{Axis\_}} -\/= validDirs;}
+\DoxyCodeLine{5     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{initializeIB_8H_a0a046c169331b4dff8ad5d79c7c0e947}\label{initializeIB_8H_a0a046c169331b4dff8ad5d79c7c0e947}} 
+\index{initializeIB.H@{initializeIB.H}!set@{set}}
+\index{set@{set}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily ib\+Contact\+Class\+\_\+ set (\begin{DoxyParamCaption}\item[{new }]{ib\+Contact\+Classgeom\+Model\+\_\+, material }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{initializeIB_8H_a992c9cbd3816d7bf8f2d7ae08e704008}\label{initializeIB_8H_a992c9cbd3816d7bf8f2d7ae08e704008}} 
+\index{initializeIB.H@{initializeIB.H}!set@{set}}
+\index{set@{set}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily ib\+Cnt\+Vars\+\_\+ set (\begin{DoxyParamCaption}\item[{new }]{ib\+Contact\+Varsbody\+Id\+\_\+, Vel\+\_\+, omega\+\_\+, Axis\+\_\+, geom\+Model\+\_\+-\/$>$get\+M0(), geom\+Model\+\_\+-\/$>$get\+M(), geom\+Model\+\_\+-\/$>$get\+Rho\+S() }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{initializeIB_8H_a238d1afe7bbf66ca506b36b8de561555}\label{initializeIB_8H_a238d1afe7bbf66ca506b36b8de561555}} 
+\index{initializeIB.H@{initializeIB.H}!set@{set}}
+\index{set@{set}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{set()}{set()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily wall\+Cnt\+Info\+\_\+ set (\begin{DoxyParamCaption}\item[{new }]{wall\+Contact\+Infoib\+Contact\+Class\+\_\+(), ib\+Cnt\+Vars\+\_\+() }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{initializeIB_8H_a189cd6d372a0452d1c24ef72f2441880}\label{initializeIB_8H_a189cd6d372a0452d1c24ef72f2441880}} 
+\index{initializeIB.H@{initializeIB.H}!setIntSpan@{setIntSpan}}
+\index{setIntSpan@{setIntSpan}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{setIntSpan()}{setIntSpan()}}
+{\footnotesize\ttfamily geom\+Model\+\_\+ set\+Int\+Span (\begin{DoxyParamCaption}\item[{int\+Span\+\_\+}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{initializeIB_8H_a77e151dbc7905c3fa7c331cc5aa30257}\label{initializeIB_8H_a77e151dbc7905c3fa7c331cc5aa30257}} 
+\index{initializeIB.H@{initializeIB.H}!setRhoS@{setRhoS}}
+\index{setRhoS@{setRhoS}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{setRhoS()}{setRhoS()}}
+{\footnotesize\ttfamily geom\+Model\+\_\+ set\+RhoS (\begin{DoxyParamCaption}\item[{immersed\+Dict\+\_\+.}]{lookup\char`\"{}rho\char`\"{} }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{initializeIB_8H_ab97f6a70ac543468c8b63f1b955b8385}\label{initializeIB_8H_ab97f6a70ac543468c8b63f1b955b8385}} 
+\index{initializeIB.H@{initializeIB.H}!setSdBasedLambda@{setSdBasedLambda}}
+\index{setSdBasedLambda@{setSdBasedLambda}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{setSdBasedLambda()}{setSdBasedLambda()}}
+{\footnotesize\ttfamily geom\+Model\+\_\+ set\+Sd\+Based\+Lambda (\begin{DoxyParamCaption}\item[{sd\+Based\+Lambda\+\_\+}]{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{initializeIB_8H_a5645b3c037fdcef22f8f7c346e27a1cb}\label{initializeIB_8H_a5645b3c037fdcef22f8f7c346e27a1cb}} 
+\index{initializeIB.H@{initializeIB.H}!Axis\_@{Axis\_}}
+\index{Axis\_@{Axis\_}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{Axis\_}{Axis\_}}
+{\footnotesize\ttfamily Axis\+\_\+ = mag(Axis\+\_\+)}
+
+
+
+Definition at line 6 of file initialize\+I\+B.\+H.
+
+\mbox{\Hypertarget{initializeIB_8H_a0544c3fe466e421738dae463968b70ba}\label{initializeIB_8H_a0544c3fe466e421738dae463968b70ba}} 
+\index{initializeIB.H@{initializeIB.H}!else@{else}}
+\index{else@{else}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{else}{else}}
+{\footnotesize\ttfamily else}
+
+{\bfseries Initial value\+:}
+\begin{DoxyCode}{0}
+\DoxyCodeLine{\{}
+\DoxyCodeLine{        \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"No body operation was found for "} << bodyName\_ << endl}
+\DoxyCodeLine{          << \textcolor{stringliteral}{"Assuming static body."}}
+
+\end{DoxyCode}
+
+
+Definition at line 79 of file initialize\+I\+B.\+H.
+
+\mbox{\Hypertarget{initializeIB_8H_a636af450f3ee8ba2a5bb1adcd5cf8348}\label{initializeIB_8H_a636af450f3ee8ba2a5bb1adcd5cf8348}} 
+\index{initializeIB.H@{initializeIB.H}!material@{material}}
+\index{material@{material}!initializeIB.H@{initializeIB.H}}
+\doxysubsubsection{\texorpdfstring{material}{material}}
+{\footnotesize\ttfamily string material = word(immersed\+Dict\+\_\+.\+lookup(\char`\"{}material\char`\"{}))}
+
+
+
+Definition at line 136 of file initialize\+I\+B.\+H.
+

@@ -1,0 +1,719 @@
+\hypertarget{classFoam_1_1virtualMeshWall}{}\doxysection{Foam\+::virtual\+Mesh\+Wall Class Reference}
+\label{classFoam_1_1virtualMeshWall}\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+
+
+{\ttfamily \#include $<$virtual\+Mesh\+Wall.\+H$>$}
+
+
+
+Collaboration diagram for Foam\+::virtual\+Mesh\+Wall\+:
+% FIG 0
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a9463c3366c3b97f5234e1abcda37a1fc}{virtual\+Mesh\+Wall}} (\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo}{virtual\+Mesh\+Wall\+Info}} \&v\+Mesh\+Wall\+Info, \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} \&c\+Geom\+Model)
+\item 
+\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a0275a9ebcd9d91dca828a4c2a3fae4ed}{$\sim$virtual\+Mesh\+Wall}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a229ccdf5daaa15de592ba5699ca24759}{detect\+First\+Contact\+Point}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a493c9c144c45daae654c8805bed08eca}{detect\+First\+Face\+Contact\+Point}} ()
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a3579436720c2e5fcceea3ab96584cef4}{evaluate\+Contact}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a00c17609d545a8eaa4116b0dc8a97a2a}{check\+Sub\+Volume}} (\mbox{\hyperlink{classFoam_1_1subVolumeProperties}{sub\+Volume\+Properties}} \&\mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}})
+\item 
+void \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a4975e48fa6b4666c3dd16faa43103229}{reset\+Sub\+Volume}} (\mbox{\hyperlink{classFoam_1_1subVolumeProperties}{sub\+Volume\+Properties}} \&\mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}})
+\item 
+vector \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a14a866a3f0a90c0259e35c7d33eb5b10}{shift\+Edge\+Sub\+Volume}} (vector \&sub\+Volume\+Index)
+\item 
+label \mbox{\hyperlink{classFoam_1_1virtualMeshWall_aa22cdb168de3f2f0d3f0f9c0f2cd57c4}{get\+Internal\+SV}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1virtualMeshWall_ad338b31ddb3749afcc633545a6bd7aea}{Dynamic\+Point\+List}} \& \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a78a7f7fc0b6680dba2b6b4b94f891208}{get\+Edge\+S\+V\+Points}} ()
+\item 
+vector \& \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ab012eb8bdc3d10cfc1b56237845e19d0}{get\+Contact\+Center}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1virtualMeshWall_aa4a24e18c7322c1aeee03310384b825c}{virtual\+Mesh\+Wall}} (\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo}{virtual\+Mesh\+Wall\+Info}} \&v\+Mesh\+Wall\+Info, \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} \&c\+Geom\+Model)
+\item 
+\mbox{\hyperlink{classFoam_1_1virtualMeshWall_ae4173bbaf81b2b062f617570708988a3}{$\sim$virtual\+Mesh\+Wall}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a229a9f3637207fb26c1b8bd183941ea7}{detect\+First\+Contact\+Point}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1virtualMeshWall_abde77809394a1922b807be5ed980bf86}{detect\+First\+Face\+Contact\+Point}} ()
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a5efd86ef7ad4562aa76a3b111a683a16}{evaluate\+Contact}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a7c4ee599c23ad200393e707c9838aead}{check\+Sub\+Volume}} (\mbox{\hyperlink{classFoam_1_1subVolumeProperties}{sub\+Volume\+Properties}} \&\mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}})
+\item 
+void \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ac48f03c69df6496a4fe804ca6ea54ad9}{reset\+Sub\+Volume}} (\mbox{\hyperlink{classFoam_1_1subVolumeProperties}{sub\+Volume\+Properties}} \&\mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}})
+\item 
+vector \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a14a866a3f0a90c0259e35c7d33eb5b10}{shift\+Edge\+Sub\+Volume}} (vector \&sub\+Volume\+Index)
+\item 
+label \mbox{\hyperlink{classFoam_1_1virtualMeshWall_af53365138a24a3c6ec8e08ed16fd9804}{get\+Internal\+SV}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1virtualMeshWall_ad338b31ddb3749afcc633545a6bd7aea}{Dynamic\+Point\+List}} \& \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a78a7f7fc0b6680dba2b6b4b94f891208}{get\+Edge\+S\+V\+Points}} ()
+\item 
+vector \& \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ab012eb8bdc3d10cfc1b56237845e19d0}{get\+Contact\+Center}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a7c763525d938c9d73319c796c424ee15}{contact\+Center\+\_\+}} = vector\+::zero
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_aa06da67cddb132c2a1d6a133a0345256}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a548f592101d720399f33c7eee9bd89cc}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ad338b31ddb3749afcc633545a6bd7aea}{Dynamic\+Point\+List}}
+\item 
+typedef Hash\+Set$<$ vector, Hash$<$ vector $>$ $>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a2f23f745d64ff6c28f39737d2cf2f3b1}{vector\+Hash\+Set}}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_aa06da67cddb132c2a1d6a133a0345256}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a548f592101d720399f33c7eee9bd89cc}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ad338b31ddb3749afcc633545a6bd7aea}{Dynamic\+Point\+List}}
+\item 
+typedef Hash\+Set$<$ vector, Hash$<$ vector $>$ $>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a2f23f745d64ff6c28f39737d2cf2f3b1}{vector\+Hash\+Set}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} \& \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a1d6d46e990e2c0ed32bdb7c1c85e9dd5}{c\+Geom\+Model\+\_\+}}
+\item 
+\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo}{virtual\+Mesh\+Wall\+Info}} \& \mbox{\hyperlink{classFoam_1_1virtualMeshWall_aad53df34d0cab2566cb7450b63c94508}{v\+Mesh\+Wall\+Info\+\_\+}}
+\item 
+\mbox{\hyperlink{classFoam_1_1bbMatrix}{bb\+Matrix}} \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bb\+Matrix\+\_\+}}
+\item 
+\mbox{\hyperlink{classFoam_1_1virtualMeshWall_ad338b31ddb3749afcc633545a6bd7aea}{Dynamic\+Point\+List}} \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a536a54320b2668e5476988bf1e7b3970}{edge\+Sub\+Volumes\+Points\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 128 of file virtual\+Mesh\+Wall.\+H.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_aa06da67cddb132c2a1d6a133a0345256}\label{classFoam_1_1virtualMeshWall_aa06da67cddb132c2a1d6a133a0345256}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_aa06da67cddb132c2a1d6a133a0345256}{Foam\+::virtual\+Mesh\+Wall\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 132 of file virtual\+Mesh\+Wall.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_aa06da67cddb132c2a1d6a133a0345256}\label{classFoam_1_1virtualMeshWall_aa06da67cddb132c2a1d6a133a0345256}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_aa06da67cddb132c2a1d6a133a0345256}{Foam\+::virtual\+Mesh\+Wall\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 132 of file virtual\+Mesh\+Wall.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_ad338b31ddb3749afcc633545a6bd7aea}\label{classFoam_1_1virtualMeshWall_ad338b31ddb3749afcc633545a6bd7aea}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ad338b31ddb3749afcc633545a6bd7aea}{Foam\+::virtual\+Mesh\+Wall\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 135 of file virtual\+Mesh\+Wall.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_ad338b31ddb3749afcc633545a6bd7aea}\label{classFoam_1_1virtualMeshWall_ad338b31ddb3749afcc633545a6bd7aea}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ad338b31ddb3749afcc633545a6bd7aea}{Foam\+::virtual\+Mesh\+Wall\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 135 of file virtual\+Mesh\+Wall.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a548f592101d720399f33c7eee9bd89cc}\label{classFoam_1_1virtualMeshWall_a548f592101d720399f33c7eee9bd89cc}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a548f592101d720399f33c7eee9bd89cc}{Foam\+::virtual\+Mesh\+Wall\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 133 of file virtual\+Mesh\+Wall.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a548f592101d720399f33c7eee9bd89cc}\label{classFoam_1_1virtualMeshWall_a548f592101d720399f33c7eee9bd89cc}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a548f592101d720399f33c7eee9bd89cc}{Foam\+::virtual\+Mesh\+Wall\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 133 of file virtual\+Mesh\+Wall.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}\label{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}{Foam\+::virtual\+Mesh\+Wall\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 134 of file virtual\+Mesh\+Wall.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}\label{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}{Foam\+::virtual\+Mesh\+Wall\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 134 of file virtual\+Mesh\+Wall.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a2f23f745d64ff6c28f39737d2cf2f3b1}\label{classFoam_1_1virtualMeshWall_a2f23f745d64ff6c28f39737d2cf2f3b1}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!vectorHashSet@{vectorHashSet}}
+\index{vectorHashSet@{vectorHashSet}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{vectorHashSet}{vectorHashSet}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Hash\+Set$<$vector,Hash$<$vector$>$ $>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a2f23f745d64ff6c28f39737d2cf2f3b1}{Foam\+::virtual\+Mesh\+Wall\+::vector\+Hash\+Set}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 136 of file virtual\+Mesh\+Wall.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a2f23f745d64ff6c28f39737d2cf2f3b1}\label{classFoam_1_1virtualMeshWall_a2f23f745d64ff6c28f39737d2cf2f3b1}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!vectorHashSet@{vectorHashSet}}
+\index{vectorHashSet@{vectorHashSet}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{vectorHashSet}{vectorHashSet}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Hash\+Set$<$vector,Hash$<$vector$>$ $>$ \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a2f23f745d64ff6c28f39737d2cf2f3b1}{Foam\+::virtual\+Mesh\+Wall\+::vector\+Hash\+Set}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 136 of file virtual\+Mesh\+Wall.\+H.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a9463c3366c3b97f5234e1abcda37a1fc}\label{classFoam_1_1virtualMeshWall_a9463c3366c3b97f5234e1abcda37a1fc}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!virtualMeshWall@{virtualMeshWall}}
+\index{virtualMeshWall@{virtualMeshWall}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{virtualMeshWall()}{virtualMeshWall()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual\+Mesh\+Wall\+::virtual\+Mesh\+Wall (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo}{virtual\+Mesh\+Wall\+Info}} \&}]{v\+Mesh\+Wall\+Info,  }\item[{\mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} \&}]{c\+Geom\+Model }\end{DoxyParamCaption})}
+
+
+
+Definition at line 40 of file virtual\+Mesh\+Wall.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{44 :}
+\DoxyCodeLine{45 \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a1d6d46e990e2c0ed32bdb7c1c85e9dd5}{cGeomModel\_}}(cGeomModel),}
+\DoxyCodeLine{46 \mbox{\hyperlink{classFoam_1_1virtualMeshWall_aad53df34d0cab2566cb7450b63c94508}{vMeshWallInfo\_}}(vMeshWallInfo),}
+\DoxyCodeLine{47 \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}(vMeshWallInfo.\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo_a8b92341a054c05284d910324b444c251}{subVolumeNVector}},}
+\DoxyCodeLine{48     vMeshWallInfo.\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo_a472721330bbc5241ac9e0fa051d1a135}{bBox}},}
+\DoxyCodeLine{49     vMeshWallInfo.\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo_a061af1f66991c7d204e2459fd544c127}{charCellSize}},}
+\DoxyCodeLine{50     vMeshWallInfo.\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo_ae22addc58ecaf971e3157c851375bc37}{subVolumeV}})}
+\DoxyCodeLine{51 \{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a0275a9ebcd9d91dca828a4c2a3fae4ed}\label{classFoam_1_1virtualMeshWall_a0275a9ebcd9d91dca828a4c2a3fae4ed}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!````~virtualMeshWall@{$\sim$virtualMeshWall}}
+\index{````~virtualMeshWall@{$\sim$virtualMeshWall}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{$\sim$virtualMeshWall()}{~virtualMeshWall()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual\+Mesh\+Wall\+::$\sim$virtual\+Mesh\+Wall (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 53 of file virtual\+Mesh\+Wall.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{54 \{}
+\DoxyCodeLine{55 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_aa4a24e18c7322c1aeee03310384b825c}\label{classFoam_1_1virtualMeshWall_aa4a24e18c7322c1aeee03310384b825c}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!virtualMeshWall@{virtualMeshWall}}
+\index{virtualMeshWall@{virtualMeshWall}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{virtualMeshWall()}{virtualMeshWall()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::virtual\+Mesh\+Wall\+::virtual\+Mesh\+Wall (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo}{virtual\+Mesh\+Wall\+Info}} \&}]{v\+Mesh\+Wall\+Info,  }\item[{\mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} \&}]{c\+Geom\+Model }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_ae4173bbaf81b2b062f617570708988a3}\label{classFoam_1_1virtualMeshWall_ae4173bbaf81b2b062f617570708988a3}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!````~virtualMeshWall@{$\sim$virtualMeshWall}}
+\index{````~virtualMeshWall@{$\sim$virtualMeshWall}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{$\sim$virtualMeshWall()}{~virtualMeshWall()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::virtual\+Mesh\+Wall\+::$\sim$virtual\+Mesh\+Wall (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a00c17609d545a8eaa4116b0dc8a97a2a}\label{classFoam_1_1virtualMeshWall_a00c17609d545a8eaa4116b0dc8a97a2a}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!checkSubVolume@{checkSubVolume}}
+\index{checkSubVolume@{checkSubVolume}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{checkSubVolume()}{checkSubVolume()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void virtual\+Mesh\+Wall\+::check\+Sub\+Volume (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1subVolumeProperties}{sub\+Volume\+Properties}} \&}]{sub\+Volume }\end{DoxyParamCaption})}
+
+
+
+Definition at line 180 of file virtual\+Mesh\+Wall.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{181 \{}
+\DoxyCodeLine{182     \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1subVolume}{subVolume}}.toCheck)}
+\DoxyCodeLine{183     \{}
+\DoxyCodeLine{184         \mbox{\hyperlink{classFoam_1_1subVolume}{subVolume}}.isCBody = \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a1d6d46e990e2c0ed32bdb7c1c85e9dd5}{cGeomModel\_}}.\mbox{\hyperlink{classFoam_1_1geomModel_a9f26fe62858c0b9da399f2c5823ea0a5}{pointInside}}(\mbox{\hyperlink{classFoam_1_1subVolume}{subVolume}}.center);}
+\DoxyCodeLine{185         \mbox{\hyperlink{classFoam_1_1subVolume}{subVolume}}.toCheck = \textcolor{keyword}{false};}
+\DoxyCodeLine{186     \}}
+\DoxyCodeLine{187 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 1
+Here is the caller graph for this function\+:
+% FIG 2
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a7c4ee599c23ad200393e707c9838aead}\label{classFoam_1_1virtualMeshWall_a7c4ee599c23ad200393e707c9838aead}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!checkSubVolume@{checkSubVolume}}
+\index{checkSubVolume@{checkSubVolume}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{checkSubVolume()}{checkSubVolume()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::virtual\+Mesh\+Wall\+::check\+Sub\+Volume (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1subVolumeProperties}{sub\+Volume\+Properties}} \&}]{sub\+Volume }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a229ccdf5daaa15de592ba5699ca24759}\label{classFoam_1_1virtualMeshWall_a229ccdf5daaa15de592ba5699ca24759}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!detectFirstContactPoint@{detectFirstContactPoint}}
+\index{detectFirstContactPoint@{detectFirstContactPoint}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{detectFirstContactPoint()}{detectFirstContactPoint()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool virtual\+Mesh\+Wall\+::detect\+First\+Contact\+Point (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 57 of file virtual\+Mesh\+Wall.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{58 \{}
+\DoxyCodeLine{59     autoPtr<DynamicVectorList> nextToCheck(}
+\DoxyCodeLine{60         \textcolor{keyword}{new} \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}{DynamicVectorList}});}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{62     autoPtr<DynamicVectorList> auxToCheck(}
+\DoxyCodeLine{63         \textcolor{keyword}{new} \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}{DynamicVectorList}});}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{65     nextToCheck-\/>append(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}.\mbox{\hyperlink{classFoam_1_1bbMatrix_a17f37ee48a2af9a679c0e642d8df8135}{getSVIndexForPoint\_Wall}}(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_aad53df34d0cab2566cb7450b63c94508}{vMeshWallInfo\_}}.\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo_ac2a279eaaf9cb23b9019b33bb71c69a6}{getStartingPoint}}()));}
+\DoxyCodeLine{66     nextToCheck-\/>append(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}.\mbox{\hyperlink{classFoam_1_1bbMatrix_adc78aadf304850e42bb5f49d0de8188a}{cornerNeighbourSubVolumes}}(nextToCheck()[0]));}
+\DoxyCodeLine{67     \textcolor{comment}{// InfoH << DEM\_Info << " -\/-\/ VM firstSV : " << nextToCheck()[0] << " point " << bbMatrix\_[nextToCheck()[0]].center << endl;}}
+\DoxyCodeLine{68     \textcolor{keywordflow}{while} (nextToCheck-\/>size() > 0)}
+\DoxyCodeLine{69     \{}
+\DoxyCodeLine{70         auxToCheck-\/>clear();}
+\DoxyCodeLine{71         \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (nextToCheck(),sV)}
+\DoxyCodeLine{72         \{}
+\DoxyCodeLine{73             \mbox{\hyperlink{classFoam_1_1subVolumeProperties}{subVolumeProperties}}\& cSubVolume = \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}[nextToCheck()[sV]];}
+\DoxyCodeLine{74             \textcolor{keywordflow}{if} (!cSubVolume.\mbox{\hyperlink{classFoam_1_1subVolumeProperties_ab7ae9955fe426675dac95dbcd4f5d2ad}{toCheck}})}
+\DoxyCodeLine{75             \{}
+\DoxyCodeLine{76                 \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{77             \}}
+\DoxyCodeLine{78             \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a00c17609d545a8eaa4116b0dc8a97a2a}{checkSubVolume}}(cSubVolume);}
+\DoxyCodeLine{79 }
+\DoxyCodeLine{80             \textcolor{keywordflow}{if} (cSubVolume.\mbox{\hyperlink{classFoam_1_1subVolumeProperties_af1217173e269c40e85af07211a037df8}{isCBody}})}
+\DoxyCodeLine{81             \{}
+\DoxyCodeLine{82                 \mbox{\hyperlink{classFoam_1_1virtualMeshWall_aad53df34d0cab2566cb7450b63c94508}{vMeshWallInfo\_}}.\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo_ac52d87907a9f17ce823c88eea544b151}{startingPoint}} = cSubVolume.\mbox{\hyperlink{classFoam_1_1subVolumeProperties_ad7c78f2858b10c5157df8e1f94d28d31}{center}};}
+\DoxyCodeLine{83                 \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a4975e48fa6b4666c3dd16faa43103229}{resetSubVolume}}(cSubVolume);}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85                 \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{86 }
+\DoxyCodeLine{87             \}}
+\DoxyCodeLine{88             auxToCheck().append(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}.\mbox{\hyperlink{classFoam_1_1bbMatrix_adc78aadf304850e42bb5f49d0de8188a}{cornerNeighbourSubVolumes}}(nextToCheck()[sV]));}
+\DoxyCodeLine{89         \}}
+\DoxyCodeLine{90         \textcolor{keyword}{const} autoPtr<DynamicVectorList> helpPtr(nextToCheck.ptr());}
+\DoxyCodeLine{91         nextToCheck.set(auxToCheck.ptr());}
+\DoxyCodeLine{92         auxToCheck = helpPtr;}
+\DoxyCodeLine{93     \}}
+\DoxyCodeLine{94     \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{95 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 3
+Here is the caller graph for this function\+:
+% FIG 4
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a229a9f3637207fb26c1b8bd183941ea7}\label{classFoam_1_1virtualMeshWall_a229a9f3637207fb26c1b8bd183941ea7}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!detectFirstContactPoint@{detectFirstContactPoint}}
+\index{detectFirstContactPoint@{detectFirstContactPoint}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{detectFirstContactPoint()}{detectFirstContactPoint()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Foam\+::virtual\+Mesh\+Wall\+::detect\+First\+Contact\+Point (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a493c9c144c45daae654c8805bed08eca}\label{classFoam_1_1virtualMeshWall_a493c9c144c45daae654c8805bed08eca}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!detectFirstFaceContactPoint@{detectFirstFaceContactPoint}}
+\index{detectFirstFaceContactPoint@{detectFirstFaceContactPoint}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{detectFirstFaceContactPoint()}{detectFirstFaceContactPoint()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool virtual\+Mesh\+Wall\+::detect\+First\+Face\+Contact\+Point (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 97 of file virtual\+Mesh\+Wall.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{98 \{}
+\DoxyCodeLine{99     autoPtr<DynamicVectorList> nextToCheck(}
+\DoxyCodeLine{100         \textcolor{keyword}{new} \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}{DynamicVectorList}});}
+\DoxyCodeLine{101 }
+\DoxyCodeLine{102     autoPtr<DynamicVectorList> auxToCheck(}
+\DoxyCodeLine{103         \textcolor{keyword}{new} \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}{DynamicVectorList}});}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{105     nextToCheck-\/>append(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}.\mbox{\hyperlink{classFoam_1_1bbMatrix_a17f37ee48a2af9a679c0e642d8df8135}{getSVIndexForPoint\_Wall}}(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_aad53df34d0cab2566cb7450b63c94508}{vMeshWallInfo\_}}.\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo_ac2a279eaaf9cb23b9019b33bb71c69a6}{getStartingPoint}}()));}
+\DoxyCodeLine{106     nextToCheck-\/>append(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}.\mbox{\hyperlink{classFoam_1_1bbMatrix_aa0282e6c9db9b90433691b00e59f37c3}{faceNeighbourSubVolumes}}(nextToCheck()[0]));}
+\DoxyCodeLine{107     \textcolor{comment}{// InfoH << DEM\_Info << " -\/-\/ VM firstSV : " << nextToCheck()[0] << " point " << bbMatrix\_[nextToCheck()[0]].center << endl;}}
+\DoxyCodeLine{108     \textcolor{keywordflow}{while} (nextToCheck-\/>size() > 0)}
+\DoxyCodeLine{109     \{}
+\DoxyCodeLine{110         auxToCheck-\/>clear();}
+\DoxyCodeLine{111         \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (nextToCheck(),sV)}
+\DoxyCodeLine{112         \{}
+\DoxyCodeLine{113             \mbox{\hyperlink{classFoam_1_1subVolumeProperties}{subVolumeProperties}}\& cSubVolume = \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}[nextToCheck()[sV]];}
+\DoxyCodeLine{114             \textcolor{keywordflow}{if} (!cSubVolume.\mbox{\hyperlink{classFoam_1_1subVolumeProperties_ab7ae9955fe426675dac95dbcd4f5d2ad}{toCheck}})}
+\DoxyCodeLine{115             \{}
+\DoxyCodeLine{116                 \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{117             \}}
+\DoxyCodeLine{118             \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a00c17609d545a8eaa4116b0dc8a97a2a}{checkSubVolume}}(cSubVolume);}
+\DoxyCodeLine{119 }
+\DoxyCodeLine{120             \textcolor{keywordflow}{if} (cSubVolume.\mbox{\hyperlink{classFoam_1_1subVolumeProperties_af1217173e269c40e85af07211a037df8}{isCBody}})}
+\DoxyCodeLine{121             \{}
+\DoxyCodeLine{122                 \mbox{\hyperlink{classFoam_1_1virtualMeshWall_aad53df34d0cab2566cb7450b63c94508}{vMeshWallInfo\_}}.\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo_ac52d87907a9f17ce823c88eea544b151}{startingPoint}} = cSubVolume.\mbox{\hyperlink{classFoam_1_1subVolumeProperties_ad7c78f2858b10c5157df8e1f94d28d31}{center}};}
+\DoxyCodeLine{123                 \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a4975e48fa6b4666c3dd16faa43103229}{resetSubVolume}}(cSubVolume);}
+\DoxyCodeLine{124 }
+\DoxyCodeLine{125                 \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{126 }
+\DoxyCodeLine{127             \}}
+\DoxyCodeLine{128             auxToCheck().append(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}.\mbox{\hyperlink{classFoam_1_1bbMatrix_aa0282e6c9db9b90433691b00e59f37c3}{faceNeighbourSubVolumes}}(nextToCheck()[sV]));}
+\DoxyCodeLine{129         \}}
+\DoxyCodeLine{130         \textcolor{keyword}{const} autoPtr<DynamicVectorList> helpPtr(nextToCheck.ptr());}
+\DoxyCodeLine{131         nextToCheck.set(auxToCheck.ptr());}
+\DoxyCodeLine{132         auxToCheck = helpPtr;}
+\DoxyCodeLine{133     \}}
+\DoxyCodeLine{134     \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{135 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 5
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_abde77809394a1922b807be5ed980bf86}\label{classFoam_1_1virtualMeshWall_abde77809394a1922b807be5ed980bf86}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!detectFirstFaceContactPoint@{detectFirstFaceContactPoint}}
+\index{detectFirstFaceContactPoint@{detectFirstFaceContactPoint}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{detectFirstFaceContactPoint()}{detectFirstFaceContactPoint()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Foam\+::virtual\+Mesh\+Wall\+::detect\+First\+Face\+Contact\+Point (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a3579436720c2e5fcceea3ab96584cef4}\label{classFoam_1_1virtualMeshWall_a3579436720c2e5fcceea3ab96584cef4}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!evaluateContact@{evaluateContact}}
+\index{evaluateContact@{evaluateContact}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{evaluateContact()}{evaluateContact()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily scalar virtual\+Mesh\+Wall\+::evaluate\+Contact (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 137 of file virtual\+Mesh\+Wall.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{138 \{}
+\DoxyCodeLine{139     label volumeCount = 0;}
+\DoxyCodeLine{140     \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a7c763525d938c9d73319c796c424ee15}{contactCenter\_}} = vector::zero;}
+\DoxyCodeLine{141     autoPtr<DynamicVectorList> nextToCheck(}
+\DoxyCodeLine{142         \textcolor{keyword}{new} \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}{DynamicVectorList}});}
+\DoxyCodeLine{143     autoPtr<DynamicVectorList> auxToCheck(}
+\DoxyCodeLine{144         \textcolor{keyword}{new} \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}{DynamicVectorList}});}
+\DoxyCodeLine{145     nextToCheck-\/>append(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}.\mbox{\hyperlink{classFoam_1_1bbMatrix_a17f37ee48a2af9a679c0e642d8df8135}{getSVIndexForPoint\_Wall}}(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_aad53df34d0cab2566cb7450b63c94508}{vMeshWallInfo\_}}.\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo_ac2a279eaaf9cb23b9019b33bb71c69a6}{getStartingPoint}}()));}
+\DoxyCodeLine{146     label iterCount(0);}
+\DoxyCodeLine{147     \textcolor{keywordflow}{while} (nextToCheck().size() > 0)}
+\DoxyCodeLine{148     \{}
+\DoxyCodeLine{149         auxToCheck().clear();}
+\DoxyCodeLine{150 }
+\DoxyCodeLine{151         \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (nextToCheck(),sV)}
+\DoxyCodeLine{152         \{}
+\DoxyCodeLine{153             \mbox{\hyperlink{classFoam_1_1subVolumeProperties}{subVolumeProperties}}\& cSubVolume = \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}[nextToCheck()[sV]];}
+\DoxyCodeLine{154             iterCount++;}
+\DoxyCodeLine{155             \textcolor{keywordflow}{if} (!cSubVolume.\mbox{\hyperlink{classFoam_1_1subVolumeProperties_ab7ae9955fe426675dac95dbcd4f5d2ad}{toCheck}})}
+\DoxyCodeLine{156             \{}
+\DoxyCodeLine{157                 \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{158             \}}
+\DoxyCodeLine{159 }
+\DoxyCodeLine{160             \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a00c17609d545a8eaa4116b0dc8a97a2a}{checkSubVolume}}(cSubVolume);}
+\DoxyCodeLine{161             \textcolor{keywordflow}{if} (cSubVolume.\mbox{\hyperlink{classFoam_1_1subVolumeProperties_af1217173e269c40e85af07211a037df8}{isCBody}})}
+\DoxyCodeLine{162             \{}
+\DoxyCodeLine{163                 volumeCount++;}
+\DoxyCodeLine{164                 \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a7c763525d938c9d73319c796c424ee15}{contactCenter\_}} += cSubVolume.\mbox{\hyperlink{classFoam_1_1subVolumeProperties_ad7c78f2858b10c5157df8e1f94d28d31}{center}};}
+\DoxyCodeLine{165                 auxToCheck-\/>append(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}.\mbox{\hyperlink{classFoam_1_1bbMatrix_aa0282e6c9db9b90433691b00e59f37c3}{faceNeighbourSubVolumes}}(nextToCheck()[sV]));}
+\DoxyCodeLine{166             \}}
+\DoxyCodeLine{167         \}}
+\DoxyCodeLine{168         \textcolor{keyword}{const} autoPtr<DynamicVectorList> helpPtr(nextToCheck.ptr());}
+\DoxyCodeLine{169         nextToCheck.set(auxToCheck.ptr());}
+\DoxyCodeLine{170         auxToCheck = helpPtr;}
+\DoxyCodeLine{171     \}}
+\DoxyCodeLine{172     \textcolor{keywordflow}{if} (volumeCount > 0)}
+\DoxyCodeLine{173     \{}
+\DoxyCodeLine{174         \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a7c763525d938c9d73319c796c424ee15}{contactCenter\_}} /= volumeCount;}
+\DoxyCodeLine{175     \}}
+\DoxyCodeLine{176 }
+\DoxyCodeLine{177     \textcolor{keywordflow}{return} volumeCount*\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}.\mbox{\hyperlink{classFoam_1_1bbMatrix_a732bfc3b441ea4c1764c1f33d39a62ac}{getSubVolumeV}}();}
+\DoxyCodeLine{178 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 6
+Here is the caller graph for this function\+:
+% FIG 7
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a5efd86ef7ad4562aa76a3b111a683a16}\label{classFoam_1_1virtualMeshWall_a5efd86ef7ad4562aa76a3b111a683a16}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!evaluateContact@{evaluateContact}}
+\index{evaluateContact@{evaluateContact}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{evaluateContact()}{evaluateContact()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily scalar Foam\+::virtual\+Mesh\+Wall\+::evaluate\+Contact (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_ab012eb8bdc3d10cfc1b56237845e19d0}\label{classFoam_1_1virtualMeshWall_ab012eb8bdc3d10cfc1b56237845e19d0}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!getContactCenter@{getContactCenter}}
+\index{getContactCenter@{getContactCenter}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{getContactCenter()}{getContactCenter()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector\& Foam\+::virtual\+Mesh\+Wall\+::get\+Contact\+Center (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 184 of file virtual\+Mesh\+Wall.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{185     \{}
+\DoxyCodeLine{186         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a7c763525d938c9d73319c796c424ee15}{contactCenter\_}};}
+\DoxyCodeLine{187     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 8
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_ab012eb8bdc3d10cfc1b56237845e19d0}\label{classFoam_1_1virtualMeshWall_ab012eb8bdc3d10cfc1b56237845e19d0}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!getContactCenter@{getContactCenter}}
+\index{getContactCenter@{getContactCenter}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{getContactCenter()}{getContactCenter()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector\& Foam\+::virtual\+Mesh\+Wall\+::get\+Contact\+Center (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 184 of file virtual\+Mesh\+Wall.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{185     \{}
+\DoxyCodeLine{186         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a7c763525d938c9d73319c796c424ee15}{contactCenter\_}};}
+\DoxyCodeLine{187     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a78a7f7fc0b6680dba2b6b4b94f891208}\label{classFoam_1_1virtualMeshWall_a78a7f7fc0b6680dba2b6b4b94f891208}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!getEdgeSVPoints@{getEdgeSVPoints}}
+\index{getEdgeSVPoints@{getEdgeSVPoints}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{getEdgeSVPoints()}{getEdgeSVPoints()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ad338b31ddb3749afcc633545a6bd7aea}{Dynamic\+Point\+List}}\& Foam\+::virtual\+Mesh\+Wall\+::get\+Edge\+S\+V\+Points (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 179 of file virtual\+Mesh\+Wall.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{180     \{}
+\DoxyCodeLine{181         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a536a54320b2668e5476988bf1e7b3970}{edgeSubVolumesPoints\_}};}
+\DoxyCodeLine{182     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a78a7f7fc0b6680dba2b6b4b94f891208}\label{classFoam_1_1virtualMeshWall_a78a7f7fc0b6680dba2b6b4b94f891208}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!getEdgeSVPoints@{getEdgeSVPoints}}
+\index{getEdgeSVPoints@{getEdgeSVPoints}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{getEdgeSVPoints()}{getEdgeSVPoints()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ad338b31ddb3749afcc633545a6bd7aea}{Dynamic\+Point\+List}}\& Foam\+::virtual\+Mesh\+Wall\+::get\+Edge\+S\+V\+Points (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 179 of file virtual\+Mesh\+Wall.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{180     \{}
+\DoxyCodeLine{181         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a536a54320b2668e5476988bf1e7b3970}{edgeSubVolumesPoints\_}};}
+\DoxyCodeLine{182     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_af53365138a24a3c6ec8e08ed16fd9804}\label{classFoam_1_1virtualMeshWall_af53365138a24a3c6ec8e08ed16fd9804}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!getInternalSV@{getInternalSV}}
+\index{getInternalSV@{getInternalSV}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{getInternalSV()}{getInternalSV()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily label Foam\+::virtual\+Mesh\+Wall\+::get\+Internal\+SV (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_aa22cdb168de3f2f0d3f0f9c0f2cd57c4}\label{classFoam_1_1virtualMeshWall_aa22cdb168de3f2f0d3f0f9c0f2cd57c4}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!getInternalSV@{getInternalSV}}
+\index{getInternalSV@{getInternalSV}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{getInternalSV()}{getInternalSV()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily label virtual\+Mesh\+Wall\+::get\+Internal\+SV (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 197 of file virtual\+Mesh\+Wall.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{198 \{}
+\DoxyCodeLine{199     autoPtr<DynamicVectorList> nextToCheck(}
+\DoxyCodeLine{200         \textcolor{keyword}{new} \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}{DynamicVectorList}});}
+\DoxyCodeLine{201     autoPtr<DynamicVectorList> auxToCheck(}
+\DoxyCodeLine{202         \textcolor{keyword}{new} \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ae76de56dfed20f918f8ac3119939850c}{DynamicVectorList}});}
+\DoxyCodeLine{203 }
+\DoxyCodeLine{204     nextToCheck-\/>append(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}.\mbox{\hyperlink{classFoam_1_1bbMatrix_a276ee0041fe40d201d4c92f9f97cc807}{getSVIndexForPoint}}(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_aad53df34d0cab2566cb7450b63c94508}{vMeshWallInfo\_}}.\mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo_ac2a279eaaf9cb23b9019b33bb71c69a6}{getStartingPoint}}()));}
+\DoxyCodeLine{205     label innerSVCount(0);}
+\DoxyCodeLine{206     \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a2f23f745d64ff6c28f39737d2cf2f3b1}{vectorHashSet}} octreeSvSet;}
+\DoxyCodeLine{207     }
+\DoxyCodeLine{208     \textcolor{keywordflow}{while} (nextToCheck-\/>size() > 0)}
+\DoxyCodeLine{209     \{}
+\DoxyCodeLine{210         auxToCheck().clear();}
+\DoxyCodeLine{211         \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (nextToCheck(),sV)}
+\DoxyCodeLine{212         \{   }
+\DoxyCodeLine{213             \textcolor{keywordflow}{if} (!octreeSvSet.found(nextToCheck()[sV]))}
+\DoxyCodeLine{214             \{}
+\DoxyCodeLine{215                 octreeSvSet.insert(nextToCheck()[sV]);}
+\DoxyCodeLine{216                 \mbox{\hyperlink{classFoam_1_1subVolumeProperties}{subVolumeProperties}}\& cSubVolume = \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}[nextToCheck()[sV]];}
+\DoxyCodeLine{217                 \textcolor{keywordflow}{if} (cSubVolume.\mbox{\hyperlink{classFoam_1_1subVolumeProperties_af1217173e269c40e85af07211a037df8}{isCBody}})}
+\DoxyCodeLine{218                 \{}
+\DoxyCodeLine{219                     \textcolor{keywordtype}{bool} isNotOnEdge(\textcolor{keyword}{true});}
+\DoxyCodeLine{220                     List<vector> neighbourSubVolumes = \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}.\mbox{\hyperlink{classFoam_1_1bbMatrix_aa0282e6c9db9b90433691b00e59f37c3}{faceNeighbourSubVolumes}}(nextToCheck()[sV]);}
+\DoxyCodeLine{221                     neighbourSubVolumes.append(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}.\mbox{\hyperlink{classFoam_1_1bbMatrix_a8fcb01f3ec1377cd0432deed08dc46c1}{edgeNeighbourSubVolumes}}(nextToCheck()[sV]));}
+\DoxyCodeLine{222                     neighbourSubVolumes.append(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}.\mbox{\hyperlink{classFoam_1_1bbMatrix_adc78aadf304850e42bb5f49d0de8188a}{cornerNeighbourSubVolumes}}(nextToCheck()[sV]));}
+\DoxyCodeLine{223                     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(neighbourSubVolumes,nSV)}
+\DoxyCodeLine{224                     \{}
+\DoxyCodeLine{225                         isNotOnEdge *= \mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}[neighbourSubVolumes[nSV]].isCBody;}
+\DoxyCodeLine{226                     \}}
+\DoxyCodeLine{227                     \textcolor{keywordflow}{if}(!isNotOnEdge)}
+\DoxyCodeLine{228                     \{}
+\DoxyCodeLine{229                         cSubVolume.\mbox{\hyperlink{classFoam_1_1subVolumeProperties_ac63d2f7474b3e736a0568f7377453443}{isOnEdge}} = \textcolor{keyword}{true};}
+\DoxyCodeLine{230                     \}}
+\DoxyCodeLine{231                     auxToCheck().append(\mbox{\hyperlink{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}{bbMatrix\_}}.\mbox{\hyperlink{classFoam_1_1bbMatrix_aa0282e6c9db9b90433691b00e59f37c3}{faceNeighbourSubVolumes}}(nextToCheck()[sV]));}
+\DoxyCodeLine{232                 \}}
+\DoxyCodeLine{233                 \textcolor{keywordflow}{if}(!cSubVolume.\mbox{\hyperlink{classFoam_1_1subVolumeProperties_ac63d2f7474b3e736a0568f7377453443}{isOnEdge}})}
+\DoxyCodeLine{234                 \{}
+\DoxyCodeLine{235                     innerSVCount++;}
+\DoxyCodeLine{236                 \}}
+\DoxyCodeLine{237             \}}
+\DoxyCodeLine{238         \}}
+\DoxyCodeLine{239 }
+\DoxyCodeLine{240         \textcolor{keyword}{const} autoPtr<DynamicVectorList> helpPtr(nextToCheck.ptr());}
+\DoxyCodeLine{241         nextToCheck.set(auxToCheck.ptr());}
+\DoxyCodeLine{242         auxToCheck = helpPtr;}
+\DoxyCodeLine{243     \}}
+\DoxyCodeLine{244     \textcolor{keywordflow}{return} innerSVCount;}
+\DoxyCodeLine{245 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 9
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a4975e48fa6b4666c3dd16faa43103229}\label{classFoam_1_1virtualMeshWall_a4975e48fa6b4666c3dd16faa43103229}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!resetSubVolume@{resetSubVolume}}
+\index{resetSubVolume@{resetSubVolume}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{resetSubVolume()}{resetSubVolume()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void virtual\+Mesh\+Wall\+::reset\+Sub\+Volume (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1subVolumeProperties}{sub\+Volume\+Properties}} \&}]{sub\+Volume }\end{DoxyParamCaption})}
+
+
+
+Definition at line 189 of file virtual\+Mesh\+Wall.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{190 \{}
+\DoxyCodeLine{191     \mbox{\hyperlink{classFoam_1_1subVolume}{subVolume}}.toCheck = \textcolor{keyword}{true};}
+\DoxyCodeLine{192     \mbox{\hyperlink{classFoam_1_1subVolume}{subVolume}}.isCBody = \textcolor{keyword}{false};}
+\DoxyCodeLine{193     \mbox{\hyperlink{classFoam_1_1subVolume}{subVolume}}.isTBody = \textcolor{keyword}{false};}
+\DoxyCodeLine{194     \mbox{\hyperlink{classFoam_1_1subVolume}{subVolume}}.isOnEdge = \textcolor{keyword}{false};   }
+\DoxyCodeLine{195 \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 10
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_ac48f03c69df6496a4fe804ca6ea54ad9}\label{classFoam_1_1virtualMeshWall_ac48f03c69df6496a4fe804ca6ea54ad9}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!resetSubVolume@{resetSubVolume}}
+\index{resetSubVolume@{resetSubVolume}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{resetSubVolume()}{resetSubVolume()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::virtual\+Mesh\+Wall\+::reset\+Sub\+Volume (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1subVolumeProperties}{sub\+Volume\+Properties}} \&}]{sub\+Volume }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a14a866a3f0a90c0259e35c7d33eb5b10}\label{classFoam_1_1virtualMeshWall_a14a866a3f0a90c0259e35c7d33eb5b10}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!shiftEdgeSubVolume@{shiftEdgeSubVolume}}
+\index{shiftEdgeSubVolume@{shiftEdgeSubVolume}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{shiftEdgeSubVolume()}{shiftEdgeSubVolume()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector Foam\+::virtual\+Mesh\+Wall\+::shift\+Edge\+Sub\+Volume (\begin{DoxyParamCaption}\item[{vector \&}]{sub\+Volume\+Index }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a14a866a3f0a90c0259e35c7d33eb5b10}\label{classFoam_1_1virtualMeshWall_a14a866a3f0a90c0259e35c7d33eb5b10}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!shiftEdgeSubVolume@{shiftEdgeSubVolume}}
+\index{shiftEdgeSubVolume@{shiftEdgeSubVolume}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{shiftEdgeSubVolume()}{shiftEdgeSubVolume()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector Foam\+::virtual\+Mesh\+Wall\+::shift\+Edge\+Sub\+Volume (\begin{DoxyParamCaption}\item[{vector \&}]{sub\+Volume\+Index }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}\label{classFoam_1_1virtualMeshWall_a717112d5a628f9bc35d0cc6c018ba1c0}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!bbMatrix\_@{bbMatrix\_}}
+\index{bbMatrix\_@{bbMatrix\_}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{bbMatrix\_}{bbMatrix\_}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classFoam_1_1bbMatrix}{bb\+Matrix}} Foam\+::virtual\+Mesh\+Wall\+::bb\+Matrix\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 142 of file virtual\+Mesh\+Wall.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a1d6d46e990e2c0ed32bdb7c1c85e9dd5}\label{classFoam_1_1virtualMeshWall_a1d6d46e990e2c0ed32bdb7c1c85e9dd5}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!cGeomModel\_@{cGeomModel\_}}
+\index{cGeomModel\_@{cGeomModel\_}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{cGeomModel\_}{cGeomModel\_}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} \& Foam\+::virtual\+Mesh\+Wall\+::c\+Geom\+Model\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 138 of file virtual\+Mesh\+Wall.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a7c763525d938c9d73319c796c424ee15}\label{classFoam_1_1virtualMeshWall_a7c763525d938c9d73319c796c424ee15}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!contactCenter\_@{contactCenter\_}}
+\index{contactCenter\_@{contactCenter\_}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{contactCenter\_}{contactCenter\_}}
+{\footnotesize\ttfamily vector Foam\+::virtual\+Mesh\+Wall\+::contact\+Center\+\_\+ = vector\+::zero}
+
+
+
+Definition at line 148 of file virtual\+Mesh\+Wall.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_a536a54320b2668e5476988bf1e7b3970}\label{classFoam_1_1virtualMeshWall_a536a54320b2668e5476988bf1e7b3970}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!edgeSubVolumesPoints\_@{edgeSubVolumesPoints\_}}
+\index{edgeSubVolumesPoints\_@{edgeSubVolumesPoints\_}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{edgeSubVolumesPoints\_}{edgeSubVolumesPoints\_}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classFoam_1_1virtualMeshWall_ad338b31ddb3749afcc633545a6bd7aea}{Dynamic\+Point\+List}} Foam\+::virtual\+Mesh\+Wall\+::edge\+Sub\+Volumes\+Points\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 144 of file virtual\+Mesh\+Wall.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1virtualMeshWall_aad53df34d0cab2566cb7450b63c94508}\label{classFoam_1_1virtualMeshWall_aad53df34d0cab2566cb7450b63c94508}} 
+\index{Foam::virtualMeshWall@{Foam::virtualMeshWall}!vMeshWallInfo\_@{vMeshWallInfo\_}}
+\index{vMeshWallInfo\_@{vMeshWallInfo\_}!Foam::virtualMeshWall@{Foam::virtualMeshWall}}
+\doxysubsubsection{\texorpdfstring{vMeshWallInfo\_}{vMeshWallInfo\_}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structFoam_1_1virtualMeshWallInfo}{virtual\+Mesh\+Wall\+Info}} \& Foam\+::virtual\+Mesh\+Wall\+::v\+Mesh\+Wall\+Info\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 140 of file virtual\+Mesh\+Wall.\+H.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/ln\+Include/\mbox{\hyperlink{lnInclude_2virtualMeshWall_8H}{virtual\+Mesh\+Wall.\+H}}\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/ln\+Include/\mbox{\hyperlink{lnInclude_2virtualMeshWall_8C}{virtual\+Mesh\+Wall.\+C}}\end{DoxyCompactItemize}

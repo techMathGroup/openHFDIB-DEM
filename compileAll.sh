@@ -7,12 +7,12 @@ wmake libso
 cd ../..
 
 # compile the solver
-cd application/pimpleHFDIBFoam
+cd application/solvers/pimpleHFDIBFoam
 wclean
 wmake
 cd ../..
 
-cd application/HFDIBDEMFoam
+cd application/solvers/HFDIBDEMFoam
 wclean
 wmake
 cd ../..

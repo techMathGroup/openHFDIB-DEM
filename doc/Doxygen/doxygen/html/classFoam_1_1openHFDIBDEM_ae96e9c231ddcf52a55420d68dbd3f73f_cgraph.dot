@@ -1,0 +1,23 @@
+digraph "Foam::openHFDIBDEM::addRemoveBodies"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="Foam::openHFDIBDEM\l::addRemoveBodies",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node2 [label="Foam::immersedBody\l::computeBodyCharPars",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1immersedBody.html#aa7cdc57bfc273af0fda0d26a094c28ad",tooltip=" "];
+  Node1 -> Node3 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node3 [label="Foam::immersedBody\l::createImmersedBody",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1immersedBody.html#af40d3928b7e25e82fea34acd42690aaa",tooltip=" "];
+  Node1 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node4 [label="forAll",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$addModels_2initializeAddModels_8H.html#adcd69a620b2d93c893cbf0e92bb7c5d7",tooltip=" "];
+  Node4 -> Node5 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node5 [label="thrSurf",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$addModels_2initializeAddModels_8H.html#a12947c9cf4cff46d3d0a324e3e718f45",tooltip=" "];
+  Node1 -> Node6 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node6 [label="Foam::immersedBody\l::getStartSynced",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1immersedBody.html#abde698a5907ac8990f6b4d96f410544f",tooltip=" "];
+  Node1 -> Node7 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 [label="Foam::immersedBody\l::initSyncWithFlow",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1immersedBody.html#afc301c98ed8c04c0a26ae633d23cba67",tooltip=" "];
+  Node7 -> Node4 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node7 -> Node8 [color="midnightblue",fontsize="10",style="solid",fontname="Helvetica"];
+  Node8 [label="Foam::immersedBody\l::printStats",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1immersedBody.html#a3512f6fae90bdb460059069f9749fd62",tooltip=" "];
+}

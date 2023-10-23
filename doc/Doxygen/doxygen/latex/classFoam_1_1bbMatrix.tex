@@ -1,0 +1,774 @@
+\hypertarget{classFoam_1_1bbMatrix}{}\doxysection{Foam\+::bb\+Matrix Class Reference}
+\label{classFoam_1_1bbMatrix}\index{Foam::bbMatrix@{Foam::bbMatrix}}
+
+
+{\ttfamily \#include $<$bb\+Matrix.\+H$>$}
+
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classFoam_1_1bbMatrix_a25cbba7233f9907343f1a5ef4ae26bb7}{bb\+Matrix}} (const vector matrix\+Size, const bound\+Box b\+Box, const scalar \&char\+Cell\+Size, const scalar \&sub\+VolumeV)
+\item 
+\mbox{\hyperlink{classFoam_1_1bbMatrix_afef119d3896874932dfce201bae9fcaa}{$\sim$bb\+Matrix}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1subVolumeProperties}{sub\+Volume\+Properties}} \& \mbox{\hyperlink{classFoam_1_1bbMatrix_a8563570fde6efce95d2466fc9dcbec6f}{operator\mbox{[}$\,$\mbox{]}}} (const vector \&s\+VI)
+\item 
+vector \mbox{\hyperlink{classFoam_1_1bbMatrix_a6f4dbab4295563a0d990be39589c56c2}{get\+Point\+In\+Mesh}} (const vector \&sub\+Volume\+Index)
+\item 
+vector \mbox{\hyperlink{classFoam_1_1bbMatrix_a276ee0041fe40d201d4c92f9f97cc807}{get\+S\+V\+Index\+For\+Point}} (const point \&point\+In\+Domain)
+\item 
+vector \mbox{\hyperlink{classFoam_1_1bbMatrix_a17f37ee48a2af9a679c0e642d8df8135}{get\+S\+V\+Index\+For\+Point\+\_\+\+Wall}} (point point\+In\+Domain)
+\item 
+vector \mbox{\hyperlink{classFoam_1_1bbMatrix_a0b736192e4890c7c0b49fd18ba91e57e}{get\+First\+Sub\+Volume\+Index}} (point \&sub\+Volume\+Point, bool \&is\+In\+Matrix)
+\item 
+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_aa0282e6c9db9b90433691b00e59f37c3}{face\+Neighbour\+Sub\+Volumes}} (vector \&sub\+Volume\+Index)
+\item 
+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_a8fcb01f3ec1377cd0432deed08dc46c1}{edge\+Neighbour\+Sub\+Volumes}} (vector \&sub\+Volume\+Index)
+\item 
+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_adc78aadf304850e42bb5f49d0de8188a}{corner\+Neighbour\+Sub\+Volumes}} (vector \&sub\+Volume\+Index)
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1bbMatrix_a732bfc3b441ea4c1764c1f33d39a62ac}{get\+Sub\+VolumeV}} ()
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1bbMatrix_afa3656ab9af6938217145e7198240f0d}{get\+Char\+Cell\+Size}} ()
+\item 
+bound\+Box \mbox{\hyperlink{classFoam_1_1bbMatrix_a7573c74f48c70670b9e15510c6a86c61}{get\+B\+Box}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1bbMatrix_aa25d3ecd91c19a349f00f9bb7126853e}{bb\+Matrix}} (const vector matrix\+Size, const bound\+Box b\+Box, const scalar \&char\+Cell\+Size, const scalar \&sub\+VolumeV)
+\item 
+\mbox{\hyperlink{classFoam_1_1bbMatrix_a51870efc22e408abcc8e08decb3ea755}{$\sim$bb\+Matrix}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1subVolumeProperties}{sub\+Volume\+Properties}} \& \mbox{\hyperlink{classFoam_1_1bbMatrix_a8563570fde6efce95d2466fc9dcbec6f}{operator\mbox{[}$\,$\mbox{]}}} (const vector \&s\+VI)
+\item 
+vector \mbox{\hyperlink{classFoam_1_1bbMatrix_a6b028b584f94c73f07330435897f8fcd}{get\+Point\+In\+Mesh}} (const vector \&sub\+Volume\+Index)
+\item 
+vector \mbox{\hyperlink{classFoam_1_1bbMatrix_a2cdc34569da86a11639f71de994a8015}{get\+S\+V\+Index\+For\+Point}} (const point \&point\+In\+Domain)
+\item 
+vector \mbox{\hyperlink{classFoam_1_1bbMatrix_a5807915641a98b491dd60c4931fb3c9e}{get\+S\+V\+Index\+For\+Point\+\_\+\+Wall}} (point point\+In\+Domain)
+\item 
+vector \mbox{\hyperlink{classFoam_1_1bbMatrix_a8dc877c0a484fa8d11e24c138ba60765}{get\+First\+Sub\+Volume\+Index}} (point \&sub\+Volume\+Point, bool \&is\+In\+Matrix)
+\item 
+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_a3b695dad54cc434495b9e068ff4cff25}{face\+Neighbour\+Sub\+Volumes}} (vector \&sub\+Volume\+Index)
+\item 
+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_afef5d500d28c0143b357620567770c5c}{edge\+Neighbour\+Sub\+Volumes}} (vector \&sub\+Volume\+Index)
+\item 
+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_a46663e67ece938888907990f37f4a14c}{corner\+Neighbour\+Sub\+Volumes}} (vector \&sub\+Volume\+Index)
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1bbMatrix_a732bfc3b441ea4c1764c1f33d39a62ac}{get\+Sub\+VolumeV}} ()
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1bbMatrix_afa3656ab9af6938217145e7198240f0d}{get\+Char\+Cell\+Size}} ()
+\item 
+bound\+Box \mbox{\hyperlink{classFoam_1_1bbMatrix_a7573c74f48c70670b9e15510c6a86c61}{get\+B\+Box}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_aaa3efdfc7e62248583ce953e37b7c7da}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_a1fd060cbd31bf15d2839924cd80545ac}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_a54aefe4e218c21a3c01b845df5fc5e4d}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_ad1e0c340c01f55f60d2a18f1b9d54427}{Dynamic\+Point\+List}}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_aaa3efdfc7e62248583ce953e37b7c7da}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_a1fd060cbd31bf15d2839924cd80545ac}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_a54aefe4e218c21a3c01b845df5fc5e4d}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_ad1e0c340c01f55f60d2a18f1b9d54427}{Dynamic\+Point\+List}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const vector \mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrix\+Size\+\_\+}}
+\item 
+const bound\+Box \mbox{\hyperlink{classFoam_1_1bbMatrix_a63d70916d85cd863b3d1bf6cc61ef78f}{b\+Box\+\_\+}}
+\item 
+const scalar \mbox{\hyperlink{classFoam_1_1bbMatrix_aedf5fa2bef41076430167661b0633cfe}{char\+Cell\+Size\+\_\+}}
+\item 
+const scalar \mbox{\hyperlink{classFoam_1_1bbMatrix_ae4e53ca5f0357f7de313a7e695887eda}{sub\+Volume\+V\+\_\+}}
+\item 
+List$<$ List$<$ List$<$ auto\+Ptr$<$ \mbox{\hyperlink{classFoam_1_1subVolumeProperties}{sub\+Volume\+Properties}} $>$ $>$ $>$ $>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_aee4256eb2dd8511c13d75ef2d748fa14}{bb\+Matrix\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 54 of file bb\+Matrix.\+H.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_aaa3efdfc7e62248583ce953e37b7c7da}\label{classFoam_1_1bbMatrix_aaa3efdfc7e62248583ce953e37b7c7da}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_aaa3efdfc7e62248583ce953e37b7c7da}{Foam\+::bb\+Matrix\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 58 of file bb\+Matrix.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_aaa3efdfc7e62248583ce953e37b7c7da}\label{classFoam_1_1bbMatrix_aaa3efdfc7e62248583ce953e37b7c7da}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_aaa3efdfc7e62248583ce953e37b7c7da}{Foam\+::bb\+Matrix\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 58 of file bb\+Matrix.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_ad1e0c340c01f55f60d2a18f1b9d54427}\label{classFoam_1_1bbMatrix_ad1e0c340c01f55f60d2a18f1b9d54427}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_ad1e0c340c01f55f60d2a18f1b9d54427}{Foam\+::bb\+Matrix\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 61 of file bb\+Matrix.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_ad1e0c340c01f55f60d2a18f1b9d54427}\label{classFoam_1_1bbMatrix_ad1e0c340c01f55f60d2a18f1b9d54427}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_ad1e0c340c01f55f60d2a18f1b9d54427}{Foam\+::bb\+Matrix\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 61 of file bb\+Matrix.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a1fd060cbd31bf15d2839924cd80545ac}\label{classFoam_1_1bbMatrix_a1fd060cbd31bf15d2839924cd80545ac}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_a1fd060cbd31bf15d2839924cd80545ac}{Foam\+::bb\+Matrix\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 59 of file bb\+Matrix.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a1fd060cbd31bf15d2839924cd80545ac}\label{classFoam_1_1bbMatrix_a1fd060cbd31bf15d2839924cd80545ac}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_a1fd060cbd31bf15d2839924cd80545ac}{Foam\+::bb\+Matrix\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 59 of file bb\+Matrix.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a54aefe4e218c21a3c01b845df5fc5e4d}\label{classFoam_1_1bbMatrix_a54aefe4e218c21a3c01b845df5fc5e4d}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_a54aefe4e218c21a3c01b845df5fc5e4d}{Foam\+::bb\+Matrix\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 60 of file bb\+Matrix.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a54aefe4e218c21a3c01b845df5fc5e4d}\label{classFoam_1_1bbMatrix_a54aefe4e218c21a3c01b845df5fc5e4d}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1bbMatrix_a54aefe4e218c21a3c01b845df5fc5e4d}{Foam\+::bb\+Matrix\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 60 of file bb\+Matrix.\+H.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a25cbba7233f9907343f1a5ef4ae26bb7}\label{classFoam_1_1bbMatrix_a25cbba7233f9907343f1a5ef4ae26bb7}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!bbMatrix@{bbMatrix}}
+\index{bbMatrix@{bbMatrix}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{bbMatrix()}{bbMatrix()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bb\+Matrix\+::bb\+Matrix (\begin{DoxyParamCaption}\item[{const vector}]{matrix\+Size,  }\item[{const bound\+Box}]{b\+Box,  }\item[{const scalar \&}]{char\+Cell\+Size,  }\item[{const scalar \&}]{sub\+VolumeV }\end{DoxyParamCaption})}
+
+
+
+Definition at line 40 of file bb\+Matrix.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{46 :}
+\DoxyCodeLine{47 \mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}(matrixSize),}
+\DoxyCodeLine{48 \mbox{\hyperlink{classFoam_1_1bbMatrix_a63d70916d85cd863b3d1bf6cc61ef78f}{bBox\_}}(bBox),}
+\DoxyCodeLine{49 \mbox{\hyperlink{classFoam_1_1bbMatrix_aedf5fa2bef41076430167661b0633cfe}{charCellSize\_}}(charCellSize),}
+\DoxyCodeLine{50 \mbox{\hyperlink{classFoam_1_1bbMatrix_ae4e53ca5f0357f7de313a7e695887eda}{subVolumeV\_}}(subVolumeV)}
+\DoxyCodeLine{51 \{}
+\DoxyCodeLine{52     \mbox{\hyperlink{classFoam_1_1bbMatrix_aee4256eb2dd8511c13d75ef2d748fa14}{bbMatrix\_}} = List<List<List<autoPtr<subVolumeProperties>>>>(\mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[0],}
+\DoxyCodeLine{53         List<List<autoPtr<subVolumeProperties>>>(\mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[1],}
+\DoxyCodeLine{54         List<autoPtr<subVolumeProperties>>(\mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[2])));}
+\DoxyCodeLine{55 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_afef119d3896874932dfce201bae9fcaa}\label{classFoam_1_1bbMatrix_afef119d3896874932dfce201bae9fcaa}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!````~bbMatrix@{$\sim$bbMatrix}}
+\index{````~bbMatrix@{$\sim$bbMatrix}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{$\sim$bbMatrix()}{~bbMatrix()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bb\+Matrix\+::$\sim$bb\+Matrix (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 56 of file bb\+Matrix.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{57 \{}
+\DoxyCodeLine{58 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_aa25d3ecd91c19a349f00f9bb7126853e}\label{classFoam_1_1bbMatrix_aa25d3ecd91c19a349f00f9bb7126853e}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!bbMatrix@{bbMatrix}}
+\index{bbMatrix@{bbMatrix}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{bbMatrix()}{bbMatrix()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::bb\+Matrix\+::bb\+Matrix (\begin{DoxyParamCaption}\item[{const vector}]{matrix\+Size,  }\item[{const bound\+Box}]{b\+Box,  }\item[{const scalar \&}]{char\+Cell\+Size,  }\item[{const scalar \&}]{sub\+VolumeV }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a51870efc22e408abcc8e08decb3ea755}\label{classFoam_1_1bbMatrix_a51870efc22e408abcc8e08decb3ea755}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!````~bbMatrix@{$\sim$bbMatrix}}
+\index{````~bbMatrix@{$\sim$bbMatrix}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{$\sim$bbMatrix()}{~bbMatrix()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::bb\+Matrix\+::$\sim$bb\+Matrix (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_adc78aadf304850e42bb5f49d0de8188a}\label{classFoam_1_1bbMatrix_adc78aadf304850e42bb5f49d0de8188a}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!cornerNeighbourSubVolumes@{cornerNeighbourSubVolumes}}
+\index{cornerNeighbourSubVolumes@{cornerNeighbourSubVolumes}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{cornerNeighbourSubVolumes()}{cornerNeighbourSubVolumes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily List$<$ vector $>$ bb\+Matrix\+::corner\+Neighbour\+Sub\+Volumes (\begin{DoxyParamCaption}\item[{vector \&}]{sub\+Volume\+Index }\end{DoxyParamCaption})}
+
+
+
+Definition at line 213 of file bb\+Matrix.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{216 \{}
+\DoxyCodeLine{217     label i(subVolumeIndex[0]);}
+\DoxyCodeLine{218     label j(subVolumeIndex[1]);}
+\DoxyCodeLine{219     label k(subVolumeIndex[2]);}
+\DoxyCodeLine{220 }
+\DoxyCodeLine{221     vector cornerNeighbour1(i+1,j+1,k+1);}
+\DoxyCodeLine{222     vector cornerNeighbour2(i+1,j-\/1,k+1);}
+\DoxyCodeLine{223     vector cornerNeighbour3(i-\/1,j-\/1,k+1);}
+\DoxyCodeLine{224     vector cornerNeighbour4(i-\/1,j+1,k+1);}
+\DoxyCodeLine{225 }
+\DoxyCodeLine{226     vector cornerNeighbour5(i+1,j+1,k-\/1);}
+\DoxyCodeLine{227     vector cornerNeighbour6(i+1,j-\/1,k-\/1);}
+\DoxyCodeLine{228     vector cornerNeighbour7(i-\/1,j-\/1,k-\/1);}
+\DoxyCodeLine{229     vector cornerNeighbour8(i-\/1,j+1,k-\/1);}
+\DoxyCodeLine{230 }
+\DoxyCodeLine{231     List<vector> NLL\{\{cornerNeighbour1,cornerNeighbour2,cornerNeighbour3,cornerNeighbour4,}
+\DoxyCodeLine{232                     cornerNeighbour5,cornerNeighbour6,cornerNeighbour7,cornerNeighbour8\}\};}
+\DoxyCodeLine{233 }
+\DoxyCodeLine{234     List<vector> cellNeighbours;}
+\DoxyCodeLine{235     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(NLL, neig)}
+\DoxyCodeLine{236     \{}
+\DoxyCodeLine{237         \textcolor{keywordflow}{if}((NLL[neig][0] >= 0 \&\& NLL[neig][0] < \mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[0])\&\&}
+\DoxyCodeLine{238             (NLL[neig][1] >= 0 \&\& NLL[neig][1] < \mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[1])\&\&}
+\DoxyCodeLine{239             (NLL[neig][2] >= 0 \&\& NLL[neig][2] < \mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[2]))}
+\DoxyCodeLine{240         \{}
+\DoxyCodeLine{241             cellNeighbours.append(NLL[neig]);}
+\DoxyCodeLine{242         \}}
+\DoxyCodeLine{243     \}}
+\DoxyCodeLine{244 }
+\DoxyCodeLine{245     \textcolor{keywordflow}{return} cellNeighbours;}
+\DoxyCodeLine{246 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 0
+Here is the caller graph for this function\+:
+% FIG 1
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a46663e67ece938888907990f37f4a14c}\label{classFoam_1_1bbMatrix_a46663e67ece938888907990f37f4a14c}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!cornerNeighbourSubVolumes@{cornerNeighbourSubVolumes}}
+\index{cornerNeighbourSubVolumes@{cornerNeighbourSubVolumes}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{cornerNeighbourSubVolumes()}{cornerNeighbourSubVolumes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily List$<$vector$>$ Foam\+::bb\+Matrix\+::corner\+Neighbour\+Sub\+Volumes (\begin{DoxyParamCaption}\item[{vector \&}]{sub\+Volume\+Index }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a8fcb01f3ec1377cd0432deed08dc46c1}\label{classFoam_1_1bbMatrix_a8fcb01f3ec1377cd0432deed08dc46c1}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!edgeNeighbourSubVolumes@{edgeNeighbourSubVolumes}}
+\index{edgeNeighbourSubVolumes@{edgeNeighbourSubVolumes}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{edgeNeighbourSubVolumes()}{edgeNeighbourSubVolumes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily List$<$ vector $>$ bb\+Matrix\+::edge\+Neighbour\+Sub\+Volumes (\begin{DoxyParamCaption}\item[{vector \&}]{sub\+Volume\+Index }\end{DoxyParamCaption})}
+
+
+
+Definition at line 171 of file bb\+Matrix.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{174 \{}
+\DoxyCodeLine{175     \textcolor{keyword}{const} label i(subVolumeIndex[0]);}
+\DoxyCodeLine{176     \textcolor{keyword}{const} label j(subVolumeIndex[1]);}
+\DoxyCodeLine{177     \textcolor{keyword}{const} label k(subVolumeIndex[2]);}
+\DoxyCodeLine{178 }
+\DoxyCodeLine{179     vector edgeNeighbour1(i-\/1,j,k-\/1);}
+\DoxyCodeLine{180     vector edgeNeighbour2(i+1,j,k-\/1);}
+\DoxyCodeLine{181     vector edgeNeighbour3(i+1,j,k+1);}
+\DoxyCodeLine{182     vector edgeNeighbour4(i-\/1,j,k+1);}
+\DoxyCodeLine{183 }
+\DoxyCodeLine{184     vector edgeNeighbour5(i-\/1,j+1,k);}
+\DoxyCodeLine{185     vector edgeNeighbour6(i-\/1,j-\/1,k);}
+\DoxyCodeLine{186     vector edgeNeighbour7(i+1,j-\/1,k);}
+\DoxyCodeLine{187     vector edgeNeighbour8(i+1,j+1,k);}
+\DoxyCodeLine{188 }
+\DoxyCodeLine{189     vector edgeNeighbour9(i,j+1,k+1);}
+\DoxyCodeLine{190     vector edgeNeighbour10(i,j+1,k-\/1);}
+\DoxyCodeLine{191     vector edgeNeighbour11(i,j-\/1,k-\/1);}
+\DoxyCodeLine{192     vector edgeNeighbour12(i,j-\/1,k+1);}
+\DoxyCodeLine{193 }
+\DoxyCodeLine{194     \textcolor{keyword}{const} List<vector> NLL\{\{edgeNeighbour1,edgeNeighbour2,edgeNeighbour3,edgeNeighbour4,}
+\DoxyCodeLine{195                             edgeNeighbour5,edgeNeighbour6,edgeNeighbour7,edgeNeighbour8,}
+\DoxyCodeLine{196                             edgeNeighbour9,edgeNeighbour10,edgeNeighbour11,edgeNeighbour12\}\};}
+\DoxyCodeLine{197     List<vector> cellNeighbours;}
+\DoxyCodeLine{198 }
+\DoxyCodeLine{199     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(NLL, neig)}
+\DoxyCodeLine{200     \{}
+\DoxyCodeLine{201         \textcolor{keywordflow}{if}((NLL[neig][0] >= 0 \&\& NLL[neig][0] < \mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[0])\&\&}
+\DoxyCodeLine{202             (NLL[neig][1] >= 0 \&\& NLL[neig][1] < \mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[1])\&\&}
+\DoxyCodeLine{203             (NLL[neig][2] >= 0 \&\& NLL[neig][2] < \mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[2]))}
+\DoxyCodeLine{204         \{}
+\DoxyCodeLine{205             cellNeighbours.append(NLL[neig]);}
+\DoxyCodeLine{206         \}}
+\DoxyCodeLine{207     \}}
+\DoxyCodeLine{208 }
+\DoxyCodeLine{209     \textcolor{keywordflow}{return} cellNeighbours;}
+\DoxyCodeLine{210 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 2
+Here is the caller graph for this function\+:
+% FIG 3
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_afef5d500d28c0143b357620567770c5c}\label{classFoam_1_1bbMatrix_afef5d500d28c0143b357620567770c5c}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!edgeNeighbourSubVolumes@{edgeNeighbourSubVolumes}}
+\index{edgeNeighbourSubVolumes@{edgeNeighbourSubVolumes}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{edgeNeighbourSubVolumes()}{edgeNeighbourSubVolumes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily List$<$vector$>$ Foam\+::bb\+Matrix\+::edge\+Neighbour\+Sub\+Volumes (\begin{DoxyParamCaption}\item[{vector \&}]{sub\+Volume\+Index }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a3b695dad54cc434495b9e068ff4cff25}\label{classFoam_1_1bbMatrix_a3b695dad54cc434495b9e068ff4cff25}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!faceNeighbourSubVolumes@{faceNeighbourSubVolumes}}
+\index{faceNeighbourSubVolumes@{faceNeighbourSubVolumes}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{faceNeighbourSubVolumes()}{faceNeighbourSubVolumes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily List$<$vector$>$ Foam\+::bb\+Matrix\+::face\+Neighbour\+Sub\+Volumes (\begin{DoxyParamCaption}\item[{vector \&}]{sub\+Volume\+Index }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_aa0282e6c9db9b90433691b00e59f37c3}\label{classFoam_1_1bbMatrix_aa0282e6c9db9b90433691b00e59f37c3}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!faceNeighbourSubVolumes@{faceNeighbourSubVolumes}}
+\index{faceNeighbourSubVolumes@{faceNeighbourSubVolumes}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{faceNeighbourSubVolumes()}{faceNeighbourSubVolumes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily List$<$ vector $>$ bb\+Matrix\+::face\+Neighbour\+Sub\+Volumes (\begin{DoxyParamCaption}\item[{vector \&}]{sub\+Volume\+Index }\end{DoxyParamCaption})}
+
+
+
+Definition at line 139 of file bb\+Matrix.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{142 \{}
+\DoxyCodeLine{143     \textcolor{keyword}{const} label i(subVolumeIndex[0]);}
+\DoxyCodeLine{144     \textcolor{keyword}{const} label j(subVolumeIndex[1]);}
+\DoxyCodeLine{145     \textcolor{keyword}{const} label k(subVolumeIndex[2]);}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{147     vector neighbour1(i-\/1,j,k);}
+\DoxyCodeLine{148     vector neighbour2(i+1,j,k);}
+\DoxyCodeLine{149     vector neighbour3(i,j-\/1,k);}
+\DoxyCodeLine{150     vector neighbour4(i,j+1,k);}
+\DoxyCodeLine{151     vector neighbour5(i,j,k-\/1);}
+\DoxyCodeLine{152     vector neighbour6(i,j,k+1);}
+\DoxyCodeLine{153 }
+\DoxyCodeLine{154     \textcolor{keyword}{const} List<vector> NLL\{\{neighbour1,neighbour2,neighbour3,neighbour4,neighbour5,neighbour6\}\};}
+\DoxyCodeLine{155     List<vector> cellNeighbours;}
+\DoxyCodeLine{156 }
+\DoxyCodeLine{157     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(NLL, neig)}
+\DoxyCodeLine{158     \{}
+\DoxyCodeLine{159         \textcolor{keywordflow}{if}((NLL[neig][0] >= 0 \&\& NLL[neig][0] < \mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[0])\&\&}
+\DoxyCodeLine{160             (NLL[neig][1] >= 0 \&\& NLL[neig][1] < \mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[1])\&\&}
+\DoxyCodeLine{161             (NLL[neig][2] >= 0 \&\& NLL[neig][2] < \mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[2]))}
+\DoxyCodeLine{162         \{}
+\DoxyCodeLine{163             cellNeighbours.append(NLL[neig]);}
+\DoxyCodeLine{164         \}}
+\DoxyCodeLine{165     \}}
+\DoxyCodeLine{166 }
+\DoxyCodeLine{167     \textcolor{keywordflow}{return} cellNeighbours;}
+\DoxyCodeLine{168 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 4
+Here is the caller graph for this function\+:
+% FIG 5
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a7573c74f48c70670b9e15510c6a86c61}\label{classFoam_1_1bbMatrix_a7573c74f48c70670b9e15510c6a86c61}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!getBBox@{getBBox}}
+\index{getBBox@{getBBox}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{getBBox()}{getBBox()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bound\+Box Foam\+::bb\+Matrix\+::get\+B\+Box (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 144 of file bb\+Matrix.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{145     \{}
+\DoxyCodeLine{146         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1bbMatrix_a63d70916d85cd863b3d1bf6cc61ef78f}{bBox\_}};}
+\DoxyCodeLine{147     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a7573c74f48c70670b9e15510c6a86c61}\label{classFoam_1_1bbMatrix_a7573c74f48c70670b9e15510c6a86c61}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!getBBox@{getBBox}}
+\index{getBBox@{getBBox}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{getBBox()}{getBBox()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bound\+Box Foam\+::bb\+Matrix\+::get\+B\+Box (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 144 of file bb\+Matrix.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{145     \{}
+\DoxyCodeLine{146         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1bbMatrix_a63d70916d85cd863b3d1bf6cc61ef78f}{bBox\_}};}
+\DoxyCodeLine{147     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_afa3656ab9af6938217145e7198240f0d}\label{classFoam_1_1bbMatrix_afa3656ab9af6938217145e7198240f0d}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!getCharCellSize@{getCharCellSize}}
+\index{getCharCellSize@{getCharCellSize}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{getCharCellSize()}{getCharCellSize()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily scalar Foam\+::bb\+Matrix\+::get\+Char\+Cell\+Size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 139 of file bb\+Matrix.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{140     \{}
+\DoxyCodeLine{141         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1bbMatrix_aedf5fa2bef41076430167661b0633cfe}{charCellSize\_}};}
+\DoxyCodeLine{142     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_afa3656ab9af6938217145e7198240f0d}\label{classFoam_1_1bbMatrix_afa3656ab9af6938217145e7198240f0d}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!getCharCellSize@{getCharCellSize}}
+\index{getCharCellSize@{getCharCellSize}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{getCharCellSize()}{getCharCellSize()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily scalar Foam\+::bb\+Matrix\+::get\+Char\+Cell\+Size (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 139 of file bb\+Matrix.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{140     \{}
+\DoxyCodeLine{141         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1bbMatrix_aedf5fa2bef41076430167661b0633cfe}{charCellSize\_}};}
+\DoxyCodeLine{142     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a8dc877c0a484fa8d11e24c138ba60765}\label{classFoam_1_1bbMatrix_a8dc877c0a484fa8d11e24c138ba60765}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!getFirstSubVolumeIndex@{getFirstSubVolumeIndex}}
+\index{getFirstSubVolumeIndex@{getFirstSubVolumeIndex}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{getFirstSubVolumeIndex()}{getFirstSubVolumeIndex()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector Foam\+::bb\+Matrix\+::get\+First\+Sub\+Volume\+Index (\begin{DoxyParamCaption}\item[{point \&}]{sub\+Volume\+Point,  }\item[{bool \&}]{is\+In\+Matrix }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a0b736192e4890c7c0b49fd18ba91e57e}\label{classFoam_1_1bbMatrix_a0b736192e4890c7c0b49fd18ba91e57e}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!getFirstSubVolumeIndex@{getFirstSubVolumeIndex}}
+\index{getFirstSubVolumeIndex@{getFirstSubVolumeIndex}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{getFirstSubVolumeIndex()}{getFirstSubVolumeIndex()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector bb\+Matrix\+::get\+First\+Sub\+Volume\+Index (\begin{DoxyParamCaption}\item[{point \&}]{sub\+Volume\+Point,  }\item[{bool \&}]{is\+In\+Matrix }\end{DoxyParamCaption})}
+
+
+
+Definition at line 116 of file bb\+Matrix.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{120 \{}
+\DoxyCodeLine{121     vector subVolumeIndex(vector::zero);}
+\DoxyCodeLine{122     isInMatrix = \textcolor{keyword}{true};}
+\DoxyCodeLine{123     \textcolor{keywordflow}{for}(label i = 0;i<3;i++)}
+\DoxyCodeLine{124     \{}
+\DoxyCodeLine{125         subVolumeIndex[i] = floor((subVolumePoint[i]-\/\mbox{\hyperlink{classFoam_1_1bbMatrix_a63d70916d85cd863b3d1bf6cc61ef78f}{bBox\_}}.min()[i])}
+\DoxyCodeLine{126             /\mbox{\hyperlink{classFoam_1_1bbMatrix_aedf5fa2bef41076430167661b0633cfe}{charCellSize\_}}*\mbox{\hyperlink{classFoam_1_1virtualMeshLevel_a1eb892ba729b2ba4c733d6157a1236e6}{virtualMeshLevel::getLevelOfDivision}}());}
+\DoxyCodeLine{127 }
+\DoxyCodeLine{128         \textcolor{keywordflow}{if}(subVolumeIndex[i] >= \mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[i] || subVolumeIndex[i] < 0 )}
+\DoxyCodeLine{129         \{}
+\DoxyCodeLine{130             subVolumeIndex = (vector::one)*(-\/1);}
+\DoxyCodeLine{131             isInMatrix = \textcolor{keyword}{false};}
+\DoxyCodeLine{132             \textcolor{keywordflow}{break};}
+\DoxyCodeLine{133         \}}
+\DoxyCodeLine{134     \}}
+\DoxyCodeLine{135     \textcolor{keywordflow}{return} subVolumeIndex;}
+\DoxyCodeLine{136 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 6
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a6f4dbab4295563a0d990be39589c56c2}\label{classFoam_1_1bbMatrix_a6f4dbab4295563a0d990be39589c56c2}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!getPointInMesh@{getPointInMesh}}
+\index{getPointInMesh@{getPointInMesh}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{getPointInMesh()}{getPointInMesh()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector bb\+Matrix\+::get\+Point\+In\+Mesh (\begin{DoxyParamCaption}\item[{const vector \&}]{sub\+Volume\+Index }\end{DoxyParamCaption})}
+
+
+
+Definition at line 61 of file bb\+Matrix.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{64 \{}
+\DoxyCodeLine{65     \textcolor{keywordflow}{return} vector(}
+\DoxyCodeLine{66         \mbox{\hyperlink{classFoam_1_1bbMatrix_a63d70916d85cd863b3d1bf6cc61ef78f}{bBox\_}}.min()[0] + (2*subVolumeIndex[0]+1)*(\mbox{\hyperlink{classFoam_1_1bbMatrix_aedf5fa2bef41076430167661b0633cfe}{charCellSize\_}}/\mbox{\hyperlink{classFoam_1_1virtualMeshLevel_a1eb892ba729b2ba4c733d6157a1236e6}{virtualMeshLevel::getLevelOfDivision}}())*0.5,}
+\DoxyCodeLine{67         \mbox{\hyperlink{classFoam_1_1bbMatrix_a63d70916d85cd863b3d1bf6cc61ef78f}{bBox\_}}.min()[1] + (2*subVolumeIndex[1]+1)*(\mbox{\hyperlink{classFoam_1_1bbMatrix_aedf5fa2bef41076430167661b0633cfe}{charCellSize\_}}/\mbox{\hyperlink{classFoam_1_1virtualMeshLevel_a1eb892ba729b2ba4c733d6157a1236e6}{virtualMeshLevel::getLevelOfDivision}}())*0.5,}
+\DoxyCodeLine{68         \mbox{\hyperlink{classFoam_1_1bbMatrix_a63d70916d85cd863b3d1bf6cc61ef78f}{bBox\_}}.min()[2] + (2*subVolumeIndex[2]+1)*(\mbox{\hyperlink{classFoam_1_1bbMatrix_aedf5fa2bef41076430167661b0633cfe}{charCellSize\_}}/\mbox{\hyperlink{classFoam_1_1virtualMeshLevel_a1eb892ba729b2ba4c733d6157a1236e6}{virtualMeshLevel::getLevelOfDivision}}())*0.5}
+\DoxyCodeLine{69     );}
+\DoxyCodeLine{70 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 7
+Here is the caller graph for this function\+:
+% FIG 8
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a6b028b584f94c73f07330435897f8fcd}\label{classFoam_1_1bbMatrix_a6b028b584f94c73f07330435897f8fcd}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!getPointInMesh@{getPointInMesh}}
+\index{getPointInMesh@{getPointInMesh}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{getPointInMesh()}{getPointInMesh()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector Foam\+::bb\+Matrix\+::get\+Point\+In\+Mesh (\begin{DoxyParamCaption}\item[{const vector \&}]{sub\+Volume\+Index }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a732bfc3b441ea4c1764c1f33d39a62ac}\label{classFoam_1_1bbMatrix_a732bfc3b441ea4c1764c1f33d39a62ac}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!getSubVolumeV@{getSubVolumeV}}
+\index{getSubVolumeV@{getSubVolumeV}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{getSubVolumeV()}{getSubVolumeV()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily scalar Foam\+::bb\+Matrix\+::get\+Sub\+VolumeV (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 134 of file bb\+Matrix.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{135     \{}
+\DoxyCodeLine{136         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1bbMatrix_ae4e53ca5f0357f7de313a7e695887eda}{subVolumeV\_}};}
+\DoxyCodeLine{137     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 9
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a732bfc3b441ea4c1764c1f33d39a62ac}\label{classFoam_1_1bbMatrix_a732bfc3b441ea4c1764c1f33d39a62ac}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!getSubVolumeV@{getSubVolumeV}}
+\index{getSubVolumeV@{getSubVolumeV}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{getSubVolumeV()}{getSubVolumeV()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily scalar Foam\+::bb\+Matrix\+::get\+Sub\+VolumeV (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 134 of file bb\+Matrix.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{135     \{}
+\DoxyCodeLine{136         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1bbMatrix_ae4e53ca5f0357f7de313a7e695887eda}{subVolumeV\_}};}
+\DoxyCodeLine{137     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a276ee0041fe40d201d4c92f9f97cc807}\label{classFoam_1_1bbMatrix_a276ee0041fe40d201d4c92f9f97cc807}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!getSVIndexForPoint@{getSVIndexForPoint}}
+\index{getSVIndexForPoint@{getSVIndexForPoint}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{getSVIndexForPoint()}{getSVIndexForPoint()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector bb\+Matrix\+::get\+S\+V\+Index\+For\+Point (\begin{DoxyParamCaption}\item[{const point \&}]{point\+In\+Domain }\end{DoxyParamCaption})}
+
+
+
+Definition at line 73 of file bb\+Matrix.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{76 \{}
+\DoxyCodeLine{77     vector subVolumeIndex(vector::zero);}
+\DoxyCodeLine{78     \textcolor{keywordflow}{for}(label i = 0;i<3;i++)}
+\DoxyCodeLine{79     \{}
+\DoxyCodeLine{80         subVolumeIndex[i] = floor((pointInDomain[i]-\/\mbox{\hyperlink{classFoam_1_1bbMatrix_a63d70916d85cd863b3d1bf6cc61ef78f}{bBox\_}}.min()[i])/\mbox{\hyperlink{classFoam_1_1bbMatrix_aedf5fa2bef41076430167661b0633cfe}{charCellSize\_}}*\mbox{\hyperlink{classFoam_1_1virtualMeshLevel_a1eb892ba729b2ba4c733d6157a1236e6}{virtualMeshLevel::getLevelOfDivision}}());}
+\DoxyCodeLine{81         \textcolor{keywordflow}{if}(subVolumeIndex[i] >= \mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[i] || subVolumeIndex[i] < 0 )}
+\DoxyCodeLine{82         \{}
+\DoxyCodeLine{83             subVolumeIndex = (vector::one)*(-\/1);}
+\DoxyCodeLine{84             \textcolor{keywordflow}{break};}
+\DoxyCodeLine{85         \}}
+\DoxyCodeLine{86     \}}
+\DoxyCodeLine{87     \textcolor{keywordflow}{return} subVolumeIndex;}
+\DoxyCodeLine{88 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 10
+Here is the caller graph for this function\+:
+% FIG 11
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a2cdc34569da86a11639f71de994a8015}\label{classFoam_1_1bbMatrix_a2cdc34569da86a11639f71de994a8015}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!getSVIndexForPoint@{getSVIndexForPoint}}
+\index{getSVIndexForPoint@{getSVIndexForPoint}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{getSVIndexForPoint()}{getSVIndexForPoint()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector Foam\+::bb\+Matrix\+::get\+S\+V\+Index\+For\+Point (\begin{DoxyParamCaption}\item[{const point \&}]{point\+In\+Domain }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a17f37ee48a2af9a679c0e642d8df8135}\label{classFoam_1_1bbMatrix_a17f37ee48a2af9a679c0e642d8df8135}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!getSVIndexForPoint\_Wall@{getSVIndexForPoint\_Wall}}
+\index{getSVIndexForPoint\_Wall@{getSVIndexForPoint\_Wall}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{getSVIndexForPoint\_Wall()}{getSVIndexForPoint\_Wall()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector bb\+Matrix\+::get\+S\+V\+Index\+For\+Point\+\_\+\+Wall (\begin{DoxyParamCaption}\item[{point}]{point\+In\+Domain }\end{DoxyParamCaption})}
+
+
+
+Definition at line 91 of file bb\+Matrix.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{94 \{}
+\DoxyCodeLine{95     \textcolor{keywordflow}{for}(label i = 0;i<3;i++)}
+\DoxyCodeLine{96     \{}
+\DoxyCodeLine{97         \textcolor{keywordflow}{if}(mag(pointInDomain[i])<SMALL)}
+\DoxyCodeLine{98         \{}
+\DoxyCodeLine{99             pointInDomain[i] = 0.0;}
+\DoxyCodeLine{100         \}}
+\DoxyCodeLine{101     \} }
+\DoxyCodeLine{102     vector subVolumeIndex(vector::zero);}
+\DoxyCodeLine{103     \textcolor{keywordflow}{for}(label i = 0;i<3;i++)}
+\DoxyCodeLine{104     \{}
+\DoxyCodeLine{105         subVolumeIndex[i] = floor((pointInDomain[i]-\/\mbox{\hyperlink{classFoam_1_1bbMatrix_a63d70916d85cd863b3d1bf6cc61ef78f}{bBox\_}}.min()[i])/\mbox{\hyperlink{classFoam_1_1bbMatrix_aedf5fa2bef41076430167661b0633cfe}{charCellSize\_}}*\mbox{\hyperlink{classFoam_1_1virtualMeshLevel_a1eb892ba729b2ba4c733d6157a1236e6}{virtualMeshLevel::getLevelOfDivision}}());}
+\DoxyCodeLine{106         \textcolor{keywordflow}{if}(subVolumeIndex[i] >= \mbox{\hyperlink{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}{matrixSize\_}}[i] || subVolumeIndex[i] < 0 )}
+\DoxyCodeLine{107         \{}
+\DoxyCodeLine{108             \textcolor{keywordflow}{return}(\mbox{\hyperlink{classFoam_1_1bbMatrix_a276ee0041fe40d201d4c92f9f97cc807}{getSVIndexForPoint}}(\mbox{\hyperlink{classFoam_1_1bbMatrix_a63d70916d85cd863b3d1bf6cc61ef78f}{bBox\_}}.midpoint()));}
+\DoxyCodeLine{109             \textcolor{keywordflow}{break};}
+\DoxyCodeLine{110         \}}
+\DoxyCodeLine{111     \}}
+\DoxyCodeLine{112     \textcolor{keywordflow}{return} subVolumeIndex;}
+\DoxyCodeLine{113 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 12
+Here is the caller graph for this function\+:
+% FIG 13
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a5807915641a98b491dd60c4931fb3c9e}\label{classFoam_1_1bbMatrix_a5807915641a98b491dd60c4931fb3c9e}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!getSVIndexForPoint\_Wall@{getSVIndexForPoint\_Wall}}
+\index{getSVIndexForPoint\_Wall@{getSVIndexForPoint\_Wall}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{getSVIndexForPoint\_Wall()}{getSVIndexForPoint\_Wall()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector Foam\+::bb\+Matrix\+::get\+S\+V\+Index\+For\+Point\+\_\+\+Wall (\begin{DoxyParamCaption}\item[{point}]{point\+In\+Domain }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a8563570fde6efce95d2466fc9dcbec6f}\label{classFoam_1_1bbMatrix_a8563570fde6efce95d2466fc9dcbec6f}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classFoam_1_1subVolumeProperties}{sub\+Volume\+Properties}}\& Foam\+::bb\+Matrix\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{const vector \&}]{s\+VI }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 85 of file bb\+Matrix.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{86     \{}
+\DoxyCodeLine{87         \textcolor{keywordflow}{if} (!\mbox{\hyperlink{classFoam_1_1bbMatrix_aee4256eb2dd8511c13d75ef2d748fa14}{bbMatrix\_}}[sVI[0]][sVI[1]][sVI[2]].valid())}
+\DoxyCodeLine{88         \{}
+\DoxyCodeLine{89             \mbox{\hyperlink{classFoam_1_1bbMatrix_aee4256eb2dd8511c13d75ef2d748fa14}{bbMatrix\_}}[sVI[0]][sVI[1]][sVI[2]].set(}
+\DoxyCodeLine{90                 \textcolor{keyword}{new} subVolumeProperties(\mbox{\hyperlink{classFoam_1_1bbMatrix_a6f4dbab4295563a0d990be39589c56c2}{getPointInMesh}}(sVI))}
+\DoxyCodeLine{91             );}
+\DoxyCodeLine{92         \}}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1bbMatrix_aee4256eb2dd8511c13d75ef2d748fa14}{bbMatrix\_}}[sVI[0]][sVI[1]][sVI[2]]();}
+\DoxyCodeLine{95     \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 14
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a8563570fde6efce95d2466fc9dcbec6f}\label{classFoam_1_1bbMatrix_a8563570fde6efce95d2466fc9dcbec6f}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!operator\mbox{[}\mbox{]}@{operator[]}}
+\index{operator\mbox{[}\mbox{]}@{operator[]}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{operator[]()}{operator[]()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classFoam_1_1subVolumeProperties}{sub\+Volume\+Properties}}\& Foam\+::bb\+Matrix\+::operator\mbox{[}$\,$\mbox{]} (\begin{DoxyParamCaption}\item[{const vector \&}]{s\+VI }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 85 of file bb\+Matrix.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{86     \{}
+\DoxyCodeLine{87         \textcolor{keywordflow}{if} (!\mbox{\hyperlink{classFoam_1_1bbMatrix_aee4256eb2dd8511c13d75ef2d748fa14}{bbMatrix\_}}[sVI[0]][sVI[1]][sVI[2]].valid())}
+\DoxyCodeLine{88         \{}
+\DoxyCodeLine{89             \mbox{\hyperlink{classFoam_1_1bbMatrix_aee4256eb2dd8511c13d75ef2d748fa14}{bbMatrix\_}}[sVI[0]][sVI[1]][sVI[2]].set(}
+\DoxyCodeLine{90                 \textcolor{keyword}{new} subVolumeProperties(\mbox{\hyperlink{classFoam_1_1bbMatrix_a6f4dbab4295563a0d990be39589c56c2}{getPointInMesh}}(sVI))}
+\DoxyCodeLine{91             );}
+\DoxyCodeLine{92         \}}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1bbMatrix_aee4256eb2dd8511c13d75ef2d748fa14}{bbMatrix\_}}[sVI[0]][sVI[1]][sVI[2]]();}
+\DoxyCodeLine{95     \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 15
+
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_aee4256eb2dd8511c13d75ef2d748fa14}\label{classFoam_1_1bbMatrix_aee4256eb2dd8511c13d75ef2d748fa14}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!bbMatrix\_@{bbMatrix\_}}
+\index{bbMatrix\_@{bbMatrix\_}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{bbMatrix\_}{bbMatrix\_}}
+{\footnotesize\ttfamily List$<$ List$<$ List$<$ auto\+Ptr$<$ \mbox{\hyperlink{classFoam_1_1subVolumeProperties}{sub\+Volume\+Properties}} $>$ $>$ $>$ $>$ Foam\+::bb\+Matrix\+::bb\+Matrix\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 67 of file bb\+Matrix.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a63d70916d85cd863b3d1bf6cc61ef78f}\label{classFoam_1_1bbMatrix_a63d70916d85cd863b3d1bf6cc61ef78f}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!bBox\_@{bBox\_}}
+\index{bBox\_@{bBox\_}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{bBox\_}{bBox\_}}
+{\footnotesize\ttfamily const bound\+Box Foam\+::bb\+Matrix\+::b\+Box\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 64 of file bb\+Matrix.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_aedf5fa2bef41076430167661b0633cfe}\label{classFoam_1_1bbMatrix_aedf5fa2bef41076430167661b0633cfe}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!charCellSize\_@{charCellSize\_}}
+\index{charCellSize\_@{charCellSize\_}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{charCellSize\_}{charCellSize\_}}
+{\footnotesize\ttfamily const scalar Foam\+::bb\+Matrix\+::char\+Cell\+Size\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 65 of file bb\+Matrix.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}\label{classFoam_1_1bbMatrix_a5c0c7c5b543d3eb03904c83c67e131b3}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!matrixSize\_@{matrixSize\_}}
+\index{matrixSize\_@{matrixSize\_}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{matrixSize\_}{matrixSize\_}}
+{\footnotesize\ttfamily const vector Foam\+::bb\+Matrix\+::matrix\+Size\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 63 of file bb\+Matrix.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1bbMatrix_ae4e53ca5f0357f7de313a7e695887eda}\label{classFoam_1_1bbMatrix_ae4e53ca5f0357f7de313a7e695887eda}} 
+\index{Foam::bbMatrix@{Foam::bbMatrix}!subVolumeV\_@{subVolumeV\_}}
+\index{subVolumeV\_@{subVolumeV\_}!Foam::bbMatrix@{Foam::bbMatrix}}
+\doxysubsubsection{\texorpdfstring{subVolumeV\_}{subVolumeV\_}}
+{\footnotesize\ttfamily const scalar Foam\+::bb\+Matrix\+::sub\+Volume\+V\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 66 of file bb\+Matrix.\+H.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/ln\+Include/\mbox{\hyperlink{lnInclude_2bbMatrix_8H}{bb\+Matrix.\+H}}\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/ln\+Include/\mbox{\hyperlink{lnInclude_2bbMatrix_8C}{bb\+Matrix.\+C}}\end{DoxyCompactItemize}

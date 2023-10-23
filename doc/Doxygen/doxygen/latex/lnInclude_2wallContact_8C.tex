@@ -1,0 +1,40 @@
+\hypertarget{lnInclude_2wallContact_8C}{}\doxysection{src/\+H\+F\+D\+I\+B\+D\+E\+M/ln\+Include/wall\+Contact.C File Reference}
+\label{lnInclude_2wallContact_8C}\index{src/HFDIBDEM/lnInclude/wallContact.C@{src/HFDIBDEM/lnInclude/wallContact.C}}
+{\ttfamily \#include \char`\"{}wall\+Contact.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}wall\+Mat\+Info.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}virtual\+Mesh\+Level.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}wall\+Plane\+Info.\+H\char`\"{}}\newline
+Include dependency graph for wall\+Contact.\+C\+:
+% FIG 0
+\doxysubsection*{Namespaces}
+\begin{DoxyCompactItemize}
+\item 
+ \mbox{\hyperlink{namespaceFoam}{Foam}}
+\item 
+ \mbox{\hyperlink{namespaceFoam_1_1contactModel}{Foam\+::contact\+Model}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+bool \mbox{\hyperlink{namespaceFoam_1_1contactModel_a026dac52f7799691f42d0dba58ba5236}{Foam\+::contact\+Model\+::detect\+Wall\+Contact}} (const fv\+Mesh \&mesh, ib\+Contact\+Class \&ib\+Class, wall\+Contact\+Info \&wall\+Cnt\+Info)
+\item 
+bool \mbox{\hyperlink{namespaceFoam_1_1contactModel_a514e84f4ba975cdbb1fca066f30f4342}{Foam\+::contact\+Model\+::detect\+Wall\+Contact\+\_\+\+Arb\+Shape}} (const fv\+Mesh \&mesh, ib\+Contact\+Class \&ib\+Class, wall\+Contact\+Info \&wall\+Cnt\+Info)
+\item 
+bool \mbox{\hyperlink{namespaceFoam_1_1contactModel_a7933a13dc39eba0a051cbacc04bda03e}{Foam\+::contact\+Model\+::detect\+Wall\+Contact\+\_\+\+Sphere}} (const fv\+Mesh \&mesh, ib\+Contact\+Class \&ib\+Class, wall\+Contact\+Info \&wall\+Cnt\+Info)
+\item 
+bool \mbox{\hyperlink{namespaceFoam_1_1contactModel_adac49abbe04527f56bfe54cb253453ed}{Foam\+::contact\+Model\+::detect\+Wall\+Contact\+\_\+\+Cluster}} (const fv\+Mesh \&mesh, ib\+Contact\+Class \&ib\+Class, wall\+Contact\+Info \&wall\+Cnt\+Info)
+\item 
+void \mbox{\hyperlink{namespaceFoam_1_1contactModel_a133ce31f847a9343816fc68c01b2004b}{Foam\+::contact\+Model\+::get\+Wall\+Contact\+Vars}} (const fv\+Mesh \&mesh, wall\+Contact\+Info \&wall\+Cnt\+Info, const scalar deltaT, wall\+Sub\+Contact\+Info \&s\+WC)
+\item 
+void \mbox{\hyperlink{namespaceFoam_1_1contactModel_a2ca5920582a637b866f11430e86e87cf}{Foam\+::contact\+Model\+::get\+Wall\+Contact\+Vars\+\_\+\+Arb\+Shape}} (const fv\+Mesh \&mesh, wall\+Contact\+Info \&wall\+Cnt\+Info, const scalar deltaT, wall\+Sub\+Contact\+Info \&s\+CW)
+\item 
+void \mbox{\hyperlink{namespaceFoam_1_1contactModel_a1bf5a7f6798e32de5bbc1d208130bc77}{Foam\+::contact\+Model\+::get\+Wall\+Contact\+Vars\+\_\+\+Sphere}} (const fv\+Mesh \&mesh, wall\+Contact\+Info \&wall\+Cnt\+Info, const scalar deltaT, wall\+Sub\+Contact\+Info \&s\+CW)
+\item 
+void \mbox{\hyperlink{namespaceFoam_1_1contactModel_a63c79957b49d3cde697bb4791d1cc6b4}{Foam\+::contact\+Model\+::get\+Wall\+Contact\+Vars\+\_\+\+Cluster}} (const fv\+Mesh \&mesh, wall\+Contact\+Info \&wall\+Cnt\+Info, const scalar deltaT, wall\+Sub\+Contact\+Info \&s\+WC)
+\item 
+bool \mbox{\hyperlink{namespaceFoam_1_1contactModel_aff2224d04310d3d48f3221a9633dbff9}{Foam\+::contact\+Model\+::solve\+Wall\+Contact}} (const fv\+Mesh \&mesh, wall\+Contact\+Info \&wall\+Cnt\+Info, scalar deltaT, wall\+Sub\+Contact\+Info \&s\+CI)
+\item 
+scalar \mbox{\hyperlink{namespaceFoam_1_1contactModel_add5e29574efd42f222481ad3370011e1}{Foam\+::contact\+Model\+::get\+Inter\+Volume\+\_\+\+Sphere}} (const fv\+Mesh \&mesh, ib\+Contact\+Class \&c\+Class, ib\+Contact\+Vars \&c\+Vars, plane \&c\+Plane)
+\item 
+scalar \mbox{\hyperlink{namespaceFoam_1_1contactModel_aa822971b620c434759c0717b1ab1e3d1}{Foam\+::contact\+Model\+::sphere\+Contact\+Area}} (const fv\+Mesh \&mesh, ib\+Contact\+Class \&c\+Class, ib\+Contact\+Vars \&c\+Vars, plane \&c\+Plane)
+\end{DoxyCompactItemize}

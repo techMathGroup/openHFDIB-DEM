@@ -1,0 +1,1891 @@
+\hypertarget{classFoam_1_1addModelRepeatRandomPosition}{}\doxysection{Foam\+::add\+Model\+Repeat\+Random\+Position Class Reference}
+\label{classFoam_1_1addModelRepeatRandomPosition}\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+
+
+{\ttfamily \#include $<$add\+Model\+Repeat\+Random\+Position.\+H$>$}
+
+
+
+Inheritance diagram for Foam\+::add\+Model\+Repeat\+Random\+Position\+:
+% FIG 0
+
+
+Collaboration diagram for Foam\+::add\+Model\+Repeat\+Random\+Position\+:
+% FIG 1
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aab1d8c767850782b573e56dd78ad25e0}{add\+Model\+Repeat\+Random\+Position}} (const dictionary \&add\+Model\+Dict, const Foam\+::fv\+Mesh \&mesh, std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ body\+Geom\+Model, List$<$ label\+List $>$ \&cell\+Points)
+\item 
+\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3e93c5fa798a00b95a9e07feae95126b}{$\sim$add\+Model\+Repeat\+Random\+Position}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a20dc25d900a1e9cef5905d916cde8ab6}{init}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a0e7de8015a2246c1e7916d36d2276360}{should\+Add\+Body}} (const vol\+Scalar\+Field \&body)
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3957d726557353c9dc8a20b13d787fd1}{add\+Body}} (const vol\+Scalar\+Field \&body, Ptr\+List$<$ \mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} $>$ \&immersed\+Bodies)
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a48e228fd9a09599fa5fa22f6df277244}{return\+Random\+Angle}} ()
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aba3da0ead31236e510b136984127eb4e}{return\+Random\+Scale}} ()
+\item 
+vector \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a9e0cdfb2be4e9b6f9bfcd04b250f2763}{return\+Random\+Rotation\+Axis}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af0170a46eedc795704e653d1be3e148e}{initialize\+Cell\+Zone}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6add78d4d409083549aca97b77159441}{update\+Cell\+Zone\+Bound\+Box}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aaa4f15ee673c2927dd22b60284abf7d6}{initialize\+Bound\+Box}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2be2963abab087890364cec8e5ae1630}{recreate\+Bound\+Box}} ()
+\item 
+label\+List \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af59ee683b4511d32cf880a5325a5eb4a}{get\+B\+Box\+Cells\+By\+Oct\+Tree}} (label cell\+To\+Check, bool \&inside\+BB, vector \&b\+Box\+Min, vector \&b\+Box\+Max, List$<$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}{Dynamic\+Label\+List}} $>$ \&b\+Box\+Cells)
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aa5887270431925f2f684aed1be7aa1e0}{check\+Lambda\+Fraction}} (const vol\+Scalar\+Field \&body)
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ad20435ff5eab3418b7f2d421ea2f1842}{check\+If\+Add}} ()
+\item 
+word \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac432b239c512fe224af2c0a547ddda59}{get\+Add\+Mode}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a082bcadcbe8918c6704b0cb46f99284f}{get\+Body\+Added}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ad9a3af2ee97478991da1648a4dd5111e}{add\+Model\+Repeat\+Random\+Position}} (const dictionary \&add\+Model\+Dict, const Foam\+::fv\+Mesh \&mesh, std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ body\+Geom\+Model, List$<$ label\+List $>$ \&cell\+Points)
+\item 
+\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a281f7996c4e9dc29ea853c8b0be402e5}{$\sim$add\+Model\+Repeat\+Random\+Position}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aea74fdaf2770b3cedadc2596798b153a}{init}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a4344881d7704148ac36c09a3c3c5ead0}{should\+Add\+Body}} (const vol\+Scalar\+Field \&body)
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a34624ff26fd9f815d56ec9df8a3ea46b}{add\+Body}} (const vol\+Scalar\+Field \&body, Ptr\+List$<$ \mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} $>$ \&immersed\+Bodies)
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a84e0c4de8e11985d1213898a3c24e357}{return\+Random\+Angle}} ()
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a24ebcc10df1f7af1fb69fb950b98cac1}{return\+Random\+Scale}} ()
+\item 
+vector \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ab7cb89147ef5d9bfb8aabd4641022fb1}{return\+Random\+Rotation\+Axis}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a73378da7a6150bd90d3b3833eb0782d4}{initialize\+Cell\+Zone}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ae5112df3ca5e7d077b8a0184fb812f4d}{update\+Cell\+Zone\+Bound\+Box}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_abe45965208635ab4265d1935f4938e23}{initialize\+Bound\+Box}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a054e5b3624e0ff0e0a3ac6586195e9b2}{recreate\+Bound\+Box}} ()
+\item 
+label\+List \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a981655321bdf74228efc212eb4439a4c}{get\+B\+Box\+Cells\+By\+Oct\+Tree}} (label cell\+To\+Check, bool \&inside\+BB, vector \&b\+Box\+Min, vector \&b\+Box\+Max, List$<$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}{Dynamic\+Label\+List}} $>$ \&b\+Box\+Cells)
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a92b978286661ab2d685140826ec38b5b}{check\+Lambda\+Fraction}} (const vol\+Scalar\+Field \&body)
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ad20435ff5eab3418b7f2d421ea2f1842}{check\+If\+Add}} ()
+\item 
+word \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac432b239c512fe224af2c0a547ddda59}{get\+Add\+Mode}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a082bcadcbe8918c6704b0cb46f99284f}{get\+Body\+Added}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModel_a6ebc08e73279bee94a8e7a317c2d57be}{is\+Body\+In\+Contact}} (Ptr\+List$<$ \mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} $>$ \&immersed\+Bodies)
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModel_af953ecafecf904333ba5236a80fe0625}{is\+Body\+In\+Contact}} (Ptr\+List$<$ \mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} $>$ \&immersed\+Bodies)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const fv\+Mesh \& \mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\+\_\+}}
+\item 
+List$<$ label\+List $>$ \& \mbox{\hyperlink{classFoam_1_1addModel_a6feb58d5e6825765583893bd4678f1b6}{cell\+Points\+\_\+}}
+\item 
+std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geom\+Model\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}{Dynamic\+Label\+List}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const dictionary \& \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2c9823314c9ea7b51dd92b73ce70be09}{add\+Model\+Dict\+\_\+}}
+\item 
+word \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2b8346cfaf48c968fe4709c1941e21c8}{add\+Mode\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30949dbbe0b470c7b6f5aa4dcd31b8db}{body\+Added\+\_\+}}
+\item 
+const dictionary \& \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30907c9b76ed91e79a3bfc5a492c1ed7}{coeffs\+Dict\+\_\+}}
+\item 
+word \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac5fab45c2f914d25fec09191a8bda768}{add\+Domain\+\_\+}}
+\item 
+word \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a653898b03251d81231f79ce475ef83e9}{scaling\+Mode\+\_\+}}
+\item 
+word \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a65d221e6e3577c84a2b790a110bce765}{rotation\+Mode\+\_\+}}
+\item 
+word \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ad9864a04d24a7e01dcdc389c73d1651f}{add\+Mode\+I\+\_\+}}
+\item 
+const dictionary \& \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a68fd8d575d0e60a9d0fb8990a15bea41}{add\+Domain\+Coeffs\+\_\+}}
+\item 
+const dictionary \& \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ae71ad7283aa5727cd629e19362e34c32}{scaling\+Mode\+Coeffs\+\_\+}}
+\item 
+const dictionary \& \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a232b340a4bcb92926989ab552f385008}{rotation\+Mode\+Coeffs\+\_\+}}
+\item 
+const dictionary \& \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a345a4d496e86dd957647dce86ef508d4}{add\+Mode\+I\+Coeffs\+\_\+}}
+\item 
+label \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a0d9d633f641e7b459b3afbeb58928252}{use\+N\+Times\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a230657bd1815947461e92b15c4e62dde}{time\+Between\+Usage\+\_\+}}
+\item 
+label \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a31d306fee89e596ae341ec11ef704507}{part\+Per\+Add\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3826b9e119ac056f38b832ee46b00a2a}{field\+Value\+\_\+}}
+\item 
+label \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6eabf6b8dd69397752a7898d52e6034d}{added\+On\+Time\+Level\+\_\+}}
+\item 
+label \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5556fc2b56b613027b5bb278a16d5de0}{part\+Per\+Add\+Temp\+\_\+}}
+\item 
+word \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a16cf729b66fcad9e39c9eaade5844bb3}{zone\+Name\+\_\+}}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2fcd2f8eca641db7969921667b043f5d}{min\+Bound\+\_\+}}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a9cd28b35f1e1c981726c7c1945257c1e}{max\+Bound\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3e007c8c63db4ad89fe1532ec6c323d1}{scale\+Particles\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6cf3cd175a4b3ee0860c44df14ddf0fd}{min\+Scale\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3ce11bf981f08ede60f209fc394a5db9}{max\+Scale\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a86f14ce9ec43c563128d10ec833331d9}{min\+Scale\+Fit\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac4887a0e2e0e5c46c6c5715551f17452}{scale\+Step\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a624c2cc2bcede2aac58587c91ca080d0}{n\+Tries\+Before\+Scaling\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_affb2341632541d959988c6a6cd436055}{rotate\+Particles\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a437ad9246e8edabb61208538762eeac5}{random\+Axis\+\_\+}}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a4ec1478689c3a444b0e35deb3489636d}{axis\+Of\+Rot\+\_\+}}
+\item 
+int \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8c9fb196a61622ee5af76bac96deb190}{body\+Addition\+Attempt\+Counter\+\_\+}}
+\item 
+int \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a02743d9d1b380175fd6c8643fb5b4330}{scale\+Correction\+Counter\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a0f254e291736caddaecf7f757230930f}{scale\+Application\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aa425091696043540874b3e0d89c17c83}{scale\+Random\+Application\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a11d61bb5d78c87415e35864ea547cfe6}{rescale\+Requirement\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a9834b3d9f014eb1dd792a1e2d576e6b8}{succesfulladition\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8a8d50804eac2f09145361432d2f3079}{scaling\+Factor\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2f165d450fafb18f2bebc9f4270764f3}{restart\+Part\+Count\+Temp\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_abac2a0f6370bed674ba6bd4dea2092a4}{reapeated\+Addition\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aa5c430261c0def27f8569df2f4b39fcf}{first\+Time\+Running\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a47153875964d938fc9531ce7eff4072c}{cell\+Zone\+Active\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a11f5fbf9998770f9a46bdaceaacd9449}{bound\+Box\+Active\+\_\+}}
+\item 
+Field$<$ label $>$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8841e5975a2296475ff5ac9494566a6f}{octree\+Field\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_afd0d6511656efdb206149fb02ffc995f}{time\+Based\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a7e4a9f6f517047d12a7ef145db67a65f}{field\+Based\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af1679a69cb732beff065892d918c5e2e}{field\+Current\+Value\+\_\+}}
+\item 
+List$<$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}{Dynamic\+Label\+List}} $>$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5bf9defb52cf47c1c303a355bc9e01e7}{cells\+In\+Bound\+Box\+\_\+}}
+\item 
+List$<$ point\+Field $>$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3e0ff90c88cbb3067904ae6c6f929c91}{cell\+Zone\+Points\+\_\+}}
+\item 
+bound\+Box \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a99a12bab445a4ebec63078dcf9afb33d}{cell\+Zone\+Bounds\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a726e48b815e43f8c5a5e7d3e2d7e60c8}{all\+Active\+Cells\+In\+Mesh\+\_\+}}
+\item 
+Random \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ab43f612d73b9e6980e1e0d042c2ae66a}{rand\+Gen\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 53 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}\label{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}{Foam\+::add\+Model\+Repeat\+Random\+Position\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 59 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}\label{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}{Foam\+::add\+Model\+Repeat\+Random\+Position\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 59 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_aab1d8c767850782b573e56dd78ad25e0}\label{classFoam_1_1addModelRepeatRandomPosition_aab1d8c767850782b573e56dd78ad25e0}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!addModelRepeatRandomPosition@{addModelRepeatRandomPosition}}
+\index{addModelRepeatRandomPosition@{addModelRepeatRandomPosition}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{addModelRepeatRandomPosition()}{addModelRepeatRandomPosition()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily add\+Model\+Repeat\+Random\+Position\+::add\+Model\+Repeat\+Random\+Position (\begin{DoxyParamCaption}\item[{const dictionary \&}]{add\+Model\+Dict,  }\item[{const Foam\+::fv\+Mesh \&}]{mesh,  }\item[{std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$}]{body\+Geom\+Model,  }\item[{List$<$ label\+List $>$ \&}]{cell\+Points }\end{DoxyParamCaption})}
+
+
+
+Definition at line 39 of file add\+Model\+Repeat\+Random\+Position.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{45 :}
+\DoxyCodeLine{46 \mbox{\hyperlink{classFoam_1_1addModel_a035422ab41f2720b8e61a72243f58e0e}{addModel}}(mesh, std::move(bodyGeomModel), cellPoints),}
+\DoxyCodeLine{47 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2c9823314c9ea7b51dd92b73ce70be09}{addModelDict\_}}(addModelDict),}
+\DoxyCodeLine{48 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2b8346cfaf48c968fe4709c1941e21c8}{addMode\_}}(word(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2c9823314c9ea7b51dd92b73ce70be09}{addModelDict\_}}.lookup(\textcolor{stringliteral}{"addModel"}))),}
+\DoxyCodeLine{49 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30949dbbe0b470c7b6f5aa4dcd31b8db}{bodyAdded\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{50 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30907c9b76ed91e79a3bfc5a492c1ed7}{coeffsDict\_}}(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2c9823314c9ea7b51dd92b73ce70be09}{addModelDict\_}}.subDict(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2b8346cfaf48c968fe4709c1941e21c8}{addMode\_}}+\textcolor{stringliteral}{"Coeffs"})),}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac5fab45c2f914d25fec09191a8bda768}{addDomain\_}}(word(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30907c9b76ed91e79a3bfc5a492c1ed7}{coeffsDict\_}}.lookup(\textcolor{stringliteral}{"addDomain"}))),}
+\DoxyCodeLine{53 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a653898b03251d81231f79ce475ef83e9}{scalingMode\_}}(word(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30907c9b76ed91e79a3bfc5a492c1ed7}{coeffsDict\_}}.lookup(\textcolor{stringliteral}{"scalingMode"}))),}
+\DoxyCodeLine{54 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a65d221e6e3577c84a2b790a110bce765}{rotationMode\_}}(word(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30907c9b76ed91e79a3bfc5a492c1ed7}{coeffsDict\_}}.lookup(\textcolor{stringliteral}{"rotationMode"}))),}
+\DoxyCodeLine{55 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ad9864a04d24a7e01dcdc389c73d1651f}{addModeI\_}}(word(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30907c9b76ed91e79a3bfc5a492c1ed7}{coeffsDict\_}}.lookup(\textcolor{stringliteral}{"addMode"}))),}
+\DoxyCodeLine{56 }
+\DoxyCodeLine{57 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a68fd8d575d0e60a9d0fb8990a15bea41}{addDomainCoeffs\_}}(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30907c9b76ed91e79a3bfc5a492c1ed7}{coeffsDict\_}}.subDict(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac5fab45c2f914d25fec09191a8bda768}{addDomain\_}} + \textcolor{stringliteral}{"Coeffs"})),}
+\DoxyCodeLine{58 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ae71ad7283aa5727cd629e19362e34c32}{scalingModeCoeffs\_}}(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30907c9b76ed91e79a3bfc5a492c1ed7}{coeffsDict\_}}.subDict(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a653898b03251d81231f79ce475ef83e9}{scalingMode\_}} + \textcolor{stringliteral}{"Coeffs"})),}
+\DoxyCodeLine{59 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a232b340a4bcb92926989ab552f385008}{rotationModeCoeffs\_}}(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30907c9b76ed91e79a3bfc5a492c1ed7}{coeffsDict\_}}.subDict(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a65d221e6e3577c84a2b790a110bce765}{rotationMode\_}} + \textcolor{stringliteral}{"Coeffs"})),}
+\DoxyCodeLine{60 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a345a4d496e86dd957647dce86ef508d4}{addModeICoeffs\_}}(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30907c9b76ed91e79a3bfc5a492c1ed7}{coeffsDict\_}}.subDict(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ad9864a04d24a7e01dcdc389c73d1651f}{addModeI\_}} + \textcolor{stringliteral}{"Coeffs"})),}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{62 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a0d9d633f641e7b459b3afbeb58928252}{useNTimes\_}}(0),}
+\DoxyCodeLine{63 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a230657bd1815947461e92b15c4e62dde}{timeBetweenUsage\_}}(0),}
+\DoxyCodeLine{64 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a31d306fee89e596ae341ec11ef704507}{partPerAdd\_}}(0),}
+\DoxyCodeLine{65 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3826b9e119ac056f38b832ee46b00a2a}{fieldValue\_}}(0),}
+\DoxyCodeLine{66 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6eabf6b8dd69397752a7898d52e6034d}{addedOnTimeLevel\_}}(0),}
+\DoxyCodeLine{67 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5556fc2b56b613027b5bb278a16d5de0}{partPerAddTemp\_}}(0),}
+\DoxyCodeLine{68 }
+\DoxyCodeLine{69 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a16cf729b66fcad9e39c9eaade5844bb3}{zoneName\_}}(),}
+\DoxyCodeLine{70 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2fcd2f8eca641db7969921667b043f5d}{minBound\_}}(vector::zero),}
+\DoxyCodeLine{71 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a9cd28b35f1e1c981726c7c1945257c1e}{maxBound\_}}(vector::zero),}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3e007c8c63db4ad89fe1532ec6c323d1}{scaleParticles\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{74 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6cf3cd175a4b3ee0860c44df14ddf0fd}{minScale\_}}(0),}
+\DoxyCodeLine{75 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3ce11bf981f08ede60f209fc394a5db9}{maxScale\_}}(0),}
+\DoxyCodeLine{76 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a86f14ce9ec43c563128d10ec833331d9}{minScaleFit\_}}(0),}
+\DoxyCodeLine{77 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac4887a0e2e0e5c46c6c5715551f17452}{scaleStep\_}}(0),}
+\DoxyCodeLine{78 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a624c2cc2bcede2aac58587c91ca080d0}{nTriesBeforeScaling\_}}(0),}
+\DoxyCodeLine{79 }
+\DoxyCodeLine{80 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_affb2341632541d959988c6a6cd436055}{rotateParticles\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{81 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a437ad9246e8edabb61208538762eeac5}{randomAxis\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{82 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a4ec1478689c3a444b0e35deb3489636d}{axisOfRot\_}}(vector::zero),}
+\DoxyCodeLine{83 }
+\DoxyCodeLine{84 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8c9fb196a61622ee5af76bac96deb190}{bodyAdditionAttemptCounter\_}}(0),}
+\DoxyCodeLine{85 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a02743d9d1b380175fd6c8643fb5b4330}{scaleCorrectionCounter\_}}(0),}
+\DoxyCodeLine{86 }
+\DoxyCodeLine{87 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a0f254e291736caddaecf7f757230930f}{scaleApplication\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{88 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aa425091696043540874b3e0d89c17c83}{scaleRandomApplication\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{89 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a11d61bb5d78c87415e35864ea547cfe6}{rescaleRequirement\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{90 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a9834b3d9f014eb1dd792a1e2d576e6b8}{succesfulladition\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{91 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8a8d50804eac2f09145361432d2f3079}{scalingFactor\_}}(0),}
+\DoxyCodeLine{92 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2f165d450fafb18f2bebc9f4270764f3}{restartPartCountTemp\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{93 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_abac2a0f6370bed674ba6bd4dea2092a4}{reapeatedAddition\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{94 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aa5c430261c0def27f8569df2f4b39fcf}{firstTimeRunning\_}}(\textcolor{keyword}{true}),}
+\DoxyCodeLine{95 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a47153875964d938fc9531ce7eff4072c}{cellZoneActive\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{96 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a11f5fbf9998770f9a46bdaceaacd9449}{boundBoxActive\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{97 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8841e5975a2296475ff5ac9494566a6f}{octreeField\_}}(\mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}}.nCells(), 0),}
+\DoxyCodeLine{98 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_afd0d6511656efdb206149fb02ffc995f}{timeBased\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{99 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a7e4a9f6f517047d12a7ef145db67a65f}{fieldBased\_}}(\textcolor{keyword}{false}),}
+\DoxyCodeLine{100 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af1679a69cb732beff065892d918c5e2e}{fieldCurrentValue\_}}(0),}
+\DoxyCodeLine{101 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a726e48b815e43f8c5a5e7d3e2d7e60c8}{allActiveCellsInMesh\_}}(\textcolor{keyword}{true}),}
+\DoxyCodeLine{102 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ab43f612d73b9e6980e1e0d042c2ae66a}{randGen\_}}(clock::getTime())}
+\DoxyCodeLine{103 \{}
+\DoxyCodeLine{104     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a20dc25d900a1e9cef5905d916cde8ab6}{init}}();}
+\DoxyCodeLine{105 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a3e93c5fa798a00b95a9e07feae95126b}\label{classFoam_1_1addModelRepeatRandomPosition_a3e93c5fa798a00b95a9e07feae95126b}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!````~addModelRepeatRandomPosition@{$\sim$addModelRepeatRandomPosition}}
+\index{````~addModelRepeatRandomPosition@{$\sim$addModelRepeatRandomPosition}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{$\sim$addModelRepeatRandomPosition()}{~addModelRepeatRandomPosition()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily add\+Model\+Repeat\+Random\+Position\+::$\sim$add\+Model\+Repeat\+Random\+Position (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 107 of file add\+Model\+Repeat\+Random\+Position.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{108 \{}
+\DoxyCodeLine{109 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_ad9a3af2ee97478991da1648a4dd5111e}\label{classFoam_1_1addModelRepeatRandomPosition_ad9a3af2ee97478991da1648a4dd5111e}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!addModelRepeatRandomPosition@{addModelRepeatRandomPosition}}
+\index{addModelRepeatRandomPosition@{addModelRepeatRandomPosition}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{addModelRepeatRandomPosition()}{addModelRepeatRandomPosition()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::add\+Model\+Repeat\+Random\+Position\+::add\+Model\+Repeat\+Random\+Position (\begin{DoxyParamCaption}\item[{const dictionary \&}]{add\+Model\+Dict,  }\item[{const Foam\+::fv\+Mesh \&}]{mesh,  }\item[{std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$}]{body\+Geom\+Model,  }\item[{List$<$ label\+List $>$ \&}]{cell\+Points }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a281f7996c4e9dc29ea853c8b0be402e5}\label{classFoam_1_1addModelRepeatRandomPosition_a281f7996c4e9dc29ea853c8b0be402e5}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!````~addModelRepeatRandomPosition@{$\sim$addModelRepeatRandomPosition}}
+\index{````~addModelRepeatRandomPosition@{$\sim$addModelRepeatRandomPosition}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{$\sim$addModelRepeatRandomPosition()}{~addModelRepeatRandomPosition()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::add\+Model\+Repeat\+Random\+Position\+::$\sim$add\+Model\+Repeat\+Random\+Position (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a3957d726557353c9dc8a20b13d787fd1}\label{classFoam_1_1addModelRepeatRandomPosition_a3957d726557353c9dc8a20b13d787fd1}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!addBody@{addBody}}
+\index{addBody@{addBody}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{addBody()}{addBody()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ add\+Model\+Repeat\+Random\+Position\+::add\+Body (\begin{DoxyParamCaption}\item[{const vol\+Scalar\+Field \&}]{body,  }\item[{Ptr\+List$<$ \mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} $>$ \&}]{immersed\+Bodies }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1addModel_a1dc9ab08cf153a26e70b839d668c46f5}{Foam\+::add\+Model}}.
+
+
+
+Definition at line 315 of file add\+Model\+Repeat\+Random\+Position.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{319 \{}
+\DoxyCodeLine{320     \mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geomModel\_}}-\/>resetBody();}
+\DoxyCodeLine{321 }
+\DoxyCodeLine{322     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8c9fb196a61622ee5af76bac96deb190}{bodyAdditionAttemptCounter\_}}++;}
+\DoxyCodeLine{323 }
+\DoxyCodeLine{324     \textcolor{comment}{// rotate}}
+\DoxyCodeLine{325     \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_affb2341632541d959988c6a6cd436055}{rotateParticles\_}})}
+\DoxyCodeLine{326     \{}
+\DoxyCodeLine{327         scalar rotAngle = \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a48e228fd9a09599fa5fa22f6df277244}{returnRandomAngle}}();}
+\DoxyCodeLine{328         \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a437ad9246e8edabb61208538762eeac5}{randomAxis\_}})}
+\DoxyCodeLine{329         \{}
+\DoxyCodeLine{330             \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a4ec1478689c3a444b0e35deb3489636d}{axisOfRot\_}} = \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a9e0cdfb2be4e9b6f9bfcd04b250f2763}{returnRandomRotationAxis}}();}
+\DoxyCodeLine{331         \}}
+\DoxyCodeLine{332         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{333             << \textcolor{stringliteral}{"Will rotate by "} << rotAngle}
+\DoxyCodeLine{334             << \textcolor{stringliteral}{" PiRad around axis "} << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a4ec1478689c3a444b0e35deb3489636d}{axisOfRot\_}} << endl;}
+\DoxyCodeLine{335 }
+\DoxyCodeLine{336         \mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geomModel\_}}-\/>bodyRotatePoints(rotAngle,\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a4ec1478689c3a444b0e35deb3489636d}{axisOfRot\_}});}
+\DoxyCodeLine{337         \textcolor{comment}{//\string~ CoM = gSum(bodySurfMesh.coordinates())/bodySurfMesh.size();}}
+\DoxyCodeLine{338     \}}
+\DoxyCodeLine{339 }
+\DoxyCodeLine{340     \textcolor{comment}{// scale}}
+\DoxyCodeLine{341     \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a0f254e291736caddaecf7f757230930f}{scaleApplication\_}} or \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aa425091696043540874b3e0d89c17c83}{scaleRandomApplication\_}})}
+\DoxyCodeLine{342     \{}
+\DoxyCodeLine{343         \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aa425091696043540874b3e0d89c17c83}{scaleRandomApplication\_}})\{\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac4887a0e2e0e5c46c6c5715551f17452}{scaleStep\_}} = \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aba3da0ead31236e510b136984127eb4e}{returnRandomScale}}();\}}
+\DoxyCodeLine{344         \mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geomModel\_}}-\/>bodyScalePoints(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac4887a0e2e0e5c46c6c5715551f17452}{scaleStep\_}});}
+\DoxyCodeLine{345     \}}
+\DoxyCodeLine{346 }
+\DoxyCodeLine{347     \mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geomModel\_}}-\/>bodyScalePoints(1.02);}
+\DoxyCodeLine{348 }
+\DoxyCodeLine{349     vector CoM(\mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geomModel\_}}-\/>getCoM());}
+\DoxyCodeLine{350     point bBoxCenter = \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a99a12bab445a4ebec63078dcf9afb33d}{cellZoneBounds\_}}.midpoint();}
+\DoxyCodeLine{351     \mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geomModel\_}}-\/>bodyMovePoints(bBoxCenter -\/ CoM);}
+\DoxyCodeLine{352 }
+\DoxyCodeLine{353     \textcolor{comment}{// translate}}
+\DoxyCodeLine{354 }
+\DoxyCodeLine{355     vector randomTrans = \mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geomModel\_}}-\/>addModelReturnRandomPosition(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a726e48b815e43f8c5a5e7d3e2d7e60c8}{allActiveCellsInMesh\_}},\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a99a12bab445a4ebec63078dcf9afb33d}{cellZoneBounds\_}},\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ab43f612d73b9e6980e1e0d042c2ae66a}{randGen\_}});}
+\DoxyCodeLine{356     \mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geomModel\_}}-\/>bodyMovePoints(randomTrans);}
+\DoxyCodeLine{357 }
+\DoxyCodeLine{358     \textcolor{comment}{// check if the body can be added}}
+\DoxyCodeLine{359     volScalarField helpBodyField\_ = body;}
+\DoxyCodeLine{360     \mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geomModel\_}}-\/>createImmersedBody(}
+\DoxyCodeLine{361         helpBodyField\_,}
+\DoxyCodeLine{362         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8841e5975a2296475ff5ac9494566a6f}{octreeField\_}},}
+\DoxyCodeLine{363         \mbox{\hyperlink{classFoam_1_1addModel_a6feb58d5e6825765583893bd4678f1b6}{cellPoints\_}}}
+\DoxyCodeLine{364     );}
+\DoxyCodeLine{365 }
+\DoxyCodeLine{366     \textcolor{keywordtype}{bool} canAddBodyI = !\mbox{\hyperlink{classFoam_1_1addModel_a6ebc08e73279bee94a8e7a317c2d57be}{isBodyInContact}}(immersedBodies);}
+\DoxyCodeLine{367 }
+\DoxyCodeLine{368     \mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geomModel\_}}-\/>bodyScalePoints(1.0/1.02);}
+\DoxyCodeLine{369 }
+\DoxyCodeLine{370     reduce(canAddBodyI, andOp<bool>());}
+\DoxyCodeLine{371     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30949dbbe0b470c7b6f5aa4dcd31b8db}{bodyAdded\_}} = (canAddBodyI);}
+\DoxyCodeLine{372 }
+\DoxyCodeLine{373     \textcolor{keywordflow}{if}(!\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30949dbbe0b470c7b6f5aa4dcd31b8db}{bodyAdded\_}})}
+\DoxyCodeLine{374     \{}
+\DoxyCodeLine{375         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a02743d9d1b380175fd6c8643fb5b4330}{scaleCorrectionCounter\_}}++;}
+\DoxyCodeLine{376     \}}
+\DoxyCodeLine{377 }
+\DoxyCodeLine{378     \textcolor{keywordflow}{if}(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30949dbbe0b470c7b6f5aa4dcd31b8db}{bodyAdded\_}})}
+\DoxyCodeLine{379     \{}
+\DoxyCodeLine{380         \textcolor{keywordflow}{if}(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_afd0d6511656efdb206149fb02ffc995f}{timeBased\_}})}
+\DoxyCodeLine{381         \{}
+\DoxyCodeLine{382             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{383                 << \textcolor{stringliteral}{"addedOnTimeLevel:  "} << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6eabf6b8dd69397752a7898d52e6034d}{addedOnTimeLevel\_}}<< endl;}
+\DoxyCodeLine{384             \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6eabf6b8dd69397752a7898d52e6034d}{addedOnTimeLevel\_}}++;}
+\DoxyCodeLine{385             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "} << \textcolor{stringliteral}{"bodyAdded: "}}
+\DoxyCodeLine{386                 << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30949dbbe0b470c7b6f5aa4dcd31b8db}{bodyAdded\_}} << \textcolor{stringliteral}{" addedOnTimeLevel:  "} << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6eabf6b8dd69397752a7898d52e6034d}{addedOnTimeLevel\_}}}
+\DoxyCodeLine{387                 << \textcolor{stringliteral}{" useNTimes: "} << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a0d9d633f641e7b459b3afbeb58928252}{useNTimes\_}}<<  endl;}
+\DoxyCodeLine{388             \textcolor{keywordflow}{if}(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6eabf6b8dd69397752a7898d52e6034d}{addedOnTimeLevel\_}} == \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a31d306fee89e596ae341ec11ef704507}{partPerAdd\_}})}
+\DoxyCodeLine{389             \{}
+\DoxyCodeLine{390                 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a0d9d633f641e7b459b3afbeb58928252}{useNTimes\_}}-\/-\/;}
+\DoxyCodeLine{391                 \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{392                     <<\textcolor{stringliteral}{" useNTimes: "} << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a0d9d633f641e7b459b3afbeb58928252}{useNTimes\_}}<<  endl;}
+\DoxyCodeLine{393                 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_abac2a0f6370bed674ba6bd4dea2092a4}{reapeatedAddition\_}} = \textcolor{keyword}{false};}
+\DoxyCodeLine{394             \}}
+\DoxyCodeLine{395         \}}
+\DoxyCodeLine{396 }
+\DoxyCodeLine{397         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a02743d9d1b380175fd6c8643fb5b4330}{scaleCorrectionCounter\_}} = 0;}
+\DoxyCodeLine{398 }
+\DoxyCodeLine{399     \}}
+\DoxyCodeLine{400 }
+\DoxyCodeLine{401     \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{402         << \textcolor{stringliteral}{"bodyAdditionAttemptNr  : "} << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8c9fb196a61622ee5af76bac96deb190}{bodyAdditionAttemptCounter\_}}<< endl;}
+\DoxyCodeLine{403     \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "} << \textcolor{stringliteral}{"sameScaleAttempts      : "}}
+\DoxyCodeLine{404         << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a02743d9d1b380175fd6c8643fb5b4330}{scaleCorrectionCounter\_}}<< endl;}
+\DoxyCodeLine{405 }
+\DoxyCodeLine{406     \textcolor{keywordflow}{if}(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a02743d9d1b380175fd6c8643fb5b4330}{scaleCorrectionCounter\_}} > \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a624c2cc2bcede2aac58587c91ca080d0}{nTriesBeforeScaling\_}} \&\& \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3e007c8c63db4ad89fe1532ec6c323d1}{scaleParticles\_}})}
+\DoxyCodeLine{407     \{}
+\DoxyCodeLine{408         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a0f254e291736caddaecf7f757230930f}{scaleApplication\_}} = \textcolor{keyword}{true};}
+\DoxyCodeLine{409         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a11d61bb5d78c87415e35864ea547cfe6}{rescaleRequirement\_}} = \textcolor{keyword}{true};}
+\DoxyCodeLine{410         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8a8d50804eac2f09145361432d2f3079}{scalingFactor\_}}++;}
+\DoxyCodeLine{411         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac4887a0e2e0e5c46c6c5715551f17452}{scaleStep\_}} = pow(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac4887a0e2e0e5c46c6c5715551f17452}{scaleStep\_}},\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8a8d50804eac2f09145361432d2f3079}{scalingFactor\_}});}
+\DoxyCodeLine{412         \textcolor{keywordflow}{if}(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac4887a0e2e0e5c46c6c5715551f17452}{scaleStep\_}}<\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a86f14ce9ec43c563128d10ec833331d9}{minScaleFit\_}})}
+\DoxyCodeLine{413         \{}
+\DoxyCodeLine{414             \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac4887a0e2e0e5c46c6c5715551f17452}{scaleStep\_}}=\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a86f14ce9ec43c563128d10ec833331d9}{minScaleFit\_}};}
+\DoxyCodeLine{415         \}}
+\DoxyCodeLine{416         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a02743d9d1b380175fd6c8643fb5b4330}{scaleCorrectionCounter\_}} = 0;}
+\DoxyCodeLine{417     \}}
+\DoxyCodeLine{418 }
+\DoxyCodeLine{419     \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geomModel\_}}-\/>getCopy();}
+\DoxyCodeLine{420 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a34624ff26fd9f815d56ec9df8a3ea46b}\label{classFoam_1_1addModelRepeatRandomPosition_a34624ff26fd9f815d56ec9df8a3ea46b}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!addBody@{addBody}}
+\index{addBody@{addBody}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{addBody()}{addBody()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}}$>$ Foam\+::add\+Model\+Repeat\+Random\+Position\+::add\+Body (\begin{DoxyParamCaption}\item[{const vol\+Scalar\+Field \&}]{body,  }\item[{Ptr\+List$<$ \mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} $>$ \&}]{immersed\+Bodies }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1addModel_a1dc9ab08cf153a26e70b839d668c46f5}{Foam\+::add\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_ad20435ff5eab3418b7f2d421ea2f1842}\label{classFoam_1_1addModelRepeatRandomPosition_ad20435ff5eab3418b7f2d421ea2f1842}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!checkIfAdd@{checkIfAdd}}
+\index{checkIfAdd@{checkIfAdd}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{checkIfAdd()}{checkIfAdd()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::check\+If\+Add (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 173 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{174     \{}
+\DoxyCodeLine{175         \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{176     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_ad20435ff5eab3418b7f2d421ea2f1842}\label{classFoam_1_1addModelRepeatRandomPosition_ad20435ff5eab3418b7f2d421ea2f1842}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!checkIfAdd@{checkIfAdd}}
+\index{checkIfAdd@{checkIfAdd}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{checkIfAdd()}{checkIfAdd()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::check\+If\+Add (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 173 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{174     \{}
+\DoxyCodeLine{175         \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{176     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_aa5887270431925f2f684aed1be7aa1e0}\label{classFoam_1_1addModelRepeatRandomPosition_aa5887270431925f2f684aed1be7aa1e0}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!checkLambdaFraction@{checkLambdaFraction}}
+\index{checkLambdaFraction@{checkLambdaFraction}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{checkLambdaFraction()}{checkLambdaFraction()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily scalar add\+Model\+Repeat\+Random\+Position\+::check\+Lambda\+Fraction (\begin{DoxyParamCaption}\item[{const vol\+Scalar\+Field \&}]{body }\end{DoxyParamCaption})}
+
+
+
+Definition at line 559 of file add\+Model\+Repeat\+Random\+Position.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{560 \{}
+\DoxyCodeLine{561     scalarList lambdaIntegrate(Pstream::nProcs());}
+\DoxyCodeLine{562     scalarList volumeIntegrate(Pstream::nProcs());}
+\DoxyCodeLine{563     scalar lambdaFraction(0);}
+\DoxyCodeLine{564     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (lambdaIntegrate,k)}
+\DoxyCodeLine{565     \{}
+\DoxyCodeLine{566         lambdaIntegrate[k] = 0;}
+\DoxyCodeLine{567         volumeIntegrate[k] = 0;}
+\DoxyCodeLine{568     \}}
+\DoxyCodeLine{569     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5bf9defb52cf47c1c303a355bc9e01e7}{cellsInBoundBox\_}}[Pstream::myProcNo()],k)}
+\DoxyCodeLine{570     \{}
+\DoxyCodeLine{571         label cell = \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5bf9defb52cf47c1c303a355bc9e01e7}{cellsInBoundBox\_}}[Pstream::myProcNo()][k];}
+\DoxyCodeLine{572         lambdaIntegrate[Pstream::myProcNo()] += \mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}}.V()[cell]*body[cell];}
+\DoxyCodeLine{573         volumeIntegrate[Pstream::myProcNo()] += \mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}}.V()[cell];}
+\DoxyCodeLine{574     \}}
+\DoxyCodeLine{575     lambdaFraction = gSum(lambdaIntegrate)/gSum(volumeIntegrate);}
+\DoxyCodeLine{576     \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{577         << \textcolor{stringliteral}{"lambda fraction in controlled region: "} << lambdaFraction<< endl;}
+\DoxyCodeLine{578     \textcolor{keywordflow}{return} lambdaFraction;}
+\DoxyCodeLine{579 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 2
+Here is the caller graph for this function\+:
+% FIG 3
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a92b978286661ab2d685140826ec38b5b}\label{classFoam_1_1addModelRepeatRandomPosition_a92b978286661ab2d685140826ec38b5b}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!checkLambdaFraction@{checkLambdaFraction}}
+\index{checkLambdaFraction@{checkLambdaFraction}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{checkLambdaFraction()}{checkLambdaFraction()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily scalar Foam\+::add\+Model\+Repeat\+Random\+Position\+::check\+Lambda\+Fraction (\begin{DoxyParamCaption}\item[{const vol\+Scalar\+Field \&}]{body }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_ac432b239c512fe224af2c0a547ddda59}\label{classFoam_1_1addModelRepeatRandomPosition_ac432b239c512fe224af2c0a547ddda59}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!getAddMode@{getAddMode}}
+\index{getAddMode@{getAddMode}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{getAddMode()}{getAddMode()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily word Foam\+::add\+Model\+Repeat\+Random\+Position\+::get\+Add\+Mode (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1addModel_a71640fabc1d0a202c6b31dd911f0c1b5}{Foam\+::add\+Model}}.
+
+
+
+Definition at line 178 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{179     \{}
+\DoxyCodeLine{180         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2b8346cfaf48c968fe4709c1941e21c8}{addMode\_}};}
+\DoxyCodeLine{181     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_ac432b239c512fe224af2c0a547ddda59}\label{classFoam_1_1addModelRepeatRandomPosition_ac432b239c512fe224af2c0a547ddda59}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!getAddMode@{getAddMode}}
+\index{getAddMode@{getAddMode}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{getAddMode()}{getAddMode()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily word Foam\+::add\+Model\+Repeat\+Random\+Position\+::get\+Add\+Mode (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1addModel_a71640fabc1d0a202c6b31dd911f0c1b5}{Foam\+::add\+Model}}.
+
+
+
+Definition at line 178 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{179     \{}
+\DoxyCodeLine{180         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2b8346cfaf48c968fe4709c1941e21c8}{addMode\_}};}
+\DoxyCodeLine{181     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_af59ee683b4511d32cf880a5325a5eb4a}\label{classFoam_1_1addModelRepeatRandomPosition_af59ee683b4511d32cf880a5325a5eb4a}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!getBBoxCellsByOctTree@{getBBoxCellsByOctTree}}
+\index{getBBoxCellsByOctTree@{getBBoxCellsByOctTree}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{getBBoxCellsByOctTree()}{getBBoxCellsByOctTree()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily label\+List add\+Model\+Repeat\+Random\+Position\+::get\+B\+Box\+Cells\+By\+Oct\+Tree (\begin{DoxyParamCaption}\item[{label}]{cell\+To\+Check,  }\item[{bool \&}]{inside\+BB,  }\item[{vector \&}]{b\+Box\+Min,  }\item[{vector \&}]{b\+Box\+Max,  }\item[{List$<$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}{Dynamic\+Label\+List}} $>$ \&}]{b\+Box\+Cells }\end{DoxyParamCaption})}
+
+
+
+Definition at line 523 of file add\+Model\+Repeat\+Random\+Position.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{530 \{}
+\DoxyCodeLine{531     labelList retList;}
+\DoxyCodeLine{532 }
+\DoxyCodeLine{533     \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8841e5975a2296475ff5ac9494566a6f}{octreeField\_}}[cellToCheck] ==0)}
+\DoxyCodeLine{534     \{}
+\DoxyCodeLine{535         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8841e5975a2296475ff5ac9494566a6f}{octreeField\_}}[cellToCheck] = 1;}
+\DoxyCodeLine{536         vector cCenter = \mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}}.C()[cellToCheck];}
+\DoxyCodeLine{537         label   partCheck(0);}
+\DoxyCodeLine{538         \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (bBoxMin,vecI)}
+\DoxyCodeLine{539         \{}
+\DoxyCodeLine{540             \textcolor{keywordflow}{if} (cCenter[vecI] >= bBoxMin[vecI] and cCenter[vecI] <= bBoxMax[vecI])}
+\DoxyCodeLine{541             \{}
+\DoxyCodeLine{542                 partCheck++;}
+\DoxyCodeLine{543             \}}
+\DoxyCodeLine{544         \}}
+\DoxyCodeLine{545         \textcolor{keywordtype}{bool} cellInside = (partCheck == 3) ? \textcolor{keyword}{true} : \textcolor{keyword}{false};}
+\DoxyCodeLine{546         \textcolor{keywordflow}{if} (cellInside)}
+\DoxyCodeLine{547         \{}
+\DoxyCodeLine{548             bBoxCells[Pstream::myProcNo()].append(cellToCheck);}
+\DoxyCodeLine{549             insideBB = \textcolor{keyword}{true};}
+\DoxyCodeLine{550         \}}
+\DoxyCodeLine{551         \textcolor{keywordflow}{if} (not insideBB or cellInside)}
+\DoxyCodeLine{552         \{}
+\DoxyCodeLine{553             retList = \mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}}.cellCells()[cellToCheck];}
+\DoxyCodeLine{554         \}}
+\DoxyCodeLine{555     \}}
+\DoxyCodeLine{556     \textcolor{keywordflow}{return} retList;}
+\DoxyCodeLine{557 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 4
+Here is the caller graph for this function\+:
+% FIG 5
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a981655321bdf74228efc212eb4439a4c}\label{classFoam_1_1addModelRepeatRandomPosition_a981655321bdf74228efc212eb4439a4c}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!getBBoxCellsByOctTree@{getBBoxCellsByOctTree}}
+\index{getBBoxCellsByOctTree@{getBBoxCellsByOctTree}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{getBBoxCellsByOctTree()}{getBBoxCellsByOctTree()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily label\+List Foam\+::add\+Model\+Repeat\+Random\+Position\+::get\+B\+Box\+Cells\+By\+Oct\+Tree (\begin{DoxyParamCaption}\item[{label}]{cell\+To\+Check,  }\item[{bool \&}]{inside\+BB,  }\item[{vector \&}]{b\+Box\+Min,  }\item[{vector \&}]{b\+Box\+Max,  }\item[{List$<$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}{Dynamic\+Label\+List}} $>$ \&}]{b\+Box\+Cells }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a082bcadcbe8918c6704b0cb46f99284f}\label{classFoam_1_1addModelRepeatRandomPosition_a082bcadcbe8918c6704b0cb46f99284f}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!getBodyAdded@{getBodyAdded}}
+\index{getBodyAdded@{getBodyAdded}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{getBodyAdded()}{getBodyAdded()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::get\+Body\+Added (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1addModel_ab24e6214ba35156e8023b70e23968fbc}{Foam\+::add\+Model}}.
+
+
+
+Definition at line 183 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{184     \{}
+\DoxyCodeLine{185         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30949dbbe0b470c7b6f5aa4dcd31b8db}{bodyAdded\_}};}
+\DoxyCodeLine{186     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a082bcadcbe8918c6704b0cb46f99284f}\label{classFoam_1_1addModelRepeatRandomPosition_a082bcadcbe8918c6704b0cb46f99284f}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!getBodyAdded@{getBodyAdded}}
+\index{getBodyAdded@{getBodyAdded}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{getBodyAdded()}{getBodyAdded()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::get\+Body\+Added (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1addModel_ab24e6214ba35156e8023b70e23968fbc}{Foam\+::add\+Model}}.
+
+
+
+Definition at line 183 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{184     \{}
+\DoxyCodeLine{185         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a30949dbbe0b470c7b6f5aa4dcd31b8db}{bodyAdded\_}};}
+\DoxyCodeLine{186     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_aea74fdaf2770b3cedadc2596798b153a}\label{classFoam_1_1addModelRepeatRandomPosition_aea74fdaf2770b3cedadc2596798b153a}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!init@{init}}
+\index{init@{init}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::add\+Model\+Repeat\+Random\+Position\+::init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1addModel_add5d7b58c1a2f4bd986487c39b536b8b}{Foam\+::add\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a20dc25d900a1e9cef5905d916cde8ab6}\label{classFoam_1_1addModelRepeatRandomPosition_a20dc25d900a1e9cef5905d916cde8ab6}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!init@{init}}
+\index{init@{init}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{init()}{init()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void add\+Model\+Repeat\+Random\+Position\+::init (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1addModel_add5d7b58c1a2f4bd986487c39b536b8b}{Foam\+::add\+Model}}.
+
+
+
+Definition at line 112 of file add\+Model\+Repeat\+Random\+Position.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{113 \{}
+\DoxyCodeLine{114     \textcolor{comment}{// set sizes to necessary datatypes}}
+\DoxyCodeLine{115     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5bf9defb52cf47c1c303a355bc9e01e7}{cellsInBoundBox\_}}.setSize(Pstream::nProcs());}
+\DoxyCodeLine{116     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3e0ff90c88cbb3067904ae6c6f929c91}{cellZonePoints\_}}.setSize(Pstream::nProcs());}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118 }
+\DoxyCodeLine{119     \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ad9864a04d24a7e01dcdc389c73d1651f}{addModeI\_}} == \textcolor{stringliteral}{"timeBased"})}
+\DoxyCodeLine{120     \{}
+\DoxyCodeLine{121         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a0d9d633f641e7b459b3afbeb58928252}{useNTimes\_}} = (readLabel(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a345a4d496e86dd957647dce86ef508d4}{addModeICoeffs\_}}.lookup(\textcolor{stringliteral}{"useNTimes"})));}
+\DoxyCodeLine{122         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a230657bd1815947461e92b15c4e62dde}{timeBetweenUsage\_}} = (readScalar(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a345a4d496e86dd957647dce86ef508d4}{addModeICoeffs\_}}.lookup(\textcolor{stringliteral}{"timeBetweenUsage"})));}
+\DoxyCodeLine{123         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a31d306fee89e596ae341ec11ef704507}{partPerAdd\_}} = (readLabel(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a345a4d496e86dd957647dce86ef508d4}{addModeICoeffs\_}}.lookup(\textcolor{stringliteral}{"partPerAdd"})));}
+\DoxyCodeLine{124         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_afd0d6511656efdb206149fb02ffc995f}{timeBased\_}} = \textcolor{keyword}{true};}
+\DoxyCodeLine{125         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{126             << \textcolor{stringliteral}{"addModel will control simulation time"} << endl;}
+\DoxyCodeLine{127         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "} << \textcolor{stringliteral}{"STL will be re-\/used "}}
+\DoxyCodeLine{128             << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a0d9d633f641e7b459b3afbeb58928252}{useNTimes\_}} << \textcolor{stringliteral}{" times"} << endl;}
+\DoxyCodeLine{129         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "} << \textcolor{stringliteral}{"STL will be added each "}}
+\DoxyCodeLine{130             << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a230657bd1815947461e92b15c4e62dde}{timeBetweenUsage\_}} << \textcolor{stringliteral}{" [T]"} << endl;}
+\DoxyCodeLine{131         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "} << \textcolor{stringliteral}{"upon each addition, "}}
+\DoxyCodeLine{132             << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a31d306fee89e596ae341ec11ef704507}{partPerAdd\_}} << \textcolor{stringliteral}{" bodies will be generated from the given STL"}}
+\DoxyCodeLine{133             << endl;}
+\DoxyCodeLine{134     \}}
+\DoxyCodeLine{135     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ad9864a04d24a7e01dcdc389c73d1651f}{addModeI\_}} == \textcolor{stringliteral}{"fieldBased"})}
+\DoxyCodeLine{136     \{}
+\DoxyCodeLine{137         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3826b9e119ac056f38b832ee46b00a2a}{fieldValue\_}} = (readScalar(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a345a4d496e86dd957647dce86ef508d4}{addModeICoeffs\_}}.lookup(\textcolor{stringliteral}{"fieldValue"})));}
+\DoxyCodeLine{138         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a7e4a9f6f517047d12a7ef145db67a65f}{fieldBased\_}} = \textcolor{keyword}{true};}
+\DoxyCodeLine{139         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{140             << \textcolor{stringliteral}{"addModel will control particles volume fraction"} << endl;}
+\DoxyCodeLine{141         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{142             << \textcolor{stringliteral}{"preset volume fraction: "} << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3826b9e119ac056f38b832ee46b00a2a}{fieldValue\_}} << endl;}
+\DoxyCodeLine{143     \}}
+\DoxyCodeLine{144     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{145     \{}
+\DoxyCodeLine{146         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{147             << \textcolor{stringliteral}{"notImplemented, will crash"} << endl;}
+\DoxyCodeLine{148     \}}
+\DoxyCodeLine{149 }
+\DoxyCodeLine{150     \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac5fab45c2f914d25fec09191a8bda768}{addDomain\_}} == \textcolor{stringliteral}{"cellZone"})}
+\DoxyCodeLine{151     \{}
+\DoxyCodeLine{152         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a16cf729b66fcad9e39c9eaade5844bb3}{zoneName\_}} = (word(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a68fd8d575d0e60a9d0fb8990a15bea41}{addDomainCoeffs\_}}.lookup(\textcolor{stringliteral}{"zoneName"})));}
+\DoxyCodeLine{153         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a47153875964d938fc9531ce7eff4072c}{cellZoneActive\_}} = \textcolor{keyword}{true};}
+\DoxyCodeLine{154         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af0170a46eedc795704e653d1be3e148e}{initializeCellZone}}();}
+\DoxyCodeLine{155         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{156             << \textcolor{stringliteral}{"cellZone based addition zone"} << endl;}
+\DoxyCodeLine{157     \}}
+\DoxyCodeLine{158     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac5fab45c2f914d25fec09191a8bda768}{addDomain\_}} == \textcolor{stringliteral}{"boundBox"})}
+\DoxyCodeLine{159     \{}
+\DoxyCodeLine{160         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2fcd2f8eca641db7969921667b043f5d}{minBound\_}}       = (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a68fd8d575d0e60a9d0fb8990a15bea41}{addDomainCoeffs\_}}.lookup(\textcolor{stringliteral}{"minBound"}));}
+\DoxyCodeLine{161         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a9cd28b35f1e1c981726c7c1945257c1e}{maxBound\_}}       = (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a68fd8d575d0e60a9d0fb8990a15bea41}{addDomainCoeffs\_}}.lookup(\textcolor{stringliteral}{"maxBound"}));}
+\DoxyCodeLine{162         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a11f5fbf9998770f9a46bdaceaacd9449}{boundBoxActive\_}} = \textcolor{keyword}{true};}
+\DoxyCodeLine{163         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aaa4f15ee673c2927dd22b60284abf7d6}{initializeBoundBox}}();}
+\DoxyCodeLine{164         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{165             << \textcolor{stringliteral}{"boundBox based addition zone"} << endl;}
+\DoxyCodeLine{166     \}}
+\DoxyCodeLine{167     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac5fab45c2f914d25fec09191a8bda768}{addDomain\_}} == \textcolor{stringliteral}{"domain"})}
+\DoxyCodeLine{168     \{}
+\DoxyCodeLine{169         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{170             << \textcolor{stringliteral}{"notImplemented, will crash"} << endl;}
+\DoxyCodeLine{171     \}}
+\DoxyCodeLine{172     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{173     \{}
+\DoxyCodeLine{174         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{175             << \textcolor{stringliteral}{"notImplemented, will crash"} << endl;}
+\DoxyCodeLine{176     \}}
+\DoxyCodeLine{177 }
+\DoxyCodeLine{178     \textcolor{comment}{// check, if the whole zone is in the mesh}}
+\DoxyCodeLine{179     scalarList procZoneVols(Pstream::nProcs());}
+\DoxyCodeLine{180     procZoneVols[Pstream::myProcNo()] = 0;}
+\DoxyCodeLine{181     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5bf9defb52cf47c1c303a355bc9e01e7}{cellsInBoundBox\_}}[Pstream::myProcNo()],cellI)}
+\DoxyCodeLine{182     \{}
+\DoxyCodeLine{183         procZoneVols[Pstream::myProcNo()]+=\mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}}.V()[\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5bf9defb52cf47c1c303a355bc9e01e7}{cellsInBoundBox\_}}[Pstream::myProcNo()][cellI]];}
+\DoxyCodeLine{184     \}}
+\DoxyCodeLine{185     scalar zoneVol(gSum(procZoneVols));}
+\DoxyCodeLine{186     scalar zoneBBoxVol(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a99a12bab445a4ebec63078dcf9afb33d}{cellZoneBounds\_}}.volume());}
+\DoxyCodeLine{187     \textcolor{keywordflow}{if} (zoneVol -\/ zoneBBoxVol > 1e-\/5*zoneBBoxVol)}
+\DoxyCodeLine{188     \{}
+\DoxyCodeLine{189         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a726e48b815e43f8c5a5e7d3e2d7e60c8}{allActiveCellsInMesh\_}} = \textcolor{keyword}{false};}
+\DoxyCodeLine{190         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{191              << \textcolor{stringliteral}{"addition zone NOT completely immersed in mesh "}}
+\DoxyCodeLine{192              << \textcolor{stringliteral}{"this computation will be EXPENSIVE"} << endl;}
+\DoxyCodeLine{193         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << zoneVol << \textcolor{stringliteral}{" "} << zoneBBoxVol << endl;}
+\DoxyCodeLine{194     \}}
+\DoxyCodeLine{195     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{196     \{}
+\DoxyCodeLine{197         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{198              << \textcolor{stringliteral}{"addition zone completely immersed in mesh -\/> OK"} << endl;}
+\DoxyCodeLine{199     \}}
+\DoxyCodeLine{200 }
+\DoxyCodeLine{201     \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a653898b03251d81231f79ce475ef83e9}{scalingMode\_}} == \textcolor{stringliteral}{"noScaling"})}
+\DoxyCodeLine{202     \{}
+\DoxyCodeLine{203         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3e007c8c63db4ad89fe1532ec6c323d1}{scaleParticles\_}} = \textcolor{keyword}{false};}
+\DoxyCodeLine{204         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{205             << \textcolor{stringliteral}{"all particles will have the same scale"} << endl;}
+\DoxyCodeLine{206     \}}
+\DoxyCodeLine{207     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a653898b03251d81231f79ce475ef83e9}{scalingMode\_}} == \textcolor{stringliteral}{"randomScaling"})}
+\DoxyCodeLine{208     \{}
+\DoxyCodeLine{209         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6cf3cd175a4b3ee0860c44df14ddf0fd}{minScale\_}}               = (readScalar(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ae71ad7283aa5727cd629e19362e34c32}{scalingModeCoeffs\_}}.lookup(\textcolor{stringliteral}{"minScale"})));}
+\DoxyCodeLine{210         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3ce11bf981f08ede60f209fc394a5db9}{maxScale\_}}               = (readScalar(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ae71ad7283aa5727cd629e19362e34c32}{scalingModeCoeffs\_}}.lookup(\textcolor{stringliteral}{"maxScale"})));}
+\DoxyCodeLine{211         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3e007c8c63db4ad89fe1532ec6c323d1}{scaleParticles\_}}         = \textcolor{keyword}{false};}
+\DoxyCodeLine{212         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aa425091696043540874b3e0d89c17c83}{scaleRandomApplication\_}} = \textcolor{keyword}{true};}
+\DoxyCodeLine{213         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{214             << \textcolor{stringliteral}{"particles will be randomly scaled"} << endl;}
+\DoxyCodeLine{215     \}}
+\DoxyCodeLine{216     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a653898b03251d81231f79ce475ef83e9}{scalingMode\_}} == \textcolor{stringliteral}{"scaleToFit"})}
+\DoxyCodeLine{217     \{}
+\DoxyCodeLine{218         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a86f14ce9ec43c563128d10ec833331d9}{minScaleFit\_}}        = (readScalar(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ae71ad7283aa5727cd629e19362e34c32}{scalingModeCoeffs\_}}.lookup(\textcolor{stringliteral}{"minScale"})));}
+\DoxyCodeLine{219         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ac4887a0e2e0e5c46c6c5715551f17452}{scaleStep\_}}          = (readScalar(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ae71ad7283aa5727cd629e19362e34c32}{scalingModeCoeffs\_}}.lookup(\textcolor{stringliteral}{"scaleStep"})));}
+\DoxyCodeLine{220         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a624c2cc2bcede2aac58587c91ca080d0}{nTriesBeforeScaling\_}}= (readScalar(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ae71ad7283aa5727cd629e19362e34c32}{scalingModeCoeffs\_}}.lookup(\textcolor{stringliteral}{"nTriesBeforeScaling"})));}
+\DoxyCodeLine{221         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{222             << \textcolor{stringliteral}{"particles will be downscaled to better fill the domain"} << endl;}
+\DoxyCodeLine{223         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{224             << \textcolor{stringliteral}{"nTriesBeforeDownScaling: "} << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a624c2cc2bcede2aac58587c91ca080d0}{nTriesBeforeScaling\_}} << endl;}
+\DoxyCodeLine{225         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3e007c8c63db4ad89fe1532ec6c323d1}{scaleParticles\_}} = \textcolor{keyword}{true};}
+\DoxyCodeLine{226     \}}
+\DoxyCodeLine{227     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{228     \{}
+\DoxyCodeLine{229         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{230             << \textcolor{stringliteral}{"notImplemented, will crash"} << endl;}
+\DoxyCodeLine{231     \}}
+\DoxyCodeLine{232 }
+\DoxyCodeLine{233     \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a65d221e6e3577c84a2b790a110bce765}{rotationMode\_}} == \textcolor{stringliteral}{"noRotation"})}
+\DoxyCodeLine{234     \{}
+\DoxyCodeLine{235         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_affb2341632541d959988c6a6cd436055}{rotateParticles\_}} = \textcolor{keyword}{false};}
+\DoxyCodeLine{236         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a437ad9246e8edabb61208538762eeac5}{randomAxis\_}}      = \textcolor{keyword}{false};}
+\DoxyCodeLine{237         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{238             << \textcolor{stringliteral}{"source STL will not be rotated upon addition"} << endl;}
+\DoxyCodeLine{239     \}}
+\DoxyCodeLine{240     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a65d221e6e3577c84a2b790a110bce765}{rotationMode\_}} == \textcolor{stringliteral}{"randomRotation"})}
+\DoxyCodeLine{241     \{}
+\DoxyCodeLine{242         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_affb2341632541d959988c6a6cd436055}{rotateParticles\_}} = \textcolor{keyword}{true};}
+\DoxyCodeLine{243         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a437ad9246e8edabb61208538762eeac5}{randomAxis\_}}      = \textcolor{keyword}{true};}
+\DoxyCodeLine{244         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{245             << \textcolor{stringliteral}{"source STL will be randomly rotated upon addition"} << endl;}
+\DoxyCodeLine{246     \}}
+\DoxyCodeLine{247     \textcolor{keywordflow}{else} \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a65d221e6e3577c84a2b790a110bce765}{rotationMode\_}} == \textcolor{stringliteral}{"fixedAxisRandomRotation"})}
+\DoxyCodeLine{248     \{}
+\DoxyCodeLine{249         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a4ec1478689c3a444b0e35deb3489636d}{axisOfRot\_}}       = (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a232b340a4bcb92926989ab552f385008}{rotationModeCoeffs\_}}.lookup(\textcolor{stringliteral}{"axis"}));}
+\DoxyCodeLine{250         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{251             << \textcolor{stringliteral}{"source STL will be rotated by a random angle around a fixed axis upon addition"} << endl;}
+\DoxyCodeLine{252         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "} << \textcolor{stringliteral}{"set rotation axis: "}}
+\DoxyCodeLine{253             << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a4ec1478689c3a444b0e35deb3489636d}{axisOfRot\_}} << endl;}
+\DoxyCodeLine{254         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_affb2341632541d959988c6a6cd436055}{rotateParticles\_}} = \textcolor{keyword}{true};}
+\DoxyCodeLine{255         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a437ad9246e8edabb61208538762eeac5}{randomAxis\_}}      = \textcolor{keyword}{false};}
+\DoxyCodeLine{256     \}}
+\DoxyCodeLine{257     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{258     \{}
+\DoxyCodeLine{259         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{260             << \textcolor{stringliteral}{"notImplemented, will crash"} << endl;}
+\DoxyCodeLine{261     \}}
+\DoxyCodeLine{262 }
+\DoxyCodeLine{263     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5556fc2b56b613027b5bb278a16d5de0}{partPerAddTemp\_}} = \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a31d306fee89e596ae341ec11ef704507}{partPerAdd\_}};}
+\DoxyCodeLine{264 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 6
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_aaa4f15ee673c2927dd22b60284abf7d6}\label{classFoam_1_1addModelRepeatRandomPosition_aaa4f15ee673c2927dd22b60284abf7d6}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!initializeBoundBox@{initializeBoundBox}}
+\index{initializeBoundBox@{initializeBoundBox}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{initializeBoundBox()}{initializeBoundBox()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void add\+Model\+Repeat\+Random\+Position\+::initialize\+Bound\+Box (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 455 of file add\+Model\+Repeat\+Random\+Position.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{456 \{}
+\DoxyCodeLine{457     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8841e5975a2296475ff5ac9494566a6f}{octreeField\_}} *= 0;}
+\DoxyCodeLine{458     List<DynamicLabelList> bBoxCells(Pstream::nProcs());}
+\DoxyCodeLine{459 }
+\DoxyCodeLine{460     \textcolor{keywordtype}{bool} isInsideBB(\textcolor{keyword}{false});}
+\DoxyCodeLine{461     labelList nextToCheck(1,0);}
+\DoxyCodeLine{462     label iterCount(0);label iterMax(\mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}}.nCells());}
+\DoxyCodeLine{463     \textcolor{keywordflow}{while} ((nextToCheck.size() > 0 or not isInsideBB) and iterCount < iterMax)}
+\DoxyCodeLine{464     \{}
+\DoxyCodeLine{465         iterCount++;}
+\DoxyCodeLine{466         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}{DynamicLabelList}} auxToCheck;}
+\DoxyCodeLine{467 }
+\DoxyCodeLine{468         \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (nextToCheck,cellToCheck)}
+\DoxyCodeLine{469         \{}
+\DoxyCodeLine{470             auxToCheck.append(}
+\DoxyCodeLine{471                 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af59ee683b4511d32cf880a5325a5eb4a}{getBBoxCellsByOctTree}}(}
+\DoxyCodeLine{472                     nextToCheck[cellToCheck],}
+\DoxyCodeLine{473                     isInsideBB,}
+\DoxyCodeLine{474                     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2fcd2f8eca641db7969921667b043f5d}{minBound\_}},\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a9cd28b35f1e1c981726c7c1945257c1e}{maxBound\_}},bBoxCells}
+\DoxyCodeLine{475                 )}
+\DoxyCodeLine{476             );}
+\DoxyCodeLine{477         \}}
+\DoxyCodeLine{478         nextToCheck = auxToCheck;}
+\DoxyCodeLine{479     \}}
+\DoxyCodeLine{480 }
+\DoxyCodeLine{481     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5bf9defb52cf47c1c303a355bc9e01e7}{cellsInBoundBox\_}}[Pstream::myProcNo()] = bBoxCells[Pstream::myProcNo()];}
+\DoxyCodeLine{482 }
+\DoxyCodeLine{483     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a99a12bab445a4ebec63078dcf9afb33d}{cellZoneBounds\_}} = boundBox(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2fcd2f8eca641db7969921667b043f5d}{minBound\_}},\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a9cd28b35f1e1c981726c7c1945257c1e}{maxBound\_}});}
+\DoxyCodeLine{484 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 7
+Here is the caller graph for this function\+:
+% FIG 8
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_abe45965208635ab4265d1935f4938e23}\label{classFoam_1_1addModelRepeatRandomPosition_abe45965208635ab4265d1935f4938e23}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!initializeBoundBox@{initializeBoundBox}}
+\index{initializeBoundBox@{initializeBoundBox}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{initializeBoundBox()}{initializeBoundBox()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::add\+Model\+Repeat\+Random\+Position\+::initialize\+Bound\+Box (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a73378da7a6150bd90d3b3833eb0782d4}\label{classFoam_1_1addModelRepeatRandomPosition_a73378da7a6150bd90d3b3833eb0782d4}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!initializeCellZone@{initializeCellZone}}
+\index{initializeCellZone@{initializeCellZone}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{initializeCellZone()}{initializeCellZone()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::add\+Model\+Repeat\+Random\+Position\+::initialize\+Cell\+Zone (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_af0170a46eedc795704e653d1be3e148e}\label{classFoam_1_1addModelRepeatRandomPosition_af0170a46eedc795704e653d1be3e148e}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!initializeCellZone@{initializeCellZone}}
+\index{initializeCellZone@{initializeCellZone}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{initializeCellZone()}{initializeCellZone()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void add\+Model\+Repeat\+Random\+Position\+::initialize\+Cell\+Zone (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 423 of file add\+Model\+Repeat\+Random\+Position.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{424 \{}
+\DoxyCodeLine{425 }
+\DoxyCodeLine{426     label zoneID = \mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}}.cellZones().findZoneID(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a16cf729b66fcad9e39c9eaade5844bb3}{zoneName\_}});}
+\DoxyCodeLine{427     \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{428         << \textcolor{stringliteral}{"label of the cellZone "} << zoneID << endl;}
+\DoxyCodeLine{429 }
+\DoxyCodeLine{430     \textcolor{keyword}{const} labelList\& cellZoneCells = \mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}}.cellZones()[zoneID];}
+\DoxyCodeLine{431     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5bf9defb52cf47c1c303a355bc9e01e7}{cellsInBoundBox\_}}[Pstream::myProcNo()] = cellZoneCells;}
+\DoxyCodeLine{432 }
+\DoxyCodeLine{433     \textcolor{keyword}{const} pointField\& cp = \mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}}.C();}
+\DoxyCodeLine{434     \textcolor{keyword}{const} pointField fCp(cp,\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5bf9defb52cf47c1c303a355bc9e01e7}{cellsInBoundBox\_}}[Pstream::myProcNo()]);}
+\DoxyCodeLine{435     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3e0ff90c88cbb3067904ae6c6f929c91}{cellZonePoints\_}}[Pstream::myProcNo()] = fCp;}
+\DoxyCodeLine{436 }
+\DoxyCodeLine{437     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6add78d4d409083549aca97b77159441}{updateCellZoneBoundBox}}();}
+\DoxyCodeLine{438 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 9
+Here is the caller graph for this function\+:
+% FIG 10
+\mbox{\Hypertarget{classFoam_1_1addModel_af953ecafecf904333ba5236a80fe0625}\label{classFoam_1_1addModel_af953ecafecf904333ba5236a80fe0625}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!isBodyInContact@{isBodyInContact}}
+\index{isBodyInContact@{isBodyInContact}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{isBodyInContact()}{isBodyInContact()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+::is\+Body\+In\+Contact (\begin{DoxyParamCaption}\item[{Ptr\+List$<$ \mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} $>$ \&}]{immersed\+Bodies }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classFoam_1_1addModel_a6ebc08e73279bee94a8e7a317c2d57be}\label{classFoam_1_1addModel_a6ebc08e73279bee94a8e7a317c2d57be}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!isBodyInContact@{isBodyInContact}}
+\index{isBodyInContact@{isBodyInContact}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{isBodyInContact()}{isBodyInContact()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool add\+Model\+::is\+Body\+In\+Contact (\begin{DoxyParamCaption}\item[{Ptr\+List$<$ \mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} $>$ \&}]{immersed\+Bodies }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 41 of file add\+Model.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{42 \{}
+\DoxyCodeLine{43     std::shared\_ptr<geomModel> gModel = \mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geomModel\_}}-\/>getCopy();}
+\DoxyCodeLine{44     \mbox{\hyperlink{classFoam_1_1ibContactClass}{ibContactClass}} cIbClass(}
+\DoxyCodeLine{45         gModel,}
+\DoxyCodeLine{46         \textcolor{stringliteral}{"None"}}
+\DoxyCodeLine{47     );}
+\DoxyCodeLine{48 }
+\DoxyCodeLine{49     vector velAxi (vector::zero);}
+\DoxyCodeLine{50     scalar helpScalar(0.0);}
+\DoxyCodeLine{51 }
+\DoxyCodeLine{52     \mbox{\hyperlink{classFoam_1_1ibContactVars}{ibContactVars}} cIbVars(}
+\DoxyCodeLine{53         immersedBodies.size(),}
+\DoxyCodeLine{54         velAxi,}
+\DoxyCodeLine{55         helpScalar,}
+\DoxyCodeLine{56         velAxi,}
+\DoxyCodeLine{57         helpScalar,}
+\DoxyCodeLine{58         helpScalar,}
+\DoxyCodeLine{59         \mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geomModel\_}}-\/>getRhoS()}
+\DoxyCodeLine{60     );}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{62     \mbox{\hyperlink{classFoam_1_1wallContactInfo}{wallContactInfo}} cIBWallCntI(}
+\DoxyCodeLine{63             cIbClass,}
+\DoxyCodeLine{64             cIbVars}
+\DoxyCodeLine{65     );}
+\DoxyCodeLine{66 }
+\DoxyCodeLine{67     \textcolor{keywordtype}{bool} inContact = \mbox{\hyperlink{namespaceFoam_1_1contactModel_a026dac52f7799691f42d0dba58ba5236}{contactModel::detectWallContact}}(}
+\DoxyCodeLine{68         \mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}},}
+\DoxyCodeLine{69         cIbClass,}
+\DoxyCodeLine{70         cIBWallCntI}
+\DoxyCodeLine{71     );}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73     \textcolor{keywordflow}{if}(!inContact)}
+\DoxyCodeLine{74     \{}
+\DoxyCodeLine{75         \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(immersedBodies, ibI)}
+\DoxyCodeLine{76         \{}
+\DoxyCodeLine{77             \textcolor{keywordtype}{bool} bBoxContact = \textcolor{keyword}{true};}
+\DoxyCodeLine{78             boundBox ibIbBox = immersedBodies[ibI].getGeomModel().getBounds();}
+\DoxyCodeLine{79             boundBox cbBox = \mbox{\hyperlink{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}{geomModel\_}}-\/>getBounds();}
+\DoxyCodeLine{80 }
+\DoxyCodeLine{81             \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(\mbox{\hyperlink{namespaceFoam_a4dafe227f98b98cc477682efd8e86a41}{geometricD}},dir)}
+\DoxyCodeLine{82             \{}
+\DoxyCodeLine{83                 \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespaceFoam_a4dafe227f98b98cc477682efd8e86a41}{geometricD}}[dir] == 1)}
+\DoxyCodeLine{84                 \{}
+\DoxyCodeLine{85                     \textcolor{keywordflow}{if}(!(ibIbBox.max()[dir] >= cbBox.min()[dir]}
+\DoxyCodeLine{86                         \&\& ibIbBox.min()[dir] <= cbBox.max()[dir]))}
+\DoxyCodeLine{87                     \{}
+\DoxyCodeLine{88                         bBoxContact = \textcolor{keyword}{false};}
+\DoxyCodeLine{89                         \textcolor{keywordflow}{break};}
+\DoxyCodeLine{90                     \}}
+\DoxyCodeLine{91                 \}}
+\DoxyCodeLine{92             \}}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94             \textcolor{keywordflow}{if}(!bBoxContact)}
+\DoxyCodeLine{95             \{}
+\DoxyCodeLine{96                 \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{97             \}}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{99             \mbox{\hyperlink{classFoam_1_1prtContactInfo}{prtContactInfo}} prtCInfo (}
+\DoxyCodeLine{100                 cIbClass,}
+\DoxyCodeLine{101                 cIbVars,}
+\DoxyCodeLine{102                 immersedBodies[ibI].getibContactClass(),}
+\DoxyCodeLine{103                 immersedBodies[ibI].getContactVars()}
+\DoxyCodeLine{104             );}
+\DoxyCodeLine{105 }
+\DoxyCodeLine{106             \mbox{\hyperlink{namespaceFoam_1_1contactModel_a3baef36a0cef71bd28ad397754d07c36}{contactModel::getContacts}}(}
+\DoxyCodeLine{107                 \mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}},}
+\DoxyCodeLine{108                 prtCInfo}
+\DoxyCodeLine{109             );}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111             DynamicList<prtSubContactInfo*> sCList;}
+\DoxyCodeLine{112             prtCInfo.registerContactList(sCList);}
+\DoxyCodeLine{113             \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(sCList,sC)}
+\DoxyCodeLine{114             \{}
+\DoxyCodeLine{115                 \mbox{\hyperlink{classFoam_1_1prtSubContactInfo}{prtSubContactInfo}}* prtSCInfo = sCList[sC];}
+\DoxyCodeLine{116 }
+\DoxyCodeLine{117                 \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespaceFoam_1_1contactModel_a103f91b983569f957d227c81e2c9ee7c}{contactModel::detectPrtPrtContact}}(}
+\DoxyCodeLine{118                     \mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}},}
+\DoxyCodeLine{119                     cIbClass,}
+\DoxyCodeLine{120                     immersedBodies[ibI].getibContactClass(),}
+\DoxyCodeLine{121                     *prtSCInfo}
+\DoxyCodeLine{122                 ))}
+\DoxyCodeLine{123                 \{}
+\DoxyCodeLine{124                     inContact = \textcolor{keyword}{true};}
+\DoxyCodeLine{125                     \textcolor{keywordflow}{break};}
+\DoxyCodeLine{126                 \}}
+\DoxyCodeLine{127 }
+\DoxyCodeLine{128             \}}
+\DoxyCodeLine{129 }
+\DoxyCodeLine{130         \}}
+\DoxyCodeLine{131     \}}
+\DoxyCodeLine{132 }
+\DoxyCodeLine{133     \textcolor{keywordflow}{return} inContact;}
+\DoxyCodeLine{134 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 11
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a054e5b3624e0ff0e0a3ac6586195e9b2}\label{classFoam_1_1addModelRepeatRandomPosition_a054e5b3624e0ff0e0a3ac6586195e9b2}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!recreateBoundBox@{recreateBoundBox}}
+\index{recreateBoundBox@{recreateBoundBox}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{recreateBoundBox()}{recreateBoundBox()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::add\+Model\+Repeat\+Random\+Position\+::recreate\+Bound\+Box (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1addModel_a31e2fbff486c1046444176cd9d90eb00}{Foam\+::add\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a2be2963abab087890364cec8e5ae1630}\label{classFoam_1_1addModelRepeatRandomPosition_a2be2963abab087890364cec8e5ae1630}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!recreateBoundBox@{recreateBoundBox}}
+\index{recreateBoundBox@{recreateBoundBox}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{recreateBoundBox()}{recreateBoundBox()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void add\+Model\+Repeat\+Random\+Position\+::recreate\+Bound\+Box (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1addModel_a31e2fbff486c1046444176cd9d90eb00}{Foam\+::add\+Model}}.
+
+
+
+Definition at line 486 of file add\+Model\+Repeat\+Random\+Position.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{487 \{}
+\DoxyCodeLine{488     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a8841e5975a2296475ff5ac9494566a6f}{octreeField\_}} = Field<label>(\mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}}.nCells(), 0);}
+\DoxyCodeLine{489     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5bf9defb52cf47c1c303a355bc9e01e7}{cellsInBoundBox\_}}[Pstream::myProcNo()].clear();}
+\DoxyCodeLine{490     List<DynamicLabelList> bBoxCells(Pstream::nProcs());}
+\DoxyCodeLine{491 }
+\DoxyCodeLine{492     \textcolor{keywordtype}{bool} isInsideBB(\textcolor{keyword}{false});}
+\DoxyCodeLine{493     labelList nextToCheck(1,0);}
+\DoxyCodeLine{494     label iterCount(0);label iterMax(\mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}}.nCells());}
+\DoxyCodeLine{495     \textcolor{keywordflow}{while} ((nextToCheck.size() > 0 or not isInsideBB) and iterCount < iterMax)}
+\DoxyCodeLine{496     \{}
+\DoxyCodeLine{497         iterCount++;}
+\DoxyCodeLine{498         \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}{DynamicLabelList}} auxToCheck;}
+\DoxyCodeLine{499 }
+\DoxyCodeLine{500         \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (nextToCheck,cellToCheck)}
+\DoxyCodeLine{501         \{}
+\DoxyCodeLine{502             auxToCheck.append(}
+\DoxyCodeLine{503                 \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af59ee683b4511d32cf880a5325a5eb4a}{getBBoxCellsByOctTree}}(}
+\DoxyCodeLine{504                     nextToCheck[cellToCheck],}
+\DoxyCodeLine{505                     isInsideBB,}
+\DoxyCodeLine{506                     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2fcd2f8eca641db7969921667b043f5d}{minBound\_}},\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a9cd28b35f1e1c981726c7c1945257c1e}{maxBound\_}},bBoxCells}
+\DoxyCodeLine{507                 )}
+\DoxyCodeLine{508             );}
+\DoxyCodeLine{509         \}}
+\DoxyCodeLine{510         nextToCheck = auxToCheck;}
+\DoxyCodeLine{511     \}}
+\DoxyCodeLine{512 }
+\DoxyCodeLine{513     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5bf9defb52cf47c1c303a355bc9e01e7}{cellsInBoundBox\_}}[Pstream::myProcNo()] = bBoxCells[Pstream::myProcNo()];}
+\DoxyCodeLine{514 }
+\DoxyCodeLine{515     \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{516         << \textcolor{stringliteral}{"recreated boundBox size "}}
+\DoxyCodeLine{517         << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a5bf9defb52cf47c1c303a355bc9e01e7}{cellsInBoundBox\_}}[Pstream::myProcNo()].size() << endl;}
+\DoxyCodeLine{518 }
+\DoxyCodeLine{519     \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a99a12bab445a4ebec63078dcf9afb33d}{cellZoneBounds\_}} = boundBox(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2fcd2f8eca641db7969921667b043f5d}{minBound\_}},\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a9cd28b35f1e1c981726c7c1945257c1e}{maxBound\_}});}
+\DoxyCodeLine{520 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 12
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a48e228fd9a09599fa5fa22f6df277244}\label{classFoam_1_1addModelRepeatRandomPosition_a48e228fd9a09599fa5fa22f6df277244}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!returnRandomAngle@{returnRandomAngle}}
+\index{returnRandomAngle@{returnRandomAngle}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{returnRandomAngle()}{returnRandomAngle()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily scalar add\+Model\+Repeat\+Random\+Position\+::return\+Random\+Angle (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 581 of file add\+Model\+Repeat\+Random\+Position.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{582 \{}
+\DoxyCodeLine{583     scalar ranNum = 2.0*\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ab43f612d73b9e6980e1e0d042c2ae66a}{randGen\_}}.scalar01() -\/ 1.0;}
+\DoxyCodeLine{584     scalar angle  = ranNum*Foam::constant::mathematical::pi;}
+\DoxyCodeLine{585     \textcolor{keywordflow}{return} angle;}
+\DoxyCodeLine{586 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a84e0c4de8e11985d1213898a3c24e357}\label{classFoam_1_1addModelRepeatRandomPosition_a84e0c4de8e11985d1213898a3c24e357}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!returnRandomAngle@{returnRandomAngle}}
+\index{returnRandomAngle@{returnRandomAngle}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{returnRandomAngle()}{returnRandomAngle()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily scalar Foam\+::add\+Model\+Repeat\+Random\+Position\+::return\+Random\+Angle (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_ab7cb89147ef5d9bfb8aabd4641022fb1}\label{classFoam_1_1addModelRepeatRandomPosition_ab7cb89147ef5d9bfb8aabd4641022fb1}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!returnRandomRotationAxis@{returnRandomRotationAxis}}
+\index{returnRandomRotationAxis@{returnRandomRotationAxis}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{returnRandomRotationAxis()}{returnRandomRotationAxis()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector Foam\+::add\+Model\+Repeat\+Random\+Position\+::return\+Random\+Rotation\+Axis (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a9e0cdfb2be4e9b6f9bfcd04b250f2763}\label{classFoam_1_1addModelRepeatRandomPosition_a9e0cdfb2be4e9b6f9bfcd04b250f2763}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!returnRandomRotationAxis@{returnRandomRotationAxis}}
+\index{returnRandomRotationAxis@{returnRandomRotationAxis}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{returnRandomRotationAxis()}{returnRandomRotationAxis()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector add\+Model\+Repeat\+Random\+Position\+::return\+Random\+Rotation\+Axis (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 598 of file add\+Model\+Repeat\+Random\+Position.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{599 \{}
+\DoxyCodeLine{600     vector  axisOfRotation(vector::zero);}
+\DoxyCodeLine{601     scalar ranNum = 0;}
+\DoxyCodeLine{602 }
+\DoxyCodeLine{603     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i=0;i<3;i++)}
+\DoxyCodeLine{604     \{}
+\DoxyCodeLine{605         ranNum = \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ab43f612d73b9e6980e1e0d042c2ae66a}{randGen\_}}.scalar01();}
+\DoxyCodeLine{606         axisOfRotation[i] = ranNum;}
+\DoxyCodeLine{607     \}}
+\DoxyCodeLine{608 }
+\DoxyCodeLine{609     axisOfRotation /=mag(axisOfRotation);}
+\DoxyCodeLine{610     \textcolor{keywordflow}{return} axisOfRotation;}
+\DoxyCodeLine{611 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_aba3da0ead31236e510b136984127eb4e}\label{classFoam_1_1addModelRepeatRandomPosition_aba3da0ead31236e510b136984127eb4e}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!returnRandomScale@{returnRandomScale}}
+\index{returnRandomScale@{returnRandomScale}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{returnRandomScale()}{returnRandomScale()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily scalar add\+Model\+Repeat\+Random\+Position\+::return\+Random\+Scale (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 588 of file add\+Model\+Repeat\+Random\+Position.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{589 \{}
+\DoxyCodeLine{590     scalar ranNum       = \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_ab43f612d73b9e6980e1e0d042c2ae66a}{randGen\_}}.scalar01();}
+\DoxyCodeLine{591     scalar scaleDiff    = \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3ce11bf981f08ede60f209fc394a5db9}{maxScale\_}} -\/ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6cf3cd175a4b3ee0860c44df14ddf0fd}{minScale\_}};}
+\DoxyCodeLine{592     scalar scaleFactor  = \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6cf3cd175a4b3ee0860c44df14ddf0fd}{minScale\_}} + ranNum*scaleDiff;}
+\DoxyCodeLine{593     \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{594         <<\textcolor{stringliteral}{"random scaleFactor "} << scaleFactor <<endl;}
+\DoxyCodeLine{595     \textcolor{keywordflow}{return} scaleFactor;}
+\DoxyCodeLine{596 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a24ebcc10df1f7af1fb69fb950b98cac1}\label{classFoam_1_1addModelRepeatRandomPosition_a24ebcc10df1f7af1fb69fb950b98cac1}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!returnRandomScale@{returnRandomScale}}
+\index{returnRandomScale@{returnRandomScale}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{returnRandomScale()}{returnRandomScale()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily scalar Foam\+::add\+Model\+Repeat\+Random\+Position\+::return\+Random\+Scale (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a4344881d7704148ac36c09a3c3c5ead0}\label{classFoam_1_1addModelRepeatRandomPosition_a4344881d7704148ac36c09a3c3c5ead0}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!shouldAddBody@{shouldAddBody}}
+\index{shouldAddBody@{shouldAddBody}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{shouldAddBody()}{shouldAddBody()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::should\+Add\+Body (\begin{DoxyParamCaption}\item[{const vol\+Scalar\+Field \&}]{body }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1addModel_a3a6d228be505fd46cd40c8d7d2f96d31}{Foam\+::add\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a0e7de8015a2246c1e7916d36d2276360}\label{classFoam_1_1addModelRepeatRandomPosition_a0e7de8015a2246c1e7916d36d2276360}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!shouldAddBody@{shouldAddBody}}
+\index{shouldAddBody@{shouldAddBody}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{shouldAddBody()}{shouldAddBody()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool add\+Model\+Repeat\+Random\+Position\+::should\+Add\+Body (\begin{DoxyParamCaption}\item[{const vol\+Scalar\+Field \&}]{body }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1addModel_a3a6d228be505fd46cd40c8d7d2f96d31}{Foam\+::add\+Model}}.
+
+
+
+Definition at line 267 of file add\+Model\+Repeat\+Random\+Position.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{268 \{}
+\DoxyCodeLine{269 }
+\DoxyCodeLine{270     \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_afd0d6511656efdb206149fb02ffc995f}{timeBased\_}})}
+\DoxyCodeLine{271     \{}
+\DoxyCodeLine{272         scalar timeVal(\mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}}.time().value());}
+\DoxyCodeLine{273         scalar deltaTime(\mbox{\hyperlink{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}{mesh\_}}.time().deltaT().value());}
+\DoxyCodeLine{274         scalar tmFrac(timeVal/\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a230657bd1815947461e92b15c4e62dde}{timeBetweenUsage\_}});}
+\DoxyCodeLine{275         tmFrac -\/=  floor(tmFrac+deltaTime);}
+\DoxyCodeLine{276 }
+\DoxyCodeLine{277         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{278             << \textcolor{stringliteral}{"Time/(Time beween usage) -\/ floor(Time/Time beween usage): "}}
+\DoxyCodeLine{279             << tmFrac << endl;}
+\DoxyCodeLine{280 }
+\DoxyCodeLine{281         \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{282             << \textcolor{stringliteral}{"Number of bodies added on this time level: "}}
+\DoxyCodeLine{283             << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6eabf6b8dd69397752a7898d52e6034d}{addedOnTimeLevel\_}} << endl;}
+\DoxyCodeLine{284 }
+\DoxyCodeLine{285         \textcolor{keywordtype}{bool} tmLevelOk(tmFrac < deltaTime);}
+\DoxyCodeLine{286 }
+\DoxyCodeLine{287         \textcolor{keywordflow}{if} (not tmLevelOk)}
+\DoxyCodeLine{288         \{}
+\DoxyCodeLine{289             \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6eabf6b8dd69397752a7898d52e6034d}{addedOnTimeLevel\_}} = 0;}
+\DoxyCodeLine{290             \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{291         \}}
+\DoxyCodeLine{292 }
+\DoxyCodeLine{293         \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a31d306fee89e596ae341ec11ef704507}{partPerAdd\_}} <= \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a6eabf6b8dd69397752a7898d52e6034d}{addedOnTimeLevel\_}}) \{\textcolor{keywordflow}{return} \textcolor{keyword}{false};\}}
+\DoxyCodeLine{294 }
+\DoxyCodeLine{295         \textcolor{keywordflow}{return} (tmLevelOk and \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a0d9d633f641e7b459b3afbeb58928252}{useNTimes\_}} > 0);}
+\DoxyCodeLine{296     \}}
+\DoxyCodeLine{297 }
+\DoxyCodeLine{298     \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a7e4a9f6f517047d12a7ef145db67a65f}{fieldBased\_}})}
+\DoxyCodeLine{299     \{}
+\DoxyCodeLine{300         scalar currentLambdaFrac(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_aa5887270431925f2f684aed1be7aa1e0}{checkLambdaFraction}}(body));}
+\DoxyCodeLine{301         \textcolor{keywordflow}{if} (currentLambdaFrac < \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3826b9e119ac056f38b832ee46b00a2a}{fieldValue\_}} )}
+\DoxyCodeLine{302         \{}
+\DoxyCodeLine{303             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da5484d7152298250e90ca523c4e467915}{addModel\_Info}} << \textcolor{stringliteral}{"-\/-\/ addModelMessage-\/-\/ "}}
+\DoxyCodeLine{304                 << \textcolor{stringliteral}{"Current lambda fraction = "} << currentLambdaFrac}
+\DoxyCodeLine{305                 << \textcolor{stringliteral}{" < then preset lambda fraction = "} << \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3826b9e119ac056f38b832ee46b00a2a}{fieldValue\_}} << endl;}
+\DoxyCodeLine{306             \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{307         \}}
+\DoxyCodeLine{308     \}}
+\DoxyCodeLine{309 }
+\DoxyCodeLine{310     \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{311 }
+\DoxyCodeLine{312 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 13
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_ae5112df3ca5e7d077b8a0184fb812f4d}\label{classFoam_1_1addModelRepeatRandomPosition_ae5112df3ca5e7d077b8a0184fb812f4d}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!updateCellZoneBoundBox@{updateCellZoneBoundBox}}
+\index{updateCellZoneBoundBox@{updateCellZoneBoundBox}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{updateCellZoneBoundBox()}{updateCellZoneBoundBox()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::add\+Model\+Repeat\+Random\+Position\+::update\+Cell\+Zone\+Bound\+Box (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a6add78d4d409083549aca97b77159441}\label{classFoam_1_1addModelRepeatRandomPosition_a6add78d4d409083549aca97b77159441}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!updateCellZoneBoundBox@{updateCellZoneBoundBox}}
+\index{updateCellZoneBoundBox@{updateCellZoneBoundBox}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{updateCellZoneBoundBox()}{updateCellZoneBoundBox()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void add\+Model\+Repeat\+Random\+Position\+::update\+Cell\+Zone\+Bound\+Box (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 440 of file add\+Model\+Repeat\+Random\+Position.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{441 \{}
+\DoxyCodeLine{442         boundBox cellZoneBounds(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a3e0ff90c88cbb3067904ae6c6f929c91}{cellZonePoints\_}}[Pstream::myProcNo()]);}
+\DoxyCodeLine{443 }
+\DoxyCodeLine{444         reduce(cellZoneBounds.min(), minOp<vector>());}
+\DoxyCodeLine{445         reduce(cellZoneBounds.max(), maxOp<vector>());}
+\DoxyCodeLine{446 }
+\DoxyCodeLine{447         \textcolor{keywordflow}{if} (Pstream::myProcNo() == 0)}
+\DoxyCodeLine{448         \{}
+\DoxyCodeLine{449             \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2fcd2f8eca641db7969921667b043f5d}{minBound\_}} = \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a99a12bab445a4ebec63078dcf9afb33d}{cellZoneBounds\_}}.min();}
+\DoxyCodeLine{450             \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a9cd28b35f1e1c981726c7c1945257c1e}{maxBound\_}} = \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a99a12bab445a4ebec63078dcf9afb33d}{cellZoneBounds\_}}.max();}
+\DoxyCodeLine{451             \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a99a12bab445a4ebec63078dcf9afb33d}{cellZoneBounds\_}} = boundBox(\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a2fcd2f8eca641db7969921667b043f5d}{minBound\_}},\mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_a9cd28b35f1e1c981726c7c1945257c1e}{maxBound\_}});}
+\DoxyCodeLine{452         \}}
+\DoxyCodeLine{453 \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 14
+
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_ac5fab45c2f914d25fec09191a8bda768}\label{classFoam_1_1addModelRepeatRandomPosition_ac5fab45c2f914d25fec09191a8bda768}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!addDomain\_@{addDomain\_}}
+\index{addDomain\_@{addDomain\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{addDomain\_}{addDomain\_}}
+{\footnotesize\ttfamily word Foam\+::add\+Model\+Repeat\+Random\+Position\+::add\+Domain\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 66 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a68fd8d575d0e60a9d0fb8990a15bea41}\label{classFoam_1_1addModelRepeatRandomPosition_a68fd8d575d0e60a9d0fb8990a15bea41}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!addDomainCoeffs\_@{addDomainCoeffs\_}}
+\index{addDomainCoeffs\_@{addDomainCoeffs\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{addDomainCoeffs\_}{addDomainCoeffs\_}}
+{\footnotesize\ttfamily const dictionary \& Foam\+::add\+Model\+Repeat\+Random\+Position\+::add\+Domain\+Coeffs\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 71 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a6eabf6b8dd69397752a7898d52e6034d}\label{classFoam_1_1addModelRepeatRandomPosition_a6eabf6b8dd69397752a7898d52e6034d}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!addedOnTimeLevel\_@{addedOnTimeLevel\_}}
+\index{addedOnTimeLevel\_@{addedOnTimeLevel\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{addedOnTimeLevel\_}{addedOnTimeLevel\_}}
+{\footnotesize\ttfamily label Foam\+::add\+Model\+Repeat\+Random\+Position\+::added\+On\+Time\+Level\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 80 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a2b8346cfaf48c968fe4709c1941e21c8}\label{classFoam_1_1addModelRepeatRandomPosition_a2b8346cfaf48c968fe4709c1941e21c8}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!addMode\_@{addMode\_}}
+\index{addMode\_@{addMode\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{addMode\_}{addMode\_}}
+{\footnotesize\ttfamily word Foam\+::add\+Model\+Repeat\+Random\+Position\+::add\+Mode\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 61 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_ad9864a04d24a7e01dcdc389c73d1651f}\label{classFoam_1_1addModelRepeatRandomPosition_ad9864a04d24a7e01dcdc389c73d1651f}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!addModeI\_@{addModeI\_}}
+\index{addModeI\_@{addModeI\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{addModeI\_}{addModeI\_}}
+{\footnotesize\ttfamily word Foam\+::add\+Model\+Repeat\+Random\+Position\+::add\+Mode\+I\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 69 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a345a4d496e86dd957647dce86ef508d4}\label{classFoam_1_1addModelRepeatRandomPosition_a345a4d496e86dd957647dce86ef508d4}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!addModeICoeffs\_@{addModeICoeffs\_}}
+\index{addModeICoeffs\_@{addModeICoeffs\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{addModeICoeffs\_}{addModeICoeffs\_}}
+{\footnotesize\ttfamily const dictionary \& Foam\+::add\+Model\+Repeat\+Random\+Position\+::add\+Mode\+I\+Coeffs\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 74 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a2c9823314c9ea7b51dd92b73ce70be09}\label{classFoam_1_1addModelRepeatRandomPosition_a2c9823314c9ea7b51dd92b73ce70be09}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!addModelDict\_@{addModelDict\_}}
+\index{addModelDict\_@{addModelDict\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{addModelDict\_}{addModelDict\_}}
+{\footnotesize\ttfamily const dictionary \& Foam\+::add\+Model\+Repeat\+Random\+Position\+::add\+Model\+Dict\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 60 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a726e48b815e43f8c5a5e7d3e2d7e60c8}\label{classFoam_1_1addModelRepeatRandomPosition_a726e48b815e43f8c5a5e7d3e2d7e60c8}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!allActiveCellsInMesh\_@{allActiveCellsInMesh\_}}
+\index{allActiveCellsInMesh\_@{allActiveCellsInMesh\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{allActiveCellsInMesh\_}{allActiveCellsInMesh\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::all\+Active\+Cells\+In\+Mesh\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 120 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a4ec1478689c3a444b0e35deb3489636d}\label{classFoam_1_1addModelRepeatRandomPosition_a4ec1478689c3a444b0e35deb3489636d}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!axisOfRot\_@{axisOfRot\_}}
+\index{axisOfRot\_@{axisOfRot\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{axisOfRot\_}{axisOfRot\_}}
+{\footnotesize\ttfamily vector Foam\+::add\+Model\+Repeat\+Random\+Position\+::axis\+Of\+Rot\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 96 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a30949dbbe0b470c7b6f5aa4dcd31b8db}\label{classFoam_1_1addModelRepeatRandomPosition_a30949dbbe0b470c7b6f5aa4dcd31b8db}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!bodyAdded\_@{bodyAdded\_}}
+\index{bodyAdded\_@{bodyAdded\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{bodyAdded\_}{bodyAdded\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::body\+Added\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 62 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a8c9fb196a61622ee5af76bac96deb190}\label{classFoam_1_1addModelRepeatRandomPosition_a8c9fb196a61622ee5af76bac96deb190}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!bodyAdditionAttemptCounter\_@{bodyAdditionAttemptCounter\_}}
+\index{bodyAdditionAttemptCounter\_@{bodyAdditionAttemptCounter\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{bodyAdditionAttemptCounter\_}{bodyAdditionAttemptCounter\_}}
+{\footnotesize\ttfamily int Foam\+::add\+Model\+Repeat\+Random\+Position\+::body\+Addition\+Attempt\+Counter\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 98 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a11f5fbf9998770f9a46bdaceaacd9449}\label{classFoam_1_1addModelRepeatRandomPosition_a11f5fbf9998770f9a46bdaceaacd9449}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!boundBoxActive\_@{boundBoxActive\_}}
+\index{boundBoxActive\_@{boundBoxActive\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{boundBoxActive\_}{boundBoxActive\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::bound\+Box\+Active\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 110 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModel_a6feb58d5e6825765583893bd4678f1b6}\label{classFoam_1_1addModel_a6feb58d5e6825765583893bd4678f1b6}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!cellPoints\_@{cellPoints\_}}
+\index{cellPoints\_@{cellPoints\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{cellPoints\_}{cellPoints\_}}
+{\footnotesize\ttfamily List$<$ label\+List $>$ \& Foam\+::add\+Model\+::cell\+Points\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 78 of file add\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a5bf9defb52cf47c1c303a355bc9e01e7}\label{classFoam_1_1addModelRepeatRandomPosition_a5bf9defb52cf47c1c303a355bc9e01e7}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!cellsInBoundBox\_@{cellsInBoundBox\_}}
+\index{cellsInBoundBox\_@{cellsInBoundBox\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{cellsInBoundBox\_}{cellsInBoundBox\_}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{classFoam_1_1addModelRepeatRandomPosition_af0bb500c4833f2931aaded0a467d0f39}{Dynamic\+Label\+List}} $>$ Foam\+::add\+Model\+Repeat\+Random\+Position\+::cells\+In\+Bound\+Box\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 116 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a47153875964d938fc9531ce7eff4072c}\label{classFoam_1_1addModelRepeatRandomPosition_a47153875964d938fc9531ce7eff4072c}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!cellZoneActive\_@{cellZoneActive\_}}
+\index{cellZoneActive\_@{cellZoneActive\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{cellZoneActive\_}{cellZoneActive\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::cell\+Zone\+Active\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 109 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a99a12bab445a4ebec63078dcf9afb33d}\label{classFoam_1_1addModelRepeatRandomPosition_a99a12bab445a4ebec63078dcf9afb33d}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!cellZoneBounds\_@{cellZoneBounds\_}}
+\index{cellZoneBounds\_@{cellZoneBounds\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{cellZoneBounds\_}{cellZoneBounds\_}}
+{\footnotesize\ttfamily bound\+Box Foam\+::add\+Model\+Repeat\+Random\+Position\+::cell\+Zone\+Bounds\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 118 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a3e0ff90c88cbb3067904ae6c6f929c91}\label{classFoam_1_1addModelRepeatRandomPosition_a3e0ff90c88cbb3067904ae6c6f929c91}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!cellZonePoints\_@{cellZonePoints\_}}
+\index{cellZonePoints\_@{cellZonePoints\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{cellZonePoints\_}{cellZonePoints\_}}
+{\footnotesize\ttfamily List$<$ point\+Field $>$ Foam\+::add\+Model\+Repeat\+Random\+Position\+::cell\+Zone\+Points\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 117 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a30907c9b76ed91e79a3bfc5a492c1ed7}\label{classFoam_1_1addModelRepeatRandomPosition_a30907c9b76ed91e79a3bfc5a492c1ed7}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!coeffsDict\_@{coeffsDict\_}}
+\index{coeffsDict\_@{coeffsDict\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{coeffsDict\_}{coeffsDict\_}}
+{\footnotesize\ttfamily const dictionary \& Foam\+::add\+Model\+Repeat\+Random\+Position\+::coeffs\+Dict\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 64 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a7e4a9f6f517047d12a7ef145db67a65f}\label{classFoam_1_1addModelRepeatRandomPosition_a7e4a9f6f517047d12a7ef145db67a65f}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!fieldBased\_@{fieldBased\_}}
+\index{fieldBased\_@{fieldBased\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{fieldBased\_}{fieldBased\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::field\+Based\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 113 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_af1679a69cb732beff065892d918c5e2e}\label{classFoam_1_1addModelRepeatRandomPosition_af1679a69cb732beff065892d918c5e2e}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!fieldCurrentValue\_@{fieldCurrentValue\_}}
+\index{fieldCurrentValue\_@{fieldCurrentValue\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{fieldCurrentValue\_}{fieldCurrentValue\_}}
+{\footnotesize\ttfamily scalar Foam\+::add\+Model\+Repeat\+Random\+Position\+::field\+Current\+Value\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 114 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a3826b9e119ac056f38b832ee46b00a2a}\label{classFoam_1_1addModelRepeatRandomPosition_a3826b9e119ac056f38b832ee46b00a2a}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!fieldValue\_@{fieldValue\_}}
+\index{fieldValue\_@{fieldValue\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{fieldValue\_}{fieldValue\_}}
+{\footnotesize\ttfamily scalar Foam\+::add\+Model\+Repeat\+Random\+Position\+::field\+Value\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 79 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_aa5c430261c0def27f8569df2f4b39fcf}\label{classFoam_1_1addModelRepeatRandomPosition_aa5c430261c0def27f8569df2f4b39fcf}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!firstTimeRunning\_@{firstTimeRunning\_}}
+\index{firstTimeRunning\_@{firstTimeRunning\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{firstTimeRunning\_}{firstTimeRunning\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::first\+Time\+Running\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 108 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}\label{classFoam_1_1addModel_a7540a20ef45e582c5803fbb5c6636c06}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!geomModel\_@{geomModel\_}}
+\index{geomModel\_@{geomModel\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{geomModel\_}{geomModel\_}}
+{\footnotesize\ttfamily std\+::unique\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ Foam\+::add\+Model\+::geom\+Model\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 80 of file add\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a9cd28b35f1e1c981726c7c1945257c1e}\label{classFoam_1_1addModelRepeatRandomPosition_a9cd28b35f1e1c981726c7c1945257c1e}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!maxBound\_@{maxBound\_}}
+\index{maxBound\_@{maxBound\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{maxBound\_}{maxBound\_}}
+{\footnotesize\ttfamily vector Foam\+::add\+Model\+Repeat\+Random\+Position\+::max\+Bound\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 85 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a3ce11bf981f08ede60f209fc394a5db9}\label{classFoam_1_1addModelRepeatRandomPosition_a3ce11bf981f08ede60f209fc394a5db9}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!maxScale\_@{maxScale\_}}
+\index{maxScale\_@{maxScale\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{maxScale\_}{maxScale\_}}
+{\footnotesize\ttfamily scalar Foam\+::add\+Model\+Repeat\+Random\+Position\+::max\+Scale\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 89 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}\label{classFoam_1_1addModel_a646d8176b6a6cc3d38e534a1918872bf}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!mesh\_@{mesh\_}}
+\index{mesh\_@{mesh\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{mesh\_}{mesh\_}}
+{\footnotesize\ttfamily const fv\+Mesh \& Foam\+::add\+Model\+::mesh\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 77 of file add\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a2fcd2f8eca641db7969921667b043f5d}\label{classFoam_1_1addModelRepeatRandomPosition_a2fcd2f8eca641db7969921667b043f5d}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!minBound\_@{minBound\_}}
+\index{minBound\_@{minBound\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{minBound\_}{minBound\_}}
+{\footnotesize\ttfamily vector Foam\+::add\+Model\+Repeat\+Random\+Position\+::min\+Bound\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 84 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a6cf3cd175a4b3ee0860c44df14ddf0fd}\label{classFoam_1_1addModelRepeatRandomPosition_a6cf3cd175a4b3ee0860c44df14ddf0fd}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!minScale\_@{minScale\_}}
+\index{minScale\_@{minScale\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{minScale\_}{minScale\_}}
+{\footnotesize\ttfamily scalar Foam\+::add\+Model\+Repeat\+Random\+Position\+::min\+Scale\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 88 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a86f14ce9ec43c563128d10ec833331d9}\label{classFoam_1_1addModelRepeatRandomPosition_a86f14ce9ec43c563128d10ec833331d9}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!minScaleFit\_@{minScaleFit\_}}
+\index{minScaleFit\_@{minScaleFit\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{minScaleFit\_}{minScaleFit\_}}
+{\footnotesize\ttfamily scalar Foam\+::add\+Model\+Repeat\+Random\+Position\+::min\+Scale\+Fit\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 90 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a624c2cc2bcede2aac58587c91ca080d0}\label{classFoam_1_1addModelRepeatRandomPosition_a624c2cc2bcede2aac58587c91ca080d0}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!nTriesBeforeScaling\_@{nTriesBeforeScaling\_}}
+\index{nTriesBeforeScaling\_@{nTriesBeforeScaling\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{nTriesBeforeScaling\_}{nTriesBeforeScaling\_}}
+{\footnotesize\ttfamily scalar Foam\+::add\+Model\+Repeat\+Random\+Position\+::n\+Tries\+Before\+Scaling\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 92 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a8841e5975a2296475ff5ac9494566a6f}\label{classFoam_1_1addModelRepeatRandomPosition_a8841e5975a2296475ff5ac9494566a6f}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!octreeField\_@{octreeField\_}}
+\index{octreeField\_@{octreeField\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{octreeField\_}{octreeField\_}}
+{\footnotesize\ttfamily Field$<$ label $>$ Foam\+::add\+Model\+Repeat\+Random\+Position\+::octree\+Field\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 111 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a31d306fee89e596ae341ec11ef704507}\label{classFoam_1_1addModelRepeatRandomPosition_a31d306fee89e596ae341ec11ef704507}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!partPerAdd\_@{partPerAdd\_}}
+\index{partPerAdd\_@{partPerAdd\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{partPerAdd\_}{partPerAdd\_}}
+{\footnotesize\ttfamily label Foam\+::add\+Model\+Repeat\+Random\+Position\+::part\+Per\+Add\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 78 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a5556fc2b56b613027b5bb278a16d5de0}\label{classFoam_1_1addModelRepeatRandomPosition_a5556fc2b56b613027b5bb278a16d5de0}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!partPerAddTemp\_@{partPerAddTemp\_}}
+\index{partPerAddTemp\_@{partPerAddTemp\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{partPerAddTemp\_}{partPerAddTemp\_}}
+{\footnotesize\ttfamily label Foam\+::add\+Model\+Repeat\+Random\+Position\+::part\+Per\+Add\+Temp\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 81 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_ab43f612d73b9e6980e1e0d042c2ae66a}\label{classFoam_1_1addModelRepeatRandomPosition_ab43f612d73b9e6980e1e0d042c2ae66a}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!randGen\_@{randGen\_}}
+\index{randGen\_@{randGen\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{randGen\_}{randGen\_}}
+{\footnotesize\ttfamily Random Foam\+::add\+Model\+Repeat\+Random\+Position\+::rand\+Gen\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 122 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a437ad9246e8edabb61208538762eeac5}\label{classFoam_1_1addModelRepeatRandomPosition_a437ad9246e8edabb61208538762eeac5}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!randomAxis\_@{randomAxis\_}}
+\index{randomAxis\_@{randomAxis\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{randomAxis\_}{randomAxis\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::random\+Axis\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 95 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_abac2a0f6370bed674ba6bd4dea2092a4}\label{classFoam_1_1addModelRepeatRandomPosition_abac2a0f6370bed674ba6bd4dea2092a4}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!reapeatedAddition\_@{reapeatedAddition\_}}
+\index{reapeatedAddition\_@{reapeatedAddition\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{reapeatedAddition\_}{reapeatedAddition\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::reapeated\+Addition\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 107 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a11d61bb5d78c87415e35864ea547cfe6}\label{classFoam_1_1addModelRepeatRandomPosition_a11d61bb5d78c87415e35864ea547cfe6}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!rescaleRequirement\_@{rescaleRequirement\_}}
+\index{rescaleRequirement\_@{rescaleRequirement\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{rescaleRequirement\_}{rescaleRequirement\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::rescale\+Requirement\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 103 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a2f165d450fafb18f2bebc9f4270764f3}\label{classFoam_1_1addModelRepeatRandomPosition_a2f165d450fafb18f2bebc9f4270764f3}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!restartPartCountTemp\_@{restartPartCountTemp\_}}
+\index{restartPartCountTemp\_@{restartPartCountTemp\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{restartPartCountTemp\_}{restartPartCountTemp\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::restart\+Part\+Count\+Temp\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 106 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_affb2341632541d959988c6a6cd436055}\label{classFoam_1_1addModelRepeatRandomPosition_affb2341632541d959988c6a6cd436055}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!rotateParticles\_@{rotateParticles\_}}
+\index{rotateParticles\_@{rotateParticles\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{rotateParticles\_}{rotateParticles\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::rotate\+Particles\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 94 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a65d221e6e3577c84a2b790a110bce765}\label{classFoam_1_1addModelRepeatRandomPosition_a65d221e6e3577c84a2b790a110bce765}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!rotationMode\_@{rotationMode\_}}
+\index{rotationMode\_@{rotationMode\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{rotationMode\_}{rotationMode\_}}
+{\footnotesize\ttfamily word Foam\+::add\+Model\+Repeat\+Random\+Position\+::rotation\+Mode\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 68 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a232b340a4bcb92926989ab552f385008}\label{classFoam_1_1addModelRepeatRandomPosition_a232b340a4bcb92926989ab552f385008}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!rotationModeCoeffs\_@{rotationModeCoeffs\_}}
+\index{rotationModeCoeffs\_@{rotationModeCoeffs\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{rotationModeCoeffs\_}{rotationModeCoeffs\_}}
+{\footnotesize\ttfamily const dictionary \& Foam\+::add\+Model\+Repeat\+Random\+Position\+::rotation\+Mode\+Coeffs\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 73 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a0f254e291736caddaecf7f757230930f}\label{classFoam_1_1addModelRepeatRandomPosition_a0f254e291736caddaecf7f757230930f}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!scaleApplication\_@{scaleApplication\_}}
+\index{scaleApplication\_@{scaleApplication\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{scaleApplication\_}{scaleApplication\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::scale\+Application\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 101 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a02743d9d1b380175fd6c8643fb5b4330}\label{classFoam_1_1addModelRepeatRandomPosition_a02743d9d1b380175fd6c8643fb5b4330}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!scaleCorrectionCounter\_@{scaleCorrectionCounter\_}}
+\index{scaleCorrectionCounter\_@{scaleCorrectionCounter\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{scaleCorrectionCounter\_}{scaleCorrectionCounter\_}}
+{\footnotesize\ttfamily int Foam\+::add\+Model\+Repeat\+Random\+Position\+::scale\+Correction\+Counter\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 99 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a3e007c8c63db4ad89fe1532ec6c323d1}\label{classFoam_1_1addModelRepeatRandomPosition_a3e007c8c63db4ad89fe1532ec6c323d1}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!scaleParticles\_@{scaleParticles\_}}
+\index{scaleParticles\_@{scaleParticles\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{scaleParticles\_}{scaleParticles\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::scale\+Particles\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 87 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_aa425091696043540874b3e0d89c17c83}\label{classFoam_1_1addModelRepeatRandomPosition_aa425091696043540874b3e0d89c17c83}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!scaleRandomApplication\_@{scaleRandomApplication\_}}
+\index{scaleRandomApplication\_@{scaleRandomApplication\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{scaleRandomApplication\_}{scaleRandomApplication\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::scale\+Random\+Application\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 102 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_ac4887a0e2e0e5c46c6c5715551f17452}\label{classFoam_1_1addModelRepeatRandomPosition_ac4887a0e2e0e5c46c6c5715551f17452}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!scaleStep\_@{scaleStep\_}}
+\index{scaleStep\_@{scaleStep\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{scaleStep\_}{scaleStep\_}}
+{\footnotesize\ttfamily scalar Foam\+::add\+Model\+Repeat\+Random\+Position\+::scale\+Step\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 91 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a8a8d50804eac2f09145361432d2f3079}\label{classFoam_1_1addModelRepeatRandomPosition_a8a8d50804eac2f09145361432d2f3079}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!scalingFactor\_@{scalingFactor\_}}
+\index{scalingFactor\_@{scalingFactor\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{scalingFactor\_}{scalingFactor\_}}
+{\footnotesize\ttfamily scalar Foam\+::add\+Model\+Repeat\+Random\+Position\+::scaling\+Factor\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 105 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a653898b03251d81231f79ce475ef83e9}\label{classFoam_1_1addModelRepeatRandomPosition_a653898b03251d81231f79ce475ef83e9}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!scalingMode\_@{scalingMode\_}}
+\index{scalingMode\_@{scalingMode\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{scalingMode\_}{scalingMode\_}}
+{\footnotesize\ttfamily word Foam\+::add\+Model\+Repeat\+Random\+Position\+::scaling\+Mode\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 67 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_ae71ad7283aa5727cd629e19362e34c32}\label{classFoam_1_1addModelRepeatRandomPosition_ae71ad7283aa5727cd629e19362e34c32}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!scalingModeCoeffs\_@{scalingModeCoeffs\_}}
+\index{scalingModeCoeffs\_@{scalingModeCoeffs\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{scalingModeCoeffs\_}{scalingModeCoeffs\_}}
+{\footnotesize\ttfamily const dictionary \& Foam\+::add\+Model\+Repeat\+Random\+Position\+::scaling\+Mode\+Coeffs\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 72 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a9834b3d9f014eb1dd792a1e2d576e6b8}\label{classFoam_1_1addModelRepeatRandomPosition_a9834b3d9f014eb1dd792a1e2d576e6b8}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!succesfulladition\_@{succesfulladition\_}}
+\index{succesfulladition\_@{succesfulladition\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{succesfulladition\_}{succesfulladition\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::succesfulladition\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 104 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_afd0d6511656efdb206149fb02ffc995f}\label{classFoam_1_1addModelRepeatRandomPosition_afd0d6511656efdb206149fb02ffc995f}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!timeBased\_@{timeBased\_}}
+\index{timeBased\_@{timeBased\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{timeBased\_}{timeBased\_}}
+{\footnotesize\ttfamily bool Foam\+::add\+Model\+Repeat\+Random\+Position\+::time\+Based\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 112 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a230657bd1815947461e92b15c4e62dde}\label{classFoam_1_1addModelRepeatRandomPosition_a230657bd1815947461e92b15c4e62dde}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!timeBetweenUsage\_@{timeBetweenUsage\_}}
+\index{timeBetweenUsage\_@{timeBetweenUsage\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{timeBetweenUsage\_}{timeBetweenUsage\_}}
+{\footnotesize\ttfamily scalar Foam\+::add\+Model\+Repeat\+Random\+Position\+::time\+Between\+Usage\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 77 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a0d9d633f641e7b459b3afbeb58928252}\label{classFoam_1_1addModelRepeatRandomPosition_a0d9d633f641e7b459b3afbeb58928252}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!useNTimes\_@{useNTimes\_}}
+\index{useNTimes\_@{useNTimes\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{useNTimes\_}{useNTimes\_}}
+{\footnotesize\ttfamily label Foam\+::add\+Model\+Repeat\+Random\+Position\+::use\+N\+Times\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 76 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1addModelRepeatRandomPosition_a16cf729b66fcad9e39c9eaade5844bb3}\label{classFoam_1_1addModelRepeatRandomPosition_a16cf729b66fcad9e39c9eaade5844bb3}} 
+\index{Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}!zoneName\_@{zoneName\_}}
+\index{zoneName\_@{zoneName\_}!Foam::addModelRepeatRandomPosition@{Foam::addModelRepeatRandomPosition}}
+\doxysubsubsection{\texorpdfstring{zoneName\_}{zoneName\_}}
+{\footnotesize\ttfamily word Foam\+::add\+Model\+Repeat\+Random\+Position\+::zone\+Name\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 83 of file add\+Model\+Repeat\+Random\+Position.\+H.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/add\+Models/\mbox{\hyperlink{addModels_2addModelRepeatRandomPosition_8H}{add\+Model\+Repeat\+Random\+Position.\+H}}\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/add\+Models/\mbox{\hyperlink{addModels_2addModelRepeatRandomPosition_8C}{add\+Model\+Repeat\+Random\+Position.\+C}}\end{DoxyCompactItemize}

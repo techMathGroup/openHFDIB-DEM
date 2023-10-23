@@ -1,0 +1,49 @@
+digraph "Foam::wallContactInfo::findContactAreas"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="Foam::wallContactInfo\l::findContactAreas",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node1 -> Node2 [color="midnightblue",fontsize="10",style="solid"];
+  Node2 [label="Foam::wallContactInfo\l::constructSM",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1wallContactInfo.html#ab5e6d7158217580908fe5277d3546a3d",tooltip=" "];
+  Node2 -> Node3 [color="midnightblue",fontsize="10",style="solid"];
+  Node3 [label="Foam::wallContactInfo\l::constructBoundBox",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1wallContactInfo.html#a5aa979867d5552dc8a406aea6092d2a6",tooltip=" "];
+  Node3 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
+  Node4 [label="Foam::virtualMeshLevel\l::getCharCellSize",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1virtualMeshLevel.html#abf8d27023f69edf8a775e41a98b873dc",tooltip=" "];
+  Node2 -> Node5 [color="midnightblue",fontsize="10",style="solid"];
+  Node5 [label="Foam::geomModel::getBounds",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1geomModel.html#a3e96ac9daa9bf49715d933c93f1f817a",tooltip=" "];
+  Node2 -> Node4 [color="midnightblue",fontsize="10",style="solid"];
+  Node2 -> Node6 [color="midnightblue",fontsize="10",style="solid"];
+  Node6 [label="Foam::ibContactClass\l::getGeomModel",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1ibContactClass.html#af24117aa9d6b8a28c64ce11354a2fa35",tooltip=" "];
+  Node1 -> Node7 [color="midnightblue",fontsize="10",style="solid"];
+  Node7 [label="Foam::wallContactInfo\l::constructVMBox",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1wallContactInfo.html#a3e65b0739791e0bcdfa21c3d395808c5",tooltip=" "];
+  Node7 -> Node8 [color="midnightblue",fontsize="10",style="solid"];
+  Node8 [label="forAll",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$addModels_2initializeAddModels_8H.html#adcd69a620b2d93c893cbf0e92bb7c5d7",tooltip=" "];
+  Node8 -> Node9 [color="midnightblue",fontsize="10",style="solid"];
+  Node9 [label="thrSurf",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$addModels_2initializeAddModels_8H.html#a12947c9cf4cff46d3d0a324e3e718f45",tooltip=" "];
+  Node1 -> Node10 [color="midnightblue",fontsize="10",style="solid"];
+  Node10 [label="Foam::wallContactInfo\l::contactPlaneBBox",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1wallContactInfo.html#a04758d72a4a74b82b060f83132270a15",tooltip=" "];
+  Node10 -> Node8 [color="midnightblue",fontsize="10",style="solid"];
+  Node1 -> Node11 [color="midnightblue",fontsize="10",style="solid"];
+  Node11 [label="Foam::wallContactInfo\l::correctSMBBforWall",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1wallContactInfo.html#a7f2c4489a75a2fad02e267d07488051b",tooltip=" "];
+  Node11 -> Node8 [color="midnightblue",fontsize="10",style="solid"];
+  Node1 -> Node12 [color="midnightblue",fontsize="10",style="solid"];
+  Node12 [label="Foam::wallContactInfo\l::detectPossibleSMContact",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1wallContactInfo.html#a04b1c5a07688c1b41bc04c38b0ecf2de",tooltip=" "];
+  Node12 -> Node8 [color="midnightblue",fontsize="10",style="solid"];
+  Node1 -> Node8 [color="midnightblue",fontsize="10",style="solid"];
+  Node1 -> Node6 [color="midnightblue",fontsize="10",style="solid"];
+  Node1 -> Node13 [color="midnightblue",fontsize="10",style="solid"];
+  Node13 [label="Foam::wallContactInfo\l::getPlanePoint",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1wallContactInfo.html#a5605d580b8832454608e604198cc0566",tooltip=" "];
+  Node13 -> Node14 [color="midnightblue",fontsize="10",style="solid"];
+  Node14 [label="Foam::wallPlaneInfo\l::getWallPlaneInfo",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1wallPlaneInfo.html#a79ee79cd0b68dc6afe60152453f29fa7",tooltip=" "];
+  Node1 -> Node15 [color="midnightblue",fontsize="10",style="solid"];
+  Node15 [label="Foam::wallContactInfo\l::getSCBBox",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1wallContactInfo.html#a697e9dc192b32f87daeb50308d0b94da",tooltip=" "];
+  Node15 -> Node8 [color="midnightblue",fontsize="10",style="solid"];
+  Node1 -> Node16 [color="midnightblue",fontsize="10",style="solid"];
+  Node16 [label="Foam::geomModel::getSTLBody\lPoints",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1geomModel.html#a21fdbb9bd4dbc303d044e9f27b0550b1",tooltip=" "];
+  Node1 -> Node17 [color="midnightblue",fontsize="10",style="solid"];
+  Node17 [label="Foam::wallContactInfo\l::isInsidePlane",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1wallContactInfo.html#a9a248b087ea6be1fb199a7a47d5d7f1b",tooltip=" "];
+  Node1 -> Node18 [color="midnightblue",fontsize="10",style="solid"];
+  Node18 [label="Foam::wallContactInfo\l::setNewSubContact",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1wallContactInfo.html#a8f3aa12a5c78b07186c8d1c55a792e03",tooltip=" "];
+}

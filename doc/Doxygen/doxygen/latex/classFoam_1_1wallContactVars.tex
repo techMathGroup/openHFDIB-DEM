@@ -1,0 +1,486 @@
+\hypertarget{classFoam_1_1wallContactVars}{}\doxysection{Foam\+::wall\+Contact\+Vars Class Reference}
+\label{classFoam_1_1wallContactVars}\index{Foam::wallContactVars@{Foam::wallContactVars}}
+
+
+{\ttfamily \#include $<$wall\+Contact\+Vars.\+H$>$}
+
+
+
+Collaboration diagram for Foam\+::wall\+Contact\+Vars\+:
+% FIG 0
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classFoam_1_1wallContactVars_a5a54a087ff36e639177565ff75118118}{wall\+Contact\+Vars}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1wallContactVars_a3d8ec989c7cf1927ec7a5ee55b2fb32f}{$\sim$wall\+Contact\+Vars}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1wallContactVars_a1ba0262b8b0f576ffd5ecb47584ef80a}{set\+Mean\+Cnt\+Pars}} (const fv\+Mesh \&mesh, Dynamic\+List$<$ Tuple2$<$ label, string $>$$>$ \&contact\+Faces, Hash\+Table$<$ \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}}, string, Hash$<$ string $>$$>$ \&wall\+Mean\+Pars)
+\item 
+void \mbox{\hyperlink{classFoam_1_1wallContactVars_a8d867556389b7bf68987108f356d6ca8}{set\+Mean\+Cnt\+Pars\+\_\+\+Plane}} (List$<$ scalar $>$ \&contact\+Areas, List$<$ string $>$ contact\+Faces, Hash\+Table$<$ \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}}, string, Hash$<$ string $>$$>$ \&wall\+Mean\+Pars)
+\item 
+\mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}} \& \mbox{\hyperlink{classFoam_1_1wallContactVars_a6e81a242bdb720f04d6651386923e842}{get\+Mean\+Cnt\+Par}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1wallContactVars_a1826e62c60ed796f937138adfe98bd7e}{clear}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1wallContactVars_a5a54a087ff36e639177565ff75118118}{wall\+Contact\+Vars}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1wallContactVars_a3d8ec989c7cf1927ec7a5ee55b2fb32f}{$\sim$wall\+Contact\+Vars}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1wallContactVars_afca0abe2b00c166856b54a758c917c27}{set\+Mean\+Cnt\+Pars}} (const fv\+Mesh \&mesh, Dynamic\+List$<$ Tuple2$<$ label, string $>$$>$ \&contact\+Faces, Hash\+Table$<$ \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}}, string, Hash$<$ string $>$$>$ \&wall\+Mean\+Pars)
+\item 
+void \mbox{\hyperlink{classFoam_1_1wallContactVars_a609aadab883f070ca3c0a6f66fa73a72}{set\+Mean\+Cnt\+Pars\+\_\+\+Plane}} (List$<$ scalar $>$ \&contact\+Areas, List$<$ string $>$ contact\+Faces, Hash\+Table$<$ \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}}, string, Hash$<$ string $>$$>$ \&wall\+Mean\+Pars)
+\item 
+\mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}} \& \mbox{\hyperlink{classFoam_1_1wallContactVars_a6e81a242bdb720f04d6651386923e842}{get\+Mean\+Cnt\+Par}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1wallContactVars_a1826e62c60ed796f937138adfe98bd7e}{clear}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Data Fields}
+\begin{DoxyCompactItemize}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1wallContactVars_a80f47993b1ac69b146265293d60b9018}{contact\+Center\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1wallContactVars_a657f714cdd7d47e1e910eecc0e27890e}{contact\+Volume\+\_\+}}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1wallContactVars_a81e2f2245e2f8dc989e09be22664937e}{contact\+Normal\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1wallContactVars_a54d43a8f2a65b3857be40020a25f7647}{contact\+Area\+\_\+}}
+\item 
+\mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}} \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physical\+Properties\+\_\+}}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1wallContactVars_a6ba26187f506e763b2da63d335027103}{l\+Vec\+\_\+}}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1wallContactVars_ad14226775c11ca49bcbd0c5fa2d0ddb4}{Veli\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1wallContactVars_a425314a369c5a821d9f41a981a806ceb}{Vn\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1wallContactVars_a5c5dcb5fd9328293b073da5535d56f35}{Lc\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1wallContactVars_a79a61babd5bf7c43d9b7a76d9940d0f2}{cur\+Adh\+N\+\_\+}}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1wallContactVars_a0c27434456e7c74e6c0724142aab7b8b}{Ft\+Prev\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 50 of file wall\+Contact\+Vars.\+H.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a5a54a087ff36e639177565ff75118118}\label{classFoam_1_1wallContactVars_a5a54a087ff36e639177565ff75118118}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!wallContactVars@{wallContactVars}}
+\index{wallContactVars@{wallContactVars}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{wallContactVars()}{wallContactVars()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Foam\+::wall\+Contact\+Vars\+::wall\+Contact\+Vars (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 69 of file wall\+Contact\+Vars.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{70     \{}
+\DoxyCodeLine{71         \mbox{\hyperlink{classFoam_1_1wallContactVars_a80f47993b1ac69b146265293d60b9018}{contactCenter\_}} = vector::zero;}
+\DoxyCodeLine{72         \mbox{\hyperlink{classFoam_1_1wallContactVars_a657f714cdd7d47e1e910eecc0e27890e}{contactVolume\_}} = 0;}
+\DoxyCodeLine{73         \mbox{\hyperlink{classFoam_1_1wallContactVars_a81e2f2245e2f8dc989e09be22664937e}{contactNormal\_}} = vector::zero;}
+\DoxyCodeLine{74         \mbox{\hyperlink{classFoam_1_1wallContactVars_a54d43a8f2a65b3857be40020a25f7647}{contactArea\_}} = 0;}
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76         \mbox{\hyperlink{classFoam_1_1wallContactVars_a6ba26187f506e763b2da63d335027103}{lVec\_}} = vector::zero;}
+\DoxyCodeLine{77         \mbox{\hyperlink{classFoam_1_1wallContactVars_ad14226775c11ca49bcbd0c5fa2d0ddb4}{Veli\_}} = vector::zero;}
+\DoxyCodeLine{78         \mbox{\hyperlink{classFoam_1_1wallContactVars_a425314a369c5a821d9f41a981a806ceb}{Vn\_}} = 0;}
+\DoxyCodeLine{79         \mbox{\hyperlink{classFoam_1_1wallContactVars_a5c5dcb5fd9328293b073da5535d56f35}{Lc\_}} = 0;}
+\DoxyCodeLine{80         \mbox{\hyperlink{classFoam_1_1wallContactVars_a79a61babd5bf7c43d9b7a76d9940d0f2}{curAdhN\_}} = 0;}
+\DoxyCodeLine{81         \mbox{\hyperlink{classFoam_1_1wallContactVars_a0c27434456e7c74e6c0724142aab7b8b}{FtPrev\_}} = vector::zero;}
+\DoxyCodeLine{82     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a3d8ec989c7cf1927ec7a5ee55b2fb32f}\label{classFoam_1_1wallContactVars_a3d8ec989c7cf1927ec7a5ee55b2fb32f}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!````~wallContactVars@{$\sim$wallContactVars}}
+\index{````~wallContactVars@{$\sim$wallContactVars}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{$\sim$wallContactVars()}{~wallContactVars()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Foam\+::wall\+Contact\+Vars\+::$\sim$wall\+Contact\+Vars (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 85 of file wall\+Contact\+Vars.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{85 \{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a5a54a087ff36e639177565ff75118118}\label{classFoam_1_1wallContactVars_a5a54a087ff36e639177565ff75118118}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!wallContactVars@{wallContactVars}}
+\index{wallContactVars@{wallContactVars}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{wallContactVars()}{wallContactVars()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::wall\+Contact\+Vars\+::wall\+Contact\+Vars (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 69 of file wall\+Contact\+Vars.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{70     \{}
+\DoxyCodeLine{71         \mbox{\hyperlink{classFoam_1_1wallContactVars_a80f47993b1ac69b146265293d60b9018}{contactCenter\_}} = vector::zero;}
+\DoxyCodeLine{72         \mbox{\hyperlink{classFoam_1_1wallContactVars_a657f714cdd7d47e1e910eecc0e27890e}{contactVolume\_}} = 0;}
+\DoxyCodeLine{73         \mbox{\hyperlink{classFoam_1_1wallContactVars_a81e2f2245e2f8dc989e09be22664937e}{contactNormal\_}} = vector::zero;}
+\DoxyCodeLine{74         \mbox{\hyperlink{classFoam_1_1wallContactVars_a54d43a8f2a65b3857be40020a25f7647}{contactArea\_}} = 0;}
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76         \mbox{\hyperlink{classFoam_1_1wallContactVars_a6ba26187f506e763b2da63d335027103}{lVec\_}} = vector::zero;}
+\DoxyCodeLine{77         \mbox{\hyperlink{classFoam_1_1wallContactVars_ad14226775c11ca49bcbd0c5fa2d0ddb4}{Veli\_}} = vector::zero;}
+\DoxyCodeLine{78         \mbox{\hyperlink{classFoam_1_1wallContactVars_a425314a369c5a821d9f41a981a806ceb}{Vn\_}} = 0;}
+\DoxyCodeLine{79         \mbox{\hyperlink{classFoam_1_1wallContactVars_a5c5dcb5fd9328293b073da5535d56f35}{Lc\_}} = 0;}
+\DoxyCodeLine{80         \mbox{\hyperlink{classFoam_1_1wallContactVars_a79a61babd5bf7c43d9b7a76d9940d0f2}{curAdhN\_}} = 0;}
+\DoxyCodeLine{81         \mbox{\hyperlink{classFoam_1_1wallContactVars_a0c27434456e7c74e6c0724142aab7b8b}{FtPrev\_}} = vector::zero;}
+\DoxyCodeLine{82     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a3d8ec989c7cf1927ec7a5ee55b2fb32f}\label{classFoam_1_1wallContactVars_a3d8ec989c7cf1927ec7a5ee55b2fb32f}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!````~wallContactVars@{$\sim$wallContactVars}}
+\index{````~wallContactVars@{$\sim$wallContactVars}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{$\sim$wallContactVars()}{~wallContactVars()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::wall\+Contact\+Vars\+::$\sim$wall\+Contact\+Vars (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 85 of file wall\+Contact\+Vars.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{85 \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a1826e62c60ed796f937138adfe98bd7e}\label{classFoam_1_1wallContactVars_a1826e62c60ed796f937138adfe98bd7e}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!clear@{clear}}
+\index{clear@{clear}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::wall\+Contact\+Vars\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 106 of file wall\+Contact\+Vars.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{107     \{}
+\DoxyCodeLine{108         \mbox{\hyperlink{classFoam_1_1wallContactVars_a80f47993b1ac69b146265293d60b9018}{contactCenter\_}} = vector::zero;}
+\DoxyCodeLine{109         \mbox{\hyperlink{classFoam_1_1wallContactVars_a657f714cdd7d47e1e910eecc0e27890e}{contactVolume\_}} = 0;}
+\DoxyCodeLine{110         \mbox{\hyperlink{classFoam_1_1wallContactVars_a81e2f2245e2f8dc989e09be22664937e}{contactNormal\_}} = vector::zero;}
+\DoxyCodeLine{111         \mbox{\hyperlink{classFoam_1_1wallContactVars_a54d43a8f2a65b3857be40020a25f7647}{contactArea\_}} = 0;}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{113         \mbox{\hyperlink{classFoam_1_1wallContactVars_a6ba26187f506e763b2da63d335027103}{lVec\_}} = vector::zero;}
+\DoxyCodeLine{114         \mbox{\hyperlink{classFoam_1_1wallContactVars_ad14226775c11ca49bcbd0c5fa2d0ddb4}{Veli\_}} = vector::zero;}
+\DoxyCodeLine{115         \mbox{\hyperlink{classFoam_1_1wallContactVars_a425314a369c5a821d9f41a981a806ceb}{Vn\_}} = 0;}
+\DoxyCodeLine{116         \mbox{\hyperlink{classFoam_1_1wallContactVars_a5c5dcb5fd9328293b073da5535d56f35}{Lc\_}} = 0;}
+\DoxyCodeLine{117         \mbox{\hyperlink{classFoam_1_1wallContactVars_a79a61babd5bf7c43d9b7a76d9940d0f2}{curAdhN\_}} = 0;}
+\DoxyCodeLine{118         \mbox{\hyperlink{classFoam_1_1wallContactVars_a0c27434456e7c74e6c0724142aab7b8b}{FtPrev\_}} = vector::zero;}
+\DoxyCodeLine{119     \}    }
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a1826e62c60ed796f937138adfe98bd7e}\label{classFoam_1_1wallContactVars_a1826e62c60ed796f937138adfe98bd7e}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!clear@{clear}}
+\index{clear@{clear}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{clear()}{clear()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::wall\+Contact\+Vars\+::clear (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 106 of file wall\+Contact\+Vars.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{107     \{}
+\DoxyCodeLine{108         \mbox{\hyperlink{classFoam_1_1wallContactVars_a80f47993b1ac69b146265293d60b9018}{contactCenter\_}} = vector::zero;}
+\DoxyCodeLine{109         \mbox{\hyperlink{classFoam_1_1wallContactVars_a657f714cdd7d47e1e910eecc0e27890e}{contactVolume\_}} = 0;}
+\DoxyCodeLine{110         \mbox{\hyperlink{classFoam_1_1wallContactVars_a81e2f2245e2f8dc989e09be22664937e}{contactNormal\_}} = vector::zero;}
+\DoxyCodeLine{111         \mbox{\hyperlink{classFoam_1_1wallContactVars_a54d43a8f2a65b3857be40020a25f7647}{contactArea\_}} = 0;}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{113         \mbox{\hyperlink{classFoam_1_1wallContactVars_a6ba26187f506e763b2da63d335027103}{lVec\_}} = vector::zero;}
+\DoxyCodeLine{114         \mbox{\hyperlink{classFoam_1_1wallContactVars_ad14226775c11ca49bcbd0c5fa2d0ddb4}{Veli\_}} = vector::zero;}
+\DoxyCodeLine{115         \mbox{\hyperlink{classFoam_1_1wallContactVars_a425314a369c5a821d9f41a981a806ceb}{Vn\_}} = 0;}
+\DoxyCodeLine{116         \mbox{\hyperlink{classFoam_1_1wallContactVars_a5c5dcb5fd9328293b073da5535d56f35}{Lc\_}} = 0;}
+\DoxyCodeLine{117         \mbox{\hyperlink{classFoam_1_1wallContactVars_a79a61babd5bf7c43d9b7a76d9940d0f2}{curAdhN\_}} = 0;}
+\DoxyCodeLine{118         \mbox{\hyperlink{classFoam_1_1wallContactVars_a0c27434456e7c74e6c0724142aab7b8b}{FtPrev\_}} = vector::zero;}
+\DoxyCodeLine{119     \}    }
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a6e81a242bdb720f04d6651386923e842}\label{classFoam_1_1wallContactVars_a6e81a242bdb720f04d6651386923e842}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!getMeanCntPar@{getMeanCntPar}}
+\index{getMeanCntPar@{getMeanCntPar}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{getMeanCntPar()}{getMeanCntPar()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}}\& Foam\+::wall\+Contact\+Vars\+::get\+Mean\+Cnt\+Par (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 101 of file wall\+Contact\+Vars.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{102     \{}
+\DoxyCodeLine{103         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}};}
+\DoxyCodeLine{104     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 1
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a6e81a242bdb720f04d6651386923e842}\label{classFoam_1_1wallContactVars_a6e81a242bdb720f04d6651386923e842}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!getMeanCntPar@{getMeanCntPar}}
+\index{getMeanCntPar@{getMeanCntPar}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{getMeanCntPar()}{getMeanCntPar()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}}\& Foam\+::wall\+Contact\+Vars\+::get\+Mean\+Cnt\+Par (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 101 of file wall\+Contact\+Vars.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{102     \{}
+\DoxyCodeLine{103         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}};}
+\DoxyCodeLine{104     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_afca0abe2b00c166856b54a758c917c27}\label{classFoam_1_1wallContactVars_afca0abe2b00c166856b54a758c917c27}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!setMeanCntPars@{setMeanCntPars}}
+\index{setMeanCntPars@{setMeanCntPars}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{setMeanCntPars()}{setMeanCntPars()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::wall\+Contact\+Vars\+::set\+Mean\+Cnt\+Pars (\begin{DoxyParamCaption}\item[{const fv\+Mesh \&}]{mesh,  }\item[{Dynamic\+List$<$ Tuple2$<$ label, string $>$$>$ \&}]{contact\+Faces,  }\item[{Hash\+Table$<$ \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}}, string, Hash$<$ string $>$$>$ \&}]{wall\+Mean\+Pars }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a1ba0262b8b0f576ffd5ecb47584ef80a}\label{classFoam_1_1wallContactVars_a1ba0262b8b0f576ffd5ecb47584ef80a}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!setMeanCntPars@{setMeanCntPars}}
+\index{setMeanCntPars@{setMeanCntPars}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{setMeanCntPars()}{setMeanCntPars()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void wall\+Contact\+Vars\+::set\+Mean\+Cnt\+Pars (\begin{DoxyParamCaption}\item[{const fv\+Mesh \&}]{mesh,  }\item[{Dynamic\+List$<$ Tuple2$<$ label, string $>$$>$ \&}]{contact\+Faces,  }\item[{Hash\+Table$<$ \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}}, string, Hash$<$ string $>$$>$ \&}]{wall\+Mean\+Pars }\end{DoxyParamCaption})}
+
+
+
+Definition at line 38 of file wall\+Contact\+Vars.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{43 \{}
+\DoxyCodeLine{44     scalar overallArea = 0;}
+\DoxyCodeLine{45     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_abf0755a856468cbd935a2f80d5e88170}{aY\_}} = 0;}
+\DoxyCodeLine{46     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a95d80a2168618ca4635c274916f243f2}{aG\_}} = 0;}
+\DoxyCodeLine{47     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_af8c6d3e0a6a5e8ec3a42fcf2278e4cbd}{aGammaN\_}} = 0;}
+\DoxyCodeLine{48     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_ae480f2d8716989dec5d09b2f9bf26ec8}{aGammat\_}} = 0;}
+\DoxyCodeLine{49     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a4fcf9a8be1e57adb08eef42435a7a270}{aMu\_}} = 0;}
+\DoxyCodeLine{50     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a15cb166e7036ec2e09cf9cd743eede98}{maxAdhN\_}} = 0;}
+\DoxyCodeLine{51     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a141ee9b743a0d7459cf4bf82ea4d8064}{reduceBeta\_}} = 0;}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(contactFaces,faceI)}
+\DoxyCodeLine{54     \{}
+\DoxyCodeLine{55         scalar area = mesh.magSf()[contactFaces[faceI].first()];}
+\DoxyCodeLine{56         overallArea += area;}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58         \mbox{\hyperlink{structFoam_1_1physicalProperties}{physicalProperties}}\& cMeanCntPars(}
+\DoxyCodeLine{59             wallMeanPars[contactFaces[faceI].second()]}
+\DoxyCodeLine{60         );}
+\DoxyCodeLine{61 }
+\DoxyCodeLine{62         \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_abf0755a856468cbd935a2f80d5e88170}{aY\_}} += (cMeanCntPars.aY\_*area);}
+\DoxyCodeLine{63         \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a95d80a2168618ca4635c274916f243f2}{aG\_}} += (cMeanCntPars.aG\_*area);}
+\DoxyCodeLine{64         \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_af8c6d3e0a6a5e8ec3a42fcf2278e4cbd}{aGammaN\_}} += (cMeanCntPars.aGammaN\_*area);}
+\DoxyCodeLine{65         \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_ae480f2d8716989dec5d09b2f9bf26ec8}{aGammat\_}} += (cMeanCntPars.aGammat\_*area);}
+\DoxyCodeLine{66         \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a4fcf9a8be1e57adb08eef42435a7a270}{aMu\_}} += (cMeanCntPars.aMu\_*area);}
+\DoxyCodeLine{67         \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a15cb166e7036ec2e09cf9cd743eede98}{maxAdhN\_}} += (cMeanCntPars.maxAdhN\_*area);}
+\DoxyCodeLine{68         \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a141ee9b743a0d7459cf4bf82ea4d8064}{reduceBeta\_}} += (cMeanCntPars.reduceBeta\_*area);}
+\DoxyCodeLine{69     \}}
+\DoxyCodeLine{70 }
+\DoxyCodeLine{71     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_abf0755a856468cbd935a2f80d5e88170}{aY\_}} /= overallArea;}
+\DoxyCodeLine{72     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a95d80a2168618ca4635c274916f243f2}{aG\_}} /= overallArea;}
+\DoxyCodeLine{73     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_af8c6d3e0a6a5e8ec3a42fcf2278e4cbd}{aGammaN\_}} /= overallArea;}
+\DoxyCodeLine{74     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_ae480f2d8716989dec5d09b2f9bf26ec8}{aGammat\_}} /= overallArea;}
+\DoxyCodeLine{75     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a4fcf9a8be1e57adb08eef42435a7a270}{aMu\_}} /= overallArea;}
+\DoxyCodeLine{76     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a15cb166e7036ec2e09cf9cd743eede98}{maxAdhN\_}} /= overallArea;}
+\DoxyCodeLine{77     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a141ee9b743a0d7459cf4bf82ea4d8064}{reduceBeta\_}} /= overallArea;}
+\DoxyCodeLine{78 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 2
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a609aadab883f070ca3c0a6f66fa73a72}\label{classFoam_1_1wallContactVars_a609aadab883f070ca3c0a6f66fa73a72}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!setMeanCntPars\_Plane@{setMeanCntPars\_Plane}}
+\index{setMeanCntPars\_Plane@{setMeanCntPars\_Plane}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{setMeanCntPars\_Plane()}{setMeanCntPars\_Plane()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::wall\+Contact\+Vars\+::set\+Mean\+Cnt\+Pars\+\_\+\+Plane (\begin{DoxyParamCaption}\item[{List$<$ scalar $>$ \&}]{contact\+Areas,  }\item[{List$<$ string $>$}]{contact\+Faces,  }\item[{Hash\+Table$<$ \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}}, string, Hash$<$ string $>$$>$ \&}]{wall\+Mean\+Pars }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a8d867556389b7bf68987108f356d6ca8}\label{classFoam_1_1wallContactVars_a8d867556389b7bf68987108f356d6ca8}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!setMeanCntPars\_Plane@{setMeanCntPars\_Plane}}
+\index{setMeanCntPars\_Plane@{setMeanCntPars\_Plane}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{setMeanCntPars\_Plane()}{setMeanCntPars\_Plane()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void wall\+Contact\+Vars\+::set\+Mean\+Cnt\+Pars\+\_\+\+Plane (\begin{DoxyParamCaption}\item[{List$<$ scalar $>$ \&}]{contact\+Areas,  }\item[{List$<$ string $>$}]{contact\+Faces,  }\item[{Hash\+Table$<$ \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}}, string, Hash$<$ string $>$$>$ \&}]{wall\+Mean\+Pars }\end{DoxyParamCaption})}
+
+
+
+Definition at line 81 of file wall\+Contact\+Vars.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{86 \{}
+\DoxyCodeLine{87     scalar overallArea = 0;}
+\DoxyCodeLine{88     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_abf0755a856468cbd935a2f80d5e88170}{aY\_}} = 0;}
+\DoxyCodeLine{89     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a95d80a2168618ca4635c274916f243f2}{aG\_}} = 0;}
+\DoxyCodeLine{90     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_af8c6d3e0a6a5e8ec3a42fcf2278e4cbd}{aGammaN\_}} = 0;}
+\DoxyCodeLine{91     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_ae480f2d8716989dec5d09b2f9bf26ec8}{aGammat\_}} = 0;}
+\DoxyCodeLine{92     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a4fcf9a8be1e57adb08eef42435a7a270}{aMu\_}} = 0;}
+\DoxyCodeLine{93     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a15cb166e7036ec2e09cf9cd743eede98}{maxAdhN\_}} = 0;}
+\DoxyCodeLine{94     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a141ee9b743a0d7459cf4bf82ea4d8064}{reduceBeta\_}} = 0;}
+\DoxyCodeLine{95 }
+\DoxyCodeLine{96     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(contactFaces,faceI)}
+\DoxyCodeLine{97     \{}
+\DoxyCodeLine{98         scalar area = contactAreas[faceI];}
+\DoxyCodeLine{99         overallArea += area;}
+\DoxyCodeLine{100 }
+\DoxyCodeLine{101         \mbox{\hyperlink{structFoam_1_1physicalProperties}{physicalProperties}}\& cMeanCntPars(}
+\DoxyCodeLine{102             wallMeanPars[contactFaces[faceI]]}
+\DoxyCodeLine{103         );}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{105         \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_abf0755a856468cbd935a2f80d5e88170}{aY\_}} += (cMeanCntPars.aY\_*area);}
+\DoxyCodeLine{106         \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a95d80a2168618ca4635c274916f243f2}{aG\_}} += (cMeanCntPars.aG\_*area);}
+\DoxyCodeLine{107         \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_af8c6d3e0a6a5e8ec3a42fcf2278e4cbd}{aGammaN\_}} += (cMeanCntPars.aGammaN\_*area);}
+\DoxyCodeLine{108         \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_ae480f2d8716989dec5d09b2f9bf26ec8}{aGammat\_}} += (cMeanCntPars.aGammat\_*area);}
+\DoxyCodeLine{109         \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a4fcf9a8be1e57adb08eef42435a7a270}{aMu\_}} += (cMeanCntPars.aMu\_*area);}
+\DoxyCodeLine{110         \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a15cb166e7036ec2e09cf9cd743eede98}{maxAdhN\_}} += (cMeanCntPars.maxAdhN\_*area);}
+\DoxyCodeLine{111         \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a141ee9b743a0d7459cf4bf82ea4d8064}{reduceBeta\_}} += (cMeanCntPars.reduceBeta\_*area);}
+\DoxyCodeLine{112     \}}
+\DoxyCodeLine{113 }
+\DoxyCodeLine{114     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_abf0755a856468cbd935a2f80d5e88170}{aY\_}} /= overallArea;}
+\DoxyCodeLine{115     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a95d80a2168618ca4635c274916f243f2}{aG\_}} /= overallArea;}
+\DoxyCodeLine{116     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_af8c6d3e0a6a5e8ec3a42fcf2278e4cbd}{aGammaN\_}} /= overallArea;}
+\DoxyCodeLine{117     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_ae480f2d8716989dec5d09b2f9bf26ec8}{aGammat\_}} /= overallArea;}
+\DoxyCodeLine{118     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a4fcf9a8be1e57adb08eef42435a7a270}{aMu\_}} /= overallArea;}
+\DoxyCodeLine{119     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a15cb166e7036ec2e09cf9cd743eede98}{maxAdhN\_}} /= overallArea;}
+\DoxyCodeLine{120     \mbox{\hyperlink{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}{physicalProperties\_}}.\mbox{\hyperlink{structFoam_1_1physicalProperties_a141ee9b743a0d7459cf4bf82ea4d8064}{reduceBeta\_}} /= overallArea;}
+\DoxyCodeLine{121 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 3
+Here is the caller graph for this function\+:
+% FIG 4
+
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a54d43a8f2a65b3857be40020a25f7647}\label{classFoam_1_1wallContactVars_a54d43a8f2a65b3857be40020a25f7647}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!contactArea\_@{contactArea\_}}
+\index{contactArea\_@{contactArea\_}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{contactArea\_}{contactArea\_}}
+{\footnotesize\ttfamily scalar Foam\+::wall\+Contact\+Vars\+::contact\+Area\+\_\+}
+
+
+
+Definition at line 56 of file wall\+Contact\+Vars.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a80f47993b1ac69b146265293d60b9018}\label{classFoam_1_1wallContactVars_a80f47993b1ac69b146265293d60b9018}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!contactCenter\_@{contactCenter\_}}
+\index{contactCenter\_@{contactCenter\_}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{contactCenter\_}{contactCenter\_}}
+{\footnotesize\ttfamily vector Foam\+::wall\+Contact\+Vars\+::contact\+Center\+\_\+}
+
+
+
+Definition at line 53 of file wall\+Contact\+Vars.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a81e2f2245e2f8dc989e09be22664937e}\label{classFoam_1_1wallContactVars_a81e2f2245e2f8dc989e09be22664937e}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!contactNormal\_@{contactNormal\_}}
+\index{contactNormal\_@{contactNormal\_}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{contactNormal\_}{contactNormal\_}}
+{\footnotesize\ttfamily vector Foam\+::wall\+Contact\+Vars\+::contact\+Normal\+\_\+}
+
+
+
+Definition at line 55 of file wall\+Contact\+Vars.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a657f714cdd7d47e1e910eecc0e27890e}\label{classFoam_1_1wallContactVars_a657f714cdd7d47e1e910eecc0e27890e}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!contactVolume\_@{contactVolume\_}}
+\index{contactVolume\_@{contactVolume\_}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{contactVolume\_}{contactVolume\_}}
+{\footnotesize\ttfamily scalar Foam\+::wall\+Contact\+Vars\+::contact\+Volume\+\_\+}
+
+
+
+Definition at line 54 of file wall\+Contact\+Vars.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a79a61babd5bf7c43d9b7a76d9940d0f2}\label{classFoam_1_1wallContactVars_a79a61babd5bf7c43d9b7a76d9940d0f2}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!curAdhN\_@{curAdhN\_}}
+\index{curAdhN\_@{curAdhN\_}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{curAdhN\_}{curAdhN\_}}
+{\footnotesize\ttfamily scalar Foam\+::wall\+Contact\+Vars\+::cur\+Adh\+N\+\_\+}
+
+
+
+Definition at line 64 of file wall\+Contact\+Vars.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a0c27434456e7c74e6c0724142aab7b8b}\label{classFoam_1_1wallContactVars_a0c27434456e7c74e6c0724142aab7b8b}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!FtPrev\_@{FtPrev\_}}
+\index{FtPrev\_@{FtPrev\_}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{FtPrev\_}{FtPrev\_}}
+{\footnotesize\ttfamily vector Foam\+::wall\+Contact\+Vars\+::\+Ft\+Prev\+\_\+}
+
+
+
+Definition at line 66 of file wall\+Contact\+Vars.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a5c5dcb5fd9328293b073da5535d56f35}\label{classFoam_1_1wallContactVars_a5c5dcb5fd9328293b073da5535d56f35}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!Lc\_@{Lc\_}}
+\index{Lc\_@{Lc\_}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{Lc\_}{Lc\_}}
+{\footnotesize\ttfamily scalar Foam\+::wall\+Contact\+Vars\+::\+Lc\+\_\+}
+
+
+
+Definition at line 63 of file wall\+Contact\+Vars.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a6ba26187f506e763b2da63d335027103}\label{classFoam_1_1wallContactVars_a6ba26187f506e763b2da63d335027103}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!lVec\_@{lVec\_}}
+\index{lVec\_@{lVec\_}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{lVec\_}{lVec\_}}
+{\footnotesize\ttfamily vector Foam\+::wall\+Contact\+Vars\+::l\+Vec\+\_\+}
+
+
+
+Definition at line 60 of file wall\+Contact\+Vars.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}\label{classFoam_1_1wallContactVars_a1a0ee112272eaaa8561d8cdbc7a00ea2}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!physicalProperties\_@{physicalProperties\_}}
+\index{physicalProperties\_@{physicalProperties\_}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{physicalProperties\_}{physicalProperties\_}}
+{\footnotesize\ttfamily \mbox{\hyperlink{structFoam_1_1physicalProperties}{physical\+Properties}} Foam\+::wall\+Contact\+Vars\+::physical\+Properties\+\_\+}
+
+
+
+Definition at line 58 of file wall\+Contact\+Vars.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_ad14226775c11ca49bcbd0c5fa2d0ddb4}\label{classFoam_1_1wallContactVars_ad14226775c11ca49bcbd0c5fa2d0ddb4}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!Veli\_@{Veli\_}}
+\index{Veli\_@{Veli\_}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{Veli\_}{Veli\_}}
+{\footnotesize\ttfamily vector Foam\+::wall\+Contact\+Vars\+::\+Veli\+\_\+}
+
+
+
+Definition at line 61 of file wall\+Contact\+Vars.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1wallContactVars_a425314a369c5a821d9f41a981a806ceb}\label{classFoam_1_1wallContactVars_a425314a369c5a821d9f41a981a806ceb}} 
+\index{Foam::wallContactVars@{Foam::wallContactVars}!Vn\_@{Vn\_}}
+\index{Vn\_@{Vn\_}!Foam::wallContactVars@{Foam::wallContactVars}}
+\doxysubsubsection{\texorpdfstring{Vn\_}{Vn\_}}
+{\footnotesize\ttfamily scalar Foam\+::wall\+Contact\+Vars\+::\+Vn\+\_\+}
+
+
+
+Definition at line 62 of file wall\+Contact\+Vars.\+H.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/contact\+Models/\mbox{\hyperlink{contactModels_2wallContactVars_8H}{wall\+Contact\+Vars.\+H}}\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/contact\+Models/\mbox{\hyperlink{contactModels_2wallContactVars_8C}{wall\+Contact\+Vars.\+C}}\end{DoxyCompactItemize}

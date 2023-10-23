@@ -1,0 +1,133 @@
+\hypertarget{HFDIBDEMFoam_8C}{}\doxysection{application/solvers/\+H\+F\+D\+I\+B\+D\+E\+M\+Foam/\+H\+F\+D\+I\+B\+D\+E\+M\+Foam.C File Reference}
+\label{HFDIBDEMFoam_8C}\index{application/solvers/HFDIBDEMFoam/HFDIBDEMFoam.C@{application/solvers/HFDIBDEMFoam/HFDIBDEMFoam.C}}
+{\ttfamily \#include \char`\"{}fv\+C\+F\+D.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}dynamic\+Fv\+Mesh.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}open\+H\+F\+D\+I\+B\+D\+E\+M.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}pimple\+Control.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}fv\+Options.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}fvc\+Smooth.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}tri\+Surface\+Mesh.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}clock\+Time.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}post\+Process.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}set\+Root\+Case.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}create\+Time.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}create\+Dynamic\+Fv\+Mesh.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}create\+Dy\+M\+Controls.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}create\+Fields.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}create\+Uf\+If\+Present.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}create\+Fv\+Options.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}create\+M\+R\+F.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}Courant\+No.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}set\+Initial\+Delta\+T.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}read\+Dyn\+Mesh\+Dict.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}initial\+Mesh\+Refinement.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}read\+Dy\+M\+Controls.\+H\char`\"{}}\newline
+{\ttfamily \#include \char`\"{}set\+Delta\+T.\+H\char`\"{}}\newline
+Include dependency graph for H\+F\+D\+I\+B\+D\+E\+M\+Foam.\+C\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+int \mbox{\hyperlink{HFDIBDEMFoam_8C_a0ddf1224851353fc92bfbff6f499fa97}{main}} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{HFDIBDEMFoam_8C_a0ddf1224851353fc92bfbff6f499fa97}\label{HFDIBDEMFoam_8C_a0ddf1224851353fc92bfbff6f499fa97}} 
+\index{HFDIBDEMFoam.C@{HFDIBDEMFoam.C}!main@{main}}
+\index{main@{main}!HFDIBDEMFoam.C@{HFDIBDEMFoam.C}}
+\doxysubsubsection{\texorpdfstring{main()}{main()}}
+{\footnotesize\ttfamily int main (\begin{DoxyParamCaption}\item[{int}]{argc,  }\item[{char $\ast$}]{argv\mbox{[}$\,$\mbox{]} }\end{DoxyParamCaption})}
+
+
+
+Definition at line 44 of file H\+F\+D\+I\+B\+D\+E\+M\+Foam.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{45 \{}
+\DoxyCodeLine{46 \textcolor{preprocessor}{    \#include "postProcess.H"}}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48 \textcolor{preprocessor}{    \#include "setRootCase.H"}}
+\DoxyCodeLine{49 \textcolor{preprocessor}{    \#include "createTime.H"}}
+\DoxyCodeLine{50 \textcolor{preprocessor}{    \#include "createDynamicFvMesh.H"}}
+\DoxyCodeLine{51 \textcolor{preprocessor}{    \#include "createDyMControls.H"}}
+\DoxyCodeLine{52 \textcolor{preprocessor}{    \#include "\mbox{\hyperlink{HFDIBDEMFoam_2createFields_8H}{createFields.H}}"}}
+\DoxyCodeLine{53 \textcolor{preprocessor}{    \#include "createUfIfPresent.H"}}
+\DoxyCodeLine{54 \textcolor{preprocessor}{    \#include "createFvOptions.H"}}
+\DoxyCodeLine{55 \textcolor{preprocessor}{    \#include "createMRF.H"}}
+\DoxyCodeLine{56 \textcolor{preprocessor}{    \#include "CourantNo.H"}}
+\DoxyCodeLine{57 \textcolor{preprocessor}{    \#include "setInitialDeltaT.H"}}
+\DoxyCodeLine{58 }
+\DoxyCodeLine{59 \textcolor{preprocessor}{    \#include "\mbox{\hyperlink{HFDIBDEMFoam_2readDynMeshDict_8H}{readDynMeshDict.H}}"}}
+\DoxyCodeLine{60 }
+\DoxyCodeLine{61     \textcolor{comment}{// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //}}
+\DoxyCodeLine{62 }
+\DoxyCodeLine{63     Info << \textcolor{stringliteral}{"\(\backslash\)nInitializing HFDIBDEM\(\backslash\)n"} << endl;}
+\DoxyCodeLine{64     openHFDIBDEM  HFDIBDEM(mesh);}
+\DoxyCodeLine{65     HFDIBDEM.initialize(lambda,\mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}},refineF,\mbox{\hyperlink{HFDIBDEMFoam_2readDynMeshDict_8H_ac859c2e889c56654339d73fa2b19cdae}{maxRefinementLevel}},runTime.timeName());}
+\DoxyCodeLine{66 \textcolor{preprocessor}{    \#include "\mbox{\hyperlink{HFDIBDEMFoam_2initialMeshRefinement_8H}{initialMeshRefinement.H}}"}}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68     Info<< \textcolor{stringliteral}{"\(\backslash\)nStarting time loop\(\backslash\)n"} << endl;}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70     \textcolor{keywordflow}{if}(HFDIBDEM.getRecordFirstTime())}
+\DoxyCodeLine{71     \{}
+\DoxyCodeLine{72         HFDIBDEM.setRecordFirstTime(\textcolor{keyword}{false});}
+\DoxyCodeLine{73         HFDIBDEM.writeFirtsTimeBodiesInfo();}
+\DoxyCodeLine{74     \}}
+\DoxyCodeLine{75 }
+\DoxyCodeLine{76     \textcolor{keywordflow}{while} (runTime.run())}
+\DoxyCodeLine{77     \{}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79 \textcolor{preprocessor}{        \#include "readDyMControls.H"}}
+\DoxyCodeLine{80 \textcolor{preprocessor}{        \#include "CourantNo.H"}}
+\DoxyCodeLine{81 \textcolor{preprocessor}{        \#include "setDeltaT.H"}}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83         runTime++;}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85         Info<< \textcolor{stringliteral}{"Time = "} << runTime.timeName() << nl << endl;}
+\DoxyCodeLine{86 }
+\DoxyCodeLine{87         HFDIBDEM.createBodies(lambda,refineF);}
+\DoxyCodeLine{88         }
+\DoxyCodeLine{89         HFDIBDEM.preUpdateBodies(lambda,\mbox{\hyperlink{pEqn_8H_a633de4b0c14ca52ea2432a3c8a5c4c31}{f}});}
+\DoxyCodeLine{90 }
+\DoxyCodeLine{91         mesh.update();}
+\DoxyCodeLine{92 }
+\DoxyCodeLine{93         \textcolor{keywordflow}{if} (mesh.changing())}
+\DoxyCodeLine{94         \{}
+\DoxyCodeLine{95             lambda *= 0;}
+\DoxyCodeLine{96             HFDIBDEM.recreateBodies(lambda,refineF);}
+\DoxyCodeLine{97         \}}
+\DoxyCodeLine{98 }
+\DoxyCodeLine{99         Info << \textcolor{stringliteral}{"updating HFDIBDEM"} << endl;}
+\DoxyCodeLine{100 }
+\DoxyCodeLine{101         HFDIBDEM.postUpdateBodies(lambda,\mbox{\hyperlink{pEqn_8H_a633de4b0c14ca52ea2432a3c8a5c4c31}{f}});}
+\DoxyCodeLine{102 }
+\DoxyCodeLine{103         HFDIBDEM.addRemoveBodies(lambda,\mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}},refineF);}
+\DoxyCodeLine{104 }
+\DoxyCodeLine{105         HFDIBDEM.updateDEM(lambda,refineF);}
+\DoxyCodeLine{106 }
+\DoxyCodeLine{107         Info << \textcolor{stringliteral}{"updated HFDIBDEM"} << endl;}
+\DoxyCodeLine{108 }
+\DoxyCodeLine{109         runTime.write();}
+\DoxyCodeLine{110 }
+\DoxyCodeLine{111         \textcolor{keywordflow}{if}(runTime.outputTime())}
+\DoxyCodeLine{112         \{}
+\DoxyCodeLine{113             HFDIBDEM.writeBodiesInfo();}
+\DoxyCodeLine{114         \}}
+\DoxyCodeLine{115 }
+\DoxyCodeLine{116         Info<< \textcolor{stringliteral}{"ExecutionTime = "} << runTime.elapsedCpuTime() << \textcolor{stringliteral}{" s"}}
+\DoxyCodeLine{117             << \textcolor{stringliteral}{"  ClockTime = "} << runTime.elapsedClockTime() << \textcolor{stringliteral}{" s"}}
+\DoxyCodeLine{118             << nl << endl;}
+\DoxyCodeLine{119 }
+\DoxyCodeLine{120     \}}
+\DoxyCodeLine{121 }
+\DoxyCodeLine{122     Info<< \textcolor{stringliteral}{"End\(\backslash\)n"} << endl;}
+\DoxyCodeLine{123 }
+\DoxyCodeLine{124 }
+\DoxyCodeLine{125     \textcolor{keywordflow}{return} 0;}
+\DoxyCodeLine{126 \};}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 1

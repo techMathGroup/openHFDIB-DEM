@@ -1,0 +1,37 @@
+\hypertarget{HFDIBDEMFoam_2initialMeshRefinement_8H}{}\doxysection{application/solvers/\+H\+F\+D\+I\+B\+D\+E\+M\+Foam/initial\+Mesh\+Refinement.H File Reference}
+\label{HFDIBDEMFoam_2initialMeshRefinement_8H}\index{application/solvers/HFDIBDEMFoam/initialMeshRefinement.H@{application/solvers/HFDIBDEMFoam/initialMeshRefinement.H}}
+This graph shows which files directly or indirectly include this file\+:
+% FIG 0
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{HFDIBDEMFoam_2initialMeshRefinement_8H_af7eb6a9d368c8345a4ef313aec45a9c8}{for}} (label level=0;level$<$ \mbox{\hyperlink{pimpleHFDIBFoam_2readDynMeshDict_8H_ac859c2e889c56654339d73fa2b19cdae}{max\+Refinement\+Level}}+1;level++)
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{HFDIBDEMFoam_2initialMeshRefinement_8H_af7eb6a9d368c8345a4ef313aec45a9c8}\label{HFDIBDEMFoam_2initialMeshRefinement_8H_af7eb6a9d368c8345a4ef313aec45a9c8}} 
+\index{initialMeshRefinement.H@{initialMeshRefinement.H}!for@{for}}
+\index{for@{for}!initialMeshRefinement.H@{initialMeshRefinement.H}}
+\doxysubsubsection{\texorpdfstring{for()}{for()}}
+{\footnotesize\ttfamily for (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 1 of file initial\+Mesh\+Refinement.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{2 \{}
+\DoxyCodeLine{3     \textcolor{comment}{// update mesh}}
+\DoxyCodeLine{4     Info << \textcolor{stringliteral}{"Updating the mesh: initial refinment"} << endl;}
+\DoxyCodeLine{5     mesh.update();}
+\DoxyCodeLine{6 }
+\DoxyCodeLine{7     \textcolor{keywordflow}{if} (mesh.changing())}
+\DoxyCodeLine{8     \{                }
+\DoxyCodeLine{9         lambda *= 0;}
+\DoxyCodeLine{10         HFDIBDEM.recreateBodies(lambda,refineF);}
+\DoxyCodeLine{11     \}}
+\DoxyCodeLine{12 \}}
+
+\end{DoxyCode}

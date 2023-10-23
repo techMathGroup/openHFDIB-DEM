@@ -1,0 +1,30 @@
+digraph "Foam::prtSubContactInfo"
+{
+ // LATEX_PDF_SIZE
+  edge [fontname="Helvetica",fontsize="10",labelfontname="Helvetica",labelfontsize="10"];
+  node [fontname="Helvetica",fontsize="10",shape=record];
+  rankdir="LR";
+  Node1 [label="Foam::prtSubContactInfo",height=0.2,width=0.4,color="black", fillcolor="grey75", style="filled", fontcolor="black",tooltip=" "];
+  Node2 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" prtCntVars_" ];
+  Node2 [label="Foam::prtContactVars",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structFoam_1_1prtContactVars.html",tooltip=" "];
+  Node3 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" vmInfo_" ];
+  Node3 [label="std::shared_ptr\< Foam\l::virtualMeshInfo \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+  Node4 -> Node3 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" ptr" ];
+  Node4 [label="Foam::virtualMeshInfo",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structFoam_1_1virtualMeshInfo.html",tooltip=" "];
+  Node5 -> Node4 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" sV" ];
+  Node5 [label="Foam::subVolume",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$classFoam_1_1subVolume.html",tooltip=" "];
+  Node6 -> Node5 [dir="back",color="midnightblue",fontsize="10",style="solid"];
+  Node6 [label="treeBoundBox",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+  Node7 -> Node5 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" parentSV_" ];
+  Node7 [label="std::shared_ptr\< Foam\l::subVolume \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+  Node5 -> Node7 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" ptr" ];
+  Node8 -> Node7 [dir="back",color="orange",fontsize="10",style="dashed",label=" \< Foam::subVolume \>" ];
+  Node8 [label="std::shared_ptr\< T \>",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip="STL class."];
+  Node9 -> Node8 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" ptr" ];
+  Node9 [label="T",height=0.2,width=0.4,color="grey75", fillcolor="white", style="filled",tooltip=" "];
+  Node10 -> Node5 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" tVolumeInfo_\ncVolumeInfo_" ];
+  Node10 [label="Foam::ibSubVolumeInfo",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structFoam_1_1ibSubVolumeInfo.html",tooltip=" "];
+  Node8 -> Node3 [dir="back",color="orange",fontsize="10",style="dashed",label=" \< Foam::virtualMeshInfo \>" ];
+  Node11 -> Node1 [dir="back",color="darkorchid3",fontsize="10",style="dashed",label=" physicalProperties_" ];
+  Node11 [label="Foam::physicalProperties",height=0.2,width=0.4,color="black", fillcolor="white", style="filled",URL="$structFoam_1_1physicalProperties.html",tooltip=" "];
+}

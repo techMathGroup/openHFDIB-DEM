@@ -1,13 +1,13 @@
 #!/bin/sh
 
 # compile the solver
-cd application/pimpleHFDIBFoam
+cd application/solvers/pimpleHFDIBFoam
 wclean
 wmake
 cd ../..
 
 # compile the solver
-cd application/pimpleHFDIBFoam
+cd application/solvers/pimpleHFDIBFoam
 wclean
 wmake
 cd ../..

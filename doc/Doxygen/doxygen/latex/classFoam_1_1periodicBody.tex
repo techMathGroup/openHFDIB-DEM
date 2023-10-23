@@ -1,0 +1,2900 @@
+\hypertarget{classFoam_1_1periodicBody}{}\doxysection{Foam\+::periodic\+Body Class Reference}
+\label{classFoam_1_1periodicBody}\index{Foam::periodicBody@{Foam::periodicBody}}
+
+
+{\ttfamily \#include $<$periodic\+Body.\+H$>$}
+
+
+
+Inheritance diagram for Foam\+::periodic\+Body\+:
+% FIG 0
+
+
+Collaboration diagram for Foam\+::periodic\+Body\+:
+% FIG 1
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classFoam_1_1periodicBody_a07127587bf259042cee79260926c0745}{periodic\+Body}} (const fv\+Mesh \&mesh, scalar \mbox{\hyperlink{lnInclude_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}{thr\+Surf}}=1)
+\item 
+\mbox{\hyperlink{classFoam_1_1periodicBody_ab2865a89647918be9dbbba55e17de7c6}{$\sim$periodic\+Body}} ()
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \mbox{\hyperlink{classFoam_1_1periodicBody_ae8725d9f401aa89cbef163b8eaf42fc6}{get\+Copy}} () final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1periodicBody_a44e877e183e974b673ace242a7a6db23}{get\+Referenced\+Lists}} (List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ \&int\+Lists, List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ \&surf\+Lists, \mbox{\hyperlink{classFoam_1_1clusterBody_adbe26ef8a2b49b2b0d9983ef37f55700}{Dynamic\+Vector\+List}} \&reference\+CoM) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1periodicBody_af4937ab0375b443811302ec3d822b364}{body\+Move\+Points}} (vector transl\+Vec) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1periodicBody_a54b9e97642857a56c21a873675f1173c}{body\+Scale\+Points}} (scalar scale\+Fac) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1periodicBody_a0ebe193422701f4e4509692236e24625}{body\+Rotate\+Points}} (scalar rot\+Angle, vector axis\+Of\+Rot) final override
+\item 
+vector \mbox{\hyperlink{classFoam_1_1periodicBody_af735072f2fde5e00efafb044f5bf28ec}{get\+CoM}} () final override
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1periodicBody_a095ac8571f648f17f79f561eaf199069}{get\+DC}} () final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1periodicBody_ac0696cc1839d589fb0c6ca07bd662e7f}{set\+Owner}} () final override
+\item 
+label \mbox{\hyperlink{classFoam_1_1periodicBody_ac986b1b29da68eb89eb991e79a8a3d32}{get\+Owner}} () final override
+\item 
+scalar \& \mbox{\hyperlink{classFoam_1_1periodicBody_a54bd030a0a01eff1112454824a01e3a9}{get\+M0}} () final override
+\item 
+vector \mbox{\hyperlink{classFoam_1_1periodicBody_a3fd44174d25cfadf11cc943973e8e2e5}{get\+L\+Vec}} (const point \&to\+Point) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1periodicBody_a08c4d1e428e5a3174b2d8b8eadb6aa73}{add\+Body\+To\+Cluster}} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ body\+To\+Add)
+\item 
+bool \mbox{\hyperlink{classFoam_1_1periodicBody_ab850148f32333d2a857d92f21aa63be7}{should\+Be\+Unclustered}} ()
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \mbox{\hyperlink{classFoam_1_1periodicBody_aac959264aa4ebe5a6361113c5e55bc51}{get\+Rem\+Geom\+Model}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1periodicBody_a373d8d246d4feb7ab698e4086560733d}{write\+Body\+Info}} (label body\+Id, I\+Odictionary \&dict, word path) final override
+\item 
+\mbox{\hyperlink{classFoam_1_1periodicBody_a07127587bf259042cee79260926c0745}{periodic\+Body}} (const fv\+Mesh \&mesh, scalar \mbox{\hyperlink{lnInclude_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}{thr\+Surf}}=1)
+\item 
+\mbox{\hyperlink{classFoam_1_1periodicBody_ab2865a89647918be9dbbba55e17de7c6}{$\sim$periodic\+Body}} ()
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \mbox{\hyperlink{classFoam_1_1periodicBody_ae8725d9f401aa89cbef163b8eaf42fc6}{get\+Copy}} () final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1periodicBody_a95f4674344e0339219d4067e001c9f75}{get\+Referenced\+Lists}} (List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ \&int\+Lists, List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ \&surf\+Lists, \mbox{\hyperlink{classFoam_1_1clusterBody_adbe26ef8a2b49b2b0d9983ef37f55700}{Dynamic\+Vector\+List}} \&reference\+CoM) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1periodicBody_a769a72a9fdbfad122254fcde173cefe5}{body\+Move\+Points}} (vector transl\+Vec) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1periodicBody_a24a9215704b8598d77feafa59b3f4ed5}{body\+Scale\+Points}} (scalar scale\+Fac) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1periodicBody_a4984c100f315326df7efb20e1b22f82c}{body\+Rotate\+Points}} (scalar rot\+Angle, vector axis\+Of\+Rot) final override
+\item 
+vector \mbox{\hyperlink{classFoam_1_1periodicBody_a5c4dbd35ecee10083dc31e6810199c35}{get\+CoM}} () final override
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1periodicBody_a83c922830b0eff3a9c37e12ce79f7df3}{get\+DC}} () final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1periodicBody_a5a0e674b6b9ddb72956cb64f8252918d}{set\+Owner}} () final override
+\item 
+label \mbox{\hyperlink{classFoam_1_1periodicBody_a3df7b0f90e66e4219cd2b4508cf76ca8}{get\+Owner}} () final override
+\item 
+scalar \& \mbox{\hyperlink{classFoam_1_1periodicBody_a45223418d020ca3f861de732e4630387}{get\+M0}} () final override
+\item 
+vector \mbox{\hyperlink{classFoam_1_1periodicBody_a4bbc2c6a72b6e090dbf9f4099764c19d}{get\+L\+Vec}} (const point \&to\+Point) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1periodicBody_a08c4d1e428e5a3174b2d8b8eadb6aa73}{add\+Body\+To\+Cluster}} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ body\+To\+Add)
+\item 
+bool \mbox{\hyperlink{classFoam_1_1periodicBody_a697693a79417aa9607ede078076dfcbe}{should\+Be\+Unclustered}} ()
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \mbox{\hyperlink{classFoam_1_1periodicBody_a34a7f16322b7dace4239e24aade93850}{get\+Rem\+Geom\+Model}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1periodicBody_a373d8d246d4feb7ab698e4086560733d}{write\+Body\+Info}} (label body\+Id, I\+Odictionary \&dict, word path) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1clusterBody_a66826a7a0470436cbccc04baeff15f6f}{create\+Immersed\+Body}} (vol\+Scalar\+Field \&body, Field$<$ label $>$ \&octree\+Field, List$<$ label\+List $>$ \&cell\+Points) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1clusterBody_a2baa51effa54cf9f04e2b54976d315d8}{create\+Immersed\+Body}} (vol\+Scalar\+Field \&body, Field$<$ label $>$ \&octree\+Field, List$<$ label\+List $>$ \&cell\+Points) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1clusterBody_ac4ebc25dfa355d2cc30c7f5f49136dad}{update\+Surf\+List}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1clusterBody_a51c43a33ebeb39b849fc2369ea9d23dd}{update\+Surf\+List}} ()
+\item 
+virtual List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ \& \mbox{\hyperlink{classFoam_1_1clusterBody_a09de9c5ee58ee18c05907d45c0ad26c9}{get\+Surface\+Cell\+List}} () final override
+\item 
+virtual List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ \& \mbox{\hyperlink{classFoam_1_1clusterBody_a09de9c5ee58ee18c05907d45c0ad26c9}{get\+Surface\+Cell\+List}} () final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1clusterBody_aaffbab47c8ec04f8dab6867fdcf79a54}{update\+Int\+List}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1clusterBody_a1aa28c2d82c3a99aff528b2e7545af1c}{update\+Int\+List}} ()
+\item 
+virtual List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ \& \mbox{\hyperlink{classFoam_1_1clusterBody_ad93c55a4c082d9396f911fcece14724c}{get\+Internal\+Cell\+List}} () final override
+\item 
+virtual List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ \& \mbox{\hyperlink{classFoam_1_1clusterBody_ad93c55a4c082d9396f911fcece14724c}{get\+Internal\+Cell\+List}} () final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1clusterBody_acca6e9371fc30897701508ddbfda3814}{calculate\+Geometrical\+Properties}} (vol\+Scalar\+Field \&body) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1clusterBody_a273d13edbdc81432b858b824f7712512}{calculate\+Geometrical\+Properties}} (vol\+Scalar\+Field \&body) final override
+\item 
+bound\+Box \mbox{\hyperlink{classFoam_1_1clusterBody_aa4b4748f6ff27d599b74fcca17eed50d}{get\+Bounds}} () final override
+\item 
+bound\+Box \mbox{\hyperlink{classFoam_1_1clusterBody_a9658c787a82ab8bc5d8e3abcda68388f}{get\+Bounds}} () final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1clusterBody_a8bddae3fdb2e208bf03f24ff4ce06884}{synchron\+Pos}} (label owner=-\/1) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1clusterBody_a79b6e74834110dfebaa8d4fb1bfd61ef}{synchron\+Pos}} (label owner=-\/1) final override
+\item 
+bool\+List \mbox{\hyperlink{classFoam_1_1clusterBody_a6abe410f94c00e7214be907f6ab573af}{point\+Inside}} (point\+Field pointI) final override
+\item 
+bool \mbox{\hyperlink{classFoam_1_1clusterBody_a4e82f0163f50edd2fc646ca4fddc48b5}{point\+Inside}} (point pointI) final override
+\item 
+bool\+List \mbox{\hyperlink{classFoam_1_1clusterBody_afb1520ac78ec99d2d7c6ab82d5eafcb1}{point\+Inside}} (point\+Field pointI) final override
+\item 
+bool \mbox{\hyperlink{classFoam_1_1clusterBody_a3683e91af120b4ec18f2e2a4654b7d27}{point\+Inside}} (point pointI) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1clusterBody_abd6a50cb1d59325660d1cd908490831f}{get\+Closest\+Point\+And\+Normal}} (const point \&start\+Point, const vector \&span, point \&closest\+Point, vector \&normal) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1clusterBody_a6509ac6f23b79c5c5c0999aacfdbf1ff}{get\+Closest\+Point\+And\+Normal}} (const point \&start\+Point, const vector \&span, point \&closest\+Point, vector \&normal) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1clusterBody_a0ac4f028dd85e3e490875ada874bc9c7}{reset\+Body}} (vol\+Scalar\+Field \&body) final override
+\item 
+void \mbox{\hyperlink{classFoam_1_1clusterBody_a4207fb37a3127a55f38b0dc965c82ca4}{reset\+Body}} (vol\+Scalar\+Field \&body) final override
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1geomModel_a6cda919dd59a8c7b1fbc012a7c8d58de}{reset\+Body}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1clusterBody_a31148673e1624bd4beb163feceb71ce4}{is\+Cluster}} () const final override
+\item 
+bool \mbox{\hyperlink{classFoam_1_1clusterBody_a31148673e1624bd4beb163feceb71ce4}{is\+Cluster}} () const final override
+\item 
+std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ $>$ \& \mbox{\hyperlink{classFoam_1_1clusterBody_a284f52a30ebda31d578267f12c902225}{get\+Cluster\+Bodies}} ()
+\item 
+std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ $>$ \& \mbox{\hyperlink{classFoam_1_1clusterBody_a284f52a30ebda31d578267f12c902225}{get\+Cluster\+Bodies}} ()
+\item 
+List$<$ std\+::shared\+\_\+ptr$<$ bound\+Box $>$ $>$ \mbox{\hyperlink{classFoam_1_1clusterBody_a312681bc1e1646b4375d7c00a7dd01e9}{get\+B\+Boxes}} () final override
+\item 
+List$<$ std\+::shared\+\_\+ptr$<$ bound\+Box $>$ $>$ \mbox{\hyperlink{classFoam_1_1clusterBody_a74f3b902bd4e8d1661834288ed9ce0e2}{get\+B\+Boxes}} () final override
+\item 
+virtual vector \mbox{\hyperlink{classFoam_1_1geomModel_ab42cfec6996dae0cf24014076ca6d9d0}{add\+Model\+Return\+Random\+Position}} (const bool all\+Active\+Cells\+In\+Mesh, const bound\+Box cell\+Zone\+Bounds, Random \&rand\+Gen)
+\item 
+virtual vector \mbox{\hyperlink{classFoam_1_1geomModel_ab42cfec6996dae0cf24014076ca6d9d0}{add\+Model\+Return\+Random\+Position}} (const bool all\+Active\+Cells\+In\+Mesh, const bound\+Box cell\+Zone\+Bounds, Random \&rand\+Gen)
+\item 
+virtual volume\+Type \mbox{\hyperlink{classFoam_1_1geomModel_ab177b3ff0fb1f3443ef7344b02f1a5c5}{get\+Volume\+Type}} (\mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&sv, bool c\+Ib)
+\item 
+virtual volume\+Type \mbox{\hyperlink{classFoam_1_1geomModel_ab177b3ff0fb1f3443ef7344b02f1a5c5}{get\+Volume\+Type}} (\mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&sv, bool c\+Ib)
+\item 
+virtual bool \mbox{\hyperlink{classFoam_1_1geomModel_ab697fc599a50c583d12d5a0397cecbcd}{limit\+Final\+Sub\+Volume}} (const \mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&sv, bool c\+Ib, bound\+Box \&lim\+B\+Box)
+\item 
+virtual bool \mbox{\hyperlink{classFoam_1_1geomModel_ab697fc599a50c583d12d5a0397cecbcd}{limit\+Final\+Sub\+Volume}} (const \mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&sv, bool c\+Ib, bound\+Box \&lim\+B\+Box)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1geomModel_a17bd0e3467c49d455a0791e05a569c7e}{set\+CoM}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1geomModel_a17bd0e3467c49d455a0791e05a569c7e}{set\+CoM}} ()
+\item 
+constexpr \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}} \mbox{\hyperlink{classFoam_1_1geomModel_aad4760c95591b65260efb023cdbbe862}{getc\+Type}} ()
+\item 
+constexpr \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}} \mbox{\hyperlink{classFoam_1_1geomModel_aad4760c95591b65260efb023cdbbe862}{getc\+Type}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_ad19f0d607ed84fec9e970babbdc65c69}{set\+Int\+Span}} (scalar int\+Span)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_ad19f0d607ed84fec9e970babbdc65c69}{set\+Int\+Span}} (scalar int\+Span)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_ae706c318abc2f5e3235079dc5e7ac589}{set\+Sd\+Based\+Lambda}} (bool sd\+Based\+Lambda)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_ae706c318abc2f5e3235079dc5e7ac589}{set\+Sd\+Based\+Lambda}} (bool sd\+Based\+Lambda)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a3775030dc1986b062cb970ee223fefbc}{reset\+Hash\+Table}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a3775030dc1986b062cb970ee223fefbc}{reset\+Hash\+Table}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1geomModel_abf9695a07f2526a7f82876f187064ddd}{set\+RhoS}} (dimensioned\+Scalar rhoS)
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1geomModel_abf9695a07f2526a7f82876f187064ddd}{set\+RhoS}} (dimensioned\+Scalar rhoS)
+\item 
+dimensioned\+Scalar \mbox{\hyperlink{classFoam_1_1geomModel_a229602a6b70a689ef42cf29ff4acf562}{get\+RhoS}} ()
+\item 
+const dimensioned\+Scalar \mbox{\hyperlink{classFoam_1_1geomModel_ac1f313551c2851a6e1768d14655f72a7}{get\+RhoS}} () const
+\item 
+dimensioned\+Scalar \mbox{\hyperlink{classFoam_1_1geomModel_a229602a6b70a689ef42cf29ff4acf562}{get\+RhoS}} ()
+\item 
+const dimensioned\+Scalar \mbox{\hyperlink{classFoam_1_1geomModel_ac1f313551c2851a6e1768d14655f72a7}{get\+RhoS}} () const
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a78b35514e8fb42ef184151793fc682ae}{add\+To\+M\+AndI}} (vol\+Scalar\+Field \&body, \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} \&label\+Cell\+Lst)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a0988d518013ea7bf538c0bb3e1101dc8}{add\+To\+M\+AndI}} (vol\+Scalar\+Field \&body, \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} \&label\+Cell\+Lst)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a042ae896c576123625e3e95f7d5d9d12}{compute\+Body\+Char\+Pars}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_aa70f4110771a869f21150381c7a23ae2}{compute\+Body\+Char\+Pars}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a190730c769a08da099c0b3e6431f8e49}{set\+M0}} (scalar M0)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a190730c769a08da099c0b3e6431f8e49}{set\+M0}} (scalar M0)
+\item 
+scalar \& \mbox{\hyperlink{classFoam_1_1geomModel_afd93801223f4b6e952aa04998d40a071}{getM}} ()
+\item 
+scalar \& \mbox{\hyperlink{classFoam_1_1geomModel_afd93801223f4b6e952aa04998d40a071}{getM}} ()
+\item 
+label \& \mbox{\hyperlink{classFoam_1_1geomModel_a7e89b7437f109aa4b4b35beafd652e36}{get\+N\+Cells}} ()
+\item 
+label \& \mbox{\hyperlink{classFoam_1_1geomModel_a7e89b7437f109aa4b4b35beafd652e36}{get\+N\+Cells}} ()
+\item 
+const symm\+Tensor \& \mbox{\hyperlink{classFoam_1_1geomModel_a0c1d8add88e024a00e7c06bba1759d0d}{getI}} () const
+\item 
+const symm\+Tensor \& \mbox{\hyperlink{classFoam_1_1geomModel_a0c1d8add88e024a00e7c06bba1759d0d}{getI}} () const
+\item 
+virtual bool \mbox{\hyperlink{classFoam_1_1geomModel_ab16c2f0c72731bd72b5ef986caa59aca}{check\+Cluster}} ()
+\item 
+virtual bool \mbox{\hyperlink{classFoam_1_1geomModel_ab16c2f0c72731bd72b5ef986caa59aca}{check\+Cluster}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1geomModel_ae19a2a210bb56448efd7a13deb57d2de}{is\+B\+Box\+In\+Mesh}} ()
+\item 
+bool \mbox{\hyperlink{classFoam_1_1geomModel_a5eafedc05ddd80d72bdfa9b3a51348ff}{is\+B\+Box\+In\+Mesh}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} \mbox{\hyperlink{classFoam_1_1geomModel_ad70ce9fe3e452b1533ca8d3b2a7cfd91}{get\+Potent\+Surf\+Cells}} (vol\+Scalar\+Field \&body, Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&cell\+Inside, List$<$ label\+List $>$ \&cell\+Points)
+\item 
+\mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} \mbox{\hyperlink{classFoam_1_1geomModel_adac6a242f418325a86bac3808e05b9b0}{get\+Potent\+Surf\+Cells}} (vol\+Scalar\+Field \&body, Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&cell\+Inside, List$<$ label\+List $>$ \&cell\+Points)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a1604b32ba5ccb8eb76504f02adeebb11}{correct\+Surf\+Cells}} (vol\+Scalar\+Field \&body, \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} \&potent\+Surf\+Cells, Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&cell\+Inside, List$<$ label\+List $>$ \&cell\+Points)
+\item 
+void \mbox{\hyperlink{classFoam_1_1geomModel_a8ea6becb3a92ac731f4995e163ee12ed}{correct\+Surf\+Cells}} (vol\+Scalar\+Field \&body, \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} \&potent\+Surf\+Cells, Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&cell\+Inside, List$<$ label\+List $>$ \&cell\+Points)
+\item 
+virtual point\+Field \mbox{\hyperlink{classFoam_1_1geomModel_a21fdbb9bd4dbc303d044e9f27b0550b1}{get\+S\+T\+L\+Body\+Points}} ()
+\item 
+virtual point\+Field \mbox{\hyperlink{classFoam_1_1geomModel_a21fdbb9bd4dbc303d044e9f27b0550b1}{get\+S\+T\+L\+Body\+Points}} ()
+\item 
+virtual face\+List \mbox{\hyperlink{classFoam_1_1geomModel_a79bdd5bab087e4be43e7ad0e7c2a64d9}{get\+S\+T\+L\+Faces}} ()
+\item 
+virtual face\+List \mbox{\hyperlink{classFoam_1_1geomModel_a79bdd5bab087e4be43e7ad0e7c2a64d9}{get\+S\+T\+L\+Faces}} ()
+\item 
+virtual point\+Field \mbox{\hyperlink{classFoam_1_1geomModel_ab73ae4069d204dc18f9dedfab029744e}{get\+S\+T\+L\+Face\+Point}} (label face\+ID)
+\item 
+virtual point\+Field \mbox{\hyperlink{classFoam_1_1geomModel_ab73ae4069d204dc18f9dedfab029744e}{get\+S\+T\+L\+Face\+Point}} (label face\+ID)
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ $>$ \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ib\+Geom\+Model\+List}}
+\item 
+const fv\+Mesh \& \mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\+\_\+}}
+\item 
+List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surf\+Cells\+\_\+}}
+\item 
+List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{int\+Cells\+\_\+}}
+\item 
+\mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} \mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ib\+Partial\+Volume\+\_\+}}
+\item 
+label \mbox{\hyperlink{classFoam_1_1geomModel_a6beec229c26dadc133ad0514ed0898f7}{owner\+\_\+}}
+\item 
+label \mbox{\hyperlink{classFoam_1_1geomModel_afba8bac78aa8199c348d643fb6ab6606}{cell\+To\+Start\+In\+Create\+I\+B\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1geomModel_aec695437242a0c3e79ddd50ea51478dd}{thr\+Surf\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1geomModel_a220b3e2c2a2e5dd60115dad2bff40a85}{int\+Span\+\_\+}}
+\item 
+bool \mbox{\hyperlink{classFoam_1_1geomModel_ae983de88f0feab99a34a6a6d1af8d744}{sd\+Based\+Lambda\+\_\+}}
+\item 
+bound\+Box \mbox{\hyperlink{classFoam_1_1geomModel_ac9646442904ddf5e6eeefbf6c640dc83}{cur\+Mesh\+Bounds\+\_\+}}
+\item 
+auto\+Ptr$<$ Hash\+Table$<$ const label\+List \&, label, Hash$<$ label $>$ $>$ $>$ \mbox{\hyperlink{classFoam_1_1geomModel_a11167d3f48311fa265c662e4880d1de2}{cached\+Neighbours\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}{M\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1geomModel_ab0cbe345c5e98c54e43e868a5b2f0f92}{M0\+\_\+}}
+\item 
+label \mbox{\hyperlink{classFoam_1_1geomModel_a164a9b5ae11beefcf8af797f331e2b1e}{n\+Cells\+\_\+}}
+\item 
+vector \mbox{\hyperlink{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}{Co\+M\+\_\+}}
+\item 
+symm\+Tensor \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\+\_\+}}
+\item 
+std\+::shared\+\_\+ptr$<$ bound\+Box $>$ \mbox{\hyperlink{classFoam_1_1geomModel_a393b0094bd325f353d7b9ca518da6c76}{b\+Box\+\_\+}}
+\item 
+scalar \mbox{\hyperlink{classFoam_1_1geomModel_a5038a5a3ebb7cb4992c894387203bc4d}{d\+C\+\_\+}}
+\item 
+dimensioned\+Scalar \mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rho\+S\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1periodicBody_a047ef2245c81f0a57fd0c5e72e7de170}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1periodicBody_abfcc4cfd5550070edcb9a6838f0e6ce7}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1periodicBody_a4e98b418e3297287c6fe5314a6162b41}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1periodicBody_a8f8a14046c4834fd634cb80ad4b423f0}{Dynamic\+Point\+List}}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1periodicBody_a047ef2245c81f0a57fd0c5e72e7de170}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1periodicBody_abfcc4cfd5550070edcb9a6838f0e6ce7}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1periodicBody_a4e98b418e3297287c6fe5314a6162b41}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1periodicBody_a8f8a14046c4834fd634cb80ad4b423f0}{Dynamic\+Point\+List}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}} \mbox{\hyperlink{classFoam_1_1geomModel_ad88bb1c51f58fe353e3899e175dca2b9}{contact\+Type\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 47 of file periodic\+Body.\+H.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a047ef2245c81f0a57fd0c5e72e7de170}\label{classFoam_1_1periodicBody_a047ef2245c81f0a57fd0c5e72e7de170}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1periodicBody_a047ef2245c81f0a57fd0c5e72e7de170}{Foam\+::periodic\+Body\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 53 of file periodic\+Body.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a047ef2245c81f0a57fd0c5e72e7de170}\label{classFoam_1_1periodicBody_a047ef2245c81f0a57fd0c5e72e7de170}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1periodicBody_a047ef2245c81f0a57fd0c5e72e7de170}{Foam\+::periodic\+Body\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 53 of file periodic\+Body.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a8f8a14046c4834fd634cb80ad4b423f0}\label{classFoam_1_1periodicBody_a8f8a14046c4834fd634cb80ad4b423f0}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1periodicBody_a8f8a14046c4834fd634cb80ad4b423f0}{Foam\+::periodic\+Body\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 56 of file periodic\+Body.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a8f8a14046c4834fd634cb80ad4b423f0}\label{classFoam_1_1periodicBody_a8f8a14046c4834fd634cb80ad4b423f0}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1periodicBody_a8f8a14046c4834fd634cb80ad4b423f0}{Foam\+::periodic\+Body\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 56 of file periodic\+Body.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_abfcc4cfd5550070edcb9a6838f0e6ce7}\label{classFoam_1_1periodicBody_abfcc4cfd5550070edcb9a6838f0e6ce7}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1periodicBody_abfcc4cfd5550070edcb9a6838f0e6ce7}{Foam\+::periodic\+Body\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 54 of file periodic\+Body.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_abfcc4cfd5550070edcb9a6838f0e6ce7}\label{classFoam_1_1periodicBody_abfcc4cfd5550070edcb9a6838f0e6ce7}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1periodicBody_abfcc4cfd5550070edcb9a6838f0e6ce7}{Foam\+::periodic\+Body\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 54 of file periodic\+Body.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a4e98b418e3297287c6fe5314a6162b41}\label{classFoam_1_1periodicBody_a4e98b418e3297287c6fe5314a6162b41}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1periodicBody_a4e98b418e3297287c6fe5314a6162b41}{Foam\+::periodic\+Body\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 55 of file periodic\+Body.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a4e98b418e3297287c6fe5314a6162b41}\label{classFoam_1_1periodicBody_a4e98b418e3297287c6fe5314a6162b41}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1periodicBody_a4e98b418e3297287c6fe5314a6162b41}{Foam\+::periodic\+Body\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 55 of file periodic\+Body.\+H.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a07127587bf259042cee79260926c0745}\label{classFoam_1_1periodicBody_a07127587bf259042cee79260926c0745}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!periodicBody@{periodicBody}}
+\index{periodicBody@{periodicBody}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{periodicBody()}{periodicBody()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Foam\+::periodic\+Body\+::periodic\+Body (\begin{DoxyParamCaption}\item[{const fv\+Mesh \&}]{mesh,  }\item[{scalar}]{thr\+Surf = {\ttfamily 1} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 65 of file periodic\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{69         :}
+\DoxyCodeLine{70         \mbox{\hyperlink{classFoam_1_1clusterBody_a5d74c52604d4824941453d0266fcb9fd}{clusterBody}}}
+\DoxyCodeLine{71         (}
+\DoxyCodeLine{72             mesh,}
+\DoxyCodeLine{73             \mbox{\hyperlink{addModels_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}{thrSurf}}}
+\DoxyCodeLine{74         )}
+\DoxyCodeLine{75         \{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_ab2865a89647918be9dbbba55e17de7c6}\label{classFoam_1_1periodicBody_ab2865a89647918be9dbbba55e17de7c6}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!````~periodicBody@{$\sim$periodicBody}}
+\index{````~periodicBody@{$\sim$periodicBody}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{$\sim$periodicBody()}{~periodicBody()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Foam\+::periodic\+Body\+::$\sim$periodic\+Body (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 78 of file periodic\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{78 \{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a07127587bf259042cee79260926c0745}\label{classFoam_1_1periodicBody_a07127587bf259042cee79260926c0745}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!periodicBody@{periodicBody}}
+\index{periodicBody@{periodicBody}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{periodicBody()}{periodicBody()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::periodic\+Body\+::periodic\+Body (\begin{DoxyParamCaption}\item[{const fv\+Mesh \&}]{mesh,  }\item[{scalar}]{thr\+Surf = {\ttfamily 1} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 65 of file periodic\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{69         :}
+\DoxyCodeLine{70         \mbox{\hyperlink{classFoam_1_1clusterBody_a5d74c52604d4824941453d0266fcb9fd}{clusterBody}}}
+\DoxyCodeLine{71         (}
+\DoxyCodeLine{72             mesh,}
+\DoxyCodeLine{73             \mbox{\hyperlink{addModels_2initializeAddModels_8H_a12947c9cf4cff46d3d0a324e3e718f45}{thrSurf}}}
+\DoxyCodeLine{74         )}
+\DoxyCodeLine{75         \{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_ab2865a89647918be9dbbba55e17de7c6}\label{classFoam_1_1periodicBody_ab2865a89647918be9dbbba55e17de7c6}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!````~periodicBody@{$\sim$periodicBody}}
+\index{````~periodicBody@{$\sim$periodicBody}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{$\sim$periodicBody()}{~periodicBody()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::periodic\+Body\+::$\sim$periodic\+Body (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 78 of file periodic\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{78 \{\}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a08c4d1e428e5a3174b2d8b8eadb6aa73}\label{classFoam_1_1periodicBody_a08c4d1e428e5a3174b2d8b8eadb6aa73}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!addBodyToCluster@{addBodyToCluster}}
+\index{addBodyToCluster@{addBodyToCluster}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{addBodyToCluster()}{addBodyToCluster()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::periodic\+Body\+::add\+Body\+To\+Cluster (\begin{DoxyParamCaption}\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$}]{body\+To\+Add }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 129 of file periodic\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{130         \{}
+\DoxyCodeLine{131             \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.push\_back(std::move(bodyToAdd));}
+\DoxyCodeLine{132         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 2
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a08c4d1e428e5a3174b2d8b8eadb6aa73}\label{classFoam_1_1periodicBody_a08c4d1e428e5a3174b2d8b8eadb6aa73}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!addBodyToCluster@{addBodyToCluster}}
+\index{addBodyToCluster@{addBodyToCluster}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{addBodyToCluster()}{addBodyToCluster()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::periodic\+Body\+::add\+Body\+To\+Cluster (\begin{DoxyParamCaption}\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$}]{body\+To\+Add }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 129 of file periodic\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{130         \{}
+\DoxyCodeLine{131             \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.push\_back(std::move(bodyToAdd));}
+\DoxyCodeLine{132         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab42cfec6996dae0cf24014076ca6d9d0}\label{classFoam_1_1geomModel_ab42cfec6996dae0cf24014076ca6d9d0}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!addModelReturnRandomPosition@{addModelReturnRandomPosition}}
+\index{addModelReturnRandomPosition@{addModelReturnRandomPosition}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{addModelReturnRandomPosition()}{addModelReturnRandomPosition()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual vector Foam\+::geom\+Model\+::add\+Model\+Return\+Random\+Position (\begin{DoxyParamCaption}\item[{const bool}]{all\+Active\+Cells\+In\+Mesh,  }\item[{const bound\+Box}]{cell\+Zone\+Bounds,  }\item[{Random \&}]{rand\+Gen }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_a66957c296d35e84b2db9c09870f7f3ff}{Foam\+::stl\+Based}}, \mbox{\hyperlink{classFoam_1_1stlBased_ab2bfae5bda4716f50ec3aa87d79d4eb7}{Foam\+::stl\+Based}}, \mbox{\hyperlink{classFoam_1_1shapeBased_a4f97e65316cb5abc431e94529510886c}{Foam\+::shape\+Based}}, and \mbox{\hyperlink{classFoam_1_1shapeBased_a922aeacfed27d9eb577186879fb22089}{Foam\+::shape\+Based}}.
+
+
+
+Definition at line 179 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{184         \{}
+\DoxyCodeLine{185             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"2-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{186                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{187             \textcolor{keywordflow}{return} vector::zero;}
+\DoxyCodeLine{188         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab42cfec6996dae0cf24014076ca6d9d0}\label{classFoam_1_1geomModel_ab42cfec6996dae0cf24014076ca6d9d0}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!addModelReturnRandomPosition@{addModelReturnRandomPosition}}
+\index{addModelReturnRandomPosition@{addModelReturnRandomPosition}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{addModelReturnRandomPosition()}{addModelReturnRandomPosition()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual vector Foam\+::geom\+Model\+::add\+Model\+Return\+Random\+Position (\begin{DoxyParamCaption}\item[{const bool}]{all\+Active\+Cells\+In\+Mesh,  }\item[{const bound\+Box}]{cell\+Zone\+Bounds,  }\item[{Random \&}]{rand\+Gen }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_a66957c296d35e84b2db9c09870f7f3ff}{Foam\+::stl\+Based}}, \mbox{\hyperlink{classFoam_1_1stlBased_ab2bfae5bda4716f50ec3aa87d79d4eb7}{Foam\+::stl\+Based}}, \mbox{\hyperlink{classFoam_1_1shapeBased_a4f97e65316cb5abc431e94529510886c}{Foam\+::shape\+Based}}, and \mbox{\hyperlink{classFoam_1_1shapeBased_a922aeacfed27d9eb577186879fb22089}{Foam\+::shape\+Based}}.
+
+
+
+Definition at line 179 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{184         \{}
+\DoxyCodeLine{185             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"2-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{186                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{187             \textcolor{keywordflow}{return} vector::zero;}
+\DoxyCodeLine{188         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a78b35514e8fb42ef184151793fc682ae}\label{classFoam_1_1geomModel_a78b35514e8fb42ef184151793fc682ae}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!addToMAndI@{addToMAndI}}
+\index{addToMAndI@{addToMAndI}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{addToMAndI()}{addToMAndI()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void geom\+Model\+::add\+To\+M\+AndI (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \&}]{label\+Cell\+Lst }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 101 of file geom\+Model.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{105 \{}
+\DoxyCodeLine{106     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (labelCellLst,cell)}
+\DoxyCodeLine{107     \{}
+\DoxyCodeLine{108         label cellI  = labelCellLst[cell];}
+\DoxyCodeLine{109 }
+\DoxyCodeLine{110         scalar Mi    = body[cellI]*\mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rhoS\_}}.value()*\mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}}.V()[cellI];}
+\DoxyCodeLine{111         \textcolor{comment}{// add to M\_}}
+\DoxyCodeLine{112 }
+\DoxyCodeLine{113         \mbox{\hyperlink{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}{M\_}}      += Mi;}
+\DoxyCodeLine{114         scalar xLoc = \mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}}.C()[cellI].x() -\/ \mbox{\hyperlink{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}{CoM\_}}.x();}
+\DoxyCodeLine{115         scalar yLoc = \mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}}.C()[cellI].y() -\/ \mbox{\hyperlink{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}{CoM\_}}.y();}
+\DoxyCodeLine{116         scalar zLoc = \mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}}.C()[cellI].z() -\/ \mbox{\hyperlink{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}{CoM\_}}.z();}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118         \textcolor{comment}{// add to I\_}}
+\DoxyCodeLine{119         \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}}.xx() += Mi*(yLoc*yLoc + zLoc*zLoc);}
+\DoxyCodeLine{120         \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}}.yy() += Mi*(xLoc*xLoc + zLoc*zLoc);}
+\DoxyCodeLine{121         \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}}.zz() += Mi*(xLoc*xLoc + yLoc*yLoc);}
+\DoxyCodeLine{122 }
+\DoxyCodeLine{123         \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}}.xy() -\/= Mi*(xLoc*yLoc);}
+\DoxyCodeLine{124         \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}}.xz() -\/= Mi*(xLoc*zLoc);}
+\DoxyCodeLine{125         \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}}.yz() -\/= Mi*(yLoc*zLoc);}
+\DoxyCodeLine{126     \}}
+\DoxyCodeLine{127 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 3
+\mbox{\Hypertarget{classFoam_1_1geomModel_a0988d518013ea7bf538c0bb3e1101dc8}\label{classFoam_1_1geomModel_a0988d518013ea7bf538c0bb3e1101dc8}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!addToMAndI@{addToMAndI}}
+\index{addToMAndI@{addToMAndI}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{addToMAndI()}{addToMAndI()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::add\+To\+M\+AndI (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \&}]{label\+Cell\+Lst }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a769a72a9fdbfad122254fcde173cefe5}\label{classFoam_1_1periodicBody_a769a72a9fdbfad122254fcde173cefe5}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!bodyMovePoints@{bodyMovePoints}}
+\index{bodyMovePoints@{bodyMovePoints}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{bodyMovePoints()}{bodyMovePoints()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::periodic\+Body\+::body\+Move\+Points (\begin{DoxyParamCaption}\item[{vector}]{transl\+Vec }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_a48f821ad4e60e54850fcc7f0ec9b6736}{Foam\+::cluster\+Body}}.
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_af4937ab0375b443811302ec3d822b364}\label{classFoam_1_1periodicBody_af4937ab0375b443811302ec3d822b364}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!bodyMovePoints@{bodyMovePoints}}
+\index{bodyMovePoints@{bodyMovePoints}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{bodyMovePoints()}{bodyMovePoints()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void periodic\+Body\+::body\+Move\+Points (\begin{DoxyParamCaption}\item[{vector}]{transl\+Vec }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_a48f821ad4e60e54850fcc7f0ec9b6736}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 62 of file periodic\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{65 \{}
+\DoxyCodeLine{66     \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{67     \{}
+\DoxyCodeLine{68         gModel-\/>bodyMovePoints(translVec);}
+\DoxyCodeLine{69     \}}
+\DoxyCodeLine{70 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a0ebe193422701f4e4509692236e24625}\label{classFoam_1_1periodicBody_a0ebe193422701f4e4509692236e24625}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!bodyRotatePoints@{bodyRotatePoints}}
+\index{bodyRotatePoints@{bodyRotatePoints}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{bodyRotatePoints()}{bodyRotatePoints()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void periodic\+Body\+::body\+Rotate\+Points (\begin{DoxyParamCaption}\item[{scalar}]{rot\+Angle,  }\item[{vector}]{axis\+Of\+Rot }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_a756ea747af1a25af35a840828b90216d}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 84 of file periodic\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{88 \{}
+\DoxyCodeLine{89     \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{90     \{}
+\DoxyCodeLine{91         gModel-\/>bodyRotatePoints(rotAngle, axisOfRot);}
+\DoxyCodeLine{92     \}}
+\DoxyCodeLine{93 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a4984c100f315326df7efb20e1b22f82c}\label{classFoam_1_1periodicBody_a4984c100f315326df7efb20e1b22f82c}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!bodyRotatePoints@{bodyRotatePoints}}
+\index{bodyRotatePoints@{bodyRotatePoints}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{bodyRotatePoints()}{bodyRotatePoints()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::periodic\+Body\+::body\+Rotate\+Points (\begin{DoxyParamCaption}\item[{scalar}]{rot\+Angle,  }\item[{vector}]{axis\+Of\+Rot }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_a756ea747af1a25af35a840828b90216d}{Foam\+::cluster\+Body}}.
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a24a9215704b8598d77feafa59b3f4ed5}\label{classFoam_1_1periodicBody_a24a9215704b8598d77feafa59b3f4ed5}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!bodyScalePoints@{bodyScalePoints}}
+\index{bodyScalePoints@{bodyScalePoints}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{bodyScalePoints()}{bodyScalePoints()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::periodic\+Body\+::body\+Scale\+Points (\begin{DoxyParamCaption}\item[{scalar}]{scale\+Fac }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_a650bd3aad87dbe18e1d46390244c4bbc}{Foam\+::cluster\+Body}}.
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a54b9e97642857a56c21a873675f1173c}\label{classFoam_1_1periodicBody_a54b9e97642857a56c21a873675f1173c}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!bodyScalePoints@{bodyScalePoints}}
+\index{bodyScalePoints@{bodyScalePoints}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{bodyScalePoints()}{bodyScalePoints()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void periodic\+Body\+::body\+Scale\+Points (\begin{DoxyParamCaption}\item[{scalar}]{scale\+Fac }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_a650bd3aad87dbe18e1d46390244c4bbc}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 73 of file periodic\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{76 \{}
+\DoxyCodeLine{77     \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{78     \{}
+\DoxyCodeLine{79         gModel-\/>bodyScalePoints(scaleFac);}
+\DoxyCodeLine{80     \}}
+\DoxyCodeLine{81 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1clusterBody_acca6e9371fc30897701508ddbfda3814}\label{classFoam_1_1clusterBody_acca6e9371fc30897701508ddbfda3814}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!calculateGeometricalProperties@{calculateGeometricalProperties}}
+\index{calculateGeometricalProperties@{calculateGeometricalProperties}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{calculateGeometricalProperties()}{calculateGeometricalProperties()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void cluster\+Body\+::calculate\+Geometrical\+Properties (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a4b52faf7083a8ee52fc6a7b6c4c43439}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 82 of file cluster\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{85 \{}
+\DoxyCodeLine{86     \mbox{\hyperlink{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}{M\_}}      = scalar(0);}
+\DoxyCodeLine{87     \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}}      = symmTensor::zero;}
+\DoxyCodeLine{88 }
+\DoxyCodeLine{89     \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{90     \{}
+\DoxyCodeLine{91         gModel-\/>calculateGeometricalProperties(body);}
+\DoxyCodeLine{92         \mbox{\hyperlink{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}{M\_}} += gModel-\/>getM();}
+\DoxyCodeLine{93         \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}} += gModel-\/>getI();}
+\DoxyCodeLine{94     \}}
+\DoxyCodeLine{95 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a273d13edbdc81432b858b824f7712512}\label{classFoam_1_1clusterBody_a273d13edbdc81432b858b824f7712512}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!calculateGeometricalProperties@{calculateGeometricalProperties}}
+\index{calculateGeometricalProperties@{calculateGeometricalProperties}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{calculateGeometricalProperties()}{calculateGeometricalProperties()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::cluster\+Body\+::calculate\+Geometrical\+Properties (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a4b52faf7083a8ee52fc6a7b6c4c43439}{Foam\+::geom\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab16c2f0c72731bd72b5ef986caa59aca}\label{classFoam_1_1geomModel_ab16c2f0c72731bd72b5ef986caa59aca}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!checkCluster@{checkCluster}}
+\index{checkCluster@{checkCluster}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{checkCluster()}{checkCluster()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual bool Foam\+::geom\+Model\+::check\+Cluster (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 388 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{389         \{}
+\DoxyCodeLine{390             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"17-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{391                 << \textcolor{stringliteral}{"not cluster model"}<<endl;}
+\DoxyCodeLine{392                 \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{393         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab16c2f0c72731bd72b5ef986caa59aca}\label{classFoam_1_1geomModel_ab16c2f0c72731bd72b5ef986caa59aca}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!checkCluster@{checkCluster}}
+\index{checkCluster@{checkCluster}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{checkCluster()}{checkCluster()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual bool Foam\+::geom\+Model\+::check\+Cluster (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 388 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{389         \{}
+\DoxyCodeLine{390             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"17-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{391                 << \textcolor{stringliteral}{"not cluster model"}<<endl;}
+\DoxyCodeLine{392                 \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{393         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a042ae896c576123625e3e95f7d5d9d12}\label{classFoam_1_1geomModel_a042ae896c576123625e3e95f7d5d9d12}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!computeBodyCharPars@{computeBodyCharPars}}
+\index{computeBodyCharPars@{computeBodyCharPars}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{computeBodyCharPars()}{computeBodyCharPars()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void geom\+Model\+::compute\+Body\+Char\+Pars (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 129 of file geom\+Model.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{130 \{}
+\DoxyCodeLine{131     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (\mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}[Pstream::myProcNo()],sCellI)}
+\DoxyCodeLine{132     \{}
+\DoxyCodeLine{133         label cellI = \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}[Pstream::myProcNo()][sCellI];}
+\DoxyCodeLine{134         \mbox{\hyperlink{classFoam_1_1geomModel_a5038a5a3ebb7cb4992c894387203bc4d}{dC\_}} = max(\mbox{\hyperlink{classFoam_1_1geomModel_a5038a5a3ebb7cb4992c894387203bc4d}{dC\_}},mag(\mbox{\hyperlink{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}{CoM\_}}-\/\mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}}.C()[cellI]));}
+\DoxyCodeLine{135     \}}
+\DoxyCodeLine{136     \mbox{\hyperlink{classFoam_1_1geomModel_ab0cbe345c5e98c54e43e868a5b2f0f92}{M0\_}} = \mbox{\hyperlink{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}{M\_}};}
+\DoxyCodeLine{137     reduce(\mbox{\hyperlink{classFoam_1_1geomModel_a5038a5a3ebb7cb4992c894387203bc4d}{dC\_}}, maxOp<scalar>());}
+\DoxyCodeLine{138 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 4
+\mbox{\Hypertarget{classFoam_1_1geomModel_aa70f4110771a869f21150381c7a23ae2}\label{classFoam_1_1geomModel_aa70f4110771a869f21150381c7a23ae2}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!computeBodyCharPars@{computeBodyCharPars}}
+\index{computeBodyCharPars@{computeBodyCharPars}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{computeBodyCharPars()}{computeBodyCharPars()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::compute\+Body\+Char\+Pars (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a1604b32ba5ccb8eb76504f02adeebb11}\label{classFoam_1_1geomModel_a1604b32ba5ccb8eb76504f02adeebb11}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!correctSurfCells@{correctSurfCells}}
+\index{correctSurfCells@{correctSurfCells}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{correctSurfCells()}{correctSurfCells()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void geom\+Model\+::correct\+Surf\+Cells (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \&}]{potent\+Surf\+Cells,  }\item[{Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&}]{cell\+Inside,  }\item[{List$<$ label\+List $>$ \&}]{cell\+Points }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 220 of file geom\+Model.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{226 \{}
+\DoxyCodeLine{227     HashTable<bool, label, Hash<label>> verticesStatus(potentSurfCells.size()*6);}
+\DoxyCodeLine{228     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(potentSurfCells, cellLabel)}
+\DoxyCodeLine{229     \{}
+\DoxyCodeLine{230         label cCell = potentSurfCells[cellLabel];}
+\DoxyCodeLine{231         scalar cBody(0);}
+\DoxyCodeLine{232 }
+\DoxyCodeLine{233         \textcolor{keywordflow}{if}(cellInside[cCell])}
+\DoxyCodeLine{234         \{}
+\DoxyCodeLine{235             cBody += 0.5;}
+\DoxyCodeLine{236         \}}
+\DoxyCodeLine{237 }
+\DoxyCodeLine{238         \textcolor{keyword}{const} labelList\& cVerts = cellPoints[cCell];}
+\DoxyCodeLine{239         scalar rVInSize(0.5/cVerts.size());}
+\DoxyCodeLine{240         \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(cVerts, vertI)}
+\DoxyCodeLine{241         \{}
+\DoxyCodeLine{242             \textcolor{keywordflow}{if}(!verticesStatus.found(cVerts[vertI]))}
+\DoxyCodeLine{243             \{}
+\DoxyCodeLine{244                 \textcolor{keywordtype}{bool} vertexInside = \mbox{\hyperlink{classFoam_1_1geomModel_a9f26fe62858c0b9da399f2c5823ea0a5}{pointInside}}(\mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}}.points()[cVerts[vertI]]);}
+\DoxyCodeLine{245                 verticesStatus.insert}
+\DoxyCodeLine{246                 (}
+\DoxyCodeLine{247                     cVerts[vertI],}
+\DoxyCodeLine{248                     vertexInside}
+\DoxyCodeLine{249                 );}
+\DoxyCodeLine{250 }
+\DoxyCodeLine{251                 \textcolor{keywordflow}{if}(vertexInside)}
+\DoxyCodeLine{252                 \{}
+\DoxyCodeLine{253                     cBody += rVInSize;}
+\DoxyCodeLine{254                 \}}
+\DoxyCodeLine{255             \}}
+\DoxyCodeLine{256             \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(verticesStatus[cVerts[vertI]])}
+\DoxyCodeLine{257             \{}
+\DoxyCodeLine{258                 cBody += rVInSize;}
+\DoxyCodeLine{259             \}}
+\DoxyCodeLine{260         \}}
+\DoxyCodeLine{261 }
+\DoxyCodeLine{262         \textcolor{keywordflow}{if} (cBody > \mbox{\hyperlink{classFoam_1_1geomModel_aec695437242a0c3e79ddd50ea51478dd}{thrSurf\_}})}
+\DoxyCodeLine{263         \{}
+\DoxyCodeLine{264             \textcolor{keywordflow}{if} (cBody > (1.0-\/\mbox{\hyperlink{classFoam_1_1geomModel_aec695437242a0c3e79ddd50ea51478dd}{thrSurf\_}}))}
+\DoxyCodeLine{265             \{}
+\DoxyCodeLine{266                 \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}}[Pstream::myProcNo()].append(cCell);}
+\DoxyCodeLine{267             \}}
+\DoxyCodeLine{268             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{269             \{}
+\DoxyCodeLine{270                 \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}[Pstream::myProcNo()].append(cCell);}
+\DoxyCodeLine{271             \}}
+\DoxyCodeLine{272             \mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ibPartialVolume\_}}[Pstream::myProcNo()] += 1;}
+\DoxyCodeLine{273 }
+\DoxyCodeLine{274             body[cCell] += cBody;}
+\DoxyCodeLine{275 }
+\DoxyCodeLine{276             \textcolor{comment}{// clip the body field values}}
+\DoxyCodeLine{277             body[cCell] = min(max(0.0,body[cCell]),1.0);}
+\DoxyCodeLine{278         \}}
+\DoxyCodeLine{279     \}}
+\DoxyCodeLine{280 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 5
+\mbox{\Hypertarget{classFoam_1_1geomModel_a8ea6becb3a92ac731f4995e163ee12ed}\label{classFoam_1_1geomModel_a8ea6becb3a92ac731f4995e163ee12ed}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!correctSurfCells@{correctSurfCells}}
+\index{correctSurfCells@{correctSurfCells}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{correctSurfCells()}{correctSurfCells()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::correct\+Surf\+Cells (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{\mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{Dynamic\+Label\+List}} \&}]{potent\+Surf\+Cells,  }\item[{Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&}]{cell\+Inside,  }\item[{List$<$ label\+List $>$ \&}]{cell\+Points }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a2baa51effa54cf9f04e2b54976d315d8}\label{classFoam_1_1clusterBody_a2baa51effa54cf9f04e2b54976d315d8}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!createImmersedBody@{createImmersedBody}}
+\index{createImmersedBody@{createImmersedBody}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{createImmersedBody()}{createImmersedBody()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::cluster\+Body\+::create\+Immersed\+Body (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{Field$<$ label $>$ \&}]{octree\+Field,  }\item[{List$<$ label\+List $>$ \&}]{cell\+Points }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_ac874ea568607e9927040cb9c6012274b}{Foam\+::geom\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a66826a7a0470436cbccc04baeff15f6f}\label{classFoam_1_1clusterBody_a66826a7a0470436cbccc04baeff15f6f}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!createImmersedBody@{createImmersedBody}}
+\index{createImmersedBody@{createImmersedBody}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{createImmersedBody()}{createImmersedBody()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void cluster\+Body\+::create\+Immersed\+Body (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{Field$<$ label $>$ \&}]{octree\+Field,  }\item[{List$<$ label\+List $>$ \&}]{cell\+Points }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_ac874ea568607e9927040cb9c6012274b}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 39 of file cluster\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{44 \{}
+\DoxyCodeLine{45     \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{46     \{}
+\DoxyCodeLine{47         gModel-\/>createImmersedBody(}
+\DoxyCodeLine{48             body,}
+\DoxyCodeLine{49             octreeField,}
+\DoxyCodeLine{50             cellPoints}
+\DoxyCodeLine{51         );}
+\DoxyCodeLine{52     \}}
+\DoxyCodeLine{53 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a74f3b902bd4e8d1661834288ed9ce0e2}\label{classFoam_1_1clusterBody_a74f3b902bd4e8d1661834288ed9ce0e2}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getBBoxes@{getBBoxes}}
+\index{getBBoxes@{getBBoxes}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getBBoxes()}{getBBoxes()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily List$<$std\+::shared\+\_\+ptr$<$bound\+Box$>$ $>$ Foam\+::cluster\+Body\+::get\+B\+Boxes (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a478b20dd5156a461e6699383bd2b23af}{Foam\+::geom\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a312681bc1e1646b4375d7c00a7dd01e9}\label{classFoam_1_1clusterBody_a312681bc1e1646b4375d7c00a7dd01e9}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getBBoxes@{getBBoxes}}
+\index{getBBoxes@{getBBoxes}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getBBoxes()}{getBBoxes()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily List$<$ std\+::shared\+\_\+ptr$<$ bound\+Box $>$ $>$ cluster\+Body\+::get\+B\+Boxes (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a478b20dd5156a461e6699383bd2b23af}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 194 of file cluster\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{195 \{}
+\DoxyCodeLine{196     List<std::shared\_ptr<boundBox>> retList;}
+\DoxyCodeLine{197     \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{198     \{}
+\DoxyCodeLine{199         List<std::shared\_ptr<boundBox>> bBoxI = gModel-\/>getBBoxes();}
+\DoxyCodeLine{200         retList.append(bBoxI);}
+\DoxyCodeLine{201     \}}
+\DoxyCodeLine{202     \textcolor{keywordflow}{return} retList;}
+\DoxyCodeLine{203 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1clusterBody_aa4b4748f6ff27d599b74fcca17eed50d}\label{classFoam_1_1clusterBody_aa4b4748f6ff27d599b74fcca17eed50d}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getBounds@{getBounds}}
+\index{getBounds@{getBounds}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getBounds()}{getBounds()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bound\+Box cluster\+Body\+::get\+Bounds (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a3e96ac9daa9bf49715d933c93f1f817a}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 102 of file cluster\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{103 \{}
+\DoxyCodeLine{104     \mbox{\hyperlink{classFoam_1_1clusterBody_ad74bc546fb88d22789cdab42dcae30f3}{DynamicPointList}} allBounds;}
+\DoxyCodeLine{105     \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{106     \{}
+\DoxyCodeLine{107         boundBox bBoxI = gModel-\/>getBounds();}
+\DoxyCodeLine{108         allBounds.append(bBoxI.min());}
+\DoxyCodeLine{109         allBounds.append(bBoxI.max());}
+\DoxyCodeLine{110     \}}
+\DoxyCodeLine{111 }
+\DoxyCodeLine{112     \textcolor{keywordflow}{return} boundBox(allBounds);}
+\DoxyCodeLine{113 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a9658c787a82ab8bc5d8e3abcda68388f}\label{classFoam_1_1clusterBody_a9658c787a82ab8bc5d8e3abcda68388f}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getBounds@{getBounds}}
+\index{getBounds@{getBounds}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getBounds()}{getBounds()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bound\+Box Foam\+::cluster\+Body\+::get\+Bounds (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a3e96ac9daa9bf49715d933c93f1f817a}{Foam\+::geom\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1clusterBody_abd6a50cb1d59325660d1cd908490831f}\label{classFoam_1_1clusterBody_abd6a50cb1d59325660d1cd908490831f}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getClosestPointAndNormal@{getClosestPointAndNormal}}
+\index{getClosestPointAndNormal@{getClosestPointAndNormal}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getClosestPointAndNormal()}{getClosestPointAndNormal()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void cluster\+Body\+::get\+Closest\+Point\+And\+Normal (\begin{DoxyParamCaption}\item[{const point \&}]{start\+Point,  }\item[{const vector \&}]{span,  }\item[{point \&}]{closest\+Point,  }\item[{vector \&}]{normal }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a09ee36e63d1216365f01ae39eb2c995c}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 153 of file cluster\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{159 \{}
+\DoxyCodeLine{160     List<point> closestPoints(\mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.size());}
+\DoxyCodeLine{161     List<vector> closestNormals(\mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.size());}
+\DoxyCodeLine{162 }
+\DoxyCodeLine{163     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} ibI = 0; ibI < \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.size(); ++ibI)}
+\DoxyCodeLine{164     \{}
+\DoxyCodeLine{165         \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[ibI]-\/>getClosestPointAndNormal(}
+\DoxyCodeLine{166             startPoint,}
+\DoxyCodeLine{167             span,}
+\DoxyCodeLine{168             closestPoints[ibI],}
+\DoxyCodeLine{169             closestNormals[ibI]}
+\DoxyCodeLine{170         );}
+\DoxyCodeLine{171     \}}
+\DoxyCodeLine{172 }
+\DoxyCodeLine{173     closestPoint = closestPoints[0];}
+\DoxyCodeLine{174     normal = closestNormals[0];}
+\DoxyCodeLine{175     \textcolor{keywordflow}{for} (\textcolor{keywordtype}{int} i = 1; i < closestPoints.size(); ++i)}
+\DoxyCodeLine{176     \{}
+\DoxyCodeLine{177         \textcolor{keywordflow}{if}(mag(startPoint -\/ closestPoint)}
+\DoxyCodeLine{178             > mag(startPoint -\/ closestPoints[i]))}
+\DoxyCodeLine{179         \{}
+\DoxyCodeLine{180             closestPoint = closestPoints[i];}
+\DoxyCodeLine{181             normal = closestNormals[i];}
+\DoxyCodeLine{182         \}}
+\DoxyCodeLine{183     \}}
+\DoxyCodeLine{184 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a6509ac6f23b79c5c5c0999aacfdbf1ff}\label{classFoam_1_1clusterBody_a6509ac6f23b79c5c5c0999aacfdbf1ff}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getClosestPointAndNormal@{getClosestPointAndNormal}}
+\index{getClosestPointAndNormal@{getClosestPointAndNormal}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getClosestPointAndNormal()}{getClosestPointAndNormal()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::cluster\+Body\+::get\+Closest\+Point\+And\+Normal (\begin{DoxyParamCaption}\item[{const point \&}]{start\+Point,  }\item[{const vector \&}]{span,  }\item[{point \&}]{closest\+Point,  }\item[{vector \&}]{normal }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a09ee36e63d1216365f01ae39eb2c995c}{Foam\+::geom\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a284f52a30ebda31d578267f12c902225}\label{classFoam_1_1clusterBody_a284f52a30ebda31d578267f12c902225}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getClusterBodies@{getClusterBodies}}
+\index{getClusterBodies@{getClusterBodies}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getClusterBodies()}{getClusterBodies()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily std\+::vector$<$std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}}$>$ $>$\& Foam\+::cluster\+Body\+::get\+Cluster\+Bodies (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 172 of file cluster\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{173         \{}
+\DoxyCodeLine{174             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}};}
+\DoxyCodeLine{175         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 6
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a284f52a30ebda31d578267f12c902225}\label{classFoam_1_1clusterBody_a284f52a30ebda31d578267f12c902225}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getClusterBodies@{getClusterBodies}}
+\index{getClusterBodies@{getClusterBodies}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getClusterBodies()}{getClusterBodies()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily std\+::vector$<$std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}}$>$ $>$\& Foam\+::cluster\+Body\+::get\+Cluster\+Bodies (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 172 of file cluster\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{173         \{}
+\DoxyCodeLine{174             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}};}
+\DoxyCodeLine{175         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a5c4dbd35ecee10083dc31e6810199c35}\label{classFoam_1_1periodicBody_a5c4dbd35ecee10083dc31e6810199c35}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getCoM@{getCoM}}
+\index{getCoM@{getCoM}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getCoM()}{getCoM()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector Foam\+::periodic\+Body\+::get\+CoM (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_a58dc598123124978924705e80818d90a}{Foam\+::cluster\+Body}}.
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_af735072f2fde5e00efafb044f5bf28ec}\label{classFoam_1_1periodicBody_af735072f2fde5e00efafb044f5bf28ec}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getCoM@{getCoM}}
+\index{getCoM@{getCoM}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getCoM()}{getCoM()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector periodic\+Body\+::get\+CoM (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_a58dc598123124978924705e80818d90a}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 95 of file periodic\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{96 \{}
+\DoxyCodeLine{97     \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[0]-\/>getCoM();}
+\DoxyCodeLine{98 \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 7
+\mbox{\Hypertarget{classFoam_1_1periodicBody_ae8725d9f401aa89cbef163b8eaf42fc6}\label{classFoam_1_1periodicBody_ae8725d9f401aa89cbef163b8eaf42fc6}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getCopy@{getCopy}}
+\index{getCopy@{getCopy}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getCopy()}{getCopy()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}}$>$ Foam\+::periodic\+Body\+::get\+Copy (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_a1ee8b75e5b6197e2039daa9b420188d7}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 86 of file periodic\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{87         \{}
+\DoxyCodeLine{88             std::shared\_ptr<periodicBody> periodicGeomModel = std::make\_shared<periodicBody>}
+\DoxyCodeLine{89             (}
+\DoxyCodeLine{90                 \mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}},}
+\DoxyCodeLine{91                 \mbox{\hyperlink{classFoam_1_1geomModel_aec695437242a0c3e79ddd50ea51478dd}{thrSurf\_}}}
+\DoxyCodeLine{92             );}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94             periodicGeomModel-\/>ibGeomModelList = \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}};}
+\DoxyCodeLine{95             \textcolor{keywordflow}{return} periodicGeomModel;}
+\DoxyCodeLine{96         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_ae8725d9f401aa89cbef163b8eaf42fc6}\label{classFoam_1_1periodicBody_ae8725d9f401aa89cbef163b8eaf42fc6}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getCopy@{getCopy}}
+\index{getCopy@{getCopy}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getCopy()}{getCopy()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}}$>$ Foam\+::periodic\+Body\+::get\+Copy (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_a1ee8b75e5b6197e2039daa9b420188d7}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 86 of file periodic\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{87         \{}
+\DoxyCodeLine{88             std::shared\_ptr<periodicBody> periodicGeomModel = std::make\_shared<periodicBody>}
+\DoxyCodeLine{89             (}
+\DoxyCodeLine{90                 \mbox{\hyperlink{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}{mesh\_}},}
+\DoxyCodeLine{91                 \mbox{\hyperlink{classFoam_1_1geomModel_aec695437242a0c3e79ddd50ea51478dd}{thrSurf\_}}}
+\DoxyCodeLine{92             );}
+\DoxyCodeLine{93 }
+\DoxyCodeLine{94             periodicGeomModel-\/>ibGeomModelList = \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}};}
+\DoxyCodeLine{95             \textcolor{keywordflow}{return} periodicGeomModel;}
+\DoxyCodeLine{96         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_aad4760c95591b65260efb023cdbbe862}\label{classFoam_1_1geomModel_aad4760c95591b65260efb023cdbbe862}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getcType@{getcType}}
+\index{getcType@{getcType}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getcType()}{getcType()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily constexpr \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}} Foam\+::geom\+Model\+::getc\+Type (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 301 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{302         \{\textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_ad88bb1c51f58fe353e3899e175dca2b9}{contactType\_}};\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 8
+\mbox{\Hypertarget{classFoam_1_1geomModel_aad4760c95591b65260efb023cdbbe862}\label{classFoam_1_1geomModel_aad4760c95591b65260efb023cdbbe862}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getcType@{getcType}}
+\index{getcType@{getcType}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getcType()}{getcType()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily constexpr \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}} Foam\+::geom\+Model\+::getc\+Type (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [constexpr]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 301 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{302         \{\textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_ad88bb1c51f58fe353e3899e175dca2b9}{contactType\_}};\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a83c922830b0eff3a9c37e12ce79f7df3}\label{classFoam_1_1periodicBody_a83c922830b0eff3a9c37e12ce79f7df3}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getDC@{getDC}}
+\index{getDC@{getDC}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getDC()}{getDC()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily scalar Foam\+::periodic\+Body\+::get\+DC (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_adb525274f0cfec53b773c2ebd315fb40}{Foam\+::cluster\+Body}}.
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a095ac8571f648f17f79f561eaf199069}\label{classFoam_1_1periodicBody_a095ac8571f648f17f79f561eaf199069}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getDC@{getDC}}
+\index{getDC@{getDC}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getDC()}{getDC()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily scalar periodic\+Body\+::get\+DC (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_adb525274f0cfec53b773c2ebd315fb40}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 100 of file periodic\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{101 \{}
+\DoxyCodeLine{102     scalar dc = \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[0]-\/>getDC();}
+\DoxyCodeLine{103     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} ibI = 0; ibI < \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.size(); ++ibI)}
+\DoxyCodeLine{104     \{}
+\DoxyCodeLine{105         \textcolor{keywordflow}{if}(dc < \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[ibI]-\/>\mbox{\hyperlink{classFoam_1_1periodicBody_a095ac8571f648f17f79f561eaf199069}{getDC}}())}
+\DoxyCodeLine{106         \{}
+\DoxyCodeLine{107             dc = \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[ibI]-\/>getDC();}
+\DoxyCodeLine{108         \}}
+\DoxyCodeLine{109     \}}
+\DoxyCodeLine{110     \textcolor{keywordflow}{return} dc;}
+\DoxyCodeLine{111 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a0c1d8add88e024a00e7c06bba1759d0d}\label{classFoam_1_1geomModel_a0c1d8add88e024a00e7c06bba1759d0d}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getI@{getI}}
+\index{getI@{getI}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getI()}{getI()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily const symm\+Tensor\& Foam\+::geom\+Model\+::getI (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 376 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{377         \{}
+\DoxyCodeLine{378             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}};}
+\DoxyCodeLine{379         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a0c1d8add88e024a00e7c06bba1759d0d}\label{classFoam_1_1geomModel_a0c1d8add88e024a00e7c06bba1759d0d}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getI@{getI}}
+\index{getI@{getI}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getI()}{getI()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily const symm\+Tensor\& Foam\+::geom\+Model\+::getI (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 376 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{377         \{}
+\DoxyCodeLine{378             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}{I\_}};}
+\DoxyCodeLine{379         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1clusterBody_ad93c55a4c082d9396f911fcece14724c}\label{classFoam_1_1clusterBody_ad93c55a4c082d9396f911fcece14724c}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getInternalCellList@{getInternalCellList}}
+\index{getInternalCellList@{getInternalCellList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getInternalCellList()}{getInternalCellList()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual List$<$\mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}}$>$\& Foam\+::cluster\+Body\+::get\+Internal\+Cell\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_aad5ad5cd92fca2079533e7cd9f9596c6}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 115 of file cluster\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{116         \{}
+\DoxyCodeLine{117             \mbox{\hyperlink{classFoam_1_1clusterBody_aaffbab47c8ec04f8dab6867fdcf79a54}{updateIntList}}();}
+\DoxyCodeLine{118             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}};}
+\DoxyCodeLine{119         \};}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 9
+\mbox{\Hypertarget{classFoam_1_1clusterBody_ad93c55a4c082d9396f911fcece14724c}\label{classFoam_1_1clusterBody_ad93c55a4c082d9396f911fcece14724c}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getInternalCellList@{getInternalCellList}}
+\index{getInternalCellList@{getInternalCellList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getInternalCellList()}{getInternalCellList()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual List$<$\mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}}$>$\& Foam\+::cluster\+Body\+::get\+Internal\+Cell\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_aad5ad5cd92fca2079533e7cd9f9596c6}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 115 of file cluster\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{116         \{}
+\DoxyCodeLine{117             \mbox{\hyperlink{classFoam_1_1clusterBody_aaffbab47c8ec04f8dab6867fdcf79a54}{updateIntList}}();}
+\DoxyCodeLine{118             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}};}
+\DoxyCodeLine{119         \};}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 10
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a3fd44174d25cfadf11cc943973e8e2e5}\label{classFoam_1_1periodicBody_a3fd44174d25cfadf11cc943973e8e2e5}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getLVec@{getLVec}}
+\index{getLVec@{getLVec}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getLVec()}{getLVec()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily vector periodic\+Body\+::get\+L\+Vec (\begin{DoxyParamCaption}\item[{const point \&}]{to\+Point }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_a70035496d5471cf0b82e634366d9fb57}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 153 of file periodic\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{154 \{}
+\DoxyCodeLine{155     List<point> closestPoints(\mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.size());}
+\DoxyCodeLine{156     List<vector> closestNormals(\mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.size());}
+\DoxyCodeLine{157 }
+\DoxyCodeLine{158     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} ibI = 0; ibI < \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.size(); ++ibI)}
+\DoxyCodeLine{159     \{}
+\DoxyCodeLine{160         \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[ibI]-\/>getClosestPointAndNormal(}
+\DoxyCodeLine{161             toPoint,}
+\DoxyCodeLine{162             (\mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[ibI]-\/>\mbox{\hyperlink{classFoam_1_1periodicBody_af735072f2fde5e00efafb044f5bf28ec}{getCoM}}() -\/ toPoint),}
+\DoxyCodeLine{163             closestPoints[ibI],}
+\DoxyCodeLine{164             closestNormals[ibI]}
+\DoxyCodeLine{165         );}
+\DoxyCodeLine{166     \}}
+\DoxyCodeLine{167 }
+\DoxyCodeLine{168     vector closestPoint = closestPoints[0];}
+\DoxyCodeLine{169     label cGModel = 0;}
+\DoxyCodeLine{170 }
+\DoxyCodeLine{171     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{int} i = 1; i < closestPoints.size(); ++i)}
+\DoxyCodeLine{172     \{}
+\DoxyCodeLine{173         \textcolor{keywordflow}{if}(mag(toPoint -\/ closestPoint)}
+\DoxyCodeLine{174             > mag(toPoint -\/ closestPoints[i]))}
+\DoxyCodeLine{175         \{}
+\DoxyCodeLine{176             closestPoint = closestPoints[i];}
+\DoxyCodeLine{177             cGModel = i;}
+\DoxyCodeLine{178         \}}
+\DoxyCodeLine{179     \}}
+\DoxyCodeLine{180 }
+\DoxyCodeLine{181     \textcolor{keywordflow}{return} toPoint -\/ \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[cGModel]-\/>getCoM();}
+\DoxyCodeLine{182 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 11
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a4bbc2c6a72b6e090dbf9f4099764c19d}\label{classFoam_1_1periodicBody_a4bbc2c6a72b6e090dbf9f4099764c19d}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getLVec@{getLVec}}
+\index{getLVec@{getLVec}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getLVec()}{getLVec()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily vector Foam\+::periodic\+Body\+::get\+L\+Vec (\begin{DoxyParamCaption}\item[{const point \&}]{to\+Point }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_a70035496d5471cf0b82e634366d9fb57}{Foam\+::cluster\+Body}}.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_afd93801223f4b6e952aa04998d40a071}\label{classFoam_1_1geomModel_afd93801223f4b6e952aa04998d40a071}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getM@{getM}}
+\index{getM@{getM}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getM()}{getM()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily scalar\& Foam\+::geom\+Model\+::getM (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 356 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{357         \{}
+\DoxyCodeLine{358             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}{M\_}};}
+\DoxyCodeLine{359         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_afd93801223f4b6e952aa04998d40a071}\label{classFoam_1_1geomModel_afd93801223f4b6e952aa04998d40a071}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getM@{getM}}
+\index{getM@{getM}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getM()}{getM()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily scalar\& Foam\+::geom\+Model\+::getM (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 356 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{357         \{}
+\DoxyCodeLine{358             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}{M\_}};}
+\DoxyCodeLine{359         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a54bd030a0a01eff1112454824a01e3a9}\label{classFoam_1_1periodicBody_a54bd030a0a01eff1112454824a01e3a9}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getM0@{getM0}}
+\index{getM0@{getM0}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getM0()}{getM0()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily scalar \& periodic\+Body\+::get\+M0 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_aa247c0d687d771767403f4ad3e1890f8}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 148 of file periodic\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{149 \{}
+\DoxyCodeLine{150     \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[0]-\/>getM0();}
+\DoxyCodeLine{151 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a45223418d020ca3f861de732e4630387}\label{classFoam_1_1periodicBody_a45223418d020ca3f861de732e4630387}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getM0@{getM0}}
+\index{getM0@{getM0}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getM0()}{getM0()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily scalar\& Foam\+::periodic\+Body\+::get\+M0 (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_aa247c0d687d771767403f4ad3e1890f8}{Foam\+::cluster\+Body}}.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a7e89b7437f109aa4b4b35beafd652e36}\label{classFoam_1_1geomModel_a7e89b7437f109aa4b4b35beafd652e36}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getNCells@{getNCells}}
+\index{getNCells@{getNCells}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getNCells()}{getNCells()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily label\& Foam\+::geom\+Model\+::get\+N\+Cells (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 361 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{362         \{}
+\DoxyCodeLine{363             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a164a9b5ae11beefcf8af797f331e2b1e}{nCells\_}};}
+\DoxyCodeLine{364         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a7e89b7437f109aa4b4b35beafd652e36}\label{classFoam_1_1geomModel_a7e89b7437f109aa4b4b35beafd652e36}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getNCells@{getNCells}}
+\index{getNCells@{getNCells}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getNCells()}{getNCells()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily label\& Foam\+::geom\+Model\+::get\+N\+Cells (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 361 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{362         \{}
+\DoxyCodeLine{363             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a164a9b5ae11beefcf8af797f331e2b1e}{nCells\_}};}
+\DoxyCodeLine{364         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_ac986b1b29da68eb89eb991e79a8a3d32}\label{classFoam_1_1periodicBody_ac986b1b29da68eb89eb991e79a8a3d32}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getOwner@{getOwner}}
+\index{getOwner@{getOwner}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getOwner()}{getOwner()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily label periodic\+Body\+::get\+Owner (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_ae58e7d11ad6d14d8c090e77eddc50c6d}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 143 of file periodic\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{144 \{}
+\DoxyCodeLine{145     \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a6beec229c26dadc133ad0514ed0898f7}{owner\_}};}
+\DoxyCodeLine{146 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a3df7b0f90e66e4219cd2b4508cf76ca8}\label{classFoam_1_1periodicBody_a3df7b0f90e66e4219cd2b4508cf76ca8}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getOwner@{getOwner}}
+\index{getOwner@{getOwner}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getOwner()}{getOwner()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily label Foam\+::periodic\+Body\+::get\+Owner (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_ae58e7d11ad6d14d8c090e77eddc50c6d}{Foam\+::cluster\+Body}}.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_adac6a242f418325a86bac3808e05b9b0}\label{classFoam_1_1geomModel_adac6a242f418325a86bac3808e05b9b0}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getPotentSurfCells@{getPotentSurfCells}}
+\index{getPotentSurfCells@{getPotentSurfCells}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getPotentSurfCells()}{getPotentSurfCells()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} Foam\+::geom\+Model\+::get\+Potent\+Surf\+Cells (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&}]{cell\+Inside,  }\item[{List$<$ label\+List $>$ \&}]{cell\+Points }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_ad70ce9fe3e452b1533ca8d3b2a7cfd91}\label{classFoam_1_1geomModel_ad70ce9fe3e452b1533ca8d3b2a7cfd91}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getPotentSurfCells@{getPotentSurfCells}}
+\index{getPotentSurfCells@{getPotentSurfCells}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getPotentSurfCells()}{getPotentSurfCells()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Dynamic\+List$<$ label $>$ geom\+Model\+::get\+Potent\+Surf\+Cells (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body,  }\item[{Hash\+Table$<$ bool, label, Hash$<$ label $>$$>$ \&}]{cell\+Inside,  }\item[{List$<$ label\+List $>$ \&}]{cell\+Points }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 174 of file geom\+Model.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{179 \{}
+\DoxyCodeLine{180     \textcolor{keyword}{const} labelList foundCells = cellInside.toc();}
+\DoxyCodeLine{181     \mbox{\hyperlink{classFoam_1_1geomModel_a7567ede32344a9cab81b883e46de29e9}{DynamicLabelList}} potentSurfCells(foundCells.size()/2);}
+\DoxyCodeLine{182     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(foundCells, cellI)}
+\DoxyCodeLine{183     \{}
+\DoxyCodeLine{184         label cCell = foundCells[cellI];}
+\DoxyCodeLine{185 }
+\DoxyCodeLine{186         \textcolor{keywordflow}{if}(cellInside[cCell])}
+\DoxyCodeLine{187         \{}
+\DoxyCodeLine{188             \textcolor{keyword}{const} labelList\& neigh = \mbox{\hyperlink{classFoam_1_1geomModel_a11167d3f48311fa265c662e4880d1de2}{cachedNeighbours\_}}()[cCell];}
+\DoxyCodeLine{189 }
+\DoxyCodeLine{190             \textcolor{keywordtype}{bool} anyOutside = \textcolor{keyword}{false};}
+\DoxyCodeLine{191             \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(neigh, neighI)}
+\DoxyCodeLine{192             \{}
+\DoxyCodeLine{193                 \textcolor{keywordflow}{if}(!cellInside[neigh[neighI]])}
+\DoxyCodeLine{194                 \{}
+\DoxyCodeLine{195                     anyOutside = \textcolor{keyword}{true};}
+\DoxyCodeLine{196                     \textcolor{keywordflow}{break};}
+\DoxyCodeLine{197                 \}}
+\DoxyCodeLine{198             \}}
+\DoxyCodeLine{199 }
+\DoxyCodeLine{200             \textcolor{keywordflow}{if}(anyOutside)}
+\DoxyCodeLine{201             \{}
+\DoxyCodeLine{202                 potentSurfCells.append(cCell);}
+\DoxyCodeLine{203             \}}
+\DoxyCodeLine{204             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{205             \{}
+\DoxyCodeLine{206                 \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}}[Pstream::myProcNo()].append(cCell);}
+\DoxyCodeLine{207                 \mbox{\hyperlink{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}{ibPartialVolume\_}}[Pstream::myProcNo()] += 1;}
+\DoxyCodeLine{208                 body[cCell] = 1.0;}
+\DoxyCodeLine{209             \}}
+\DoxyCodeLine{210         \}}
+\DoxyCodeLine{211         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{212         \{}
+\DoxyCodeLine{213             potentSurfCells.append(cCell);}
+\DoxyCodeLine{214         \}}
+\DoxyCodeLine{215     \}}
+\DoxyCodeLine{216     \textcolor{keywordflow}{return} potentSurfCells;}
+\DoxyCodeLine{217 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 12
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a95f4674344e0339219d4067e001c9f75}\label{classFoam_1_1periodicBody_a95f4674344e0339219d4067e001c9f75}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getReferencedLists@{getReferencedLists}}
+\index{getReferencedLists@{getReferencedLists}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getReferencedLists()}{getReferencedLists()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::periodic\+Body\+::get\+Referenced\+Lists (\begin{DoxyParamCaption}\item[{List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ \&}]{int\+Lists,  }\item[{List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ \&}]{surf\+Lists,  }\item[{\mbox{\hyperlink{classFoam_1_1clusterBody_adbe26ef8a2b49b2b0d9983ef37f55700}{Dynamic\+Vector\+List}} \&}]{reference\+CoM }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_a9842e695082959dbab91d2c2fd7c4132}{Foam\+::cluster\+Body}}.
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a44e877e183e974b673ace242a7a6db23}\label{classFoam_1_1periodicBody_a44e877e183e974b673ace242a7a6db23}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getReferencedLists@{getReferencedLists}}
+\index{getReferencedLists@{getReferencedLists}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getReferencedLists()}{getReferencedLists()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void periodic\+Body\+::get\+Referenced\+Lists (\begin{DoxyParamCaption}\item[{List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ \&}]{int\+Lists,  }\item[{List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ \&}]{surf\+Lists,  }\item[{\mbox{\hyperlink{classFoam_1_1clusterBody_adbe26ef8a2b49b2b0d9983ef37f55700}{Dynamic\+Vector\+List}} \&}]{reference\+CoM }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1clusterBody_a9842e695082959dbab91d2c2fd7c4132}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 38 of file periodic\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{43 \{}
+\DoxyCodeLine{44     intLists.resize(\mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.size());}
+\DoxyCodeLine{45     surfLists.resize(\mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.size());}
+\DoxyCodeLine{46     referenceCoM.resize(\mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.size());}
+\DoxyCodeLine{47 }
+\DoxyCodeLine{48     \textcolor{keywordflow}{for}(\textcolor{keywordtype}{size\_t} ibI = 0; ibI < \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.size(); ++ibI)}
+\DoxyCodeLine{49     \{}
+\DoxyCodeLine{50         intLists[ibI] =}
+\DoxyCodeLine{51             \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[ibI]-\/>getInternalCellList()[Pstream::myProcNo()];}
+\DoxyCodeLine{52 }
+\DoxyCodeLine{53         surfLists[ibI] =}
+\DoxyCodeLine{54             \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[ibI]-\/>getSurfaceCellList()[Pstream::myProcNo()];}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56         referenceCoM[ibI] =}
+\DoxyCodeLine{57             \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[ibI]-\/>getCoM();}
+\DoxyCodeLine{58     \}}
+\DoxyCodeLine{59 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a34a7f16322b7dace4239e24aade93850}\label{classFoam_1_1periodicBody_a34a7f16322b7dace4239e24aade93850}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getRemGeomModel@{getRemGeomModel}}
+\index{getRemGeomModel@{getRemGeomModel}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getRemGeomModel()}{getRemGeomModel()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$\mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}}$>$ Foam\+::periodic\+Body\+::get\+Rem\+Geom\+Model (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_aac959264aa4ebe5a6361113c5e55bc51}\label{classFoam_1_1periodicBody_aac959264aa4ebe5a6361113c5e55bc51}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getRemGeomModel@{getRemGeomModel}}
+\index{getRemGeomModel@{getRemGeomModel}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getRemGeomModel()}{getRemGeomModel()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ periodic\+Body\+::get\+Rem\+Geom\+Model (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 198 of file periodic\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{199 \{}
+\DoxyCodeLine{200     \textcolor{keyword}{auto} iter = find\_if(\mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.begin(), \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.end(),}
+\DoxyCodeLine{201         [] (\textcolor{keyword}{const} std::shared\_ptr<geomModel>\& gP) \{ return gP-\/>getM() > 0; \} );}
+\DoxyCodeLine{202 }
+\DoxyCodeLine{203     \textcolor{keywordflow}{if} (iter != \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}.end())}
+\DoxyCodeLine{204     \{}
+\DoxyCodeLine{205         \textcolor{keywordflow}{return} *iter;}
+\DoxyCodeLine{206     \}}
+\DoxyCodeLine{207     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{208     \{}
+\DoxyCodeLine{209         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[0];}
+\DoxyCodeLine{210     \}}
+\DoxyCodeLine{211 \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 13
+\mbox{\Hypertarget{classFoam_1_1geomModel_a229602a6b70a689ef42cf29ff4acf562}\label{classFoam_1_1geomModel_a229602a6b70a689ef42cf29ff4acf562}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getRhoS@{getRhoS}}
+\index{getRhoS@{getRhoS}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getRhoS()}{getRhoS()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily dimensioned\+Scalar Foam\+::geom\+Model\+::get\+RhoS (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 331 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{331 \{\textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rhoS\_}};\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a229602a6b70a689ef42cf29ff4acf562}\label{classFoam_1_1geomModel_a229602a6b70a689ef42cf29ff4acf562}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getRhoS@{getRhoS}}
+\index{getRhoS@{getRhoS}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getRhoS()}{getRhoS()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily dimensioned\+Scalar Foam\+::geom\+Model\+::get\+RhoS (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 331 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{331 \{\textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rhoS\_}};\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ac1f313551c2851a6e1768d14655f72a7}\label{classFoam_1_1geomModel_ac1f313551c2851a6e1768d14655f72a7}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getRhoS@{getRhoS}}
+\index{getRhoS@{getRhoS}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getRhoS()}{getRhoS()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily const dimensioned\+Scalar Foam\+::geom\+Model\+::get\+RhoS (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 366 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{367         \{}
+\DoxyCodeLine{368             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rhoS\_}};}
+\DoxyCodeLine{369         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ac1f313551c2851a6e1768d14655f72a7}\label{classFoam_1_1geomModel_ac1f313551c2851a6e1768d14655f72a7}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getRhoS@{getRhoS}}
+\index{getRhoS@{getRhoS}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getRhoS()}{getRhoS()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily const dimensioned\+Scalar Foam\+::geom\+Model\+::get\+RhoS (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 366 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{367         \{}
+\DoxyCodeLine{368             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rhoS\_}};}
+\DoxyCodeLine{369         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a21fdbb9bd4dbc303d044e9f27b0550b1}\label{classFoam_1_1geomModel_a21fdbb9bd4dbc303d044e9f27b0550b1}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getSTLBodyPoints@{getSTLBodyPoints}}
+\index{getSTLBodyPoints@{getSTLBodyPoints}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getSTLBodyPoints()}{getSTLBodyPoints()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual point\+Field Foam\+::geom\+Model\+::get\+S\+T\+L\+Body\+Points (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_ae7350280b736833df5544f4e53ee718d}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_ae7350280b736833df5544f4e53ee718d}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 414 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{415         \{}
+\DoxyCodeLine{416             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"18-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{417                 << \textcolor{stringliteral}{"not cluster model"}<<endl;}
+\DoxyCodeLine{418             pointField emptyField;}
+\DoxyCodeLine{419             \textcolor{keywordflow}{return} emptyField;}
+\DoxyCodeLine{420         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a21fdbb9bd4dbc303d044e9f27b0550b1}\label{classFoam_1_1geomModel_a21fdbb9bd4dbc303d044e9f27b0550b1}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getSTLBodyPoints@{getSTLBodyPoints}}
+\index{getSTLBodyPoints@{getSTLBodyPoints}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getSTLBodyPoints()}{getSTLBodyPoints()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual point\+Field Foam\+::geom\+Model\+::get\+S\+T\+L\+Body\+Points (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_ae7350280b736833df5544f4e53ee718d}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_ae7350280b736833df5544f4e53ee718d}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 414 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{415         \{}
+\DoxyCodeLine{416             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"18-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{417                 << \textcolor{stringliteral}{"not cluster model"}<<endl;}
+\DoxyCodeLine{418             pointField emptyField;}
+\DoxyCodeLine{419             \textcolor{keywordflow}{return} emptyField;}
+\DoxyCodeLine{420         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 14
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab73ae4069d204dc18f9dedfab029744e}\label{classFoam_1_1geomModel_ab73ae4069d204dc18f9dedfab029744e}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getSTLFacePoint@{getSTLFacePoint}}
+\index{getSTLFacePoint@{getSTLFacePoint}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getSTLFacePoint()}{getSTLFacePoint()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual point\+Field Foam\+::geom\+Model\+::get\+S\+T\+L\+Face\+Point (\begin{DoxyParamCaption}\item[{label}]{face\+ID }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_afef756b17a533816653d6aacc204e9c5}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_afef756b17a533816653d6aacc204e9c5}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 430 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{431         \{}
+\DoxyCodeLine{432             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"20-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{433                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{434             pointField nonPointField;}
+\DoxyCodeLine{435             \textcolor{keywordflow}{return} nonPointField;}
+\DoxyCodeLine{436         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab73ae4069d204dc18f9dedfab029744e}\label{classFoam_1_1geomModel_ab73ae4069d204dc18f9dedfab029744e}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getSTLFacePoint@{getSTLFacePoint}}
+\index{getSTLFacePoint@{getSTLFacePoint}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getSTLFacePoint()}{getSTLFacePoint()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual point\+Field Foam\+::geom\+Model\+::get\+S\+T\+L\+Face\+Point (\begin{DoxyParamCaption}\item[{label}]{face\+ID }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_afef756b17a533816653d6aacc204e9c5}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_afef756b17a533816653d6aacc204e9c5}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 430 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{431         \{}
+\DoxyCodeLine{432             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"20-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{433                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{434             pointField nonPointField;}
+\DoxyCodeLine{435             \textcolor{keywordflow}{return} nonPointField;}
+\DoxyCodeLine{436         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a79bdd5bab087e4be43e7ad0e7c2a64d9}\label{classFoam_1_1geomModel_a79bdd5bab087e4be43e7ad0e7c2a64d9}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getSTLFaces@{getSTLFaces}}
+\index{getSTLFaces@{getSTLFaces}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getSTLFaces()}{getSTLFaces()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual face\+List Foam\+::geom\+Model\+::get\+S\+T\+L\+Faces (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_a96f2f1725022225d7609cdeb2c1c96cb}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_a96f2f1725022225d7609cdeb2c1c96cb}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 422 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{423         \{}
+\DoxyCodeLine{424             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"19-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{425                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{426             faceList emptyList;}
+\DoxyCodeLine{427             \textcolor{keywordflow}{return} emptyList;}
+\DoxyCodeLine{428         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a79bdd5bab087e4be43e7ad0e7c2a64d9}\label{classFoam_1_1geomModel_a79bdd5bab087e4be43e7ad0e7c2a64d9}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getSTLFaces@{getSTLFaces}}
+\index{getSTLFaces@{getSTLFaces}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getSTLFaces()}{getSTLFaces()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual face\+List Foam\+::geom\+Model\+::get\+S\+T\+L\+Faces (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_a96f2f1725022225d7609cdeb2c1c96cb}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_a96f2f1725022225d7609cdeb2c1c96cb}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 422 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{423         \{}
+\DoxyCodeLine{424             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"19-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{425                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{426             faceList emptyList;}
+\DoxyCodeLine{427             \textcolor{keywordflow}{return} emptyList;}
+\DoxyCodeLine{428         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a09de9c5ee58ee18c05907d45c0ad26c9}\label{classFoam_1_1clusterBody_a09de9c5ee58ee18c05907d45c0ad26c9}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getSurfaceCellList@{getSurfaceCellList}}
+\index{getSurfaceCellList@{getSurfaceCellList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getSurfaceCellList()}{getSurfaceCellList()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual List$<$\mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}}$>$\& Foam\+::cluster\+Body\+::get\+Surface\+Cell\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_aadb30406567a7931b05aae7827630988}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 107 of file cluster\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{108         \{}
+\DoxyCodeLine{109             \mbox{\hyperlink{classFoam_1_1clusterBody_ac4ebc25dfa355d2cc30c7f5f49136dad}{updateSurfList}}();}
+\DoxyCodeLine{110             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}};}
+\DoxyCodeLine{111         \};}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 15
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a09de9c5ee58ee18c05907d45c0ad26c9}\label{classFoam_1_1clusterBody_a09de9c5ee58ee18c05907d45c0ad26c9}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getSurfaceCellList@{getSurfaceCellList}}
+\index{getSurfaceCellList@{getSurfaceCellList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getSurfaceCellList()}{getSurfaceCellList()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual List$<$\mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}}$>$\& Foam\+::cluster\+Body\+::get\+Surface\+Cell\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_aadb30406567a7931b05aae7827630988}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 107 of file cluster\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{108         \{}
+\DoxyCodeLine{109             \mbox{\hyperlink{classFoam_1_1clusterBody_ac4ebc25dfa355d2cc30c7f5f49136dad}{updateSurfList}}();}
+\DoxyCodeLine{110             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}};}
+\DoxyCodeLine{111         \};}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 16
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab177b3ff0fb1f3443ef7344b02f1a5c5}\label{classFoam_1_1geomModel_ab177b3ff0fb1f3443ef7344b02f1a5c5}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getVolumeType@{getVolumeType}}
+\index{getVolumeType@{getVolumeType}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getVolumeType()}{getVolumeType()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual volume\+Type Foam\+::geom\+Model\+::get\+Volume\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&}]{sv,  }\item[{bool}]{c\+Ib }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_a4b04aacec1e47cd9ddacf83ef98d9f2d}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_aa10bd5af88189f9d219a2e08ddd694a7}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 259 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{260         \{}
+\DoxyCodeLine{261             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"13-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{262                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{263             \textcolor{keywordflow}{return} volumeType::unknown;}
+\DoxyCodeLine{264         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 17
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab177b3ff0fb1f3443ef7344b02f1a5c5}\label{classFoam_1_1geomModel_ab177b3ff0fb1f3443ef7344b02f1a5c5}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!getVolumeType@{getVolumeType}}
+\index{getVolumeType@{getVolumeType}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{getVolumeType()}{getVolumeType()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual volume\+Type Foam\+::geom\+Model\+::get\+Volume\+Type (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&}]{sv,  }\item[{bool}]{c\+Ib }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_a4b04aacec1e47cd9ddacf83ef98d9f2d}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_aa10bd5af88189f9d219a2e08ddd694a7}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 259 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{260         \{}
+\DoxyCodeLine{261             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"13-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{262                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{263             \textcolor{keywordflow}{return} volumeType::unknown;}
+\DoxyCodeLine{264         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a5eafedc05ddd80d72bdfa9b3a51348ff}\label{classFoam_1_1geomModel_a5eafedc05ddd80d72bdfa9b3a51348ff}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!isBBoxInMesh@{isBBoxInMesh}}
+\index{isBBoxInMesh@{isBBoxInMesh}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{isBBoxInMesh()}{isBBoxInMesh()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Foam\+::geom\+Model\+::is\+B\+Box\+In\+Mesh (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_ae19a2a210bb56448efd7a13deb57d2de}\label{classFoam_1_1geomModel_ae19a2a210bb56448efd7a13deb57d2de}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!isBBoxInMesh@{isBBoxInMesh}}
+\index{isBBoxInMesh@{isBBoxInMesh}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{isBBoxInMesh()}{isBBoxInMesh()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool geom\+Model\+::is\+B\+Box\+In\+Mesh (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 155 of file geom\+Model.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{156 \{}
+\DoxyCodeLine{157     boundBox ibBound(\mbox{\hyperlink{classFoam_1_1geomModel_a3e96ac9daa9bf49715d933c93f1f817a}{getBounds}}());}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{159     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(\mbox{\hyperlink{namespaceFoam_a4dafe227f98b98cc477682efd8e86a41}{geometricD}},dir)}
+\DoxyCodeLine{160     \{}
+\DoxyCodeLine{161         \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespaceFoam_a4dafe227f98b98cc477682efd8e86a41}{geometricD}}[dir] == 1)}
+\DoxyCodeLine{162         \{}
+\DoxyCodeLine{163             \textcolor{keywordflow}{if}(!(\mbox{\hyperlink{classFoam_1_1geomModel_ac9646442904ddf5e6eeefbf6c640dc83}{curMeshBounds\_}}.max()[dir] >= ibBound.min()[dir]}
+\DoxyCodeLine{164                 \&\& \mbox{\hyperlink{classFoam_1_1geomModel_ac9646442904ddf5e6eeefbf6c640dc83}{curMeshBounds\_}}.min()[dir] <= ibBound.max()[dir]))}
+\DoxyCodeLine{165             \{}
+\DoxyCodeLine{166                 \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{167             \}}
+\DoxyCodeLine{168         \}}
+\DoxyCodeLine{169     \}}
+\DoxyCodeLine{170     \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{171 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 18
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a31148673e1624bd4beb163feceb71ce4}\label{classFoam_1_1clusterBody_a31148673e1624bd4beb163feceb71ce4}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!isCluster@{isCluster}}
+\index{isCluster@{isCluster}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{isCluster()}{isCluster()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Foam\+::cluster\+Body\+::is\+Cluster (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a52273797dd78b8e0e679350270a436fd}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 167 of file cluster\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{168         \{}
+\DoxyCodeLine{169             \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{170         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a31148673e1624bd4beb163feceb71ce4}\label{classFoam_1_1clusterBody_a31148673e1624bd4beb163feceb71ce4}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!isCluster@{isCluster}}
+\index{isCluster@{isCluster}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{isCluster()}{isCluster()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool Foam\+::cluster\+Body\+::is\+Cluster (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a52273797dd78b8e0e679350270a436fd}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 167 of file cluster\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{168         \{}
+\DoxyCodeLine{169             \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{170         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab697fc599a50c583d12d5a0397cecbcd}\label{classFoam_1_1geomModel_ab697fc599a50c583d12d5a0397cecbcd}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!limitFinalSubVolume@{limitFinalSubVolume}}
+\index{limitFinalSubVolume@{limitFinalSubVolume}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{limitFinalSubVolume()}{limitFinalSubVolume()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual bool Foam\+::geom\+Model\+::limit\+Final\+Sub\+Volume (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&}]{sv,  }\item[{bool}]{c\+Ib,  }\item[{bound\+Box \&}]{lim\+B\+Box }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_aa49ed0e960396e3d3966db5be408b85e}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_a4333ff336de5409d9ac49f2018b975fa}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 284 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{289         \{}
+\DoxyCodeLine{290             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"15-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{291                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{292             \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{293         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 19
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab697fc599a50c583d12d5a0397cecbcd}\label{classFoam_1_1geomModel_ab697fc599a50c583d12d5a0397cecbcd}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!limitFinalSubVolume@{limitFinalSubVolume}}
+\index{limitFinalSubVolume@{limitFinalSubVolume}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{limitFinalSubVolume()}{limitFinalSubVolume()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual bool Foam\+::geom\+Model\+::limit\+Final\+Sub\+Volume (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classFoam_1_1subVolume}{sub\+Volume}} \&}]{sv,  }\item[{bool}]{c\+Ib,  }\item[{bound\+Box \&}]{lim\+B\+Box }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1stlBased_aa49ed0e960396e3d3966db5be408b85e}{Foam\+::stl\+Based}}, and \mbox{\hyperlink{classFoam_1_1stlBased_a4333ff336de5409d9ac49f2018b975fa}{Foam\+::stl\+Based}}.
+
+
+
+Definition at line 284 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{289         \{}
+\DoxyCodeLine{290             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"15-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{291                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{292             \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{293         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a3683e91af120b4ec18f2e2a4654b7d27}\label{classFoam_1_1clusterBody_a3683e91af120b4ec18f2e2a4654b7d27}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!pointInside@{pointInside}}
+\index{pointInside@{pointInside}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{pointInside()}{pointInside()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily bool Foam\+::cluster\+Body\+::point\+Inside (\begin{DoxyParamCaption}\item[{point}]{pointI }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_af0414777a0565560f378ec980ad8781a}{Foam\+::geom\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a4e82f0163f50edd2fc646ca4fddc48b5}\label{classFoam_1_1clusterBody_a4e82f0163f50edd2fc646ca4fddc48b5}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!pointInside@{pointInside}}
+\index{pointInside@{pointInside}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{pointInside()}{pointInside()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily bool cluster\+Body\+::point\+Inside (\begin{DoxyParamCaption}\item[{point}]{pointI }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_af0414777a0565560f378ec980ad8781a}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 142 of file cluster\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{143 \{}
+\DoxyCodeLine{144     \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{145     \{}
+\DoxyCodeLine{146         \textcolor{keywordflow}{if}(gModel-\/>pointInside(pointI))}
+\DoxyCodeLine{147             \textcolor{keywordflow}{return} \textcolor{keyword}{true};}
+\DoxyCodeLine{148     \}}
+\DoxyCodeLine{149     \textcolor{keywordflow}{return} \textcolor{keyword}{false};}
+\DoxyCodeLine{150 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a6abe410f94c00e7214be907f6ab573af}\label{classFoam_1_1clusterBody_a6abe410f94c00e7214be907f6ab573af}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!pointInside@{pointInside}}
+\index{pointInside@{pointInside}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{pointInside()}{pointInside()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily bool\+List cluster\+Body\+::point\+Inside (\begin{DoxyParamCaption}\item[{point\+Field}]{pointI }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a9f26fe62858c0b9da399f2c5823ea0a5}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 123 of file cluster\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{124 \{}
+\DoxyCodeLine{125     boolList inside(pointF.size());}
+\DoxyCodeLine{126 }
+\DoxyCodeLine{127     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(pointF,pointI)}
+\DoxyCodeLine{128     \{}
+\DoxyCodeLine{129         \textcolor{keywordtype}{bool} \mbox{\hyperlink{classFoam_1_1clusterBody_a6abe410f94c00e7214be907f6ab573af}{pointInside}} = \textcolor{keyword}{false};}
+\DoxyCodeLine{130         \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{131         \{}
+\DoxyCodeLine{132             \mbox{\hyperlink{classFoam_1_1clusterBody_a6abe410f94c00e7214be907f6ab573af}{pointInside}} = gModel-\/>pointInside(pointF[pointI]);}
+\DoxyCodeLine{133             \textcolor{keywordflow}{if}(\mbox{\hyperlink{classFoam_1_1clusterBody_a6abe410f94c00e7214be907f6ab573af}{pointInside}})}
+\DoxyCodeLine{134                 \textcolor{keywordflow}{break};}
+\DoxyCodeLine{135         \}}
+\DoxyCodeLine{136         inside[pointI] = \mbox{\hyperlink{classFoam_1_1clusterBody_a6abe410f94c00e7214be907f6ab573af}{pointInside}};}
+\DoxyCodeLine{137     \}}
+\DoxyCodeLine{138 }
+\DoxyCodeLine{139     \textcolor{keywordflow}{return} inside;}
+\DoxyCodeLine{140 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 20
+\mbox{\Hypertarget{classFoam_1_1clusterBody_afb1520ac78ec99d2d7c6ab82d5eafcb1}\label{classFoam_1_1clusterBody_afb1520ac78ec99d2d7c6ab82d5eafcb1}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!pointInside@{pointInside}}
+\index{pointInside@{pointInside}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{pointInside()}{pointInside()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily bool\+List Foam\+::cluster\+Body\+::point\+Inside (\begin{DoxyParamCaption}\item[{point\+Field}]{pointI }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a9f26fe62858c0b9da399f2c5823ea0a5}{Foam\+::geom\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a6cda919dd59a8c7b1fbc012a7c8d58de}\label{classFoam_1_1geomModel_a6cda919dd59a8c7b1fbc012a7c8d58de}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!resetBody@{resetBody}}
+\index{resetBody@{resetBody}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{resetBody()}{resetBody()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily virtual void Foam\+::geom\+Model\+::reset\+Body (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a5d051933b6288e41013b742f400b3328}{Foam\+::sphere\+Body}}, \mbox{\hyperlink{classFoam_1_1sphereBody_a5d051933b6288e41013b742f400b3328}{Foam\+::sphere\+Body}}, \mbox{\hyperlink{classFoam_1_1stlBased_a2ac6c0b240a24e8267d833172c159742}{Foam\+::stl\+Based}}, \mbox{\hyperlink{classFoam_1_1stlBased_a2ac6c0b240a24e8267d833172c159742}{Foam\+::stl\+Based}}, \mbox{\hyperlink{classFoam_1_1shapeBased_a83d7fdac25cbf1d791d8a85de57146d1}{Foam\+::shape\+Based}}, and \mbox{\hyperlink{classFoam_1_1shapeBased_a83d7fdac25cbf1d791d8a85de57146d1}{Foam\+::shape\+Based}}.
+
+
+
+Definition at line 212 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{213         \{}
+\DoxyCodeLine{214             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"6-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{215                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{216         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a0ac4f028dd85e3e490875ada874bc9c7}\label{classFoam_1_1clusterBody_a0ac4f028dd85e3e490875ada874bc9c7}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!resetBody@{resetBody}}
+\index{resetBody@{resetBody}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{resetBody()}{resetBody()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily void cluster\+Body\+::reset\+Body (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a4e0b05c4c79a7155bd2d890cc1805ad2}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 186 of file cluster\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{187 \{}
+\DoxyCodeLine{188     \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{189     \{}
+\DoxyCodeLine{190         gModel-\/>resetBody(body);}
+\DoxyCodeLine{191     \}}
+\DoxyCodeLine{192 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a4207fb37a3127a55f38b0dc965c82ca4}\label{classFoam_1_1clusterBody_a4207fb37a3127a55f38b0dc965c82ca4}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!resetBody@{resetBody}}
+\index{resetBody@{resetBody}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{resetBody()}{resetBody()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily void Foam\+::cluster\+Body\+::reset\+Body (\begin{DoxyParamCaption}\item[{vol\+Scalar\+Field \&}]{body }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a4e0b05c4c79a7155bd2d890cc1805ad2}{Foam\+::geom\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a3775030dc1986b062cb970ee223fefbc}\label{classFoam_1_1geomModel_a3775030dc1986b062cb970ee223fefbc}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!resetHashTable@{resetHashTable}}
+\index{resetHashTable@{resetHashTable}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{resetHashTable()}{resetHashTable()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::reset\+Hash\+Table (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 328 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{328 \{\mbox{\hyperlink{classFoam_1_1geomModel_a11167d3f48311fa265c662e4880d1de2}{cachedNeighbours\_}}.clear();\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a3775030dc1986b062cb970ee223fefbc}\label{classFoam_1_1geomModel_a3775030dc1986b062cb970ee223fefbc}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!resetHashTable@{resetHashTable}}
+\index{resetHashTable@{resetHashTable}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{resetHashTable()}{resetHashTable()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::reset\+Hash\+Table (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 328 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{328 \{\mbox{\hyperlink{classFoam_1_1geomModel_a11167d3f48311fa265c662e4880d1de2}{cachedNeighbours\_}}.clear();\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a17bd0e3467c49d455a0791e05a569c7e}\label{classFoam_1_1geomModel_a17bd0e3467c49d455a0791e05a569c7e}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!setCoM@{setCoM}}
+\index{setCoM@{setCoM}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{setCoM()}{setCoM()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::geom\+Model\+::set\+CoM (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a41c12cbbc0ec3b6e99041258efb160c9}{Foam\+::sphere\+Body}}, \mbox{\hyperlink{classFoam_1_1sphereBody_a41c12cbbc0ec3b6e99041258efb160c9}{Foam\+::sphere\+Body}}, \mbox{\hyperlink{classFoam_1_1stlBased_a5a9d46e2e14732afbc97c6c8526b1a70}{Foam\+::stl\+Based}}, \mbox{\hyperlink{classFoam_1_1stlBased_a5a9d46e2e14732afbc97c6c8526b1a70}{Foam\+::stl\+Based}}, \mbox{\hyperlink{classFoam_1_1shapeBased_a32ca76641283bc6ea3318417d2654ade}{Foam\+::shape\+Based}}, and \mbox{\hyperlink{classFoam_1_1shapeBased_a32ca76641283bc6ea3318417d2654ade}{Foam\+::shape\+Based}}.
+
+
+
+Definition at line 295 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{296         \{}
+\DoxyCodeLine{297             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"16-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{298                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{299         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a17bd0e3467c49d455a0791e05a569c7e}\label{classFoam_1_1geomModel_a17bd0e3467c49d455a0791e05a569c7e}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!setCoM@{setCoM}}
+\index{setCoM@{setCoM}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{setCoM()}{setCoM()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::geom\+Model\+::set\+CoM (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_a41c12cbbc0ec3b6e99041258efb160c9}{Foam\+::sphere\+Body}}, \mbox{\hyperlink{classFoam_1_1sphereBody_a41c12cbbc0ec3b6e99041258efb160c9}{Foam\+::sphere\+Body}}, \mbox{\hyperlink{classFoam_1_1stlBased_a5a9d46e2e14732afbc97c6c8526b1a70}{Foam\+::stl\+Based}}, \mbox{\hyperlink{classFoam_1_1stlBased_a5a9d46e2e14732afbc97c6c8526b1a70}{Foam\+::stl\+Based}}, \mbox{\hyperlink{classFoam_1_1shapeBased_a32ca76641283bc6ea3318417d2654ade}{Foam\+::shape\+Based}}, and \mbox{\hyperlink{classFoam_1_1shapeBased_a32ca76641283bc6ea3318417d2654ade}{Foam\+::shape\+Based}}.
+
+
+
+Definition at line 295 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{296         \{}
+\DoxyCodeLine{297             \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a4cce070270f4a646189b05400235d3b6}{InfoH}} << \mbox{\hyperlink{namespaceFoam_1_1outputHFDIBDEM_a1fdb068e6d2eb61db05d056f3a35fb1da452e389ee57ea3021adb20e892724f13}{iB\_Info}} << \textcolor{stringliteral}{"16-\/-\/ geomModelMessage-\/-\/ "}}
+\DoxyCodeLine{298                 << \textcolor{stringliteral}{"notIplemented"}<<endl;}
+\DoxyCodeLine{299         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ad19f0d607ed84fec9e970babbdc65c69}\label{classFoam_1_1geomModel_ad19f0d607ed84fec9e970babbdc65c69}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!setIntSpan@{setIntSpan}}
+\index{setIntSpan@{setIntSpan}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{setIntSpan()}{setIntSpan()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::set\+Int\+Span (\begin{DoxyParamCaption}\item[{scalar}]{int\+Span }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 324 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{324 \{\mbox{\hyperlink{classFoam_1_1geomModel_a220b3e2c2a2e5dd60115dad2bff40a85}{intSpan\_}} = intSpan;\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ad19f0d607ed84fec9e970babbdc65c69}\label{classFoam_1_1geomModel_ad19f0d607ed84fec9e970babbdc65c69}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!setIntSpan@{setIntSpan}}
+\index{setIntSpan@{setIntSpan}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{setIntSpan()}{setIntSpan()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::set\+Int\+Span (\begin{DoxyParamCaption}\item[{scalar}]{int\+Span }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 324 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{324 \{\mbox{\hyperlink{classFoam_1_1geomModel_a220b3e2c2a2e5dd60115dad2bff40a85}{intSpan\_}} = intSpan;\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a190730c769a08da099c0b3e6431f8e49}\label{classFoam_1_1geomModel_a190730c769a08da099c0b3e6431f8e49}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!setM0@{setM0}}
+\index{setM0@{setM0}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{setM0()}{setM0()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::set\+M0 (\begin{DoxyParamCaption}\item[{scalar}]{M0 }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 351 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{352         \{}
+\DoxyCodeLine{353             \mbox{\hyperlink{classFoam_1_1geomModel_ab0cbe345c5e98c54e43e868a5b2f0f92}{M0\_}} = M0;}
+\DoxyCodeLine{354         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a190730c769a08da099c0b3e6431f8e49}\label{classFoam_1_1geomModel_a190730c769a08da099c0b3e6431f8e49}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!setM0@{setM0}}
+\index{setM0@{setM0}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{setM0()}{setM0()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::set\+M0 (\begin{DoxyParamCaption}\item[{scalar}]{M0 }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 351 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{352         \{}
+\DoxyCodeLine{353             \mbox{\hyperlink{classFoam_1_1geomModel_ab0cbe345c5e98c54e43e868a5b2f0f92}{M0\_}} = M0;}
+\DoxyCodeLine{354         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_ac0696cc1839d589fb0c6ca07bd662e7f}\label{classFoam_1_1periodicBody_ac0696cc1839d589fb0c6ca07bd662e7f}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!setOwner@{setOwner}}
+\index{setOwner@{setOwner}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{setOwner()}{setOwner()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void periodic\+Body\+::set\+Owner (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_aea6f262abe8aecc315fce91ccd253cdd}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 113 of file periodic\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{114 \{}
+\DoxyCodeLine{115     HashTable<label, label, Hash<label>> frequency;}
+\DoxyCodeLine{116     \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{117     \{}
+\DoxyCodeLine{118         gModel-\/>setOwner();}
+\DoxyCodeLine{119 }
+\DoxyCodeLine{120         label ownerI = gModel-\/>getOwner();}
+\DoxyCodeLine{121         \textcolor{keywordflow}{if}(!frequency.found(ownerI))}
+\DoxyCodeLine{122         \{}
+\DoxyCodeLine{123             frequency.insert(ownerI, 0);}
+\DoxyCodeLine{124         \}}
+\DoxyCodeLine{125 }
+\DoxyCodeLine{126         frequency[ownerI]++;}
+\DoxyCodeLine{127     \}}
+\DoxyCodeLine{128 }
+\DoxyCodeLine{129     label maxFreq = 0;}
+\DoxyCodeLine{130     label maxProc = 0;}
+\DoxyCodeLine{131     \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} it = frequency.begin(); it != frequency.end(); ++it)}
+\DoxyCodeLine{132     \{}
+\DoxyCodeLine{133         \textcolor{keywordflow}{if} (*it > maxFreq)}
+\DoxyCodeLine{134         \{}
+\DoxyCodeLine{135             maxFreq = *it;}
+\DoxyCodeLine{136             maxProc = it.key();}
+\DoxyCodeLine{137         \}}
+\DoxyCodeLine{138     \}}
+\DoxyCodeLine{139 }
+\DoxyCodeLine{140     \mbox{\hyperlink{classFoam_1_1geomModel_a6beec229c26dadc133ad0514ed0898f7}{owner\_}} = maxProc;}
+\DoxyCodeLine{141 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a5a0e674b6b9ddb72956cb64f8252918d}\label{classFoam_1_1periodicBody_a5a0e674b6b9ddb72956cb64f8252918d}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!setOwner@{setOwner}}
+\index{setOwner@{setOwner}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{setOwner()}{setOwner()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::periodic\+Body\+::set\+Owner (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_aea6f262abe8aecc315fce91ccd253cdd}{Foam\+::geom\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_abf9695a07f2526a7f82876f187064ddd}\label{classFoam_1_1geomModel_abf9695a07f2526a7f82876f187064ddd}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!setRhoS@{setRhoS}}
+\index{setRhoS@{setRhoS}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{setRhoS()}{setRhoS()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::geom\+Model\+::set\+RhoS (\begin{DoxyParamCaption}\item[{dimensioned\+Scalar}]{rhoS }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_ab0180d6c1180033b6c82eafac45f5a2d}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_ab0180d6c1180033b6c82eafac45f5a2d}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 330 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{330 \{\mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rhoS\_}} = rhoS;\}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 21
+\mbox{\Hypertarget{classFoam_1_1geomModel_abf9695a07f2526a7f82876f187064ddd}\label{classFoam_1_1geomModel_abf9695a07f2526a7f82876f187064ddd}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!setRhoS@{setRhoS}}
+\index{setRhoS@{setRhoS}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{setRhoS()}{setRhoS()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::geom\+Model\+::set\+RhoS (\begin{DoxyParamCaption}\item[{dimensioned\+Scalar}]{rhoS }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented in \mbox{\hyperlink{classFoam_1_1sphereBody_ab0180d6c1180033b6c82eafac45f5a2d}{Foam\+::sphere\+Body}}, and \mbox{\hyperlink{classFoam_1_1sphereBody_ab0180d6c1180033b6c82eafac45f5a2d}{Foam\+::sphere\+Body}}.
+
+
+
+Definition at line 330 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{330 \{\mbox{\hyperlink{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}{rhoS\_}} = rhoS;\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ae706c318abc2f5e3235079dc5e7ac589}\label{classFoam_1_1geomModel_ae706c318abc2f5e3235079dc5e7ac589}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!setSdBasedLambda@{setSdBasedLambda}}
+\index{setSdBasedLambda@{setSdBasedLambda}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{setSdBasedLambda()}{setSdBasedLambda()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::set\+Sd\+Based\+Lambda (\begin{DoxyParamCaption}\item[{bool}]{sd\+Based\+Lambda }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 326 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{326 \{\mbox{\hyperlink{classFoam_1_1geomModel_ae983de88f0feab99a34a6a6d1af8d744}{sdBasedLambda\_}} = sdBasedLambda;\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1geomModel_ae706c318abc2f5e3235079dc5e7ac589}\label{classFoam_1_1geomModel_ae706c318abc2f5e3235079dc5e7ac589}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!setSdBasedLambda@{setSdBasedLambda}}
+\index{setSdBasedLambda@{setSdBasedLambda}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{setSdBasedLambda()}{setSdBasedLambda()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::geom\+Model\+::set\+Sd\+Based\+Lambda (\begin{DoxyParamCaption}\item[{bool}]{sd\+Based\+Lambda }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 326 of file geom\+Model.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{326 \{\mbox{\hyperlink{classFoam_1_1geomModel_ae983de88f0feab99a34a6a6d1af8d744}{sdBasedLambda\_}} = sdBasedLambda;\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a697693a79417aa9607ede078076dfcbe}\label{classFoam_1_1periodicBody_a697693a79417aa9607ede078076dfcbe}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!shouldBeUnclustered@{shouldBeUnclustered}}
+\index{shouldBeUnclustered@{shouldBeUnclustered}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{shouldBeUnclustered()}{shouldBeUnclustered()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily bool Foam\+::periodic\+Body\+::should\+Be\+Unclustered (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1periodicBody_ab850148f32333d2a857d92f21aa63be7}\label{classFoam_1_1periodicBody_ab850148f32333d2a857d92f21aa63be7}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!shouldBeUnclustered@{shouldBeUnclustered}}
+\index{shouldBeUnclustered@{shouldBeUnclustered}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{shouldBeUnclustered()}{shouldBeUnclustered()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily bool periodic\+Body\+::should\+Be\+Unclustered (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 184 of file periodic\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{185 \{}
+\DoxyCodeLine{186     \textcolor{keywordtype}{int} remBodies = 0;}
+\DoxyCodeLine{187     \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{188     \{}
+\DoxyCodeLine{189         \textcolor{keywordflow}{if}(gModel-\/>getM() > 0)}
+\DoxyCodeLine{190         \{}
+\DoxyCodeLine{191             ++remBodies;}
+\DoxyCodeLine{192         \}}
+\DoxyCodeLine{193     \}}
+\DoxyCodeLine{194 }
+\DoxyCodeLine{195     \textcolor{keywordflow}{return} remBodies == 1;}
+\DoxyCodeLine{196 \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 22
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a79b6e74834110dfebaa8d4fb1bfd61ef}\label{classFoam_1_1clusterBody_a79b6e74834110dfebaa8d4fb1bfd61ef}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!synchronPos@{synchronPos}}
+\index{synchronPos@{synchronPos}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{synchronPos()}{synchronPos()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::cluster\+Body\+::synchron\+Pos (\begin{DoxyParamCaption}\item[{label}]{owner = {\ttfamily -\/1} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a8095734d9ef4a2f4589d4793693a9924}{Foam\+::geom\+Model}}.
+
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a8bddae3fdb2e208bf03f24ff4ce06884}\label{classFoam_1_1clusterBody_a8bddae3fdb2e208bf03f24ff4ce06884}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!synchronPos@{synchronPos}}
+\index{synchronPos@{synchronPos}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{synchronPos()}{synchronPos()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void cluster\+Body\+::synchron\+Pos (\begin{DoxyParamCaption}\item[{label}]{owner = {\ttfamily -\/1} }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1geomModel_a8095734d9ef4a2f4589d4793693a9924}{Foam\+::geom\+Model}}.
+
+
+
+Definition at line 115 of file cluster\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{116 \{}
+\DoxyCodeLine{117     \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{118     \{}
+\DoxyCodeLine{119         gModel-\/>synchronPos(\mbox{\hyperlink{classFoam_1_1geomModel_a6beec229c26dadc133ad0514ed0898f7}{owner\_}});}
+\DoxyCodeLine{120     \}}
+\DoxyCodeLine{121 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a1aa28c2d82c3a99aff528b2e7545af1c}\label{classFoam_1_1clusterBody_a1aa28c2d82c3a99aff528b2e7545af1c}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!updateIntList@{updateIntList}}
+\index{updateIntList@{updateIntList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{updateIntList()}{updateIntList()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::cluster\+Body\+::update\+Int\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classFoam_1_1clusterBody_aaffbab47c8ec04f8dab6867fdcf79a54}\label{classFoam_1_1clusterBody_aaffbab47c8ec04f8dab6867fdcf79a54}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!updateIntList@{updateIntList}}
+\index{updateIntList@{updateIntList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{updateIntList()}{updateIntList()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void cluster\+Body\+::update\+Int\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 68 of file cluster\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{69 \{}
+\DoxyCodeLine{70     \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}}.clear();}
+\DoxyCodeLine{71     \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}}.setSize(Pstream::nProcs());}
+\DoxyCodeLine{72 }
+\DoxyCodeLine{73     \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{74     \{}
+\DoxyCodeLine{75         \mbox{\hyperlink{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}{intCells\_}}[Pstream::myProcNo()].append(}
+\DoxyCodeLine{76             gModel-\/>getInternalCellList()[Pstream::myProcNo()]}
+\DoxyCodeLine{77         );}
+\DoxyCodeLine{78     \}}
+\DoxyCodeLine{79 \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 23
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a51c43a33ebeb39b849fc2369ea9d23dd}\label{classFoam_1_1clusterBody_a51c43a33ebeb39b849fc2369ea9d23dd}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!updateSurfList@{updateSurfList}}
+\index{updateSurfList@{updateSurfList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{updateSurfList()}{updateSurfList()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::cluster\+Body\+::update\+Surf\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+\mbox{\Hypertarget{classFoam_1_1clusterBody_ac4ebc25dfa355d2cc30c7f5f49136dad}\label{classFoam_1_1clusterBody_ac4ebc25dfa355d2cc30c7f5f49136dad}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!updateSurfList@{updateSurfList}}
+\index{updateSurfList@{updateSurfList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{updateSurfList()}{updateSurfList()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void cluster\+Body\+::update\+Surf\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inherited]}}
+
+
+
+Definition at line 55 of file cluster\+Body.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{56 \{}
+\DoxyCodeLine{57     \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}.clear();}
+\DoxyCodeLine{58     \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}.setSize(Pstream::nProcs());}
+\DoxyCodeLine{59 }
+\DoxyCodeLine{60     \textcolor{keywordflow}{for}(std::shared\_ptr<geomModel>\& gModel : \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}})}
+\DoxyCodeLine{61     \{}
+\DoxyCodeLine{62         \mbox{\hyperlink{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}{surfCells\_}}[Pstream::myProcNo()].append(}
+\DoxyCodeLine{63             gModel-\/>getSurfaceCellList()[Pstream::myProcNo()]}
+\DoxyCodeLine{64         );}
+\DoxyCodeLine{65     \}}
+\DoxyCodeLine{66 \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 24
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a373d8d246d4feb7ab698e4086560733d}\label{classFoam_1_1periodicBody_a373d8d246d4feb7ab698e4086560733d}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!writeBodyInfo@{writeBodyInfo}}
+\index{writeBodyInfo@{writeBodyInfo}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{writeBodyInfo()}{writeBodyInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::periodic\+Body\+::write\+Body\+Info (\begin{DoxyParamCaption}\item[{label}]{body\+Id,  }\item[{I\+Odictionary \&}]{dict,  }\item[{word}]{path }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1clusterBody_ac431dd769e97df94ac9d9ebb251d9b5f}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 138 of file periodic\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{139         \{}
+\DoxyCodeLine{140             \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[0]-\/>writeBodyInfo(bodyId, dict, path);}
+\DoxyCodeLine{141         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1periodicBody_a373d8d246d4feb7ab698e4086560733d}\label{classFoam_1_1periodicBody_a373d8d246d4feb7ab698e4086560733d}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!writeBodyInfo@{writeBodyInfo}}
+\index{writeBodyInfo@{writeBodyInfo}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{writeBodyInfo()}{writeBodyInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::periodic\+Body\+::write\+Body\+Info (\begin{DoxyParamCaption}\item[{label}]{body\+Id,  }\item[{I\+Odictionary \&}]{dict,  }\item[{word}]{path }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Reimplemented from \mbox{\hyperlink{classFoam_1_1clusterBody_ac431dd769e97df94ac9d9ebb251d9b5f}{Foam\+::cluster\+Body}}.
+
+
+
+Definition at line 138 of file periodic\+Body.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{139         \{}
+\DoxyCodeLine{140             \mbox{\hyperlink{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}{ibGeomModelList}}[0]-\/>writeBodyInfo(bodyId, dict, path);}
+\DoxyCodeLine{141         \}}
+
+\end{DoxyCode}
+
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{classFoam_1_1geomModel_a393b0094bd325f353d7b9ca518da6c76}\label{classFoam_1_1geomModel_a393b0094bd325f353d7b9ca518da6c76}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!bBox\_@{bBox\_}}
+\index{bBox\_@{bBox\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{bBox\_}{bBox\_}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$ bound\+Box $>$ Foam\+::geom\+Model\+::b\+Box\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 124 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a11167d3f48311fa265c662e4880d1de2}\label{classFoam_1_1geomModel_a11167d3f48311fa265c662e4880d1de2}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!cachedNeighbours\_@{cachedNeighbours\_}}
+\index{cachedNeighbours\_@{cachedNeighbours\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{cachedNeighbours\_}{cachedNeighbours\_}}
+{\footnotesize\ttfamily auto\+Ptr$<$ Hash\+Table$<$ const label\+List \&, label, Hash$<$ label $>$ $>$ $>$ Foam\+::geom\+Model\+::cached\+Neighbours\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 110 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_afba8bac78aa8199c348d643fb6ab6606}\label{classFoam_1_1geomModel_afba8bac78aa8199c348d643fb6ab6606}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!cellToStartInCreateIB\_@{cellToStartInCreateIB\_}}
+\index{cellToStartInCreateIB\_@{cellToStartInCreateIB\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{cellToStartInCreateIB\_}{cellToStartInCreateIB\_}}
+{\footnotesize\ttfamily label Foam\+::geom\+Model\+::cell\+To\+Start\+In\+Create\+I\+B\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 104 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}\label{classFoam_1_1geomModel_a1793e23c17d2e89176b083336371eb09}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!CoM\_@{CoM\_}}
+\index{CoM\_@{CoM\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{CoM\_}{CoM\_}}
+{\footnotesize\ttfamily vector Foam\+::geom\+Model\+::\+Co\+M\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 118 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_ad88bb1c51f58fe353e3899e175dca2b9}\label{classFoam_1_1geomModel_ad88bb1c51f58fe353e3899e175dca2b9}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!contactType\_@{contactType\_}}
+\index{contactType\_@{contactType\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{contactType\_}{contactType\_}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{namespaceFoam_a0944a83a07e78055f752758326d795a5}{contact\+Type}} Foam\+::geom\+Model\+::contact\+Type\+\_\+\hspace{0.3cm}{\ttfamily [private]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 88 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_ac9646442904ddf5e6eeefbf6c640dc83}\label{classFoam_1_1geomModel_ac9646442904ddf5e6eeefbf6c640dc83}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!curMeshBounds\_@{curMeshBounds\_}}
+\index{curMeshBounds\_@{curMeshBounds\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{curMeshBounds\_}{curMeshBounds\_}}
+{\footnotesize\ttfamily bound\+Box Foam\+::geom\+Model\+::cur\+Mesh\+Bounds\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 109 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a5038a5a3ebb7cb4992c894387203bc4d}\label{classFoam_1_1geomModel_a5038a5a3ebb7cb4992c894387203bc4d}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!dC\_@{dC\_}}
+\index{dC\_@{dC\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{dC\_}{dC\_}}
+{\footnotesize\ttfamily scalar Foam\+::geom\+Model\+::d\+C\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 127 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}\label{classFoam_1_1geomModel_a90cef3ba17a7f4c8091605f67b1a4d2c}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!I\_@{I\_}}
+\index{I\_@{I\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{I\_}{I\_}}
+{\footnotesize\ttfamily symm\+Tensor Foam\+::geom\+Model\+::\+I\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 121 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}\label{classFoam_1_1clusterBody_a0053f52322d6c64c325450979cdf0800}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!ibGeomModelList@{ibGeomModelList}}
+\index{ibGeomModelList@{ibGeomModelList}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{ibGeomModelList}{ibGeomModelList}}
+{\footnotesize\ttfamily std\+::vector$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ $>$ Foam\+::cluster\+Body\+::ib\+Geom\+Model\+List\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 60 of file cluster\+Body.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}\label{classFoam_1_1geomModel_a3f0251d1ef9818a1b6c35f818e44882a}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!ibPartialVolume\_@{ibPartialVolume\_}}
+\index{ibPartialVolume\_@{ibPartialVolume\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{ibPartialVolume\_}{ibPartialVolume\_}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} Foam\+::geom\+Model\+::ib\+Partial\+Volume\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 101 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}\label{classFoam_1_1geomModel_a4cd4a0a2442e55d3cb091309f555e893}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!intCells\_@{intCells\_}}
+\index{intCells\_@{intCells\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{intCells\_}{intCells\_}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ Foam\+::geom\+Model\+::int\+Cells\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 98 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a220b3e2c2a2e5dd60115dad2bff40a85}\label{classFoam_1_1geomModel_a220b3e2c2a2e5dd60115dad2bff40a85}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!intSpan\_@{intSpan\_}}
+\index{intSpan\_@{intSpan\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{intSpan\_}{intSpan\_}}
+{\footnotesize\ttfamily scalar Foam\+::geom\+Model\+::int\+Span\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 107 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_ab0cbe345c5e98c54e43e868a5b2f0f92}\label{classFoam_1_1geomModel_ab0cbe345c5e98c54e43e868a5b2f0f92}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!M0\_@{M0\_}}
+\index{M0\_@{M0\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{M0\_}{M0\_}}
+{\footnotesize\ttfamily scalar Foam\+::geom\+Model\+::\+M0\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 114 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}\label{classFoam_1_1geomModel_a706f9bcb5e6ff406303e1cb6b767bac4}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!M\_@{M\_}}
+\index{M\_@{M\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{M\_}{M\_}}
+{\footnotesize\ttfamily scalar Foam\+::geom\+Model\+::\+M\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 113 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}\label{classFoam_1_1geomModel_aed0491fcc86d5e43ed96c1997919757a}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!mesh\_@{mesh\_}}
+\index{mesh\_@{mesh\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{mesh\_}{mesh\_}}
+{\footnotesize\ttfamily const fv\+Mesh \& Foam\+::geom\+Model\+::mesh\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 92 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a164a9b5ae11beefcf8af797f331e2b1e}\label{classFoam_1_1geomModel_a164a9b5ae11beefcf8af797f331e2b1e}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!nCells\_@{nCells\_}}
+\index{nCells\_@{nCells\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{nCells\_}{nCells\_}}
+{\footnotesize\ttfamily label Foam\+::geom\+Model\+::n\+Cells\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 115 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a6beec229c26dadc133ad0514ed0898f7}\label{classFoam_1_1geomModel_a6beec229c26dadc133ad0514ed0898f7}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!owner\_@{owner\_}}
+\index{owner\_@{owner\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{owner\_}{owner\_}}
+{\footnotesize\ttfamily label Foam\+::geom\+Model\+::owner\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 102 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}\label{classFoam_1_1geomModel_add8ed13d6fb356b43aa830ca5b02554f}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!rhoS\_@{rhoS\_}}
+\index{rhoS\_@{rhoS\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{rhoS\_}{rhoS\_}}
+{\footnotesize\ttfamily dimensioned\+Scalar Foam\+::geom\+Model\+::rho\+S\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 130 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_ae983de88f0feab99a34a6a6d1af8d744}\label{classFoam_1_1geomModel_ae983de88f0feab99a34a6a6d1af8d744}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!sdBasedLambda\_@{sdBasedLambda\_}}
+\index{sdBasedLambda\_@{sdBasedLambda\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{sdBasedLambda\_}{sdBasedLambda\_}}
+{\footnotesize\ttfamily bool Foam\+::geom\+Model\+::sd\+Based\+Lambda\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 108 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}\label{classFoam_1_1geomModel_a4d1c4e45f8f17f93a0262adbb0322d92}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!surfCells\_@{surfCells\_}}
+\index{surfCells\_@{surfCells\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{surfCells\_}{surfCells\_}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{classFoam_1_1clusterBody_a06589f05c2f6ec67ff831043f9e657d3}{Dynamic\+Label\+List}} $>$ Foam\+::geom\+Model\+::surf\+Cells\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 95 of file geom\+Model.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1geomModel_aec695437242a0c3e79ddd50ea51478dd}\label{classFoam_1_1geomModel_aec695437242a0c3e79ddd50ea51478dd}} 
+\index{Foam::periodicBody@{Foam::periodicBody}!thrSurf\_@{thrSurf\_}}
+\index{thrSurf\_@{thrSurf\_}!Foam::periodicBody@{Foam::periodicBody}}
+\doxysubsubsection{\texorpdfstring{thrSurf\_}{thrSurf\_}}
+{\footnotesize\ttfamily scalar Foam\+::geom\+Model\+::thr\+Surf\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 105 of file geom\+Model.\+H.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/geom\+Models/cluster\+Based/\mbox{\hyperlink{geomModels_2clusterBased_2periodicBody_8H}{periodic\+Body.\+H}}\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/geom\+Models/cluster\+Based/\mbox{\hyperlink{geomModels_2clusterBased_2periodicBody_8C}{periodic\+Body.\+C}}\end{DoxyCompactItemize}

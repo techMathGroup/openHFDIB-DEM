@@ -1,0 +1,261 @@
+\hypertarget{pEqn_8H}{}\doxysection{application/solvers/pimple\+H\+F\+D\+I\+B\+Foam/p\+Eqn.H File Reference}
+\label{pEqn_8H}\index{application/solvers/pimpleHFDIBFoam/pEqn.H@{application/solvers/pimpleHFDIBFoam/pEqn.H}}
+{\ttfamily \#include \char`\"{}continuity\+Errs.\+H\char`\"{}}\newline
+Include dependency graph for p\+Eqn.\+H\+:
+% FIG 0
+This graph shows which files directly or indirectly include this file\+:
+% FIG 1
+\doxysubsection*{Functions}
+\begin{DoxyCompactItemize}
+\item 
+vol\+Scalar\+Field \mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{r\+AU}} (1.\+0/U\+Eqn.\+A())
+\item 
+vol\+Vector\+Field \mbox{\hyperlink{pEqn_8H_a748dcc48c958062d58a54c8687c51b88}{HbyA}} (constrain\+HbyA(\mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{r\+AU}} $\ast$U\+Eqn.\+H(), \mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}}, p))
+\item 
+surface\+Scalar\+Field \mbox{\hyperlink{pEqn_8H_aa8a75b752b2c5a0842b47b83cef7b281}{phi\+HbyA}} (\char`\"{}phi\+HbyA\char`\"{}, fvc\+::flux(\mbox{\hyperlink{pEqn_8H_a748dcc48c958062d58a54c8687c51b88}{HbyA}})+M\+R\+F.\+zero\+Filter(fvc\+::interpolate(\mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{r\+AU}}) $\ast$fvc\+::ddt\+Corr(\mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}}, phi, Uf)))
+\item 
+M\+RF \mbox{\hyperlink{pEqn_8H_a23f3f4fc9a5a416491cfab1d403fdafa}{make\+Relative}} (\mbox{\hyperlink{pEqn_8H_aa8a75b752b2c5a0842b47b83cef7b281}{phi\+HbyA}})
+\item 
+\mbox{\hyperlink{pEqn_8H_acaeed9c6594c054d066f2410e4ab1d85}{if}} (p.\+need\+Reference())
+\item 
+tmp$<$ vol\+Scalar\+Field $>$ \mbox{\hyperlink{pEqn_8H_afe01da774d03b179d1e22adc75a3c2fe}{r\+AtU}} (\mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{r\+AU}})
+\item 
+\mbox{\hyperlink{pEqn_8H_a51a6e1697d23e2077ab4d9b2b12f2d54}{if}} (pimple.\+consistent())
+\item 
+\mbox{\hyperlink{pEqn_8H_a98ec4639f6f3250223689b87374d340f}{if}} (pimple.\+n\+Corr\+Piso()$<$=1)
+\item 
+\mbox{\hyperlink{pEqn_8H_a0513d5980014a3f2b86d266379b8ccfa}{constrain\+Pressure}} (p, \mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}}, \mbox{\hyperlink{pEqn_8H_aa8a75b752b2c5a0842b47b83cef7b281}{phi\+HbyA}}, \mbox{\hyperlink{pEqn_8H_afe01da774d03b179d1e22adc75a3c2fe}{r\+AtU}}(), M\+RF)
+\item 
+vol\+Vector\+Field \mbox{\hyperlink{pEqn_8H_a11a0f7fc514ff642863df4b698e9fd67}{FbyA}} (\mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{r\+AU}} $\ast$\mbox{\hyperlink{pEqn_8H_a633de4b0c14ca52ea2432a3c8a5c4c31}{f}})
+\item 
+surface\+Scalar\+Field \mbox{\hyperlink{pEqn_8H_a8afcb300a3b7041ccdd88435f628e01c}{phi\+FbyA}} (\char`\"{}phi\+FbyA\char`\"{}, fvc\+::flux(\mbox{\hyperlink{pEqn_8H_a11a0f7fc514ff642863df4b698e9fd67}{FbyA}}))
+\item 
+\mbox{\hyperlink{pEqn_8H_ab13470e79e249d04c443bf59be9ff31d}{while}} (pimple.\+correct\+Non\+Orthogonal())
+\item 
+p \mbox{\hyperlink{pEqn_8H_a15bfa901ef14c7146d67360f3c63addc}{relax}} ()
+\item 
+\mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}} \mbox{\hyperlink{pEqn_8H_a00a7f09fddd305c7a7977494b2a6a952}{correct\+Boundary\+Conditions}} ()
+\item 
+fv\+Options \mbox{\hyperlink{pEqn_8H_a139f25a7d5ee64548c7fd514755e4842}{correct}} (\mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}})
+\item 
+H\+F\+D\+I\+B\+D\+EM \mbox{\hyperlink{pEqn_8H_a8206df473b708aa4f79057e5bab871fb}{update\+F\+S\+Coupling}} (lambda, \mbox{\hyperlink{pEqn_8H_a633de4b0c14ca52ea2432a3c8a5c4c31}{f}})
+\item 
+H\+F\+D\+I\+B\+D\+EM \mbox{\hyperlink{pEqn_8H_ac639badc84aa6991315073e17007b0b3}{interpolate\+IB}} (\mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}}, Ui, lambda)
+\end{DoxyCompactItemize}
+\doxysubsection*{Variables}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}} = \mbox{\hyperlink{pEqn_8H_a748dcc48c958062d58a54c8687c51b88}{HbyA}} -\/ \mbox{\hyperlink{pEqn_8H_afe01da774d03b179d1e22adc75a3c2fe}{r\+AtU}}$\ast$fvc\+::grad(p) + \mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{r\+AU}}$\ast$\mbox{\hyperlink{pEqn_8H_a633de4b0c14ca52ea2432a3c8a5c4c31}{f}}
+\item 
+\mbox{\hyperlink{pEqn_8H_a633de4b0c14ca52ea2432a3c8a5c4c31}{f}} = 0.\+8$\ast$lambda$\ast$(Ui -\/ \mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}})/run\+Time.\+deltaT()
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Function Documentation}
+\mbox{\Hypertarget{pEqn_8H_a0513d5980014a3f2b86d266379b8ccfa}\label{pEqn_8H_a0513d5980014a3f2b86d266379b8ccfa}} 
+\index{pEqn.H@{pEqn.H}!constrainPressure@{constrainPressure}}
+\index{constrainPressure@{constrainPressure}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{constrainPressure()}{constrainPressure()}}
+{\footnotesize\ttfamily constrain\+Pressure (\begin{DoxyParamCaption}\item[{p}]{,  }\item[{\mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}}}]{,  }\item[{\mbox{\hyperlink{pEqn_8H_aa8a75b752b2c5a0842b47b83cef7b281}{phi\+HbyA}}}]{,  }\item[{\mbox{\hyperlink{pEqn_8H_afe01da774d03b179d1e22adc75a3c2fe}{r\+AtU}}()}]{,  }\item[{M\+RF}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{pEqn_8H_a139f25a7d5ee64548c7fd514755e4842}\label{pEqn_8H_a139f25a7d5ee64548c7fd514755e4842}} 
+\index{pEqn.H@{pEqn.H}!correct@{correct}}
+\index{correct@{correct}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{correct()}{correct()}}
+{\footnotesize\ttfamily fv\+Options correct (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{pEqn_8H_a00a7f09fddd305c7a7977494b2a6a952}\label{pEqn_8H_a00a7f09fddd305c7a7977494b2a6a952}} 
+\index{pEqn.H@{pEqn.H}!correctBoundaryConditions@{correctBoundaryConditions}}
+\index{correctBoundaryConditions@{correctBoundaryConditions}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{correctBoundaryConditions()}{correctBoundaryConditions()}}
+{\footnotesize\ttfamily \mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}} correct\+Boundary\+Conditions (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{pEqn_8H_a11a0f7fc514ff642863df4b698e9fd67}\label{pEqn_8H_a11a0f7fc514ff642863df4b698e9fd67}} 
+\index{pEqn.H@{pEqn.H}!FbyA@{FbyA}}
+\index{FbyA@{FbyA}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{FbyA()}{FbyA()}}
+{\footnotesize\ttfamily vol\+Vector\+Field FbyA (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{r\+AU}} $\ast$}]{f }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{pEqn_8H_a748dcc48c958062d58a54c8687c51b88}\label{pEqn_8H_a748dcc48c958062d58a54c8687c51b88}} 
+\index{pEqn.H@{pEqn.H}!HbyA@{HbyA}}
+\index{HbyA@{HbyA}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{HbyA()}{HbyA()}}
+{\footnotesize\ttfamily vol\+Vector\+Field HbyA (\begin{DoxyParamCaption}\item[{constrain\+HbyA(\mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{r\+AU}} $\ast$U\+Eqn.\+H(), \mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}}, p)}]{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+% FIG 2
+\mbox{\Hypertarget{pEqn_8H_acaeed9c6594c054d066f2410e4ab1d85}\label{pEqn_8H_acaeed9c6594c054d066f2410e4ab1d85}} 
+\index{pEqn.H@{pEqn.H}!if@{if}}
+\index{if@{if}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [1/3]}}
+{\footnotesize\ttfamily if (\begin{DoxyParamCaption}\item[{p.}]{need\+Reference() }\end{DoxyParamCaption})}
+
+
+
+Definition at line 12 of file p\+Eqn.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{13 \{}
+\DoxyCodeLine{14     \mbox{\hyperlink{pEqn_8H_a23f3f4fc9a5a416491cfab1d403fdafa}{fvc::makeRelative}}(\mbox{\hyperlink{pEqn_8H_aa8a75b752b2c5a0842b47b83cef7b281}{phiHbyA}}, \mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}});}
+\DoxyCodeLine{15     adjustPhi(\mbox{\hyperlink{pEqn_8H_aa8a75b752b2c5a0842b47b83cef7b281}{phiHbyA}}, \mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}}, p);}
+\DoxyCodeLine{16     fvc::makeAbsolute(\mbox{\hyperlink{pEqn_8H_aa8a75b752b2c5a0842b47b83cef7b281}{phiHbyA}}, \mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}});}
+\DoxyCodeLine{17 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 3
+\mbox{\Hypertarget{pEqn_8H_a51a6e1697d23e2077ab4d9b2b12f2d54}\label{pEqn_8H_a51a6e1697d23e2077ab4d9b2b12f2d54}} 
+\index{pEqn.H@{pEqn.H}!if@{if}}
+\index{if@{if}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [2/3]}}
+{\footnotesize\ttfamily if (\begin{DoxyParamCaption}\item[{pimple.}]{consistent() }\end{DoxyParamCaption})}
+
+
+
+Definition at line 21 of file p\+Eqn.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{22 \{}
+\DoxyCodeLine{23     \mbox{\hyperlink{pEqn_8H_afe01da774d03b179d1e22adc75a3c2fe}{rAtU}} = 1.0/max(1.0/\mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{rAU}} -\/ \mbox{\hyperlink{UEqn_8H_aeeb518d883492fb109c93a7959833ffb}{UEqn}}.H1(), 0.1/\mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{rAU}});}
+\DoxyCodeLine{24     \mbox{\hyperlink{pEqn_8H_aa8a75b752b2c5a0842b47b83cef7b281}{phiHbyA}} +=}
+\DoxyCodeLine{25         fvc::interpolate(\mbox{\hyperlink{pEqn_8H_afe01da774d03b179d1e22adc75a3c2fe}{rAtU}}() -\/ \mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{rAU}})*fvc::snGrad(p)*mesh.magSf();}
+\DoxyCodeLine{26     \mbox{\hyperlink{pEqn_8H_a748dcc48c958062d58a54c8687c51b88}{HbyA}} -\/= (\mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{rAU}} -\/ \mbox{\hyperlink{pEqn_8H_afe01da774d03b179d1e22adc75a3c2fe}{rAtU}}())*fvc::grad(p);}
+\DoxyCodeLine{27 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 4
+\mbox{\Hypertarget{pEqn_8H_a98ec4639f6f3250223689b87374d340f}\label{pEqn_8H_a98ec4639f6f3250223689b87374d340f}} 
+\index{pEqn.H@{pEqn.H}!if@{if}}
+\index{if@{if}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{if()}{if()}\hspace{0.1cm}{\footnotesize\ttfamily [3/3]}}
+{\footnotesize\ttfamily if (\begin{DoxyParamCaption}\item[{pimple.\+n\+Corr\+Piso()$<$=}]{1 }\end{DoxyParamCaption})}
+
+
+
+Definition at line 29 of file p\+Eqn.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{30 \{}
+\DoxyCodeLine{31     \mbox{\hyperlink{UEqn_8H_ac8d6c496ddf5a565a55fd0f6271c8e53}{tUEqn}}.clear();}
+\DoxyCodeLine{32 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 5
+\mbox{\Hypertarget{pEqn_8H_ac639badc84aa6991315073e17007b0b3}\label{pEqn_8H_ac639badc84aa6991315073e17007b0b3}} 
+\index{pEqn.H@{pEqn.H}!interpolateIB@{interpolateIB}}
+\index{interpolateIB@{interpolateIB}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{interpolateIB()}{interpolateIB()}}
+{\footnotesize\ttfamily H\+F\+D\+I\+B\+D\+EM interpolate\+IB (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}}}]{,  }\item[{Ui}]{,  }\item[{lambda}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{pEqn_8H_a23f3f4fc9a5a416491cfab1d403fdafa}\label{pEqn_8H_a23f3f4fc9a5a416491cfab1d403fdafa}} 
+\index{pEqn.H@{pEqn.H}!makeRelative@{makeRelative}}
+\index{makeRelative@{makeRelative}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{makeRelative()}{makeRelative()}}
+{\footnotesize\ttfamily M\+RF make\+Relative (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{pEqn_8H_aa8a75b752b2c5a0842b47b83cef7b281}{phi\+HbyA}}}]{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+% FIG 6
+\mbox{\Hypertarget{pEqn_8H_a8afcb300a3b7041ccdd88435f628e01c}\label{pEqn_8H_a8afcb300a3b7041ccdd88435f628e01c}} 
+\index{pEqn.H@{pEqn.H}!phiFbyA@{phiFbyA}}
+\index{phiFbyA@{phiFbyA}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{phiFbyA()}{phiFbyA()}}
+{\footnotesize\ttfamily surface\+Scalar\+Field phi\+FbyA (\begin{DoxyParamCaption}\item[{\char`\"{}phi\+FbyA\char`\"{}}]{,  }\item[{fvc\+::flux(\mbox{\hyperlink{pEqn_8H_a11a0f7fc514ff642863df4b698e9fd67}{FbyA}})}]{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+% FIG 7
+\mbox{\Hypertarget{pEqn_8H_aa8a75b752b2c5a0842b47b83cef7b281}\label{pEqn_8H_aa8a75b752b2c5a0842b47b83cef7b281}} 
+\index{pEqn.H@{pEqn.H}!phiHbyA@{phiHbyA}}
+\index{phiHbyA@{phiHbyA}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{phiHbyA()}{phiHbyA()}}
+{\footnotesize\ttfamily surface\+Scalar\+Field phi\+HbyA (\begin{DoxyParamCaption}\item[{\char`\"{}phi\+HbyA\char`\"{}}]{,  }\item[{fvc\+::flux(\mbox{\hyperlink{pEqn_8H_a748dcc48c958062d58a54c8687c51b88}{HbyA}})+M\+R\+F.\+zero\+Filter(fvc\+::interpolate(\mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{r\+AU}}) $\ast$fvc\+::ddt\+Corr(\mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}}, phi, Uf))}]{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+% FIG 8
+\mbox{\Hypertarget{pEqn_8H_afe01da774d03b179d1e22adc75a3c2fe}\label{pEqn_8H_afe01da774d03b179d1e22adc75a3c2fe}} 
+\index{pEqn.H@{pEqn.H}!rAtU@{rAtU}}
+\index{rAtU@{rAtU}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{rAtU()}{rAtU()}}
+{\footnotesize\ttfamily tmp$<$vol\+Scalar\+Field$>$ r\+AtU (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{r\+AU}}}]{ }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+% FIG 9
+\mbox{\Hypertarget{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}\label{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}} 
+\index{pEqn.H@{pEqn.H}!rAU@{rAU}}
+\index{rAU@{rAU}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{rAU()}{rAU()}}
+{\footnotesize\ttfamily vol\+Scalar\+Field r\+AU (\begin{DoxyParamCaption}\item[{1.\+0/U\+Eqn.}]{A() }\end{DoxyParamCaption})}
+
+Here is the caller graph for this function\+:
+% FIG 10
+\mbox{\Hypertarget{pEqn_8H_a15bfa901ef14c7146d67360f3c63addc}\label{pEqn_8H_a15bfa901ef14c7146d67360f3c63addc}} 
+\index{pEqn.H@{pEqn.H}!relax@{relax}}
+\index{relax@{relax}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{relax()}{relax()}}
+{\footnotesize\ttfamily p relax (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{pEqn_8H_a8206df473b708aa4f79057e5bab871fb}\label{pEqn_8H_a8206df473b708aa4f79057e5bab871fb}} 
+\index{pEqn.H@{pEqn.H}!updateFSCoupling@{updateFSCoupling}}
+\index{updateFSCoupling@{updateFSCoupling}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{updateFSCoupling()}{updateFSCoupling()}}
+{\footnotesize\ttfamily H\+F\+D\+I\+B\+D\+EM update\+F\+S\+Coupling (\begin{DoxyParamCaption}\item[{lambda}]{,  }\item[{\mbox{\hyperlink{pEqn_8H_a633de4b0c14ca52ea2432a3c8a5c4c31}{f}}}]{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{pEqn_8H_ab13470e79e249d04c443bf59be9ff31d}\label{pEqn_8H_ab13470e79e249d04c443bf59be9ff31d}} 
+\index{pEqn.H@{pEqn.H}!while@{while}}
+\index{while@{while}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{while()}{while()}}
+{\footnotesize\ttfamily while (\begin{DoxyParamCaption}\item[{pimple.}]{correct\+Non\+Orthogonal() }\end{DoxyParamCaption})}
+
+
+
+Definition at line 46 of file p\+Eqn.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{47 \{}
+\DoxyCodeLine{48     fvScalarMatrix pEqn}
+\DoxyCodeLine{49     (}
+\DoxyCodeLine{50         fvm::laplacian(\mbox{\hyperlink{pEqn_8H_afe01da774d03b179d1e22adc75a3c2fe}{rAtU}}(), p) == fvc::div(\mbox{\hyperlink{pEqn_8H_aa8a75b752b2c5a0842b47b83cef7b281}{phiHbyA}})}
+\DoxyCodeLine{51                                    + fvc::div(\mbox{\hyperlink{pEqn_8H_a8afcb300a3b7041ccdd88435f628e01c}{phiFbyA}})}
+\DoxyCodeLine{52     );}
+\DoxyCodeLine{53 }
+\DoxyCodeLine{54     pEqn.setReference(pRefCell, pRefValue);}
+\DoxyCodeLine{55 }
+\DoxyCodeLine{56     pEqn.solve();}
+\DoxyCodeLine{57 }
+\DoxyCodeLine{58     \textcolor{keywordflow}{if} (pimple.finalNonOrthogonalIter())}
+\DoxyCodeLine{59     \{}
+\DoxyCodeLine{60         phi = \mbox{\hyperlink{pEqn_8H_aa8a75b752b2c5a0842b47b83cef7b281}{phiHbyA}} -\/ pEqn.flux() + \mbox{\hyperlink{pEqn_8H_a8afcb300a3b7041ccdd88435f628e01c}{phiFbyA}};}
+\DoxyCodeLine{61     \}}
+\DoxyCodeLine{62 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 11
+
+
+\doxysubsection{Variable Documentation}
+\mbox{\Hypertarget{pEqn_8H_a633de4b0c14ca52ea2432a3c8a5c4c31}\label{pEqn_8H_a633de4b0c14ca52ea2432a3c8a5c4c31}} 
+\index{pEqn.H@{pEqn.H}!f@{f}}
+\index{f@{f}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{f}{f}}
+{\footnotesize\ttfamily f = 0.\+8$\ast$lambda$\ast$(Ui -\/ \mbox{\hyperlink{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}{U}})/run\+Time.\+deltaT()}
+
+
+
+Definition at line 84 of file p\+Eqn.\+H.
+
+\mbox{\Hypertarget{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}\label{pEqn_8H_a81cf6107131a3583e2b0b762cb9c2862}} 
+\index{pEqn.H@{pEqn.H}!U@{U}}
+\index{U@{U}!pEqn.H@{pEqn.H}}
+\doxysubsubsection{\texorpdfstring{U}{U}}
+{\footnotesize\ttfamily U = \mbox{\hyperlink{pEqn_8H_a748dcc48c958062d58a54c8687c51b88}{HbyA}} -\/ \mbox{\hyperlink{pEqn_8H_afe01da774d03b179d1e22adc75a3c2fe}{r\+AtU}}$\ast$fvc\+::grad(p) + \mbox{\hyperlink{pEqn_8H_a4ae3ff6f0732a8a206a641d7ff2d9f7d}{r\+AU}}$\ast$\mbox{\hyperlink{pEqn_8H_a633de4b0c14ca52ea2432a3c8a5c4c31}{f}}}
+
+
+
+Definition at line 69 of file p\+Eqn.\+H.
+

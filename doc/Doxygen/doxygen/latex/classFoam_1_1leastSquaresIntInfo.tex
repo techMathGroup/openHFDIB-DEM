@@ -1,0 +1,1414 @@
+\hypertarget{classFoam_1_1leastSquaresIntInfo}{}\doxysection{Foam\+::least\+Squares\+Int\+Info Class Reference}
+\label{classFoam_1_1leastSquaresIntInfo}\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+
+
+{\ttfamily \#include $<$least\+Squares\+Int\+Info.\+H$>$}
+
+
+
+Inheritance diagram for Foam\+::least\+Squares\+Int\+Info\+:
+% FIG 0
+
+
+Collaboration diagram for Foam\+::least\+Squares\+Int\+Info\+:
+% FIG 1
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a34605fe967ada8ebc7c623ec0245cf90}{least\+Squares\+Int\+Info}} (const fv\+Mesh \&mesh, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \&g\+Model, scalar dist\+Factor, scalar radius\+Factor, scalar angle\+Factor, scalar max\+C\+C\+Rows)
+\item 
+\mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a1273c70347358801b3e22e19d31af80d}{$\sim$least\+Squares\+Int\+Info}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a65d7ab88df9a00594f3d586f349a92ad}{reset\+Intp\+Info}} (label new\+Size)
+\item 
+void \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a0b3deb8aae522928cb07a391858b86c3}{reset\+Inv\+Dir\+Mat}} (label new\+Size)
+\item 
+void \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a6dfafd16d2faf85aac335a80f376d914}{set\+Intp\+Info}} () final override
+\item 
+List$<$ vector $>$ \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a57c5e29e3845401254fb30186a4be3b5}{get\+Ib\+Normals}} ()
+\item 
+const List$<$ vector $>$ \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_afc13f5ee2817b60bfbf3e371e4b2b917}{get\+Ib\+Normals}} () const
+\item 
+label\+List\+List \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a70c6933c55cb28cfe354a15047d148c3}{get\+Cell\+Cells}} ()
+\item 
+const label\+List\+List \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2e9fe8b87b5fd28e10a731711840a2f2}{get\+Cell\+Cells}} () const
+\item 
+Ptr\+List$<$ scalar\+Rectangular\+Matrix $>$ \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a30be6f155a547342f2baf7059eb61745}{get\+Inv\+Dir\+Mats}} ()
+\item 
+const Ptr\+List$<$ scalar\+Rectangular\+Matrix $>$ \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_ab3885cf081ad060dbd10e9f130d41b04}{get\+Inv\+Dir\+Mats}} () const
+\item 
+\mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{Dynamic\+Label\+List}} \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a1480011b82f54a2b2fcafc1fa1d1f01d}{get\+Ib\+Faces}} ()
+\item 
+const \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{Dynamic\+Label\+List}} \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_aae376cba95c5f2537a0958f3cef989f6}{get\+Ib\+Faces}} () const
+\item 
+Dynamic\+List$<$ bool $>$ \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_ab49bd5cc13e4f51c825e4b635e134ebd}{get\+Ib\+Faces\+Flips}} ()
+\item 
+const Dynamic\+List$<$ bool $>$ \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a38f88dc3c61ed4e4cfa80f17878d0e1b}{get\+Ib\+Faces\+Flips}} () const
+\item 
+\mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_ab460bc4303b616d6b5df6f292c766d47}{least\+Squares\+Int\+Info}} (const fv\+Mesh \&mesh, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \&g\+Model, scalar dist\+Factor, scalar radius\+Factor, scalar angle\+Factor, scalar max\+C\+C\+Rows)
+\item 
+\mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a392fd67d5819695ef6f3f3afa3c05c8a}{$\sim$least\+Squares\+Int\+Info}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a65d7ab88df9a00594f3d586f349a92ad}{reset\+Intp\+Info}} (label new\+Size)
+\item 
+void \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a0b3deb8aae522928cb07a391858b86c3}{reset\+Inv\+Dir\+Mat}} (label new\+Size)
+\item 
+void \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_adbe2f78069a5f8693e5dfbf05d502f28}{set\+Intp\+Info}} () final override
+\item 
+List$<$ vector $>$ \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a57c5e29e3845401254fb30186a4be3b5}{get\+Ib\+Normals}} ()
+\item 
+const List$<$ vector $>$ \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_afc13f5ee2817b60bfbf3e371e4b2b917}{get\+Ib\+Normals}} () const
+\item 
+label\+List\+List \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a70c6933c55cb28cfe354a15047d148c3}{get\+Cell\+Cells}} ()
+\item 
+const label\+List\+List \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2e9fe8b87b5fd28e10a731711840a2f2}{get\+Cell\+Cells}} () const
+\item 
+Ptr\+List$<$ scalar\+Rectangular\+Matrix $>$ \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a30be6f155a547342f2baf7059eb61745}{get\+Inv\+Dir\+Mats}} ()
+\item 
+const Ptr\+List$<$ scalar\+Rectangular\+Matrix $>$ \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_ab3885cf081ad060dbd10e9f130d41b04}{get\+Inv\+Dir\+Mats}} () const
+\item 
+\mbox{\hyperlink{classFoam_1_1interpolationInfo_a1e2ab0fa5afe1dec16c8c0ceeb86fdf2}{Dynamic\+Label\+List}} \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a1480011b82f54a2b2fcafc1fa1d1f01d}{get\+Ib\+Faces}} ()
+\item 
+const \mbox{\hyperlink{classFoam_1_1interpolationInfo_a1e2ab0fa5afe1dec16c8c0ceeb86fdf2}{Dynamic\+Label\+List}} \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_aae376cba95c5f2537a0958f3cef989f6}{get\+Ib\+Faces}} () const
+\item 
+Dynamic\+List$<$ bool $>$ \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_ab49bd5cc13e4f51c825e4b635e134ebd}{get\+Ib\+Faces\+Flips}} ()
+\item 
+const Dynamic\+List$<$ bool $>$ \& \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a38f88dc3c61ed4e4cfa80f17878d0e1b}{get\+Ib\+Faces\+Flips}} () const
+\item 
+List$<$ point $>$ \& \mbox{\hyperlink{classFoam_1_1interpolationInfo_ab5d3fce754b0071e3e837a5e473c33fa}{get\+Ib\+Points}} ()
+\item 
+List$<$ point $>$ \& \mbox{\hyperlink{classFoam_1_1interpolationInfo_ab5d3fce754b0071e3e837a5e473c33fa}{get\+Ib\+Points}} ()
+\item 
+const \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{Dynamic\+Label\+List}} \& \mbox{\hyperlink{classFoam_1_1interpolationInfo_a3ca39a4f44ff35f421a7b6bea9d2ea51}{get\+Surf\+Cells}} () const
+\item 
+const \mbox{\hyperlink{classFoam_1_1interpolationInfo_a1e2ab0fa5afe1dec16c8c0ceeb86fdf2}{Dynamic\+Label\+List}} \& \mbox{\hyperlink{classFoam_1_1interpolationInfo_a3ca39a4f44ff35f421a7b6bea9d2ea51}{get\+Surf\+Cells}} () const
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1interpolationInfo_a6e365ef39177adaa46afd77eb875316c}{clear\+Intp\+Info}} ()
+\item 
+virtual void \mbox{\hyperlink{classFoam_1_1interpolationInfo_a6e365ef39177adaa46afd77eb875316c}{clear\+Intp\+Info}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Protected Attributes}
+\begin{DoxyCompactItemize}
+\item 
+const Foam\+::fv\+Mesh \& \mbox{\hyperlink{classFoam_1_1interpolationInfo_ae6a0dd05a42d370ffeb69a7823fbb638}{mesh\+\_\+}}
+\item 
+std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \& \mbox{\hyperlink{classFoam_1_1interpolationInfo_abd1d60905cf600e0fd67e99e237c8e8f}{geom\+Model\+\_\+}}
+\item 
+auto\+Ptr$<$ List$<$ point $>$ $>$ \mbox{\hyperlink{classFoam_1_1interpolationInfo_a74c40cda6587c6f6c9195212fe726e83}{ib\+Points\+Ptr\+\_\+}}
+\item 
+auto\+Ptr$<$ List$<$ vector $>$ $>$ \mbox{\hyperlink{classFoam_1_1interpolationInfo_a2023800dbfc31f964ef78522ee3be160}{ib\+Normals\+Ptr\+\_\+}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a62401e431d6f2b4c8d1cb1eb0aac0d74}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a6dce9b2fa08bb1b163efca93ac37f131}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a4c3fec6ec0841e2b532cfe3b0c9c6e71}{Dynamic\+Point\+List}}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a62401e431d6f2b4c8d1cb1eb0aac0d74}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a6dce9b2fa08bb1b163efca93ac37f131}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a4c3fec6ec0841e2b532cfe3b0c9c6e71}{Dynamic\+Point\+List}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_afa3cf5dbb111e5be738c5a554f4a18a2}{find\+Cell\+Cells}} (const label cell\+Id, label\+List \&cell\+Cells, scalar \&center\+Mean\+Dist)
+\item 
+void \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a8f49c6ba68afcc6bb69a0a55fcf92659}{get\+Inv\+Dirichlet\+Matrix}} (const \mbox{\hyperlink{classFoam_1_1interpolationInfo_a1e2ab0fa5afe1dec16c8c0ceeb86fdf2}{Dynamic\+Label\+List}} \&ib\+Cells)
+\item 
+void \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a244d80c249a113b44d4b2159dadf0131}{get\+Ib\+Cells\+Faces}} (const \mbox{\hyperlink{classFoam_1_1interpolationInfo_a1e2ab0fa5afe1dec16c8c0ceeb86fdf2}{Dynamic\+Label\+List}} \&ib\+Cells)
+\item 
+scalar\+Square\+Matrix \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_ae7d0884902f273c7595eb4e45215f870}{L\+Uinvert}} (scalar\+Square\+Matrix \&matrix)
+\item 
+void \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a427b62cc08c8c1308f083f9f19e9299c}{find\+Cell\+Cells}} (const label cell\+Id, label\+List \&cell\+Cells, scalar \&center\+Mean\+Dist)
+\item 
+void \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_ab9478ec1afe6f709bdacbc03bb18f756}{get\+Inv\+Dirichlet\+Matrix}} (const \mbox{\hyperlink{classFoam_1_1interpolationInfo_a1e2ab0fa5afe1dec16c8c0ceeb86fdf2}{Dynamic\+Label\+List}} \&ib\+Cells)
+\item 
+void \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a4ffa69a71800a6d5a9ccaeabfc75e645}{get\+Ib\+Cells\+Faces}} (const \mbox{\hyperlink{classFoam_1_1interpolationInfo_a1e2ab0fa5afe1dec16c8c0ceeb86fdf2}{Dynamic\+Label\+List}} \&ib\+Cells)
+\item 
+scalar\+Square\+Matrix \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a034349640f247e3437f68c6224c98694}{L\+Uinvert}} (scalar\+Square\+Matrix \&matrix)
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+auto\+Ptr$<$ label\+List\+List $>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a5f30d007b171a195b5f46533a83e9d9e}{cell\+Cells\+Ptr\+\_\+}}
+\item 
+Ptr\+List$<$ scalar\+Rectangular\+Matrix $>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a3d369eed7d42ba2254fd82942c42a192}{inv\+Dirichlet\+Matrices\+\_\+}}
+\item 
+auto\+Ptr$<$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{Dynamic\+Label\+List}} $>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a98853c9d14b1ce70521916a7d5490d91}{ib\+Faces\+Ptr\+\_\+}}
+\item 
+auto\+Ptr$<$ Dynamic\+List$<$ bool $>$ $>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a3d11a3c50de1464415117244451d6e09}{ib\+Face\+Flips\+Ptr\+\_\+}}
+\item 
+const scalar \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_af2a24506a11ddead9e1d65753372de62}{dist\+Factor\+\_\+}}
+\item 
+const scalar \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_ac22147de00fb6521650f77dcc68deedc}{radius\+Factor\+\_\+}}
+\item 
+const scalar \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a539967c6fedc7ebc13aaf10860c9c130}{angle\+Factor\+\_\+}}
+\item 
+const scalar \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_aba4b5126e0a79f77fef0408f49db0064}{max\+C\+C\+Rows\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 45 of file least\+Squares\+Int\+Info.\+H.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}\label{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{Foam\+::least\+Squares\+Int\+Info\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 48 of file least\+Squares\+Int\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}\label{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{Foam\+::least\+Squares\+Int\+Info\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 48 of file least\+Squares\+Int\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a4c3fec6ec0841e2b532cfe3b0c9c6e71}\label{classFoam_1_1leastSquaresIntInfo_a4c3fec6ec0841e2b532cfe3b0c9c6e71}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a4c3fec6ec0841e2b532cfe3b0c9c6e71}{Foam\+::least\+Squares\+Int\+Info\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 51 of file least\+Squares\+Int\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a4c3fec6ec0841e2b532cfe3b0c9c6e71}\label{classFoam_1_1leastSquaresIntInfo_a4c3fec6ec0841e2b532cfe3b0c9c6e71}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a4c3fec6ec0841e2b532cfe3b0c9c6e71}{Foam\+::least\+Squares\+Int\+Info\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 51 of file least\+Squares\+Int\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a62401e431d6f2b4c8d1cb1eb0aac0d74}\label{classFoam_1_1leastSquaresIntInfo_a62401e431d6f2b4c8d1cb1eb0aac0d74}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a62401e431d6f2b4c8d1cb1eb0aac0d74}{Foam\+::least\+Squares\+Int\+Info\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 49 of file least\+Squares\+Int\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a62401e431d6f2b4c8d1cb1eb0aac0d74}\label{classFoam_1_1leastSquaresIntInfo_a62401e431d6f2b4c8d1cb1eb0aac0d74}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a62401e431d6f2b4c8d1cb1eb0aac0d74}{Foam\+::least\+Squares\+Int\+Info\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 49 of file least\+Squares\+Int\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a6dce9b2fa08bb1b163efca93ac37f131}\label{classFoam_1_1leastSquaresIntInfo_a6dce9b2fa08bb1b163efca93ac37f131}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a6dce9b2fa08bb1b163efca93ac37f131}{Foam\+::least\+Squares\+Int\+Info\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 50 of file least\+Squares\+Int\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a6dce9b2fa08bb1b163efca93ac37f131}\label{classFoam_1_1leastSquaresIntInfo_a6dce9b2fa08bb1b163efca93ac37f131}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a6dce9b2fa08bb1b163efca93ac37f131}{Foam\+::least\+Squares\+Int\+Info\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 50 of file least\+Squares\+Int\+Info.\+H.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a34605fe967ada8ebc7c623ec0245cf90}\label{classFoam_1_1leastSquaresIntInfo_a34605fe967ada8ebc7c623ec0245cf90}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!leastSquaresIntInfo@{leastSquaresIntInfo}}
+\index{leastSquaresIntInfo@{leastSquaresIntInfo}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{leastSquaresIntInfo()}{leastSquaresIntInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily least\+Squares\+Int\+Info\+::least\+Squares\+Int\+Info (\begin{DoxyParamCaption}\item[{const fv\+Mesh \&}]{mesh,  }\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \&}]{g\+Model,  }\item[{scalar}]{dist\+Factor,  }\item[{scalar}]{radius\+Factor,  }\item[{scalar}]{angle\+Factor,  }\item[{scalar}]{max\+C\+C\+Rows }\end{DoxyParamCaption})}
+
+
+
+Definition at line 39 of file least\+Squares\+Int\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{47 :}
+\DoxyCodeLine{48 \mbox{\hyperlink{classFoam_1_1interpolationInfo_a8bab2e9e65b145315eb3a0bf63ada956}{interpolationInfo}}}
+\DoxyCodeLine{49 (}
+\DoxyCodeLine{50     mesh,}
+\DoxyCodeLine{51     gModel}
+\DoxyCodeLine{52 ),}
+\DoxyCodeLine{53 \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_af2a24506a11ddead9e1d65753372de62}{distFactor\_}}(distFactor),}
+\DoxyCodeLine{54 \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_ac22147de00fb6521650f77dcc68deedc}{radiusFactor\_}}(radiusFactor),}
+\DoxyCodeLine{55 \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a539967c6fedc7ebc13aaf10860c9c130}{angleFactor\_}}(angleFactor),}
+\DoxyCodeLine{56 \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_aba4b5126e0a79f77fef0408f49db0064}{maxCCRows\_}}(maxCCRows)}
+\DoxyCodeLine{57 \{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a1273c70347358801b3e22e19d31af80d}\label{classFoam_1_1leastSquaresIntInfo_a1273c70347358801b3e22e19d31af80d}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!````~leastSquaresIntInfo@{$\sim$leastSquaresIntInfo}}
+\index{````~leastSquaresIntInfo@{$\sim$leastSquaresIntInfo}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{$\sim$leastSquaresIntInfo()}{~leastSquaresIntInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily least\+Squares\+Int\+Info\+::$\sim$least\+Squares\+Int\+Info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 58 of file least\+Squares\+Int\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{59 \{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_ab460bc4303b616d6b5df6f292c766d47}\label{classFoam_1_1leastSquaresIntInfo_ab460bc4303b616d6b5df6f292c766d47}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!leastSquaresIntInfo@{leastSquaresIntInfo}}
+\index{leastSquaresIntInfo@{leastSquaresIntInfo}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{leastSquaresIntInfo()}{leastSquaresIntInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::least\+Squares\+Int\+Info\+::least\+Squares\+Int\+Info (\begin{DoxyParamCaption}\item[{const fv\+Mesh \&}]{mesh,  }\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \&}]{g\+Model,  }\item[{scalar}]{dist\+Factor,  }\item[{scalar}]{radius\+Factor,  }\item[{scalar}]{angle\+Factor,  }\item[{scalar}]{max\+C\+C\+Rows }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a392fd67d5819695ef6f3f3afa3c05c8a}\label{classFoam_1_1leastSquaresIntInfo_a392fd67d5819695ef6f3f3afa3c05c8a}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!````~leastSquaresIntInfo@{$\sim$leastSquaresIntInfo}}
+\index{````~leastSquaresIntInfo@{$\sim$leastSquaresIntInfo}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{$\sim$leastSquaresIntInfo()}{~leastSquaresIntInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::least\+Squares\+Int\+Info\+::$\sim$least\+Squares\+Int\+Info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classFoam_1_1interpolationInfo_a6e365ef39177adaa46afd77eb875316c}\label{classFoam_1_1interpolationInfo_a6e365ef39177adaa46afd77eb875316c}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!clearIntpInfo@{clearIntpInfo}}
+\index{clearIntpInfo@{clearIntpInfo}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{clearIntpInfo()}{clearIntpInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::interpolation\+Info\+::clear\+Intp\+Info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 99 of file interpolation\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{100         \{}
+\DoxyCodeLine{101             \mbox{\hyperlink{classFoam_1_1interpolationInfo_a74c40cda6587c6f6c9195212fe726e83}{ibPointsPtr\_}}.clear();}
+\DoxyCodeLine{102             \mbox{\hyperlink{classFoam_1_1interpolationInfo_a2023800dbfc31f964ef78522ee3be160}{ibNormalsPtr\_}}.clear();}
+\DoxyCodeLine{103         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1interpolationInfo_a6e365ef39177adaa46afd77eb875316c}\label{classFoam_1_1interpolationInfo_a6e365ef39177adaa46afd77eb875316c}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!clearIntpInfo@{clearIntpInfo}}
+\index{clearIntpInfo@{clearIntpInfo}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{clearIntpInfo()}{clearIntpInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily virtual void Foam\+::interpolation\+Info\+::clear\+Intp\+Info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [virtual]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 99 of file interpolation\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{100         \{}
+\DoxyCodeLine{101             \mbox{\hyperlink{classFoam_1_1interpolationInfo_a74c40cda6587c6f6c9195212fe726e83}{ibPointsPtr\_}}.clear();}
+\DoxyCodeLine{102             \mbox{\hyperlink{classFoam_1_1interpolationInfo_a2023800dbfc31f964ef78522ee3be160}{ibNormalsPtr\_}}.clear();}
+\DoxyCodeLine{103         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a427b62cc08c8c1308f083f9f19e9299c}\label{classFoam_1_1leastSquaresIntInfo_a427b62cc08c8c1308f083f9f19e9299c}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!findCellCells@{findCellCells}}
+\index{findCellCells@{findCellCells}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{findCellCells()}{findCellCells()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::least\+Squares\+Int\+Info\+::find\+Cell\+Cells (\begin{DoxyParamCaption}\item[{const label}]{cell\+Id,  }\item[{label\+List \&}]{cell\+Cells,  }\item[{scalar \&}]{center\+Mean\+Dist }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_afa3cf5dbb111e5be738c5a554f4a18a2}\label{classFoam_1_1leastSquaresIntInfo_afa3cf5dbb111e5be738c5a554f4a18a2}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!findCellCells@{findCellCells}}
+\index{findCellCells@{findCellCells}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{findCellCells()}{findCellCells()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void least\+Squares\+Int\+Info\+::find\+Cell\+Cells (\begin{DoxyParamCaption}\item[{const label}]{cell\+Id,  }\item[{label\+List \&}]{cell\+Cells,  }\item[{scalar \&}]{center\+Mean\+Dist }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 314 of file least\+Squares\+Int\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{319 \{}
+\DoxyCodeLine{320     labelHashSet cellSet;}
+\DoxyCodeLine{321     cellSet.insert(cellId);}
+\DoxyCodeLine{322     labelList currCells;}
+\DoxyCodeLine{323     labelList auxCells = cellSet.toc();}
+\DoxyCodeLine{324 }
+\DoxyCodeLine{325     \textcolor{keywordflow}{for}(label nRow = 0; nRow < \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_aba4b5126e0a79f77fef0408f49db0064}{maxCCRows\_}}; nRow++)}
+\DoxyCodeLine{326     \{}
+\DoxyCodeLine{327         currCells = auxCells;}
+\DoxyCodeLine{328         auxCells.clear();}
+\DoxyCodeLine{329         \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(currCells, cellI)}
+\DoxyCodeLine{330         \{}
+\DoxyCodeLine{331             label curCell = currCells[cellI];}
+\DoxyCodeLine{332             \textcolor{keyword}{const} labelList\& curCellPoints = \mbox{\hyperlink{classFoam_1_1interpolationInfo_ae6a0dd05a42d370ffeb69a7823fbb638}{mesh\_}}.cellPoints()[curCell];}
+\DoxyCodeLine{333             \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(curCellPoints, pointI)}
+\DoxyCodeLine{334             \{}
+\DoxyCodeLine{335                 label curPoint = curCellPoints[pointI];}
+\DoxyCodeLine{336                 \textcolor{keyword}{const} labelList\& curPointCells = \mbox{\hyperlink{classFoam_1_1interpolationInfo_ae6a0dd05a42d370ffeb69a7823fbb638}{mesh\_}}.pointCells()[curPoint];}
+\DoxyCodeLine{337                 \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(curPointCells, nCellI)}
+\DoxyCodeLine{338                 \{}
+\DoxyCodeLine{339                     label nCellId = curPointCells[nCellI];}
+\DoxyCodeLine{340                     \textcolor{keywordflow}{if}(!cellSet.found(nCellId))}
+\DoxyCodeLine{341                     \{}
+\DoxyCodeLine{342                         cellSet.insert(nCellId);}
+\DoxyCodeLine{343                         auxCells.append(nCellId);}
+\DoxyCodeLine{344                     \}}
+\DoxyCodeLine{345                 \}}
+\DoxyCodeLine{346             \}}
+\DoxyCodeLine{347         \}}
+\DoxyCodeLine{348 }
+\DoxyCodeLine{349         \textcolor{keywordflow}{if} (nRow == 0 \&\& auxCells.size())}
+\DoxyCodeLine{350         \{}
+\DoxyCodeLine{351             \textcolor{keyword}{const} vectorField\& C = \mbox{\hyperlink{classFoam_1_1interpolationInfo_ae6a0dd05a42d370ffeb69a7823fbb638}{mesh\_}}.cellCentres();}
+\DoxyCodeLine{352             \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(auxCells, cellI)}
+\DoxyCodeLine{353             \{}
+\DoxyCodeLine{354                 centerMeanDist += mag(C[cellId] -\/ C[auxCells[cellI]]);}
+\DoxyCodeLine{355             \}}
+\DoxyCodeLine{356             centerMeanDist /= auxCells.size();}
+\DoxyCodeLine{357         \}}
+\DoxyCodeLine{358     \}}
+\DoxyCodeLine{359 }
+\DoxyCodeLine{360     cellSet.erase(cellId);}
+\DoxyCodeLine{361     cellCells = cellSet.toc();}
+\DoxyCodeLine{362 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 2
+Here is the caller graph for this function\+:
+% FIG 3
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a70c6933c55cb28cfe354a15047d148c3}\label{classFoam_1_1leastSquaresIntInfo_a70c6933c55cb28cfe354a15047d148c3}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getCellCells@{getCellCells}}
+\index{getCellCells@{getCellCells}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getCellCells()}{getCellCells()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily label\+List\+List\& Foam\+::least\+Squares\+Int\+Info\+::get\+Cell\+Cells (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 135 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{136         \{}
+\DoxyCodeLine{137             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a5f30d007b171a195b5f46533a83e9d9e}{cellCellsPtr\_}}();}
+\DoxyCodeLine{138         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 4
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a70c6933c55cb28cfe354a15047d148c3}\label{classFoam_1_1leastSquaresIntInfo_a70c6933c55cb28cfe354a15047d148c3}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getCellCells@{getCellCells}}
+\index{getCellCells@{getCellCells}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getCellCells()}{getCellCells()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily label\+List\+List\& Foam\+::least\+Squares\+Int\+Info\+::get\+Cell\+Cells (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 135 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{136         \{}
+\DoxyCodeLine{137             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a5f30d007b171a195b5f46533a83e9d9e}{cellCellsPtr\_}}();}
+\DoxyCodeLine{138         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a2e9fe8b87b5fd28e10a731711840a2f2}\label{classFoam_1_1leastSquaresIntInfo_a2e9fe8b87b5fd28e10a731711840a2f2}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getCellCells@{getCellCells}}
+\index{getCellCells@{getCellCells}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getCellCells()}{getCellCells()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily const label\+List\+List\& Foam\+::least\+Squares\+Int\+Info\+::get\+Cell\+Cells (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 140 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{141         \{}
+\DoxyCodeLine{142             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a5f30d007b171a195b5f46533a83e9d9e}{cellCellsPtr\_}}();}
+\DoxyCodeLine{143         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a2e9fe8b87b5fd28e10a731711840a2f2}\label{classFoam_1_1leastSquaresIntInfo_a2e9fe8b87b5fd28e10a731711840a2f2}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getCellCells@{getCellCells}}
+\index{getCellCells@{getCellCells}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getCellCells()}{getCellCells()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily const label\+List\+List\& Foam\+::least\+Squares\+Int\+Info\+::get\+Cell\+Cells (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 140 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{141         \{}
+\DoxyCodeLine{142             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a5f30d007b171a195b5f46533a83e9d9e}{cellCellsPtr\_}}();}
+\DoxyCodeLine{143         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a4ffa69a71800a6d5a9ccaeabfc75e645}\label{classFoam_1_1leastSquaresIntInfo_a4ffa69a71800a6d5a9ccaeabfc75e645}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbCellsFaces@{getIbCellsFaces}}
+\index{getIbCellsFaces@{getIbCellsFaces}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbCellsFaces()}{getIbCellsFaces()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::least\+Squares\+Int\+Info\+::get\+Ib\+Cells\+Faces (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classFoam_1_1interpolationInfo_a1e2ab0fa5afe1dec16c8c0ceeb86fdf2}{Dynamic\+Label\+List}} \&}]{ib\+Cells }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a244d80c249a113b44d4b2159dadf0131}\label{classFoam_1_1leastSquaresIntInfo_a244d80c249a113b44d4b2159dadf0131}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbCellsFaces@{getIbCellsFaces}}
+\index{getIbCellsFaces@{getIbCellsFaces}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbCellsFaces()}{getIbCellsFaces()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void least\+Squares\+Int\+Info\+::get\+Ib\+Cells\+Faces (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classFoam_1_1interpolationInfo_a1e2ab0fa5afe1dec16c8c0ceeb86fdf2}{Dynamic\+Label\+List}} \&}]{ib\+Cells }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 273 of file least\+Squares\+Int\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{276 \{}
+\DoxyCodeLine{277     labelList ibCellIndic(\mbox{\hyperlink{classFoam_1_1interpolationInfo_ae6a0dd05a42d370ffeb69a7823fbb638}{mesh\_}}.nCells(), -\/1);}
+\DoxyCodeLine{278 }
+\DoxyCodeLine{279     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(ibCells, cellI)}
+\DoxyCodeLine{280     \{}
+\DoxyCodeLine{281         ibCellIndic[ibCells[cellI]] = cellI;}
+\DoxyCodeLine{282     \}}
+\DoxyCodeLine{283 }
+\DoxyCodeLine{284     \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{DynamicLabelList}}\& ibFaces = \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a1480011b82f54a2b2fcafc1fa1d1f01d}{getIbFaces}}();}
+\DoxyCodeLine{285     DynamicList<bool>\& ibFaceFlips = \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_ab49bd5cc13e4f51c825e4b635e134ebd}{getIbFacesFlips}}();}
+\DoxyCodeLine{286 }
+\DoxyCodeLine{287     \textcolor{keyword}{const} unallocLabelList\& owner = \mbox{\hyperlink{classFoam_1_1interpolationInfo_ae6a0dd05a42d370ffeb69a7823fbb638}{mesh\_}}.owner();}
+\DoxyCodeLine{288     \textcolor{keyword}{const} unallocLabelList\& neighbour = \mbox{\hyperlink{classFoam_1_1interpolationInfo_ae6a0dd05a42d370ffeb69a7823fbb638}{mesh\_}}.neighbour();}
+\DoxyCodeLine{289 }
+\DoxyCodeLine{290     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(neighbour, faceI)}
+\DoxyCodeLine{291     \{}
+\DoxyCodeLine{292         \textcolor{keywordflow}{if}}
+\DoxyCodeLine{293         (}
+\DoxyCodeLine{294             ibCellIndic[owner[faceI]] == -\/1}
+\DoxyCodeLine{295         \&\&  ibCellIndic[neighbour[faceI]] > -\/1}
+\DoxyCodeLine{296         )}
+\DoxyCodeLine{297         \{}
+\DoxyCodeLine{298             ibFaces.append(faceI);}
+\DoxyCodeLine{299             ibFaceFlips.append(\textcolor{keyword}{false});}
+\DoxyCodeLine{300         \}}
+\DoxyCodeLine{301         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}}
+\DoxyCodeLine{302         (}
+\DoxyCodeLine{303             ibCellIndic[owner[faceI]] > -\/1}
+\DoxyCodeLine{304         \&\&  ibCellIndic[neighbour[faceI]] == -\/1}
+\DoxyCodeLine{305         )}
+\DoxyCodeLine{306         \{}
+\DoxyCodeLine{307             ibFaces.append(faceI);}
+\DoxyCodeLine{308             ibFaceFlips.append(\textcolor{keyword}{true});}
+\DoxyCodeLine{309         \}}
+\DoxyCodeLine{310     \}}
+\DoxyCodeLine{311 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 5
+Here is the caller graph for this function\+:
+% FIG 6
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a1480011b82f54a2b2fcafc1fa1d1f01d}\label{classFoam_1_1leastSquaresIntInfo_a1480011b82f54a2b2fcafc1fa1d1f01d}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbFaces@{getIbFaces}}
+\index{getIbFaces@{getIbFaces}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbFaces()}{getIbFaces()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{Dynamic\+Label\+List}}\& Foam\+::least\+Squares\+Int\+Info\+::get\+Ib\+Faces (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 155 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{156         \{}
+\DoxyCodeLine{157             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a98853c9d14b1ce70521916a7d5490d91}{ibFacesPtr\_}}();}
+\DoxyCodeLine{158         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 7
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a1480011b82f54a2b2fcafc1fa1d1f01d}\label{classFoam_1_1leastSquaresIntInfo_a1480011b82f54a2b2fcafc1fa1d1f01d}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbFaces@{getIbFaces}}
+\index{getIbFaces@{getIbFaces}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbFaces()}{getIbFaces()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classFoam_1_1interpolationInfo_a1e2ab0fa5afe1dec16c8c0ceeb86fdf2}{Dynamic\+Label\+List}}\& Foam\+::least\+Squares\+Int\+Info\+::get\+Ib\+Faces (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 155 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{156         \{}
+\DoxyCodeLine{157             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a98853c9d14b1ce70521916a7d5490d91}{ibFacesPtr\_}}();}
+\DoxyCodeLine{158         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_aae376cba95c5f2537a0958f3cef989f6}\label{classFoam_1_1leastSquaresIntInfo_aae376cba95c5f2537a0958f3cef989f6}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbFaces@{getIbFaces}}
+\index{getIbFaces@{getIbFaces}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbFaces()}{getIbFaces()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{classFoam_1_1interpolationInfo_a1e2ab0fa5afe1dec16c8c0ceeb86fdf2}{Dynamic\+Label\+List}}\& Foam\+::least\+Squares\+Int\+Info\+::get\+Ib\+Faces (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 160 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{161         \{}
+\DoxyCodeLine{162             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a98853c9d14b1ce70521916a7d5490d91}{ibFacesPtr\_}}();}
+\DoxyCodeLine{163         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_aae376cba95c5f2537a0958f3cef989f6}\label{classFoam_1_1leastSquaresIntInfo_aae376cba95c5f2537a0958f3cef989f6}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbFaces@{getIbFaces}}
+\index{getIbFaces@{getIbFaces}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbFaces()}{getIbFaces()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{Dynamic\+Label\+List}}\& Foam\+::least\+Squares\+Int\+Info\+::get\+Ib\+Faces (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 160 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{161         \{}
+\DoxyCodeLine{162             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a98853c9d14b1ce70521916a7d5490d91}{ibFacesPtr\_}}();}
+\DoxyCodeLine{163         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_ab49bd5cc13e4f51c825e4b635e134ebd}\label{classFoam_1_1leastSquaresIntInfo_ab49bd5cc13e4f51c825e4b635e134ebd}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbFacesFlips@{getIbFacesFlips}}
+\index{getIbFacesFlips@{getIbFacesFlips}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbFacesFlips()}{getIbFacesFlips()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily Dynamic\+List$<$bool$>$\& Foam\+::least\+Squares\+Int\+Info\+::get\+Ib\+Faces\+Flips (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 165 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{166         \{}
+\DoxyCodeLine{167             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a3d11a3c50de1464415117244451d6e09}{ibFaceFlipsPtr\_}}();}
+\DoxyCodeLine{168         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_ab49bd5cc13e4f51c825e4b635e134ebd}\label{classFoam_1_1leastSquaresIntInfo_ab49bd5cc13e4f51c825e4b635e134ebd}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbFacesFlips@{getIbFacesFlips}}
+\index{getIbFacesFlips@{getIbFacesFlips}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbFacesFlips()}{getIbFacesFlips()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily Dynamic\+List$<$bool$>$\& Foam\+::least\+Squares\+Int\+Info\+::get\+Ib\+Faces\+Flips (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 165 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{166         \{}
+\DoxyCodeLine{167             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a3d11a3c50de1464415117244451d6e09}{ibFaceFlipsPtr\_}}();}
+\DoxyCodeLine{168         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 8
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a38f88dc3c61ed4e4cfa80f17878d0e1b}\label{classFoam_1_1leastSquaresIntInfo_a38f88dc3c61ed4e4cfa80f17878d0e1b}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbFacesFlips@{getIbFacesFlips}}
+\index{getIbFacesFlips@{getIbFacesFlips}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbFacesFlips()}{getIbFacesFlips()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily const Dynamic\+List$<$bool$>$\& Foam\+::least\+Squares\+Int\+Info\+::get\+Ib\+Faces\+Flips (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 170 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{171         \{}
+\DoxyCodeLine{172             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a3d11a3c50de1464415117244451d6e09}{ibFaceFlipsPtr\_}}();}
+\DoxyCodeLine{173         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a38f88dc3c61ed4e4cfa80f17878d0e1b}\label{classFoam_1_1leastSquaresIntInfo_a38f88dc3c61ed4e4cfa80f17878d0e1b}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbFacesFlips@{getIbFacesFlips}}
+\index{getIbFacesFlips@{getIbFacesFlips}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbFacesFlips()}{getIbFacesFlips()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily const Dynamic\+List$<$bool$>$\& Foam\+::least\+Squares\+Int\+Info\+::get\+Ib\+Faces\+Flips (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 170 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{171         \{}
+\DoxyCodeLine{172             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a3d11a3c50de1464415117244451d6e09}{ibFaceFlipsPtr\_}}();}
+\DoxyCodeLine{173         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a57c5e29e3845401254fb30186a4be3b5}\label{classFoam_1_1leastSquaresIntInfo_a57c5e29e3845401254fb30186a4be3b5}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbNormals@{getIbNormals}}
+\index{getIbNormals@{getIbNormals}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbNormals()}{getIbNormals()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily List$<$vector$>$\& Foam\+::least\+Squares\+Int\+Info\+::get\+Ib\+Normals (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 125 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{126         \{}
+\DoxyCodeLine{127             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1interpolationInfo_a2023800dbfc31f964ef78522ee3be160}{ibNormalsPtr\_}}();}
+\DoxyCodeLine{128         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 9
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a57c5e29e3845401254fb30186a4be3b5}\label{classFoam_1_1leastSquaresIntInfo_a57c5e29e3845401254fb30186a4be3b5}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbNormals@{getIbNormals}}
+\index{getIbNormals@{getIbNormals}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbNormals()}{getIbNormals()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily List$<$vector$>$\& Foam\+::least\+Squares\+Int\+Info\+::get\+Ib\+Normals (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 125 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{126         \{}
+\DoxyCodeLine{127             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1interpolationInfo_a2023800dbfc31f964ef78522ee3be160}{ibNormalsPtr\_}}();}
+\DoxyCodeLine{128         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_afc13f5ee2817b60bfbf3e371e4b2b917}\label{classFoam_1_1leastSquaresIntInfo_afc13f5ee2817b60bfbf3e371e4b2b917}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbNormals@{getIbNormals}}
+\index{getIbNormals@{getIbNormals}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbNormals()}{getIbNormals()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily const List$<$vector$>$\& Foam\+::least\+Squares\+Int\+Info\+::get\+Ib\+Normals (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 130 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{131         \{}
+\DoxyCodeLine{132             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1interpolationInfo_a2023800dbfc31f964ef78522ee3be160}{ibNormalsPtr\_}}();}
+\DoxyCodeLine{133         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_afc13f5ee2817b60bfbf3e371e4b2b917}\label{classFoam_1_1leastSquaresIntInfo_afc13f5ee2817b60bfbf3e371e4b2b917}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbNormals@{getIbNormals}}
+\index{getIbNormals@{getIbNormals}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbNormals()}{getIbNormals()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily const List$<$vector$>$\& Foam\+::least\+Squares\+Int\+Info\+::get\+Ib\+Normals (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 130 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{131         \{}
+\DoxyCodeLine{132             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1interpolationInfo_a2023800dbfc31f964ef78522ee3be160}{ibNormalsPtr\_}}();}
+\DoxyCodeLine{133         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1interpolationInfo_ab5d3fce754b0071e3e837a5e473c33fa}\label{classFoam_1_1interpolationInfo_ab5d3fce754b0071e3e837a5e473c33fa}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbPoints@{getIbPoints}}
+\index{getIbPoints@{getIbPoints}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbPoints()}{getIbPoints()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily List$<$point$>$\& Foam\+::interpolation\+Info\+::get\+Ib\+Points (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 78 of file interpolation\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{79         \{}
+\DoxyCodeLine{80             \textcolor{keywordflow}{if}(\mbox{\hyperlink{classFoam_1_1interpolationInfo_a74c40cda6587c6f6c9195212fe726e83}{ibPointsPtr\_}}.empty())}
+\DoxyCodeLine{81             \{}
+\DoxyCodeLine{82                 \mbox{\hyperlink{classFoam_1_1interpolationInfo_a91e4642ab9e1d7cecde6db33f5cad9dd}{setIntpInfo}}();}
+\DoxyCodeLine{83             \}}
+\DoxyCodeLine{84             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1interpolationInfo_a74c40cda6587c6f6c9195212fe726e83}{ibPointsPtr\_}}();}
+\DoxyCodeLine{85         \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 10
+\mbox{\Hypertarget{classFoam_1_1interpolationInfo_ab5d3fce754b0071e3e837a5e473c33fa}\label{classFoam_1_1interpolationInfo_ab5d3fce754b0071e3e837a5e473c33fa}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getIbPoints@{getIbPoints}}
+\index{getIbPoints@{getIbPoints}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getIbPoints()}{getIbPoints()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily List$<$point$>$\& Foam\+::interpolation\+Info\+::get\+Ib\+Points (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 78 of file interpolation\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{79         \{}
+\DoxyCodeLine{80             \textcolor{keywordflow}{if}(\mbox{\hyperlink{classFoam_1_1interpolationInfo_a74c40cda6587c6f6c9195212fe726e83}{ibPointsPtr\_}}.empty())}
+\DoxyCodeLine{81             \{}
+\DoxyCodeLine{82                 \mbox{\hyperlink{classFoam_1_1interpolationInfo_a91e4642ab9e1d7cecde6db33f5cad9dd}{setIntpInfo}}();}
+\DoxyCodeLine{83             \}}
+\DoxyCodeLine{84             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1interpolationInfo_a74c40cda6587c6f6c9195212fe726e83}{ibPointsPtr\_}}();}
+\DoxyCodeLine{85         \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 11
+Here is the caller graph for this function\+:
+% FIG 12
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_ab9478ec1afe6f709bdacbc03bb18f756}\label{classFoam_1_1leastSquaresIntInfo_ab9478ec1afe6f709bdacbc03bb18f756}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getInvDirichletMatrix@{getInvDirichletMatrix}}
+\index{getInvDirichletMatrix@{getInvDirichletMatrix}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getInvDirichletMatrix()}{getInvDirichletMatrix()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::least\+Squares\+Int\+Info\+::get\+Inv\+Dirichlet\+Matrix (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classFoam_1_1interpolationInfo_a1e2ab0fa5afe1dec16c8c0ceeb86fdf2}{Dynamic\+Label\+List}} \&}]{ib\+Cells }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a8f49c6ba68afcc6bb69a0a55fcf92659}\label{classFoam_1_1leastSquaresIntInfo_a8f49c6ba68afcc6bb69a0a55fcf92659}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getInvDirichletMatrix@{getInvDirichletMatrix}}
+\index{getInvDirichletMatrix@{getInvDirichletMatrix}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getInvDirichletMatrix()}{getInvDirichletMatrix()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void least\+Squares\+Int\+Info\+::get\+Inv\+Dirichlet\+Matrix (\begin{DoxyParamCaption}\item[{const \mbox{\hyperlink{classFoam_1_1interpolationInfo_a1e2ab0fa5afe1dec16c8c0ceeb86fdf2}{Dynamic\+Label\+List}} \&}]{ib\+Cells }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 130 of file least\+Squares\+Int\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{133 \{}
+\DoxyCodeLine{134     \textcolor{keyword}{const} List<point>\& ibPoints = \mbox{\hyperlink{classFoam_1_1interpolationInfo_ab5d3fce754b0071e3e837a5e473c33fa}{getIbPoints}}();}
+\DoxyCodeLine{135     \textcolor{comment}{//const List<vector>\& ibNormals = getIbNormals();}}
+\DoxyCodeLine{136     \textcolor{keyword}{const} labelListList\& cellCells = \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a70c6933c55cb28cfe354a15047d148c3}{getCellCells}}();}
+\DoxyCodeLine{137     \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a0b3deb8aae522928cb07a391858b86c3}{resetInvDirMat}}(ibCells.size());}
+\DoxyCodeLine{138     PtrList<scalarRectangularMatrix>\& cInvDirMats = \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a30be6f155a547342f2baf7059eb61745}{getInvDirMats}}();}
+\DoxyCodeLine{139     \textcolor{keyword}{const} vectorField\& C = \mbox{\hyperlink{classFoam_1_1interpolationInfo_ae6a0dd05a42d370ffeb69a7823fbb638}{mesh\_}}.cellCentres();}
+\DoxyCodeLine{140 }
+\DoxyCodeLine{141     label nCoeffs = 5;}
+\DoxyCodeLine{142     \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespaceFoam_ad00a2e82157ece90bc4eaed2fe1572bd}{case3D}})}
+\DoxyCodeLine{143     \{}
+\DoxyCodeLine{144         nCoeffs += 4;}
+\DoxyCodeLine{145     \}}
+\DoxyCodeLine{146 }
+\DoxyCodeLine{147     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(ibCells, cellI)}
+\DoxyCodeLine{148     \{}
+\DoxyCodeLine{149         \textcolor{keyword}{const} labelList\& curCells = cellCells[cellI];}
+\DoxyCodeLine{150 }
+\DoxyCodeLine{151         vectorField allPoints(curCells.size(), vector::zero);}
+\DoxyCodeLine{152 }
+\DoxyCodeLine{153         \textcolor{keywordflow}{if}(allPoints.size() < nCoeffs)}
+\DoxyCodeLine{154         \{}
+\DoxyCodeLine{155             Info << \textcolor{stringliteral}{"Not eneough interp Points"} << endl;}
+\DoxyCodeLine{156         \}}
+\DoxyCodeLine{157         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{158         \{}
+\DoxyCodeLine{159             \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(curCells, cI)}
+\DoxyCodeLine{160             \{}
+\DoxyCodeLine{161                 allPoints[cI] = C[curCells[cI]];}
+\DoxyCodeLine{162             \}}
+\DoxyCodeLine{163 }
+\DoxyCodeLine{164             \textcolor{comment}{//Weights}}
+\DoxyCodeLine{165             point origin = C[ibCells[cellI]];}
+\DoxyCodeLine{166             scalarField curDist = mag(allPoints -\/ origin);}
+\DoxyCodeLine{167             scalarField W = 0.5*}
+\DoxyCodeLine{168                 (}
+\DoxyCodeLine{169                     1+cos(Foam::constant::mathematical::pi*curDist/}
+\DoxyCodeLine{170                     (1.1*max(curDist)))}
+\DoxyCodeLine{171                 );}
+\DoxyCodeLine{172 }
+\DoxyCodeLine{173             cInvDirMats.set}
+\DoxyCodeLine{174             (}
+\DoxyCodeLine{175                 cellI,}
+\DoxyCodeLine{176                 \textcolor{keyword}{new} scalarRectangularMatrix}
+\DoxyCodeLine{177                 (}
+\DoxyCodeLine{178                     nCoeffs,}
+\DoxyCodeLine{179                     allPoints.size(),}
+\DoxyCodeLine{180                     0.0}
+\DoxyCodeLine{181                 )}
+\DoxyCodeLine{182             );}
+\DoxyCodeLine{183             scalarRectangularMatrix\& curMatrix = cInvDirMats[cellI];}
+\DoxyCodeLine{184             scalarRectangularMatrix Mi}
+\DoxyCodeLine{185             (}
+\DoxyCodeLine{186                 allPoints.size(),}
+\DoxyCodeLine{187                 nCoeffs,}
+\DoxyCodeLine{188                 0.0}
+\DoxyCodeLine{189             );}
+\DoxyCodeLine{190 }
+\DoxyCodeLine{191             origin = ibPoints[cellI];}
+\DoxyCodeLine{192 }
+\DoxyCodeLine{193             \textcolor{keywordflow}{for}(label i = 0; i < allPoints.size(); i++)}
+\DoxyCodeLine{194             \{}
+\DoxyCodeLine{195                 scalar X = allPoints[i].x() -\/ origin.x();}
+\DoxyCodeLine{196                 scalar Y = allPoints[i].y() -\/ origin.y();}
+\DoxyCodeLine{197                 scalar Z = allPoints[i].z() -\/ origin.z();}
+\DoxyCodeLine{198                 \textcolor{keywordflow}{if}(\mbox{\hyperlink{namespaceFoam_ad00a2e82157ece90bc4eaed2fe1572bd}{case3D}})}
+\DoxyCodeLine{199                 \{}
+\DoxyCodeLine{200                     label coeff = 0;}
+\DoxyCodeLine{201                     Mi[i][coeff++] = X;}
+\DoxyCodeLine{202                     Mi[i][coeff++] = Y;}
+\DoxyCodeLine{203                     Mi[i][coeff++] = X*Y;}
+\DoxyCodeLine{204                     Mi[i][coeff++] = sqr(X);}
+\DoxyCodeLine{205                     Mi[i][coeff++] = sqr(Y);}
+\DoxyCodeLine{206                     Mi[i][coeff++] = Z;}
+\DoxyCodeLine{207                     Mi[i][coeff++] = X*Z;}
+\DoxyCodeLine{208                     Mi[i][coeff++] = Y*Z;}
+\DoxyCodeLine{209                     Mi[i][coeff++] = sqr(Z);}
+\DoxyCodeLine{210                 \}}
+\DoxyCodeLine{211                 \textcolor{keywordflow}{else}}
+\DoxyCodeLine{212                 \{}
+\DoxyCodeLine{213                     labelList A (2,0.0);}
+\DoxyCodeLine{214                     scalarList dists(3,0.0);}
+\DoxyCodeLine{215                     dists[0] = X;}
+\DoxyCodeLine{216                     dists[1] = Y;}
+\DoxyCodeLine{217                     dists[2] = Z;}
+\DoxyCodeLine{218                     label validDim = 0;}
+\DoxyCodeLine{219                     \textcolor{keywordflow}{for}(label dim = 0; dim < 3; dim++)}
+\DoxyCodeLine{220                     \{}
+\DoxyCodeLine{221                         \textcolor{keywordflow}{if}(dim != \mbox{\hyperlink{namespaceFoam_a2ef3b57e3f0b3247f76cb2be911676f9}{emptyDim}})}
+\DoxyCodeLine{222                         \{}
+\DoxyCodeLine{223                             A[validDim++] = dim;}
+\DoxyCodeLine{224                         \}}
+\DoxyCodeLine{225                     \}}
+\DoxyCodeLine{226                     label coeff = 0;}
+\DoxyCodeLine{227                     Mi[i][coeff++] = dists[A[0]];}
+\DoxyCodeLine{228                     Mi[i][coeff++] = dists[A[1]];}
+\DoxyCodeLine{229                     Mi[i][coeff++] = dists[A[0]]*dists[A[1]];}
+\DoxyCodeLine{230                     Mi[i][coeff++] = sqr(dists[A[0]]);}
+\DoxyCodeLine{231                     Mi[i][coeff++] = sqr(dists[A[1]]);}
+\DoxyCodeLine{232                 \}}
+\DoxyCodeLine{233             \}}
+\DoxyCodeLine{234 }
+\DoxyCodeLine{235             \textcolor{keywordflow}{for}(label i = 0; i < Mi.m(); i++)}
+\DoxyCodeLine{236             \{}
+\DoxyCodeLine{237                 \textcolor{keywordflow}{for}(label j = 0; j < Mi.n(); j++)}
+\DoxyCodeLine{238                 \{}
+\DoxyCodeLine{239                     Mi[i][j] *= W[i];}
+\DoxyCodeLine{240                 \}}
+\DoxyCodeLine{241             \}}
+\DoxyCodeLine{242 }
+\DoxyCodeLine{243             scalarSquareMatrix lsM(nCoeffs, 0.0);}
+\DoxyCodeLine{244             \textcolor{keywordflow}{for}(label i = 0; i < lsM.m(); i++)}
+\DoxyCodeLine{245             \{}
+\DoxyCodeLine{246                 \textcolor{keywordflow}{for}(label j = 0; j < lsM.n(); j++)}
+\DoxyCodeLine{247                 \{}
+\DoxyCodeLine{248                     \textcolor{keywordflow}{for}(label k = 0; k < Mi.m(); k++)}
+\DoxyCodeLine{249                     \{}
+\DoxyCodeLine{250                         lsM[i][j] += Mi[k][i]*Mi[k][j];}
+\DoxyCodeLine{251                     \}}
+\DoxyCodeLine{252                 \}}
+\DoxyCodeLine{253             \}}
+\DoxyCodeLine{254 }
+\DoxyCodeLine{255             scalarSquareMatrix invLsM = \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_ae7d0884902f273c7595eb4e45215f870}{LUinvert}}(lsM);}
+\DoxyCodeLine{256 }
+\DoxyCodeLine{257             \textcolor{keywordflow}{for}(label i = 0; i < lsM.m(); i++)}
+\DoxyCodeLine{258             \{}
+\DoxyCodeLine{259                 \textcolor{keywordflow}{for}(label j = 0; j < Mi.m(); j++)}
+\DoxyCodeLine{260                 \{}
+\DoxyCodeLine{261                     \textcolor{keywordflow}{for}(label k = 0; k < lsM.m(); k++)}
+\DoxyCodeLine{262                     \{}
+\DoxyCodeLine{263                         curMatrix[i][j] += invLsM[i][k]*Mi[j][k]*W[j];}
+\DoxyCodeLine{264                     \}}
+\DoxyCodeLine{265                 \}}
+\DoxyCodeLine{266             \}}
+\DoxyCodeLine{267         \}}
+\DoxyCodeLine{268     \}}
+\DoxyCodeLine{269 }
+\DoxyCodeLine{270 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 13
+Here is the caller graph for this function\+:
+% FIG 14
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a30be6f155a547342f2baf7059eb61745}\label{classFoam_1_1leastSquaresIntInfo_a30be6f155a547342f2baf7059eb61745}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getInvDirMats@{getInvDirMats}}
+\index{getInvDirMats@{getInvDirMats}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getInvDirMats()}{getInvDirMats()}\hspace{0.1cm}{\footnotesize\ttfamily [1/4]}}
+{\footnotesize\ttfamily Ptr\+List$<$scalar\+Rectangular\+Matrix$>$\& Foam\+::least\+Squares\+Int\+Info\+::get\+Inv\+Dir\+Mats (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 145 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{146         \{}
+\DoxyCodeLine{147             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a3d369eed7d42ba2254fd82942c42a192}{invDirichletMatrices\_}};}
+\DoxyCodeLine{148         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 15
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a30be6f155a547342f2baf7059eb61745}\label{classFoam_1_1leastSquaresIntInfo_a30be6f155a547342f2baf7059eb61745}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getInvDirMats@{getInvDirMats}}
+\index{getInvDirMats@{getInvDirMats}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getInvDirMats()}{getInvDirMats()}\hspace{0.1cm}{\footnotesize\ttfamily [2/4]}}
+{\footnotesize\ttfamily Ptr\+List$<$scalar\+Rectangular\+Matrix$>$\& Foam\+::least\+Squares\+Int\+Info\+::get\+Inv\+Dir\+Mats (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 145 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{146         \{}
+\DoxyCodeLine{147             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a3d369eed7d42ba2254fd82942c42a192}{invDirichletMatrices\_}};}
+\DoxyCodeLine{148         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_ab3885cf081ad060dbd10e9f130d41b04}\label{classFoam_1_1leastSquaresIntInfo_ab3885cf081ad060dbd10e9f130d41b04}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getInvDirMats@{getInvDirMats}}
+\index{getInvDirMats@{getInvDirMats}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getInvDirMats()}{getInvDirMats()}\hspace{0.1cm}{\footnotesize\ttfamily [3/4]}}
+{\footnotesize\ttfamily const Ptr\+List$<$scalar\+Rectangular\+Matrix$>$\& Foam\+::least\+Squares\+Int\+Info\+::get\+Inv\+Dir\+Mats (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 150 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{151         \{}
+\DoxyCodeLine{152             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a3d369eed7d42ba2254fd82942c42a192}{invDirichletMatrices\_}};}
+\DoxyCodeLine{153         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_ab3885cf081ad060dbd10e9f130d41b04}\label{classFoam_1_1leastSquaresIntInfo_ab3885cf081ad060dbd10e9f130d41b04}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getInvDirMats@{getInvDirMats}}
+\index{getInvDirMats@{getInvDirMats}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getInvDirMats()}{getInvDirMats()}\hspace{0.1cm}{\footnotesize\ttfamily [4/4]}}
+{\footnotesize\ttfamily const Ptr\+List$<$scalar\+Rectangular\+Matrix$>$\& Foam\+::least\+Squares\+Int\+Info\+::get\+Inv\+Dir\+Mats (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 150 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{151         \{}
+\DoxyCodeLine{152             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a3d369eed7d42ba2254fd82942c42a192}{invDirichletMatrices\_}};}
+\DoxyCodeLine{153         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1interpolationInfo_a3ca39a4f44ff35f421a7b6bea9d2ea51}\label{classFoam_1_1interpolationInfo_a3ca39a4f44ff35f421a7b6bea9d2ea51}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getSurfCells@{getSurfCells}}
+\index{getSurfCells@{getSurfCells}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getSurfCells()}{getSurfCells()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{classFoam_1_1interpolationInfo_a1e2ab0fa5afe1dec16c8c0ceeb86fdf2}{Dynamic\+Label\+List}}\& Foam\+::interpolation\+Info\+::get\+Surf\+Cells (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 94 of file interpolation\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{95         \{}
+\DoxyCodeLine{96             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1interpolationInfo_abd1d60905cf600e0fd67e99e237c8e8f}{geomModel\_}}-\/>getSurfaceCellList()[Pstream::myProcNo()];}
+\DoxyCodeLine{97         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1interpolationInfo_a3ca39a4f44ff35f421a7b6bea9d2ea51}\label{classFoam_1_1interpolationInfo_a3ca39a4f44ff35f421a7b6bea9d2ea51}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!getSurfCells@{getSurfCells}}
+\index{getSurfCells@{getSurfCells}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{getSurfCells()}{getSurfCells()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily const \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{Dynamic\+Label\+List}}\& Foam\+::interpolation\+Info\+::get\+Surf\+Cells (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const\hspace{0.3cm}{\ttfamily [inline]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 94 of file interpolation\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{95         \{}
+\DoxyCodeLine{96             \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1interpolationInfo_abd1d60905cf600e0fd67e99e237c8e8f}{geomModel\_}}-\/>getSurfaceCellList()[Pstream::myProcNo()];}
+\DoxyCodeLine{97         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 16
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_ae7d0884902f273c7595eb4e45215f870}\label{classFoam_1_1leastSquaresIntInfo_ae7d0884902f273c7595eb4e45215f870}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!LUinvert@{LUinvert}}
+\index{LUinvert@{LUinvert}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{LUinvert()}{LUinvert()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily scalar\+Square\+Matrix least\+Squares\+Int\+Info\+::\+L\+Uinvert (\begin{DoxyParamCaption}\item[{scalar\+Square\+Matrix \&}]{matrix }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 365 of file least\+Squares\+Int\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{368 \{}
+\DoxyCodeLine{369     scalarSquareMatrix luInvert(matrix.m());}
+\DoxyCodeLine{370     scalarField column(matrix.m());}
+\DoxyCodeLine{371 }
+\DoxyCodeLine{372     labelList pivotIndices(matrix.m());}
+\DoxyCodeLine{373     LUDecompose(matrix, pivotIndices);}
+\DoxyCodeLine{374 }
+\DoxyCodeLine{375     \textcolor{keywordflow}{for}(label j = 0; j < matrix.m(); j++)}
+\DoxyCodeLine{376     \{}
+\DoxyCodeLine{377         \textcolor{keywordflow}{for}(label i = 0; i < matrix.m(); i++)}
+\DoxyCodeLine{378         \{}
+\DoxyCodeLine{379             column[i] = 0.0;}
+\DoxyCodeLine{380         \}}
+\DoxyCodeLine{381 }
+\DoxyCodeLine{382         column[j] = 1.0;}
+\DoxyCodeLine{383 }
+\DoxyCodeLine{384         LUBacksubstitute(matrix, pivotIndices, column);}
+\DoxyCodeLine{385 }
+\DoxyCodeLine{386         \textcolor{keywordflow}{for}(label i = 0; i < matrix.m(); i++)}
+\DoxyCodeLine{387         \{}
+\DoxyCodeLine{388             luInvert[i][j] = column[i];}
+\DoxyCodeLine{389         \}}
+\DoxyCodeLine{390     \}}
+\DoxyCodeLine{391 }
+\DoxyCodeLine{392     \textcolor{keywordflow}{return} luInvert;}
+\DoxyCodeLine{393 \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a034349640f247e3437f68c6224c98694}\label{classFoam_1_1leastSquaresIntInfo_a034349640f247e3437f68c6224c98694}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!LUinvert@{LUinvert}}
+\index{LUinvert@{LUinvert}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{LUinvert()}{LUinvert()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily scalar\+Square\+Matrix Foam\+::least\+Squares\+Int\+Info\+::\+L\+Uinvert (\begin{DoxyParamCaption}\item[{scalar\+Square\+Matrix \&}]{matrix }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a65d7ab88df9a00594f3d586f349a92ad}\label{classFoam_1_1leastSquaresIntInfo_a65d7ab88df9a00594f3d586f349a92ad}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!resetIntpInfo@{resetIntpInfo}}
+\index{resetIntpInfo@{resetIntpInfo}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{resetIntpInfo()}{resetIntpInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::least\+Squares\+Int\+Info\+::reset\+Intp\+Info (\begin{DoxyParamCaption}\item[{label}]{new\+Size }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 109 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{110         \{}
+\DoxyCodeLine{111             \mbox{\hyperlink{classFoam_1_1interpolationInfo_a74c40cda6587c6f6c9195212fe726e83}{ibPointsPtr\_}}.reset(\textcolor{keyword}{new} List<point>(newSize, vector::zero));}
+\DoxyCodeLine{112             \mbox{\hyperlink{classFoam_1_1interpolationInfo_a2023800dbfc31f964ef78522ee3be160}{ibNormalsPtr\_}}.reset(\textcolor{keyword}{new} List<vector>(newSize, vector::zero));}
+\DoxyCodeLine{113             \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a5f30d007b171a195b5f46533a83e9d9e}{cellCellsPtr\_}}.reset(\textcolor{keyword}{new} labelListList(newSize));}
+\DoxyCodeLine{114             \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a98853c9d14b1ce70521916a7d5490d91}{ibFacesPtr\_}}.reset(\textcolor{keyword}{new} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{DynamicLabelList}}());}
+\DoxyCodeLine{115             \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a3d11a3c50de1464415117244451d6e09}{ibFaceFlipsPtr\_}}.reset(\textcolor{keyword}{new} DynamicList<bool>());}
+\DoxyCodeLine{116         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a65d7ab88df9a00594f3d586f349a92ad}\label{classFoam_1_1leastSquaresIntInfo_a65d7ab88df9a00594f3d586f349a92ad}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!resetIntpInfo@{resetIntpInfo}}
+\index{resetIntpInfo@{resetIntpInfo}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{resetIntpInfo()}{resetIntpInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::least\+Squares\+Int\+Info\+::reset\+Intp\+Info (\begin{DoxyParamCaption}\item[{label}]{new\+Size }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 109 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{110         \{}
+\DoxyCodeLine{111             \mbox{\hyperlink{classFoam_1_1interpolationInfo_a74c40cda6587c6f6c9195212fe726e83}{ibPointsPtr\_}}.reset(\textcolor{keyword}{new} List<point>(newSize, vector::zero));}
+\DoxyCodeLine{112             \mbox{\hyperlink{classFoam_1_1interpolationInfo_a2023800dbfc31f964ef78522ee3be160}{ibNormalsPtr\_}}.reset(\textcolor{keyword}{new} List<vector>(newSize, vector::zero));}
+\DoxyCodeLine{113             \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a5f30d007b171a195b5f46533a83e9d9e}{cellCellsPtr\_}}.reset(\textcolor{keyword}{new} labelListList(newSize));}
+\DoxyCodeLine{114             \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a98853c9d14b1ce70521916a7d5490d91}{ibFacesPtr\_}}.reset(\textcolor{keyword}{new} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{DynamicLabelList}}());}
+\DoxyCodeLine{115             \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a3d11a3c50de1464415117244451d6e09}{ibFaceFlipsPtr\_}}.reset(\textcolor{keyword}{new} DynamicList<bool>());}
+\DoxyCodeLine{116         \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 17
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a0b3deb8aae522928cb07a391858b86c3}\label{classFoam_1_1leastSquaresIntInfo_a0b3deb8aae522928cb07a391858b86c3}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!resetInvDirMat@{resetInvDirMat}}
+\index{resetInvDirMat@{resetInvDirMat}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{resetInvDirMat()}{resetInvDirMat()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::least\+Squares\+Int\+Info\+::reset\+Inv\+Dir\+Mat (\begin{DoxyParamCaption}\item[{label}]{new\+Size }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 118 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{119         \{}
+\DoxyCodeLine{120             \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a3d369eed7d42ba2254fd82942c42a192}{invDirichletMatrices\_}}.setSize(newSize);}
+\DoxyCodeLine{121         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a0b3deb8aae522928cb07a391858b86c3}\label{classFoam_1_1leastSquaresIntInfo_a0b3deb8aae522928cb07a391858b86c3}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!resetInvDirMat@{resetInvDirMat}}
+\index{resetInvDirMat@{resetInvDirMat}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{resetInvDirMat()}{resetInvDirMat()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::least\+Squares\+Int\+Info\+::reset\+Inv\+Dir\+Mat (\begin{DoxyParamCaption}\item[{label}]{new\+Size }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 118 of file least\+Squares\+Int\+Info.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{119         \{}
+\DoxyCodeLine{120             \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a3d369eed7d42ba2254fd82942c42a192}{invDirichletMatrices\_}}.setSize(newSize);}
+\DoxyCodeLine{121         \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a6dfafd16d2faf85aac335a80f376d914}\label{classFoam_1_1leastSquaresIntInfo_a6dfafd16d2faf85aac335a80f376d914}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!setIntpInfo@{setIntpInfo}}
+\index{setIntpInfo@{setIntpInfo}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{setIntpInfo()}{setIntpInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void least\+Squares\+Int\+Info\+::set\+Intp\+Info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1interpolationInfo_a91e4642ab9e1d7cecde6db33f5cad9dd}{Foam\+::interpolation\+Info}}.
+
+
+
+Definition at line 61 of file least\+Squares\+Int\+Info.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{62 \{}
+\DoxyCodeLine{63     \textcolor{keyword}{const} \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{DynamicLabelList}}\& cSurfCells = \mbox{\hyperlink{classFoam_1_1interpolationInfo_a3ca39a4f44ff35f421a7b6bea9d2ea51}{getSurfCells}}();}
+\DoxyCodeLine{64 }
+\DoxyCodeLine{65     \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a65d7ab88df9a00594f3d586f349a92ad}{resetIntpInfo}}(cSurfCells.size());}
+\DoxyCodeLine{66     List<point>\& ibPoints = \mbox{\hyperlink{classFoam_1_1interpolationInfo_ab5d3fce754b0071e3e837a5e473c33fa}{getIbPoints}}();}
+\DoxyCodeLine{67     List<vector>\& ibNormals = \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a57c5e29e3845401254fb30186a4be3b5}{getIbNormals}}();}
+\DoxyCodeLine{68     labelListList\& cellCells = \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a70c6933c55cb28cfe354a15047d148c3}{getCellCells}}();}
+\DoxyCodeLine{69 }
+\DoxyCodeLine{70     \textcolor{keyword}{const} vectorField\& C = \mbox{\hyperlink{classFoam_1_1interpolationInfo_ae6a0dd05a42d370ffeb69a7823fbb638}{mesh\_}}.cellCentres();}
+\DoxyCodeLine{71     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(cellCells, cellI)}
+\DoxyCodeLine{72     \{}
+\DoxyCodeLine{73         labelList currCells;}
+\DoxyCodeLine{74         scalar centerMeanDist;}
+\DoxyCodeLine{75         \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_afa3cf5dbb111e5be738c5a554f4a18a2}{findCellCells}}}
+\DoxyCodeLine{76         (}
+\DoxyCodeLine{77             cSurfCells[cellI],}
+\DoxyCodeLine{78             currCells,}
+\DoxyCodeLine{79             centerMeanDist}
+\DoxyCodeLine{80         );}
+\DoxyCodeLine{81         centerMeanDist *= \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_ac22147de00fb6521650f77dcc68deedc}{radiusFactor\_}};}
+\DoxyCodeLine{82 }
+\DoxyCodeLine{83         vector span(centerMeanDist, centerMeanDist, centerMeanDist);}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85         \mbox{\hyperlink{classFoam_1_1interpolationInfo_abd1d60905cf600e0fd67e99e237c8e8f}{geomModel\_}}-\/>getClosestPointAndNormal(}
+\DoxyCodeLine{86             C[cSurfCells[cellI]],}
+\DoxyCodeLine{87             span*2,}
+\DoxyCodeLine{88             ibPoints[cellI],}
+\DoxyCodeLine{89             ibNormals[cellI]}
+\DoxyCodeLine{90         );}
+\DoxyCodeLine{91 }
+\DoxyCodeLine{92         scalar angleLimit =}
+\DoxyCodeLine{93             Foam::cos(\mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a539967c6fedc7ebc13aaf10860c9c130}{angleFactor\_}}*Foam::constant::mathematical::pi/180);}
+\DoxyCodeLine{94 }
+\DoxyCodeLine{95         cellCells[cellI] = labelList(currCells.size(), -\/1);}
+\DoxyCodeLine{96         label nUsedCells = 0;}
+\DoxyCodeLine{97         \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(currCells, cCellI)}
+\DoxyCodeLine{98         \{}
+\DoxyCodeLine{99             label currCell = currCells[cCellI];}
+\DoxyCodeLine{100             scalar r = mag(C[currCell] -\/ C[cSurfCells[cellI]]);}
+\DoxyCodeLine{101 }
+\DoxyCodeLine{102             \textcolor{keywordflow}{if}(r <= centerMeanDist)}
+\DoxyCodeLine{103             \{}
+\DoxyCodeLine{104                 vector dir = C[currCell] -\/ ibPoints[cellI];}
+\DoxyCodeLine{105                 \textcolor{keywordflow}{if}(mag(dir) > 0)}
+\DoxyCodeLine{106                     dir /= mag(dir);}
+\DoxyCodeLine{107 }
+\DoxyCodeLine{108                 \textcolor{keywordflow}{if}(mag(ibNormals[cellI] \& dir) >= angleLimit)}
+\DoxyCodeLine{109                 \{}
+\DoxyCodeLine{110                     cellCells[cellI][nUsedCells++] = currCell;}
+\DoxyCodeLine{111                 \}}
+\DoxyCodeLine{112             \}}
+\DoxyCodeLine{113         \}}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115         cellCells[cellI].setSize(nUsedCells);}
+\DoxyCodeLine{116     \}}
+\DoxyCodeLine{117 }
+\DoxyCodeLine{118     \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a244d80c249a113b44d4b2159dadf0131}{getIbCellsFaces}}}
+\DoxyCodeLine{119     (}
+\DoxyCodeLine{120         cSurfCells}
+\DoxyCodeLine{121     );}
+\DoxyCodeLine{122 }
+\DoxyCodeLine{123     \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a8f49c6ba68afcc6bb69a0a55fcf92659}{getInvDirichletMatrix}}}
+\DoxyCodeLine{124     (}
+\DoxyCodeLine{125         cSurfCells}
+\DoxyCodeLine{126     );}
+\DoxyCodeLine{127 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 18
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_adbe2f78069a5f8693e5dfbf05d502f28}\label{classFoam_1_1leastSquaresIntInfo_adbe2f78069a5f8693e5dfbf05d502f28}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!setIntpInfo@{setIntpInfo}}
+\index{setIntpInfo@{setIntpInfo}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{setIntpInfo()}{setIntpInfo()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::least\+Squares\+Int\+Info\+::set\+Intp\+Info (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [final]}, {\ttfamily [override]}, {\ttfamily [virtual]}}
+
+
+
+Implements \mbox{\hyperlink{classFoam_1_1interpolationInfo_a91e4642ab9e1d7cecde6db33f5cad9dd}{Foam\+::interpolation\+Info}}.
+
+
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a539967c6fedc7ebc13aaf10860c9c130}\label{classFoam_1_1leastSquaresIntInfo_a539967c6fedc7ebc13aaf10860c9c130}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!angleFactor\_@{angleFactor\_}}
+\index{angleFactor\_@{angleFactor\_}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{angleFactor\_}{angleFactor\_}}
+{\footnotesize\ttfamily const scalar Foam\+::least\+Squares\+Int\+Info\+::angle\+Factor\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 63 of file least\+Squares\+Int\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a5f30d007b171a195b5f46533a83e9d9e}\label{classFoam_1_1leastSquaresIntInfo_a5f30d007b171a195b5f46533a83e9d9e}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!cellCellsPtr\_@{cellCellsPtr\_}}
+\index{cellCellsPtr\_@{cellCellsPtr\_}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{cellCellsPtr\_}{cellCellsPtr\_}}
+{\footnotesize\ttfamily auto\+Ptr$<$ label\+List\+List $>$ Foam\+::least\+Squares\+Int\+Info\+::cell\+Cells\+Ptr\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 55 of file least\+Squares\+Int\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_af2a24506a11ddead9e1d65753372de62}\label{classFoam_1_1leastSquaresIntInfo_af2a24506a11ddead9e1d65753372de62}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!distFactor\_@{distFactor\_}}
+\index{distFactor\_@{distFactor\_}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{distFactor\_}{distFactor\_}}
+{\footnotesize\ttfamily const scalar Foam\+::least\+Squares\+Int\+Info\+::dist\+Factor\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 61 of file least\+Squares\+Int\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1interpolationInfo_abd1d60905cf600e0fd67e99e237c8e8f}\label{classFoam_1_1interpolationInfo_abd1d60905cf600e0fd67e99e237c8e8f}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!geomModel\_@{geomModel\_}}
+\index{geomModel\_@{geomModel\_}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{geomModel\_}{geomModel\_}}
+{\footnotesize\ttfamily std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1geomModel}{geom\+Model}} $>$ \& Foam\+::interpolation\+Info\+::geom\+Model\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 61 of file interpolation\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a3d11a3c50de1464415117244451d6e09}\label{classFoam_1_1leastSquaresIntInfo_a3d11a3c50de1464415117244451d6e09}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!ibFaceFlipsPtr\_@{ibFaceFlipsPtr\_}}
+\index{ibFaceFlipsPtr\_@{ibFaceFlipsPtr\_}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{ibFaceFlipsPtr\_}{ibFaceFlipsPtr\_}}
+{\footnotesize\ttfamily auto\+Ptr$<$ Dynamic\+List$<$ bool $>$ $>$ Foam\+::least\+Squares\+Int\+Info\+::ib\+Face\+Flips\+Ptr\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 58 of file least\+Squares\+Int\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a98853c9d14b1ce70521916a7d5490d91}\label{classFoam_1_1leastSquaresIntInfo_a98853c9d14b1ce70521916a7d5490d91}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!ibFacesPtr\_@{ibFacesPtr\_}}
+\index{ibFacesPtr\_@{ibFacesPtr\_}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{ibFacesPtr\_}{ibFacesPtr\_}}
+{\footnotesize\ttfamily auto\+Ptr$<$ \mbox{\hyperlink{classFoam_1_1leastSquaresIntInfo_a2def04188988631302729ef80c5eb9ec}{Dynamic\+Label\+List}} $>$ Foam\+::least\+Squares\+Int\+Info\+::ib\+Faces\+Ptr\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 57 of file least\+Squares\+Int\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1interpolationInfo_a2023800dbfc31f964ef78522ee3be160}\label{classFoam_1_1interpolationInfo_a2023800dbfc31f964ef78522ee3be160}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!ibNormalsPtr\_@{ibNormalsPtr\_}}
+\index{ibNormalsPtr\_@{ibNormalsPtr\_}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{ibNormalsPtr\_}{ibNormalsPtr\_}}
+{\footnotesize\ttfamily auto\+Ptr$<$ List$<$ vector $>$ $>$ Foam\+::interpolation\+Info\+::ib\+Normals\+Ptr\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 64 of file interpolation\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1interpolationInfo_a74c40cda6587c6f6c9195212fe726e83}\label{classFoam_1_1interpolationInfo_a74c40cda6587c6f6c9195212fe726e83}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!ibPointsPtr\_@{ibPointsPtr\_}}
+\index{ibPointsPtr\_@{ibPointsPtr\_}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{ibPointsPtr\_}{ibPointsPtr\_}}
+{\footnotesize\ttfamily auto\+Ptr$<$ List$<$ point $>$ $>$ Foam\+::interpolation\+Info\+::ib\+Points\+Ptr\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 63 of file interpolation\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_a3d369eed7d42ba2254fd82942c42a192}\label{classFoam_1_1leastSquaresIntInfo_a3d369eed7d42ba2254fd82942c42a192}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!invDirichletMatrices\_@{invDirichletMatrices\_}}
+\index{invDirichletMatrices\_@{invDirichletMatrices\_}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{invDirichletMatrices\_}{invDirichletMatrices\_}}
+{\footnotesize\ttfamily Ptr\+List$<$ scalar\+Rectangular\+Matrix $>$ Foam\+::least\+Squares\+Int\+Info\+::inv\+Dirichlet\+Matrices\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 56 of file least\+Squares\+Int\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_aba4b5126e0a79f77fef0408f49db0064}\label{classFoam_1_1leastSquaresIntInfo_aba4b5126e0a79f77fef0408f49db0064}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!maxCCRows\_@{maxCCRows\_}}
+\index{maxCCRows\_@{maxCCRows\_}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{maxCCRows\_}{maxCCRows\_}}
+{\footnotesize\ttfamily const scalar Foam\+::least\+Squares\+Int\+Info\+::max\+C\+C\+Rows\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 64 of file least\+Squares\+Int\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1interpolationInfo_ae6a0dd05a42d370ffeb69a7823fbb638}\label{classFoam_1_1interpolationInfo_ae6a0dd05a42d370ffeb69a7823fbb638}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!mesh\_@{mesh\_}}
+\index{mesh\_@{mesh\_}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{mesh\_}{mesh\_}}
+{\footnotesize\ttfamily const Foam\+::fv\+Mesh \& Foam\+::interpolation\+Info\+::mesh\+\_\+\hspace{0.3cm}{\ttfamily [protected]}, {\ttfamily [inherited]}}
+
+
+
+Definition at line 59 of file interpolation\+Info.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1leastSquaresIntInfo_ac22147de00fb6521650f77dcc68deedc}\label{classFoam_1_1leastSquaresIntInfo_ac22147de00fb6521650f77dcc68deedc}} 
+\index{Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}!radiusFactor\_@{radiusFactor\_}}
+\index{radiusFactor\_@{radiusFactor\_}!Foam::leastSquaresIntInfo@{Foam::leastSquaresIntInfo}}
+\doxysubsubsection{\texorpdfstring{radiusFactor\_}{radiusFactor\_}}
+{\footnotesize\ttfamily const scalar Foam\+::least\+Squares\+Int\+Info\+::radius\+Factor\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 62 of file least\+Squares\+Int\+Info.\+H.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/ib\+Interpolation/least\+Squares\+Int/\mbox{\hyperlink{ibInterpolation_2leastSquaresInt_2leastSquaresIntInfo_8H}{least\+Squares\+Int\+Info.\+H}}\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/ib\+Interpolation/least\+Squares\+Int/\mbox{\hyperlink{ibInterpolation_2leastSquaresInt_2leastSquaresIntInfo_8C}{least\+Squares\+Int\+Info.\+C}}\end{DoxyCompactItemize}

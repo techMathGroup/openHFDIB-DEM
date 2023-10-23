@@ -1,0 +1,795 @@
+\hypertarget{classFoam_1_1verletList}{}\doxysection{Foam\+::verlet\+List Class Reference}
+\label{classFoam_1_1verletList}\index{Foam::verletList@{Foam::verletList}}
+
+
+{\ttfamily \#include $<$verlet\+List.\+H$>$}
+
+
+
+Collaboration diagram for Foam\+::verlet\+List\+:
+% FIG 0
+\doxysubsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\hyperlink{classFoam_1_1verletList_a3da7ac136fb024e1561f095c31c056e5}{verlet\+List}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1verletList_af17444604e1a165aca08bcf1606ef739}{$\sim$verlet\+List}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1verletList_aea6f0fad34c18dc07869fa23c0ece9a8}{add\+Body\+To\+V\+List}} (\mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} \&ib)
+\item 
+void \mbox{\hyperlink{classFoam_1_1verletList_a0270b6eac3a78c7e190aa487cdcfb76a}{remove\+Body\+From\+V\+List}} (\mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} \&ib)
+\item 
+void \mbox{\hyperlink{classFoam_1_1verletList_aa681491f5eac761aba8b30b7caddae3e}{initial\+Sorting}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1verletList_a93aa279b698e9560004e50a4775c5dff}{update}} (Ptr\+List$<$ \mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} $>$ \&ibs)
+\item 
+c\+Pair\+Has\+Set\+::iterator \mbox{\hyperlink{classFoam_1_1verletList_a5563b565da5f9d3b94c0b55818e7fff4}{begin}} ()
+\item 
+c\+Pair\+Has\+Set\+::iterator \mbox{\hyperlink{classFoam_1_1verletList_a231d5849845db41ff89b8eb6e5023916}{end}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1verletList_a5e40b713b9839916314a45c9b935a610}{verlet\+List}} ()
+\item 
+\mbox{\hyperlink{classFoam_1_1verletList_a14b8cfbf9cb1759ccfdb47c944ff10c5}{$\sim$verlet\+List}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1verletList_a1398a202b41dff6575cc181f4662118d}{add\+Body\+To\+V\+List}} (\mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} \&ib)
+\item 
+void \mbox{\hyperlink{classFoam_1_1verletList_aeefaeb2b56f7866e091add3d250fe0be}{remove\+Body\+From\+V\+List}} (\mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} \&ib)
+\item 
+void \mbox{\hyperlink{classFoam_1_1verletList_a4ecf2e94c1652fdc2f227495a9fdb5b1}{initial\+Sorting}} ()
+\item 
+void \mbox{\hyperlink{classFoam_1_1verletList_a6de9566641107c788153d1274eebc692}{update}} (Ptr\+List$<$ \mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} $>$ \&ibs)
+\item 
+c\+Pair\+Has\+Set\+::iterator \mbox{\hyperlink{classFoam_1_1verletList_a5563b565da5f9d3b94c0b55818e7fff4}{begin}} ()
+\item 
+c\+Pair\+Has\+Set\+::iterator \mbox{\hyperlink{classFoam_1_1verletList_a231d5849845db41ff89b8eb6e5023916}{end}} ()
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1verletList_a4cb615118b6502959efe1343915c2c7c}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1verletList_ac6791be34fe3dc8021f520a4d440bed4}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1verletList_a45490f8fe84ee59c2e708e108e6f5024}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1verletList_ab727b9e56c009ca5892f1e8d23f7af63}{Dynamic\+Point\+List}}
+\item 
+typedef std\+::pair$<$ label, label $>$ \mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}}
+\item 
+typedef std\+::map$<$ \mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}}, \mbox{\hyperlink{classFoam_1_1verletContact}{verlet\+Contact}} $>$ \mbox{\hyperlink{classFoam_1_1verletList_ab2df19862e48f44b748e4fd46c1220b5}{c\+Pair\+Vcontact\+Map}}
+\item 
+typedef std\+::unordered\+\_\+set$<$ \mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}}, \mbox{\hyperlink{structFoam_1_1hashFunction}{hash\+Function}} $>$ \mbox{\hyperlink{classFoam_1_1verletList_ac1ae4277de019631def3be732bd6dfb9}{c\+Pair\+Has\+Set}}
+\item 
+typedef Dynamic\+List$<$ label $>$ \mbox{\hyperlink{classFoam_1_1verletList_a4cb615118b6502959efe1343915c2c7c}{Dynamic\+Label\+List}}
+\item 
+typedef Dynamic\+List$<$ scalar $>$ \mbox{\hyperlink{classFoam_1_1verletList_ac6791be34fe3dc8021f520a4d440bed4}{Dynamic\+Scalar\+List}}
+\item 
+typedef Dynamic\+List$<$ vector $>$ \mbox{\hyperlink{classFoam_1_1verletList_a45490f8fe84ee59c2e708e108e6f5024}{Dynamic\+Vector\+List}}
+\item 
+typedef Dynamic\+List$<$ point $>$ \mbox{\hyperlink{classFoam_1_1verletList_ab727b9e56c009ca5892f1e8d23f7af63}{Dynamic\+Point\+List}}
+\item 
+typedef std\+::pair$<$ label, label $>$ \mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}}
+\item 
+typedef std\+::map$<$ \mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}}, \mbox{\hyperlink{classFoam_1_1verletContact}{verlet\+Contact}} $>$ \mbox{\hyperlink{classFoam_1_1verletList_ab2df19862e48f44b748e4fd46c1220b5}{c\+Pair\+Vcontact\+Map}}
+\item 
+typedef std\+::unordered\+\_\+set$<$ \mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}}, \mbox{\hyperlink{structFoam_1_1hashFunction}{hash\+Function}} $>$ \mbox{\hyperlink{classFoam_1_1verletList_ac1ae4277de019631def3be732bd6dfb9}{c\+Pair\+Has\+Set}}
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+void \mbox{\hyperlink{classFoam_1_1verletList_aaacaf777331e1d10d1678f3495cdbc54}{swap\+Verlet\+Points}} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$ a, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$ b, label coord)
+\item 
+void \mbox{\hyperlink{classFoam_1_1verletList_a796482083152ff10a13909553406a132}{add\+C\+Pair\+To\+Cnt\+N\+List}} (\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}} \mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}}, label coord, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$ a, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$ b)
+\item 
+void \mbox{\hyperlink{classFoam_1_1verletList_a9018fe57e1802d25ca2862b78d1bef5c}{swap\+Verlet\+Points}} (std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$ a, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$ b, label coord)
+\item 
+void \mbox{\hyperlink{classFoam_1_1verletList_ab664d2157dbb158f6b2aa0e7ab7f64ca}{add\+C\+Pair\+To\+Cnt\+N\+List}} (\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}} \mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}}, label coord, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$ a, std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$ b)
+\end{DoxyCompactItemize}
+\doxysubsection*{Private Attributes}
+\begin{DoxyCompactItemize}
+\item 
+std\+::list$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletBox}{verlet\+Box}} $>$ $>$ \mbox{\hyperlink{classFoam_1_1verletList_a414e5f7e269869da5eb65fb0446f6be0}{verlet\+Boxes\+\_\+}}
+\item 
+List$<$ std\+::list$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$ $>$ $>$ \mbox{\hyperlink{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}{verlet\+Lists\+\_\+}}
+\item 
+List$<$ \mbox{\hyperlink{classFoam_1_1verletList_ab2df19862e48f44b748e4fd46c1220b5}{c\+Pair\+Vcontact\+Map}} $>$ \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cnt\+Neigh\+List\+\_\+}}
+\item 
+\mbox{\hyperlink{classFoam_1_1verletList_ac1ae4277de019631def3be732bd6dfb9}{c\+Pair\+Has\+Set}} \mbox{\hyperlink{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}{pos\+Cnt\+List\+\_\+}}
+\end{DoxyCompactItemize}
+
+
+\doxysubsection{Detailed Description}
+
+
+Definition at line 69 of file verlet\+List.\+H.
+
+
+
+\doxysubsection{Member Typedef Documentation}
+\mbox{\Hypertarget{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}\label{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}} 
+\index{Foam::verletList@{Foam::verletList}!cPair@{cPair}}
+\index{cPair@{cPair}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{cPair}{cPair}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef std\+::pair$<$label, label$>$ \mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{Foam\+::verlet\+List\+::c\+Pair}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 78 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}\label{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}} 
+\index{Foam::verletList@{Foam::verletList}!cPair@{cPair}}
+\index{cPair@{cPair}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{cPair}{cPair}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef std\+::pair$<$label, label$>$ \mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{Foam\+::verlet\+List\+::c\+Pair}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 78 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_ac1ae4277de019631def3be732bd6dfb9}\label{classFoam_1_1verletList_ac1ae4277de019631def3be732bd6dfb9}} 
+\index{Foam::verletList@{Foam::verletList}!cPairHasSet@{cPairHasSet}}
+\index{cPairHasSet@{cPairHasSet}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{cPairHasSet}{cPairHasSet}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef std\+::unordered\+\_\+set$<$\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}}, \mbox{\hyperlink{structFoam_1_1hashFunction}{hash\+Function}}$>$ \mbox{\hyperlink{classFoam_1_1verletList_ac1ae4277de019631def3be732bd6dfb9}{Foam\+::verlet\+List\+::c\+Pair\+Has\+Set}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 81 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_ac1ae4277de019631def3be732bd6dfb9}\label{classFoam_1_1verletList_ac1ae4277de019631def3be732bd6dfb9}} 
+\index{Foam::verletList@{Foam::verletList}!cPairHasSet@{cPairHasSet}}
+\index{cPairHasSet@{cPairHasSet}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{cPairHasSet}{cPairHasSet}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef std\+::unordered\+\_\+set$<$\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}}, \mbox{\hyperlink{structFoam_1_1hashFunction}{hash\+Function}}$>$ \mbox{\hyperlink{classFoam_1_1verletList_ac1ae4277de019631def3be732bd6dfb9}{Foam\+::verlet\+List\+::c\+Pair\+Has\+Set}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 81 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_ab2df19862e48f44b748e4fd46c1220b5}\label{classFoam_1_1verletList_ab2df19862e48f44b748e4fd46c1220b5}} 
+\index{Foam::verletList@{Foam::verletList}!cPairVcontactMap@{cPairVcontactMap}}
+\index{cPairVcontactMap@{cPairVcontactMap}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{cPairVcontactMap}{cPairVcontactMap}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef std\+::map$<$\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}}, \mbox{\hyperlink{classFoam_1_1verletContact}{verlet\+Contact}}$>$ \mbox{\hyperlink{classFoam_1_1verletList_ab2df19862e48f44b748e4fd46c1220b5}{Foam\+::verlet\+List\+::c\+Pair\+Vcontact\+Map}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 79 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_ab2df19862e48f44b748e4fd46c1220b5}\label{classFoam_1_1verletList_ab2df19862e48f44b748e4fd46c1220b5}} 
+\index{Foam::verletList@{Foam::verletList}!cPairVcontactMap@{cPairVcontactMap}}
+\index{cPairVcontactMap@{cPairVcontactMap}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{cPairVcontactMap}{cPairVcontactMap}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef std\+::map$<$\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}}, \mbox{\hyperlink{classFoam_1_1verletContact}{verlet\+Contact}}$>$ \mbox{\hyperlink{classFoam_1_1verletList_ab2df19862e48f44b748e4fd46c1220b5}{Foam\+::verlet\+List\+::c\+Pair\+Vcontact\+Map}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 79 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_a4cb615118b6502959efe1343915c2c7c}\label{classFoam_1_1verletList_a4cb615118b6502959efe1343915c2c7c}} 
+\index{Foam::verletList@{Foam::verletList}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1verletList_a4cb615118b6502959efe1343915c2c7c}{Foam\+::verlet\+List\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 73 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_a4cb615118b6502959efe1343915c2c7c}\label{classFoam_1_1verletList_a4cb615118b6502959efe1343915c2c7c}} 
+\index{Foam::verletList@{Foam::verletList}!DynamicLabelList@{DynamicLabelList}}
+\index{DynamicLabelList@{DynamicLabelList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{DynamicLabelList}{DynamicLabelList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$label$>$ \mbox{\hyperlink{classFoam_1_1verletList_a4cb615118b6502959efe1343915c2c7c}{Foam\+::verlet\+List\+::\+Dynamic\+Label\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 73 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_ab727b9e56c009ca5892f1e8d23f7af63}\label{classFoam_1_1verletList_ab727b9e56c009ca5892f1e8d23f7af63}} 
+\index{Foam::verletList@{Foam::verletList}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1verletList_ab727b9e56c009ca5892f1e8d23f7af63}{Foam\+::verlet\+List\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 76 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_ab727b9e56c009ca5892f1e8d23f7af63}\label{classFoam_1_1verletList_ab727b9e56c009ca5892f1e8d23f7af63}} 
+\index{Foam::verletList@{Foam::verletList}!DynamicPointList@{DynamicPointList}}
+\index{DynamicPointList@{DynamicPointList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{DynamicPointList}{DynamicPointList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$point$>$ \mbox{\hyperlink{classFoam_1_1verletList_ab727b9e56c009ca5892f1e8d23f7af63}{Foam\+::verlet\+List\+::\+Dynamic\+Point\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 76 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_ac6791be34fe3dc8021f520a4d440bed4}\label{classFoam_1_1verletList_ac6791be34fe3dc8021f520a4d440bed4}} 
+\index{Foam::verletList@{Foam::verletList}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1verletList_ac6791be34fe3dc8021f520a4d440bed4}{Foam\+::verlet\+List\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 74 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_ac6791be34fe3dc8021f520a4d440bed4}\label{classFoam_1_1verletList_ac6791be34fe3dc8021f520a4d440bed4}} 
+\index{Foam::verletList@{Foam::verletList}!DynamicScalarList@{DynamicScalarList}}
+\index{DynamicScalarList@{DynamicScalarList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{DynamicScalarList}{DynamicScalarList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$scalar$>$ \mbox{\hyperlink{classFoam_1_1verletList_ac6791be34fe3dc8021f520a4d440bed4}{Foam\+::verlet\+List\+::\+Dynamic\+Scalar\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 74 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_a45490f8fe84ee59c2e708e108e6f5024}\label{classFoam_1_1verletList_a45490f8fe84ee59c2e708e108e6f5024}} 
+\index{Foam::verletList@{Foam::verletList}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1verletList_a45490f8fe84ee59c2e708e108e6f5024}{Foam\+::verlet\+List\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 75 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_a45490f8fe84ee59c2e708e108e6f5024}\label{classFoam_1_1verletList_a45490f8fe84ee59c2e708e108e6f5024}} 
+\index{Foam::verletList@{Foam::verletList}!DynamicVectorList@{DynamicVectorList}}
+\index{DynamicVectorList@{DynamicVectorList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{DynamicVectorList}{DynamicVectorList}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily typedef Dynamic\+List$<$vector$>$ \mbox{\hyperlink{classFoam_1_1verletList_a45490f8fe84ee59c2e708e108e6f5024}{Foam\+::verlet\+List\+::\+Dynamic\+Vector\+List}}\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 75 of file verlet\+List.\+H.
+
+
+
+\doxysubsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classFoam_1_1verletList_a3da7ac136fb024e1561f095c31c056e5}\label{classFoam_1_1verletList_a3da7ac136fb024e1561f095c31c056e5}} 
+\index{Foam::verletList@{Foam::verletList}!verletList@{verletList}}
+\index{verletList@{verletList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{verletList()}{verletList()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily verlet\+List\+::verlet\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 37 of file verlet\+List.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{38 :}
+\DoxyCodeLine{39 \mbox{\hyperlink{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}{verletLists\_}}(3),}
+\DoxyCodeLine{40 \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}(3)}
+\DoxyCodeLine{41 \{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1verletList_af17444604e1a165aca08bcf1606ef739}\label{classFoam_1_1verletList_af17444604e1a165aca08bcf1606ef739}} 
+\index{Foam::verletList@{Foam::verletList}!````~verletList@{$\sim$verletList}}
+\index{````~verletList@{$\sim$verletList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{$\sim$verletList()}{~verletList()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily verlet\+List\+::$\sim$verlet\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 42 of file verlet\+List.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{43 \{\}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1verletList_a5e40b713b9839916314a45c9b935a610}\label{classFoam_1_1verletList_a5e40b713b9839916314a45c9b935a610}} 
+\index{Foam::verletList@{Foam::verletList}!verletList@{verletList}}
+\index{verletList@{verletList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{verletList()}{verletList()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::verlet\+List\+::verlet\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1verletList_a14b8cfbf9cb1759ccfdb47c944ff10c5}\label{classFoam_1_1verletList_a14b8cfbf9cb1759ccfdb47c944ff10c5}} 
+\index{Foam::verletList@{Foam::verletList}!````~verletList@{$\sim$verletList}}
+\index{````~verletList@{$\sim$verletList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{$\sim$verletList()}{~verletList()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Foam\+::verlet\+List\+::$\sim$verlet\+List (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Member Function Documentation}
+\mbox{\Hypertarget{classFoam_1_1verletList_aea6f0fad34c18dc07869fa23c0ece9a8}\label{classFoam_1_1verletList_aea6f0fad34c18dc07869fa23c0ece9a8}} 
+\index{Foam::verletList@{Foam::verletList}!addBodyToVList@{addBodyToVList}}
+\index{addBodyToVList@{addBodyToVList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{addBodyToVList()}{addBodyToVList()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void verlet\+List\+::add\+Body\+To\+V\+List (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} \&}]{ib }\end{DoxyParamCaption})}
+
+
+
+Definition at line 138 of file verlet\+List.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{139 \{}
+\DoxyCodeLine{140     List<std::shared\_ptr<boundBox>> bBoxes = ib.\mbox{\hyperlink{classFoam_1_1immersedBody_a721fb801dd7a85d2a1ee95db8dc674ac}{getGeomModel}}().\mbox{\hyperlink{classFoam_1_1geomModel_a478b20dd5156a461e6699383bd2b23af}{getBBoxes}}();}
+\DoxyCodeLine{141 }
+\DoxyCodeLine{142     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(bBoxes, bBox)}
+\DoxyCodeLine{143     \{}
+\DoxyCodeLine{144         \mbox{\hyperlink{classFoam_1_1verletList_a414e5f7e269869da5eb65fb0446f6be0}{verletBoxes\_}}.push\_back(\mbox{\hyperlink{classFoam_1_1verletBox_a03e14c5fe63f7945d9162a4b0f9d8af2}{verletBox::create}}(}
+\DoxyCodeLine{145             ib.\mbox{\hyperlink{classFoam_1_1immersedBody_abcd1c50794faf308fa491e9990b3db5a}{getBodyId}}(),}
+\DoxyCodeLine{146             bBoxes[bBox]}
+\DoxyCodeLine{147         ));}
+\DoxyCodeLine{148 }
+\DoxyCodeLine{149         \mbox{\hyperlink{classFoam_1_1verletList_a414e5f7e269869da5eb65fb0446f6be0}{verletBoxes\_}}.back()-\/>setVerletPoints();}
+\DoxyCodeLine{150 }
+\DoxyCodeLine{151         \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(\mbox{\hyperlink{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}{verletLists\_}}, vListI)}
+\DoxyCodeLine{152         \{}
+\DoxyCodeLine{153             \textcolor{keywordflow}{if}(vListI != \mbox{\hyperlink{namespaceFoam_a2ef3b57e3f0b3247f76cb2be911676f9}{emptyDim}})}
+\DoxyCodeLine{154             \{}
+\DoxyCodeLine{155                 \mbox{\hyperlink{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}{verletLists\_}}[vListI].push\_back(}
+\DoxyCodeLine{156                     \mbox{\hyperlink{classFoam_1_1verletList_a414e5f7e269869da5eb65fb0446f6be0}{verletBoxes\_}}.back()-\/>getMinPoint()}
+\DoxyCodeLine{157                 );}
+\DoxyCodeLine{158 }
+\DoxyCodeLine{159                 \mbox{\hyperlink{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}{verletLists\_}}[vListI].push\_back(}
+\DoxyCodeLine{160                     \mbox{\hyperlink{classFoam_1_1verletList_a414e5f7e269869da5eb65fb0446f6be0}{verletBoxes\_}}.back()-\/>getMaxPoint()}
+\DoxyCodeLine{161                 );}
+\DoxyCodeLine{162             \}}
+\DoxyCodeLine{163         \}}
+\DoxyCodeLine{164     \}}
+\DoxyCodeLine{165 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 1
+Here is the caller graph for this function\+:
+% FIG 2
+\mbox{\Hypertarget{classFoam_1_1verletList_a1398a202b41dff6575cc181f4662118d}\label{classFoam_1_1verletList_a1398a202b41dff6575cc181f4662118d}} 
+\index{Foam::verletList@{Foam::verletList}!addBodyToVList@{addBodyToVList}}
+\index{addBodyToVList@{addBodyToVList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{addBodyToVList()}{addBodyToVList()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::verlet\+List\+::add\+Body\+To\+V\+List (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} \&}]{ib }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1verletList_ab664d2157dbb158f6b2aa0e7ab7f64ca}\label{classFoam_1_1verletList_ab664d2157dbb158f6b2aa0e7ab7f64ca}} 
+\index{Foam::verletList@{Foam::verletList}!addCPairToCntNList@{addCPairToCntNList}}
+\index{addCPairToCntNList@{addCPairToCntNList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{addCPairToCntNList()}{addCPairToCntNList()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::verlet\+List\+::add\+C\+Pair\+To\+Cnt\+N\+List (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}}}]{c\+Pair,  }\item[{label}]{coord,  }\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$}]{a,  }\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$}]{b }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classFoam_1_1verletList_a796482083152ff10a13909553406a132}\label{classFoam_1_1verletList_a796482083152ff10a13909553406a132}} 
+\index{Foam::verletList@{Foam::verletList}!addCPairToCntNList@{addCPairToCntNList}}
+\index{addCPairToCntNList@{addCPairToCntNList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{addCPairToCntNList()}{addCPairToCntNList()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void verlet\+List\+::add\+C\+Pair\+To\+Cnt\+N\+List (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{c\+Pair}}}]{c\+Pair,  }\item[{label}]{coord,  }\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$}]{a,  }\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$}]{b }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 96 of file verlet\+List.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{102 \{}
+\DoxyCodeLine{103     \textcolor{keywordflow}{if}(\mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[coord].find(\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}) == \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[coord].\mbox{\hyperlink{classFoam_1_1verletList_a231d5849845db41ff89b8eb6e5023916}{end}}())}
+\DoxyCodeLine{104     \{}
+\DoxyCodeLine{105         \mbox{\hyperlink{classFoam_1_1verletContact}{verletContact}} newContact(\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}});}
+\DoxyCodeLine{106         \textcolor{keywordflow}{if} (a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}() < b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}())}
+\DoxyCodeLine{107         \{}
+\DoxyCodeLine{108             newContact.addContactBox(a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a9da54b88dbb98d1e49f3f080c5cf1e5e}{getParentBox}}(), b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a9da54b88dbb98d1e49f3f080c5cf1e5e}{getParentBox}}());}
+\DoxyCodeLine{109         \}}
+\DoxyCodeLine{110         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{111         \{}
+\DoxyCodeLine{112             newContact.addContactBox(b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a9da54b88dbb98d1e49f3f080c5cf1e5e}{getParentBox}}(), a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a9da54b88dbb98d1e49f3f080c5cf1e5e}{getParentBox}}());}
+\DoxyCodeLine{113         \}}
+\DoxyCodeLine{114 }
+\DoxyCodeLine{115         \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[coord].insert(\{\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}, newContact\});}
+\DoxyCodeLine{116     \}}
+\DoxyCodeLine{117     \textcolor{keywordflow}{else}}
+\DoxyCodeLine{118     \{}
+\DoxyCodeLine{119         \textcolor{keywordflow}{if} (a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}() < b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}())}
+\DoxyCodeLine{120         \{}
+\DoxyCodeLine{121             \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[coord][\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}].addContactBox(a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a9da54b88dbb98d1e49f3f080c5cf1e5e}{getParentBox}}(), b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a9da54b88dbb98d1e49f3f080c5cf1e5e}{getParentBox}}());}
+\DoxyCodeLine{122         \}}
+\DoxyCodeLine{123         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{124         \{}
+\DoxyCodeLine{125             \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[coord][\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}].addContactBox(b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a9da54b88dbb98d1e49f3f080c5cf1e5e}{getParentBox}}(), a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a9da54b88dbb98d1e49f3f080c5cf1e5e}{getParentBox}}());}
+\DoxyCodeLine{126         \}}
+\DoxyCodeLine{127     \}}
+\DoxyCodeLine{128 }
+\DoxyCodeLine{129     \textcolor{keywordflow}{if}(\mbox{\hyperlink{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}{posCntList\_}}.find(\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}) == \mbox{\hyperlink{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}{posCntList\_}}.end() \&\&}
+\DoxyCodeLine{130         (\mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[0].find(\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}) != \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[0].end() || \mbox{\hyperlink{namespaceFoam_a2ef3b57e3f0b3247f76cb2be911676f9}{emptyDim}} == 0) \&\&}
+\DoxyCodeLine{131         (\mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[1].find(\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}) != \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[1].end() || \mbox{\hyperlink{namespaceFoam_a2ef3b57e3f0b3247f76cb2be911676f9}{emptyDim}} == 1) \&\&}
+\DoxyCodeLine{132         (\mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[2].find(\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}) != \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[2].end() || \mbox{\hyperlink{namespaceFoam_a2ef3b57e3f0b3247f76cb2be911676f9}{emptyDim}} == 2))}
+\DoxyCodeLine{133     \{}
+\DoxyCodeLine{134         \mbox{\hyperlink{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}{posCntList\_}}.insert(\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}});}
+\DoxyCodeLine{135     \}}
+\DoxyCodeLine{136 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 3
+Here is the caller graph for this function\+:
+% FIG 4
+\mbox{\Hypertarget{classFoam_1_1verletList_a5563b565da5f9d3b94c0b55818e7fff4}\label{classFoam_1_1verletList_a5563b565da5f9d3b94c0b55818e7fff4}} 
+\index{Foam::verletList@{Foam::verletList}!begin@{begin}}
+\index{begin@{begin}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily c\+Pair\+Has\+Set\+::iterator Foam\+::verlet\+List\+::begin (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 128 of file verlet\+List.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{129     \{}
+\DoxyCodeLine{130         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}{posCntList\_}}.begin();}
+\DoxyCodeLine{131     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1verletList_a5563b565da5f9d3b94c0b55818e7fff4}\label{classFoam_1_1verletList_a5563b565da5f9d3b94c0b55818e7fff4}} 
+\index{Foam::verletList@{Foam::verletList}!begin@{begin}}
+\index{begin@{begin}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{begin()}{begin()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily c\+Pair\+Has\+Set\+::iterator Foam\+::verlet\+List\+::begin (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 128 of file verlet\+List.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{129     \{}
+\DoxyCodeLine{130         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}{posCntList\_}}.begin();}
+\DoxyCodeLine{131     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 5
+\mbox{\Hypertarget{classFoam_1_1verletList_a231d5849845db41ff89b8eb6e5023916}\label{classFoam_1_1verletList_a231d5849845db41ff89b8eb6e5023916}} 
+\index{Foam::verletList@{Foam::verletList}!end@{end}}
+\index{end@{end}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily c\+Pair\+Has\+Set\+::iterator Foam\+::verlet\+List\+::end (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 133 of file verlet\+List.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{134     \{}
+\DoxyCodeLine{135         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}{posCntList\_}}.end();}
+\DoxyCodeLine{136     \}}
+
+\end{DoxyCode}
+\mbox{\Hypertarget{classFoam_1_1verletList_a231d5849845db41ff89b8eb6e5023916}\label{classFoam_1_1verletList_a231d5849845db41ff89b8eb6e5023916}} 
+\index{Foam::verletList@{Foam::verletList}!end@{end}}
+\index{end@{end}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{end()}{end()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily c\+Pair\+Has\+Set\+::iterator Foam\+::verlet\+List\+::end (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Definition at line 133 of file verlet\+List.\+H.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{134     \{}
+\DoxyCodeLine{135         \textcolor{keywordflow}{return} \mbox{\hyperlink{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}{posCntList\_}}.end();}
+\DoxyCodeLine{136     \}}
+
+\end{DoxyCode}
+Here is the caller graph for this function\+:
+% FIG 6
+\mbox{\Hypertarget{classFoam_1_1verletList_aa681491f5eac761aba8b30b7caddae3e}\label{classFoam_1_1verletList_aa681491f5eac761aba8b30b7caddae3e}} 
+\index{Foam::verletList@{Foam::verletList}!initialSorting@{initialSorting}}
+\index{initialSorting@{initialSorting}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{initialSorting()}{initialSorting()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void verlet\+List\+::initial\+Sorting (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+Definition at line 216 of file verlet\+List.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{217 \{}
+\DoxyCodeLine{218     \textcolor{keywordflow}{for} (label coord = 0; coord < 3; ++coord)}
+\DoxyCodeLine{219     \{}
+\DoxyCodeLine{220         \mbox{\hyperlink{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}{verletLists\_}}[coord].sort([\&coord](}
+\DoxyCodeLine{221             std::shared\_ptr<verletPoint>\& vPoint1,}
+\DoxyCodeLine{222             std::shared\_ptr<verletPoint>\& vPoint2)}
+\DoxyCodeLine{223         \{}
+\DoxyCodeLine{224             \textcolor{keywordflow}{return} vPoint1-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a168a99add4ecf645f04b85a10062faa8}{getPoint}}()[coord] < vPoint2-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a168a99add4ecf645f04b85a10062faa8}{getPoint}}()[coord];}
+\DoxyCodeLine{225         \});}
+\DoxyCodeLine{226 }
+\DoxyCodeLine{227         std::list<std::shared\_ptr<verletPoint>> openedIb;}
+\DoxyCodeLine{228         \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} iter = \mbox{\hyperlink{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}{verletLists\_}}[coord].\mbox{\hyperlink{classFoam_1_1verletList_a5563b565da5f9d3b94c0b55818e7fff4}{begin}}();}
+\DoxyCodeLine{229             iter != \mbox{\hyperlink{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}{verletLists\_}}[coord].end(); ++iter)}
+\DoxyCodeLine{230         \{}
+\DoxyCodeLine{231             \textcolor{keywordflow}{if}((*iter)-\/>isMin())}
+\DoxyCodeLine{232             \{}
+\DoxyCodeLine{233                 label curIb = (*iter)-\/>getBodyId();}
+\DoxyCodeLine{234                 \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} oIbIter = openedIb.begin();}
+\DoxyCodeLine{235                     oIbIter != openedIb.end(); ++oIbIter)}
+\DoxyCodeLine{236                 \{}
+\DoxyCodeLine{237                     \mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}} newPair(}
+\DoxyCodeLine{238                         min(curIb, (*oIbIter)-\/>getBodyId()), max(curIb, (*oIbIter)-\/>getBodyId())}
+\DoxyCodeLine{239                     );}
+\DoxyCodeLine{240                     \mbox{\hyperlink{classFoam_1_1verletList_a796482083152ff10a13909553406a132}{addCPairToCntNList}}(newPair, coord, *iter, *oIbIter);}
+\DoxyCodeLine{241                 \}}
+\DoxyCodeLine{242 }
+\DoxyCodeLine{243                 openedIb.push\_back(*iter);}
+\DoxyCodeLine{244             \}}
+\DoxyCodeLine{245             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{246             \{}
+\DoxyCodeLine{247                 label curIb = (*iter)-\/>getBodyId();}
+\DoxyCodeLine{248                 openedIb.remove\_if(}
+\DoxyCodeLine{249                     [\&curIb](std::shared\_ptr<verletPoint>\& vPoint)}
+\DoxyCodeLine{250                     \{}
+\DoxyCodeLine{251                         \textcolor{keywordflow}{return} vPoint-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}() == curIb;}
+\DoxyCodeLine{252                     \}}
+\DoxyCodeLine{253                 );}
+\DoxyCodeLine{254             \}}
+\DoxyCodeLine{255         \}}
+\DoxyCodeLine{256     \}}
+\DoxyCodeLine{257 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 7
+\mbox{\Hypertarget{classFoam_1_1verletList_a4ecf2e94c1652fdc2f227495a9fdb5b1}\label{classFoam_1_1verletList_a4ecf2e94c1652fdc2f227495a9fdb5b1}} 
+\index{Foam::verletList@{Foam::verletList}!initialSorting@{initialSorting}}
+\index{initialSorting@{initialSorting}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{initialSorting()}{initialSorting()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::verlet\+List\+::initial\+Sorting (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1verletList_aeefaeb2b56f7866e091add3d250fe0be}\label{classFoam_1_1verletList_aeefaeb2b56f7866e091add3d250fe0be}} 
+\index{Foam::verletList@{Foam::verletList}!removeBodyFromVList@{removeBodyFromVList}}
+\index{removeBodyFromVList@{removeBodyFromVList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{removeBodyFromVList()}{removeBodyFromVList()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::verlet\+List\+::remove\+Body\+From\+V\+List (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} \&}]{ib }\end{DoxyParamCaption})}
+
+\mbox{\Hypertarget{classFoam_1_1verletList_a0270b6eac3a78c7e190aa487cdcfb76a}\label{classFoam_1_1verletList_a0270b6eac3a78c7e190aa487cdcfb76a}} 
+\index{Foam::verletList@{Foam::verletList}!removeBodyFromVList@{removeBodyFromVList}}
+\index{removeBodyFromVList@{removeBodyFromVList}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{removeBodyFromVList()}{removeBodyFromVList()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void verlet\+List\+::remove\+Body\+From\+V\+List (\begin{DoxyParamCaption}\item[{\mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} \&}]{ib }\end{DoxyParamCaption})}
+
+
+
+Definition at line 167 of file verlet\+List.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{168 \{}
+\DoxyCodeLine{169     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}} (\mbox{\hyperlink{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}{verletLists\_}}, coordI)}
+\DoxyCodeLine{170     \{}
+\DoxyCodeLine{171         \mbox{\hyperlink{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}{verletLists\_}}[coordI].remove\_if(}
+\DoxyCodeLine{172             [\&ib](std::shared\_ptr<verletPoint>\& vPoint)}
+\DoxyCodeLine{173             \{}
+\DoxyCodeLine{174                 \textcolor{keywordflow}{return} vPoint-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}() == ib.\mbox{\hyperlink{classFoam_1_1immersedBody_abcd1c50794faf308fa491e9990b3db5a}{getBodyId}}();}
+\DoxyCodeLine{175             \}}
+\DoxyCodeLine{176         );}
+\DoxyCodeLine{177 }
+\DoxyCodeLine{178         \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} it = \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[coordI].\mbox{\hyperlink{classFoam_1_1verletList_a5563b565da5f9d3b94c0b55818e7fff4}{begin}}();}
+\DoxyCodeLine{179             it != \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[coordI].end();)}
+\DoxyCodeLine{180         \{}
+\DoxyCodeLine{181             \textcolor{keywordflow}{if} (it-\/>first.first == ib.\mbox{\hyperlink{classFoam_1_1immersedBody_abcd1c50794faf308fa491e9990b3db5a}{getBodyId}}()}
+\DoxyCodeLine{182                 ||}
+\DoxyCodeLine{183                 it-\/>first.second == ib.\mbox{\hyperlink{classFoam_1_1immersedBody_abcd1c50794faf308fa491e9990b3db5a}{getBodyId}}())}
+\DoxyCodeLine{184             \{}
+\DoxyCodeLine{185                 it = \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[coordI].erase(it);}
+\DoxyCodeLine{186             \}}
+\DoxyCodeLine{187             \textcolor{keywordflow}{else}}
+\DoxyCodeLine{188             \{}
+\DoxyCodeLine{189                 ++it;}
+\DoxyCodeLine{190             \}}
+\DoxyCodeLine{191         \}}
+\DoxyCodeLine{192     \}}
+\DoxyCodeLine{193 }
+\DoxyCodeLine{194     \mbox{\hyperlink{classFoam_1_1verletList_a414e5f7e269869da5eb65fb0446f6be0}{verletBoxes\_}}.remove\_if(}
+\DoxyCodeLine{195         [\&ib](std::shared\_ptr<verletBox>\& vBox)}
+\DoxyCodeLine{196         \{}
+\DoxyCodeLine{197             \textcolor{keywordflow}{return} vBox-\/>\mbox{\hyperlink{classFoam_1_1verletBox_a7e9ab969eb7fc18d33d070cc4183d0ce}{getBodyId}}() == ib.\mbox{\hyperlink{classFoam_1_1immersedBody_abcd1c50794faf308fa491e9990b3db5a}{getBodyId}}();}
+\DoxyCodeLine{198         \}}
+\DoxyCodeLine{199     );}
+\DoxyCodeLine{200 }
+\DoxyCodeLine{201     \textcolor{keywordflow}{for} (\textcolor{keyword}{auto} iter = \mbox{\hyperlink{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}{posCntList\_}}.begin(); iter != \mbox{\hyperlink{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}{posCntList\_}}.end();)}
+\DoxyCodeLine{202     \{}
+\DoxyCodeLine{203         \textcolor{keywordflow}{if} (iter-\/>first == ib.\mbox{\hyperlink{classFoam_1_1immersedBody_abcd1c50794faf308fa491e9990b3db5a}{getBodyId}}()}
+\DoxyCodeLine{204             ||}
+\DoxyCodeLine{205             iter-\/>second == ib.\mbox{\hyperlink{classFoam_1_1immersedBody_abcd1c50794faf308fa491e9990b3db5a}{getBodyId}}())}
+\DoxyCodeLine{206         \{}
+\DoxyCodeLine{207             iter = \mbox{\hyperlink{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}{posCntList\_}}.erase(iter);}
+\DoxyCodeLine{208         \}}
+\DoxyCodeLine{209         \textcolor{keywordflow}{else}}
+\DoxyCodeLine{210         \{}
+\DoxyCodeLine{211             ++iter;}
+\DoxyCodeLine{212         \}}
+\DoxyCodeLine{213     \}}
+\DoxyCodeLine{214 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 8
+Here is the caller graph for this function\+:
+% FIG 9
+\mbox{\Hypertarget{classFoam_1_1verletList_a9018fe57e1802d25ca2862b78d1bef5c}\label{classFoam_1_1verletList_a9018fe57e1802d25ca2862b78d1bef5c}} 
+\index{Foam::verletList@{Foam::verletList}!swapVerletPoints@{swapVerletPoints}}
+\index{swapVerletPoints@{swapVerletPoints}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{swapVerletPoints()}{swapVerletPoints()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void Foam\+::verlet\+List\+::swap\+Verlet\+Points (\begin{DoxyParamCaption}\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$}]{a,  }\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$}]{b,  }\item[{label}]{coord }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+\mbox{\Hypertarget{classFoam_1_1verletList_aaacaf777331e1d10d1678f3495cdbc54}\label{classFoam_1_1verletList_aaacaf777331e1d10d1678f3495cdbc54}} 
+\index{Foam::verletList@{Foam::verletList}!swapVerletPoints@{swapVerletPoints}}
+\index{swapVerletPoints@{swapVerletPoints}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{swapVerletPoints()}{swapVerletPoints()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void verlet\+List\+::swap\+Verlet\+Points (\begin{DoxyParamCaption}\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$}]{a,  }\item[{std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$}]{b,  }\item[{label}]{coord }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 45 of file verlet\+List.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{50 \{}
+\DoxyCodeLine{51     \textcolor{keywordflow}{if}(a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}() != b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}())}
+\DoxyCodeLine{52     \{}
+\DoxyCodeLine{53         \textcolor{keywordflow}{if}(!a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a54e882a91098495ecf282a4edfcffa34}{isMin}}() \&\& b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a54e882a91098495ecf282a4edfcffa34}{isMin}}())}
+\DoxyCodeLine{54         \{}
+\DoxyCodeLine{55             \mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}} newPair(}
+\DoxyCodeLine{56                 min(a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}(), b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}()),}
+\DoxyCodeLine{57                 max(a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}(), b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}())}
+\DoxyCodeLine{58             );}
+\DoxyCodeLine{59             \mbox{\hyperlink{classFoam_1_1verletList_a796482083152ff10a13909553406a132}{addCPairToCntNList}}(newPair, coord, a, b);}
+\DoxyCodeLine{60         \}}
+\DoxyCodeLine{61         \textcolor{keywordflow}{else} \textcolor{keywordflow}{if}(a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a54e882a91098495ecf282a4edfcffa34}{isMin}}() \&\& !b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a54e882a91098495ecf282a4edfcffa34}{isMin}}())}
+\DoxyCodeLine{62         \{}
+\DoxyCodeLine{63             \mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}} \mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}(}
+\DoxyCodeLine{64                 min(a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}(), b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}()),}
+\DoxyCodeLine{65                 max(a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}(), b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}())}
+\DoxyCodeLine{66             );}
+\DoxyCodeLine{67 }
+\DoxyCodeLine{68             \textcolor{keywordflow}{if}(\mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[coord].find(\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}) != \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[coord].\mbox{\hyperlink{classFoam_1_1verletList_a231d5849845db41ff89b8eb6e5023916}{end}}())}
+\DoxyCodeLine{69             \{}
+\DoxyCodeLine{70                 \textcolor{keywordflow}{if} (a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}() < b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_afbc3f6f3929b912c88acef479759b9ff}{getBodyId}}())}
+\DoxyCodeLine{71                 \{}
+\DoxyCodeLine{72                     \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[coord][\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}].removeContactBox(a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a9da54b88dbb98d1e49f3f080c5cf1e5e}{getParentBox}}(), b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a9da54b88dbb98d1e49f3f080c5cf1e5e}{getParentBox}}());}
+\DoxyCodeLine{73                 \}}
+\DoxyCodeLine{74                 \textcolor{keywordflow}{else}}
+\DoxyCodeLine{75                 \{}
+\DoxyCodeLine{76                     \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[coord][\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}].removeContactBox(b-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a9da54b88dbb98d1e49f3f080c5cf1e5e}{getParentBox}}(), a-\/>\mbox{\hyperlink{classFoam_1_1verletPoint_a9da54b88dbb98d1e49f3f080c5cf1e5e}{getParentBox}}());}
+\DoxyCodeLine{77                 \}}
+\DoxyCodeLine{78 }
+\DoxyCodeLine{79                 \textcolor{keywordflow}{if} (\mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[coord][\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}].getContactBoxes().size() == 0)}
+\DoxyCodeLine{80                 \{}
+\DoxyCodeLine{81                     \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[coord].erase(\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}});}
+\DoxyCodeLine{82                 \}}
+\DoxyCodeLine{83             \}}
+\DoxyCodeLine{84 }
+\DoxyCodeLine{85             \textcolor{keywordflow}{if}(\mbox{\hyperlink{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}{posCntList\_}}.find(\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}) != \mbox{\hyperlink{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}{posCntList\_}}.end() \&\&}
+\DoxyCodeLine{86                 ((\mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[0].find(\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}) == \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[0].end() \&\& \mbox{\hyperlink{namespaceFoam_a2ef3b57e3f0b3247f76cb2be911676f9}{emptyDim}} != 0) ||}
+\DoxyCodeLine{87                 (\mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[1].find(\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}) == \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[1].end() \&\& \mbox{\hyperlink{namespaceFoam_a2ef3b57e3f0b3247f76cb2be911676f9}{emptyDim}} != 1) ||}
+\DoxyCodeLine{88                 (\mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[2].find(\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}}) == \mbox{\hyperlink{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}{cntNeighList\_}}[2].end() \&\& \mbox{\hyperlink{namespaceFoam_a2ef3b57e3f0b3247f76cb2be911676f9}{emptyDim}} != 2)))}
+\DoxyCodeLine{89             \{}
+\DoxyCodeLine{90                 \mbox{\hyperlink{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}{posCntList\_}}.erase(\mbox{\hyperlink{classFoam_1_1verletList_a1f74e681ce0b22a845c123a3aada4045}{cPair}});}
+\DoxyCodeLine{91             \}}
+\DoxyCodeLine{92         \}}
+\DoxyCodeLine{93     \}}
+\DoxyCodeLine{94 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 10
+Here is the caller graph for this function\+:
+% FIG 11
+\mbox{\Hypertarget{classFoam_1_1verletList_a93aa279b698e9560004e50a4775c5dff}\label{classFoam_1_1verletList_a93aa279b698e9560004e50a4775c5dff}} 
+\index{Foam::verletList@{Foam::verletList}!update@{update}}
+\index{update@{update}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{update()}{update()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily void verlet\+List\+::update (\begin{DoxyParamCaption}\item[{Ptr\+List$<$ \mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} $>$ \&}]{ibs }\end{DoxyParamCaption})}
+
+
+
+Definition at line 259 of file verlet\+List.\+C.
+
+
+\begin{DoxyCode}{0}
+\DoxyCodeLine{260 \{}
+\DoxyCodeLine{261     \mbox{\hyperlink{addModels_2initializeAddModels_8H_adcd69a620b2d93c893cbf0e92bb7c5d7}{forAll}}(ibs, ibi)}
+\DoxyCodeLine{262     \{}
+\DoxyCodeLine{263         ibs[ibi].getGeomModel().getBBoxes();}
+\DoxyCodeLine{264     \}}
+\DoxyCodeLine{265 }
+\DoxyCodeLine{266     \textcolor{comment}{// use insertion sort to sort the neighbour list}}
+\DoxyCodeLine{267     \textcolor{comment}{// besides the first sorting, this is O(N) efficient}}
+\DoxyCodeLine{268     \textcolor{keywordflow}{for} (label coord = 0; coord < 3; ++coord)}
+\DoxyCodeLine{269     \{}
+\DoxyCodeLine{270         \textcolor{keywordflow}{if} (!\mbox{\hyperlink{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}{verletLists\_}}[coord].empty())}
+\DoxyCodeLine{271         \{}
+\DoxyCodeLine{272             \textcolor{keyword}{auto} it2 = \mbox{\hyperlink{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}{verletLists\_}}[coord].begin();}
+\DoxyCodeLine{273             \textcolor{keyword}{auto} it1 = it2++;}
+\DoxyCodeLine{274 }
+\DoxyCodeLine{275             \textcolor{keywordflow}{while}(\textcolor{keyword}{true})}
+\DoxyCodeLine{276             \{}
+\DoxyCodeLine{277                 \textcolor{keywordflow}{if}((*it1)-\/>getPoint()[coord]}
+\DoxyCodeLine{278                     > (*it2)-\/>getPoint()[coord])}
+\DoxyCodeLine{279                 \{}
+\DoxyCodeLine{280                     \mbox{\hyperlink{classFoam_1_1verletList_aaacaf777331e1d10d1678f3495cdbc54}{swapVerletPoints}}(*it1, *it2, coord);}
+\DoxyCodeLine{281                     std::swap(*it1, *it2);}
+\DoxyCodeLine{282 }
+\DoxyCodeLine{283                     \textcolor{keywordflow}{if} (it1 != \mbox{\hyperlink{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}{verletLists\_}}[coord].\mbox{\hyperlink{classFoam_1_1verletList_a5563b565da5f9d3b94c0b55818e7fff4}{begin}}())}
+\DoxyCodeLine{284                     \{}
+\DoxyCodeLine{285                         it2 = it1-\/-\/;}
+\DoxyCodeLine{286                         \textcolor{keywordflow}{continue};}
+\DoxyCodeLine{287                     \}}
+\DoxyCodeLine{288                 \}}
+\DoxyCodeLine{289                 it1 = it2++;}
+\DoxyCodeLine{290                 \textcolor{keywordflow}{if} (it2 == \mbox{\hyperlink{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}{verletLists\_}}[coord].\mbox{\hyperlink{classFoam_1_1verletList_a231d5849845db41ff89b8eb6e5023916}{end}}())}
+\DoxyCodeLine{291                 \{}
+\DoxyCodeLine{292                     \textcolor{keywordflow}{break};}
+\DoxyCodeLine{293                 \}}
+\DoxyCodeLine{294             \}}
+\DoxyCodeLine{295         \}}
+\DoxyCodeLine{296     \}}
+\DoxyCodeLine{297 \}}
+
+\end{DoxyCode}
+Here is the call graph for this function\+:
+% FIG 12
+Here is the caller graph for this function\+:
+% FIG 13
+\mbox{\Hypertarget{classFoam_1_1verletList_a6de9566641107c788153d1274eebc692}\label{classFoam_1_1verletList_a6de9566641107c788153d1274eebc692}} 
+\index{Foam::verletList@{Foam::verletList}!update@{update}}
+\index{update@{update}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{update()}{update()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily void Foam\+::verlet\+List\+::update (\begin{DoxyParamCaption}\item[{Ptr\+List$<$ \mbox{\hyperlink{classFoam_1_1immersedBody}{immersed\+Body}} $>$ \&}]{ibs }\end{DoxyParamCaption})}
+
+
+
+\doxysubsection{Field Documentation}
+\mbox{\Hypertarget{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}\label{classFoam_1_1verletList_a4e782b96304d86bdabae820871ec75f3}} 
+\index{Foam::verletList@{Foam::verletList}!cntNeighList\_@{cntNeighList\_}}
+\index{cntNeighList\_@{cntNeighList\_}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{cntNeighList\_}{cntNeighList\_}}
+{\footnotesize\ttfamily List$<$ \mbox{\hyperlink{classFoam_1_1verletList_ab2df19862e48f44b748e4fd46c1220b5}{c\+Pair\+Vcontact\+Map}} $>$ Foam\+::verlet\+List\+::cnt\+Neigh\+List\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 88 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}\label{classFoam_1_1verletList_ac88428dbfb873bffb7982c448e24432c}} 
+\index{Foam::verletList@{Foam::verletList}!posCntList\_@{posCntList\_}}
+\index{posCntList\_@{posCntList\_}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{posCntList\_}{posCntList\_}}
+{\footnotesize\ttfamily \mbox{\hyperlink{classFoam_1_1verletList_ac1ae4277de019631def3be732bd6dfb9}{c\+Pair\+Has\+Set}} Foam\+::verlet\+List\+::pos\+Cnt\+List\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 91 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_a414e5f7e269869da5eb65fb0446f6be0}\label{classFoam_1_1verletList_a414e5f7e269869da5eb65fb0446f6be0}} 
+\index{Foam::verletList@{Foam::verletList}!verletBoxes\_@{verletBoxes\_}}
+\index{verletBoxes\_@{verletBoxes\_}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{verletBoxes\_}{verletBoxes\_}}
+{\footnotesize\ttfamily std\+::list$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletBox}{verlet\+Box}} $>$ $>$ Foam\+::verlet\+List\+::verlet\+Boxes\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 84 of file verlet\+List.\+H.
+
+\mbox{\Hypertarget{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}\label{classFoam_1_1verletList_af48e4c76351fc64c6fc2241f8647c353}} 
+\index{Foam::verletList@{Foam::verletList}!verletLists\_@{verletLists\_}}
+\index{verletLists\_@{verletLists\_}!Foam::verletList@{Foam::verletList}}
+\doxysubsubsection{\texorpdfstring{verletLists\_}{verletLists\_}}
+{\footnotesize\ttfamily List$<$ std\+::list$<$ std\+::shared\+\_\+ptr$<$ \mbox{\hyperlink{classFoam_1_1verletPoint}{verlet\+Point}} $>$ $>$ $>$ Foam\+::verlet\+List\+::verlet\+Lists\+\_\+\hspace{0.3cm}{\ttfamily [private]}}
+
+
+
+Definition at line 86 of file verlet\+List.\+H.
+
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/contact\+Models/verlet\+List/\mbox{\hyperlink{contactModels_2verletList_2verletList_8H}{verlet\+List.\+H}}\item 
+src/\+H\+F\+D\+I\+B\+D\+E\+M/contact\+Models/verlet\+List/\mbox{\hyperlink{contactModels_2verletList_2verletList_8C}{verlet\+List.\+C}}\end{DoxyCompactItemize}
