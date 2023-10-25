@@ -4,12 +4,12 @@
 cd application/solvers/pimpleHFDIBFoam
 wclean
 wmake
-cd ../..
+cd ../../../
 
 # compile the solver
-cd application/solvers/pimpleHFDIBFoam
+cd application/solvers/HFDIBDEMFoam
 wclean
 wmake
-cd ../..
+cd ../../../
 
 exit 0

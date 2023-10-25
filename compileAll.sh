@@ -4,17 +4,17 @@
 cd src/HFDIBDEM
 wclean
 wmake libso
-cd ../..
+cd ../../
 
 # compile the solver
 cd application/solvers/pimpleHFDIBFoam
 wclean
 wmake
-cd ../..
+cd ../../../
 
 cd application/solvers/HFDIBDEMFoam
 wclean
 wmake
-cd ../..
+cd ../../../
 
 exit 0

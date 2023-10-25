@@ -42,7 +42,7 @@ namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                      Class virtualMeshLevel Declaration
+                      Class contactModelInfo Declaration
 \*---------------------------------------------------------------------------*/
 
 
@@ -63,12 +63,7 @@ class contactModelInfo
     {
         contactModel_ = contactModel;
     }
-
-    static void setNSolidsTreshnold(label nSolidsInTreshold)
-    {
-        nSolidsTreshnold_ = nSolidsInTreshold;
-    }
-
+    
     static scalar getLcCoeff()
     {
         return LcCoeff_;
@@ -84,16 +79,11 @@ class contactModelInfo
         return contactModel_;
     }
 
-    static label getNSolidsTreshnold()
-    {
-        return nSolidsTreshnold_;
-    }
-
 
     static scalar LcCoeff_;
     static scalar betaCoeff_;
     static bool contactModel_;
-    static label nSolidsTreshnold_;
+
 
 };
 

@@ -63,6 +63,7 @@ int main(int argc, char *argv[])
     Info << "\nInitializing HFDIBDEM\n" << endl;
     openHFDIBDEM  HFDIBDEM(mesh);
     HFDIBDEM.initialize(lambda,U,refineF,maxRefinementLevel,runTime.timeName());
+    HFDIBDEM.setSolverInfo();
     #include "initialMeshRefinement.H"
 
     Info<< "\nStarting time loop\n" << endl;

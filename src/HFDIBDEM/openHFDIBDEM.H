@@ -197,6 +197,8 @@ namespace Foam
     }
 
     void writeFirtsTimeBodiesInfo();
+    
+    void setSolverInfo();
 
  };
 }

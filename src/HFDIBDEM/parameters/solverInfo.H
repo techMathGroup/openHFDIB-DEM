@@ -26,60 +26,55 @@ InNamspace
     contactModel
 
 Description
-    DEM parameters
+    Static class for storing virtual mesh level
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef parameters_H
-#define parameters_H
+#ifndef solverInfo_H
+#define solverInfo_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
-
-#include "materialProperties.H"
-#include "interAdhesion.H"
-#include "wallMatInfo.H"
-#include "wallPlaneInfo.H"
-#include "virtualMeshLevel.H"
-#include "cyclicPlaneInfo.H"
-#include "contactModelInfo.H"
-#include "solverInfo.H"
 
 namespace Foam
 {
 
 /*---------------------------------------------------------------------------*\
-                            Parameters Definition
+                      Class solverInfo Declaration
 \*---------------------------------------------------------------------------*/
 
-HashTable<materialInfo,string,Hash<string>> materialProperties::materialProps_ =
-    HashTable<materialInfo,string,Hash<string>>();
 
-HashTable<scalar,string,Hash<string>> interAdhesion::matInterAdh_ =
-    HashTable<scalar,string,Hash<string>>();
+class solverInfo
+{
+    public:
 
-HashTable<materialInfo,string,Hash<string>> wallMatInfo::wallMatInfo_ =
-    HashTable<materialInfo,string,Hash<string>>();
+    static void setOnlyDEM(bool onlyDEM)
+    {
+        onlyDEM_ = onlyDEM;
+    }
 
-HashTable<List<vector>,string,Hash<string>> wallPlaneInfo::wallPlaneInfo_ =
-    HashTable<List<vector>,string,Hash<string>>();
+    static void setNSolidsTreshnold(label nSolidsTreshold)
+    {
+        nSolidsTreshnold_ = nSolidsTreshold;
+    }
 
-HashTable<List<vector>,string,Hash<string>> cyclicPlaneInfo::cyclicPlaneInfo_ =
-    HashTable<List<vector>,string,Hash<string>>();
+    static bool getOnlyDEM()
+    {
+        return onlyDEM_;
+    }
 
-std::map<string, string> cyclicPlaneInfo::cyclicPatchPairs_ =
-    std::map<string, string>();
+    static label getNSolidsTreshnold()
+    {
+        return nSolidsTreshnold_;
+    }
 
-scalar virtualMeshLevel::virtualMeshLevel_ = 1;
-scalar virtualMeshLevel::levelOfDivision_ = 1;
-scalar virtualMeshLevel::charCellSize_ = 1;
-scalar contactModelInfo::LcCoeff_ = 4.0;
-scalar contactModelInfo::betaCoeff_ = 5.0;
-bool   contactModelInfo::contactModel_ = true;
-label  solverInfo::nSolidsTreshnold_ = 1000;
-bool   solverInfo::onlyDEM_ = false;
+
+    static bool onlyDEM_;
+    static label nSolidsTreshnold_;
+
+};
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
