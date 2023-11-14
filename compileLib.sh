@@ -1,9 +1,13 @@
 #!/bin/sh
 
+rootDir=$(pwd)
+
+echo "Working from directory: $rootDir"
+
 # compile the library
 cd src/HFDIBDEM
 wclean
 wmake libso
-cd ../..
+cd $rootDir
 
 exit 0

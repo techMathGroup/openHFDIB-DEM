@@ -684,7 +684,9 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         }
 
         verletList_.update(immersedBodies_);
-
+//OS Time effitiency Testing    
+        clockTime wallContactStopWatch;
+//OS Time effitiency Testing
         DynamicLabelList wallContactIB;
         DynamicList<wallSubContactInfo*> wallContactList;
         forAll (immersedBodies_,bodyId)
@@ -721,10 +723,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             {
                 wallContactPerProc = 1;
             }
-
+//OS Time effitiency Testing                
+            clockTime wallContactParallelRun;
+//OS Time effitiency Testing                
             for(int assignProc = Pstream::myProcNo()*wallContactPerProc; assignProc < min((Pstream::myProcNo()+1)*wallContactPerProc,wallContactList.size()); assignProc++)
             {
-                // Pout << "Running wall contact solver for " << assignProc << " / " << wallContactList.size() << endl;
                 wallSubContactInfo* sCW = wallContactList[assignProc];
                 immersedBody& cIb(immersedBodies_[sCW->getBodyId()]);
                 sCW->setResolvedContact(solveWallContact(
@@ -734,7 +737,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     *sCW
                     ));
             }
-            // Pout <<" Survived " << endl;
+
+            //OS Time effitiency Testing                
+            wallContactParallelTime_ += wallContactParallelRun.timeIncrement();
+            clockTime wallContactSCRun;
+            //OS Time effitiency Testing 
 
             forAll (wallContactIB,iB)
             {
@@ -757,10 +764,19 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 }
                 cIb.getWallCntInfo().clearOldContact();
             }
-            // Pout <<" Survived 2 " << endl;
+
+            //OS Time effitiency Testing                
+            wallContactReduceTime_ += wallContactSCRun.timeIncrement();
+            //OS Time effitiency Testing 
         }
         wallContactList.clear();
         wallContactIB.clear();
+        
+        wallContactTime_ += wallContactStopWatch.timeIncrement();
+//OS Time effitiency Testing        
+        clockTime particleContactStopWatch;
+        clockTime particleContactSCRun;
+//OS Time effitiency Testing
         // Pout <<" Survived 3 " << endl;
         DynamicList<prtSubContactInfo*> contactList;
         // check only pairs whose bounding boxes are intersected for the contact
@@ -800,7 +816,10 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 prtcInfo.registerContactList(contactList);
             }
         }
-
+//OS Time effitiency Testing
+        prtContactReduceTime_ += particleContactSCRun.timeIncrement();
+        clockTime particleContactParallelRun;
+//OS Time effitiency Testing        
         if(contactList.size() > 0 )
         {
             label contactPerProc(ceil(double(contactList.size())/Pstream::nProcs()));
@@ -824,7 +843,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 }
             }
         }
-
+//OS Time effitiency Testing
+        prtContactParallelTime_ += particleContactParallelRun.timeIncrement();
+        prtContactTime_ += prtContactStopWatch.timeIncrement();
+        clockTime DEMIntergrationRun;
+//OS Time effitiency Testing
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
         {
             const Tuple2<label, label> cPair = Tuple2<label, label>(it->first, it->second);
@@ -876,9 +899,12 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         InfoH << basic_Info << "Max CoNum = " << maxCoNum << " at body " << bodyId << endl;
 
         pos += step;
-
+        
         if (pos + step + SMALL >= 1)
             step = 1 - pos;
+//OS Time effitiency Testing            
+        demItegrationTime_ = DEMIntergrationRun.timeIncrement(); 
+//OS Time effitiency Testing                   
     }
 }
 //---------------------------------------------------------------------------//

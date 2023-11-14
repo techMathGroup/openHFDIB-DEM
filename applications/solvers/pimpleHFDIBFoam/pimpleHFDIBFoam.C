@@ -44,7 +44,7 @@ Description
 
 #include "triSurfaceMesh.H"
 #include "openHFDIBDEM.H"
-
+#include "clockTime.H"
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -83,6 +83,15 @@ int main(int argc, char *argv[])
     }
 
     Info<< "\nStarting time loop\n" << endl;
+    scalar CFDTime_(0.0);
+    scalar preUpdateTime_(0.0);
+    scalar postUpdateTime_(0.0);
+    scalar addRemoveTime_(0.0);
+    scalar updateDEMTime_(0.0);
+    scalar writeBodiesInfoTime_(0.0);
+    scalar meshUpdateTime_(0.0);
+    scalar meshChangingTime_(0.0);
+    scalar createBodiesTime_(0.0);
 
     while (pimple.run(runTime))
     {
@@ -102,9 +111,15 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
+        clockTime createBodiesTime; // OS time efficiency testing
         HFDIBDEM.createBodies(lambda,refineF);
+        createBodiesTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
+        
+        clockTime preUpdateBodiesTime; // OS time efficiency testing
         HFDIBDEM.preUpdateBodies(lambda,f);
+        preUpdateTime_ += preUpdateBodiesTime.timeIncrement(); // OS time efficiency testing
 
+        clockTime pimpleRunClockTime; // OS time efficiency testing
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
@@ -154,22 +169,31 @@ int main(int argc, char *argv[])
                 turbulence->correct();
             }
         }
-
+        CFDTime_ += pimpleRunClockTime.timeIncrement();
         Info << "updating HFDIBDEM" << endl;
+        clockTime postUpdateBodiesTime;
         HFDIBDEM.postUpdateBodies(lambda,f);
+        postUpdateTime_ += postUpdateBodiesTime.timeIncrement();
 
+
+        clockTime addRemoveTime;
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
+        addRemoveTime_ += addRemoveTime.timeIncrement();
 
+        clockTime updateDEMTime;
         HFDIBDEM.updateDEM(lambda,refineF);
+        updateDEMTime_ += updateDEMTime.timeIncrement();
         Info << "updated HFDIBDEM" << endl;
 
 
         runTime.write();
 
+        clockTime writeBodiesInfoTime;
         if(runTime.outputTime())
         {
             HFDIBDEM.writeBodiesInfo();
         }
+        writeBodiesInfoTime_ += writeBodiesInfoTime.timeIncrement();
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
