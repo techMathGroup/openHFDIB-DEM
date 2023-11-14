@@ -203,7 +203,9 @@ namespace Foam
         (
             scalar deltaT = -1.0
         );
-
+        
+        void printBodyInfo();
+        
         //update body movement based on acting forces
         void updateMovement
         (

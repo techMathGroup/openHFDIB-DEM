@@ -664,6 +664,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         }
     }
 
+    label possibleWallContacts(0);
+    label resolvedWallContacts(0);
+    label possiblePrtContacts(0);
+    label resolvedPrtContacts(0);
+
     scalar deltaTime(mesh_.time().deltaT().value());
     scalar pos(0.0);
     scalar step(stepDEM_);
@@ -715,6 +720,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 }
             }
         }
+        possibleWallContacts = wallContactIB.size();
         if(wallContactIB.size() > 0)
         {
             label wallContactPerProc(ceil(double(wallContactList.size())/Pstream::nProcs()));
@@ -728,6 +734,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 //OS Time effitiency Testing                
             for(int assignProc = Pstream::myProcNo()*wallContactPerProc; assignProc < min((Pstream::myProcNo()+1)*wallContactPerProc,wallContactList.size()); assignProc++)
             {
+                resolvedWallContacts++;
                 wallSubContactInfo* sCW = wallContactList[assignProc];
                 immersedBody& cIb(immersedBodies_[sCW->getBodyId()]);
                 sCW->setResolvedContact(solveWallContact(
@@ -764,14 +771,19 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 }
                 cIb.getWallCntInfo().clearOldContact();
             }
-
+            
             //OS Time effitiency Testing                
+            
             wallContactReduceTime_ += wallContactSCRun.timeIncrement();
             //OS Time effitiency Testing 
         }
         wallContactList.clear();
         wallContactIB.clear();
-        
+        reduce(resolvedWallContacts,sumOp<label>());
+        InfoH << basic_Info << " -- Possible Wall Contacts: " << possibleWallContacts
+            << " Resolved Wall Contacts: " << resolvedWallContacts 
+            << " contactPerProc : " << ceil(possibleWallContacts/Pstream::nProcs()) << endl;
+
         wallContactTime_ += wallContactStopWatch.timeIncrement();
 //OS Time effitiency Testing        
         clockTime particleContactStopWatch;
@@ -819,7 +831,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 //OS Time effitiency Testing
         prtContactReduceTime_ += particleContactSCRun.timeIncrement();
         clockTime particleContactParallelRun;
-//OS Time effitiency Testing        
+//OS Time effitiency Testing 
+        possiblePrtContacts = contactList.size();      
         if(contactList.size() > 0 )
         {
             label contactPerProc(ceil(double(contactList.size())/Pstream::nProcs()));
@@ -838,6 +851,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
                 if(detectPrtPrtContact(mesh_,cClass,tClass,*sCI))
                 {
+                    resolvedPrtContacts++;
                     prtContactInfo& prtcInfo(getPrtcInfo(cPair));
                     sCI->setResolvedContact(solvePrtContact(mesh_, prtcInfo, *sCI, deltaTime*step));
                 }
@@ -845,7 +859,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         }
 //OS Time effitiency Testing
         prtContactParallelTime_ += particleContactParallelRun.timeIncrement();
-        prtContactTime_ += prtContactStopWatch.timeIncrement();
+        prtContactTime_ += particleContactStopWatch.timeIncrement();
         clockTime DEMIntergrationRun;
 //OS Time effitiency Testing
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
@@ -882,13 +896,16 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 );
             }
         }
-
+        reduce(resolvedPrtContacts,sumOp<label>());
+        InfoH << basic_Info << " -- Possible Particle Contacts: " << possiblePrtContacts
+            << " Resolved Particle Contacts: " << resolvedPrtContacts 
+            << " contactPerProc : " << ceil(possiblePrtContacts/Pstream::nProcs()) << endl;
         scalar maxCoNum = 0;
         label  bodyId = 0;
         forAll (immersedBodies_,ib)
         {
             immersedBodies_[ib].updateMovement(deltaTime*step*0.5);
-
+            immersedBodies_[ib].printBodyInfo();
             immersedBodies_[ib].computeBodyCoNumber();
             if (maxCoNum < immersedBodies_[ib].getCoNum())
             {

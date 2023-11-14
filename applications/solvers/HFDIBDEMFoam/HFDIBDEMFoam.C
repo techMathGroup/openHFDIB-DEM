@@ -144,29 +144,29 @@ int main(int argc, char *argv[])
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
-
-        Info<< "preUpdateTime       = " << preUpdateTime_       << " s \n"
-            << "createBodiesTime    = " << createBodiesTime_       << " s \n"
-            << "meshUpdateTime      = " << meshUpdateTime_       << " s \n"
-            << "meshChangingTime    = " << preUpdateTime_       << " s \n"
-            << "postUpdateTime      = " << postUpdateTime_      << " s \n"
-            << "addRemoveTime       = " << addRemoveTime_       << " s \n"
-            << "updateDEMTime       = " << updateDEMTime_       << " s \n"
-            << "   wallContactTime_         = " << HFDIBDEM.wallContactTime_<< " s \n"
-            << "   wallContactParallelTime_ = " << HFDIBDEM.wallContactParallelTime_<< " s \n"
-            << "   wallContactSCTime_       = " << HFDIBDEM.wallContactReduceTime_<< " s \n"
-            << "   prtContactTime_          = " << HFDIBDEM.prtContactTime_<< " s \n"
-            << "   prtContactParallelTime_  = " << HFDIBDEM.prtContactParallelTime_<< " s \n"
-            << "   prtContactSCTime_        = " << HFDIBDEM.prtContactReduceTime_<< " s \n"
-            << "   demItegrationTime_       = " << HFDIBDEM.demItegrationTime_<< " s \n"
-            << "writeBodiesInfoTime = " << writeBodiesInfoTime_ << " s \n" << endl;
+            
+    Info<< "preUpdateTime       = " << preUpdateTime_       << " s \n"
+        << "createBodiesTime    = " << createBodiesTime_    << " s \n"
+        << "meshUpdateTime      = " << meshUpdateTime_      << " s \n"
+        << "meshChangingTime    = " << meshChangingTime_       << " s \n"
+        << "postUpdateTime      = " << postUpdateTime_      << " s \n"
+        << "addRemoveTime       = " << addRemoveTime_       << " s \n"
+        << "updateDEMTime       = " << updateDEMTime_       << " s \n"
+        << "   wallContactTime_         = " << HFDIBDEM.wallContactTime_        << " s \n"
+        << "   wallContactParallelTime_ = " << HFDIBDEM.wallContactParallelTime_<< " s \n"
+        << "   wallContactSCTime_       = " << HFDIBDEM.wallContactReduceTime_  << " s \n"
+        << "   prtContactTime_          = " << HFDIBDEM.prtContactTime_         << " s \n"
+        << "   prtContactParallelTime_  = " << HFDIBDEM.prtContactParallelTime_ << " s \n"
+        << "   prtContactSCTime_        = " << HFDIBDEM.prtContactReduceTime_   << " s \n"
+        << "   demItegrationTime_       = " << HFDIBDEM.demItegrationTime_      << " s \n"
+        << "writeBodiesInfoTime = " << writeBodiesInfoTime_ << " s \n" << endl;
 
     }
 
     Info<< "preUpdateTime       = " << preUpdateTime_       << " s \n"
         << "createBodiesTime    = " << createBodiesTime_    << " s \n"
         << "meshUpdateTime      = " << meshUpdateTime_      << " s \n"
-        << "meshChangingTime    = " << preUpdateTime_       << " s \n"
+        << "meshChangingTime    = " << meshChangingTime_       << " s \n"
         << "postUpdateTime      = " << postUpdateTime_      << " s \n"
         << "addRemoveTime       = " << addRemoveTime_       << " s \n"
         << "updateDEMTime       = " << updateDEMTime_       << " s \n"

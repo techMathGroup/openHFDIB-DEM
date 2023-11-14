@@ -676,6 +676,21 @@ void immersedBody::moveImmersedBody
 
     geomModel_->synchronPos();
 
+    // InfoH << iB_Info;
+    // InfoH << "-- body " << bodyId_ << " CoM                  : "
+    //     << geomModel_->getCoM() << endl;
+    // InfoH << "-- body " << bodyId_ << " linear velocity      : "
+    //     << Vel_ << endl;
+    // InfoH << "-- body " << bodyId_ << " angluar velocity     : "
+    //     << omega_ << endl;
+    // InfoH << "-- body " << bodyId_ << " axis of rotation     : "
+    //     << Axis_ << endl;
+    // InfoH << "-- body " << bodyId_ << " total rotation matrix: "
+    //     << totRotMatrix_ << endl;
+}
+//---------------------------------------------------------------------------//
+void immersedBody::printBodyInfo()
+{
     InfoH << iB_Info;
     InfoH << "-- body " << bodyId_ << " CoM                  : "
         << geomModel_->getCoM() << endl;
