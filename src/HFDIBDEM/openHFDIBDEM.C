@@ -664,11 +664,6 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         }
     }
 
-    label possibleWallContacts(0);
-    label resolvedWallContacts(0);
-    label possiblePrtContacts(0);
-    label resolvedPrtContacts(0);
-
     scalar deltaTime(mesh_.time().deltaT().value());
     scalar pos(0.0);
     scalar step(stepDEM_);
@@ -676,6 +671,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
     while( pos < 1)
     {
+        label possibleWallContacts(0);
+        label resolvedWallContacts(0);
+        label possiblePrtContacts(0);
+        label resolvedPrtContacts(0);
+
         InfoH << DEM_Info << " Start DEM pos: " << pos
             << " DEM step: " << step << endl;
 
