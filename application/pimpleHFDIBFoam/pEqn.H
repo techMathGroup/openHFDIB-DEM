@@ -81,4 +81,12 @@ HFDIBDEM.interpolateIB(U,Ui,lambda);
 
 //Ui -= (Ui - U)*(1-lambda);
 
-f += 0.8*lambda*(Ui - U)/runTime.deltaT();
+forAll(surface, sI)
+{
+    if (lambda[sI] > 0)
+        surface[sI] = 1;
+    else
+        surface[sI] = 0;
+}
+
+f += 0.8*surface*(Ui - U)/runTime.deltaT();
