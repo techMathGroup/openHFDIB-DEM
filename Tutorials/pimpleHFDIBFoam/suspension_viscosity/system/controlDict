@@ -1,0 +1,77 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     pimpleHFDIBFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+
+endTime         1000;
+
+deltaT          1e-4;
+
+writeControl    adjustableRunTime;
+
+writeInterval   1;
+//writeInterval   1e-7;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  6;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   6;
+
+runTimeModifiable true;
+
+adjustTimeStep  yes;
+
+maxCo           0.9;
+
+maxDeltaT       0.005;
+functions
+{
+ wallShearStress1
+ {
+     type          wallShearStress;
+
+    libs          ("libfieldFunctionObjects.so");
+
+    writeControl  writeTime;
+    timeInterval  1;
+
+    log           yes;
+
+    patches       ("top");
+    rho           rhoInf;     // Indicates incompressible
+    log           true;
+    rhoInf        1;          // Redundant for incompressible
+
+    CofR          (0 0 0);    // Rotation around centre line of propeller
+    pitchAxis     (0 1 0);
+ }
+};
+
+// ************************************************************************* //
