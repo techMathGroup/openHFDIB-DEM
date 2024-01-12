@@ -1,5 +1,5 @@
 # openHFDIB-DEM
-Version 2.3
+Version 2.5
 
 Implementation of the Hybrid Fictitious Domain-Immersed Boundary (HFDIB)
 coupled with the Discrete Element Method (DEM) by
@@ -24,7 +24,6 @@ original.
 Code capabilities
 -----------------
 * simulation settings is defined in HFDIBDEMdict (see DOCUMENTATION)
-
 * simulations with either spherical or STL-defined particles (see HFDIBDEM/geomModels)
 * simulations of two-phase (solid-fluid) flow (see pimpleHFDIBFoam)
 * simulations of solid phase in standard DEM mode (see HFDIBDEMFoam)
