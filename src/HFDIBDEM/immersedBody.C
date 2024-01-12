@@ -910,6 +910,8 @@ void immersedBody::printStats()
         << " magnitude: " << mag(p) <<endl;
     InfoH << "-- body " << bodyId_ << " angular momentum:" << L
         << " magnitude: " << mag(L) <<endl;
+    InfoH << basic_Info << "-- body " << bodyId_ << " CoM :"
+        << geomModel_->getCoM() << endl;
     InfoH << basic_Info << "-- body " << bodyId_ << "  linear velocity:"
         << Vel_ << " magnitude: " << mag(Vel_) <<endl;
     InfoH << "-- body " << bodyId_ << " angular velocity:" << omega_

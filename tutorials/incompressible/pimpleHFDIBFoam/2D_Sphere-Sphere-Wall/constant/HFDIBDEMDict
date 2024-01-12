@@ -28,7 +28,7 @@ stepDEM     0.01;
 // stepDEM     1;
 geometricD (1 1 -1);
 recordSimulation true;
-recordFirstTimeStep true;
+recordFirstTimeStep false;
 
 outputSetup
 {
@@ -40,14 +40,13 @@ outputSetup
 }
 DEM
 {
+	LcCoeff 4.0;
     materials
     {
         particle
         {
             Y       1e8;
-
             nu      0.0;
-            gamma   0;
             mu      0;
             adhN    0;
 			eps	 	1;
@@ -56,17 +55,13 @@ DEM
         wall
         {
             Y       1e8;
-            // nu      0.5;
             nu      0.0;
-            gamma   0;
             mu      0;
             adhN    0;
 			eps	 	1;
         }
     }
-    LcCoeff 4.0;
-    betaCoeff 5.0;
-	useOldModel false;	
+
 	cyclicPatches
 	{
 		// outlet 
@@ -130,14 +125,6 @@ sphere_Top
 		velocity (0 -1.0 0);
 	}
 
-	// staticBody;
-	// prescribedTransRotBody
-	// {
-	// 	velocity (0 -0.5 0);
-	// 	omega 0;
-	// 	axis (0 0 1);
-	// }
-
 	rho         rho [1 -3 0 0 0 0 0] 4000;
 
 	refineMC 5;
@@ -166,28 +153,14 @@ sphere_Top
 	sdBasedLambda false;
 	interfaceSpan 1.0;
 	startSynced false;
-	refineBuffers 2;
-	timesToSetStatic -1;
-	
+	refineBuffers 1;
 	timesToSetStatic -1;
 	
 }
 
 sphere_Bot
 {
-
-	// fullyCoupledBody;
-	// {
-	// 	velocity (0 -1.0 0);
-	// }
-
 	staticBody;
-	// prescribedTransRotBody
-	// {
-	// 	velocity (0 -0.5 0);
-	// 	omega 0;
-	// 	axis (0 0 1);
-	// }
 
 	rho         rho [1 -3 0 0 0 0 0] 4000;
 
@@ -205,7 +178,6 @@ sphere_Bot
 	}
 		
 	material particle;
-//	bodyGeom convex;
 	bodyGeom sphere;
 	sphere
 	{
@@ -217,9 +189,7 @@ sphere_Bot
 	sdBasedLambda false;
 	interfaceSpan 1.0;
 	startSynced false;
-	refineBuffers 2;
-	timesToSetStatic -1;
-	
+	refineBuffers 1;
 	timesToSetStatic -1;
 	
 }

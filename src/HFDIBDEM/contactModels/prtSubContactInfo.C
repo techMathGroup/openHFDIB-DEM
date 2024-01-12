@@ -93,22 +93,23 @@ vector prtSubContactInfo::getFA()
 //---------------------------------------------------------------------------//
 vector prtSubContactInfo::getFNd()
 {
-    if(contactModelInfo::getContactModel())
-    {
-        return (physicalProperties_.aGammaN_*sqrt(physicalProperties_.aY_
-            *physicalProperties_.reduceM_/pow(Lc_+SMALL,3))*
-            (prtCntVars_.contactArea_ * Vn_))*prtCntVars_.contactNormal_;
-    }
-    else
-    {
-        return (physicalProperties_.reduceBeta_*sqrt(physicalProperties_.aY_
-            *physicalProperties_.reduceM_*prtCntVars_.contactArea_/(Lc_+SMALL))*
-            Vn_)*prtCntVars_.contactNormal_;
-    }
+    return (physicalProperties_.reduceBeta_*sqrt(physicalProperties_.aY_
+        *physicalProperties_.reduceM_*prtCntVars_.contactArea_/(Lc_+SMALL))*
+        Vn_)*prtCntVars_.contactNormal_;
+
 }
 //---------------------------------------------------------------------------//
 vector prtSubContactInfo::getFt(scalar deltaT)
 {
+    // compute relative tangential velocity
+    vector FtLastP(FtPrev_ - (FtPrev_ & prtCntVars_.contactNormal_)
+        *prtCntVars_.contactNormal_);
+
+    // scale projected Ft to have same magnitude as FtLast
+
+
+    vector FtLastS(mag(FtPrev_) * (FtLastP/(mag(FtLastP)+SMALL)));
+
     // compute relative tangential velocity
     vector cVeliNorm = cVeli_ - ((cVeli_ & prtCntVars_.contactNormal_)
         *prtCntVars_.contactNormal_);
@@ -116,12 +117,17 @@ vector prtSubContactInfo::getFt(scalar deltaT)
     vector tVeliNorm = tVeli_ - ((tVeli_ & prtCntVars_.contactNormal_)
         *prtCntVars_.contactNormal_);
 
-    vector Vt(cVeliNorm - tVeliNorm);
+    vector Vt((cVeli_-tVeli_)-(cVeliNorm - tVeliNorm));
     // compute tangential force
-    vector Ftdi(- physicalProperties_.aGammat_
-        *sqrt(physicalProperties_.aG_*physicalProperties_.reduceM_*Lc_)*Vt);
-    Ftdi -= physicalProperties_.aG_*Lc_*Vt*deltaT;
-    return Ftdi;
+        //NewDefinition
+
+    scalar kT = 8*physicalProperties_.aG_*(prtCntVars_.contactArea_/(Lc_+SMALL));
+
+    vector deltaFt(kT*Vt*deltaT- 2*physicalProperties_.reduceBeta_*sqrt(kT*physicalProperties_.reduceM_)*Vt);
+
+    FtPrev_ = - FtLastS - deltaFt;
+    
+    return FtPrev_;
 }
 //---------------------------------------------------------------------------//
 void prtSubContactInfo::setVMInfo(boundBox& bBox, scalar subVolumeV)

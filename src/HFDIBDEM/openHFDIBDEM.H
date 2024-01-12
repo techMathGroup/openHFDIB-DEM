@@ -137,13 +137,14 @@ namespace Foam
     ~openHFDIBDEM();
 
     // Public methods --------------------------------------------------
-    scalar wallContactTime_ = 0.0;
-    scalar wallContactParallelTime_ = 0.0;
-    scalar wallContactReduceTime_ = 0.0;
-    scalar prtContactTime_ = 0.0;
-    scalar prtContactParallelTime_ = 0.0;
-    scalar prtContactReduceTime_ = 0.0;
-    scalar demItegrationTime_ = 0.0;
+
+    // scalar wallContactTime_ = 0.0;
+    // scalar wallContactParallelTime_ = 0.0;
+    // scalar wallContactReduceTime_ = 0.0;
+    // scalar prtContactTime_ = 0.0;
+    // scalar prtContactParallelTime_ = 0.0;
+    // scalar prtContactReduceTime_ = 0.0;
+    // scalar demItegrationTime_ = 0.0;
 
     void initialize(volScalarField& body,volVectorField& U,volScalarField& refineF,label recomputeM0, word runTime);
 

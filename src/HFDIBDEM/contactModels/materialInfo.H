@@ -70,9 +70,6 @@ class materialInfo
         // poisson ration
         scalar  nu_;
 
-        // dissipative coef
-        scalar gamma_;
-
         // friction coefficient
         scalar mu_;
 
@@ -90,7 +87,6 @@ class materialInfo
         string material,
         scalar Y,
         scalar nu,
-        scalar gamma,
         scalar mu,
         scalar adhN,
         scalar eps
@@ -117,11 +113,6 @@ class materialInfo
     const scalar& getNu()   const
     {
         return nu_;
-    }
-
-    const scalar& getGamma()   const
-    {
-        return gamma_;
     }
 
     const scalar& getMu()   const

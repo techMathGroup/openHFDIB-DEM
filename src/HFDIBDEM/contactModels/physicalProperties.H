@@ -53,8 +53,6 @@ struct physicalProperties
     :
         aY_(0),
         aG_(0),
-        aGammaN_(0),
-        aGammat_(0),
         aMu_(0),
         maxAdhN_(0),
         curAdhN_(0),
@@ -66,8 +64,6 @@ struct physicalProperties
     (
         const scalar aY,
         const scalar aG,
-        const scalar aGammaN,
-        const scalar aGammat,
         const scalar aMu,
         const scalar maxAdhN,
         const scalar curAdhN,
@@ -76,8 +72,6 @@ struct physicalProperties
     ):
         aY_(aY),
         aG_(aG),
-        aGammaN_(aGammaN),
-        aGammat_(aGammat),
         aMu_(aMu),
         maxAdhN_(maxAdhN),
         curAdhN_(curAdhN),
@@ -89,8 +83,6 @@ struct physicalProperties
     // Mean model parameters
     scalar aY_ = 0;         // Contact Young modulus
     scalar aG_ = 0;         // Contact shear modulus
-    scalar aGammaN_ = 0;    // Contact normal gamma
-    scalar aGammat_ = 0;    // Contact tangential gamma
     scalar aMu_ = 0;        // Contact frictional coef
     scalar maxAdhN_ = 0;    // Contact adhesive coef
     scalar curAdhN_ = 0;    // Current contact adhesive coef

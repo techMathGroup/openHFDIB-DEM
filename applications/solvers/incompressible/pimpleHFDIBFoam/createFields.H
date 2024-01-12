@@ -86,6 +86,21 @@ volScalarField refineF
     dimensionedScalar("zero",dimless,0)
 );
 
+InfoH<< "Reading field surface\n" << endl;
+volScalarField surface
+(
+    IOobject
+    (
+        "surface",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("zero",dimless,0)
+);
+
 #include "createPhi.H"
 
 

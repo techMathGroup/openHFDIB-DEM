@@ -54,35 +54,13 @@ class contactModelInfo
     {
         LcCoeff_ = LcCoeff;
     }
-    static void setBetaCoeff(scalar betaCoeff)
-    {
-        betaCoeff_ = betaCoeff;
-    }
 
-    static void setContactModel(bool contactModel)
-    {
-        contactModel_ = contactModel;
-    }
-    
     static scalar getLcCoeff()
     {
         return LcCoeff_;
     }
 
-    static scalar getBetaCoeff()
-    {
-        return betaCoeff_;
-    }
-
-    static bool getContactModel()
-    {
-        return contactModel_;
-    }
-
-
     static scalar LcCoeff_;
-    static scalar betaCoeff_;
-    static bool contactModel_;
 
 
 };

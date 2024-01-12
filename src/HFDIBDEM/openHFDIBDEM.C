@@ -82,7 +82,7 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 {
     materialProperties::matProps_insert(
         "None",
-        materialInfo("None", 1, 1, 1, 1, 1, 1)
+        materialInfo("None", 1, 1, 1, 1, 1)
     );
 
     if(HFDIBDEMDict_.found("recordFirstTimeStep"))
@@ -107,7 +107,6 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
                 materialsNames[matI],
                 readScalar(matIDic.lookup("Y")),
                 readScalar(matIDic.lookup("nu")),
-                readScalar(matIDic.lookup("gamma")),
                 readScalar(matIDic.lookup("mu")),
                 readScalar(matIDic.lookup("adhN")),
                 readScalar(matIDic.lookup("eps"))
@@ -154,42 +153,8 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         contactModelInfo::setLcCoeff(4.0);
         // Info <<" -- Coefficient for characteristic Lenght Lc is set to : 4.0"<< endl;
     }
-
-    if(demDic.found("betaCoeff"))
-    {
-        contactModelInfo::setBetaCoeff(readScalar(demDic.lookup("betaCoeff")));
-        // Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
-    }
-    else
-    {
-        contactModelInfo::setBetaCoeff(5.0);
-        // Info <<" -- Coefficient for characteristic Lenght Lc is set to : 4.0"<< endl;
-    }
     
-    if(demDic.found("useOldModel"))
-    {
-        contactModelInfo::setContactModel(readBool(demDic.lookup("useOldModel")));
-        // Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
-    }
-    else
-    {
-        contactModelInfo::setContactModel(true);
-        // Info <<" -- Coefficient for characteristic Lenght Lc is set to : 4.0"<< endl;
-    }
-    
-
     Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
-    Info <<" -- Coefficient for beta disipation term is set to  : "<< contactModelInfo::getBetaCoeff() << endl;
-    if(contactModelInfo::getContactModel())
-    {
-        Info <<" -- Old dissipation term with gamma term is active : "<< endl;
-    }
-    else
-    {
-        Info <<" -- New dissipation term with Coefficient of resttution is active : "<< endl;
-    }
-    
-    
 
     dictionary patchDic = demDic.subDict("collisionPatches");
     List<word> patchNames = patchDic.toc();
@@ -671,10 +636,10 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
     while( pos < 1)
     {
-        label possibleWallContacts(0);
-        label resolvedWallContacts(0);
-        label possiblePrtContacts(0);
-        label resolvedPrtContacts(0);
+        // label possibleWallContacts(0);
+        // label resolvedWallContacts(0);
+        // label possiblePrtContacts(0);
+        // label resolvedPrtContacts(0);
 
         InfoH << DEM_Info << " Start DEM pos: " << pos
             << " DEM step: " << step << endl;
@@ -690,7 +655,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
         verletList_.update(immersedBodies_);
 //OS Time effitiency Testing    
-        clockTime wallContactStopWatch;
+        // clockTime wallContactStopWatch;
 //OS Time effitiency Testing
         DynamicLabelList wallContactIB;
         DynamicList<wallSubContactInfo*> wallContactList;
@@ -720,7 +685,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 }
             }
         }
-        possibleWallContacts = wallContactIB.size();
+        // possibleWallContacts = wallContactIB.size();
         if(wallContactIB.size() > 0)
         {
             label wallContactPerProc(ceil(double(wallContactList.size())/Pstream::nProcs()));
@@ -730,11 +695,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 wallContactPerProc = 1;
             }
 //OS Time effitiency Testing                
-            clockTime wallContactParallelRun;
+            // clockTime wallContactParallelRun;
 //OS Time effitiency Testing                
             for(int assignProc = Pstream::myProcNo()*wallContactPerProc; assignProc < min((Pstream::myProcNo()+1)*wallContactPerProc,wallContactList.size()); assignProc++)
             {
-                resolvedWallContacts++;
+                // resolvedWallContacts++;
                 wallSubContactInfo* sCW = wallContactList[assignProc];
                 immersedBody& cIb(immersedBodies_[sCW->getBodyId()]);
                 sCW->setResolvedContact(solveWallContact(
@@ -746,8 +711,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             }
 
             //OS Time effitiency Testing                
-            wallContactParallelTime_ += wallContactParallelRun.timeIncrement();
-            clockTime wallContactSCRun;
+            // wallContactParallelTime_ += wallContactParallelRun.timeIncrement();
+            // clockTime wallContactSCRun;
             //OS Time effitiency Testing 
 
             forAll (wallContactIB,iB)
@@ -774,20 +739,21 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             
             //OS Time effitiency Testing                
             
-            wallContactReduceTime_ += wallContactSCRun.timeIncrement();
+            // wallContactReduceTime_ += wallContactSCRun.timeIncrement();
             //OS Time effitiency Testing 
         }
         wallContactList.clear();
         wallContactIB.clear();
-        reduce(resolvedWallContacts,sumOp<label>());
-        InfoH << basic_Info << " -- Possible Wall Contacts: " << possibleWallContacts
-            << " Resolved Wall Contacts: " << resolvedWallContacts 
-            << " contactPerProc : " << ceil(possibleWallContacts/Pstream::nProcs()) << endl;
+        // reduce(resolvedWallContacts,sumOp<label>());
+        // InfoH << basic_Info << " -- Possible Wall Contacts: " << possibleWallContacts
+        //     << " Resolved Wall Contacts: " << resolvedWallContacts 
+        //     << " contactPerProc : " << ceil(possibleWallContacts/Pstream::nProcs()) << endl;
 
-        wallContactTime_ += wallContactStopWatch.timeIncrement();
+        
 //OS Time effitiency Testing        
-        clockTime particleContactStopWatch;
-        clockTime particleContactSCRun;
+        // wallContactTime_ += wallContactStopWatch.timeIncrement();
+        // clockTime particleContactStopWatch;
+        // clockTime particleContactSCRun;
 //OS Time effitiency Testing
         // Pout <<" Survived 3 " << endl;
         DynamicList<prtSubContactInfo*> contactList;
@@ -829,10 +795,10 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             }
         }
 //OS Time effitiency Testing
-        prtContactReduceTime_ += particleContactSCRun.timeIncrement();
-        clockTime particleContactParallelRun;
-//OS Time effitiency Testing 
-        possiblePrtContacts = contactList.size();      
+        // prtContactReduceTime_ += particleContactSCRun.timeIncrement();
+        // clockTime particleContactParallelRun;
+        // possiblePrtContacts = contactList.size();      
+//OS Time effitiency Testing         
         if(contactList.size() > 0 )
         {
             label contactPerProc(ceil(double(contactList.size())/Pstream::nProcs()));
@@ -851,16 +817,16 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
                 if(detectPrtPrtContact(mesh_,cClass,tClass,*sCI))
                 {
-                    resolvedPrtContacts++;
+                    // resolvedPrtContacts++;
                     prtContactInfo& prtcInfo(getPrtcInfo(cPair));
                     sCI->setResolvedContact(solvePrtContact(mesh_, prtcInfo, *sCI, deltaTime*step));
                 }
             }
         }
 //OS Time effitiency Testing
-        prtContactParallelTime_ += particleContactParallelRun.timeIncrement();
-        prtContactTime_ += particleContactStopWatch.timeIncrement();
-        clockTime DEMIntergrationRun;
+        // prtContactParallelTime_ += particleContactParallelRun.timeIncrement();
+        // prtContactTime_ += particleContactStopWatch.timeIncrement();
+        // clockTime DEMIntergrationRun;
 //OS Time effitiency Testing
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
         {
@@ -896,31 +862,31 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 );
             }
         }
-        reduce(resolvedPrtContacts,sumOp<label>());
-        InfoH << basic_Info << " -- Possible Particle Contacts: " << possiblePrtContacts
-            << " Resolved Particle Contacts: " << resolvedPrtContacts 
-            << " contactPerProc : " << ceil(possiblePrtContacts/Pstream::nProcs()) << endl;
-        scalar maxCoNum = 0;
-        label  bodyId = 0;
+        // reduce(resolvedPrtContacts,sumOp<label>());
+        // InfoH << basic_Info << " -- Possible Particle Contacts: " << possiblePrtContacts
+        //     << " Resolved Particle Contacts: " << resolvedPrtContacts 
+        //     << " contactPerProc : " << ceil(possiblePrtContacts/Pstream::nProcs()) << endl;
+        // scalar maxCoNum = 0;
+        // label  bodyId = 0;
         forAll (immersedBodies_,ib)
         {
             immersedBodies_[ib].updateMovement(deltaTime*step*0.5);
             immersedBodies_[ib].printBodyInfo();
-            immersedBodies_[ib].computeBodyCoNumber();
-            if (maxCoNum < immersedBodies_[ib].getCoNum())
-            {
-                maxCoNum = immersedBodies_[ib].getCoNum();
-                bodyId = ib;
-            }
+            // immersedBodies_[ib].computeBodyCoNumber();
+            // if (maxCoNum < immersedBodies_[ib].getCoNum())
+            // {
+                // maxCoNum = immersedBodies_[ib].getCoNum();
+                // bodyId = ib;
+            // }
         }
-        InfoH << basic_Info << "Max CoNum = " << maxCoNum << " at body " << bodyId << endl;
+        // InfoH << basic_Info << "Max CoNum = " << maxCoNum << " at body " << bodyId << endl;
 
         pos += step;
         
         if (pos + step + SMALL >= 1)
             step = 1 - pos;
 //OS Time effitiency Testing            
-        demItegrationTime_ = DEMIntergrationRun.timeIncrement(); 
+        // demItegrationTime_ = DEMIntergrationRun.timeIncrement(); 
 //OS Time effitiency Testing                   
     }
 }
@@ -1155,16 +1121,14 @@ void openHFDIBDEM::writeFirtsTimeBodiesInfo()
     bool checkExistance(false);
     if(!recordSimulation_ || isDir(curOutDir))
         return;
-
+    reduce(checkExistance,orOp<bool>());
     if(Pstream::myProcNo() == 0)
     {
         mkDir(curOutDir);
+        mkDir(curOutDir +"/stlFiles");
     }
-
     reduce(checkExistance,orOp<bool>());
 
-    
-    mkDir(curOutDir +"/stlFiles");
     DynamicLabelList activeIB;
     forAll (immersedBodies_,bodyId)
     {
@@ -1173,6 +1137,7 @@ void openHFDIBDEM::writeFirtsTimeBodiesInfo()
             activeIB.append(bodyId);
         }
     }
+
     wordList bodyNames;
     scalar listZize(activeIB.size());
     label bodiesPerProc = ceil(listZize/Pstream::nProcs());

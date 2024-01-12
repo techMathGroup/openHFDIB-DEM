@@ -186,22 +186,9 @@ vector wallSubContactInfo::getFA(wallContactVars& wallCntvar)
 vector wallSubContactInfo::getFNd(wallContactVars& wallCntvar)
 {
     physicalProperties& meanCntPar(wallCntvar.getMeanCntPar());
-    if(contactModelInfo::getContactModel())
-    {
-        return (meanCntPar.aGammaN_*sqrt(meanCntPar.aY_*reduceM_
-            /pow(wallCntvar.Lc_+SMALL,3))*(wallCntvar.contactArea_*wallCntvar.Vn_))
-            *wallCntvar.contactNormal_;
-
-    }
-    else
-    {
-        return ((meanCntPar.reduceBeta_*sqrt(meanCntPar.aY_
+    return ((meanCntPar.reduceBeta_*sqrt(meanCntPar.aY_
             *reduceM_*wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL))*
             wallCntvar.Vn_)*wallCntvar.contactNormal_);
-    }
-    // Info << "effective beta : "<< meanCntPar.reduceBeta_ << endl;
-    // Info << "effective gamma : "<< meanCntPar.reduceGamma_ << endl;
-
 
 }
 //---------------------------------------------------------------------------//
@@ -213,17 +200,18 @@ vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
         - (wallCntvar.FtPrev_ & wallCntvar.contactNormal_)
         *wallCntvar.contactNormal_);
     // scale projected Ft to have same magnitude as FtLast
-    // vector FtLastS(mag(wallCntvar.FtPrev_) * (FtLastP/(mag(FtLastP)+SMALL)));
+    vector FtLastS(mag(wallCntvar.FtPrev_) * (FtLastP/(mag(FtLastP)+SMALL)));
     // compute relative tangential velocity
     vector cVeliNorm = wallCntvar.Veli_
         - ((wallCntvar.Veli_ & wallCntvar.contactNormal_)
         *wallCntvar.contactNormal_);
 
-    vector Vt(cVeliNorm - vector::zero);
+    vector Vt(wallCntvar.Veli_-(cVeliNorm - vector::zero));
     // compute tangential force
-    vector Ftdi(- meanCntPar.aGammat_*sqrt(meanCntPar.aG_*reduceM_*wallCntvar.Lc_)*Vt);
-    // wallCntvar.FtPrev_ = FtLastS - meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT + Ftdi;
-    wallCntvar.FtPrev_ =  - meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT + Ftdi;
+
+    scalar kT = 8*meanCntPar.aG_*(wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL));
+    vector deltaFt(kT*Vt*deltaT + 2*meanCntPar.reduceBeta_*sqrt(kT*reduceM_)*Vt);
+    wallCntvar.FtPrev_ = - FtLastS - deltaFt;
     return wallCntvar.FtPrev_;
 }
 //---------------------------------------------------------------------------//

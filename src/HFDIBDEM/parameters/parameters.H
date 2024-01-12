@@ -76,8 +76,6 @@ scalar virtualMeshLevel::virtualMeshLevel_ = 1;
 scalar virtualMeshLevel::levelOfDivision_ = 1;
 scalar virtualMeshLevel::charCellSize_ = 1;
 scalar contactModelInfo::LcCoeff_ = 4.0;
-scalar contactModelInfo::betaCoeff_ = 5.0;
-bool   contactModelInfo::contactModel_ = true;
 label  solverInfo::nSolidsTreshnold_ = 1000;
 bool   solverInfo::onlyDEM_ = false;
 

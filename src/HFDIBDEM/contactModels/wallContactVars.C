@@ -44,8 +44,6 @@ void wallContactVars::setMeanCntPars
     scalar overallArea = 0;
     physicalProperties_.aY_ = 0;
     physicalProperties_.aG_ = 0;
-    physicalProperties_.aGammaN_ = 0;
-    physicalProperties_.aGammat_ = 0;
     physicalProperties_.aMu_ = 0;
     physicalProperties_.maxAdhN_ = 0;
     physicalProperties_.reduceBeta_ = 0;
@@ -61,8 +59,6 @@ void wallContactVars::setMeanCntPars
 
         physicalProperties_.aY_ += (cMeanCntPars.aY_*area);
         physicalProperties_.aG_ += (cMeanCntPars.aG_*area);
-        physicalProperties_.aGammaN_ += (cMeanCntPars.aGammaN_*area);
-        physicalProperties_.aGammat_ += (cMeanCntPars.aGammat_*area);
         physicalProperties_.aMu_ += (cMeanCntPars.aMu_*area);
         physicalProperties_.maxAdhN_ += (cMeanCntPars.maxAdhN_*area);
         physicalProperties_.reduceBeta_ += (cMeanCntPars.reduceBeta_*area);
@@ -70,8 +66,6 @@ void wallContactVars::setMeanCntPars
 
     physicalProperties_.aY_ /= overallArea;
     physicalProperties_.aG_ /= overallArea;
-    physicalProperties_.aGammaN_ /= overallArea;
-    physicalProperties_.aGammat_ /= overallArea;
     physicalProperties_.aMu_ /= overallArea;
     physicalProperties_.maxAdhN_ /= overallArea;
     physicalProperties_.reduceBeta_ /= overallArea;
@@ -87,8 +81,6 @@ void wallContactVars::setMeanCntPars_Plane
     scalar overallArea = 0;
     physicalProperties_.aY_ = 0;
     physicalProperties_.aG_ = 0;
-    physicalProperties_.aGammaN_ = 0;
-    physicalProperties_.aGammat_ = 0;
     physicalProperties_.aMu_ = 0;
     physicalProperties_.maxAdhN_ = 0;
     physicalProperties_.reduceBeta_ = 0;
@@ -104,8 +96,6 @@ void wallContactVars::setMeanCntPars_Plane
 
         physicalProperties_.aY_ += (cMeanCntPars.aY_*area);
         physicalProperties_.aG_ += (cMeanCntPars.aG_*area);
-        physicalProperties_.aGammaN_ += (cMeanCntPars.aGammaN_*area);
-        physicalProperties_.aGammat_ += (cMeanCntPars.aGammat_*area);
         physicalProperties_.aMu_ += (cMeanCntPars.aMu_*area);
         physicalProperties_.maxAdhN_ += (cMeanCntPars.maxAdhN_*area);
         physicalProperties_.reduceBeta_ += (cMeanCntPars.reduceBeta_*area);
@@ -113,8 +103,6 @@ void wallContactVars::setMeanCntPars_Plane
 
     physicalProperties_.aY_ /= overallArea;
     physicalProperties_.aG_ /= overallArea;
-    physicalProperties_.aGammaN_ /= overallArea;
-    physicalProperties_.aGammat_ /= overallArea;
     physicalProperties_.aMu_ /= overallArea;
     physicalProperties_.maxAdhN_ /= overallArea;
     physicalProperties_.reduceBeta_ /= overallArea;

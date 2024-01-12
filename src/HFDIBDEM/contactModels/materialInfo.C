@@ -39,7 +39,6 @@ materialInfo::materialInfo
     string material,
     scalar Y,
     scalar nu,
-    scalar gamma,
     scalar mu,
     scalar adhN,
     scalar eps
@@ -48,7 +47,6 @@ materialInfo::materialInfo
 material_(material),
 Y_(Y),
 nu_(nu),
-gamma_(gamma),
 mu_(mu),
 adhN_(adhN),
 eps_(eps)
@@ -61,7 +59,6 @@ materialInfo::materialInfo(const materialInfo& mi)
 material_(mi.material_),
 Y_(mi.Y_),
 nu_(mi.nu_),
-gamma_(mi.gamma_),
 mu_(mi.mu_),
 adhN_(mi.adhN_),
 eps_(mi.eps_)

@@ -27,12 +27,7 @@ stepDEM     0.02;
 geometricD (1 -1 1);
 recordSimulation true;
 recordFirstTimeStep false;
-
-virtualMesh
-{
-    level 2;
-    charCellSize 0.0012;
-}
+nSolidsInDomain 1000;       //Sets Upper Limit On Number Of Particles In Domain if not spcecified sets to 1000 by default
 
 outputSetup
 {
@@ -54,7 +49,6 @@ DEM
         {
             Y       1e7;
             nu      0.3;
-            gamma   20;
             mu      0.05;
             adhN    0;
             eps     0.5;
@@ -64,7 +58,6 @@ DEM
         {
             Y       1e7;
             nu      0.2;
-            gamma   20;
             mu      0;
             adhN    0;
             eps     0.5;
@@ -101,6 +94,12 @@ DEM
     }
 }
 
+virtualMesh
+{
+    level 2;
+    charCellSize 0.0012;
+}
+
 icoSphere
 {
 fullyCoupledBody;
@@ -115,7 +114,7 @@ updateTorque false;
 sdBasedLambda false;
 interfaceSpan 1.0;
 startSynced false;
-refineBuffers 2;
+refineBuffers 1;
 timesToSetStatic 30; //number of timeSteps in contact with wall/static body to set body as static. Never when -1
 bodyAddition
 {

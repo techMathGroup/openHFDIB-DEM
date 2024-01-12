@@ -81,10 +81,6 @@ tContactVars_(tVars)
         + (1 - sqr(tMatInfo.getNu()))/tMatInfo.getY());
     physicalProperties_.aG_ = 1/(2*(2 - cMatInfo.getNu())*(1 + cMatInfo.getNu())/cMatInfo.getY()
         + 2*(2 - tMatInfo.getNu())*(1 + tMatInfo.getNu())/tMatInfo.getY());
-    physicalProperties_.aGammaN_ = (cMatInfo.getGamma()*tMatInfo.getGamma())
-        /(cMatInfo.getGamma()+tMatInfo.getGamma()+SMALL);
-    physicalProperties_.aGammat_ = (cMatInfo.getGamma()*tMatInfo.getGamma())
-        /(cMatInfo.getGamma()+tMatInfo.getGamma()+SMALL);
     physicalProperties_.aMu_ = (cMatInfo.getMu()+tMatInfo.getMu())/2;
     physicalProperties_.maxAdhN_ = cMatInfo.getAdhN() + tMatInfo.getAdhN() - 2*adhPot;
     physicalProperties_.curAdhN_ = 0;
@@ -97,7 +93,7 @@ tContactVars_(tVars)
     );
     physicalProperties_.reduceBeta_ =
     (
-       (-1)*sqrt(contactModelInfo::getBetaCoeff())*log((0.5*(cMatInfo.getEps()+tMatInfo.getEps())))/
+       (-1)*sqrt(5.0)*log((0.5*(cMatInfo.getEps()+tMatInfo.getEps())))/
        (sqrt(sqr(log(cMatInfo.getEps()+tMatInfo.getEps()))+
        sqr(Foam::constant::mathematical::pi)))
     );

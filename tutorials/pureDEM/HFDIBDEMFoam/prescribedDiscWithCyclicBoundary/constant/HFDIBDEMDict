@@ -25,10 +25,11 @@ interpolationSchemes
 
 surfaceThreshold    1e-4;
 stepDEM     1;
-// stepDEM     1;
 geometricD (1 1 -1);
 recordSimulation true;
-recordFirstTimeStep true;
+recordFirstTimeStep false;
+nSolidsInDomain 100;       //Sets Upper Limit On Number Of Particles In Domain if not spcecified sets to 1000 by default
+
 
 outputSetup
 {
@@ -40,33 +41,27 @@ outputSetup
 }
 DEM
 {
+	LcCoeff 4.0;
     materials
     {
         particle
         {
             Y       6e8;
-            // nu      0.5;
             nu      0.0;
-            gamma   5;
             mu      0;
             adhN    0;
-	    eps     1;
+	    	eps     1;
         }
         
         wall
         {
             Y       1e8;
-            // nu      0.5;
             nu      0.0;
-            gamma   5;
             mu      0;
             adhN    0;
-	    eps     1;
+	    	eps     1;
         }   
     }
-    LcCoeff 4.0;
-    betaCoeff 5.0;
-    useOldModel false;
 	cyclicPatches
 	{
 		outlet 

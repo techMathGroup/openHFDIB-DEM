@@ -28,7 +28,9 @@ stepDEM     1;
 // stepDEM     1;
 geometricD (1 1 -1);
 recordSimulation true;
-recordFirstTimeStep true;
+recordFirstTimeStep false;
+nSolidsInDomain 1000;       //Sets Upper Limit On Number Of Particles In Domain if not spcecified sets to 1000 by default
+
 
 outputSetup
 {
@@ -40,33 +42,28 @@ outputSetup
 }
 DEM
 {
+	LcCoeff 4.0;
     materials
     {
         particle
         {
             Y       6e8;
-            // nu      0.5;
             nu      0.0;
-            gamma   5;
             mu      0;
             adhN    0;
-	    eps     1;
+	    	eps     1;
         }
         
         wall
         {
             Y       1e8;
-            // nu      0.5;
             nu      0.0;
-            gamma   5;
             mu      0;
             adhN    0;
-	    eps     1;
+	    	eps     1;
         }   
     }
-    LcCoeff 4.0;
-    betaCoeff 5.0;
-    useOldModel false;
+
 	cyclicPatches
 	{
 		outlet 
@@ -87,36 +84,7 @@ DEM
 	} 
     collisionPatches
     {
-		// wall0
-		// {
-		// 	material wall;
-		// 	nVec (1.0 0.0 0.0);
-		// 	planePoint (0.015 0.00 0.0);
-		// }
-		// wall1
-		// {
-		// 	material wall;
-		// 	nVec (0.0 0.0 1.0);
-		// 	planePoint (0.0 0.0 0.015);
-		// }
-		// wall2
-		// {
-		// 	material wall;
-		// 	nVec (-1.0 0.0 0.0);
-		// 	planePoint (-0.015 0.0 0.0);
-		// }
-		// wall3
-		// {
-		// 	material wall;
-		// 	nVec (0.0 0.0 -1.0);
-		// 	planePoint (0.0 0.0 -0.015);
-		// }
-		// bot
-		// {
-		// 	material wall;
-		// 	nVec (0.0 -1.0 0.0);
-		// 	planePoint (0.0 -0.03 0.0);
-		// }
+
     }
 }
 
@@ -130,12 +98,6 @@ virtualMesh
 icoSphere
 {
 
-	// fullyCoupledBody
-	// {
-	// 	velocity (0 -1.0 0);
-	// }
-
-	// staticBody;
 	prescribedTransRotBody
 	{
 		velocity (0 -0.5 0);
@@ -171,9 +133,7 @@ icoSphere
 	sdBasedLambda false;
 	interfaceSpan 1.0;
 	startSynced false;
-	refineBuffers 2;
-	timesToSetStatic -1;
-	
+	refineBuffers 1;
 	timesToSetStatic -1;
 	
 }

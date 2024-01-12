@@ -27,8 +27,9 @@ stepDEM     0.1;
 // stepDEM     1;
 geometricD (1 1 1);
 recordSimulation true;
-recordFirstTimeStep true;
-nSolidsInDomain 100;
+recordFirstTimeStep false;
+nSolidsInDomain 100;       //Sets Upper Limit On Number Of Particles In Domain if not spcecified sets to 1000 by default
+
 outputSetup
 {
     basic true;
@@ -39,14 +40,13 @@ outputSetup
 }
 DEM
 {
+	LcCoeff 4.0;
     materials
     {
         particle
         {
             Y       1e8;
-
             nu      0.0;
-            gamma   0.0;
             mu      0.01;
             adhN    0;
 			eps	 	0.05;
@@ -55,17 +55,13 @@ DEM
         wall
         {
             Y       1e8;
-            // nu      0.5;
             nu      0.0;
-            gamma   0.0;
             mu      0.01;
             adhN    0;
 			eps	 	0.05;
         }
     }
-    LcCoeff 4.0;
-    betaCoeff 5.0;
-	useOldModel false;	
+
 	cyclicPatches
 	{
 

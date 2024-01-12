@@ -20,7 +20,8 @@ surfaceThreshold    1e-4;
 stepDEM     0.02;
 geometricD (1 1 -1);
 recordSimulation true;
-virtMeshDecompositionLevel 2;
+recordFirstTimeStep false;
+nSolidsInDomain 1000;       //Sets Upper Limit On Number Of Particles In Domain if not spcecified sets to 1000 by default
 
 outputSetup
 {
@@ -30,9 +31,6 @@ outputSetup
     addModel true;
     parallelDEM false;
 }
-
-recordSimulation true;
-recordFirstTimeStep false;
 
 virtualMesh
 {
@@ -52,15 +50,12 @@ outputSetup
 DEM
 {
     LcCoeff 4.0;
-    betaCoeff 5.0;
-	useOldModel false;	
     materials
     {
         particle
         {
             Y       1e7;
             nu      0.3;
-            gamma   20;
             mu      0.05;
             adhN    0;
             eps     0.5;
@@ -70,7 +65,6 @@ DEM
         {
             Y       1e7;
             nu      0.2;
-            gamma   20;
             mu      0;
             adhN    0;
             eps     0.5;
@@ -159,17 +153,13 @@ U
 }
 material particle;
 bodyGeom convex;
-// sphere
-// {
-//     startPosition   (9e-3 0.046 0);
-//     radius  0.006;
-// }
 updateTorque false;
 sdBasedLambda false;
 interfaceSpan 1.0;
 startSynced false;
-refineBuffers 2;
+refineBuffers 1;
 timesToSetStatic -1;
+
 bodyAddition
 {
 	addModel once;

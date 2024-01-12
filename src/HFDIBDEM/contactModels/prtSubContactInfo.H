@@ -88,6 +88,8 @@ class prtSubContactInfo
 
     Tuple2<forces,forces> outForce_; // Out variable for force
 
+    vector FtPrev_ = vector::zero;     // Tangential force from previous time-step
+
     bool contactResolved_ = false;
 
     vector getVeli(ibContactVars& cVars, vector& lVec);
