@@ -1,5 +1,5 @@
 # openHFDIB-DEM
-Version 2.4
+Version 2.5
 
 About openHFDIB-DEM
 -------------------
@@ -24,7 +24,7 @@ Code capabilities
 * simulations of solid phase in standard DEM mode (see HFDIBDEMFoam)
 * adaptive mesh refinement based on the particles position
 * spring-dashpot contact model based on particle elastic modulus and
-  a damping constant (see HFDIBDEM/contactModels)
+  a damping based on coefficient of restitution(see HFDIBDEM/contactModels)
 * extension to contact model for inclusion of adhesive forces
 * multiple solid phase initialization options such as random spatial
   distribution of uniformly sized bodies (see HFDIBDEM/addModels)
