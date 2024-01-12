@@ -18,7 +18,7 @@ coupled with the Discrete Element Method (DEM). The initial HFDIB implementation
 
 Code capabilities
 -----------------
-* simulation settings are defined in HFDIBDEMdict (see DOCUMENTATION)tak
+* simulation settings are defined in HFDIBDEMdict (see DOCUMENTATION)
 * simulations with either spherical or STL-defined particles (see HFDIBDEM/geomModels)
 * simulations of two-phase (solid-fluid) flow (see pimpleHFDIBFoam)
 * simulations of solid phase in standard DEM mode (see HFDIBDEMFoam)
