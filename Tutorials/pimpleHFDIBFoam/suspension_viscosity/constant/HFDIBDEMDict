@@ -1,0 +1,167 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \    /   O peration     | Version:  3.0.x                                 |
+|   \  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      HFDIBDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+bodyNames ( "sphereFill" );
+
+// interpolationSchemes
+// {
+//   U cellPointFace;
+//   distFactor    1.5;
+//   radiusFactor  3.1;
+//   angleFactor   80;
+//   maxCCRows     4;
+// }
+
+surfaceThreshold    1e-4;
+stepDEM     0.05;
+geometricD (1 1 1);
+recordSimulation true;
+
+outputSetup
+{
+    basic true;
+    iB  false;
+    DEM false;
+    addModel false;
+    parallelDEM true;
+}
+
+DEM
+{
+    materials
+    {
+        particle
+        {
+            Y       5e7;
+            nu      0.3;
+            gamma   1;
+            mu      0.25;
+            adhN    0;
+        }
+        
+        wall
+        {
+            Y       5e7;
+            nu      0.3;
+            gamma   1;
+            mu      0.25;
+            adhN    0;
+        }   
+    }
+
+    interfaceAdh
+    {
+        
+    }
+
+    collisionPatches
+    {
+	top
+        {
+           material wall;
+           nVec (0 0 1.0);
+           planePoint (1e-5 1e-5 1e-3);
+        }
+        
+        bottom
+        {
+           material wall;
+           nVec (0 0 -1.0);
+           planePoint (1e-5 1e-5 0);
+        }
+        
+        front
+        {
+           material wall;
+           nVec (0 -1.0 0);
+           planePoint (1e-5 0 1e-5);
+        }
+        
+        back
+        {
+           material wall;
+           nVec (0 1.0 0);
+           planePoint (1e-5 2e-3 9.5e-5);
+        }
+    }
+    
+    cyclicPatches 
+    {
+        left
+        {
+          nVec (-1.0 0 0);
+          planePoint (0 0 0);
+          neighbourPatch right;
+        }
+        right
+        {
+          nVec (1.0 0 0);
+          planePoint (0.001 0 0);
+          neighbourPatch left;
+        }
+    }
+}
+
+sphereFill
+{
+fullyCoupledBody;
+rho         rho [1 -3 0 0 0 0 0] 3950;
+refineMC 5;
+U
+{
+	BC  noSlip;
+}
+material particle;
+bodyGeom sphere;
+sphere
+{
+    startPosition (0 0 0);
+    radius 4.9e-5;
+}
+updateTorque true;
+sdBasedLambda false;
+interfaceSpan 1.0;
+startSynced true;
+velRelaxFac 1;
+refineBuffers 0;
+timesToSetStatic -1;
+bodyAddition
+{
+        addModel onceScatter;
+        onceScatterCoeffs
+        {
+                addMode fieldBased;
+                fieldBasedCoeffs
+                {
+                        fieldName lambda;
+                        fieldValue 0.05;
+                }
+                addDomain boundBox;
+                boundBoxCoeffs
+                {
+                        minBound (0 0 0);
+                        maxBound (1e-3 2e-3 1e-3);
+                }
+
+        scalingMode    noScaling;
+        noScalingCoeffs{}
+
+        rotationMode   randomRotation;
+        randomRotationCoeffs{}
+        }
+}
+}
+// ************************************************************************* //
