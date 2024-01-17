@@ -1,7 +1,7 @@
 #!/bin/sh
 
 # compile the library
-cd HFDIBDEM
+cd scr/HFDIBDEM
 wclean
 wmake libso
 cd ..
