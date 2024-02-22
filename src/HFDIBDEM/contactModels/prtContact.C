@@ -68,11 +68,13 @@ void getContacts(
     }
     else
     {
-        if (Pstream::myProcNo() == 0)
-        {
-            scalar ranCellVol = mesh.V()[0];
-            prtcInfo.getContacts_ArbShape(ranCellVol);
-        }
+        // if (Pstream::myProcNo() == 0)
+        // {
+            // scalar ranCellVol = mesh.V()[0];
+            // prtcInfo.getContacts_ArbShape(ranCellVol);
+        // }
+        scalar ranCellVol = pow(virtualMeshLevel::getCharCellSize(),3);
+        prtcInfo.getContacts_ArbShape(ranCellVol);        
     }
 
     prtcInfo.swapContactLists();

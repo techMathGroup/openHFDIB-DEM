@@ -422,7 +422,7 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList
         if(mag(weightedDir) > SMALL)
         {
             normOk = true;
-            normalVec = weightedDir/mag(weightedDir);
+            normalVec = weightedDir/(mag(weightedDir)+SMALL);
         }
         if (!normOk || mag(normalVec) < 1)
             normalVec = normalVector;

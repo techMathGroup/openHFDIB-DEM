@@ -251,6 +251,7 @@ namespace Foam
             return triSurf_().faces()[faceID].points(bodySurfMesh_.points());
         }
 
+        void setBodyPosition(pointField pos) final override;
     };
 }
 #endif

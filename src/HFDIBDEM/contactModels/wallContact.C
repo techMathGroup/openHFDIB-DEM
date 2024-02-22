@@ -95,7 +95,7 @@ bool detectWallContact_ArbShape(
     bool isContact(false);
     if(wallCntInfo.detectWallContact())
     {
-        wallCntInfo.findContactAreas();
+        // wallCntInfo.findContactAreas();
         isContact = true;
     }
     return(isContact);

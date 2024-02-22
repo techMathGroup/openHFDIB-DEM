@@ -434,6 +434,26 @@ namespace Foam
             pointField nonPointField;
             return nonPointField;
         }
+
+        virtual  void setBodyPosition(vector pos)
+        {
+            InfoH << iB_Info << "21-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
+
+        virtual vector getBodyPosition()
+        {
+            InfoH << iB_Info << "23-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            return vector::zero;
+        }
+
+        virtual  void setBodyPosition(pointField pos)
+        {
+            InfoH << iB_Info << "22-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
+
     };
 }
 #endif

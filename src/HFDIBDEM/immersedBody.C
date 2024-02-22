@@ -629,8 +629,8 @@ void immersedBody::moveImmersedBody
 {
     if (bodyOperation_ == 0) return;
 
-    if (geomModel_->getOwner() == Pstream::myProcNo())
-    {
+    // if (geomModel_->getOwner() == Pstream::myProcNo())
+    // {
         if (mag(deltaT + 1.0) < SMALL) deltaT = mesh_.time().deltaT().value();
 
         // incremental rotation angle
@@ -672,9 +672,9 @@ void immersedBody::moveImmersedBody
 
         geomModel_->bodyRotatePoints(angle,Axis_);
         geomModel_->bodyMovePoints(transIncr);
-    }
+    // }
 
-    geomModel_->synchronPos();
+    // geomModel_->synchronPos();
 
     // InfoH << iB_Info;
     // InfoH << "-- body " << bodyId_ << " CoM                  : "
