@@ -1,5 +1,5 @@
 # openHFDIB-DEM
-Version 2.5
+Version 2.6 - Experimental Version currently under heavy develpoment. Not recomended for use. 
 
 About openHFDIB-DEM
 -------------------
