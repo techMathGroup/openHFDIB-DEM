@@ -94,7 +94,7 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     {
         solverInfo::setNSolidsTreshnold(readLabel(HFDIBDEMDict_.lookup("nSolidsInDomain")));
     }
-    
+ 
     dictionary demDic = HFDIBDEMDict_.subDict("DEM");
     dictionary materialsDic = demDic.subDict("materials");
     List<word> materialsNames = materialsDic.toc();
@@ -146,13 +146,30 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     if(demDic.found("LcCoeff"))
     {
         contactModelInfo::setLcCoeff(readScalar(demDic.lookup("LcCoeff")));
-        // Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
     }
     else
     {
         contactModelInfo::setLcCoeff(4.0);
-        // Info <<" -- Coefficient for characteristic Lenght Lc is set to : 4.0"<< endl;
     }
+
+    if(demDic.found("rotationModel"))
+    {
+        word rotModel = demDic.lookup("rotationModel");
+        if(rotModel == "chen2012")
+        {
+            contactModelInfo::setRotationModel(0);
+        }
+        else if(rotModel == "mindlin1953")
+        {
+            contactModelInfo::setRotationModel(1);
+        }
+        else
+        {
+            Info << "Rotation Model not recognized, setting to default chen2012" << endl;
+            contactModelInfo::setRotationModel(0);
+        }
+    }
+
     
     Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
 
@@ -265,8 +282,6 @@ void openHFDIBDEM::initialize
         );
     }
 
-    // get data from HFDIBDEMDict
-    //HFDIBinterpDict_ = HFDIBDEMDict_.subDict("interpolationSchemes");
     preCalculateCellPoints();
 
     if(HFDIBDEMDict_.found("interpolationSchemes"))

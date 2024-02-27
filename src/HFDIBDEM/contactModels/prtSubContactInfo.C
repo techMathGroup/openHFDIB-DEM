@@ -120,12 +120,20 @@ vector prtSubContactInfo::getFt(scalar deltaT)
     vector Vt((cVeli_-tVeli_)-(cVeliNorm - tVeliNorm));
     // compute tangential force
         //NewDefinition
+    if(contactModelInfo::getUseMindlinRotationalModel())
+    {
+        scalar kT = 8*physicalProperties_.aG_*(prtCntVars_.contactArea_/(Lc_+SMALL));
+        vector deltaFt(kT*Vt*deltaT- 2*physicalProperties_.reduceBeta_*sqrt(kT*physicalProperties_.reduceM_)*Vt);
+        FtPrev_ = - FtLastS - deltaFt;
+    }
 
-    scalar kT = 8*physicalProperties_.aG_*(prtCntVars_.contactArea_/(Lc_+SMALL));
+    if(contactModelInfo::getUseChenRotationalModel())
+    {
+        vector Ftdi(- physicalProperties_.reduceBeta_*sqrt(physicalProperties_.aG_*physicalProperties_.reduceM_*Lc_)*Vt);
+        Ftdi -= physicalProperties_.aG_*Lc_*Vt*deltaT;
+        FtPrev_ = - FtLastS - Ftdi;
+    }
 
-    vector deltaFt(kT*Vt*deltaT- 2*physicalProperties_.reduceBeta_*sqrt(kT*physicalProperties_.reduceM_)*Vt);
-
-    FtPrev_ = - FtLastS - deltaFt;
     
     return FtPrev_;
 }

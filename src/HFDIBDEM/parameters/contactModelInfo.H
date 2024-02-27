@@ -55,12 +55,39 @@ class contactModelInfo
         LcCoeff_ = LcCoeff;
     }
 
+    static void setRotationModel(label modelID)
+    {
+        if (modelID == 0)
+        {
+            useChenRotationalModel_ = true;
+            useMindlinRotationalModel_ = false;
+        }
+        else if (modelID == 1)
+        {
+            useChenRotationalModel_ = false;
+            useMindlinRotationalModel_ = true;
+        }
+    }
+
     static scalar getLcCoeff()
     {
         return LcCoeff_;
     }
 
+    static bool getUseChenRotationalModel()
+    {
+        return useChenRotationalModel_;
+    }
+
+    static bool getUseMindlinRotationalModel()
+    {
+        return useMindlinRotationalModel_;
+    }
+
     static scalar LcCoeff_;
+    static bool useChenRotationalModel_;
+    static bool useMindlinRotationalModel_;
+
 
 
 };
