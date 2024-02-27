@@ -41,8 +41,8 @@ outputSetup
 DEM
 {
     LcCoeff 4.0;
-    betaCoeff 5.0;
-	useOldModel false;	
+    	rotationModel chen2012;
+	// rotationModel mindlin1953
     materials
     {
         particle
