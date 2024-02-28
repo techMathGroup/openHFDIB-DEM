@@ -210,6 +210,7 @@ vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
     // compute tangential force
     if(contactModelInfo::getUseMindlinRotationalModel())
     {
+        
         scalar kT = 8*meanCntPar.aG_*(wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL));
         vector deltaFt(kT*Vt*deltaT + 2*meanCntPar.reduceBeta_*sqrt(kT*reduceM_)*Vt);
         wallCntvar.FtPrev_ = - FtLastS - deltaFt;
@@ -217,6 +218,7 @@ vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
 
     if(contactModelInfo::getUseChenRotationalModel())
     {
+   
         vector Ftdi(- meanCntPar.reduceBeta_*sqrt(meanCntPar.aG_*reduceM_*wallCntvar.Lc_)*Vt);
         wallCntvar.FtPrev_ = FtLastS - meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT + Ftdi;
     }

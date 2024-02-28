@@ -122,6 +122,7 @@ vector prtSubContactInfo::getFt(scalar deltaT)
         //NewDefinition
     if(contactModelInfo::getUseMindlinRotationalModel())
     {
+        
         scalar kT = 8*physicalProperties_.aG_*(prtCntVars_.contactArea_/(Lc_+SMALL));
         vector deltaFt(kT*Vt*deltaT- 2*physicalProperties_.reduceBeta_*sqrt(kT*physicalProperties_.reduceM_)*Vt);
         FtPrev_ = - FtLastS - deltaFt;
@@ -129,9 +130,11 @@ vector prtSubContactInfo::getFt(scalar deltaT)
 
     if(contactModelInfo::getUseChenRotationalModel())
     {
+        
         vector Ftdi(- physicalProperties_.reduceBeta_*sqrt(physicalProperties_.aG_*physicalProperties_.reduceM_*Lc_)*Vt);
+        // vector Ftdi(- *sqrt(physicalProperties_.aG_*physicalProperties_.reduceM_*Lc_)*Vt);
         Ftdi -= physicalProperties_.aG_*Lc_*Vt*deltaT;
-        FtPrev_ = - FtLastS - Ftdi;
+        FtPrev_ = FtLastS- Ftdi;
     }
 
     
