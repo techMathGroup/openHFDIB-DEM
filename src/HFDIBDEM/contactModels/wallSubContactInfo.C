@@ -220,8 +220,9 @@ vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
     if(contactModelInfo::getUseChenRotationalModel())
     {
    
-        vector Ftdi(- meanCntPar.reduceBeta_*sqrt(meanCntPar.aG_*reduceM_*wallCntvar.Lc_)*Vt);
-        wallCntvar.FtPrev_ = FtLastS - meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT + Ftdi;
+        vector Ftdi(meanCntPar.reduceBeta_*sqrt(meanCntPar.aG_*reduceM_*wallCntvar.Lc_)*Vt);
+        Ftdi += meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT;
+        wallCntvar.FtPrev_ = - FtLastS - Ftdi;
     }
 
     return wallCntvar.FtPrev_;
