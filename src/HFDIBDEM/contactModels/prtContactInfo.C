@@ -94,7 +94,7 @@ tContactVars_(tVars)
     physicalProperties_.reduceBeta_ =
     (
        (-1)*sqrt(5.0)*log((0.5*(cMatInfo.getEps()+tMatInfo.getEps())))/
-       (sqrt(sqr(log(cMatInfo.getEps()+tMatInfo.getEps()))+
+       (sqrt(sqr(log(0.5*(cMatInfo.getEps()+tMatInfo.getEps())))+
        sqr(Foam::constant::mathematical::pi)))
     );
 }

@@ -62,7 +62,9 @@ void prtSubContactInfo::evalVariables(
 )
 {
     cLVec_ = cIb.getGeomModel().getLVec(prtCntVars_.contactCenter_);
+    // cLVec_ = prtCntVars_.contactCenter_ - cIb.getGeomModel().getCoM();
     tLVec_ = tIb.getGeomModel().getLVec(prtCntVars_.contactCenter_);
+    // tLVec_ = prtCntVars_.contactCenter_ - tIb.getGeomModel().getCoM();
 
     cVeli_ = getVeli(cVars, cLVec_);
     tVeli_ = getVeli(tVars, tLVec_);
@@ -111,11 +113,9 @@ vector prtSubContactInfo::getFt(scalar deltaT)
     vector FtLastS(mag(FtPrev_) * (FtLastP/(mag(FtLastP)+SMALL)));
 
     // compute relative tangential velocity
-    vector cVeliNorm = cVeli_ - ((cVeli_ & prtCntVars_.contactNormal_)
-        *prtCntVars_.contactNormal_);
+    vector cVeliNorm = cVeli_*((cVeli_ & prtCntVars_.contactNormal_));
 
-    vector tVeliNorm = tVeli_ - ((tVeli_ & prtCntVars_.contactNormal_)
-        *prtCntVars_.contactNormal_);
+    vector tVeliNorm = tVeli_*((tVeli_ & prtCntVars_.contactNormal_));
 
     vector Vt((cVeli_-tVeli_)-(cVeliNorm - tVeliNorm));
     // compute tangential force
@@ -123,8 +123,8 @@ vector prtSubContactInfo::getFt(scalar deltaT)
     if(contactModelInfo::getUseMindlinRotationalModel())
     {
         
-        scalar kT = 8*physicalProperties_.aG_*(prtCntVars_.contactArea_/(Lc_+SMALL));
-        vector deltaFt(kT*Vt*deltaT- 2*physicalProperties_.reduceBeta_*sqrt(kT*physicalProperties_.reduceM_)*Vt);
+        scalar kT = 200*8*physicalProperties_.aG_*(prtCntVars_.contactArea_/(Lc_+SMALL));
+        vector deltaFt(kT*Vt*deltaT + 2*physicalProperties_.reduceBeta_*sqrt(kT*physicalProperties_.reduceM_)*Vt);
         FtPrev_ = - FtLastS - deltaFt;
     }
 
