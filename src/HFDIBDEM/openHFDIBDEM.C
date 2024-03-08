@@ -749,7 +749,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             for(int assignProc = Pstream::myProcNo()*wallContactPerProc; assignProc < min((Pstream::myProcNo()+1)*wallContactPerProc,wallContactIB.size()); assignProc++)
             {
                 immersedBody& cIb(immersedBodies_[wallContactIB[assignProc]]);
-                if(cIb.getGeomModel().getcType() != sphere || cIb.getGeomModel().getcType() != cluster) 
+                if(cIb.getGeomModel().getcType() != sphere && cIb.getGeomModel().getcType() != cluster) 
                 {
                     cIb.getWallCntInfo().findContactAreas();
                 }

@@ -86,7 +86,7 @@ ibContactVars_(cVars)
         scalar maxAdhN = cMatInfo.getAdhN() + wInfo.getAdhN() - 2*adhPot;
         scalar reduceBeta =
         (
-            (-1)*sqrt(5.0)*log((0.5*(cMatInfo.getEps()+wInfo.getEps())))/
+           (-1)*sqrt(5.0)*log((0.5*(cMatInfo.getEps()+wInfo.getEps())))/
             (sqrt(sqr(log((0.5*(cMatInfo.getEps()+wInfo.getEps()))))+
             sqr(Foam::constant::mathematical::pi)))
         );
