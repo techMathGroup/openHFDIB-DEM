@@ -98,9 +98,25 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     dictionary demDic = HFDIBDEMDict_.subDict("DEM");
     dictionary materialsDic = demDic.subDict("materials");
     List<word> materialsNames = materialsDic.toc();
+    if(demDic.found("increasedDamping"))
+    {
+        contactModelInfo::setIncreasedDamping(readBool(demDic.lookup("increasedDamping")));
+    }
+    else
+    {
+        contactModelInfo::setIncreasedDamping(false);
+    }
+
     forAll(materialsNames, matI)
     {
         dictionary matIDic = materialsDic.subDict(materialsNames[matI]);
+        scalar eps = readScalar(matIDic.lookup("eps"));
+        if(!contactModelInfo::getIncreasedDamping())
+        {
+            eps = 0.906463027*eps + 0.093538298;//LinearRegression based on LIGGGHTS data testing
+            eps = min(eps, 1.0);
+        }
+        
         materialProperties::matProps_insert(
             materialsNames[matI],
             materialInfo(
@@ -109,7 +125,8 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
                 readScalar(matIDic.lookup("nu")),
                 readScalar(matIDic.lookup("mu")),
                 readScalar(matIDic.lookup("adhN")),
-                readScalar(matIDic.lookup("eps"))
+                // readScalar(matIDic.lookup("eps"))
+                eps
             )
         );
     }
@@ -165,8 +182,8 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         }
         else
         {
-            Info << "Rotation Model not recognized, setting to default chen2012" << endl;
-            contactModelInfo::setRotationModel(0);
+            Info << "Rotation Model not recognized, setting to default mindlin1953" << endl;
+            contactModelInfo::setRotationModel(1);
         }
     }
 

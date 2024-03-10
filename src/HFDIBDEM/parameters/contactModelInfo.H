@@ -69,6 +69,11 @@ class contactModelInfo
         }
     }
 
+    static void setIncreasedDamping(bool increasedDamping)
+    {
+        increasedDamping_ = increasedDamping;
+    }
+
     static scalar getLcCoeff()
     {
         return LcCoeff_;
@@ -84,9 +89,15 @@ class contactModelInfo
         return useMindlinRotationalModel_;
     }
 
+    static bool getIncreasedDamping()
+    {
+        return increasedDamping_;
+    }
+
     static scalar LcCoeff_;
     static bool useChenRotationalModel_;
     static bool useMindlinRotationalModel_;
+    static bool increasedDamping_;
 
 
 
