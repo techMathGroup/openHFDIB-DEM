@@ -441,11 +441,33 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
         }
     }
 
+    List<scalar> particleMasses(immersedBodies_.size(),0.0);
+    List<label> particleCells(immersedBodies_.size(),0);
+    List<symmTensor> particleInertiaTensors(immersedBodies_.size(),symmTensor::zero);
+
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            immersedBodies_[bodyId].syncCreateImmersedBody(body,refineF);
+            immersedBodies_[bodyId].syncImmersedBodyParralell1(body,refineF);
+            particleMasses[bodyId] =  immersedBodies_[bodyId].getGeomModel().getM();
+            particleCells[bodyId] =  immersedBodies_[bodyId].getGeomModel().getNCells();
+            particleInertiaTensors[bodyId] =  immersedBodies_[bodyId].getGeomModel().getI();
+        }
+    }
+    reduce(particleMasses,sumOp<List<scalar>>());
+    reduce(particleCells,sumOp<List<label>>());
+    reduce(particleInertiaTensors,sumOp<List<symmTensor>>());
+
+    forAll (immersedBodies_,bodyId)            
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            immersedBodies_[bodyId].getGeomModel().setM(particleMasses[bodyId]);
+            immersedBodies_[bodyId].getGeomModel().setNCells(particleCells[bodyId]);
+            immersedBodies_[bodyId].getGeomModel().setI(particleInertiaTensors[bodyId]);
+
+            immersedBodies_[bodyId].syncImmersedBodyParralell2(body,refineF);
             immersedBodies_[bodyId].checkIfInDomain(body);
             immersedBodies_[bodyId].updateOldMovementVars();
         }

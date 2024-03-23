@@ -183,6 +183,64 @@ void immersedBody::syncCreateImmersedBody
         << charCellSize_ << endl;
 }
 //---------------------------------------------------------------------------//
+void immersedBody::syncImmersedBodyParralell1
+(
+    volScalarField& body,
+    volScalarField& refineF
+)
+{
+    geomModel_->setOwner();
+    InfoH << iB_Info << "body: " << bodyId_
+        << " owner: " << geomModel_->getOwner() << endl;
+
+    InfoH << iB_Info << "Computing geometrical properties" << endl;
+    geomModel_->calculateGeometricalPropertiesParallel(body);
+}
+//---------------------------------------------------------------------------//
+void immersedBody::syncImmersedBodyParralell2
+(
+    volScalarField& body,
+    volScalarField& refineF
+)
+{
+    // update body courant number
+    // computeBodyCoNumber();
+
+    InfoH << iB_Info << "-- body: " << bodyId_
+        << " current center of mass position: " << geomModel_->getCoM() << endl;
+
+    const List<DynamicLabelList>& surfCells = geomModel_->getSurfaceCellList();
+    DynamicLabelList zeroList(surfCells[Pstream::myProcNo()].size(), 0);
+
+    constructRefineField(
+        body,
+        refineF,
+        surfCells[Pstream::myProcNo()],
+        zeroList
+    );
+
+    scalarList charCellSizeL(Pstream::nProcs(),1e4);
+    forAll (surfCells[Pstream::myProcNo()],sCellI)
+    {
+        label cellI = surfCells[Pstream::myProcNo()][sCellI];
+        charCellSizeL[Pstream::myProcNo()] =
+            min(charCellSizeL[Pstream::myProcNo()],
+                Foam::pow(mesh_.V()[cellI],0.3333)
+            );
+    }
+    forAll(charCellSizeL,indl)
+    {
+        if(charCellSizeL[indl] > 5e3)
+        {
+            charCellSizeL[indl] = -1.0;
+        }
+    }
+
+    charCellSize_ = gMax(charCellSizeL);
+    InfoH << iB_Info << "Body characteristic cell size: "
+        << charCellSize_ << endl;
+}
+//---------------------------------------------------------------------------//
 void immersedBody::constructRefineField
 (
     volScalarField& body,

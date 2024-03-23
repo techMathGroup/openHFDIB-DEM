@@ -333,6 +333,12 @@ namespace Foam
         virtual void calculateGeometricalProperties(
             volScalarField& body
         );
+        
+        virtual void calculateGeometricalPropertiesParallel(
+            volScalarField& body
+        );
+
+
 
         //evaluate center of mass and inertia tensor
         void addToMAndI
@@ -358,9 +364,20 @@ namespace Foam
             return M_;
         }
 
+        void setM(scalar M)
+        {
+            M_ = M;
+        }
+
+
         label& getNCells()
         {
             return nCells_;
+        }
+
+        void setNCells(label nCells)
+        {
+            nCells_ = nCells;
         }
 
         const dimensionedScalar getRhoS()    const
@@ -376,6 +393,11 @@ namespace Foam
         const symmTensor& getI()    const
         {
             return I_;
+        }
+
+        void setI(const symmTensor& I)
+        {
+            I_ = I;
         }
 
         virtual void resetBody(volScalarField& body);

@@ -97,6 +97,27 @@ void geomModel::calculateGeometricalProperties
     }*/
 }
 //---------------------------------------------------------------------------//
+void geomModel::calculateGeometricalPropertiesParallel
+(
+    volScalarField& body
+)
+{
+    //vector CoMOld  = CoM_;
+    M_      = scalar(0);
+    //CoM_    = vector::zero;
+    setCoM();
+    I_      = symmTensor::zero;
+    //vector tmpCom(vector::zero);
+    //reset cellCount
+    nCells_ = label(0);
+
+    addToMAndI(body,surfCells_[Pstream::myProcNo()]);
+    addToMAndI(body,intCells_[Pstream::myProcNo()]);
+    //Get CellCount At Each SubDomain
+    nCells_ = intCells_[Pstream::myProcNo()].size() + surfCells_[Pstream::myProcNo()].size();
+
+}
+//---------------------------------------------------------------------------//
 void geomModel::addToMAndI
 (
     volScalarField& body,
