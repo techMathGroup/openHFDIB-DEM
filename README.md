@@ -1,5 +1,5 @@
 # openHFDIB-DEM
-Version 2.5
+Version 2.2
 
 About openHFDIB-DEM
 -------------------
