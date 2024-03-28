@@ -45,9 +45,9 @@ Note: the scripts have to be ran from terminals with sourced OpenFOAMv8
 
 For users
 ---------
-Please note that the code is developed by a small research team. The openHFDIB-DEM library is distributed, similarly to OpenFOAM itself, in the hope that it will be useful but without any warranty. Furthermore, we are glad for any remarks and comments on any potential bugs. Please, report them to us via the "Issues" (https://github.com/MartinKotoucSourek/openHFDIB-DEM/issues).
+Please note that the code is developed by a small research team. The openHFDIB-DEM library is distributed, similarly to OpenFOAM itself, in the hope that it will be useful but without any warranty. Furthermore, we are glad for any remarks and comments on any potential bugs. Please, report them to us via the "Issues" (https://github.com/techMathGroup/openHFDIB-DEM/issues).
 
-For any questions regarding specific cases or code capabilities, we kindly ask you to use the "Discussions" page (https://github.com/MartinKotoucSourek/openHFDIB-DEM/discussions). We are trying to be present there and to communicate with you as users. However, due to our team size and workload, we cannot provide individual support to each openHFDIB-DEM user.
+For any questions regarding specific cases or code capabilities, we kindly ask you to use the "Discussions" page (https://github.com/techMathGroup/openHFDIB-DEM/discussions). We are trying to be present there and to communicate with you as users. However, due to our team size and workload, we cannot provide individual support to each openHFDIB-DEM user.
 
 If you need to contact the authors in matters regarding openHFDIB-DEM, please do so via email: openhfdib-dem@it.cas.cz
 
