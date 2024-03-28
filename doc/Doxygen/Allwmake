@@ -1,0 +1,71 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+WM_PROJECT_DIR="../../"
+
+[ -d "$WM_PROJECT_DIR" ] || {
+    echo "    Error: WM_PROJECT_DIR directory does not exist"
+    echo "        Check the OpenFOAM entries in your dot-files and source them."
+    echo "        WM_PROJECT_DIR=$WM_PROJECT_DIR"
+    exit 1
+}
+
+usage() {
+    exec 1>&2
+    while [ "$#" -ge 1 ]; do echo "$1"; shift; done
+    cat<<USAGE
+
+usage: ${0##*/} [OPTION] <path-1> <path-2> ...
+options:
+  -online    use the links to the Github repositories instead of the local source code
+  -help
+
+USAGE
+    exit 1
+}
+
+# parse options
+while [ "$#" -gt 0 ]
+do
+    case "$1" in
+    -h | -help)
+        usage
+        ;;
+    -online)
+        defineURL
+        shift
+        ;;
+    -*)
+        usage "unknown option/argument: '$*'"
+        ;;
+    *)
+        inputDirs="$inputDirs $1"
+        shift
+        ;;
+    esac
+done
+
+#------------------------------------------------------------------------------
+
+rm -rf latex man
+
+# remove html directory in background
+mv html html-stagedRemove$$ 2> /dev/null
+rm -rf html-stagedRemove$$ >/dev/null 2>&1 &
+
+# format the input directories
+[ -z "$inputDirs" ] || inputDirs="INPUT=$inputDirs"
+
+# ensure that created files are readable by everyone
+echo "ssssssss" $inputDirs
+umask 22
+(cat Doxyfile; echo "$inputDirs") | doxygen -
+
+# fix permissions (NB: '+X' and not '+x'!)
+chmod -R a+rX html latex man 2>/dev/null
+
+echo
+echo "Done doxygen"
+echo
+
+#------------------------------------------------------------------------------

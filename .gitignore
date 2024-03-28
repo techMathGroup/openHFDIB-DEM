@@ -48,7 +48,7 @@ platforms/
 # Top-level build directories
 /build/
 /platforms/
-/HFDIBDEM/lnInclude/
+/src/HFDIBDEM/lnInclude/
 
 # Reinstate wmake rules that might look like build directories
 !/wmake/rules/*/

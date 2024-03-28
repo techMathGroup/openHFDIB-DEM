@@ -1,5 +1,5 @@
 # openHFDIB-DEM
-Version 2.2
+Version 2.5
 
 About openHFDIB-DEM
 -------------------
@@ -14,17 +14,17 @@ The main contributors are:
 The implementation itself is based on the Hybrid Fictitious Domain-Immersed Boundary (HFDIB)
 coupled with the Discrete Element Method (DEM). The initial HFDIB implementation spans from the work of Federico Municchi (https://github.com/fmuni/openHFDIB). However, the code was heavily modified. The DEM implementation for arbitrarily shaped solids into OpenFOAM is original.
 
-![alt text](https://github.com/MartinKotoucSourek/openHFDIB-DEM/blob/main/Images/openHFDIB-DEM_IntroImage.png?raw=true)
+![alt text](https://github.com/techMathGroup/openHFDIB-DEM/blob/main/Images/openHFDIB-DEM_IntroImage.png?raw=true)
 
 Code capabilities
 -----------------
-* simulation settings are defined in HFDIBDEMdict (see DOCUMENTATION)tak 
+* simulation settings are defined in HFDIBDEMdict (see DOCUMENTATION)
 * simulations with either spherical or STL-defined particles (see HFDIBDEM/geomModels)
 * simulations of two-phase (solid-fluid) flow (see pimpleHFDIBFoam)
 * simulations of solid phase in standard DEM mode (see HFDIBDEMFoam)
 * adaptive mesh refinement based on the particles position
 * spring-dashpot contact model based on particle elastic modulus and
-  a damping constant (see HFDIBDEM/contactModels)
+  a damping based on coefficient of restitution(see HFDIBDEM/contactModels)
 * extension to contact model for inclusion of adhesive forces
 * multiple solid phase initialization options such as random spatial
   distribution of uniformly sized bodies (see HFDIBDEM/addModels)
