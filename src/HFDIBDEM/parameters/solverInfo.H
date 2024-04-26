@@ -70,7 +70,6 @@ class solverInfo
         return nSolidsTreshnold_;
     }
 
-
     static bool onlyDEM_;
     static label nSolidsTreshnold_;
 

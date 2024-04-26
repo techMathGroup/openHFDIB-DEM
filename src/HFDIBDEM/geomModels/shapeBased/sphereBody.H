@@ -230,6 +230,16 @@ namespace Foam
         {
             CoM_ = position_;
         }
+
+        void setBodyPosition(vector pos) final override
+        {
+            position_ = pos;
+        }
+
+        vector getBodyPosition() final override
+        {
+            return position_;
+        }        
     };
 }
 

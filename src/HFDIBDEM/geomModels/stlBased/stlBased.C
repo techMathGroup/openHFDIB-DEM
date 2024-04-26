@@ -501,3 +501,10 @@ void stlBased::intersectBb
     }
 }
 //---------------------------------------------------------------------------//
+void stlBased::setBodyPosition(pointField pos)
+{
+    bodySurfMesh_.movePoints(pos);
+    triSurf_.reset(new triSurface(bodySurfMesh_));
+    triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
+}
+//---------------------------------------------------------------------------//

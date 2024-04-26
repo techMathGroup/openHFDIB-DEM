@@ -153,12 +153,12 @@ void wallSubContactInfo::evalVariables(
     );
 
     wallCntvar.lVec_ = getLVec(wallCntvar,ibCClass);
-
+    // wallCntvar.lVec_ = wallCntvar.contactCenter_ - ibCClass.getGeomModel().getCoM();
     wallCntvar.Veli_ = getVeli(wallCntvar, cVars);
 
     wallCntvar.Vn_ = -(wallCntvar.Veli_ - vector::zero) & wallCntvar.contactNormal_;
-    wallCntvar.Lc_ = (contactModelInfo::getLcCoeff())*mag(wallCntvar.lVec_)*mag(wallCntvar.lVec_)
-        /(mag(wallCntvar.lVec_) + mag(wallCntvar.lVec_));
+    wallCntvar.Lc_ = (contactModelInfo::getLcCoeff())*mag(wallCntvar.lVec_)*mag(wallCntvar.lVec_)/(mag(wallCntvar.lVec_) + mag(wallCntvar.lVec_));
+    
 
     wallCntvar.curAdhN_ = min
     (
@@ -202,16 +202,29 @@ vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
     // scale projected Ft to have same magnitude as FtLast
     vector FtLastS(mag(wallCntvar.FtPrev_) * (FtLastP/(mag(FtLastP)+SMALL)));
     // compute relative tangential velocity
-    vector cVeliNorm = wallCntvar.Veli_
-        - ((wallCntvar.Veli_ & wallCntvar.contactNormal_)
-        *wallCntvar.contactNormal_);
+    // vector cVeliNorm = wallCntvar.Veli_
+        // - ((wallCntvar.Veli_ & wallCntvar.contactNormal_)
+        // *wallCntvar.contactNormal_);
+    vector cVeliNorm = wallCntvar.Veli_*(wallCntvar.Veli_&wallCntvar.contactNormal_);
 
     vector Vt(wallCntvar.Veli_-(cVeliNorm - vector::zero));
     // compute tangential force
+    if(contactModelInfo::getUseMindlinRotationalModel())
+    {
+        
+        scalar kT = 200*8*meanCntPar.aG_*(wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL));
+        vector deltaFt(kT*Vt*deltaT + 2*meanCntPar.reduceBeta_*sqrt(kT*reduceM_)*Vt);
+        wallCntvar.FtPrev_ = - FtLastS - deltaFt;
+    }
 
-    scalar kT = 8*meanCntPar.aG_*(wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL));
-    vector deltaFt(kT*Vt*deltaT + 2*meanCntPar.reduceBeta_*sqrt(kT*reduceM_)*Vt);
-    wallCntvar.FtPrev_ = - FtLastS - deltaFt;
+    if(contactModelInfo::getUseChenRotationalModel())
+    {
+   
+        vector Ftdi(meanCntPar.reduceBeta_*sqrt(meanCntPar.aG_*reduceM_*wallCntvar.Lc_)*Vt);
+        Ftdi += meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT;
+        wallCntvar.FtPrev_ = - FtLastS - Ftdi;
+    }
+
     return wallCntvar.FtPrev_;
 }
 //---------------------------------------------------------------------------//

@@ -240,6 +240,18 @@ namespace Foam
             volScalarField& refineF
         );
 
+        void syncImmersedBodyParralell1
+        (
+            volScalarField& body,
+            volScalarField& refineF
+        );
+
+        void syncImmersedBodyParralell2
+        (
+            volScalarField& body,
+            volScalarField& refineF
+        );
+
         void constructRefineField
         (
             volScalarField& body,

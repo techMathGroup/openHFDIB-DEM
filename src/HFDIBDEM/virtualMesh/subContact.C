@@ -50,7 +50,7 @@ void subContact::addSubVolume(std::shared_ptr<subVolume> sV)
     subVolumes_.push_back(sV);
     tmp<pointField> points = boundBox_.points();
     points->append(sV->points());
-    boundBox_ = boundBox(points);
+    boundBox_ = boundBox(points,false);
     volume_ += sV->volume();
 }
 //---------------------------------------------------------------------------//

@@ -333,6 +333,12 @@ namespace Foam
         virtual void calculateGeometricalProperties(
             volScalarField& body
         );
+        
+        virtual void calculateGeometricalPropertiesParallel(
+            volScalarField& body
+        );
+
+
 
         //evaluate center of mass and inertia tensor
         void addToMAndI
@@ -358,9 +364,20 @@ namespace Foam
             return M_;
         }
 
+        void setM(scalar M)
+        {
+            M_ = M;
+        }
+
+
         label& getNCells()
         {
             return nCells_;
+        }
+
+        void setNCells(label nCells)
+        {
+            nCells_ = nCells;
         }
 
         const dimensionedScalar getRhoS()    const
@@ -370,12 +387,17 @@ namespace Foam
 
         virtual vector getLVec(const point& toPoint)
         {
-            return toPoint - CoM_;
+            return toPoint - getCoM();
         }
 
         const symmTensor& getI()    const
         {
             return I_;
+        }
+
+        void setI(const symmTensor& I)
+        {
+            I_ = I;
         }
 
         virtual void resetBody(volScalarField& body);
@@ -434,6 +456,26 @@ namespace Foam
             pointField nonPointField;
             return nonPointField;
         }
+
+        virtual  void setBodyPosition(vector pos)
+        {
+            InfoH << iB_Info << "21-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
+
+        virtual vector getBodyPosition()
+        {
+            InfoH << iB_Info << "23-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+            return vector::zero;
+        }
+
+        virtual  void setBodyPosition(pointField pos)
+        {
+            InfoH << iB_Info << "22-- geomModelMessage-- "
+                << "notIplemented"<<endl;
+        }
+
     };
 }
 #endif

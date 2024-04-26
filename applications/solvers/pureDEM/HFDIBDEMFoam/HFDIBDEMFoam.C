@@ -76,7 +76,7 @@ int main(int argc, char *argv[])
     // scalar writeBodiesInfoTime_(0.0);
     // scalar meshUpdateTime_(0.0);
     // scalar meshChangingTime_(0.0);
-    // scalar createBodiesTime_(0.0);
+    scalar createBodiesTime_(0.0);
     
     // OS time efficiency testing
     if(HFDIBDEM.getRecordFirstTime())
@@ -96,9 +96,9 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        // clockTime createBodiesTime; // OS time efficiency testing
+        clockTime createBodiesTime; // OS time efficiency testing
         HFDIBDEM.createBodies(lambda,refineF);
-        // createBodiesTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
+        createBodiesTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
         
         // clockTime preUpdateBodiesTime; // OS time efficiency testing
         HFDIBDEM.preUpdateBodies(lambda,f);
@@ -144,7 +144,8 @@ int main(int argc, char *argv[])
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
-            
+        Info << "createBodiesTime    = " << createBodiesTime_    << " s " << endl;
+        
     // Info<< "preUpdateTime       = " << preUpdateTime_       << " s \n"
     //     << "createBodiesTime    = " << createBodiesTime_    << " s \n"
     //     << "meshUpdateTime      = " << meshUpdateTime_      << " s \n"
