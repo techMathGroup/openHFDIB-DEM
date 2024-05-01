@@ -184,8 +184,10 @@ vector periodicBody::getLVec(const point& toPoint)
 bool periodicBody::shouldBeUnclustered()
 {
     int remBodies = 0;
+    Info << "Periodic body " << ibGeomModelList.size() << " size." << endl;
     for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
+        Info << "Periodic body " << gModel->getM() << " size." << endl;
         if(gModel->getM() > 0)
         {
             ++remBodies;

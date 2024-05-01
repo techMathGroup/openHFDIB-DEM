@@ -333,7 +333,7 @@ namespace Foam
         virtual void calculateGeometricalProperties(
             volScalarField& body
         );
-        
+
         virtual void calculateGeometricalPropertiesParallel(
             volScalarField& body
         );
@@ -433,41 +433,12 @@ namespace Foam
 
         virtual List<std::shared_ptr<boundBox>> getBBoxes();
 
-        virtual pointField getSTLBodyPoints()
+        virtual pointField getBodyPoints()
         {
             InfoH << iB_Info << "18-- geomModelMessage-- "
                 << "not cluster model"<<endl;
             pointField emptyField;
             return emptyField;
-        }
-
-        virtual faceList getSTLFaces()
-        {
-            InfoH << iB_Info << "19-- geomModelMessage-- "
-                << "notIplemented"<<endl;
-            faceList emptyList;
-            return emptyList;
-        }
-
-        virtual pointField getSTLFacePoint(label faceID)
-        {
-            InfoH << iB_Info << "20-- geomModelMessage-- "
-                << "notIplemented"<<endl;
-            pointField nonPointField;
-            return nonPointField;
-        }
-
-        virtual  void setBodyPosition(vector pos)
-        {
-            InfoH << iB_Info << "21-- geomModelMessage-- "
-                << "notIplemented"<<endl;
-        }
-
-        virtual vector getBodyPosition()
-        {
-            InfoH << iB_Info << "23-- geomModelMessage-- "
-                << "notIplemented"<<endl;
-            return vector::zero;
         }
 
         virtual  void setBodyPosition(pointField pos)

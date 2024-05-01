@@ -122,6 +122,12 @@ namespace Foam
             volScalarField& body
         ) final override;
 
+        void calculateGeometricalPropertiesParallel(
+            volScalarField& body
+        ) final override;
+
+        void setMassAndInertia();
+
         virtual void bodyMovePoints(vector translVec) = 0;
 
         virtual void bodyScalePoints(scalar scaleFac) = 0;

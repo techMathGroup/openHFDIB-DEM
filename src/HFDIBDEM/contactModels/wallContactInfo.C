@@ -97,7 +97,7 @@ ibContactVars_(cVars)
         // Info << "reduceBeta " <<reduceBeta <<endl;
         // Info << "sqrt(5) "<< sqrt(5) <<endl;
     }
-    
+
     // forAll(cntPatches, patchI)
     // {
     //     physicalProperties& cMeanCntPars(wallMeanPars_[cntPatches[patchI]]);
@@ -203,7 +203,7 @@ void wallContactInfo::findContactAreas()
 
     // InfoH << DEM_Info <<" -- SM bbBoxIsInContact " << endl;
     // InfoH << DEM_Info <<" -- SM contactPatches_.size() "<< contactPatches_.size() << endl;
-    pointField bodyPoints = ibContactClass_.getGeomModel().getSTLBodyPoints();
+    pointField bodyPoints = ibContactClass_.getGeomModel().getBodyPoints();
     forAll(bodyPoints,bP)
     {
         forAll(contactPatches_,wP)
