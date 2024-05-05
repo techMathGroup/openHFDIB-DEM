@@ -41,7 +41,7 @@ materialInfo::materialInfo
     scalar nu,
     scalar mu,
     scalar adhN,
-    scalar eps
+    scalar gamma
 )
 :
 material_(material),
@@ -49,7 +49,7 @@ Y_(Y),
 nu_(nu),
 mu_(mu),
 adhN_(adhN),
-eps_(eps)
+gamma_(gamma)
 
 {
 }
@@ -61,7 +61,7 @@ Y_(mi.Y_),
 nu_(mi.nu_),
 mu_(mi.mu_),
 adhN_(mi.adhN_),
-eps_(mi.eps_)
+gamma_(mi.gamma_)
 {
 }
 

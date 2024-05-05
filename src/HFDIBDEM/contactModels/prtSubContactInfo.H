@@ -88,7 +88,7 @@ class prtSubContactInfo
 
     Tuple2<forces,forces> outForce_; // Out variable for force
 
-    vector FtPrev_ = vector::zero;     // Tangential force from previous time-step
+    vector FNd_;         // Normal damping force
 
     bool contactResolved_ = false;
 
@@ -184,6 +184,16 @@ class prtSubContactInfo
     }
 
     void syncData();
+
+    void setFNdOutput(vector FNd)
+    {
+        FNd_ = FNd;
+    }
+
+    vector getFNdOutput()
+    {
+        return FNd_;
+    }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

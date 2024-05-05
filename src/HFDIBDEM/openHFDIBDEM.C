@@ -98,25 +98,10 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     dictionary demDic = HFDIBDEMDict_.subDict("DEM");
     dictionary materialsDic = demDic.subDict("materials");
     List<word> materialsNames = materialsDic.toc();
-    if(demDic.found("increasedDamping"))
-    {
-        contactModelInfo::setIncreasedDamping(readBool(demDic.lookup("increasedDamping")));
-    }
-    else
-    {
-        contactModelInfo::setIncreasedDamping(false);
-    }
 
     forAll(materialsNames, matI)
     {
         dictionary matIDic = materialsDic.subDict(materialsNames[matI]);
-        scalar eps = readScalar(matIDic.lookup("eps"));
-        if(!contactModelInfo::getIncreasedDamping())
-        {
-            eps = 0.906463027*eps + 0.093538298;//LinearRegression based on LIGGGHTS data testing
-            eps = min(eps, 1.0);
-        }
-
         materialProperties::matProps_insert(
             materialsNames[matI],
             materialInfo(
@@ -125,8 +110,7 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
                 readScalar(matIDic.lookup("nu")),
                 readScalar(matIDic.lookup("mu")),
                 readScalar(matIDic.lookup("adhN")),
-                // readScalar(matIDic.lookup("eps"))
-                eps
+                readScalar(matIDic.lookup("gamma"))
             )
         );
     }
@@ -168,25 +152,6 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     {
         contactModelInfo::setLcCoeff(4.0);
     }
-
-    if(demDic.found("rotationModel"))
-    {
-        word rotModel = demDic.lookup("rotationModel");
-        if(rotModel == "chen2012")
-        {
-            contactModelInfo::setRotationModel(0);
-        }
-        else if(rotModel == "mindlin1953")
-        {
-            contactModelInfo::setRotationModel(1);
-        }
-        else
-        {
-            Info << "Rotation Model not recognized, setting to default mindlin1953" << endl;
-            contactModelInfo::setRotationModel(1);
-        }
-    }
-
 
     Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
 
@@ -831,10 +796,10 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             for(int assignProc = Pstream::myProcNo()*wallContactPerProc; assignProc < min((Pstream::myProcNo()+1)*wallContactPerProc,wallContactIB.size()); assignProc++)
             {
                 immersedBody& cIb(immersedBodies_[wallContactIB[assignProc]]);
-                if(cIb.getGeomModel().getcType() != sphere && cIb.getGeomModel().getcType() != cluster)
-                {
-                    cIb.getWallCntInfo().findContactAreas();
-                }
+                // if(cIb.getGeomModel().getcType() != sphere && cIb.getGeomModel().getcType() != cluster)
+                // {
+                cIb.getWallCntInfo().findContactAreas();
+                // }
 
                 DynamicList<wallSubContactInfo*> wallContactList;
                 cIb.getWallCntInfo().registerSubContactList(wallContactList);
@@ -859,6 +824,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
             List<vector> iBodyOutForceList(wallContactIB.size(),vector::zero);
             List<vector> iBodyOutTorqueList(wallContactIB.size(),vector::zero);
+            List<vector> iBodyOutDissipationList(wallContactIB.size(),vector::zero);
 
             forAll (wallContactIB,iB)
             {
@@ -875,12 +841,14 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                         {
                             iBodyOutForceList[cKey] += sCW->getOutForce().F;
                             iBodyOutTorqueList[cKey] += sCW->getOutForce().T;
+                            iBodyOutDissipationList[cKey] += sCW->getFNdOutput();
                         }
                     }
                 }
             }
             reduce(iBodyOutForceList,sumOp<List<vector>>());
             reduce(iBodyOutTorqueList,sumOp<List<vector>>());
+            reduce(iBodyOutDissipationList,sumOp<List<vector>>());
 
             forAll (wallContactIB,iB)
             {
@@ -891,6 +859,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
                 cIb.updateContactForces(cF);
                 cIb.getWallCntInfo().clearOldContact();
+                cIb.updateDissipativeForce(iBodyOutDissipationList[iB]);
             }
         }
 
@@ -987,6 +956,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         List<vector> cBodyOutTorqueList(vListSize,vector::zero);
         List<vector> tBodyOutForceList(vListSize,vector::zero);
         List<vector> tBodyOutTorqueList(vListSize,vector::zero);
+        List<vector> cBodyDissForceList(vListSize,vector::zero);
+        List<vector> tBodyDissForceList(vListSize,vector::zero);
         syncOutForceKeyTable.clear();
 
         label nIter(0);
@@ -1008,6 +979,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     cBodyOutTorqueList[nIter] += sC->getOutForce().first().T;
                     tBodyOutForceList[nIter] += sC->getOutForce().second().F;
                     tBodyOutTorqueList[nIter] += sC->getOutForce().second().T;
+                    cBodyDissForceList[nIter] += sC->getFNdOutput();
+                    tBodyDissForceList[nIter] -= sC->getFNdOutput();
                 }
             }
             syncOutForceKeyTable.insert(cPair,nIter);
@@ -1018,6 +991,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         reduce(cBodyOutTorqueList,sumOp<List<vector>>());
         reduce(tBodyOutForceList,sumOp<List<vector>>());
         reduce(tBodyOutTorqueList,sumOp<List<vector>>());
+        reduce(cBodyDissForceList,sumOp<List<vector>>());
+        reduce(tBodyDissForceList,sumOp<List<vector>>());
 
         label nvListIter(0);
 
@@ -1054,11 +1029,17 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 vector T1 = vector::zero;
                 vector F2 = vector::zero;
                 vector T2 = vector::zero;
+                vector FNd1 = vector::zero;
+                vector FNd2 = vector::zero;
 
                 F1 += cBodyOutForceList[nvListIter];
                 T1 += cBodyOutTorqueList[nvListIter];
                 F2 += tBodyOutForceList[nvListIter];
                 T2 += tBodyOutTorqueList[nvListIter];
+
+                FNd1 += cBodyDissForceList[nvListIter];
+                FNd2 += cBodyDissForceList[nvListIter];
+
 
                 forces cF;
                 cF.F = F1;
@@ -1069,6 +1050,9 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
                 immersedBodies_[cInd].updateContactForces(cF);
                 immersedBodies_[tInd].updateContactForces(tF);
+
+                immersedBodies_[cInd].updateDissipativeForce(FNd1);
+                immersedBodies_[tInd].updateDissipativeForce(FNd2);
             }
             else
             {

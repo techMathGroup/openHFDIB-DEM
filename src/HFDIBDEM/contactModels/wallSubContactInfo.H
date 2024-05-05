@@ -95,6 +95,8 @@ class wallSubContactInfo
 
     bool contactResolved_ = false;
 
+    vector FNd_;         // Normal damping force
+
     public:
 
     // Constructors ------------------------------------------------
@@ -230,6 +232,15 @@ class wallSubContactInfo
         return BB_;
     }
 
+    void setFNdOutput(vector FNd)
+    {
+        FNd_ = FNd;
+    }
+
+    vector getFNdOutput()
+    {
+        return FNd_;
+    }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

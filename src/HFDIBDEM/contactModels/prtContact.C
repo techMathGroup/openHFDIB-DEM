@@ -658,6 +658,8 @@ bool solvePrtContact(
     }
 
     F += FNd;
+    subCInfo.setFNdOutput(FNd);
+    
     InfoH << parallelDEM_Info << "-- Particle-particle " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact FN " << F << endl;
 
     vector Ft = subCInfo.getFt(deltaT);

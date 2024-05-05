@@ -46,7 +46,7 @@ void wallContactVars::setMeanCntPars
     physicalProperties_.aG_ = 0;
     physicalProperties_.aMu_ = 0;
     physicalProperties_.maxAdhN_ = 0;
-    physicalProperties_.reduceBeta_ = 0;
+    physicalProperties_.aGamma_ = 0;
 
     forAll(contactFaces,faceI)
     {
@@ -61,14 +61,14 @@ void wallContactVars::setMeanCntPars
         physicalProperties_.aG_ += (cMeanCntPars.aG_*area);
         physicalProperties_.aMu_ += (cMeanCntPars.aMu_*area);
         physicalProperties_.maxAdhN_ += (cMeanCntPars.maxAdhN_*area);
-        physicalProperties_.reduceBeta_ += (cMeanCntPars.reduceBeta_*area);
+        physicalProperties_.aGamma_ += (cMeanCntPars.aGamma_*area);
     }
 
     physicalProperties_.aY_ /= overallArea;
     physicalProperties_.aG_ /= overallArea;
     physicalProperties_.aMu_ /= overallArea;
     physicalProperties_.maxAdhN_ /= overallArea;
-    physicalProperties_.reduceBeta_ /= overallArea;
+    physicalProperties_.aGamma_ /= overallArea;
 }
 //---------------------------------------------------------------------------//
 void wallContactVars::setMeanCntPars_Plane
@@ -83,7 +83,7 @@ void wallContactVars::setMeanCntPars_Plane
     physicalProperties_.aG_ = 0;
     physicalProperties_.aMu_ = 0;
     physicalProperties_.maxAdhN_ = 0;
-    physicalProperties_.reduceBeta_ = 0;
+    physicalProperties_.aGamma_ = 0;
 
     forAll(contactFaces,faceI)
     {
@@ -98,13 +98,13 @@ void wallContactVars::setMeanCntPars_Plane
         physicalProperties_.aG_ += (cMeanCntPars.aG_*area);
         physicalProperties_.aMu_ += (cMeanCntPars.aMu_*area);
         physicalProperties_.maxAdhN_ += (cMeanCntPars.maxAdhN_*area);
-        physicalProperties_.reduceBeta_ += (cMeanCntPars.reduceBeta_*area);
+        physicalProperties_.aGamma_ += (cMeanCntPars.aGamma_*area);
     }
 
     physicalProperties_.aY_ /= overallArea;
     physicalProperties_.aG_ /= overallArea;
     physicalProperties_.aMu_ /= overallArea;
     physicalProperties_.maxAdhN_ /= overallArea;
-    physicalProperties_.reduceBeta_ /= overallArea;
+    physicalProperties_.aGamma_ /= overallArea;
 }
 //---------------------------------------------------------------------------//

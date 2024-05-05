@@ -84,15 +84,11 @@ ibContactVars_(cVars)
             *(1 + wInfo.getNu())/wInfo.getY());
         scalar aMu = (cMatInfo.getMu()+wInfo.getMu())/2;
         scalar maxAdhN = cMatInfo.getAdhN() + wInfo.getAdhN() - 2*adhPot;
-        scalar reduceBeta =
-        (
-           (-1)*sqrt(5.0)*log((0.5*(cMatInfo.getEps()+wInfo.getEps())))/
-            (sqrt(sqr(log((0.5*(cMatInfo.getEps()+wInfo.getEps()))))+
-            sqr(Foam::constant::mathematical::pi)))
-        );
+        scalar aGamma = (cMatInfo.getGamma()*wInfo.getGamma())
+            /(cMatInfo.getGamma()+wInfo.getGamma()+SMALL);
         wallMeanPars_.insert(
             cntPatches[patchI],
-            physicalProperties(aY, aG, aMu, maxAdhN, 0, 0, reduceBeta)
+            physicalProperties(aY, aG, aMu, maxAdhN, 0, 0, aGamma)
         );
         // Info << "reduceBeta " <<reduceBeta <<endl;
         // Info << "sqrt(5) "<< sqrt(5) <<endl;

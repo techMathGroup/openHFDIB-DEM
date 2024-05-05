@@ -98,7 +98,10 @@ charCellSize_(1e3),
 refineBuffers_(0),
 recomputeM0_(recomputeM0),
 timesToSetStatic_(-1),
-staticContactPost_(vector::zero)
+staticContactPost_(vector::zero),
+bodyFND_(2, vector::zero),
+dissipatedContactEnergy_(0.0),
+couplingEnergy_(0.0)
 {
     #include "initializeIB.H"
 
@@ -590,12 +593,14 @@ void immersedBody::updateMovementComp
         {
             // compute current acceleration (assume constant over timeStep)
 
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" ParticelMass  : " << geomModel_->getM0() << endl;
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" Acting Force  : " << F << endl;
+
             a_  = F/(geomModel_->getM0());
             // update body linear velocity
             Vel_ = Vel + deltaT*a_;
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" accelaration  : " << a_ << endl;
+
+            // // InfoH << iB_Info <<"-- body "<< bodyId_ <<" ParticelMass  : " << geomModel_->getM0() << endl;
+            // // InfoH << iB_Info <<"-- body "<< bodyId_ <<" Acting Force  : " << F << endl;            
+            // // InfoH << iB_Info <<"-- body "<< bodyId_ <<" accelaration  : " << a_ << endl;
         }
     };
 
@@ -697,6 +702,10 @@ void immersedBody::moveImmersedBody
         // translation increment
         vector transIncr = Vel_*deltaT;
 
+        dissipatedContactEnergy_ += getAverageDissipativeForce() & transIncr;
+        updateDissipativeForceList();
+        couplingEnergy_ += FCoupling_.F & transIncr;
+
         // rotation matrix
         tensor rotMatrix(Foam::cos(angle)*tensor::I);
         rotMatrix += Foam::sin(angle)*tensor(
@@ -760,6 +769,10 @@ void immersedBody::printBodyInfo()
         << Axis_ << endl;
     InfoH << "-- body " << bodyId_ << " total rotation matrix: "
         << totRotMatrix_ << endl;
+    InfoH << "-- body " << bodyId_ << " total dissipative force work: "
+        << dissipatedContactEnergy_ << endl;
+    InfoH << "-- body " << bodyId_ << " total drag force work: "
+        << couplingEnergy_ << endl;        
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateVectorField

@@ -57,7 +57,7 @@ struct physicalProperties
         maxAdhN_(0),
         curAdhN_(0),
         reduceM_(0),
-        reduceBeta_(0)
+        aGamma_(0)
     {}
 
     physicalProperties
@@ -68,7 +68,7 @@ struct physicalProperties
         const scalar maxAdhN,
         const scalar curAdhN,
         const scalar reduceM,
-        const scalar reduceBeta
+        const scalar aGamma
     ):
         aY_(aY),
         aG_(aG),
@@ -76,7 +76,7 @@ struct physicalProperties
         maxAdhN_(maxAdhN),
         curAdhN_(curAdhN),
         reduceM_(reduceM),
-        reduceBeta_(reduceBeta),
+        aGamma_(aGamma),
     {}
 
     // Mean model parame,ters
@@ -86,7 +86,7 @@ struct physicalProperties
     scalar maxAdhN_ = 0;    // Contact adhesive coef
     scalar curAdhN_ = 0;    // Current contact adhesive coef
     scalar reduceM_ = 0;    // Reduced Mass of the contact pair
-    scalar reduceBeta_ = 0;    // Reduced dissipation coeffitient
+    scalar aGamma_ = 0;    // Reduced dissipation coeffitient
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

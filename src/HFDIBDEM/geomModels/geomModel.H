@@ -387,7 +387,7 @@ namespace Foam
 
         virtual vector getLVec(const point& toPoint)
         {
-            return toPoint - getCoM();
+            return toPoint - CoM_;
         }
 
         const symmTensor& getI()    const

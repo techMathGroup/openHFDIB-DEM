@@ -173,6 +173,11 @@ namespace Foam
         label   recomputeM0_;                                           //how many times rocompute M0_ because of refinement
         label   timesToSetStatic_;
         vector  staticContactPost_;
+
+        List<vector> bodyFND_;
+        scalar dissipatedContactEnergy_;
+        scalar couplingEnergy_; 
+
         protected:
 
 
@@ -502,6 +507,23 @@ namespace Foam
         }
 
         vectorField getUatIbPoints();
+
+        void updateDissipativeForce(vector FNd)
+        {
+            bodyFND_[1] += FNd;
+        }
+
+        void updateDissipativeForceList()
+        {
+            bodyFND_[0] = bodyFND_[1];
+            bodyFND_[1] = vector::zero;
+        }
+
+        vector getAverageDissipativeForce()
+        {
+            return (bodyFND_[0]+bodyFND_[1])*0.5;
+        }
+        
     };
 }
 #endif

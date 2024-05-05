@@ -540,6 +540,7 @@ bool solveWallContact
     }
 
     F += FNd;
+    sCI.setFNdOutput(FNd);
     InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FN " << F << endl;
 
     vector Ft = sCI.getFt(wallCntVar, deltaT);

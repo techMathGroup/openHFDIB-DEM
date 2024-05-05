@@ -1,0 +1,43 @@
+Working from directory: /stonefly2/studenio/PhD_VirtualMesh/Versions/01_techMath_openHFDIB-DEMM
+wmake libso .
+wmakeLnIncludeAll: running wmakeLnInclude on dependent libraries:
+    Making dependency list for source file openHFDIBDEM.C
+Making dependency list for source file immersedBody.C
+Making dependency list for source file leastSquaresInt.C
+Making dependency list for source file leastSquaresIntInfo.C
+Making dependency list for source file lineInt.C
+Making dependency list for source file lineIntInfo.C
+Making dependency list for source file interpolationInfo.C
+Making dependency list for source file addModelDistribution.C
+Making dependency list for source file addModelRepeatRandomPosition.C
+Making dependency list for source file addModelRepeatSamePosition.C
+Making dependency list for source file addModelOnceScatter.C
+Making dependency list for source file addModelOnceFromFile.C
+Making dependency list for source file addModelOnce.C
+Making dependency list for source file addModel.C
+Making dependency list for source file verletList.C
+Making dependency list for source file cyclicContact.C
+Making dependency list for source file wallContact.C
+Making dependency list for source file prtContact.C
+Making dependency list for source file wallSubContactInfo.C
+Making dependency list for source file wallContactInfo.C
+Making dependency list for source file prtSubContactInfo.C
+Making dependency list for source file prtContactInfo.C
+Making dependency list for source file ibContactClass.C
+Making dependency list for source file wallContactVars.C
+Making dependency list for source file materialInfo.C
+Making dependency list for source file virtualMeshWall.C
+Making dependency list for source file spectatorMesh.C
+Making dependency list for source file virtualMesh.C
+Making dependency list for source file subVolume.C
+Making dependency list for source file subContact.C
+Making dependency list for source file bbMatrix.C
+Making dependency list for source file periodicBody.C
+Making dependency list for source file clusterBody.C
+Making dependency list for source file sphereBody.C
+Making dependency list for source file shapeBased.C
+Making dependency list for source file nonConvexBody.C
+Making dependency list for source file convexBody.C
+Making dependency list for source file stlBased.C
+Making dependency list for source file geomModel.C
+g++ -std=c++11 -m64 -Dlinux64 -DWM_ARCH_OPTION=64 -DWM_DP -DWM_LABEL_SIZE=32 -Wall -Wextra -Wold-style-cast -Wnon-virtual-dtor -Wno-unused-parameter -Wno-invalid-offsetof -Wno-attributes -O3  -DNoRepository -ftemplate-depth-100 -I/opt/openfoam8/src/triSurface/lnInclude -I/opt/openfoam8/src/dynamicMesh/lnInclude -I/opt/openfoam8/src/meshTools/lnInclude -I/opt/openfoam8/src/finiteVolume/lnInclude -I/opt/openfoam8/src/mesh/blockMesh/lnInclude -I/usr/lib/x86_64-linux-gnu/openmpi/include -I./lnInclude -IlnInclude -I. -I/opt/openfoam8/src/OpenFOAM/lnInclude -I/opt/openfoam8/src/OSspecific/POSIX/lnInclude   -fPIC -c geomModels/geomModel.C -o Make/linux64GccDPInt32Opt/geomModels/geomModel.o
