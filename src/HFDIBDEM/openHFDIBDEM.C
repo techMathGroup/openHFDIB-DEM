@@ -1001,11 +1001,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
         label nvListIter(0);
 
-        Info << " -- possibleWallContacts.size() : " << possiblePrtContacts.size() << endl;
-        Info << " -- resolvedWallContacts.size() : " << resolvedWallContacts.size() << endl;
-        Info << " -- possiblePrtContacts.size()  : " << possiblePrtContacts.size() << endl;
-        Info << " -- resolvedPrtContacts.size()  : " << resolvedPrtContacts.size() << endl;
-        
+        Info << " -- possibleWallContacts : " << possibleWallContacts<< endl;
+        Info << " -- resolvedWallContacts : " << resolvedWallContacts<< endl;
+        Info << " -- possiblePrtContacts  : " << possiblePrtContacts<< endl;
+        Info << " -- resolvedPrtContacts  : " << resolvedPrtContacts << endl;
+
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
         {
             const Tuple2<label, label> cPair = Tuple2<label, label>(it->first, it->second);
