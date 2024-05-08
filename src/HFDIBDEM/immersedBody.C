@@ -754,6 +754,10 @@ void immersedBody::moveImmersedBody
     //     << Axis_ << endl;
     // InfoH << "-- body " << bodyId_ << " total rotation matrix: "
     //     << totRotMatrix_ << endl;
+    Info << "-- body " << bodyId_ << " total dissipative force work: "
+        << dissipatedContactEnergy_ << endl;
+    Info << "-- body " << bodyId_ << " total drag force work: "
+        << couplingEnergy_ << endl;            
 }
 //---------------------------------------------------------------------------//
 void immersedBody::printBodyInfo()
@@ -769,10 +773,6 @@ void immersedBody::printBodyInfo()
         << Axis_ << endl;
     InfoH << "-- body " << bodyId_ << " total rotation matrix: "
         << totRotMatrix_ << endl;
-    InfoH << "-- body " << bodyId_ << " total dissipative force work: "
-        << dissipatedContactEnergy_ << endl;
-    InfoH << "-- body " << bodyId_ << " total drag force work: "
-        << couplingEnergy_ << endl;        
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateVectorField

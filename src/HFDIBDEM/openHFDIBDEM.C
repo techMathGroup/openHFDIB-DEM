@@ -699,6 +699,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
     {
         bodiesPositionList[Pstream::myProcNo()].clear();
 
+        label possibleWallContacts(0);
+        label resolvedWallContacts(0);
+        label possiblePrtContacts(0);
+        label resolvedPrtContacts(0);
+
         InfoH << DEM_Info << " Start DEM pos: " << pos
             << " DEM step: " << step << endl;
 
@@ -782,7 +787,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 }
             }
         }
-        // possibleWallContacts = wallContactIB.size();
+        possibleWallContacts = wallContactIB.size();
         List<bool> wallContactResolvedList(wallContactIB.size(),false);
 
         if(wallContactIB.size() > 0)
@@ -836,6 +841,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     {
                         std::vector<std::shared_ptr<wallSubContactInfo>>& subCList
                             = cIb.getWallCntInfo().getWallSCList();
+
+                        resolvedWallContacts++;
 
                         for(auto sCW : subCList)
                         {
@@ -911,7 +918,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         List<label> contactResolvedtKey(contactList.size(),0);
         bool syncedData(true);
         reduce(syncedData, orOp<bool>());
-
+        possiblePrtContacts = contactList.size();   
         if(contactList.size() > 0 )
         {
             label contactPerProc(ceil(double(contactList.size())/Pstream::nProcs()));
@@ -933,7 +940,6 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
                 if(detectPrtPrtContact(mesh_,cClass,tClass,*sCI))
                 {
-                    // resolvedPrtContacts++;
                     prtContactInfo& prtcInfo(getPrtcInfo(cPair));
 
                     bool resolved(solvePrtContact(mesh_, prtcInfo, *sCI, deltaTime*step));
@@ -969,12 +975,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
             if(contactResolvedKeyTable.found(cPair))
             {
-                label nSubContact(0);
                 std::vector<std::shared_ptr<prtSubContactInfo>>& subCList
-                    = prtcInfo.getPrtSCList();
+                    = prtcInfo.getPrtSCList();                
                 for(auto sC : subCList)
                 {
-                    nSubContact++;
+                    resolvedPrtContacts++;
                     cBodyOutForceList[nIter] += sC->getOutForce().first().F;
                     cBodyOutTorqueList[nIter] += sC->getOutForce().first().T;
                     tBodyOutForceList[nIter] += sC->getOutForce().second().F;
@@ -996,6 +1001,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
         label nvListIter(0);
 
+        Info << " -- possibleWallContacts.size() : " << possiblePrtContacts.size() << endl;
+        Info << " -- resolvedWallContacts.size() : " << resolvedWallContacts.size() << endl;
+        Info << " -- possiblePrtContacts.size()  : " << possiblePrtContacts.size() << endl;
+        Info << " -- resolvedPrtContacts.size()  : " << resolvedPrtContacts.size() << endl;
+        
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
         {
             const Tuple2<label, label> cPair = Tuple2<label, label>(it->first, it->second);
