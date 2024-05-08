@@ -84,14 +84,9 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    // scalar CFDTime_(0.0);
-    // scalar DEMTime_(0.0);
-    // scalar preUpdateTime_(0.0);
-    // scalar postUpdateTime_(0.0);
-    // scalar addRemoveTime_(0.0);
-    // scalar updateDEMTime_(0.0);
-    // scalar writeBodiesInfoTime_(0.0);
-    // scalar createBodiesTime_(0.0);
+    scalar CFDTime_(0.0);
+    scalar DEMTime_(0.0);
+    scalar suplTime_(0.0);
 
     while (pimple.run(runTime))
     {
@@ -111,15 +106,15 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        // clockTime createBodiesTime; // OS time efficiency testing
+        clockTime createBodiesTime; // OS time efficiency testing
         HFDIBDEM.createBodies(lambda,refineF);
-        // createBodiesTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
+        suplTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
         
-        // clockTime preUpdateBodiesTime; // OS time efficiency testing
+        clockTime preUpdateBodiesTime; // OS time efficiency testing
         HFDIBDEM.preUpdateBodies(lambda,f);
-        // preUpdateTime_ += preUpdateBodiesTime.timeIncrement(); // OS time efficiency testing
+        suplTime_ += preUpdateBodiesTime.timeIncrement(); // OS time efficiency testing
 
-        // clockTime pimpleRunClockTime; // OS time efficiency testing
+        clockTime pimpleRunClockTime; // OS time efficiency testing
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
@@ -169,39 +164,40 @@ int main(int argc, char *argv[])
                 turbulence->correct();
             }
         }
-        // CFDTime_ += pimpleRunClockTime.timeIncrement();
+        CFDTime_ += pimpleRunClockTime.timeIncrement();
         Info << "updating HFDIBDEM" << endl;
-        // clockTime postUpdateBodiesTime;
+        clockTime postUpdateBkodiesTime;
         HFDIBDEM.postUpdateBodies(lambda,f);
-        // postUpdateTime_ += postUpdateBodiesTime.timeIncrement();
+        suplTime_ += postUpdateBodiesTime.timeIncrement();
 
 
-        // clockTime addRemoveTime;
+        clockTime addRemoveTime;
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
-        // addRemoveTime_ += addRemoveTime.timeIncrement();
+        suplTime_ += adkdRemoveTime.timeIncrement();
 
-        // clockTime updateDEMTime;
+        clockTime updateDEMTime;
         HFDIBDEM.updateDEM(lambda,refineF);
-        // updateDEMTime_ += updateDEMTime.timeIncrement();
+        DEMTime_ += updateDEMTime.timeIncrement();
         Info << "updated HFDIBDEM" << endl;
 
 
         runTime.write();
 
-        // clockTime writeBodiesInfoTime;
+        clockTime writeBodiesInfoTime;
         if(runTime.outputTime())
         {
             HFDIBDEM.writeBodiesInfo();
         }
-        // writeBodiesInfoTime_ += writeBodiesInfoTime.timeIncrement();
+        suplTime_ += writeBodiesInfoTime.timeIncrement();
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
 
     // DEMTime_ = preUpdateTime_ + createBodiesTime_ + postUpdateTime_ + addRemoveTime_ + updateDEMTime_ + writeBodiesInfoTime_;
-    // Info<< "CFDTime_            = " << CFDTime_             << " s \n"
-    //     << "DEMTime_            = " << DEMTime_             << " s \n" 
+    Info<< "CFDTime_                 = " << CFDTime_             << " s \n" <<
+           "Solver suplementary time = " << << " s \n"
+        << "DEMTime_                 = " << DEMTime_             << " s \n" << endl;
     //     << "preUpdateTime       = " << preUpdateTime_       << " s \n"
     //     << "createBodiesTime    = " << createBodiesTime_    << " s \n"
     //     << "postUpdateTime      = " << postUpdateTime_      << " s \n"
