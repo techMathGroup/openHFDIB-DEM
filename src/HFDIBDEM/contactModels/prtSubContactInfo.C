@@ -43,7 +43,8 @@ prtSubContactInfo::prtSubContactInfo
 :
 contactPair_(contactPair),
 physicalProperties_(physicalProperties),
-FNd_(vector::zero)
+FNd_(vector::zero),
+contactOverlap_(0.0)
 {}
 
 prtSubContactInfo::~prtSubContactInfo()
@@ -72,6 +73,9 @@ void prtSubContactInfo::evalVariables(
 
     Vn_ = -(cVeli_ - tVeli_) & prtCntVars_.contactNormal_;
     Lc_ = (contactModelInfo::getLcCoeff())*mag(cLVec_)*mag(tLVec_)/(mag(cLVec_) + mag(tLVec_));
+
+    contactOverlap_ = max(0,(0.5*tIb.getGeomModel().getDC()+0.5*cIb.getGeomModel().getDC()) 
+                        - mag(cIb.getGeomModel().getCoM()-tIb.getGeomModel().getCoM()));
 
     physicalProperties_.curAdhN_ = min
     (

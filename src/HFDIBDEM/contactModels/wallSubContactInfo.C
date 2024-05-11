@@ -55,7 +55,8 @@ internalBBData_(internalBBData),
 wallMeanPars_(wallMeanPars),
 BB_(BB),
 bodyId_(bodyId),
-FNd_(vector::zero)
+FNd_(vector::zero),
+contactOverlap_(0.0)
 {
     forAll(contactBBData,cBD)
     {
@@ -160,6 +161,7 @@ void wallSubContactInfo::evalVariables(
     wallCntvar.Vn_ = -(wallCntvar.Veli_ - vector::zero) & wallCntvar.contactNormal_;
     wallCntvar.Lc_ = (contactModelInfo::getLcCoeff())*mag(wallCntvar.lVec_)*mag(wallCntvar.lVec_)/(mag(wallCntvar.lVec_) + mag(wallCntvar.lVec_));
     
+    contactOverlap_ = max(0,0.5*ibCClass.getGeomModel().getDC()-mag(ibCClass.getGeomModel().getCoM() - wallCntvar.contactCenter_));
 
     wallCntvar.curAdhN_ = min
     (

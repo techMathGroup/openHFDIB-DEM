@@ -97,6 +97,7 @@ class wallSubContactInfo
 
     vector FNd_;         // Normal damping force
 
+    scalar contactOverlap_;
     public:
 
     // Constructors ------------------------------------------------
@@ -241,6 +242,12 @@ class wallSubContactInfo
     {
         return FNd_;
     }
+
+    scalar getContactOverlap()
+    {
+        return contactOverlap_;
+    }  
+
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -89,6 +89,8 @@ class prtSubContactInfo
     Tuple2<forces,forces> outForce_; // Out variable for force
 
     vector FNd_;         // Normal damping force
+    
+    scalar contactOverlap_; // postion overlap
 
     bool contactResolved_ = false;
 
@@ -193,6 +195,11 @@ class prtSubContactInfo
     vector getFNdOutput()
     {
         return FNd_;
+    }
+
+    scalar getContactOverlap()
+    {
+        return contactOverlap_;
     }
 };
 

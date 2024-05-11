@@ -174,7 +174,6 @@ namespace Foam
         label   timesToSetStatic_;
         vector  staticContactPost_;
 
-        List<vector> bodyFND_;
         scalar dissipatedContactEnergy_;
         scalar couplingEnergy_; 
 
@@ -508,21 +507,21 @@ namespace Foam
 
         vectorField getUatIbPoints();
 
-        void updateDissipativeForce(vector FNd)
+        void updateDissipatedEnergy(scalar E)
         {
-            bodyFND_[1] += FNd;
+            dissipatedContactEnergy_ += E;
         }
 
-        void updateDissipativeForceList()
+        scalar getDissipatedEnergy()
         {
-            bodyFND_[0] = bodyFND_[1];
-            bodyFND_[1] = vector::zero;
+            return dissipatedContactEnergy_;
         }
 
-        vector getAverageDissipativeForce()
+        scalar getCouplingEnergy()
         {
-            return (bodyFND_[0]+bodyFND_[1])*0.5;
+            return couplingEnergy_;
         }
+
         
     };
 }

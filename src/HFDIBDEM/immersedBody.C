@@ -99,7 +99,6 @@ refineBuffers_(0),
 recomputeM0_(recomputeM0),
 timesToSetStatic_(-1),
 staticContactPost_(vector::zero),
-bodyFND_(2, vector::zero),
 dissipatedContactEnergy_(0.0),
 couplingEnergy_(0.0)
 {
@@ -702,8 +701,6 @@ void immersedBody::moveImmersedBody
         // translation increment
         vector transIncr = Vel_*deltaT;
 
-        dissipatedContactEnergy_ += getAverageDissipativeForce() & transIncr;
-        updateDissipativeForceList();
         couplingEnergy_ += FCoupling_.F & transIncr;
 
         // rotation matrix
@@ -754,10 +751,10 @@ void immersedBody::moveImmersedBody
     //     << Axis_ << endl;
     // InfoH << "-- body " << bodyId_ << " total rotation matrix: "
     //     << totRotMatrix_ << endl;
-    Info << "-- body " << bodyId_ << " total dissipative force work: "
-        << dissipatedContactEnergy_ << endl;
-    Info << "-- body " << bodyId_ << " total drag force work: "
-        << couplingEnergy_ << endl;            
+    // Info << "-- body " << bodyId_ << " total dissipative force work: "
+    //     << dissipatedContactEnergy_ << endl;
+    // Info << "-- body " << bodyId_ << " total drag force work: "
+    //     << couplingEnergy_ << endl;            
 }
 //---------------------------------------------------------------------------//
 void immersedBody::printBodyInfo()
