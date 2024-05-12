@@ -127,6 +127,8 @@ namespace Foam
     bool recordSimulation_;
     bool recordFirstTimeStep_ = false;
     word recordOutDir_;
+    HashTable <Tuple2<vector,scalar>,label,Hash<label>> syncDissipativeWallForceOld_;
+    HashTable <Tuple2<vector,scalar>,Tuple2<label, label>,Hash<Tuple2<label, label>>> syncDissipativePrtForceOld_;
 
     public:
 

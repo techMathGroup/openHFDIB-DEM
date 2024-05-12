@@ -438,11 +438,11 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
     reduce(particleCells,sumOp<List<label>>());
     reduce(particleInertiaTensors,sumOp<List<symmTensor>>());
 
-    Info << "mass list size " << particleMasses.size() << endl;
-    for (auto& m : particleMasses)
-    {
-        Info << "mass " << m << endl;
-    }
+    // Info << "mass list size " << particleMasses.size() << endl;
+    // for (auto& m : particleMasses)
+    // {
+    //     Info << "mass " << m << endl;
+    // }
 
     label bodyIndex(0);
     forAll (immersedBodies_,bodyId)
@@ -701,10 +701,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
     HashTable <label,Tuple2<label, label>,Hash<Tuple2<label, label>>> syncOutForceKeyTable;
 
     HashTable <Tuple2<vector,scalar>,Tuple2<label, label>,Hash<Tuple2<label, label>>> syncDissipativePrtForce;
-    HashTable <Tuple2<vector,scalar>,Tuple2<label, label>,Hash<Tuple2<label, label>>> syncDissipativePrtForceOld;
-
     HashTable <Tuple2<vector,scalar>,label,Hash<label>> syncDissipativeWallForce;
-    HashTable <Tuple2<vector,scalar>,label,Hash<label>> syncDissipativeWallForceOld;
+    
 
     HashTable <label,Tuple2<label, label>,Hash<Tuple2<label, label>>> contactResolvedKeyTable;
     HashTable <label,label,Hash<label>> wallContactIBTable;
@@ -717,18 +715,6 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         label possiblePrtContacts(0);
         label resolvedPrtContacts(0);
 
-        syncDissipativeWallForceOld.clear();
-        for (auto& item :syncDissipativeWallForce.toc())
-        {
-            syncDissipativeWallForceOld.insert(item,syncDissipativeWallForce[item]);
-        }
-        syncDissipativeWallForce.clear();
-        syncDissipativePrtForceOld.clear();
-        for (auto& item :syncDissipativePrtForceOld.toc())
-        {
-            syncDissipativePrtForceOld.insert(item,syncDissipativePrtForce[item]);
-        }
-        syncDissipativePrtForce.clear();
         InfoH << DEM_Info << " Start DEM pos: " << pos
             << " DEM step: " << step << endl;
 
@@ -886,7 +872,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             reduce(iBodyDissipationList,sumOp<List<vector>>());
             reduce(iBodyOverlapList,sumOp<List<scalar>>());
 
-            reduce(resolvedWallContacts,sumOp<label>());
+            // reduce(resolvedWallContacts,sumOp<label>());
             reduce(possibleWallContacts,sumOp<label>());
             
             forAll (wallContactIB,iB)
@@ -900,10 +886,10 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 syncDissipativeWallForce.insert(iB,Tuple2<vector,scalar>(iBodyDissipationList[iB],iBodyOverlapList[iB]));
                 vector oldFND(vector::zero);
                 scalar oldOverlap(0.0);
-                if(syncDissipativeWallForceOld.found(iB))
+                if(syncDissipativeWallForceOld_.found(iB))
                 {
-                    oldFND = syncDissipativeWallForceOld[iB].first();
-                    oldOverlap = syncDissipativeWallForceOld[iB].second();
+                    oldFND = syncDissipativeWallForceOld_[iB].first();
+                    oldOverlap = syncDissipativeWallForceOld_[iB].second();
                 }
                 //dissipative force should always remove energy from the systemm, with overlap defined as scalar I shall assume that at all times
                 scalar eDissipated(-0.5*(mag(oldFND)+mag(syncDissipativeWallForce[iB].first()))*mag(syncDissipativeWallForce[iB].second()-oldOverlap));
@@ -1048,14 +1034,9 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         reduce(cPairOverlpaList,sumOp<List<scalar>>());
 
         reduce(possiblePrtContacts,sumOp<label>());
-        reduce(resolvedPrtContacts,sumOp<label>());
+        // reduce(resolvedPrtContacts,sumOp<label>());
 
         label nvListIter(0);
-
-        // Info << " -- possibleWallContacts : " << possibleWallContacts<< endl;
-        // Info << " -- resolvedWallContacts : " << resolvedWallContacts<< endl;
-        // Info << " -- possiblePrtContacts  : " << possiblePrtContacts<< endl;
-        // Info << " -- resolvedPrtContacts  : " << resolvedPrtContacts << endl;
 
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
         {
@@ -1099,13 +1080,14 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 syncDissipativePrtForce.insert(cPair,Tuple2<vector,scalar>(dissipativeForceList[nvListIter],cPairOverlpaList[nvListIter]));
                 vector oldFND(vector::zero);
                 scalar oldOverlap(0.0);
-                if(syncDissipativePrtForceOld.found(cPair))
+                if(syncDissipativePrtForceOld_.found(cPair))
                 {
-                    oldFND = syncDissipativePrtForceOld[cPair].first();
-                    oldOverlap = syncDissipativePrtForceOld[cPair].second();
+                    oldFND = syncDissipativePrtForceOld_[cPair].first();
+                    oldOverlap = syncDissipativePrtForceOld_[cPair].second();
                 }
                 //dissipative force should always remove energy from the systemm, with overlap defined as scalar I shall assume that at all times
-                scalar eDissipated(-0.5*(mag(oldFND)+mag(syncDissipativePrtForce[cPair].first()))*mag(syncDissipativePrtForce[cPair].second()-oldOverlap));                
+                scalar eDissipated(-0.5*(mag(oldFND)+mag(syncDissipativePrtForce[cPair].first()))*mag(syncDissipativePrtForce[cPair].second()-oldOverlap));
+                // Info << "-- cPair : "<< cPair << " eDissipated : " << eDissipated << " FNDOld " << mag(oldFND) << " FND "  << mag(syncDissipativePrtForce[cPair].first()) <<" overlapOld : " << oldOverlap <<" overlap : "  << syncDissipativePrtForce[cPair].second() <<endl;
                 immersedBodies_[cInd].updateDissipatedEnergy(eDissipated);
                 immersedBodies_[tInd].updateDissipatedEnergy(eDissipated);
 //EvalForces
@@ -1128,6 +1110,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     continue;
                 }
             }
+                syncDissipativeWallForceOld_.clear();
         }
 
         forAll (immersedBodies_,ib)
@@ -1136,6 +1119,19 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             immersedBodies_[ib].printBodyInfo();
         }
         // InfoH << basic_Info << "Max CoNum = " << maxCoNum << " at body " << bodyId << endl;
+
+        for (auto& item :syncDissipativeWallForce.toc())
+        {
+            syncDissipativeWallForceOld_.insert(item,syncDissipativeWallForce[item]);
+        }
+        syncDissipativeWallForce.clear();
+
+        syncDissipativePrtForceOld_.clear();
+        for (auto& item :syncDissipativePrtForce.toc())
+        {
+            syncDissipativePrtForceOld_.insert(item,syncDissipativePrtForce[item]);
+        }
+        syncDissipativePrtForce.clear();    
 
         possibleWallContactsG += possibleWallContacts;
         resolvedWallContactsG += resolvedWallContacts;
@@ -1146,16 +1142,15 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
         if (pos + step + SMALL >= 1)
             step = 1 - pos;
-//OS Time effitiency Testing
-        // demItegrationTime_ = DEMIntergrationRun.timeIncrement();
-//OS Time effitiency Testing
+
     }
+
     Info << "-- possible wall contact : " << possibleWallContactsG << " resolved wall contacts : " << resolvedWallContactsG << endl;
     Info << "-- possible particle contact : " << possiblePrtContactsG << " resolved particle contacts : "<< resolvedPrtContactsG << endl;
     
     forAll (immersedBodies_,ib)
     {
-        Info << "-- body " << immersedBodies_[ib].getBodyId() << " cumulativeDragForce : " << immersedBodies_[ib].getCouplingEnergy() << " energy dissipated in contact : " << immersedBodies_[ib].getDissipatedEnergy() << endl;
+        Info << "-- body " << immersedBodies_[ib].getBodyId() << " drag force work : " << immersedBodies_[ib].getCouplingEnergy() << " energy dissipated in contact : " << immersedBodies_[ib].getDissipatedEnergy() << endl;
     }    
 }
 //---------------------------------------------------------------------------//
