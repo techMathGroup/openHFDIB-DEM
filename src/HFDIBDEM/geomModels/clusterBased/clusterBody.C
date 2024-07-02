@@ -49,6 +49,10 @@ void clusterBody::createImmersedBody
             octreeField,
             cellPoints
         );
+
+        Info << "Periodic body created" << " mass: " << gModel->getM() << endl;
+        Info << "Periodic body created" << " bbox: " << gModel->getBounds().min() << " " << gModel->getBounds().max() << endl;
+        Info << "Periodic body created" << " intList: " << gModel->getInternalCellList()[Pstream::myProcNo()].size() << endl;
     }
 }
 //---------------------------------------------------------------------------//
@@ -89,6 +93,34 @@ void clusterBody::calculateGeometricalProperties
     for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
     {
         gModel->calculateGeometricalProperties(body);
+        M_ += gModel->getM();
+        I_ += gModel->getI();
+    }
+}
+//---------------------------------------------------------------------------//
+void clusterBody::calculateGeometricalPropertiesParallel
+(
+    volScalarField& body
+)
+{
+    M_      = scalar(0);
+    I_      = symmTensor::zero;
+
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
+    {
+        gModel->calculateGeometricalPropertiesParallel(body);
+
+        Info << "Periodic body calculated" << " mass: " << gModel->getM() << endl;
+    }
+}
+//---------------------------------------------------------------------------//
+void clusterBody::setMassAndInertia()
+{
+    M_      = scalar(0);
+    I_      = symmTensor::zero;
+
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
+    {
         M_ += gModel->getM();
         I_ += gModel->getI();
     }

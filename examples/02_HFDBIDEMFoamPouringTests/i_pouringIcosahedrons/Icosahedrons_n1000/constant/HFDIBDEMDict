@@ -1,0 +1,156 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  3.0.x                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      HFDIBDEMDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+bodyNames ( "PH_SC");
+
+surfaceThreshold    1e-4;
+stepDEM     0.01;
+geometricD (1 1 1);
+recordSimulation true;
+recordFirstTimeStep true;
+nSolidsInDomain 1000;
+
+outputSetup
+{
+    basic false;
+    iB  false;
+    DEM false;
+    addModel false;
+    parallelDEM false;
+}
+DEM
+{
+    materials
+    {
+        particle
+        {
+            Y       5e8;
+            nu      0.5;
+            mu      1.0;
+            adhN    0;
+	    	eps     0.25;
+        }
+
+        
+        wall
+        {
+            Y       1e8;
+            nu      0.5;
+	    	mu      1.0;
+            adhN    0;
+	    	eps	    0.25;
+        }   
+    }
+
+    LcCoeff 4.0;
+
+    collisionPatches
+    {
+		polygonWall0
+		{
+			material wall;
+			nVec (1.0 0.0 0.0);
+			planePoint (0.04 0.04 0.0);
+		}
+		polygonWall1
+		{
+			material wall;
+			nVec (0.0 0.0 1.0);
+			planePoint (0.0 0.04 0.04);
+		}
+		polygonWall2
+		{
+			material wall;
+			nVec (-1.0 0.0 0.0);
+			planePoint (-0.04 0.04 0.0);
+		}
+		polygonWall3
+		{
+			material wall;
+			nVec (0.0 0.0 -1.0);
+			planePoint (0.0 0.04 -0.04);
+		}
+		bot
+		{
+			material wall;
+			nVec (0.0 -1.0 0.0);
+			planePoint (0.0 0.0 0.0);
+		}		
+		Top
+		{
+			material wall;
+			nVec (0.0 1.0 0.0);
+			planePoint (0.0 0.10 0.0);
+		}
+    }
+}
+
+virtualMesh
+{
+    level 4;
+    charCellSize 0.001;
+	recordContact false;
+}
+
+PH_SC
+{
+
+	fullyCoupledBody;
+	
+	rho         rho [1 -3 0 0 0 0 0] 4000;
+
+	refineMC 5;
+
+	U
+	{
+	BC  noSlip;
+	}
+
+	bodyAddition
+	{
+		addModel onceScatter;
+		onceScatterCoeffs
+		{
+			addMode fieldBased;
+			fieldBasedCoeffs
+			{
+				fieldName lambda;
+				fieldValue 0.3;
+			}
+			addDomain boundBox;
+			boundBoxCoeffs
+			{
+				minBound (-0.04 0.0 -0.04);
+				maxBound (0.04 0.1 0.04);
+			}
+			
+			scalingMode    noScaling;
+			noScalingCoeffs{}
+			
+			rotationMode   randomRotation;
+			randomRotationCoeffs{}
+		}
+	}	
+	
+	material particle;
+	bodyGeom convex;
+	updateTorque true;
+	sdBasedLambda false;
+	interfaceSpan 1.0;
+	startSynced false;
+	refineBuffers 0;
+	timesToSetStatic 1500;
+}

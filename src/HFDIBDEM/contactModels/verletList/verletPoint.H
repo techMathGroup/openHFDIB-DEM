@@ -63,6 +63,7 @@ class verletPoint
 
     point& vPoint_;
     const bool isMin_;
+    bool isStatic_;
 
     public:
 
@@ -72,13 +73,15 @@ class verletPoint
         label bodyID,
         std::shared_ptr<verletBox> parentBox,
         point& vPoint,
-        const bool isMin
+        const bool isMin,
+        bool isStatic
     )
     :
     bodyID_(bodyID),
     parentBox_(parentBox),
     vPoint_(vPoint),
-    isMin_(isMin)
+    isMin_(isMin),
+    isStatic_(isStatic)
     {};
 
     // Destructors -------------------------------------------------
@@ -99,6 +102,11 @@ class verletPoint
         return bodyID_;
     }
 
+    bool getIsStatic()
+    {
+        return isStatic_;
+    }
+
     std::shared_ptr<verletBox> getParentBox()
     {
         return parentBox_;
@@ -112,6 +120,7 @@ class verletBox
 
     label bodyID_;
     std::shared_ptr<boundBox> bBox_;
+    bool isStatic_;
 
     std::shared_ptr<verletPoint> minPoint_;
     std::shared_ptr<verletPoint> maxPoint_;
@@ -120,11 +129,13 @@ class verletBox
     verletBox
     (
         label bodyID,
-        std::shared_ptr<boundBox> bBox
+        std::shared_ptr<boundBox> bBox,
+        bool isStatic
     )
     :
     bodyID_(bodyID),
-    bBox_(bBox)
+    bBox_(bBox),
+    isStatic_(isStatic)
     {};
 
     public:
@@ -138,11 +149,12 @@ class verletBox
     [[nodiscard]] static std::shared_ptr<verletBox> create
     (
         label bodyID,
-        std::shared_ptr<boundBox> bBox
+        std::shared_ptr<boundBox> bBox,
+        bool isStatic
     )
     {
         // Not using std::make_shared<Best> because the c'tor is private.
-        return std::shared_ptr<verletBox>(new verletBox(bodyID, bBox));
+        return std::shared_ptr<verletBox>(new verletBox(bodyID, bBox, isStatic));
     }
 
     std::shared_ptr<boundBox>& getBBox()
@@ -157,8 +169,8 @@ class verletBox
 
     void setVerletPoints()
     {
-        minPoint_ = std::make_shared<verletPoint>(bodyID_, shared_from_this(), bBox_->min(), true);
-        maxPoint_ = std::make_shared<verletPoint>(bodyID_, shared_from_this(), bBox_->max(), false);
+        minPoint_ = std::make_shared<verletPoint>(bodyID_, shared_from_this(), bBox_->min(), true,isStatic_);
+        maxPoint_ = std::make_shared<verletPoint>(bodyID_, shared_from_this(), bBox_->max(), false,isStatic_);
     }
 
     std::shared_ptr<verletPoint> getMinPoint()

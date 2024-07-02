@@ -94,13 +94,29 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     {
         solverInfo::setNSolidsTreshnold(readLabel(HFDIBDEMDict_.lookup("nSolidsInDomain")));
     }
-    
+
     dictionary demDic = HFDIBDEMDict_.subDict("DEM");
     dictionary materialsDic = demDic.subDict("materials");
     List<word> materialsNames = materialsDic.toc();
+    if(demDic.found("increasedDamping"))
+    {
+        contactModelInfo::setIncreasedDamping(readBool(demDic.lookup("increasedDamping")));
+    }
+    else
+    {
+        contactModelInfo::setIncreasedDamping(false);
+    }
+
     forAll(materialsNames, matI)
     {
         dictionary matIDic = materialsDic.subDict(materialsNames[matI]);
+        scalar eps = readScalar(matIDic.lookup("eps"));
+        if(!contactModelInfo::getIncreasedDamping())
+        {
+            eps = 0.906463027*eps + 0.093538298;//LinearRegression based on LIGGGHTS data testing
+            eps = min(eps, 1.0);
+        }
+
         materialProperties::matProps_insert(
             materialsNames[matI],
             materialInfo(
@@ -109,7 +125,8 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
                 readScalar(matIDic.lookup("nu")),
                 readScalar(matIDic.lookup("mu")),
                 readScalar(matIDic.lookup("adhN")),
-                readScalar(matIDic.lookup("eps"))
+                // readScalar(matIDic.lookup("eps"))
+                eps
             )
         );
     }
@@ -146,14 +163,31 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     if(demDic.found("LcCoeff"))
     {
         contactModelInfo::setLcCoeff(readScalar(demDic.lookup("LcCoeff")));
-        // Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
     }
     else
     {
         contactModelInfo::setLcCoeff(4.0);
-        // Info <<" -- Coefficient for characteristic Lenght Lc is set to : 4.0"<< endl;
     }
-    
+
+    if(demDic.found("rotationModel"))
+    {
+        word rotModel = demDic.lookup("rotationModel");
+        if(rotModel == "chen2012")
+        {
+            contactModelInfo::setRotationModel(0);
+        }
+        else if(rotModel == "mindlin1953")
+        {
+            contactModelInfo::setRotationModel(1);
+        }
+        else
+        {
+            Info << "Rotation Model not recognized, setting to default mindlin1953" << endl;
+            contactModelInfo::setRotationModel(1);
+        }
+    }
+
+
     Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
 
     dictionary patchDic = demDic.subDict("collisionPatches");
@@ -196,7 +230,7 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         }
         Info << "CyclicPatches  " <<  cyclicPatchNames <<endl;
     }
-    
+
     if (HFDIBDEMDict_.found("geometricD"))
     {
         geometricD = HFDIBDEMDict_.lookup("geometricD");
@@ -265,8 +299,6 @@ void openHFDIBDEM::initialize
         );
     }
 
-    // get data from HFDIBDEMDict
-    //HFDIBinterpDict_ = HFDIBDEMDict_.subDict("interpolationSchemes");
     preCalculateCellPoints();
 
     if(HFDIBDEMDict_.found("interpolationSchemes"))
@@ -409,11 +441,71 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
         }
     }
 
+    DynamicList<scalar> particleMasses;
+    DynamicList<label> particleCells;
+    DynamicList<symmTensor> particleInertiaTensors;
+
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            immersedBodies_[bodyId].syncCreateImmersedBody(body,refineF);
+            immersedBodies_[bodyId].syncImmersedBodyParralell1(body,refineF);
+            if (immersedBodies_[bodyId].getGeomModel().isCluster())
+            {
+                clusterBody& cBody = dynamic_cast<clusterBody&>(immersedBodies_[bodyId].getGeomModel());
+                std::vector<std::shared_ptr<geomModel>>& cBodies = cBody.getClusterBodies();
+                for (auto& cB : cBodies)
+                {
+                    particleMasses.append(cB->getM());
+                    particleCells.append(cB->getNCells());
+                    particleInertiaTensors.append(cB->getI());
+                }
+            }
+            else
+            {
+                particleMasses.append(immersedBodies_[bodyId].getGeomModel().getM());
+                particleCells.append(immersedBodies_[bodyId].getGeomModel().getNCells());
+                particleInertiaTensors.append(immersedBodies_[bodyId].getGeomModel().getI());
+            }
+        }
+    }
+    reduce(particleMasses,sumOp<List<scalar>>());
+    reduce(particleCells,sumOp<List<label>>());
+    reduce(particleInertiaTensors,sumOp<List<symmTensor>>());
+
+    Info << "mass list size " << particleMasses.size() << endl;
+    for (auto& m : particleMasses)
+    {
+        Info << "mass " << m << endl;
+    }
+
+    label bodyIndex(0);
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            if (immersedBodies_[bodyId].getGeomModel().isCluster())
+            {
+                clusterBody& cBody = dynamic_cast<clusterBody&>(immersedBodies_[bodyId].getGeomModel());
+                std::vector<std::shared_ptr<geomModel>>& cBodies = cBody.getClusterBodies();
+                for (auto& cB : cBodies)
+                {
+                    cB->setM(particleMasses[bodyIndex]);
+                    cB->setNCells(particleCells[bodyIndex]);
+                    cB->setI(particleInertiaTensors[bodyIndex]);
+                    bodyIndex++;
+                }
+                cBody.setMassAndInertia();
+            }
+            else
+            {
+                immersedBodies_[bodyId].getGeomModel().setM(particleMasses[bodyIndex]);
+                immersedBodies_[bodyId].getGeomModel().setNCells(particleCells[bodyIndex]);
+                immersedBodies_[bodyId].getGeomModel().setI(particleInertiaTensors[bodyIndex]);
+                bodyIndex++;
+            }
+
+            immersedBodies_[bodyId].syncImmersedBodyParralell2(body,refineF);
             immersedBodies_[bodyId].checkIfInDomain(body);
             immersedBodies_[bodyId].updateOldMovementVars();
         }
@@ -633,13 +725,14 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
     scalar pos(0.0);
     scalar step(stepDEM_);
     // scalar timeStep(step*deltaTime);
-
+    List<DynamicList<pointField>> bodiesPositionList(Pstream::nProcs());
+    // Infos <<bodiesPositionList.size() << endl;
+    HashTable <label,Tuple2<label, label>,Hash<Tuple2<label, label>>> syncOutForceKeyTable;
+    HashTable <label,Tuple2<label, label>,Hash<Tuple2<label, label>>> contactResolvedKeyTable;
+    HashTable <label,label,Hash<label>> wallContactIBTable;
     while( pos < 1)
     {
-        // label possibleWallContacts(0);
-        // label resolvedWallContacts(0);
-        // label possiblePrtContacts(0);
-        // label resolvedPrtContacts(0);
+        bodiesPositionList[Pstream::myProcNo()].clear();
 
         InfoH << DEM_Info << " Start DEM pos: " << pos
             << " DEM step: " << step << endl;
@@ -650,15 +743,53 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         forAll (immersedBodies_,ib)
         {
             immersedBodies_[ib].updateMovement(deltaTime*step*0.5);
-            immersedBodies_[ib].moveImmersedBody(deltaTime*step);
+
+            if(Pstream::myProcNo() == 0 )
+            {
+                immersedBodies_[ib].moveImmersedBody(deltaTime*step);
+                if(immersedBodies_[ib].getGeomModel().getcType() != cluster)
+                {
+                    bodiesPositionList[Pstream::myProcNo()].append(immersedBodies_[ib].getGeomModel().getBodyPoints());
+                }
+                else
+                {
+                    clusterBody& cBody = dynamic_cast<clusterBody&>(immersedBodies_[ib].getGeomModel());
+                    std::vector<std::shared_ptr<geomModel>>& cBodies = cBody.getClusterBodies();
+                    for (auto& cB : cBodies)
+                    {
+                        bodiesPositionList[Pstream::myProcNo()].append(cB->getBodyPoints());
+                    }
+                }
+            }
         }
 
+        Pstream::gatherList(bodiesPositionList,0);
+        Pstream::scatterList(bodiesPositionList,0);
+
+        label bodyIndex(0);
+        forAll (immersedBodies_,ib)
+        {
+            if(immersedBodies_[ib].getGeomModel().getcType() != cluster)
+            {
+                immersedBodies_[ib].getGeomModel().setBodyPosition(bodiesPositionList[0][bodyIndex++]);
+            }
+            else
+            {
+                clusterBody& cBody = dynamic_cast<clusterBody&>(immersedBodies_[ib].getGeomModel());
+                std::vector<std::shared_ptr<geomModel>>& cBodies = cBody.getClusterBodies();
+                for (auto& cB : cBodies)
+                {
+                    cB->setBodyPosition(bodiesPositionList[0][bodyIndex++]);
+                }
+            }
+        }
+
+        bodiesPositionList[Pstream::myProcNo()].clear();
+
         verletList_.update(immersedBodies_);
-//OS Time effitiency Testing    
-        // clockTime wallContactStopWatch;
-//OS Time effitiency Testing
+
         DynamicLabelList wallContactIB;
-        DynamicList<wallSubContactInfo*> wallContactList;
+        wallContactIBTable.clear();
         forAll (immersedBodies_,bodyId)
         {
             immersedBody& cIb(immersedBodies_[bodyId]);
@@ -680,84 +811,94 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                         cIb.getibContactClass().setWallContact(true);
                         cIb.getibContactClass().inContactWithStatic(true);
                         wallContactIB.append(bodyId);
-                        cIb.getWallCntInfo().registerSubContactList(wallContactList);
+                        wallContactIBTable.insert(bodyId,wallContactIB.size()-1);
+                        // cIb.getWallCntInfo().registerSubContactList(wallContactList);
                     }
                 }
             }
         }
         // possibleWallContacts = wallContactIB.size();
+        List<bool> wallContactResolvedList(wallContactIB.size(),false);
+
         if(wallContactIB.size() > 0)
         {
-            label wallContactPerProc(ceil(double(wallContactList.size())/Pstream::nProcs()));
+            label wallContactPerProc(ceil(double(wallContactIB.size())/Pstream::nProcs()));
             // Info <<" wallContactPerProc : "<< wallContactPerProc << endl;
-            if( wallContactList.size() <= Pstream::nProcs())
+            if( wallContactIB.size() <= Pstream::nProcs())
             {
                 wallContactPerProc = 1;
             }
-//OS Time effitiency Testing                
-            // clockTime wallContactParallelRun;
-//OS Time effitiency Testing                
-            for(int assignProc = Pstream::myProcNo()*wallContactPerProc; assignProc < min((Pstream::myProcNo()+1)*wallContactPerProc,wallContactList.size()); assignProc++)
+            for(int assignProc = Pstream::myProcNo()*wallContactPerProc; assignProc < min((Pstream::myProcNo()+1)*wallContactPerProc,wallContactIB.size()); assignProc++)
             {
-                // resolvedWallContacts++;
-                wallSubContactInfo* sCW = wallContactList[assignProc];
-                immersedBody& cIb(immersedBodies_[sCW->getBodyId()]);
-                sCW->setResolvedContact(solveWallContact(
-                    mesh_,
-                    cIb.getWallCntInfo(),
-                    deltaTime*step,
-                    *sCW
-                    ));
+                immersedBody& cIb(immersedBodies_[wallContactIB[assignProc]]);
+                if(cIb.getGeomModel().getcType() != sphere && cIb.getGeomModel().getcType() != cluster)
+                {
+                    cIb.getWallCntInfo().findContactAreas();
+                }
+
+                DynamicList<wallSubContactInfo*> wallContactList;
+                cIb.getWallCntInfo().registerSubContactList(wallContactList);
+                List<bool> wallcRList(wallContactList.size(),false);
+
+                forAll(wallContactList,sC)
+                {
+                    wallSubContactInfo* sCW = wallContactList[sC];
+                    bool resolved(solveWallContact(
+                        mesh_,
+                        cIb.getWallCntInfo(),
+                        deltaTime*step,
+                        *sCW
+                        ));
+                    sCW->setResolvedContact(resolved);
+                    wallContactResolvedList[assignProc] += resolved;
+                    wallcRList[sC] = resolved;
+                }
             }
 
-            //OS Time effitiency Testing                
-            // wallContactParallelTime_ += wallContactParallelRun.timeIncrement();
-            // clockTime wallContactSCRun;
-            //OS Time effitiency Testing 
+            reduce(wallContactResolvedList,sumOp<List<bool>>());
+
+            List<vector> iBodyOutForceList(wallContactIB.size(),vector::zero);
+            List<vector> iBodyOutTorqueList(wallContactIB.size(),vector::zero);
 
             forAll (wallContactIB,iB)
             {
                 immersedBody& cIb(immersedBodies_[wallContactIB[iB]]);
-
-                std::vector<std::shared_ptr<wallSubContactInfo>>& subCList
-                    = cIb.getWallCntInfo().getWallSCList();
-
-                for(auto sC : subCList)
+                if(wallContactIBTable.found(cIb.getBodyId()))
                 {
-                    sC->syncContactResolve();
-                    if(sC->getContactResolved())
+                    label cKey(wallContactIBTable[cIb.getBodyId()]);
+                    if(wallContactResolvedList[cKey])
                     {
-                        sC->syncData();
+                        std::vector<std::shared_ptr<wallSubContactInfo>>& subCList
+                            = cIb.getWallCntInfo().getWallSCList();
 
-                        cIb.updateContactForces(
-                            sC->getOutForce()
-                        );
+                        for(auto sCW : subCList)
+                        {
+                            iBodyOutForceList[cKey] += sCW->getOutForce().F;
+                            iBodyOutTorqueList[cKey] += sCW->getOutForce().T;
+                        }
                     }
                 }
+            }
+            reduce(iBodyOutForceList,sumOp<List<vector>>());
+            reduce(iBodyOutTorqueList,sumOp<List<vector>>());
+
+            forAll (wallContactIB,iB)
+            {
+                immersedBody& cIb(immersedBodies_[wallContactIB[iB]]);
+                forces cF;
+                cF.F = iBodyOutForceList[iB];
+                cF.T = iBodyOutTorqueList[iB];
+
+                cIb.updateContactForces(cF);
                 cIb.getWallCntInfo().clearOldContact();
             }
-            
-            //OS Time effitiency Testing                
-            
-            // wallContactReduceTime_ += wallContactSCRun.timeIncrement();
-            //OS Time effitiency Testing 
         }
-        wallContactList.clear();
-        wallContactIB.clear();
-        // reduce(resolvedWallContacts,sumOp<label>());
-        // InfoH << basic_Info << " -- Possible Wall Contacts: " << possibleWallContacts
-        //     << " Resolved Wall Contacts: " << resolvedWallContacts 
-        //     << " contactPerProc : " << ceil(possibleWallContacts/Pstream::nProcs()) << endl;
 
-        
-//OS Time effitiency Testing        
-        // wallContactTime_ += wallContactStopWatch.timeIncrement();
-        // clockTime particleContactStopWatch;
-        // clockTime particleContactSCRun;
-//OS Time effitiency Testing
-        // Pout <<" Survived 3 " << endl;
+        wallContactIB.clear();
+
         DynamicList<prtSubContactInfo*> contactList;
         // check only pairs whose bounding boxes are intersected for the contact
+        label vListSize(0);
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
         {
             const Tuple2<label, label> cPair = Tuple2<label, label>(it->first, it->second);
@@ -789,16 +930,19 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     prtcInfo
                 );
 
-                prtcInfo.syncContactList();
+                // prtcInfo.syncContactList();
 
                 prtcInfo.registerContactList(contactList);
             }
+            vListSize++;
         }
-//OS Time effitiency Testing
-        // prtContactReduceTime_ += particleContactSCRun.timeIncrement();
-        // clockTime particleContactParallelRun;
-        // possiblePrtContacts = contactList.size();      
-//OS Time effitiency Testing         
+
+        List<bool> contactResolved(contactList.size(),false);
+        List<label> contactResolvedcKey(contactList.size(),0);
+        List<label> contactResolvedtKey(contactList.size(),0);
+        bool syncedData(true);
+        reduce(syncedData, orOp<bool>());
+
         if(contactList.size() > 0 )
         {
             label contactPerProc(ceil(double(contactList.size())/Pstream::nProcs()));
@@ -812,6 +956,9 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 prtSubContactInfo* sCI = contactList[assignProc];
                 const Tuple2<label, label>& cPair = sCI->getCPair();
 
+                contactResolvedcKey[assignProc] = cPair.first();
+                contactResolvedtKey[assignProc] = cPair.second();
+
                 ibContactClass& cClass(immersedBodies_[cPair.first()].getibContactClass());
                 ibContactClass& tClass(immersedBodies_[cPair.second()].getibContactClass());
 
@@ -819,23 +966,68 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 {
                     // resolvedPrtContacts++;
                     prtContactInfo& prtcInfo(getPrtcInfo(cPair));
-                    sCI->setResolvedContact(solvePrtContact(mesh_, prtcInfo, *sCI, deltaTime*step));
+
+                    bool resolved(solvePrtContact(mesh_, prtcInfo, *sCI, deltaTime*step));
+                    sCI->setResolvedContact(resolved);
+
+                    contactResolved[assignProc] += resolved;
                 }
             }
         }
-//OS Time effitiency Testing
-        // prtContactParallelTime_ += particleContactParallelRun.timeIncrement();
-        // prtContactTime_ += particleContactStopWatch.timeIncrement();
-        // clockTime DEMIntergrationRun;
-//OS Time effitiency Testing
+
+        reduce(contactResolved,sumOp<List<bool>>());
+        reduce(contactResolvedcKey,sumOp<List<label>>());
+        reduce(contactResolvedtKey,sumOp<List<label>>());
+        contactResolvedKeyTable.clear();
+        forAll(contactResolvedcKey,cKey)
+        {
+            contactResolvedKeyTable.insert(Tuple2<label, label>(contactResolvedcKey[cKey],contactResolvedtKey[cKey]),cKey);
+        }
+        List<vector> cBodyOutForceList(vListSize,vector::zero);
+        List<vector> cBodyOutTorqueList(vListSize,vector::zero);
+        List<vector> tBodyOutForceList(vListSize,vector::zero);
+        List<vector> tBodyOutTorqueList(vListSize,vector::zero);
+        syncOutForceKeyTable.clear();
+
+        label nIter(0);
+        for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
+        {
+            const Tuple2<label, label> cPair = Tuple2<label, label>(it->first, it->second);
+
+            prtContactInfo& prtcInfo(getPrtcInfo(cPair));
+
+            if(contactResolvedKeyTable.found(cPair))
+            {
+                label nSubContact(0);
+                std::vector<std::shared_ptr<prtSubContactInfo>>& subCList
+                    = prtcInfo.getPrtSCList();
+                for(auto sC : subCList)
+                {
+                    nSubContact++;
+                    cBodyOutForceList[nIter] += sC->getOutForce().first().F;
+                    cBodyOutTorqueList[nIter] += sC->getOutForce().first().T;
+                    tBodyOutForceList[nIter] += sC->getOutForce().second().F;
+                    tBodyOutTorqueList[nIter] += sC->getOutForce().second().T;
+                }
+            }
+            syncOutForceKeyTable.insert(cPair,nIter);
+            nIter++;
+        }
+
+        reduce(cBodyOutForceList,sumOp<List<vector>>());
+        reduce(cBodyOutTorqueList,sumOp<List<vector>>());
+        reduce(tBodyOutForceList,sumOp<List<vector>>());
+        reduce(tBodyOutTorqueList,sumOp<List<vector>>());
+
+        label nvListIter(0);
+
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
         {
             const Tuple2<label, label> cPair = Tuple2<label, label>(it->first, it->second);
             label cInd(cPair.first());
             label tInd(cPair.second());
 
-            prtContactInfo& prtcInfo(getPrtcInfo(cPair));
-            if(!prtcInfo.contactResolved())
+            if(!contactResolvedKeyTable.found(cPair))
             {
                 if(prtcInfoTable_.found(cPair))
                 {
@@ -843,31 +1035,51 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     continue;
                 }
             }
-
-            std::vector<std::shared_ptr<prtSubContactInfo>>& subCList
-                = prtcInfo.getPrtSCList();
-
-            for(auto sC : subCList)
+            else if(contactResolved[contactResolvedKeyTable[cPair]])
             {
-                sC->syncData();
+                if(!syncOutForceKeyTable.found(cPair))
+                {
+                    Pout <<" -- cPair  "<<cInd << " - "<<tInd << " not found in syncOutForceKeyTable" << endl;
+                    continue;
+                }
 
-                immersedBodies_[cInd].updateContactForces
-                (
-                    sC->getOutForce().first()
-                );
+                nvListIter = syncOutForceKeyTable[cPair];
+                if(nvListIter > cBodyOutForceList.size())
+                {
+                    Pout <<" -- cPair  "<<cInd << " - "<<tInd << " nvListIter > bodiesOutForceList[Pstream::myProcNo()].size()" << endl;
+                    continue;
+                }
 
-                immersedBodies_[tInd].updateContactForces
-                (
-                    sC->getOutForce().second()
-                );
+                vector F1 = vector::zero;
+                vector T1 = vector::zero;
+                vector F2 = vector::zero;
+                vector T2 = vector::zero;
+
+                F1 += cBodyOutForceList[nvListIter];
+                T1 += cBodyOutTorqueList[nvListIter];
+                F2 += tBodyOutForceList[nvListIter];
+                T2 += tBodyOutTorqueList[nvListIter];
+
+                forces cF;
+                cF.F = F1;
+                cF.T = T1;
+                forces tF;
+                tF.F = F2;
+                tF.T = T2;
+
+                immersedBodies_[cInd].updateContactForces(cF);
+                immersedBodies_[tInd].updateContactForces(tF);
+            }
+            else
+            {
+                if(prtcInfoTable_.found(cPair))
+                {
+                    prtcInfoTable_.erase(cPair);
+                    continue;
+                }
             }
         }
-        // reduce(resolvedPrtContacts,sumOp<label>());
-        // InfoH << basic_Info << " -- Possible Particle Contacts: " << possiblePrtContacts
-        //     << " Resolved Particle Contacts: " << resolvedPrtContacts 
-        //     << " contactPerProc : " << ceil(possiblePrtContacts/Pstream::nProcs()) << endl;
-        // scalar maxCoNum = 0;
-        // label  bodyId = 0;
+
         forAll (immersedBodies_,ib)
         {
             immersedBodies_[ib].updateMovement(deltaTime*step*0.5);
@@ -882,12 +1094,12 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         // InfoH << basic_Info << "Max CoNum = " << maxCoNum << " at body " << bodyId << endl;
 
         pos += step;
-        
+
         if (pos + step + SMALL >= 1)
             step = 1 - pos;
-//OS Time effitiency Testing            
-        // demItegrationTime_ = DEMIntergrationRun.timeIncrement(); 
-//OS Time effitiency Testing                   
+//OS Time effitiency Testing
+        // demItegrationTime_ = DEMIntergrationRun.timeIncrement();
+//OS Time effitiency Testing
     }
 }
 //---------------------------------------------------------------------------//
@@ -1143,12 +1355,10 @@ void openHFDIBDEM::writeFirtsTimeBodiesInfo()
     label bodiesPerProc = ceil(listZize/Pstream::nProcs());
     InfoH << basic_Info << "Active IB listZize      : " << listZize<< endl;
     InfoH << basic_Info << "bodiesPerProc : " << bodiesPerProc<< endl;
-    Pout << "Processor "<< Pstream::myProcNo() << endl;
 
     for(int assignProc = Pstream::myProcNo()*bodiesPerProc; assignProc < min((Pstream::myProcNo()+1)*bodiesPerProc,activeIB.size()); assignProc++)
     {
         const label bodyId(activeIB[assignProc]);
-        Pout <<"Processor "<< Pstream::myProcNo() << " writes Body " << bodyId << endl;
         word path(curOutDir + "/body" + std::to_string(immersedBodies_[bodyId].getBodyId()) +".info");
         OFstream ofStream(path);
         IOobject outClass

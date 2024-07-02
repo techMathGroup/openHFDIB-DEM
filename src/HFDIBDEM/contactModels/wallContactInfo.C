@@ -86,8 +86,8 @@ ibContactVars_(cVars)
         scalar maxAdhN = cMatInfo.getAdhN() + wInfo.getAdhN() - 2*adhPot;
         scalar reduceBeta =
         (
-            (-1)*sqrt(5.0)*log((0.5*(cMatInfo.getEps()+wInfo.getEps())))/
-            (sqrt(sqr(log(cMatInfo.getEps()+wInfo.getEps()))+
+           (-1)*sqrt(5.0)*log((0.5*(cMatInfo.getEps()+wInfo.getEps())))/
+            (sqrt(sqr(log((0.5*(cMatInfo.getEps()+wInfo.getEps()))))+
             sqr(Foam::constant::mathematical::pi)))
         );
         wallMeanPars_.insert(
@@ -97,7 +97,7 @@ ibContactVars_(cVars)
         // Info << "reduceBeta " <<reduceBeta <<endl;
         // Info << "sqrt(5) "<< sqrt(5) <<endl;
     }
-    
+
     // forAll(cntPatches, patchI)
     // {
     //     physicalProperties& cMeanCntPars(wallMeanPars_[cntPatches[patchI]]);
@@ -203,7 +203,7 @@ void wallContactInfo::findContactAreas()
 
     // InfoH << DEM_Info <<" -- SM bbBoxIsInContact " << endl;
     // InfoH << DEM_Info <<" -- SM contactPatches_.size() "<< contactPatches_.size() << endl;
-    pointField bodyPoints = ibContactClass_.getGeomModel().getSTLBodyPoints();
+    pointField bodyPoints = ibContactClass_.getGeomModel().getBodyPoints();
     forAll(bodyPoints,bP)
     {
         forAll(contactPatches_,wP)

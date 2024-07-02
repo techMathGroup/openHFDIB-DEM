@@ -1,0 +1,137 @@
+###################################Header for General commands#######################################################
+
+atom_style	granular		#Simulation of particles
+
+boundary	f f f			#fixed boundaries -> particles will be deleted if leaving the simulation box
+
+units		si
+
+communicate	single vel yes	#default
+
+newton		off				#default
+
+###################################System variables##################################################################
+
+#Definition of boundaries
+variable xmin equal -0.5
+variable xmax equal 2.0
+
+variable ymin equal -0.05
+variable ymax equal 0.05
+
+variable zmin equal -0.1
+variable zmax equal 0.1
+
+#Definition of the timestep
+
+variable dt equal 1e-6			
+
+
+###################################Specific variables for current simulation#########################################
+
+variable natoms equal 2 	#1 -> particle #2->Box
+
+####variable for material properties####
+
+####Young Modulus####
+variable	youngmodulus1	equal 	1e8		#N/mm²
+variable	youngmodulus2	equal 	1e8		#N/mm²
+
+####Poission ratio####
+variable 	poission1	equal	0.0
+variable 	poission2	equal	0.0
+
+####variable for contact properties####
+
+####coefficient of restitution####
+variable	CoR11	equal	1.0
+variable	CoR12	equal	1.0
+variable	CoR21	equal	1.0
+variable	CoR22	equal	1.0
+
+####sliding friction coefficient####
+variable	sf11	equal	1
+variable	sf12	equal	1
+variable	sf21	equal	1
+variable	sf22	equal	1
+
+####rolling friction coefficient####
+variable	rf11	equal	0.0
+variable	rf12	equal	0.0
+variable	rf21	equal	0.0
+variable	rf22	equal	0.0
+
+
+####variable for particle####
+
+#Number of particle radius
+
+variable	density	equal	2500	#kg/m³
+
+
+####filling parameters####
+
+variable	runTime	equal	0.76	#seconds
+
+variable	runSteps	equal	${runTime}/${dt}		#Transform time to iteration steps
+
+###################################Definition of simulationbox#######################################################
+
+region		reg block ${xmin} ${xmax} ${ymin} ${ymax} ${zmin} ${zmax} units box
+
+create_box	2 reg
+
+neighbor	0.004 bin		#default
+
+neigh_modify	delay 0		#default
+
+#################################Definition of the contact models####################################################
+
+pair_style gran model hertz tangential history rolling_friction epsd2	#contact model
+
+pair_coeff	* *				#default
+
+timestep ${dt}
+
+fix		integrator all nve/sphere			#default
+
+fix		gravi all gravity 9.81 vector  0.34202014332566877 -0.9396926207859083 0.0
+###################################Definition of Material properties#################################################
+
+
+fix 		m1 all property/global youngsModulus peratomtype ${youngmodulus1} ${youngmodulus2}
+
+fix 		m2 all property/global poissonsRatio peratomtype ${poission1} ${poission2}
+
+fix 		m3 all property/global coefficientRestitution peratomtypepair ${natoms} ${CoR11} ${CoR12} ${CoR21} ${CoR22}
+
+fix 		m4 all property/global coefficientFriction peratomtypepair ${natoms} ${sf11} ${sf12} ${sf21} ${sf22}
+
+fix 		m5 all property/global coefficientRollingFriction peratomtypepair ${natoms} ${rf11} ${rf12} ${rf21} ${rf22}
+
+###################################Generation and Loading of the Geometry .stl#######################################
+
+fix			Box 	all mesh/surface file inclinePlaneMesh.stl 	type 2  scale 1 curvature_tolerant yes		#load mesh from STL file. Type 2 for geometry. Scale down to transform mm to meters
+
+fix 		walls 	all wall/gran model hertz tangential history rolling_friction epsd2 mesh n_meshes 1 meshes Box
+
+
+###################################Generation and Insertion of the particles#########################################
+create_atoms 1 single 0.0 0.04 0.0   units box
+set atom 1 diameter 0.08 density 2500 vx 0 vy 0 vz 0
+###################################Dumping of the data for post-processing to visualize############################
+
+shell 	mkdir post
+
+#Definition of the dumptime
+
+variable writeTime equal 0.01	# Every 0.05 s 1 image 
+
+variable writeSteps equal ${writeTime}/${dt}	#Transform to iteration steps
+
+dump	dmpparticle all custom/vtk ${writeSteps} post/particles_Res_*.vtk id type x y z vx vy vz fx fy fz omegax omegay omegaz radius mass
+
+####################################RUN the simulation filling###########################################################
+
+run	 ${runSteps}
+

@@ -77,7 +77,10 @@ scalar virtualMeshLevel::levelOfDivision_ = 1;
 scalar virtualMeshLevel::charCellSize_ = 1;
 scalar contactModelInfo::LcCoeff_ = 4.0;
 label  solverInfo::nSolidsTreshnold_ = 1000;
-bool   solverInfo::onlyDEM_ = false;
+bool solverInfo::onlyDEM_ = false;
+bool contactModelInfo::useChenRotationalModel_ = false;
+bool contactModelInfo::useMindlinRotationalModel_ = false;
+bool contactModelInfo::increasedDamping_ = false;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

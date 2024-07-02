@@ -84,14 +84,9 @@ int main(int argc, char *argv[])
 
     Info<< "\nStarting time loop\n" << endl;
 
-    // scalar CFDTime_(0.0);
-    // scalar DEMTime_(0.0);
-    // scalar preUpdateTime_(0.0);
-    // scalar postUpdateTime_(0.0);
-    // scalar addRemoveTime_(0.0);
-    // scalar updateDEMTime_(0.0);
-    // scalar writeBodiesInfoTime_(0.0);
-    // scalar createBodiesTime_(0.0);
+    scalar CFDTime_(0.0);
+    scalar DEMTime_(0.0);
+    scalar suplTime_(0.0);
 
     while (pimple.run(runTime))
     {
@@ -111,15 +106,15 @@ int main(int argc, char *argv[])
 
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
-        // clockTime createBodiesTime; // OS time efficiency testing
+        clockTime createBodiesTime; // OS time efficiency testing
         HFDIBDEM.createBodies(lambda,refineF);
-        // createBodiesTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
+        suplTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
         
-        // clockTime preUpdateBodiesTime; // OS time efficiency testing
+        clockTime preUpdateBodiesTime; // OS time efficiency testing
         HFDIBDEM.preUpdateBodies(lambda,f);
-        // preUpdateTime_ += preUpdateBodiesTime.timeIncrement(); // OS time efficiency testing
+        suplTime_ += preUpdateBodiesTime.timeIncrement(); // OS time efficiency testing
 
-        // clockTime pimpleRunClockTime; // OS time efficiency testing
+        clockTime pimpleRunClockTime; // OS time efficiency testing
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
@@ -169,71 +164,43 @@ int main(int argc, char *argv[])
                 turbulence->correct();
             }
         }
-        // CFDTime_ += pimpleRunClockTime.timeIncrement();
+        CFDTime_ += pimpleRunClockTime.timeIncrement();
         Info << "updating HFDIBDEM" << endl;
-        // clockTime postUpdateBodiesTime;
+        clockTime postUpdateBodiesTime;
         HFDIBDEM.postUpdateBodies(lambda,f);
-        // postUpdateTime_ += postUpdateBodiesTime.timeIncrement();
+        suplTime_ += postUpdateBodiesTime.timeIncrement();
 
 
-        // clockTime addRemoveTime;
+        clockTime addRemoveTime;
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
-        // addRemoveTime_ += addRemoveTime.timeIncrement();
+        suplTime_ += addRemoveTime.timeIncrement();
 
-        // clockTime updateDEMTime;
+        clockTime updateDEMTime;
         HFDIBDEM.updateDEM(lambda,refineF);
-        // updateDEMTime_ += updateDEMTime.timeIncrement();
+        DEMTime_ += updateDEMTime.timeIncrement();
         Info << "updated HFDIBDEM" << endl;
 
 
         runTime.write();
 
-        // clockTime writeBodiesInfoTime;
+        clockTime writeBodiesInfoTime;
         if(runTime.outputTime())
         {
             HFDIBDEM.writeBodiesInfo();
         }
-        // writeBodiesInfoTime_ += writeBodiesInfoTime.timeIncrement();
+        suplTime_ += writeBodiesInfoTime.timeIncrement();
 
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
 
-    // DEMTime_ = preUpdateTime_ + createBodiesTime_ + postUpdateTime_ + addRemoveTime_ + updateDEMTime_ + writeBodiesInfoTime_;
-    // Info<< "CFDTime_            = " << CFDTime_             << " s \n"
-    //     << "DEMTime_            = " << DEMTime_             << " s \n" 
-    //     << "preUpdateTime       = " << preUpdateTime_       << " s \n"
-    //     << "createBodiesTime    = " << createBodiesTime_    << " s \n"
-    //     << "postUpdateTime      = " << postUpdateTime_      << " s \n"
-    //     << "addRemoveTime       = " << addRemoveTime_       << " s \n"
-    //     << "updateDEMTime       = " << updateDEMTime_       << " s \n"
-    //     << "   wallContactTime_         = " << HFDIBDEM.wallContactTime_        << " s \n"
-    //     << "   wallContactParallelTime_ = " << HFDIBDEM.wallContactParallelTime_<< " s \n"
-    //     << "   wallContactSCTime_       = " << HFDIBDEM.wallContactReduceTime_  << " s \n"
-    //     << "   prtContactTime_          = " << HFDIBDEM.prtContactTime_         << " s \n"
-    //     << "   prtContactParallelTime_  = " << HFDIBDEM.prtContactParallelTime_ << " s \n"
-    //     << "   prtContactSCTime_        = " << HFDIBDEM.prtContactReduceTime_   << " s \n"
-    //     << "   demItegrationTime_       = " << HFDIBDEM.demItegrationTime_      << " s \n"
-    //     << "writeBodiesInfoTime = " << writeBodiesInfoTime_ << " s \n" << endl;
+    Info<< " CFDTime_                 = " << CFDTime_             << " s \n" <<
+           " Solver suplementary time = " << suplTime_            << " s \n" << 
+           " DEMTime_                 = " << DEMTime_             << " s \n" << endl;
     }
 
     Info<< "End\n" << endl;
 
-    // Info<< "CFDTime_            = " << CFDTime_             << " s \n"
-    //     << "DEMTime_            = " << DEMTime_             << " s \n"
-    //     << "preUpdateTime       = " << preUpdateTime_       << " s \n"
-    //     << "createBodiesTime    = " << createBodiesTime_    << " s \n"
-    //     << "postUpdateTime      = " << postUpdateTime_      << " s \n"
-    //     << "addRemoveTime       = " << addRemoveTime_       << " s \n"
-    //     << "updateDEMTime       = " << updateDEMTime_       << " s \n"
-    //     << "   wallContactTime_         = " << HFDIBDEM.wallContactTime_        << " s \n"
-    //     << "   wallContactParallelTime_ = " << HFDIBDEM.wallContactParallelTime_<< " s \n"
-    //     << "   wallContactSCTime_       = " << HFDIBDEM.wallContactReduceTime_  << " s \n"
-    //     << "   prtContactTime_          = " << HFDIBDEM.prtContactTime_         << " s \n"
-    //     << "   prtContactParallelTime_  = " << HFDIBDEM.prtContactParallelTime_ << " s \n"
-    //     << "   prtContactSCTime_        = " << HFDIBDEM.prtContactReduceTime_   << " s \n"
-    //     << "   demItegrationTime_       = " << HFDIBDEM.demItegrationTime_      << " s \n"
-    //     << "writeBodiesInfoTime = " << writeBodiesInfoTime_ << " s \n" << endl;
     return 0;
 }
 

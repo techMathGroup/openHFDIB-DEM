@@ -1,0 +1,134 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  3.0.x                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      HFDIBDEMDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+bodyNames ("sphere_Top1" "sphere_Bot1");
+interpolationSchemes
+{
+  U cell;
+}
+
+surfaceThreshold    1e-4;
+stepDEM     1e-2;
+geometricD (1 1 1);
+recordSimulation true;
+recordFirstTimeStep true;
+
+outputSetup
+{
+    basic true;
+    iB  true;
+    DEM true;
+    addModel false;
+    parallelDEM true;
+}
+DEM
+{
+	LcCoeff 0.55;
+    materials
+    {
+        particle1
+        {
+            Y       1e8;
+            nu      0.0;
+            mu      0.0;
+            adhN    0;
+			eps	 	1.0;
+        }
+
+        semiIron
+        {
+            Y       1e8;
+            nu      0.0;
+            mu      0.0;
+            adhN    0;
+			eps	 	1.0;
+        }    
+    }
+	collisionPatches
+	{
+		
+	}
+}
+
+sphere_Top1
+{
+	fullyCoupledBody
+	{
+		velocity (0 -1.0 0);
+	}
+
+	rho         rho [1 -3 0 0 0 0 0] 2500;
+
+	refineMC 5;
+	U
+	{
+	BC  noSlip;
+	}
+
+	bodyAddition
+	{
+		addModel   once;
+		onceCoeffs{}
+	}
+		
+	material particle1;
+	bodyGeom sphere;
+	sphere
+	{
+	    startPosition   (0.0 0.015 0.0);
+	    radius  0.01;
+	}
+	updateTorque true;
+	sdBasedLambda false;
+	interfaceSpan 1.0;
+	startSynced false;
+	refineBuffers -1;
+	timesToSetStatic -1;
+}
+
+sphere_Bot1
+{
+	staticBody;
+	rho         rho [1 -3 0 0 0 0 0] 2500;
+
+	refineMC 5;
+	U
+	{
+	BC  noSlip;
+	}
+	bodyAddition
+	{
+		addModel   once;
+		onceCoeffs{}
+	}
+		
+	material particle1;
+	bodyGeom sphere;
+	sphere
+	{
+	    startPosition   (0.0 -0.015 0.0);
+	    radius  0.01;
+	}
+	updateTorque false;
+	sdBasedLambda false;
+	interfaceSpan 1.0;
+	startSynced false;
+	refineBuffers -1;
+	timesToSetStatic -1;
+}
+
+// ************************************************************************* //

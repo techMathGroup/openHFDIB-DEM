@@ -1,0 +1,138 @@
+###################################Header for General commands#######################################################
+
+atom_style	granular		#Simulation of particles
+
+boundary	f f f			#fixed boundaries -> particles will be deleted if leaving the simulation box
+
+units		si
+
+communicate	single vel yes	#default
+
+newton		off				#default
+
+###################################System variables##################################################################
+
+#Definition of boundaries
+variable xmin equal -1.5e-2
+variable xmax equal 1.5e-2
+
+variable ymin equal -3.5e-2
+variable ymax equal 3.5e-2
+
+variable zmin equal -1.5e-2
+variable zmax equal 1.5e-2
+
+#Definition of the timestep
+
+variable dt equal 1e-5			
+
+###################################Specific variables for current simulation#########################################
+
+variable natoms equal 2 	
+
+####variable for material properties####
+
+####Young Modulus####
+variable	youngmodulus1	equal 	1e8		#N/mm²
+variable	youngmodulus2	equal 	1e8		#N/mm²
+
+####Poission ratio####
+variable 	poission1	equal	0.0
+variable 	poission2	equal	0.0
+
+####variable for contact properties####
+
+####coefficient of restitution####
+variable	CoR11	equal	1.0
+variable	CoR12	equal	1.0	
+variable	CoR21	equal	1.0
+variable	CoR22	equal	1.0
+
+####sliding friction coefficient####
+variable	sf11	equal	0.0
+variable	sf12	equal	0.0
+variable	sf21	equal	0.0
+variable	sf22	equal	0.0
+
+####rolling friction coefficient####
+variable	rf11	equal	0.0
+variable	rf12	equal	0.0
+variable	rf21	equal	0.0
+variable	rf22	equal	0.0
+
+####filling parameters####
+
+variable	runTime	    equal	0.02	#seconds
+
+variable	runSteps	equal	${runTime}/${dt}		#Transform time to iteration steps
+
+###################################Definition of simulationbox#######################################################
+
+region		reg block ${xmin} ${xmax} ${ymin} ${ymax} ${zmin} ${zmax} units box
+
+create_box	2 reg
+
+neighbor	0.004 bin		#default
+
+neigh_modify	delay 0		#default
+
+#################################Definition of the contact models####################################################
+
+pair_style gran model hertz tangential history rolling_friction epsd2 limitForce on	#contact model
+
+pair_coeff	* *				#default
+
+timestep ${dt}
+
+fix		integrator all nve/sphere			#default
+
+fix		gravi all gravity 0 vector 0.0 -1.0 0.0		
+
+###################################Definition of Material properties#################################################
+
+
+fix 		m1 all property/global youngsModulus peratomtype ${youngmodulus1} ${youngmodulus2}
+
+fix 		m2 all property/global poissonsRatio peratomtype ${poission1} ${poission2}
+
+fix 		m3 all property/global coefficientRestitution peratomtypepair ${natoms} ${CoR11} ${CoR12} ${CoR21} ${CoR22}
+
+fix 		m4 all property/global coefficientFriction peratomtypepair ${natoms} ${sf11} ${sf12} ${sf21} ${sf22}
+
+fix 		m5 all property/global coefficientRollingFriction peratomtypepair ${natoms} ${rf11} ${rf12} ${rf21} ${rf22}
+
+###################################Generation and Insertion of the particles#########################################
+
+create_atoms 1 single 0.0 0.015 0.0  units box
+create_atoms 2 single 0.0 -0.015 0.0  units box
+set atom 1 diameter 0.02 density 2500 vx 0 vy -1.0 vz 0
+set atom 2 diameter 0.02 density 2500 vx 0 vy 0.0 vz 0
+group  mine type 2
+fix freeze mine setforce 0.0 0.0 0.0 region reg
+
+###################################Dumping of the data for post-processing to visualize############################
+
+shell 	mkdir post
+
+#Definition of the dumptime
+
+variable writeTime equal 1e-5	# Every 0.05 s 1 image 
+
+variable writeStep equal ${writeTime}/${dt}	#Transform to iteration steps
+
+
+#~ dump	dmpparticle all custom ${dumpstep} post/particles_*.liggghts id type x y z vx vy vz fx fy fz radius mass
+dump	dmpparticle all custom/vtk ${writeStep} post/particles_Res_*.vtk id type x y z vx vy vz fx fy fz omegax omegay omegaz radius mass
+# dump	dmpBox all mesh/stl ${dumpstep} post/Box*.stl Box
+
+####################################RUN the simulation filling###########################################################
+
+run	 ${runSteps}
+
+#unfix	ins
+
+##################################RUN the simulation settling#############################################################
+
+#run	 ${settlesteps}
+
+

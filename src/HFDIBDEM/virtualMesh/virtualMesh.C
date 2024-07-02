@@ -308,6 +308,10 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(bool nonConvex)
         for (subContact& sC : sCS)
         {
             DynamicPointList edgeSubContactPoints = sC.getEdgePoints();
+            if(edgeSubContactPoints.size() < 1)
+            {
+                continue;
+            }
             Tuple2<scalar,vector> cNormalAndSurf
                 = get3DcontactNormalAndSurface(edgeSubContactPoints);
 
@@ -422,7 +426,7 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList
         if(mag(weightedDir) > SMALL)
         {
             normOk = true;
-            normalVec = weightedDir/mag(weightedDir);
+            normalVec = weightedDir/(mag(weightedDir)+SMALL);
         }
         if (!normOk || mag(normalVec) < 1)
             normalVec = normalVector;

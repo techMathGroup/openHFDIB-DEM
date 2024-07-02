@@ -334,6 +334,12 @@ namespace Foam
             volScalarField& body
         );
 
+        virtual void calculateGeometricalPropertiesParallel(
+            volScalarField& body
+        );
+
+
+
         //evaluate center of mass and inertia tensor
         void addToMAndI
         (
@@ -358,9 +364,20 @@ namespace Foam
             return M_;
         }
 
+        void setM(scalar M)
+        {
+            M_ = M;
+        }
+
+
         label& getNCells()
         {
             return nCells_;
+        }
+
+        void setNCells(label nCells)
+        {
+            nCells_ = nCells;
         }
 
         const dimensionedScalar getRhoS()    const
@@ -370,12 +387,17 @@ namespace Foam
 
         virtual vector getLVec(const point& toPoint)
         {
-            return toPoint - CoM_;
+            return toPoint - getCoM();
         }
 
         const symmTensor& getI()    const
         {
             return I_;
+        }
+
+        void setI(const symmTensor& I)
+        {
+            I_ = I;
         }
 
         virtual void resetBody(volScalarField& body);
@@ -411,7 +433,7 @@ namespace Foam
 
         virtual List<std::shared_ptr<boundBox>> getBBoxes();
 
-        virtual pointField getSTLBodyPoints()
+        virtual pointField getBodyPoints()
         {
             InfoH << iB_Info << "18-- geomModelMessage-- "
                 << "not cluster model"<<endl;
@@ -419,21 +441,12 @@ namespace Foam
             return emptyField;
         }
 
-        virtual faceList getSTLFaces()
+        virtual  void setBodyPosition(pointField pos)
         {
-            InfoH << iB_Info << "19-- geomModelMessage-- "
+            InfoH << iB_Info << "22-- geomModelMessage-- "
                 << "notIplemented"<<endl;
-            faceList emptyList;
-            return emptyList;
         }
 
-        virtual pointField getSTLFacePoint(label faceID)
-        {
-            InfoH << iB_Info << "20-- geomModelMessage-- "
-                << "notIplemented"<<endl;
-            pointField nonPointField;
-            return nonPointField;
-        }
     };
 }
 #endif

@@ -126,6 +126,10 @@ void verletList::addCPairToCntNList(
         }
     }
 
+    if(a->getIsStatic() && b->getIsStatic())
+    {
+        return;
+    }
     if(posCntList_.find(cPair) == posCntList_.end() &&
         (cntNeighList_[0].find(cPair) != cntNeighList_[0].end() || emptyDim == 0) &&
         (cntNeighList_[1].find(cPair) != cntNeighList_[1].end() || emptyDim == 1) &&
@@ -143,7 +147,8 @@ void verletList::addBodyToVList(immersedBody& ib)
     {
         verletBoxes_.push_back(verletBox::create(
             ib.getBodyId(),
-            bBoxes[bBox]
+            bBoxes[bBox],
+            ib.getbodyOperation()==0
         ));
 
         verletBoxes_.back()->setVerletPoints();

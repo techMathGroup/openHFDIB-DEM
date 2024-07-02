@@ -42,6 +42,8 @@ Contributors
 #include "shapeBased.H"
 #include "OFstream.H"
 
+#include <assert.h>
+
 namespace Foam
 {
     class sphereBody
@@ -229,6 +231,18 @@ namespace Foam
         void setCoM() final override
         {
             CoM_ = position_;
+        }
+
+        void setBodyPosition(pointField pos) final override
+        {
+            assert(pos.size() == 1 && "Only one point is allowed for sphere body");
+            position_ = pos[0];
+        }
+
+        pointField getBodyPoints() final override
+        {
+            pointField points(1,position_);
+            return points;
         }
     };
 }

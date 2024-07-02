@@ -62,6 +62,8 @@ class wallContactVars
     scalar Vn_;
     scalar Lc_;
     scalar curAdhN_;    // Current contact adhesive coef
+    
+    vector lVector_;    // Vector from contact center to the contact point
 
     vector FtPrev_;     // Tangential force from previous time-step
 
