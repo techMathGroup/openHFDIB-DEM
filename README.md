@@ -1,5 +1,5 @@
 # openHFDIB-DEM
-Version 2.6 - Experimental Version currently under heavy develpoment. Not recomended for use. 
+Version 2.6 
 
 About openHFDIB-DEM
 -------------------
@@ -30,6 +30,8 @@ Code capabilities
   distribution of uniformly sized bodies (see HFDIBDEM/addModels)
 * instructive tutorials for a single particle falling through a fluid and
   for interaction between a particle and a complex-shaped impeller (see Tutorials)
+* possible applications added to examples; see for settings of large-scale simulations
+* fully parallel version
 
 Compatibility
 -------------
