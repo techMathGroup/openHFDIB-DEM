@@ -1,0 +1,8 @@
+#!/bin/bash
+# LIGGGHTS software download and compiled from gitHub 
+# source https://github.com/CFDEMproject/LIGGGHTS-PUBLIC.git
+
+#installation tutorial available from https://www.engineerdo.com/wp-content/uploads/2020/06/EngineerDo_Installation_liggghts.pdf
+#video tutorial available at https://youtu.be/ru3119ozC6M
+
+liggghts -in input.liggghts
