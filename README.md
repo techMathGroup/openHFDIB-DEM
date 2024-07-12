@@ -51,6 +51,8 @@ Please note that the code is developed by a small research team. The openHFDIB-D
 
 For any questions regarding specific cases or code capabilities, we kindly ask you to use the "Discussions" page (https://github.com/techMathGroup/openHFDIB-DEM/discussions). We are trying to be present there and to communicate with you as users. However, due to our team size and workload, we cannot provide individual support to each openHFDIB-DEM user.
 
+Finally, doxygen documentation for the library is available at http://docs.isoz.eu.
+
 If you need to contact the authors in matters regarding openHFDIB-DEM, please do so via email: openhfdib-dem@it.cas.cz
 
 
