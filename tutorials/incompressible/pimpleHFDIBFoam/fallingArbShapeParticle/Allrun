@@ -13,5 +13,3 @@ application=`getApplication`
 runApplication $application &
 
 paraFoam -touch
-
-# Note: mesh non-orthogonality = 0. mesh OK
