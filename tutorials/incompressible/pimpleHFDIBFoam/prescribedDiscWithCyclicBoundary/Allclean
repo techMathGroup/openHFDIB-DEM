@@ -8,7 +8,4 @@ cd ${0%/*} || exit 1    # run from this directory
 
 cleanCase
 rm -rf 0
-rm -f *.obj
-
-rm -f *.pyData                                                          #remove all the saved matrices
-rm -f pyVisMat/*      
+rm -f *.obj   

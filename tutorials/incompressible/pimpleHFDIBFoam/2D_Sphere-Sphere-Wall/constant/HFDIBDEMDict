@@ -16,7 +16,7 @@ FoamFile
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 bodyNames ("sphere_Top" "sphere_Bot");
-// bodyNames ("spehere-top" "sphere-bot");
+
 interpolationSchemes
 {
   //~ U cellPointFace;
@@ -66,22 +66,8 @@ DEM
 
 	cyclicPatches
 	{
-		// outlet 
-		// {
-		// 	material wall;
-		// 	nVec (0.0 -1.0 0.0);
-		// 	planePoint (0.00 -0.25 0.0);
-		// 	neighbourPatch "movingWall";
-		// }
-
-		// movingWall
-		// {
-		// 	material wall;
-		// 	nVec (0.0 1.0 0.0);
-		// 	planePoint (0.00 0.05 0.0);
-		// 	neighbourPatch "outlet";
-		// }
 	} 
+
     collisionPatches
     {
 		wall0
@@ -143,7 +129,6 @@ sphere_Top
 	}
 		
 	material particle;
-//	bodyGeom convex;
 	bodyGeom sphere;
 	sphere
 	{

@@ -17,12 +17,7 @@ FoamFile
 
 ddtSchemes
 {
-    //~ default         backward;
-    //~ default         steadyState;
     default         Euler;
-    // ddt(CO2Mass)    CrankNicolson 0.9;
-    // ddt(N2Mass)     CrankNicolson 0.9;
-    //~ default         CrankNicolson 0.9;
 }
 
 gradSchemes
@@ -37,36 +32,26 @@ gradSchemes
 
 divSchemes
 {
-    // default         Gauss SFCD;
-//    default         Gauss linear;
+    default         Gauss linear;
     div(phi,U)      Gauss linear grad(U);
     div((nuEff*dev2(T(grad(U))))) Gauss linear;
-    div(((lambda*(1|A(U)))*f))  Gauss linear;
-    // div(dummyPhi,CO2Mass) Gauss SuperBee;
-    // div(dummyPhi,CO2) Gauss SuperBee;
-    // div(dummyPhi,N2Mass) Gauss SuperBee;
-    // div(dummyPhi,N2) Gauss SuperBee;
-    // div(dummyPhi,currSpMass) Gauss vanLeer;
-    
+    div(((lambda*(1|A(U)))*f))  Gauss linear;    
 }
 
 laplacianSchemes
 {
-    //~ default         Gauss linear uncorrected;
-    default         Gauss linear limited corrected 0.5;
+    default         Gauss linear uncorrected;
 }
 
 interpolationSchemes
 {
     default         linear;
     interpolate(dummyUi)        linear;
-    // interpolate(dummyUi)		downwind gradLambda;
 }
 
 snGradSchemes
 {
-    //~ default         uncorrected;
-    default         limited corrected 0.5;
+    default         uncorrected;
 }
 
 

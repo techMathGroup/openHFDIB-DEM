@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
 | =========                 |                                                 |
 | \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \\    /   O peration     | Version:  3.0.x                                 |
+|  \\    /   O peration     | Version:  dev                                 |
 |   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \\/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -16,10 +16,7 @@ FoamFile
 
 convertToMeters 0.01;
 xInlet 0;
-//~ xOutlet  12;
 xOutlet  12;
-//~ xResolution 225;
-//~ xResolution 125;
 xResolution 100;
 
 ycStart -0.05;
@@ -29,7 +26,6 @@ ycyclicResolution 1;
 zcStart -3;
 zcyclicLength  3; //dp = 2, i.e., 4 diameters per box
 
-//~ zcyclicResolution 90;
 zcyclicResolution 50;
 
 
@@ -44,14 +40,11 @@ vertices
   ($xOutlet $ycStart       $zcyclicLength)
   ($xOutlet $ycyclicLength $zcyclicLength)
   ($xInlet  $ycyclicLength $zcyclicLength)
-
-
 );
 
 blocks
 (
   hex (0 1 2 3 4 5 6 7) ($xResolution $ycyclicResolution $zcyclicResolution) simpleGrading (1 1 1)
-
 );
 
 edges
@@ -62,10 +55,7 @@ boundary
 (
   z1
 {
-  //~ type symmetry;
   type wall;
-/*         type wall;*/
-//        neighbourPatch z0;
   faces
   (
    (4 5 6 7)
@@ -74,10 +64,7 @@ boundary
 
 z0
 {
-  //~ type symmetry;
   type wall;
-/*         type wall;*/
-//        neighbourPatch z1;
   faces
   (
    (0 3 2 1)
@@ -86,9 +73,7 @@ z0
 
 x1
 {
-
 type wall;
-/*         type wall;*/
 neighbourPatch x0;
   faces
   (
@@ -99,7 +84,6 @@ neighbourPatch x0;
 x0
 {
 type patch;
-/*         type wall;*/
 neighbourPatch x1;
   faces
   (
@@ -109,11 +93,7 @@ neighbourPatch x1;
 
 frontAndBack
  {
-    //~ type patch;
   type patch;
-//     neighbourPatch periodic_y0;
-/*        transform translational;*/
-/*        separationVector (0 -0.008 0);*/
      faces
      (
      (3 7 6 2)
