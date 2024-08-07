@@ -44,20 +44,18 @@ DEM
         {
             Y       1e8;
             nu      0.0;
-            gamma   0.0;
             mu      1;
             adhN    0;
-			eps	 	0.9;
+			eps	 	1;
         }
         
         wall
         {
             Y       1e8;
             nu      0.0;
-            gamma   0.0;
             mu      1;
             adhN    0;
-			eps	 	0.9;
+			eps	 	1;
         }
     }
     LcCoeff 0.55;
