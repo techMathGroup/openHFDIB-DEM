@@ -184,9 +184,14 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         {
             Info << "Rotation Model not recognized, setting to default mindlin1953" << endl;
             contactModelInfo::setRotationModel(1);
-        }
+        }    
     }
-
+    else
+    {
+        Info << "Rotation Model not recognized, setting to default mindlin1953" << endl;
+        contactModelInfo::setRotationModel(1);
+    }
+    
 
     Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
 
