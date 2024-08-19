@@ -478,12 +478,6 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
     reduce(particleCells,sumOp<List<label>>());
     reduce(particleInertiaTensors,sumOp<List<symmTensor>>());
 
-    Info << "mass list size " << particleMasses.size() << endl;
-    for (auto& m : particleMasses)
-    {
-        Info << "mass " << m << endl;
-    }
-
     label bodyIndex(0);
     forAll (immersedBodies_,bodyId)
     {
