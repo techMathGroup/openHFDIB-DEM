@@ -97,7 +97,7 @@ neighbourPatch x1;
 
 frontAndBack
  {
-  type patch;
+  type empty;
      faces
      (
      (3 7 6 2)
