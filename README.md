@@ -53,14 +53,16 @@ For any questions regarding specific cases or code capabilities, we kindly ask y
 
 Finally, doxygen documentation for the library is available at http://docs.isoz.eu.
 
+For the installation guide and detailed tutorials, see our repo wiki (https://github.com/techMathGroup/openHFDIB-DEM/wiki/)
+
 If you need to contact the authors in matters regarding openHFDIB-DEM, please do so via email: openhfdib-dem@it.cas.cz
 
 
 Cite this work as
 -----------------
 * Isoz, M.; Kotouč Šourek, M.; Studeník, O.; Kočí, P.: Hybrid fictitious domain-immersed boundary solver coupled with discrete element method for simulations of flows laden with arbitrarily-shaped particles. Computers & Fluids, 244 (2022) 105538, DOI: 10.1016/j.compfluid.2022.105538
+* Kotouč Šourek, M.; Studeník, O.; Isoz, M.;  Kočí, P.: Viscosity prediction for dense suspensions of non-spherical particles based on CFD-DEM simulations. Powder Technology, 444 (2024) 120067, DOI:10.1016/j.powtec.2024.120067
 * Studeník, O.; Kotouč Šourek, M.; Isoz, M.: Octree-generated virtual mesh for improved contact resolution in CFD-DEM coupling. In Proceedings Topical Problems of Fluid Mechanics 2022, Prague, 2022, Edited by David Šimurda and Tomáš Bodnár, pp. 151-158, DOI: 10.14311/TPFM.2022.021 
-* Kotouč Šourek, M.; Isoz, M.: Estimating rheological properties of suspensions formed of arbitrarily-shaped particles via CFD-DEM. In Proceedings Topical Problems of Fluid Mechanics 2022, Prague, 2022, Edited by David Šimurda and Tomáš Bodnár, pp. 103-110, DOI: 10.14311/TPFM.2022.015 
 
 License
 -------
