@@ -53,7 +53,7 @@ For any questions regarding specific cases or code capabilities, we kindly ask y
 
 Finally, doxygen documentation for the library is available at http://docs.isoz.eu.
 
-For the installation guide and detailed tutorials, see our repo wiki (https://github.com/techMathGroup/openHFDIB-DEM/wiki/)
+For the installation guide and detailed tutorials, see our "Wiki" page (https://github.com/techMathGroup/openHFDIB-DEM/wiki/)
 
 If you need to contact the authors in matters regarding openHFDIB-DEM, please do so via email: openhfdib-dem@it.cas.cz
 
