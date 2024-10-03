@@ -1,7 +1,7 @@
 /*--------------------------------*- C++ -*----------------------------------*\
-| =========                 |                                                 |
+| =========                |                                                 |
 | \      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
-|  \    /   O peration     | Version:  3.0.x                                 |
+|  \    /   O peration     | Version:  8                                     |
 |   \  /    A nd           | Web:      www.OpenFOAM.org                      |
 |    \/     M anipulation  |                                                 |
 \*---------------------------------------------------------------------------*/
@@ -18,51 +18,50 @@ bodyNames ( "icoSphere" );
 
 interpolationSchemes
 {
-  U cellPointFace;
-  method line;
+    U      cellPointFace;
+    method line;
 }
 
 surfaceThreshold    1e-4;
-stepDEM     0.02;
-geometricD (1 -1 1);
-recordSimulation true;
+stepDEM             0.02;
+geometricD          (1 -1 1);
+recordSimulation    true;
 recordFirstTimeStep false;
-nSolidsInDomain 1000;       //Sets Upper Limit On Number Of Particles In Domain if not spcecified sets to 1000 by default
+nSolidsInDomain      1000;
 
 outputSetup
 {
-    basic true;
-    iB  false;
-    DEM false;
-    addModel true;
+    basic       true;
+    iB          false;
+    DEM         false;
+    addModel    true;
     parallelDEM false;
 }
 
 DEM
 {
-    LcCoeff 4.0;
-    	rotationModel chen2012;
-	// rotationModel mindlin1953
+    
     materials
     {
         particle
         {
             Y       1e7;
             nu      0.3;
-            mu      0.05;
+            mu      0.75;
             adhN    0;
-            eps     0.5;
+            eps     0.25;
         }
 
         wall
         {
             Y       1e7;
             nu      0.2;
-            mu      0;
+            mu      0.75;
             adhN    0;
-            eps     0.5;
+            eps     0.25;
         }
     }
+    LcCoeff 4.0;
 
     collisionPatches
     {
@@ -102,46 +101,43 @@ virtualMesh
 
 icoSphere
 {
-fullyCoupledBody;
-rho         rho [1 -3 0 0 0 0 0] 3950;
-U
-{
-	BC  noSlip;
-}
-material particle
-bodyGeom convex;
-updateTorque false;
-sdBasedLambda false;
-interfaceSpan 1.0;
-startSynced false;
-refineBuffers 1;
-timesToSetStatic 30; //number of timeSteps in contact with wall/static body to set body as static. Never when -1
-bodyAddition
-{
-	addModel distribution;
-    distributionCoeffs
+    fullyCoupledBody;
+    updateTorque true;
+    startSynced false;
+    rho         rho [1 -3 0 0 0 0 0] 10000;
+    material particle;
+    U
     {
-        stlBaseSize     0.005;
-        addMode             fieldBased;
-        fieldBasedCoeffs
+        BC  noSlip;
+    }
+    bodyGeom convex;
+    interfaceSpan 1.0;
+    timesToSetStatic 80;
+    bodyAddition
+    {
+        addModel distribution;
+        distributionCoeffs
         {
-            fieldName   lambda;                                      //name of the indicator field
-            fieldValue	0.05;                                        //minimal field value before addition
+            stlBaseSize     0.005;
+            addMode         fieldBased;
+            fieldBasedCoeffs
+            {
+                fieldName   lambda;
+                fieldValue	0.05;
+            }
+    
+            addDomain      boundBox;
+            boundBoxCoeffs
+            {
+                minBound (0 -0.001 -0.03);
+                maxBound (0.04 0.001 0.03);
+            }
+    
+            scalingMode    noScaling;
+            noScalingCoeffs{};
+            rotationMode   noRotation;
+            noRotationCoeffs{};
         }
-
-        addDomain      boundBox;
-        boundBoxCoeffs
-        {
-            minBound (0 -0.001 -0.03);
-            maxBound (0.04 0.001 0.03);
-        }
-
-        scalingMode    noScaling;
-        noScalingCoeffs{};
-        rotationMode   noRotation;
-        noRotationCoeffs{};
     }
 }
-}
-
 // ************************************************************************* //

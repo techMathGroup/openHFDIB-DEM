@@ -20,27 +20,15 @@ internalField   uniform 0;
 
 boundaryField
 {
-    movingWall
+    inlet
     {
         type            fixedValue;
         value           $internalField;
-        // type            cyclic;
     }
 
     outlet
     {
 		type            zeroGradient;
-        // type            cyclic;
-    }
-    
-    fixedWalls
-    {
-        type            zeroGradient;
-        
-    }
-    frontAndBack
-    {
-        type            empty;
     }
 }
 

@@ -40,7 +40,7 @@
 >> ***materialName*** - *required* > Custom name of material Multiple blocks possible (see example)
 >>> **Y** - *required* > Young's modulus  
 >>> **nu** - *required* > Poisson ratio  
->>> **gamma** - *required* > Viscoelastic damping constant  
+>>> **eps** - *required* > Viscoelastic damping constant  
 >>> **mu** - *required* > Tangential force truncation  
 >>> **adhN** - *required* > Adhesive force coefficient
 
@@ -52,6 +52,8 @@
 > **collisionPatches** - *required* > List of patches with which the bodies collide  
 >> ***patchName*** - *required* > Name of the patch
 >>> Possible values: ***materialName***
+>>> nVec: ***normal vector***
+>>> planePoint: *** point located on plane***
 
 ***bodyName*** - *required* > Body name which correspond to value in **bodyNames**
 
@@ -94,14 +96,9 @@
 > **updateTorque** - *optional* > Should be rotational movement updated according to acting forces?
 >> Possible values: {*true*, *false*}
 
-> **sdBasedLambda** - *optional* > sdBased algorithm for lambda reconstruction. Default false
->> Possible values: {*true*, *false*}  
-
 > **interfaceSpan** - *optional* > For sdBased algorithm. Best results with 1.0
 
 > **startSynced** - *optional* > Should be body movement sync with fluid movement when added? Default false
 >> Possible values: {*true*, *false*}
-
-> **refineBuffers** - *optional* > Number of layers around cell to be refined. dynamicRefineFvMesh required when value > 0. Default 0
 
 > **timesToSetStatic** - *optional* > Number of timesteps to set body as static. Value -1 means never. Default -1
