@@ -1,3 +1,0 @@
-contactModels/materialInfo.C
-contactModels/wallContactVars.C
-LIB = $(FOAM_USER_LIBBIN)/libHFDIBDEM_new
