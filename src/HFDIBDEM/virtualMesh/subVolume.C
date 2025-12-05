@@ -80,7 +80,8 @@ ibSubVolumeInfo& subVolume::tVolumeInfo()
     return tVolumeInfo_;
 }
 //---------------------------------------------------------------------------//
-List<subVolume>& subVolume::childSubVolumes()
+//~ List<subVolume>& subVolume::childSubVolumes()
+List<autoPtr<subVolume>>& subVolume::childSubVolumes()
 {
     if (childSubVolumes_.size() == 0)
     {
@@ -89,12 +90,15 @@ List<subVolume>& subVolume::childSubVolumes()
         {
             childSubVolumes_.append
             (
-                subVolume
+                autoPtr<subVolume>
                 (
-                    subBbox(octant),
-                    parentSV,
-                    cVolumeInfo_.volumeType_,
-                    tVolumeInfo_.volumeType_
+                    new subVolume
+                    (
+                        subBbox(octant),
+                        parentSV,
+                        cVolumeInfo_.volumeType_,
+                        tVolumeInfo_.volumeType_
+                    )
                 )
             );
         }
@@ -147,3 +151,73 @@ bool subVolume::isEdge() const
     return isEdge_;
 }
 //---------------------------------------------------------------------------//
+// --- Copy constructor (deep-copies List<autoPtr<subVolume>>)
+subVolume::subVolume(const subVolume& other)
+:
+    // copy the treeBoundBox part
+    treeBoundBox(static_cast<const treeBoundBox&>(other)),
+    // shared_ptr can be copied directly (shared ownership of parent)
+    parentSV_(other.parentSV_),
+    // create an empty list; we'll size & fill below
+    childSubVolumes_(),
+    // cheap copies (ibSubVolumeInfo is now copyable)
+    cVolumeInfo_(other.cVolumeInfo_),
+    tVolumeInfo_(other.tVolumeInfo_),
+    isEdge_(other.isEdge_)
+{
+    // Deep copy children: clone each pointed subVolume if present
+    const label n = other.childSubVolumes_.size();
+    childSubVolumes_.setSize(n);
+
+    for (label i = 0; i < n; ++i)
+    {
+        if (other.childSubVolumes_[i].valid())
+        {
+            childSubVolumes_[i].reset
+            (
+                new subVolume(*other.childSubVolumes_[i]) // recursive copy
+            );
+        }
+        else
+        {
+            childSubVolumes_[i].clear(); // keep invalid (null) autoPtr
+        }
+    }
+}
+
+// --- Copy assignment (deep-copies List<autoPtr<subVolume>>)
+subVolume& subVolume::operator=(const subVolume& other)
+{
+    if (this != &other)
+    {
+        // copy base
+        static_cast<treeBoundBox&>(*this) = static_cast<const treeBoundBox&>(other);
+
+        // copy trivials
+        parentSV_   = other.parentSV_;
+        cVolumeInfo_ = other.cVolumeInfo_;
+        tVolumeInfo_ = other.tVolumeInfo_;
+        isEdge_      = other.isEdge_;
+
+        // rebuild children (strong exception-safety not strictly required here,
+        // but this is reasonably safe with OpenFOAM containers)
+        const label n = other.childSubVolumes_.size();
+        childSubVolumes_.setSize(n);
+
+        for (label i = 0; i < n; ++i)
+        {
+            if (other.childSubVolumes_[i].valid())
+            {
+                childSubVolumes_[i].reset
+                (
+                    new subVolume(*other.childSubVolumes_[i])
+                );
+            }
+            else
+            {
+                childSubVolumes_[i].clear();
+            }
+        }
+    }
+    return *this;
+}

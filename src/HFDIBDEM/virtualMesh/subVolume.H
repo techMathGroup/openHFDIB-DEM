@@ -71,36 +71,41 @@ struct ibSubVolumeInfo
 
     volumeType volumeType_;
     autoPtr<labelList> shapesIn_;
-
-    //move constructor
-    // ibSubVolumeInfo(ibSubVolumeInfo&&) = default;
-    //move asssignment operator
-    // ibSubVolumeInfo& operator=(ibSubVolumeInfo&&) = default;
-
+    
+    // --- copy ctor (deep copy of shapesIn_) ---
     ibSubVolumeInfo(const ibSubVolumeInfo& other)
     :
         volumeType_(other.volumeType_),
-        shapesIn_(other.shapesIn_.valid()
+        shapesIn_
+        (
+            other.shapesIn_.valid()
             ? autoPtr<labelList>(new labelList(*other.shapesIn_))
-            : nullptr)
+            : autoPtr<labelList>()
+        )
     {}
 
+    // --- copy assignment (deep copy of shapesIn_) ---
     ibSubVolumeInfo& operator=(const ibSubVolumeInfo& other)
     {
         if (this != &other)
         {
             volumeType_ = other.volumeType_;
+
+            // reset current storage
             shapesIn_.clear();
+
             if (other.shapesIn_.valid())
             {
                 shapesIn_.reset(new labelList(*other.shapesIn_));
             }
+            // else shapesIn_ remains empty (invalid)
         }
         return *this;
     }
 
-    ibSubVolumeInfo(ibSubVolumeInfo&&) = default;
-    ibSubVolumeInfo& operator=(ibSubVolumeInfo&&) = default;
+    // --- move operations (transfer ownership of autoPtr) ---
+    ibSubVolumeInfo(ibSubVolumeInfo&&) noexcept = default;
+    ibSubVolumeInfo& operator=(ibSubVolumeInfo&&) noexcept = default;
 };
 
 /*---------------------------------------------------------------------------*\
@@ -111,7 +116,8 @@ class subVolume : public treeBoundBox
     private:
 
     std::shared_ptr<subVolume> parentSV_;
-    List<subVolume> childSubVolumes_;
+    //~ List<subVolume> childSubVolumes_;
+    List<autoPtr<subVolume>> childSubVolumes_;                          //This is a List of autoPtr, which requires manual deep-copy
 
     ibSubVolumeInfo cVolumeInfo_;
     ibSubVolumeInfo tVolumeInfo_;
@@ -144,7 +150,9 @@ class subVolume : public treeBoundBox
     ibSubVolumeInfo& cVolumeInfo();
     ibSubVolumeInfo& tVolumeInfo();
 
-    List<subVolume>& childSubVolumes();
+    //~ List<subVolume>& childSubVolumes();
+    List<autoPtr<subVolume>>& childSubVolumes();
+    
     bool hasChildSubVolumes() const;
 
     std::shared_ptr<subVolume>& parentSV();
@@ -154,17 +162,12 @@ class subVolume : public treeBoundBox
 
     void setAsEdge();
     bool isEdge() const;
-    
-    //move constructor
-    // subVolume(subVolume&&) = default;
-    //move asssignment operator
-    // subVolume& operator=(subVolume&&) = default;
-
-    subVolume(const subVolume& other) = default;
-    subVolume& operator=(const subVolume& other) = default;
-
-    subVolume(subVolume&&) = default;
-    subVolume& operator=(subVolume&&) = default;
+        
+    // Make copy/move operations available -------------------------
+    subVolume(const subVolume& other);                                  // defined in .C
+    subVolume& operator=(const subVolume& other);                       // defined in .C
+    subVolume(subVolume&&) noexcept = default;
+    subVolume& operator=(subVolume&&) noexcept = default;
 
 };
 

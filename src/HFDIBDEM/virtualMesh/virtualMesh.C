@@ -126,29 +126,59 @@ bool virtualMesh::detectFirstVolumeInContact(subVolume& sV, bool& startPointFoun
         return true;
     }
 
-    List<subVolume>& sVs = sV.childSubVolumes();
+    //~ List<subVolume>& sVs = sV.childSubVolumes();
 
+    //~ if (!startPointFound)
+    //~ {
+        //~ for (auto iter = sVs.begin(); iter != sVs.end(); ++iter)
+        //~ {
+            //~ if (iter->contains(vMeshInfo_.getStartingPoint()))
+            //~ {
+                //~ // Move this one to the front
+                //~ std::rotate(sVs.begin(), iter, sVs.end());
+                //~ break;
+            //~ }
+        //~ }
+    //~ }
+    
+    // Access the autoPtr list
+    List<autoPtr<subVolume>>& sVsPtr = sV.childSubVolumes();
+    
     if (!startPointFound)
     {
-        for (auto iter = sVs.begin(); iter != sVs.end(); ++iter)
+        // Use iterators over the autoPtr list
+        for (auto iter = sVsPtr.begin(); iter != sVsPtr.end(); ++iter)
         {
-            if (iter->contains(vMeshInfo_.getStartingPoint()))
+            subVolume& sv = **iter;  // dereference autoPtr to get the actual object
+    
+            if (sv.contains(vMeshInfo_.getStartingPoint()))
             {
                 // Move this one to the front
-                std::rotate(sVs.begin(), iter, sVs.end());
+                std::rotate(sVsPtr.begin(), iter, sVsPtr.end());
                 break;
             }
         }
     }
 
-    forAll(sVs,i)
+    //~ forAll(sVs,i)
+    //~ {
+        //~ if (detectFirstVolumeInContact(sVs[i], startPointFound))
+        //~ {
+            //~ return true;
+        //~ }
+        //~ startPointFound = true;
+    //~ }
+    forAll(sVsPtr, i)
     {
-        if (detectFirstVolumeInContact(sVs[i], startPointFound))
+        subVolume& sv = *(sVsPtr[i]);   // dereference autoPtr to get the actual object
+    
+        if (detectFirstVolumeInContact(sv, startPointFound))
         {
             return true;
         }
         startPointFound = true;
     }
+    
     return false;
 }
 //---------------------------------------------------------------------------//
@@ -265,11 +295,14 @@ void virtualMesh::inspectSubVolume(
         return;
     }
 
-    List<subVolume>& sVs = sV.childSubVolumes();
+    //~ List<subVolume>& sVs = sV.childSubVolumes();
+    // Access the autoPtr list
+    List<autoPtr<subVolume>>& sVsPtr = sV.childSubVolumes();
     DynamicPointList newEdgePoints;
-    forAll(sVs,i)
+    forAll(sVsPtr,i)
     {
-        inspectSubVolume(sVs[i], contactVolume, contactCenter, newEdgePoints);
+        subVolume& cSv = *(sVsPtr[i]);   // dereference autoPtr to get the actual object
+        inspectSubVolume(cSv, contactVolume, contactCenter, newEdgePoints);
     }
 
     if (newEdgePoints.size() > 0)
@@ -525,8 +558,13 @@ std::vector<subContact> virtualMesh::findsubContacts(subVolume& sV)
     if (sV.hasChildSubVolumes())
     {
         std::vector<subContact> childsSubContacts;
-        for (subVolume& child : sV.childSubVolumes())
+        
+        List<autoPtr<subVolume>>& sVsPtr = sV.childSubVolumes();
+        
+        //~ for (subVolume& child : sV.childSubVolumes())
+        forAll (sVsPtr, i)
         {
+            subVolume& child = *(sVsPtr[i]);
             std::vector<subContact> childSubContacts(findsubContacts(child));
             std::move(childSubContacts.begin(), childSubContacts.end(), std::back_inserter(childsSubContacts));
         }

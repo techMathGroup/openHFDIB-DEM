@@ -207,15 +207,40 @@ volumeType stlBased::getVolumeType(subVolume& sv, bool cIb)
 {
     const indexedOctree<treeDataTriSurface>& tree = triSurfSearch_->tree();
     const treeDataTriSurface& shapes = tree.shapes();
+    
+    Info << "I am here 1" << endl;
+    const auto& info = sv.getVolumeInfo(cIb);
 
-    autoPtr<labelList>& shapesIn = sv.getVolumeInfo(cIb).shapesIn_;
-
-    if (shapesIn->empty())
+    labelList shapesIn;
+    if (info.shapesIn_.valid())
+    {
+        Info << "info.shapesIn_.valid() for sv" << endl;
+        shapesIn = info.shapesIn_();                                    // OK: operator() returns const labelList&
+    }
+    
+    //~ labelList& shapesIn = sv.getVolumeInfo(cIb).shapesIn_();
+    
+    Info << "shapesIn:" << shapesIn << endl;
+    
+    Info << "I am here 2" << endl;
+    
+    //~ if (shapesIn->empty())
+    if (shapesIn.empty())
     {
         std::shared_ptr<subVolume> parentSV = sv.parentSV();
         if (parentSV)
         {
-            const labelList& parentShapesIn = *(parentSV->getVolumeInfo(cIb).shapesIn_);
+            const auto& infoParent = parentSV->getVolumeInfo(cIb);
+            labelList parentShapesIn;
+            if (infoParent.shapesIn_.valid())
+            {
+                Info << "info.shapesIn_.valid() for parentSV" << endl;
+                parentShapesIn = infoParent.shapesIn_();
+                //~ parentShapesIn = *(parentSV->getVolumeInfo(cIb).shapesIn_);
+            }
+            //~ const labelList& parentShapesIn = *(parentSV->getVolumeInfo(cIb).shapesIn_);
+            Info << "I am here 2c" << endl;
+            Info << "parentShapesIn" << parentShapesIn << endl;
             labelHashSet shapesInSV;
 
             forAll(parentShapesIn, i)
@@ -227,15 +252,20 @@ volumeType stlBased::getVolumeType(subVolume& sv, bool cIb)
                 }
             }
 
-            shapesIn.reset(new labelList(shapesInSV.toc()));
+            //~ shapesIn.reset(new labelList(shapesInSV.toc()));
+            shapesIn = labelList(shapesInSV.toc());
         }
         else
         {
-            shapesIn.reset(new labelList(tree.findBox(sv)));
+            //~ shapesIn.reset(new labelList(tree.findBox(sv)));
+            shapesIn = labelList(tree.findBox(sv));
         }
     }
+    
+    Info << "I am here 3" << endl;
 
-    if (shapesIn->size() > 0)                                           //OF.com: mixed, inside, outside -> MIXED, INSIDE, OUTSIDE
+    //~ if (shapesIn->size() > 0)                                           //OF.com: mixed, inside, outside -> MIXED, INSIDE, OUTSIDE
+    if (shapesIn.size() > 0)                                           //OF.com: mixed, inside, outside -> MIXED, INSIDE, OUTSIDE
     {
         return volumeType::MIXED;
     }
