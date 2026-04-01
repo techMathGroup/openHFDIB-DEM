@@ -524,9 +524,9 @@ void immersedBody::updateCoupling
         {
             label cellI = surfListI[surfCell];
 
-            FV -=  f[cellI]*mesh_.V()[cellI];
-            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])
-                *mesh_.V()[cellI];
+            FV -=  body[cellI]*f[cellI]*mesh_.V()[cellI];
+            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^(body[cellI]*f[cellI])
+                *mesh_.V()[cellI]);
         }
     }
 
