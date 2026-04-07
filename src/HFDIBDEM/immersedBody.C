@@ -1067,22 +1067,31 @@ void immersedBody::pimpleUpdate
 //---------------------------------------------------------------------------//
 void immersedBody::checkIfInDomain(volScalarField& body)
 {
-    if(geomModel_->getM0() < SMALL)
+    if(geomModel_->getM0() < SMALL && geomModel_->getNCells() <= 0 && !geomModel_->isCluster())
     {
+        InfoH << iB_Info << "condition 1 triggred" << endl;
+        InfoH << iB_Info << "-- body " << bodyId_ << " switched off due to zero mass" << endl;
         switchActiveOff(body);
         geomModel_->resetBody(body);
     }
 
     InfoH << iB_Info << "-- body " << bodyId_ << " current M/M0: "
         << geomModel_->getM()/geomModel_->getM0() << endl;
+    InfoH << iB_Info << "-- body " << bodyId_ << " current cellCount: "
+        << geomModel_->getNCells()  << endl;
+    
     // if only 1% of the initial particle mass remains in the domain, switch it off
-    if (geomModel_->getM()/(geomModel_->getM0()+SMALL) < 1e-2 && case3D)
+    if (geomModel_->getM()/(geomModel_->getM0()+SMALL) < 1e-2 && case3D && geomModel_->getNCells() <= 0)
     {
+        InfoH << iB_Info << "condition 2 triggred" << endl;
+        InfoH << iB_Info << "-- body " << bodyId_ << " switched off due to zero mass" << endl;
         switchActiveOff(body);
         geomModel_->resetBody(body);
     }
     else if (!case3D && geomModel_->getNCells() <= 1 && !geomModel_->isCluster())
     {
+        InfoH << iB_Info << "condition 3 triggred" << endl;
+        InfoH << iB_Info << "-- body " << bodyId_ << " switched off due to zero mass" << endl;
         switchActiveOff(body);
         geomModel_->resetBody(body);
         InfoH << iB_Info << "-- body " << bodyId_ << " switched off" << endl;
