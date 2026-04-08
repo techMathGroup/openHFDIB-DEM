@@ -132,6 +132,7 @@ if (mesh_.nGeometricD() < 3)
     geomModel_->setIntSpan(intSpan_);
     geomModel_->setSdBasedLambda(sdBasedLambda_);
     geomModel_->setRhoS(immersedDict_.lookup("rho"));
+    geomModel_->setRefineBuffers(refineBuffers_);
 
     string material = word(immersedDict_.lookup("material"));
 

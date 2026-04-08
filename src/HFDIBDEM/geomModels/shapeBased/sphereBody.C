@@ -59,7 +59,7 @@ void sphereBody::createImmersedBody
         return;
     }
 
-    // get the list of cell centroids
+        // get the list of cell centroids
     const pointField& cp = mesh_.C();
 
     autoPtr<DynamicLabelList> nextToCheck(
@@ -68,7 +68,7 @@ void sphereBody::createImmersedBody
         new DynamicLabelList);
 
     label tableSize = 128;
-    if(cachedNeighbours_.valid())
+    if(cachedNeighbours_.valid()  && getRefineBuffers() == 0)
     {
         tableSize = cachedNeighbours_().toc().size()*1.5;
     }
@@ -81,7 +81,7 @@ void sphereBody::createImmersedBody
 
     label iterCount(0);label iterMax(mesh_.nCells());
     while (nextToCheck().size() > 0 and iterCount++ < iterMax)
-    {
+    { 
         auxToCheck().clear();
         forAll (nextToCheck(),cellToCheck)
         {

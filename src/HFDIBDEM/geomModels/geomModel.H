@@ -129,6 +129,8 @@ namespace Foam
         //body density
         dimensionedScalar rhoS_;
 
+        label   refineBuffers_;  
+
         public:
 
         // Constructors ------------------------------------------------
@@ -445,6 +447,16 @@ namespace Foam
         {
             InfoH << iB_Info << "22-- geomModelMessage-- "
                 << "notIplemented"<<endl;
+        }
+
+        void setRefineBuffers(label refineBuffers)
+        {
+            refineBuffers_ = refineBuffers;
+        }
+
+        label getRefineBuffers()
+        {
+            return refineBuffers_;
         }
 
     };
