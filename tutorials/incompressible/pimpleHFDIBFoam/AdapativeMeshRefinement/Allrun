@@ -1,0 +1,18 @@
+#!/bin/sh
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+rm -rf 0
+mkdir 0
+cp -rf 0.org/* 0
+
+runApplication blockMesh
+
+#~ runApplication checkMesh -allGeometry -allTopology
+runApplication decomposePar -force
+application=`getApplication`
+# runApplication $application
+runParallel $application
+
+paraFoam -touch
+
+# Note: mesh non-orthogonality = 0. mesh OK

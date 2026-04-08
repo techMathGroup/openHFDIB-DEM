@@ -1,0 +1,140 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  3.0.x                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      HFDIBDEMDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+bodyNames ("sphere_Top1");
+
+interpolationSchemes
+{
+  U cell;
+}
+
+surfaceThreshold    1e-4;
+stepDEM     0.2;
+geometricD (1 1 1);
+recordSimulation true;
+recordFirstTimeStep true;
+
+outputSetup
+{
+    basic true;
+    iB  true;
+    DEM false;
+    addModel false;
+    parallelDEM false;
+}
+
+DEM
+{
+	LcCoeff 0.55;
+	rotationModel mindlin1953;
+	
+    materials
+    {
+        particle1
+        {
+            Y       1e8;
+            nu      0.5;
+            gamma   0.0;
+            mu      0.0;
+            adhN    0;
+			// eps	 	0.965;
+			eps	 	1.0;
+        }
+
+        semiIron
+        {
+            Y       1e8;
+
+            nu      0.0;
+            gamma   0.0;
+            mu      0.0;
+            adhN    0;
+			// eps	 	0.965;
+			eps	 	1.0;
+        }    
+    }
+
+    collisionPatches
+    {
+        // outlet
+		// {
+		// 	material semiIron;
+		// 	nVec (0.0 -1.0 0.0);
+		// 	planePoint (0.00 -0.25 0.0);
+		// }
+
+        // fixedWalls
+		// {
+		// 	material semiIron;
+		// 	nVec (0.0 1.0 0.0);
+		// 	planePoint (0.00 0.05 0.0);
+		// }
+	}
+}
+
+virtualMesh
+{
+    level 0;
+    charCellSize 0.0005;
+    recordContact false;
+}
+sphere_Top1
+{
+
+	fullyCoupledBody;
+	// {
+		// velocity (0 -1.0 0);
+	// }
+
+	rho         rho [1 -3 0 0 0 0 0] 10000;
+
+	refineMC 5;
+
+	U
+	{
+	BC  noSlip;
+	}
+
+	bodyAddition
+	{
+		addModel   once;
+		onceCoeffs{}
+	}
+		
+	material particle1;
+    // bodyGeom convex;
+	bodyGeom sphere;
+	sphere
+	{
+	    startPosition   (0.0 0.015 0.0);
+	    radius  0.01;
+	}
+
+	updateTorque false;
+	sdBasedLambda false;
+	interfaceSpan 1.0;
+	startSynced false;
+	refineBuffers 5;
+	// refineBuffers 4;
+	// refineBuffers 3;
+	// refineBuffers 2;
+	// refineBuffers 1; 
+	// refineBuffers 0; // no refinement
+	timesToSetStatic -1;
+}
+
+// ************************************************************************* //
