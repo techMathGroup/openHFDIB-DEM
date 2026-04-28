@@ -204,50 +204,55 @@ void stlBased::synchronPos(label owner)
 }
 //---------------------------------------------------------------------------//
 volumeType stlBased::getVolumeType(subVolume& sv, bool cIb)
-{    
-    const indexedOctree<treeDataTriSurface>& tree = triSurfSearch_->tree();
-    const treeDataTriSurface& shapes = tree.shapes();
-    
+{
     auto& info = sv.getVolumeInfo(cIb);
 
-    labelList shapesIn;
-    if (info.shapesIn_.valid())
+    if (!info.shapesIn_.valid())
     {
-        shapesIn = info.shapesIn_();                                    // OK: operator() returns const labelList&
-    }
+        const indexedOctree<treeDataTriSurface>& tree = triSurfSearch_->tree();
 
-    if (shapesIn.empty())
-    {
         std::shared_ptr<subVolume> parentSV = sv.parentSV();
         if (parentSV)
         {
             const auto& infoParent = parentSV->getVolumeInfo(cIb);
-            labelList parentShapesIn;
             if (infoParent.shapesIn_.valid())
             {
-                parentShapesIn = infoParent.shapesIn_();
-            }
-            
-            labelHashSet shapesInSV;
-
-            forAll(parentShapesIn, i)
-            {
-                label shapeI = parentShapesIn[i];
-                if (shapes.overlaps(shapeI, sv))
+                const labelList& parentShapesIn = infoParent.shapesIn_();
+                if (parentShapesIn.size() == 0)
                 {
-                    shapesInSV.insert(shapeI);
+                    info.shapesIn_.reset(new labelList(0));
+                }
+                else
+                {
+                    const treeDataTriSurface& shapes = tree.shapes();
+                    labelList shapesIn(parentShapesIn.size());
+                    label nShapesIn = 0;
+
+                    forAll(parentShapesIn, i)
+                    {
+                        const label shapeI = parentShapesIn[i];
+                        if (shapes.overlaps(shapeI, sv))
+                        {
+                            shapesIn[nShapesIn++] = shapeI;
+                        }
+                    }
+
+                    shapesIn.setSize(nShapesIn);
+                    info.shapesIn_.reset(new labelList(shapesIn));
                 }
             }
-
-            shapesIn = labelList(shapesInSV.toc());
+            else
+            {
+                info.shapesIn_.reset(new labelList(tree.findBox(sv)));
+            }
         }
         else
         {
-            shapesIn = labelList(tree.findBox(sv));
+            info.shapesIn_.reset(new labelList(tree.findBox(sv)));
         }
-        
-        info.shapesIn_.reset(new labelList(shapesIn));
     }
+
+    const labelList& shapesIn = info.shapesIn_();
 
     if (shapesIn.size() > 0)                                            //OF.com: mixed, inside, outside -> MIXED, INSIDE, OUTSIDE
     {

@@ -36,6 +36,27 @@ Contributors
 
 using namespace Foam;
 
+namespace
+{
+
+volumeType ensureVolumeType
+(
+    subVolume& sV,
+    geomModel& geom,
+    const bool cIb
+)
+{
+    ibSubVolumeInfo& info = sV.getVolumeInfo(cIb);
+    if (info.volumeType_ == volumeType::UNKNOWN)
+    {
+        info.volumeType_ = geom.getVolumeType(sV, cIb);
+    }
+
+    return info.volumeType_;
+}
+
+}
+
 //---------------------------------------------------------------------------//
 virtualMesh::virtualMesh
 (
@@ -64,20 +85,16 @@ bool virtualMesh::detectFirstContactPoint()
 //---------------------------------------------------------------------------//
 bool virtualMesh::detectFirstVolumeInContact(subVolume& sV, bool& startPointFound)
 {
+    ibSubVolumeInfo& cInfo = sV.cVolumeInfo();
+    ibSubVolumeInfo& tInfo = sV.tVolumeInfo();
+
     if (sV.volume() < vMeshInfo_.subVolumeV)
     {
-        if (sV.cVolumeInfo().volumeType_ != volumeType::INSIDE)
-        {
-            sV.cVolumeInfo().volumeType_ = cGeomModel_.getVolumeType(sV, true);
-        }
+        ensureVolumeType(sV, cGeomModel_, true);
+        ensureVolumeType(sV, tGeomModel_, false);
 
-        if (sV.tVolumeInfo().volumeType_ != volumeType::INSIDE)
-        {
-            sV.tVolumeInfo().volumeType_ = tGeomModel_.getVolumeType(sV, false);
-        }
-
-        if (sV.cVolumeInfo().volumeType_ == volumeType::OUTSIDE
-            || sV.tVolumeInfo().volumeType_ == volumeType::OUTSIDE)
+        if (cInfo.volumeType_ == volumeType::OUTSIDE
+            || tInfo.volumeType_ == volumeType::OUTSIDE)
         {
             return false;
         }
@@ -85,14 +102,14 @@ bool virtualMesh::detectFirstVolumeInContact(subVolume& sV, bool& startPointFoun
         boundBox cBBox = boundBox(sV.min(), sV.max());
         boundBox tBBox = boundBox(sV.min(), sV.max());
 
-        if (sV.cVolumeInfo().volumeType_ == volumeType::MIXED)          //OF.com: mixed, inside, outside -> MIXED, INSIDE, OUTSIDE
+        if (cInfo.volumeType_ == volumeType::MIXED)          //OF.com: mixed, inside, outside -> MIXED, INSIDE, OUTSIDE
         {
             if (!cGeomModel_.limitFinalSubVolume(sV,true,cBBox))
             {
                 return false;
             }
         }
-        if (sV.tVolumeInfo().volumeType_ == volumeType::MIXED)
+        if (tInfo.volumeType_ == volumeType::MIXED)
         {
             if (!tGeomModel_.limitFinalSubVolume(sV,false,tBBox))
             {
@@ -107,21 +124,16 @@ bool virtualMesh::detectFirstVolumeInContact(subVolume& sV, bool& startPointFoun
         return false;
     }
 
-    if (sV.cVolumeInfo().volumeType_ != volumeType::INSIDE)
-    {
-        sV.cVolumeInfo().volumeType_ = cGeomModel_.getVolumeType(sV, true);
-    }
+    ensureVolumeType(sV, cGeomModel_, true);
+    ensureVolumeType(sV, tGeomModel_, false);
 
-    if (sV.tVolumeInfo().volumeType_ != volumeType::INSIDE)
-    {
-        sV.tVolumeInfo().volumeType_ = tGeomModel_.getVolumeType(sV, false);
-    }
-
-    if (sV.cVolumeInfo().volumeType_ == volumeType::OUTSIDE || sV.tVolumeInfo().volumeType_ == volumeType::OUTSIDE)
+    if (cInfo.volumeType_ == volumeType::OUTSIDE
+        || tInfo.volumeType_ == volumeType::OUTSIDE)
     {
         return false;
     }
-    else if (sV.cVolumeInfo().volumeType_ == volumeType::INSIDE && sV.tVolumeInfo().volumeType_ == volumeType::INSIDE)
+    else if (cInfo.volumeType_ == volumeType::INSIDE
+        && tInfo.volumeType_ == volumeType::INSIDE)
     {
         return true;
     }
@@ -206,33 +218,29 @@ void virtualMesh::inspectSubVolume(
     DynamicPointList& edgePoints
 )
 {
+    ibSubVolumeInfo& cInfo = sV.cVolumeInfo();
+    ibSubVolumeInfo& tInfo = sV.tVolumeInfo();
+
     if (sV.volume() < vMeshInfo_.subVolumeV)
     {
-        if (sV.cVolumeInfo().volumeType_ != volumeType::INSIDE)
-        {
-            sV.cVolumeInfo().volumeType_ = cGeomModel_.getVolumeType(sV, true);
-        }
-
-        if (sV.tVolumeInfo().volumeType_ != volumeType::INSIDE)
-        {
-            sV.tVolumeInfo().volumeType_ = tGeomModel_.getVolumeType(sV, false);
-        }
+        ensureVolumeType(sV, cGeomModel_, true);
+        ensureVolumeType(sV, tGeomModel_, false);
 
         boundBox cBBox = boundBox(sV.min(), sV.max());
         boundBox tBBox = boundBox(sV.min(), sV.max());
         bool cVolumeTypeMixed = false;
-        if (sV.cVolumeInfo().volumeType_ == volumeType::MIXED)
+        if (cInfo.volumeType_ == volumeType::MIXED)
         {
             cVolumeTypeMixed = true;
 
-            sV.cVolumeInfo().volumeType_ = cGeomModel_.limitFinalSubVolume(
+            cInfo.volumeType_ = cGeomModel_.limitFinalSubVolume(
                 sV,
                 true,
                 cBBox
             ) ? volumeType::INSIDE : volumeType::OUTSIDE;
         }
 
-        if (sV.tVolumeInfo().volumeType_ == volumeType::MIXED)
+        if (tInfo.volumeType_ == volumeType::MIXED)
         {
             if (cVolumeTypeMixed)
             {
@@ -240,15 +248,15 @@ void virtualMesh::inspectSubVolume(
                 sV.setAsEdge();
             }
 
-            sV.tVolumeInfo().volumeType_ = tGeomModel_.limitFinalSubVolume(
+            tInfo.volumeType_ = tGeomModel_.limitFinalSubVolume(
                 sV,
                 false,
                 tBBox
             ) ? volumeType::INSIDE : volumeType::OUTSIDE;
         }
 
-        if (sV.cVolumeInfo().volumeType_ == volumeType::INSIDE
-            && sV.tVolumeInfo().volumeType_ == volumeType::INSIDE
+        if (cInfo.volumeType_ == volumeType::INSIDE
+            && tInfo.volumeType_ == volumeType::INSIDE
             && cBBox.overlaps(tBBox))
         {
             // boundBox as a cross section of cBBox and tBBox
@@ -274,21 +282,16 @@ void virtualMesh::inspectSubVolume(
         return;
     }
 
-    if (sV.cVolumeInfo().volumeType_ != volumeType::INSIDE)
-    {
-        sV.cVolumeInfo().volumeType_ = cGeomModel_.getVolumeType(sV, true);
-    }
+    ensureVolumeType(sV, cGeomModel_, true);
+    ensureVolumeType(sV, tGeomModel_, false);
 
-    if (sV.tVolumeInfo().volumeType_ != volumeType::INSIDE)
-    {
-        sV.tVolumeInfo().volumeType_ = tGeomModel_.getVolumeType(sV, false);
-    }
-
-    if (sV.cVolumeInfo().volumeType_ == volumeType::OUTSIDE || sV.tVolumeInfo().volumeType_ == volumeType::OUTSIDE)
+    if (cInfo.volumeType_ == volumeType::OUTSIDE
+        || tInfo.volumeType_ == volumeType::OUTSIDE)
     {
         return;
     }
-    else if (sV.cVolumeInfo().volumeType_ == volumeType::INSIDE && sV.tVolumeInfo().volumeType_ == volumeType::INSIDE)
+    else if (cInfo.volumeType_ == volumeType::INSIDE
+        && tInfo.volumeType_ == volumeType::INSIDE)
     {
         contactVolume += sV.volume();
         contactCenter += (sV.midpoint()*sV.volume());
@@ -311,7 +314,8 @@ void virtualMesh::inspectSubVolume(
         return;
     }
 
-    if (sV.cVolumeInfo().volumeType_ == volumeType::MIXED && sV.tVolumeInfo().volumeType_ == volumeType::MIXED)
+    if (cInfo.volumeType_ == volumeType::MIXED
+        && tInfo.volumeType_ == volumeType::MIXED)
     {
         edgePoints.append(sV.midpoint());
         sV.setAsEdge();
