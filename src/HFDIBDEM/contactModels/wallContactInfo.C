@@ -351,6 +351,8 @@ List<DynamicList<vector>> wallContactInfo::detectPossibleSMContact
     forAll(contactPoints,cP)
     {
         vector elementIndex(SM_().getSMCentroidIndex(contactPoints[cP]));
+        //-- skip points outside the SM bounding box
+        if (elementIndex[0] < 0) { continue; }
         if(!possibleContactElements.found(elementIndex))
         {
             possibleContactElements.insert(elementIndex);

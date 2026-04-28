@@ -15,7 +15,7 @@ FoamFile
 }
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
-application     HFDIBDEMFoam_new;
+application     HFDIBDEMFoam;
 
 startFrom       latestTime;
 

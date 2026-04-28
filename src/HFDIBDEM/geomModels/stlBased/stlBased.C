@@ -204,7 +204,7 @@ void stlBased::synchronPos(label owner)
 }
 //---------------------------------------------------------------------------//
 volumeType stlBased::getVolumeType(subVolume& sv, bool cIb)
-{
+{    
     const indexedOctree<treeDataTriSurface>& tree = triSurfSearch_->tree();
     const treeDataTriSurface& shapes = tree.shapes();
     

@@ -67,14 +67,16 @@ charCellSize_(charCellSize)
             centroidMatrix_[i][j].setSize(matrixSize_[2]);
         }
     }        
+    // Note (MI): vertex grid is (N+1) per dimension
+    vertexMatrix_.setSize(matrixSize_[0]+1);
     forAll(vertexMatrix_, i)
     {
-        vertexMatrix_[i].setSize(matrixSize_[1]);
+        vertexMatrix_[i].setSize(matrixSize_[1]+1);
         forAll(vertexMatrix_[i], j)
         {
-            vertexMatrix_[i][j].setSize(matrixSize_[2]);
+            vertexMatrix_[i][j].setSize(matrixSize_[2]+1);
         }
-    }          
+    }
 }
 spectatorMesh::~spectatorMesh()
 {

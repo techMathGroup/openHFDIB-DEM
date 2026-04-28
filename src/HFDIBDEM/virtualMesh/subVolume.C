@@ -35,6 +35,12 @@ using namespace Foam;
 
 //---------------------------------------------------------------------------//
 subVolume::subVolume()
+:
+treeBoundBox(boundBox()),
+parentSV_(),
+cVolumeInfo_(volumeType::UNKNOWN),
+tVolumeInfo_(volumeType::UNKNOWN),
+isEdge_(false)
 {
 }
 
@@ -44,16 +50,17 @@ subVolume::subVolume
 )
 :
 treeBoundBox(bb),
-parentSV_(nullptr),
+parentSV_(),
 cVolumeInfo_(volumeType::UNKNOWN),
-tVolumeInfo_(volumeType::UNKNOWN)
+tVolumeInfo_(volumeType::UNKNOWN),
+isEdge_(false)
 {
 }
 
 subVolume::subVolume
 (
     const boundBox bb,
-    const std::shared_ptr<subVolume> parentSV,
+    const std::shared_ptr<subVolume>& parentSV,
     const volumeType cVolumeType,
     const volumeType tVolumeType
 )
@@ -112,9 +119,9 @@ bool subVolume::hasChildSubVolumes() const
     return childSubVolumes_.size() > 0;
 }
 //---------------------------------------------------------------------------//
-std::shared_ptr<subVolume>& subVolume::parentSV()
+std::shared_ptr<subVolume> subVolume::parentSV() const
 {
-    return parentSV_;
+    return parentSV_.lock();
 }
 //---------------------------------------------------------------------------//
 ibSubVolumeInfo& subVolume::getVolumeInfo(bool cIb)

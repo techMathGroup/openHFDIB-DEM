@@ -1,0 +1,39 @@
+# openHFDIB-DEM clangd configuration
+# tuned for OpenFOAM style projects and generated compile_commands.json
+
+CompileFlags:
+  # keep this lightweight; compile_commands.json remains the primary source
+  Add:
+    - "-I./src/HFDIBDEM"
+    - "-I./src/HFDIBDEM/lnInclude"
+    - "-I./src/HFDIBDEM/virtualMesh"
+    - "-I./applications/solvers"
+    - "-Wno-unknown-pragmas"
+  # remove flags that commonly confuse clang when imported from custom builds
+  Remove:
+    - "-fdiagnostics-color=*"
+
+Diagnostics:
+  # OpenFOAM code often has intentional broad includes
+  UnusedIncludes: None
+  MissingIncludes: Strict
+
+Index:
+  Background: Build
+  StandardLibrary: true
+
+Completion:
+  AllScopes: true
+  HeaderInsertion: Never
+
+Hover:
+  ShowAKA: true
+
+InlayHints:
+  Enabled: true
+  ParameterNames: true
+  DeducedTypes: false
+
+ClangTidy:
+  Add: []
+  Remove: ["*"]

@@ -52,7 +52,9 @@ struct ibSubVolumeInfo
         volumeType_(volumeType::UNKNOWN)
     {}
 
-    ibSubVolumeInfo(volumeType vType)
+    explicit ibSubVolumeInfo(volumeType vType)
+    :
+        volumeType_(volumeType::UNKNOWN)
     {
         switch(vType)
         {
@@ -65,6 +67,9 @@ struct ibSubVolumeInfo
                 break;
             case volumeType::OUTSIDE:
                 volumeType_ = volumeType::OUTSIDE;
+                break;
+            default:
+                volumeType_ = volumeType::UNKNOWN;
                 break;
         }
     }
@@ -115,8 +120,7 @@ class subVolume : public treeBoundBox
 {
     private:
 
-    std::shared_ptr<subVolume> parentSV_;
-    //~ List<subVolume> childSubVolumes_;
+    std::weak_ptr<subVolume> parentSV_;
     List<autoPtr<subVolume>> childSubVolumes_;                          //This is a List of autoPtr, which requires manual deep-copy
 
     ibSubVolumeInfo cVolumeInfo_;
@@ -137,7 +141,7 @@ class subVolume : public treeBoundBox
     subVolume
     (
         const boundBox bb,
-        const std::shared_ptr<subVolume> parentSV,
+        const std::shared_ptr<subVolume>& parentSV,
         const volumeType cVolumeType,
         const volumeType tVolumeType
     );
@@ -155,7 +159,7 @@ class subVolume : public treeBoundBox
     
     bool hasChildSubVolumes() const;
 
-    std::shared_ptr<subVolume>& parentSV();
+    std::shared_ptr<subVolume> parentSV() const;
 
     ibSubVolumeInfo& getVolumeInfo(bool cIb);
     const ibSubVolumeInfo& getVolumeInfo(bool cIb) const;
@@ -164,8 +168,8 @@ class subVolume : public treeBoundBox
     bool isEdge() const;
         
     // Make copy/move operations available -------------------------
-    subVolume(const subVolume& other);                                  // defined in .C
-    subVolume& operator=(const subVolume& other);                       // defined in .C
+    subVolume(const subVolume& other);                                  //defined in .C
+    subVolume& operator=(const subVolume& other);                       //defined in .C
     subVolume(subVolume&&) noexcept = default;
     subVolume& operator=(subVolume&&) noexcept = default;
 

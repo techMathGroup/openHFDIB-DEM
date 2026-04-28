@@ -363,7 +363,8 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(bool nonConvex)
 //---------------------------------------------------------------------------//
 Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList edgeSubVolumesPoints)
 {
-    // This function is taken from prtContact and just adjusted for higher accuracy
+    //Note (??): This function is taken from prtContact and just adjusted
+    //           for higher accuracy
     scalar area(0.0);
     vector normalVec(vector::zero);
     scalar tDC(tGeomModel_.getDC());
@@ -452,7 +453,9 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList
             normalVec = weightedDir/(mag(weightedDir)+SMALL);
         }
         if (!normOk || mag(normalVec) < 1)
+        {
             normalVec = normalVector;
+        }
 
         // create best fitting plane
         plane bestFitPlane(contactCenter_, normalVec);
@@ -496,7 +499,18 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList
 
                 forAll (commCellsPosInPlane, celli)
                 {
-                    if (uPlane.sideOfPlane(commCellsPosInPlane[celli]) == 0 && vPlane.sideOfPlane(commCellsPosInPlane[celli]) == 1)
+                    const label uSide = uPlane.sideOfPlane
+                    (
+                        commCellsPosInPlane[celli]
+                    );
+                    const label vSide = vPlane.sideOfPlane
+                    (
+                        commCellsPosInPlane[celli]
+                    );
+
+                    //-- select points in angular sector
+                    if (   uSide == plane::NORMAL
+                        && vSide == plane::FLIP)
                     {
                         pointsInSection.append(commCellsPosInPlane[celli]);
                     }
@@ -508,18 +522,22 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList
                     scalar distance(0);
                     forAll (pointsInSection, pointI)
                     {
-                         scalar magnitude = mag(pointsInSection[pointI]-contactCenter_);
+                         scalar magnitude = mag(
+                             pointsInSection[pointI]-contactCenter_
+                         );
                          if (magnitude > distance)
                          {
-                             magnitude = distance;
+                             distance = magnitude;
                              max = pointsInSection[pointI];
                          }
                     }
+
                     commCellsInSections.append(max);
                 }
             }
         }
-        // calculate contact area
+
+        //-- calculate contact area
         for (label i = 0; i + 1 < commCellsInSections.size(); i++)
         {
             //~ Info << commCellsInSections[i] << endl;

@@ -363,6 +363,7 @@ void getPrtContactVars_ArbShape(
         contactCenter = virtMesh.getContactCenter();
     }
 
+
     if (intersectedVolume > 0 && contactArea > 0)
     {
         subCInfo.getprtCntVars().contactCenter_ = contactCenter;
@@ -612,6 +613,7 @@ bool solvePrtContact(
     {
         return false;
     }
+
 
     InfoH << parallelDEM_Info << "-- Detected Particle-particle contact: -- body "
             << subCInfo.getCPair().first() << " & -- body "

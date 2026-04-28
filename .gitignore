@@ -93,3 +93,9 @@ doc/Doxygen/DTAGS
 /.cproject
 /.project
 /.dir-locals.el
+
+# local analysis and helper folders
+analyses/
+tests/
+tools/
+old_codes/

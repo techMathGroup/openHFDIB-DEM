@@ -35,6 +35,8 @@ using namespace Foam;
 
 //---------------------------------------------------------------------------//
 subContact::subContact()
+:
+volume_(0)
 {}
 
 subContact::~subContact()
