@@ -125,8 +125,8 @@ int main(int argc, char *argv[])
         
         // hfdib-dem code modification
         HFDIBDEM.createBodies(lambda,refineF);
-        //~ HFDIBDEM.updateBodiesRhoF(rho);
-        HFDIBDEM.updateBodiesRhoF(alpha1,lambda,rho1.value(),rho2.value());
+        HFDIBDEM.updateBodiesRhoF(rho);
+        // HFDIBDEM.updateBodiesRhoF(alpha1,lambda,rho1.value(),rho2.value());
         HFDIBDEM.preUpdateBodies(lambda);
 
         // --- Pressure-velocity PIMPLE corrector loop
@@ -223,6 +223,7 @@ int main(int argc, char *argv[])
         HFDIBDEM.postUpdateBodies(lambda,gradLambda,fDragPress,fDragVisc);
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
         HFDIBDEM.updateBodiesRhoF(rho);
+        // HFDIBDEM.updateBodiesRhoF(alpha1,lambda,rho1.value(),rho2.value());
         HFDIBDEM.updateDEM(lambda,refineF);
         Info << "updated HFDIBDEM" << endl;
 

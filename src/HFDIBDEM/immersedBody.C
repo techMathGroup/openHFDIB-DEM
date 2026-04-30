@@ -1325,7 +1325,14 @@ void immersedBody::updateRhoF                                           //varian
     reduce(bodyVol, sumOp<scalar>());
     
     
-    rhoF_ = rhoFAux/bodyVol;
+    if (bodyVol > SMALL)
+    {
+        rhoF_ = rhoFAux/bodyVol;
+    }
+    else
+    {
+        rhoF_ = 1.0;
+    }
     Info << "Body " << bodyId_ << ": rhoF = " << rhoF_ << endl;
 }
 void immersedBody::updateRhoF
@@ -1345,6 +1352,7 @@ void immersedBody::updateRhoF                                           //varian
 {
     scalar rhoFAux(0);
     scalar bodyVol(0);
+    scalar epsFluidMin(1e-1);
     
     List<DynamicLabelList> intLists;
     List<DynamicLabelList> surfLists;
@@ -1371,11 +1379,26 @@ void immersedBody::updateRhoF                                           //varian
         forAll (surfListI, surfCell)
         {
             label cellI = surfListI[surfCell];
-            
-            scalar  alphaF = min(alpha[cellI]/(1.0 - body[cellI]), 1.0);
-            
-            rhoFAux += (alphaF*rho1 + (1.0 - alphaF*rho2))*mesh_.V()[cellI];
-            bodyVol += mesh_.V()[cellI];
+
+            const scalar fluidFrac =
+                max(scalar(1) - body[cellI], scalar(0));
+
+            if (fluidFrac <= epsFluidMin)
+            {
+                continue;
+            }
+
+            const scalar alphaF =
+                min
+                (
+                    max(alpha[cellI]/fluidFrac, scalar(0)),
+                    scalar(1)
+                );
+
+            const scalar fluidVol = fluidFrac*mesh_.V()[cellI];
+
+            rhoFAux += (alphaF*rho1 + (1.0 - alphaF)*rho2)*fluidVol;
+            bodyVol += fluidVol;
         }
     }
     
@@ -1383,7 +1406,14 @@ void immersedBody::updateRhoF                                           //varian
     reduce(bodyVol, sumOp<scalar>());
     
     
-    rhoF_ = rhoFAux/bodyVol;
+    if (bodyVol > SMALL)
+    {
+        rhoF_ = rhoFAux/bodyVol;
+    }
+    else
+    {
+        rhoF_ = 1.0;
+    }
     Info << "Body " << bodyId_ << ": rhoF = " << rhoF_ << endl;
     
     

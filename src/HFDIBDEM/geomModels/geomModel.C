@@ -243,6 +243,7 @@ void geomModel::correctSurfCells
     List<labelList>& cellPoints
 )
 {
+    const vector sDSpan(4.0*(mesh_.bounds().max()-mesh_.bounds().min()));
     HashTable<bool, label, Hash<label>> verticesStatus(potentSurfCells.size()*6);
     forAll(potentSurfCells, cellLabel)
     {
@@ -287,6 +288,29 @@ void geomModel::correctSurfCells
             else
             {
                 surfCells_[Pstream::myProcNo()].append(cCell);
+
+                if (sdBasedLambda_)
+                {
+                    point closestPoint(point::zero);
+                    vector normal(vector::zero);
+                    getClosestPointAndNormal
+                    (
+                        mesh_.C()[cCell],
+                        sDSpan,
+                        closestPoint,
+                        normal
+                    );
+                    const scalar signedDist =
+                        mag(closestPoint - mesh_.C()[cCell]);
+                    if (cellInside[cCell])
+                    {
+                        cBody = 0.5*(Foam::tanh(intSpan_*signedDist/Foam::pow(mesh_.V()[cCell],0.333))+1.0);
+                    }
+                    else
+                    {
+                        cBody = 0.5*(-1.0*Foam::tanh(intSpan_*signedDist/Foam::pow(mesh_.V()[cCell],0.333))+1.0);
+                    }
+                }
             }
             ibPartialVolume_[Pstream::myProcNo()] += 1;
 
