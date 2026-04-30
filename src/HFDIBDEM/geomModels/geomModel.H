@@ -45,6 +45,7 @@ Contributors
 #include "dictionary.H"
 #include "fvCFD.H"
 #include "triSurfaceMesh.H"
+#include "triangleFuncs.H"
 
 #include "contactType.H"
 #include "subVolume.H"
@@ -107,7 +108,11 @@ namespace Foam
         scalar  intSpan_;
         bool    sdBasedLambda_;
         boundBox curMeshBounds_;
-        autoPtr<HashTable<const labelList&, label, Hash<label>>> cachedNeighbours_;
+
+        //cachedNeighbours_ may cost problems in OF.com
+        // autoPtr<HashTable<const labelList&, label, Hash<label>>> cachedNeighbours_;
+        autoPtr<HashTable<labelList, label, Hash<label>>> cachedNeighbours_;
+        // HashTable<labelList, label, Hash<label>> cachedNeighbours_;
 
         //body mass
         scalar M_;
@@ -260,7 +265,7 @@ namespace Foam
         {
             InfoH << iB_Info << "13-- geomModelMessage-- "
                 << "notIplemented"<<endl;
-            return volumeType::unknown;
+            return volumeType::UNKNOWN;
         }
 
         virtual scalar getDC()
@@ -304,7 +309,7 @@ namespace Foam
         virtual void setOwner()
         {
             Pstream::gatherList(ibPartialVolume_, 0);
-            Pstream::scatter(ibPartialVolume_, 0);
+            Pstream::broadcast(ibPartialVolume_, 0);                    //OF.com scatter -> broadcast
             for (label i = 0; i < ibPartialVolume_.size(); i++)
             {
                 if (ibPartialVolume_[i] == max(ibPartialVolume_))

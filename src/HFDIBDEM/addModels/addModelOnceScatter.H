@@ -55,6 +55,7 @@ class addModelOnceScatter
 {
 
     private:
+
     typedef DynamicList<label>  DynamicLabelList;
     const dictionary&           addModelDict_;
     word                        addMode_;
@@ -63,53 +64,53 @@ class addModelOnceScatter
 
     const dictionary&   coeffsDict_;
 
-	word			    addDomain_;
-    word			    scalingMode_;
-    word			    rotationMode_;
-	word			    addModeI_;
+    word    addDomain_;
+    word    scalingMode_;
+    word    rotationMode_;
+    word    addModeI_;
 
-	const dictionary& addDomainCoeffs_;
-	const dictionary& scalingModeCoeffs_;
-	const dictionary& rotationModeCoeffs_;
-	const dictionary& addModeICoeffs_;
+    const dictionary& addDomainCoeffs_;
+    const dictionary& scalingModeCoeffs_;
+    const dictionary& rotationModeCoeffs_;
+    const dictionary& addModeICoeffs_;
 
-    label		partPerAdd_;
-	scalar		fieldValue_;
-    label		addedOnTimeLevel_;
-    const scalar startTimeValue_;
+    label  partPerAdd_;
+    scalar fieldValue_;
+    label  addedOnTimeLevel_;
+    const  scalar startTimeValue_;
 
-	word		zoneName_;
-    vector		minBound_;
-    vector		maxBound_;
+    word   zoneName_;
+    vector minBound_;
+    vector maxBound_;
 
-	bool 		scaleParticles_;
-	scalar 		minScale_;
-	scalar		maxScale_;
-	scalar 		minScaleFit_;
-	scalar		scaleStep_;
-	scalar		nTriesBeforeScaling_;
+    bool   scaleParticles_;
+    scalar minScale_;
+    scalar maxScale_;
+    scalar minScaleFit_;
+    scalar scaleStep_;
+    scalar nTriesBeforeScaling_;
 
-	bool 		rotateParticles_;
-	bool		randomAxis_;
-    vector 		axisOfRot_;
+    bool  rotateParticles_;
+    bool  randomAxis_;
+    vector axisOfRot_;
 
-	int 		bodyAdditionAttemptCounter_;
-	int 		scaleCorrectionCounter_;
+    int  bodyAdditionAttemptCounter_;
+    int  scaleCorrectionCounter_;
 
-	bool 		scaleApplication_;
-	bool 		scaleRandomApplication_;
-	bool 		rescaleRequirement_;
-	bool 		succesfulladition_;
-	scalar		scalingFactor_;
-	bool		restartPartCountTemp_;
-	bool		reapeatedAddition_;
-	bool		firstTimeRunning_;
-	bool 		cellZoneActive_;
-	bool		boundBoxActive_;
-	Field<label>octreeField_;
-	bool		multiBody_;
-	bool		fieldBased_;
-	scalar		fieldCurrentValue_;
+    bool scaleApplication_;
+    bool scaleRandomApplication_;
+    bool rescaleRequirement_;
+    bool succesfulladition_;
+    scalar scalingFactor_;
+    bool restartPartCountTemp_;
+    bool reapeatedAddition_;
+    bool firstTimeRunning_;
+    bool cellZoneActive_;
+    bool boundBoxActive_;
+    Field<label>octreeField_;
+    bool multiBody_;
+    bool fieldBased_;
+    scalar fieldCurrentValue_;
 
     List<DynamicLabelList>  cellsInBoundBox_;
     List<pointField>        cellZonePoints_;
@@ -148,19 +149,19 @@ class addModelOnceScatter
         PtrList<immersedBody>& immersedBodies
     );
 
-	scalar returnRandomAngle();
+    scalar returnRandomAngle();
 
-	scalar returnRandomScale();
+    scalar returnRandomScale();
 
     vector returnRandomRotationAxis();
 
-	void initializeCellZone();
+    void initializeCellZone();
 
-	void updateCellZoneBoundBox();
+    void updateCellZoneBoundBox();
 
     void initializeBoundBox();
 
-	labelList getBBoxCellsByOctTree
+    labelList getBBoxCellsByOctTree
     (
         label cellToCheck,
         bool& insideBB,
@@ -169,7 +170,7 @@ class addModelOnceScatter
         List<DynamicLabelList>& bBoxCells
     );
 
-	scalar checkLambdaFraction(const volScalarField& body);
+    scalar checkLambdaFraction(const volScalarField& body);
 
     bool checkIfAdd()
     {

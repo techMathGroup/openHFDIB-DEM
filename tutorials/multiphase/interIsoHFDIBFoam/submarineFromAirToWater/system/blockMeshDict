@@ -1,0 +1,129 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  dev                                 |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      blockMeshDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+convertToMeters 0.01;
+// xInlet 0;
+// xOutlet  12;
+// xResolution 100;
+
+// ycStart -0.05;
+// ycyclicLength  0.05; //dp = 2, i.e., 4 diameters per box
+// ycyclicResolution 1;
+
+// zcStart -3;
+// zcyclicLength  3; //dp = 2, i.e., 4 diameters per box
+
+// zcyclicResolution 50;
+
+
+
+// vertices
+// (
+//   (-2.5 0  -2.5) //0
+//   (2.5 0   -2.5) //1
+//   (2.5 15  -2.5) //2
+//   (-2.5 15 -2.5) //3
+//   (-2.5 0 2.5) //4
+//   (2.5 0 2.5) //5
+//   (2.5 15 2.5)  //6
+//   (-2.5 15 2.5)  //7
+// );
+
+// blocks
+// (
+//   hex (0 1 2 3 4 5 6 7) (40 120 40) simpleGrading (1 1 1)
+// );
+
+vertices
+(
+  (-5 0  -5) //0
+  (5 0   -5) //1
+  (5 20  -5) //2
+  (-5 20 -5) //3
+  (-5 0 5) //4
+  (5 0 5) //5
+  (5 20 5)  //6
+  (-5 20 5)  //7
+);
+
+blocks
+(
+  hex (0 1 2 3 4 5 6 7) (70 140 70) simpleGrading (1 1 1)
+);
+
+edges
+(
+);
+
+boundary
+(
+  top
+  {
+    type patch;
+    faces
+    (
+      (2 3 7 6)
+    );
+  }
+
+  bottom
+  {
+    type wall;
+    faces
+    (
+      (1 5 4 0)
+    );
+  }
+  left
+  {
+    type wall;
+    faces
+    (
+      (7 3 0 4)
+    );
+  }
+  right
+  {
+    type wall;
+    faces
+    (
+      (1 2 6 5)
+    );
+  }
+  front
+  {
+    type wall;
+    faces
+    (
+      (4 5 6 7)
+    );
+  }
+  back
+  {
+    type wall;
+    faces
+    (
+      (0 3 2 1)
+    );
+  }
+
+);
+
+mergePatchPairs
+(
+);
+
+// ************************************************************************* //

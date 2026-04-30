@@ -33,6 +33,11 @@ Contributors
 #include "fvMatrices.H"
 #include "geometricOneField.H"
 
+
+#include "processorPolyPatch.H"                                         //OF.com: required
+
+
+
 #include "interpolationCellPoint.H"
 #include "interpolationCell.H"
 #include "meshSearch.H"
@@ -74,6 +79,7 @@ mesh_(mesh),
 transportProperties_(transportProperties),
 geomModel_(std::move(bodyGeomModel)),
 cellPoints_(cellPoints),
+haloCells_(Pstream::nProcs()),
 Axis_(vector::one),
 AxisOld_(vector::one),
 omega_(0.0),
@@ -84,7 +90,8 @@ a_(vector::zero),
 alpha_(vector::zero),
 totalAngle_(vector::zero),
 CoNum_(0.0),
-rhoF_(transportProperties_.lookup("rho")),
+//~ rhoF_(dimensionedScalar(transportProperties_.lookup("rho"))),
+rhoF_(1.0),
 bodyId_(bodyId),
 updateTorque_(false),
 bodyOperation_(0),
@@ -125,6 +132,9 @@ void immersedBody::createImmersedBody
         octreeField_,
         cellPoints_
     );
+    
+    const List<DynamicLabelList>& surfCells = geomModel_->getSurfaceCellList();
+    haloCells_[Pstream::myProcNo()] = surfCells[Pstream::myProcNo()];
 
     if(synchCreation)
     {
@@ -472,70 +482,178 @@ void immersedBody::constructRefineField
 void immersedBody::postPimpleUpdateImmersedBody
 (
     volScalarField& body,
-    volVectorField& f
+    volVectorField& fPress,
+    volVectorField& fVisc
 )
 {
     // update Vel_, Axis_ and omega_
-    updateCoupling(body,f);
+    updateCoupling(body,fPress,fVisc);
+    
+    // move FCouplingOld_ here -> update
 
     Vel_ = VelOld_;
     Axis_ = AxisOld_;
     omega_ = omegaOld_;
+    
+    FCouplingOld_ = FCoupling_;
+}
+//---------------------------------------------------------------------------//
+void immersedBody::updateHaloCells
+(
+    volVectorField& gradBody
+)
+{
+    // clear halo cells
+    haloCells_[Pstream::myProcNo()].clear(); 
+    
+    // initialize the marchingCube algorithm
+    autoPtr<DynamicLabelList> nextToCheck(new DynamicLabelList);
+    autoPtr<DynamicLabelList> auxToCheck(new DynamicLabelList);
+        
+    // initialize halo cells
+    nextToCheck().append(geomModel_->getSurfaceCellList()[Pstream::myProcNo()]);
+    labelHashSet checkedCells;
+            
+    // run the marchingCube
+    label iterCount(0);
+    label iterMax(mesh_.nCells());
+    while(nextToCheck().size() > 0 && iterCount < iterMax)
+    {
+        auxToCheck().clear();
+        forAll(nextToCheck(), cellI)
+        {
+            label cellId = nextToCheck()[cellI];
+            if(!checkedCells.found(cellId))
+            {
+                checkedCells.insert(cellId);
+                vector pCVec(mesh_.C()[cellId] - geomModel_->getCoM());
+                //~ if(mag(gradBody[cellI]) > SMALL && (-gradBody[cellI] & pCVec) > SMALL)
+                if(mag(gradBody[cellId]) > SMALL)
+                {
+                    //~ Pout << mag(gradBody[cellId])*Foam::pow(mesh_.V()[cellId],0.3333) << endl;
+                    haloCells_[Pstream::myProcNo()].append(cellId);
+                    auxToCheck().append(mesh_.cellCells()[cellId]);
+                }
+            }
+        }
+        autoPtr<DynamicLabelList> helpPtr(nextToCheck.ptr());
+        nextToCheck.reset(auxToCheck.ptr());
+        auxToCheck = std::move(helpPtr);
+        iterCount++;
+    }
+}
+void immersedBody::updateHaloCells
+(
+    volVectorField& gradBody,
+    volScalarField& body
+)
+{
+    // clear halo cells
+    haloCells_[Pstream::myProcNo()].clear(); 
+    
+    // initialize the marchingCube algorithm
+    autoPtr<DynamicLabelList> nextToCheck(new DynamicLabelList);
+    autoPtr<DynamicLabelList> auxToCheck(new DynamicLabelList);
+        
+    // initialize halo cells
+    nextToCheck().append(geomModel_->getSurfaceCellList()[Pstream::myProcNo()]);
+    labelHashSet checkedCells;
+            
+    // run the marchingCube
+    label iterCount(0);
+    label iterMax(mesh_.nCells());
+    while(nextToCheck().size() > 0 && iterCount < iterMax)
+    {
+        auxToCheck().clear();
+        forAll(nextToCheck(), cellI)
+        {
+            label cellId = nextToCheck()[cellI];
+            if(!checkedCells.found(cellId))
+            {
+                checkedCells.insert(cellId);
+                vector pCVec(mesh_.C()[cellId] - geomModel_->getCoM());
+                //~ if(mag(gradBody[cellI]) > SMALL && (-gradBody[cellI] & pCVec) > SMALL)
+                if(mag(gradBody[cellId]) > SMALL and body[cellId] < SMALL)
+                {
+                    //~ Pout << mag(gradBody[cellId])*Foam::pow(mesh_.V()[cellId],0.3333) << endl;
+                    haloCells_[Pstream::myProcNo()].append(cellId);
+                    auxToCheck().append(mesh_.cellCells()[cellId]);
+                }
+            }
+        }
+        autoPtr<DynamicLabelList> helpPtr(nextToCheck.ptr());
+        nextToCheck.reset(auxToCheck.ptr());
+        auxToCheck = std::move(helpPtr);
+        iterCount++;
+    }
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateCoupling
 (
     volScalarField& body,
-    volVectorField& f
+    volVectorField& fPress,
+    volVectorField& fVisc
 )
 {
     vector FV(vector::zero);
     vector TA(vector::zero);
+    
+    // calcualate viscous force and torque
+    const vector& CoM(geomModel_->getCoM());
+    
+    //~ const DynamicLabelList& intList(getInternalCellList()[Pstream::myProcNo()]);
+    const DynamicLabelList& surfList(getSurfaceCellList()[Pstream::myProcNo()]);
 
-    List<DynamicLabelList> intLists;
-    List<DynamicLabelList> surfLists;
-    DynamicVectorList refCoMList;
+    //~ forAll(intList, i)
+    //~ {
+        //~ label cellI = intList[i];
+        
+        //~ vector fCellPress = fPress[cellI];
+        //~ vector fCellVisc  = fVisc[cellI];
+        
+        //~ FV -= (fCellPress + fCellVisc)*mesh_.V()[cellI];
+        //~ FV -= (fCellVisc)*mesh_.V()[cellI];
+        //~ TA -= ((mesh_.C()[cellI] - CoM)^fCellVisc)*mesh_.V()[cellI];
+    //~ }
 
-    geomModel_->getReferencedLists(
-        intLists,
-        surfLists,
-        refCoMList
-    );
-
-  // calcualate viscous force and torque
-
-    forAll (intLists, i)
+    forAll(surfList, i)
     {
-        DynamicLabelList& intListI = intLists[i];
-        forAll (intListI, intCell)
-        {
-            label cellI = intListI[intCell];
-
-            FV -=  f[cellI]*mesh_.V()[cellI];
-            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])
-                *mesh_.V()[cellI];
-        }
+        label cellI = surfList[i];
+        
+        vector fCellPress = body[cellI]*fPress[cellI];
+        vector fCellVisc  = body[cellI]*fVisc[cellI];
+        
+        FV -= (fCellPress + fCellVisc)*mesh_.V()[cellI];
+        TA -= ((mesh_.C()[cellI] - CoM)^fCellVisc)*mesh_.V()[cellI];
     }
-
-    forAll (surfLists, i)
+    
+    
+    const DynamicLabelList& haloList(haloCells_[Pstream::myProcNo()]);
+    
+    forAll(haloList, i)
     {
-        DynamicLabelList& surfListI = surfLists[i];
-        forAll (surfListI, surfCell)
-        {
-            label cellI = surfListI[surfCell];
-
-            FV -=  f[cellI]*mesh_.V()[cellI];
-            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])
-                *mesh_.V()[cellI];
-        }
+        label cellI = haloList[i];
+        
+        vector fCellPress = fPress[cellI];
+        vector fCellVisc  = fVisc[cellI];
+        
+        // scalar scaleFact  = Foam::pow(mesh_.V()[cellI],0.3333);
+        // scalar scaleFact  = max(1.0-12.0*Foam::pow(mag(body[cellI]-0.5),4.0),0);//increase weight of surfCells
+        scalar scaleFact  = Foam::exp(-Foam::pow(body[cellI] - 0.5,4.0)/(2.0*Foam::pow(0.15,2.0)));//increase weight of surfCells
+        
+        
+        FV -= scaleFact*(fCellPress + fCellVisc)*mesh_.V()[cellI];
+        TA -= scaleFact*((mesh_.C()[cellI] - CoM)^fCellVisc)*mesh_.V()[cellI];
     }
-
-  reduce(FV, sumOp<vector>());
-  reduce(TA, sumOp<vector>());
-  FV *= rhoF_.value();
-  TA *= rhoF_.value();
-
-  FCoupling_ = forces(FV, TA);
+    
+    reduce(FV, sumOp<vector>());
+    reduce(TA, sumOp<vector>());
+    
+    FCoupling_ = couplingHistCoef_*forces(FV, TA) + (1.0-couplingHistCoef_)*FCouplingOld_;
+    
+    couplingHistCoef_ = max(couplingHistCoef_*0.95, 0.5);
+    
+    Info << "======= COUPLING COEF IS: " << couplingHistCoef_ << endl;
 }
 //---------------------------------------------------------------------------//
 // update movement variables of the body
@@ -569,7 +687,7 @@ void immersedBody::updateMovementComp
 
         const uniformDimensionedVectorField& g =
             mesh_.lookupObject<uniformDimensionedVectorField>("g");
-        
+            
         vector FG(vector::zero);
         if(!solverInfo::getOnlyDEM())
             FG = geomModel_->getM0()*(1.0-rhoF_.value()
@@ -590,9 +708,13 @@ void immersedBody::updateMovementComp
         {
             // compute current acceleration (assume constant over timeStep)
 
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" ParticelMass  : " << geomModel_->getM0() << endl;
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" Acting Force  : " << F << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" ParticelMass    : " << geomModel_->getM0() << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" Acting Force    : " << F << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" Coupling Force  : " << FCoupling_.F << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" G-B Force       : " << FG << endl;
+            
             a_  = F/(geomModel_->getM0());
+            
             // update body linear velocity
             Vel_ = Vel + deltaT*a_;
             InfoH << iB_Info <<"-- body "<< bodyId_ <<" accelaration  : " << a_ << endl;
@@ -687,50 +809,47 @@ void immersedBody::moveImmersedBody
 {
     if (bodyOperation_ == 0) return;
 
-    // if (geomModel_->getOwner() == Pstream::myProcNo())
-    // {
-        if (mag(deltaT + 1.0) < SMALL) deltaT = mesh_.time().deltaT().value();
+    if (mag(deltaT + 1.0) < SMALL) deltaT = mesh_.time().deltaT().value();
 
-        // incremental rotation angle
-        scalar angle     = omega_*deltaT;
+    // incremental rotation angle
+    scalar angle     = omega_*deltaT;
 
-        // translation increment
-        vector transIncr = Vel_*deltaT;
+    // translation increment
+    vector transIncr = Vel_*deltaT;
 
-        // rotation matrix
-        tensor rotMatrix(Foam::cos(angle)*tensor::I);
-        rotMatrix += Foam::sin(angle)*tensor(
-            0.0,      -Axis_.z(),  Axis_.y(),
-            Axis_.z(), 0.0,       -Axis_.x(),
-            -Axis_.y(), Axis_.x(),  0.0
-        );
-        rotMatrix += (1.0-Foam::cos(angle))*(Axis_ * Axis_);
+    // rotation matrix
+    tensor rotMatrix(Foam::cos(angle)*tensor::I);
+    rotMatrix += Foam::sin(angle)*tensor(
+        0.0,      -Axis_.z(),  Axis_.y(),
+        Axis_.z(), 0.0,       -Axis_.x(),
+        -Axis_.y(), Axis_.x(),  0.0
+    );
+    rotMatrix += (1.0-Foam::cos(angle))*(Axis_ * Axis_);
 
-        // update total rotation matrix
-        totRotMatrix_ = rotMatrix & totRotMatrix_;
-        vector eulerAngles;
-        scalar sy = Foam::sqrt(totRotMatrix_.xx()*totRotMatrix_.xx()
-            + totRotMatrix_.yy()*totRotMatrix_.yy());
+    // update total rotation matrix
+    totRotMatrix_ = rotMatrix & totRotMatrix_;
+    vector eulerAngles;
+    scalar sy = Foam::sqrt(totRotMatrix_.xx()*totRotMatrix_.xx()
+        + totRotMatrix_.yy()*totRotMatrix_.yy());
 
-        if (sy > SMALL)
-        {
-            eulerAngles.x() =
-                Foam::atan2(totRotMatrix_.zy(),totRotMatrix_.zz());
-            eulerAngles.y() = Foam::atan2(-totRotMatrix_.zx(),sy);
-            eulerAngles.z() =
-                Foam::atan2(totRotMatrix_.yx(),totRotMatrix_.xx());
-        }
-        else
-        {
-            eulerAngles.x() =
-                Foam::atan2(-totRotMatrix_.yz(),totRotMatrix_.yy());
-            eulerAngles.y() = Foam::atan2(-totRotMatrix_.zx(),sy);
-            eulerAngles.z() = 0.0;
-        }
+    if (sy > SMALL)
+    {
+        eulerAngles.x() =
+            Foam::atan2(totRotMatrix_.zy(),totRotMatrix_.zz());
+        eulerAngles.y() = Foam::atan2(-totRotMatrix_.zx(),sy);
+        eulerAngles.z() =
+            Foam::atan2(totRotMatrix_.yx(),totRotMatrix_.xx());
+    }
+    else
+    {
+        eulerAngles.x() =
+            Foam::atan2(-totRotMatrix_.yz(),totRotMatrix_.yy());
+        eulerAngles.y() = Foam::atan2(-totRotMatrix_.zx(),sy);
+        eulerAngles.z() = 0.0;
+    }
 
-        geomModel_->bodyRotatePoints(angle,Axis_);
-        geomModel_->bodyMovePoints(transIncr);
-    // }
+    geomModel_->bodyRotatePoints(angle,Axis_);
+    geomModel_->bodyMovePoints(transIncr);
 
     // geomModel_->synchronPos();
 
@@ -770,7 +889,7 @@ void immersedBody::updateVectorField
 )
 {
     // check dictionary for parameters (only noSlip allowed)
-    word BC = immersedDict_.subDict(VName).lookup("BC");
+    word BC = word(immersedDict_.subDict(VName).lookup("BC"));
 
     List<DynamicLabelList> intLists;
     List<DynamicLabelList> surfLists;
@@ -1058,10 +1177,11 @@ void immersedBody::initSyncWithFlow(const volVectorField& U)
 void immersedBody::pimpleUpdate
 (
     volScalarField& body,
-    volVectorField& f
+    volVectorField& fPress,
+    volVectorField& fVisc
 )
 {
-    updateCoupling(body, f);
+    updateCoupling(body, fPress, fVisc);
     updateMovement(VelOld_, AxisOld_, omegaOld_);
 }
 //---------------------------------------------------------------------------//
@@ -1107,7 +1227,7 @@ void immersedBody::setRestartSim(vector vel, scalar angVel, vector axisRot, bool
     }
 }
 //---------------------------------------------------------------------------//
-void immersedBody::chceckBodyOp()
+void immersedBody::checkBodyOp()
 {
     if(bodyOperation_ != 5 || timesToSetStatic_ == -1)
         return;
@@ -1148,4 +1268,153 @@ void immersedBody::chceckBodyOp()
     }
 
     ibContactClass_->inContactWithStatic(false);
+}
+
+//---------------------------------------------------------------------------//
+void immersedBody::updateRhoF                                           //variant_1 for VOF
+(
+    volScalarField& rho
+)
+{
+    scalar rhoFAux(0);
+    scalar bodyVol(0);
+    
+    List<DynamicLabelList> intLists;
+    List<DynamicLabelList> surfLists;
+    DynamicVectorList refCoMList;
+    
+    geomModel_->getReferencedLists(
+        intLists,
+        surfLists,
+        refCoMList
+    );
+    
+    // Note (MI): in this case, we do not want to take into account the
+    //            fluid composition inside the particle
+    // - we calculate the density of the surrounding fluid only from
+    //   surface cells
+    // - in this version, no correction for the presence of solid in the
+    //   surface cells is taken into account
+    
+    // compute the weighted average of density    
+    //~ forAll (intLists, i)
+    //~ {
+        //~ DynamicLabelList& intListI = intLists[i];
+        //~ forAll (intListI, intCell)
+        //~ {
+            //~ label cellI = intListI[intCell];
+            
+            //~ rhoFAux += rho[cellI]*mesh_.V()[cellI];
+            //~ bodyVol += mesh_.V()[cellI];
+        //~ }
+    //~ }
+    
+    forAll (surfLists, i)
+    {
+        DynamicLabelList& surfListI = surfLists[i];
+        forAll (surfListI, surfCell)
+        {
+            label cellI = surfListI[surfCell];
+            
+            rhoFAux += rho[cellI]*mesh_.V()[cellI];
+            bodyVol += mesh_.V()[cellI];
+        }
+    }
+    
+    reduce(rhoFAux, sumOp<scalar>());
+    reduce(bodyVol, sumOp<scalar>());
+    
+    
+    if (bodyVol > SMALL)
+    {
+        rhoF_ = rhoFAux/bodyVol;
+    }
+    else
+    {
+        rhoF_ = 1.0;
+    }
+    Info << "Body " << bodyId_ << ": rhoF = " << rhoF_ << endl;
+}
+void immersedBody::updateRhoF
+(
+    scalar rho
+)
+{    
+    rhoF_ = rho;
+}
+void immersedBody::updateRhoF                                           //variant_2 for VOF
+(
+    volScalarField& alpha,
+    volScalarField& body,
+    const scalar rho1,
+    const scalar rho2
+)
+{
+    scalar rhoFAux(0);
+    scalar bodyVol(0);
+    scalar epsFluidMin(1e-1);
+    
+    List<DynamicLabelList> intLists;
+    List<DynamicLabelList> surfLists;
+    DynamicVectorList refCoMList;
+    
+    geomModel_->getReferencedLists(
+        intLists,
+        surfLists,
+        refCoMList
+    );
+    
+    // Note (MI): in this case, we do not want to take into account the
+    //            fluid composition inside the particle
+    // - we calculate the density of the surrounding fluid only from
+    //   surface cells
+    // - here, I am attempting to remove the solid volume from the alpha
+    //   field computation through a simple correction (alphaF)
+    // - this is probrably/most definitely not correct but might improve
+    //   the behavior over the variant _1
+    
+    forAll (surfLists, i)
+    {
+        DynamicLabelList& surfListI = surfLists[i];
+        forAll (surfListI, surfCell)
+        {
+            label cellI = surfListI[surfCell];
+
+            const scalar fluidFrac =
+                max(scalar(1) - body[cellI], scalar(0));
+
+            if (fluidFrac <= epsFluidMin)
+            {
+                continue;
+            }
+
+            const scalar alphaF =
+                min
+                (
+                    max(alpha[cellI]/fluidFrac, scalar(0)),
+                    scalar(1)
+                );
+
+            const scalar fluidVol = fluidFrac*mesh_.V()[cellI];
+
+            rhoFAux += (alphaF*rho1 + (1.0 - alphaF)*rho2)*fluidVol;
+            bodyVol += fluidVol;
+        }
+    }
+    
+    reduce(rhoFAux, sumOp<scalar>());
+    reduce(bodyVol, sumOp<scalar>());
+    
+    
+    if (bodyVol > SMALL)
+    {
+        rhoF_ = rhoFAux/bodyVol;
+    }
+    else
+    {
+        rhoF_ = 1.0;
+    }
+    Info << "Body " << bodyId_ << ": rhoF = " << rhoF_ << endl;
+    
+    
 }

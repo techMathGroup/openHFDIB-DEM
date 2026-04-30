@@ -77,7 +77,7 @@ int main(int argc, char *argv[])
     // scalar meshUpdateTime_(0.0);
     // scalar meshChangingTime_(0.0);
     scalar createBodiesTime_(0.0);
-    
+
     // OS time efficiency testing
     if(HFDIBDEM.getRecordFirstTime())
     {
@@ -99,9 +99,9 @@ int main(int argc, char *argv[])
         clockTime createBodiesTime; // OS time efficiency testing
         HFDIBDEM.createBodies(lambda,refineF);
         createBodiesTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
-        
+
         // clockTime preUpdateBodiesTime; // OS time efficiency testing
-        HFDIBDEM.preUpdateBodies(lambda,f);
+        HFDIBDEM.preUpdateBodies(lambda);
         // preUpdateTime_ += preUpdateBodiesTime.timeIncrement(); // OS time efficiency testing
 
         // clockTime meshUpdateTime; // OS time efficiency testing
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
         // clockTime meshChangingTime; // OS time efficiency testing
         if (mesh.changing())
         {
-            lambda *= 0;
+            lambda *= 0.;
             HFDIBDEM.recreateBodies(lambda,refineF);
         }
         // meshChangingTime_ += meshChangingTime.timeIncrement(); // OS time efficiency testing
@@ -119,7 +119,8 @@ int main(int argc, char *argv[])
         Info << "updating HFDIBDEM" << endl;
 
         // clockTime postUpdateBodiesTime;
-        HFDIBDEM.postUpdateBodies(lambda,f);
+        volVectorField gradLambda(fvc::grad(lambda));
+        HFDIBDEM.postUpdateBodies(lambda,gradLambda,f,f);               //MI: here, we should clean up interfaces
         // postUpdateTime_ += postUpdateBodiesTime.timeIncrement();
 
         // clockTime addRemoveTime;
@@ -145,7 +146,7 @@ int main(int argc, char *argv[])
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
         Info << "createBodiesTime    = " << createBodiesTime_    << " s " << endl;
-        
+
     // Info<< "preUpdateTime       = " << preUpdateTime_       << " s \n"
     //     << "createBodiesTime    = " << createBodiesTime_    << " s \n"
     //     << "meshUpdateTime      = " << meshUpdateTime_      << " s \n"

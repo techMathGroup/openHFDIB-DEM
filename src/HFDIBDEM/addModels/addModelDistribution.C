@@ -98,7 +98,7 @@ fieldCurrentValue_(0),
 allActiveCellsInMesh_(true),
 randGen_(clock::getTime())
 {
-	init();
+    init();
 }
 
 addModelDistribution::~addModelDistribution()
@@ -136,7 +136,7 @@ void addModelDistribution::init()
 
 	if (addDomain_ == "cellZone")
 	{
-		zoneName_ = (word(addDomainCoeffs_.lookup("zoneName")));
+		zoneName_ = word(addDomainCoeffs_.lookup("zoneName"));
 		cellZoneActive_ = true;
         initializeCellZone();
         InfoH << addModel_Info << "-- addModelMessage-- "
@@ -144,8 +144,8 @@ void addModelDistribution::init()
 	}
 	else if (addDomain_ == "boundBox")
 	{
-		minBound_       = (addDomainCoeffs_.lookup("minBound"));
-		maxBound_       = (addDomainCoeffs_.lookup("maxBound"));
+		minBound_       = vector(addDomainCoeffs_.lookup("minBound"));
+		maxBound_       = vector(addDomainCoeffs_.lookup("maxBound"));
 		boundBoxActive_ = true;
 
         initializeBoundBox();
@@ -172,7 +172,8 @@ void addModelDistribution::init()
     }
 
     Pstream::gatherList(procZoneVols, 0);
-    Pstream::scatter(procZoneVols, 0);
+    Pstream::broadcast(procZoneVols, 0);                                //OF.com compatibility: scatter -> broadcast
+
 
     scalar zoneVol(0);
     forAll (procZoneVols, procI)
@@ -195,7 +196,7 @@ void addModelDistribution::init()
              << "addition zone completely immersed in mesh -> OK" << endl;
     }
 
-	partPerAddTemp_ = partPerAdd_;
+    partPerAddTemp_ = partPerAdd_;
 }
 
 //---------------------------------------------------------------------------//
@@ -287,9 +288,9 @@ std::shared_ptr<geomModel> addModelDistribution::addBody
     reduce(canAddBodyI, andOp<bool>());
     bodyAdded_ = (canAddBodyI);
 
-	if(bodyAdded_)
-	{
-		if(timeBased_)
+    if(bodyAdded_)
+    {
+        if(timeBased_)
 		{
 			InfoH << addModel_Info << "-- addModelMessage-- "
                 << "addedOnTimeLevel:  " << addedOnTimeLevel_<< endl;
@@ -473,24 +474,24 @@ scalar addModelDistribution::checkLambdaFraction(const volScalarField& body)
 //---------------------------------------------------------------------------//
 scalar addModelDistribution::returnRandomAngle()
 {
-    scalar ranNum = 2.0*randGen_.scalar01() - 1.0;
+    scalar ranNum = 2.0*randGen_.sample01<scalar>() - 1.0;
     scalar angle  = ranNum*Foam::constant::mathematical::pi;
-	return angle;
+    return angle;
 }
 //---------------------------------------------------------------------------//
 vector addModelDistribution::returnRandomRotationAxis()
 {
-	vector  axisOfRotation(vector::zero);
-	scalar ranNum = 0;
+    vector  axisOfRotation(vector::zero);
+    scalar ranNum = 0;
 
-	for (int i=0;i<3;i++)
-	{
-		ranNum = randGen_.scalar01();
-		axisOfRotation[i] = ranNum;
-	}
+    for (int i=0;i<3;i++)
+    {
+        ranNum = randGen_.sample01<scalar>();
+        axisOfRotation[i] = ranNum;
+    }
 
-	axisOfRotation /=mag(axisOfRotation);
-	return axisOfRotation;
+    axisOfRotation /=mag(axisOfRotation);
+    return axisOfRotation;
 }
 //---------------------------------------------------------------------------//
 Tuple2<label, scalar> addModelDistribution::returnScaleFactor()
@@ -519,8 +520,7 @@ Tuple2<label, scalar> addModelDistribution::returnScaleFactor()
     {
         totalMissParts += missingParticles[size];
     }
-
-    label randomMissPart = floor(randGen_.scalar01()*totalMissParts);
+    label randomMissPart = floor(randGen_.sample01<scalar>()*totalMissParts);
     label missingPart(0);
     forAll (missingParticles,size)
     {
@@ -531,8 +531,7 @@ Tuple2<label, scalar> addModelDistribution::returnScaleFactor()
             break;
         }
     }
-
-    scalar factor(particleSize_[missingPart - 1] + (particleSize_[missingPart] - particleSize_[missingPart - 1]) * randGen_.scalar01());
+    scalar factor(particleSize_[missingPart - 1] + (particleSize_[missingPart] - particleSize_[missingPart - 1]) * randGen_.sample01<scalar>());
     factor *= convertToMeters_/stlBaseSize_;
 
     Tuple2<label, scalar> returnValue(missingPart, factor);

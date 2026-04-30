@@ -75,7 +75,7 @@ vector shapeBased::addModelReturnRandomPosition
     scalar ranNum = 0;
     for (int i=0;i<3;i++)
     {
-        ranNum = 2.0*maxScales[i]*randGen.scalar01() - 1.0*maxScales[i];
+        ranNum = 2.0*maxScales[i]*randGen.sample01<scalar>() - 1.0*maxScales[i];
         ranVec[i] = ranNum;
     }
 

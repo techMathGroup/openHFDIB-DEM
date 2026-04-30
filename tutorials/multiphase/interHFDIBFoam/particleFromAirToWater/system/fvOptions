@@ -1,0 +1,27 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Website:  https://openfoam.org                  |
+|   \\  /    A nd           | Version:  8                                     |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      fvOptions;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+gravity
+{
+    type            buoyancyForce;
+    active          false;
+    selectionMode   all;         // or cellZone, cellSet, points
+    fields          (U);         // Name of velocity field
+    rho             rho;         // Name of density field
+    g               g;          // Load g value from constant/g
+}
+// ************************************************************************* //
+

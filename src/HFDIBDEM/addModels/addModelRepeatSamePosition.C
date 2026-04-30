@@ -56,9 +56,6 @@ addModelRepeatSamePosition::~addModelRepeatSamePosition()
 {
 }
 
-//~ void init()
-//~ {
-//~ }
 
 //---------------------------------------------------------------------------//
 bool addModelRepeatSamePosition::shouldAddBody(const volScalarField& body)

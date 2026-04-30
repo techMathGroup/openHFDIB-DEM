@@ -57,7 +57,6 @@ void lineIntInfo::setIntpInfo()
     List<List<intPoint>>& intPoints = getIntPoints();
 
     // create temporary unit surface normals
-    // vectorField& surfNorm = getSurfNorm_();
     forAll (cSurfCells, cellI)
     {
         // get surface cell label

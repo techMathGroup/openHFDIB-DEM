@@ -26,20 +26,13 @@ if (pimple.consistent())
     HbyA -= (rAU - rAtU())*fvc::grad(p);
 }
 
-if (pimple.nCorrPiso() <= 1)
+if (pimple.nCorrPISO() <= 1)
 {
     tUEqn.clear();
 }
 
 // Update the pressure BCs to ensure flux consistency
 constrainPressure(p, U, phiHbyA, rAtU(), MRF);
-
-volVectorField FbyA(rAU*f);
-surfaceScalarField phiFbyA
-(
-    "phiFbyA",
-    fvc::flux(FbyA)
-);
 
 
 // Non-orthogonal pressure corrector loop
@@ -48,7 +41,6 @@ while (pimple.correctNonOrthogonal())
     fvScalarMatrix pEqn
     (
         fvm::laplacian(rAtU(), p) == fvc::div(phiHbyA)
-                                   + fvc::div(phiFbyA)
     );
 
     pEqn.setReference(pRefCell, pRefValue);
@@ -57,7 +49,7 @@ while (pimple.correctNonOrthogonal())
 
     if (pimple.finalNonOrthogonalIter())
     {
-        phi = phiHbyA - pEqn.flux() + phiFbyA;
+        phi = phiHbyA - pEqn.flux();
     }
 }
 
@@ -66,7 +58,8 @@ while (pimple.correctNonOrthogonal())
 // Explicitly relax pressure for momentum corrector
 p.relax();
 
-U = HbyA - rAtU*fvc::grad(p) + rAU*f;
+// Momentum corrector
+U = HbyA - rAtU*fvc::grad(p);
 U.correctBoundaryConditions();
 fvOptions.correct(U);
 
@@ -76,17 +69,6 @@ fvc::correctUf(Uf, U, phi);
 // Make the fluxes relative to the mesh motion
 fvc::makeRelative(phi, U);
 
-HFDIBDEM.updateFSCoupling(lambda,f);
+// Update U based on new U values and old Ui
 HFDIBDEM.interpolateIB(U,Ui,lambda);
 
-//Ui -= (Ui - U)*(1-lambda);
-
-forAll(surface, sI)
-{
-    if (lambda[sI] > 0)
-        surface[sI] = 1;
-    else
-        surface[sI] = 0;
-}
-
-f += 0.8*surface*(Ui - U)/runTime.deltaT();

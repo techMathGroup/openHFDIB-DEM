@@ -74,7 +74,8 @@ void sphereBody::createImmersedBody
     }
     else
     {
-        cachedNeighbours_ = new HashTable<const labelList&, label, Hash<label>>;
+        // cachedNeighbours_ = new HashTable<const labelList&, label, Hash<label>>;
+        cachedNeighbours_.reset(new HashTable<labelList, label, Hash<label>>);
     }
 
     HashTable<bool, label, Hash<label>> cellInside(tableSize);
@@ -111,9 +112,9 @@ void sphereBody::createImmersedBody
                 }
             }
         }
-        const autoPtr<DynamicLabelList> helpPtr(nextToCheck.ptr());
-        nextToCheck.set(auxToCheck.ptr());
-        auxToCheck = helpPtr;
+        autoPtr<DynamicLabelList> helpPtr(nextToCheck.ptr()); // removed const Type pointer
+        nextToCheck.reset(auxToCheck.ptr()); // issue set -> reset compiler warning
+        auxToCheck = std::move(helpPtr); // added std::move
     }
 
     DynamicLabelList keyToErase;
@@ -188,9 +189,9 @@ label sphereBody::getCellInBody
                 }
             }
         }
-        const autoPtr<DynamicLabelList> helpPtr(nextToCheck.ptr());
-        nextToCheck.set(auxToCheck.ptr());
-        auxToCheck = helpPtr;
+        autoPtr<DynamicLabelList> helpPtr(nextToCheck.ptr());
+        nextToCheck.reset(auxToCheck.ptr());
+        auxToCheck = std::move(helpPtr);
     }
     return -1;
 }

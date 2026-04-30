@@ -1,5 +1,4 @@
 EXE_INC = \
-    -I$(LIB_SRC)/triSurface/lnInclude \
     -I$(LIB_SRC)/dynamicMesh/lnInclude \
     -I$(LIB_SRC)/meshTools/lnInclude \
     -I$(LIB_SRC)/finiteVolume/lnInclude \
@@ -9,11 +8,8 @@ EXE_INC = \
 
 
 LIB_LIBS = \
-    -ltriSurface \
     -ldynamicFvMesh \
     -ltopoChangerFvMesh \
     -ldynamicMesh \
     -lmeshTools \
-    -lblockMesh #\
-#    -L$(MPI_ARCH_PATH)/lib64 \
-#    -lmpi_cxx \
+    -lblockMesh

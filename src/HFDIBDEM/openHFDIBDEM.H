@@ -51,7 +51,6 @@ Contributors
 #include "primitiveFieldsFwd.H"
 #include "volFieldsFwd.H"
 #include "fvMatricesFwd.H"
-//// #include "fvMesh.H"
 #include "triSurfaceMesh.H"
 #include "immersedBody.H"
 
@@ -63,16 +62,15 @@ Contributors
 #include "addModelRepeatRandomPosition.H"
 #include "addModelDistribution.H"
 
-// #include "contactModel.H"
 #include "leastSquaresInt.H"
 #include "lineInt.H"
-// #include "IOstream.H"
-// #include "virtualMesh.H"
 
 #include "verletList.H"
-//OS Time effitiency Testing
+
+//OS Time efficiency Testing
 #include "clockTime.H"
-//OS Time effitiency Testing
+
+
 namespace Foam
 {
 
@@ -156,15 +154,21 @@ namespace Foam
 
     void preUpdateBodies
     (
-        volScalarField& body,
-        volVectorField& f
+        volScalarField& body
     );
-    void postUpdateBodies(volScalarField& body,volVectorField& f);
+    void postUpdateBodies
+    (
+        volScalarField& body,
+        volVectorField& gradBody,
+        volVectorField& fPress,
+        volVectorField& fVisc
+    );
 
     void updateFSCoupling
     (
         volScalarField& body,
-        volVectorField& f
+        volVectorField& fPress,
+        volVectorField& fVisc
     );
 
     void recreateBodies(volScalarField& body,volScalarField& refineF);
@@ -207,8 +211,18 @@ namespace Foam
     }
 
     void writeFirtsTimeBodiesInfo();
-    
+
     void setSolverInfo();
+    
+    void updateBodiesRhoF(volScalarField& rho);
+    void updateBodiesRhoF(scalar rho);
+    void updateBodiesRhoF
+    (
+        volScalarField& alpha,
+        volScalarField& body,
+        const scalar rho1,
+        const scalar rho2
+    );
 
  };
 }

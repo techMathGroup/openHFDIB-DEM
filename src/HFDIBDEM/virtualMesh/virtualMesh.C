@@ -36,6 +36,27 @@ Contributors
 
 using namespace Foam;
 
+namespace
+{
+
+volumeType ensureVolumeType
+(
+    subVolume& sV,
+    geomModel& geom,
+    const bool cIb
+)
+{
+    ibSubVolumeInfo& info = sV.getVolumeInfo(cIb);
+    if (info.volumeType_ == volumeType::UNKNOWN)
+    {
+        info.volumeType_ = geom.getVolumeType(sV, cIb);
+    }
+
+    return info.volumeType_;
+}
+
+}
+
 //---------------------------------------------------------------------------//
 virtualMesh::virtualMesh
 (
@@ -64,20 +85,16 @@ bool virtualMesh::detectFirstContactPoint()
 //---------------------------------------------------------------------------//
 bool virtualMesh::detectFirstVolumeInContact(subVolume& sV, bool& startPointFound)
 {
+    ibSubVolumeInfo& cInfo = sV.cVolumeInfo();
+    ibSubVolumeInfo& tInfo = sV.tVolumeInfo();
+
     if (sV.volume() < vMeshInfo_.subVolumeV)
     {
-        if (sV.cVolumeInfo().volumeType_ != volumeType::inside)
-        {
-            sV.cVolumeInfo().volumeType_ = cGeomModel_.getVolumeType(sV, true);
-        }
+        ensureVolumeType(sV, cGeomModel_, true);
+        ensureVolumeType(sV, tGeomModel_, false);
 
-        if (sV.tVolumeInfo().volumeType_ != volumeType::inside)
-        {
-            sV.tVolumeInfo().volumeType_ = tGeomModel_.getVolumeType(sV, false);
-        }
-
-        if (sV.cVolumeInfo().volumeType_ == volumeType::outside
-            || sV.tVolumeInfo().volumeType_ == volumeType::outside)
+        if (cInfo.volumeType_ == volumeType::OUTSIDE
+            || tInfo.volumeType_ == volumeType::OUTSIDE)
         {
             return false;
         }
@@ -85,25 +102,16 @@ bool virtualMesh::detectFirstVolumeInContact(subVolume& sV, bool& startPointFoun
         boundBox cBBox = boundBox(sV.min(), sV.max());
         boundBox tBBox = boundBox(sV.min(), sV.max());
 
-        if (sV.cVolumeInfo().volumeType_ == volumeType::mixed)
+        if (cInfo.volumeType_ == volumeType::MIXED)          //OF.com: mixed, inside, outside -> MIXED, INSIDE, OUTSIDE
         {
-            if (!cGeomModel_.limitFinalSubVolume(
-                sV,
-                true,
-                cBBox
-            ))
+            if (!cGeomModel_.limitFinalSubVolume(sV,true,cBBox))
             {
                 return false;
             }
         }
-
-        if (sV.tVolumeInfo().volumeType_ == volumeType::mixed)
+        if (tInfo.volumeType_ == volumeType::MIXED)
         {
-            if (!tGeomModel_.limitFinalSubVolume(
-                sV,
-                false,
-                tBBox
-            ))
+            if (!tGeomModel_.limitFinalSubVolume(sV,false,tBBox))
             {
                 return false;
             }
@@ -116,54 +124,79 @@ bool virtualMesh::detectFirstVolumeInContact(subVolume& sV, bool& startPointFoun
         return false;
     }
 
-    if (sV.cVolumeInfo().volumeType_ != volumeType::inside)
-    {
-        sV.cVolumeInfo().volumeType_ = cGeomModel_.getVolumeType(sV, true);
-    }
+    ensureVolumeType(sV, cGeomModel_, true);
+    ensureVolumeType(sV, tGeomModel_, false);
 
-    if (sV.tVolumeInfo().volumeType_ != volumeType::inside)
-    {
-        sV.tVolumeInfo().volumeType_ = tGeomModel_.getVolumeType(sV, false);
-    }
-
-    if (sV.cVolumeInfo().volumeType_ == volumeType::outside || sV.tVolumeInfo().volumeType_ == volumeType::outside)
+    if (cInfo.volumeType_ == volumeType::OUTSIDE
+        || tInfo.volumeType_ == volumeType::OUTSIDE)
     {
         return false;
     }
-    else if (sV.cVolumeInfo().volumeType_ == volumeType::inside && sV.tVolumeInfo().volumeType_ == volumeType::inside)
+    else if (cInfo.volumeType_ == volumeType::INSIDE
+        && tInfo.volumeType_ == volumeType::INSIDE)
     {
         return true;
     }
 
-    List<subVolume>& sVs = sV.childSubVolumes();
+    //~ List<subVolume>& sVs = sV.childSubVolumes();
 
+    //~ if (!startPointFound)
+    //~ {
+        //~ for (auto iter = sVs.begin(); iter != sVs.end(); ++iter)
+        //~ {
+            //~ if (iter->contains(vMeshInfo_.getStartingPoint()))
+            //~ {
+                //~ // Move this one to the front
+                //~ std::rotate(sVs.begin(), iter, sVs.end());
+                //~ break;
+            //~ }
+        //~ }
+    //~ }
+    
+    // Access the autoPtr list
+    List<autoPtr<subVolume>>& sVsPtr = sV.childSubVolumes();
+    
     if (!startPointFound)
     {
-        for (auto iter = sVs.begin(); iter != sVs.end(); ++iter)
+        // Use iterators over the autoPtr list
+        for (auto iter = sVsPtr.begin(); iter != sVsPtr.end(); ++iter)
         {
-            if (iter->contains(vMeshInfo_.getStartingPoint()))
+            subVolume& sv = **iter;  // dereference autoPtr to get the actual object
+    
+            if (sv.contains(vMeshInfo_.getStartingPoint()))
             {
                 // Move this one to the front
-                std::rotate(sVs.begin(), iter, sVs.end());
+                std::rotate(sVsPtr.begin(), iter, sVsPtr.end());
                 break;
             }
         }
     }
 
-    forAll(sVs,i)
+    //~ forAll(sVs,i)
+    //~ {
+        //~ if (detectFirstVolumeInContact(sVs[i], startPointFound))
+        //~ {
+            //~ return true;
+        //~ }
+        //~ startPointFound = true;
+    //~ }
+    forAll(sVsPtr, i)
     {
-        if (detectFirstVolumeInContact(sVs[i], startPointFound))
+        subVolume& sv = *(sVsPtr[i]);   // dereference autoPtr to get the actual object
+    
+        if (detectFirstVolumeInContact(sv, startPointFound))
         {
             return true;
         }
         startPointFound = true;
     }
+    
     return false;
 }
 //---------------------------------------------------------------------------//
 scalar virtualMesh::evaluateContact()
 {
-    scalar contactVolume = 0;
+    scalar contactVolume = 0.;
     edgeSubVolumesPoints_.clear();
     contactCenter_ = vector::zero;
 
@@ -185,34 +218,29 @@ void virtualMesh::inspectSubVolume(
     DynamicPointList& edgePoints
 )
 {
+    ibSubVolumeInfo& cInfo = sV.cVolumeInfo();
+    ibSubVolumeInfo& tInfo = sV.tVolumeInfo();
+
     if (sV.volume() < vMeshInfo_.subVolumeV)
     {
-        if (sV.cVolumeInfo().volumeType_ != volumeType::inside)
-        {
-            sV.cVolumeInfo().volumeType_ = cGeomModel_.getVolumeType(sV, true);
-        }
-
-        if (sV.tVolumeInfo().volumeType_ != volumeType::inside)
-        {
-            sV.tVolumeInfo().volumeType_ = tGeomModel_.getVolumeType(sV, false);
-        }
+        ensureVolumeType(sV, cGeomModel_, true);
+        ensureVolumeType(sV, tGeomModel_, false);
 
         boundBox cBBox = boundBox(sV.min(), sV.max());
         boundBox tBBox = boundBox(sV.min(), sV.max());
-
         bool cVolumeTypeMixed = false;
-        if (sV.cVolumeInfo().volumeType_ == volumeType::mixed)
+        if (cInfo.volumeType_ == volumeType::MIXED)
         {
             cVolumeTypeMixed = true;
 
-            sV.cVolumeInfo().volumeType_ = cGeomModel_.limitFinalSubVolume(
+            cInfo.volumeType_ = cGeomModel_.limitFinalSubVolume(
                 sV,
                 true,
                 cBBox
-            ) ? volumeType::inside : volumeType::outside;
+            ) ? volumeType::INSIDE : volumeType::OUTSIDE;
         }
 
-        if (sV.tVolumeInfo().volumeType_ == volumeType::mixed)
+        if (tInfo.volumeType_ == volumeType::MIXED)
         {
             if (cVolumeTypeMixed)
             {
@@ -220,15 +248,15 @@ void virtualMesh::inspectSubVolume(
                 sV.setAsEdge();
             }
 
-            sV.tVolumeInfo().volumeType_ = tGeomModel_.limitFinalSubVolume(
+            tInfo.volumeType_ = tGeomModel_.limitFinalSubVolume(
                 sV,
                 false,
                 tBBox
-            ) ? volumeType::inside : volumeType::outside;
+            ) ? volumeType::INSIDE : volumeType::OUTSIDE;
         }
 
-        if (sV.cVolumeInfo().volumeType_ == volumeType::inside
-            && sV.tVolumeInfo().volumeType_ == volumeType::inside
+        if (cInfo.volumeType_ == volumeType::INSIDE
+            && tInfo.volumeType_ == volumeType::INSIDE
             && cBBox.overlaps(tBBox))
         {
             // boundBox as a cross section of cBBox and tBBox
@@ -254,32 +282,30 @@ void virtualMesh::inspectSubVolume(
         return;
     }
 
-    if (sV.cVolumeInfo().volumeType_ != volumeType::inside)
-    {
-        sV.cVolumeInfo().volumeType_ = cGeomModel_.getVolumeType(sV, true);
-    }
+    ensureVolumeType(sV, cGeomModel_, true);
+    ensureVolumeType(sV, tGeomModel_, false);
 
-    if (sV.tVolumeInfo().volumeType_ != volumeType::inside)
-    {
-        sV.tVolumeInfo().volumeType_ = tGeomModel_.getVolumeType(sV, false);
-    }
-
-    if (sV.cVolumeInfo().volumeType_ == volumeType::outside || sV.tVolumeInfo().volumeType_ == volumeType::outside)
+    if (cInfo.volumeType_ == volumeType::OUTSIDE
+        || tInfo.volumeType_ == volumeType::OUTSIDE)
     {
         return;
     }
-    else if (sV.cVolumeInfo().volumeType_ == volumeType::inside && sV.tVolumeInfo().volumeType_ == volumeType::inside)
+    else if (cInfo.volumeType_ == volumeType::INSIDE
+        && tInfo.volumeType_ == volumeType::INSIDE)
     {
         contactVolume += sV.volume();
         contactCenter += (sV.midpoint()*sV.volume());
         return;
     }
 
-    List<subVolume>& sVs = sV.childSubVolumes();
+    //~ List<subVolume>& sVs = sV.childSubVolumes();
+    // Access the autoPtr list
+    List<autoPtr<subVolume>>& sVsPtr = sV.childSubVolumes();
     DynamicPointList newEdgePoints;
-    forAll(sVs,i)
+    forAll(sVsPtr,i)
     {
-        inspectSubVolume(sVs[i], contactVolume, contactCenter, newEdgePoints);
+        subVolume& cSv = *(sVsPtr[i]);   // dereference autoPtr to get the actual object
+        inspectSubVolume(cSv, contactVolume, contactCenter, newEdgePoints);
     }
 
     if (newEdgePoints.size() > 0)
@@ -288,7 +314,8 @@ void virtualMesh::inspectSubVolume(
         return;
     }
 
-    if (sV.cVolumeInfo().volumeType_ == volumeType::mixed && sV.tVolumeInfo().volumeType_ == volumeType::mixed)
+    if (cInfo.volumeType_ == volumeType::MIXED
+        && tInfo.volumeType_ == volumeType::MIXED)
     {
         edgePoints.append(sV.midpoint());
         sV.setAsEdge();
@@ -340,7 +367,8 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(bool nonConvex)
 //---------------------------------------------------------------------------//
 Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList edgeSubVolumesPoints)
 {
-// This function is taken from prtContact and just adjustated for higher accuracy
+    //Note (??): This function is taken from prtContact and just adjusted
+    //           for higher accuracy
     scalar area(0.0);
     vector normalVec(vector::zero);
     scalar tDC(tGeomModel_.getDC());
@@ -429,7 +457,9 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList
             normalVec = weightedDir/(mag(weightedDir)+SMALL);
         }
         if (!normOk || mag(normalVec) < 1)
+        {
             normalVec = normalVector;
+        }
 
         // create best fitting plane
         plane bestFitPlane(contactCenter_, normalVec);
@@ -438,7 +468,7 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList
         forAll (edgeSubVolumesPoints,cell)
         {
             commCellsPosInPlane.append(bestFitPlane.nearestPoint(edgeSubVolumesPoints[cell]));
-		}
+        }
 
         vector q1(1.0, 0.0, 0.0);
         vector q2(0.0, 1.0, 0.0);
@@ -473,7 +503,18 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList
 
                 forAll (commCellsPosInPlane, celli)
                 {
-                    if (uPlane.sideOfPlane(commCellsPosInPlane[celli]) == 0 && vPlane.sideOfPlane(commCellsPosInPlane[celli]) == 1)
+                    const label uSide = uPlane.sideOfPlane
+                    (
+                        commCellsPosInPlane[celli]
+                    );
+                    const label vSide = vPlane.sideOfPlane
+                    (
+                        commCellsPosInPlane[celli]
+                    );
+
+                    //-- select points in angular sector
+                    if (   uSide == plane::NORMAL
+                        && vSide == plane::FLIP)
                     {
                         pointsInSection.append(commCellsPosInPlane[celli]);
                     }
@@ -485,18 +526,22 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList
                     scalar distance(0);
                     forAll (pointsInSection, pointI)
                     {
-                         scalar magnitude = mag(pointsInSection[pointI]-contactCenter_);
+                         scalar magnitude = mag(
+                             pointsInSection[pointI]-contactCenter_
+                         );
                          if (magnitude > distance)
                          {
-							 magnitude = distance;
-							 max = pointsInSection[pointI];
-						 }
-					}
+                             distance = magnitude;
+                             max = pointsInSection[pointI];
+                         }
+                    }
+
                     commCellsInSections.append(max);
                 }
             }
         }
-        // calculate contact area
+
+        //-- calculate contact area
         for (label i = 0; i + 1 < commCellsInSections.size(); i++)
         {
             //~ Info << commCellsInSections[i] << endl;
@@ -518,12 +563,12 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList
     if (normalVec == vector::zero)
     {
         normalVec = normalVector;
-	}
+    }
 
-	if ((normalVector & normalVec) < 0)
-	{
-		normalVec = normalVec * (-1);
-	}
+    if ((normalVector & normalVec) < 0)
+    {
+        normalVec = normalVec * (-1);
+    }
 
     Tuple2<scalar,vector> returnValue(area,normalVec);
 
@@ -535,8 +580,13 @@ std::vector<subContact> virtualMesh::findsubContacts(subVolume& sV)
     if (sV.hasChildSubVolumes())
     {
         std::vector<subContact> childsSubContacts;
-        for (subVolume& child : sV.childSubVolumes())
+        
+        List<autoPtr<subVolume>>& sVsPtr = sV.childSubVolumes();
+        
+        //~ for (subVolume& child : sV.childSubVolumes())
+        forAll (sVsPtr, i)
         {
+            subVolume& child = *(sVsPtr[i]);
             std::vector<subContact> childSubContacts(findsubContacts(child));
             std::move(childSubContacts.begin(), childSubContacts.end(), std::back_inserter(childsSubContacts));
         }
@@ -586,8 +636,8 @@ std::vector<subContact> virtualMesh::findsubContacts(subVolume& sV)
     }
 
     std::vector<subContact> returnValue;
-    if (sV.cVolumeInfo().volumeType_ != volumeType::outside
-        && sV.tVolumeInfo().volumeType_ != volumeType::outside)
+    if (sV.cVolumeInfo().volumeType_ != volumeType::OUTSIDE
+        && sV.tVolumeInfo().volumeType_ != volumeType::OUTSIDE)
     {
         returnValue.push_back(subContact());
         returnValue.back().addSubVolume(std::make_shared<subVolume>(sV));

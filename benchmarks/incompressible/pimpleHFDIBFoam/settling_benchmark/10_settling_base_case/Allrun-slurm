@@ -1,0 +1,51 @@
+#!/bin/bash
+#SBATCH -J AAAA
+#SBATCH -p short
+##SBATCH --time=0-01:00:0
+#SBATCH --ntasks=BBBB
+#SBATCH --nodes=1
+##SBATCH --mem=300gb
+##SBATCH --exclude=kraken-m[1-7,9]
+#SBATCH --nodelist=CCCC
+
+# Note: cluster documentation is available from http://docs.it.cas.cz/doku.php?id=computing:cluster:fronty:start
+# Note: the job is set up via #SBATCH commands
+#       -J ... job name
+#       -p ... queue (partition) to be used
+#       --time= ... D-HH:MM:SS ... time after which the job will be killed (if not completed before)
+#       --ntasks=... INTEGER ... number of cores to be used
+#       --nodes=... INTEGER ... number of nodes to be used (we usually keep this equal to one NOT to distribute the job over nodes)
+#       --mem=... INTEGERgb ... memory request for the job
+#       --exclude=... NODE NAMES ... nodes NOT TO run the job on
+#       --nodelist=... NODE NAMES ... nodes TO run the job on
+# Note: if two hastags are used, the option is not taken into account
+
+# start time
+date "+%d/%m/%Y %T"
+
+# -- load modules with required capabilities
+module load openfoam/2312
+
+# -- source the run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+# -- copy initial conditions
+
+rm -rf 0
+
+cp -r 0.org 0
+
+paraFoam -touch
+paraFoam -builtin -touch
+
+
+runApplication blockMesh
+runApplication decomposePar -force
+application=`getApplication`
+srun $application -parallel > log.$application
+
+# -- clean up the cluster environment
+module unload openfoam/2312
+
+# end time
+date "+%d/%m/%Y %T"

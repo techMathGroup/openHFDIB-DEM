@@ -1,0 +1,60 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  dev                                        |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+application     interHFDIBFoam;
+
+startFrom       latestTime;
+
+startTime       0;
+
+stopAt          endTime;
+//~ stopAt          writeNow;
+
+endTime         0.5;
+
+deltaT          1e-4;
+
+writeControl    adjustableRunTime;
+//~ writeControl    timeStep;
+
+writeInterval   1e-2;
+//~ writeInterval   1;
+
+purgeWrite      0;
+
+writeFormat     ascii;
+
+writePrecision  8;
+
+writeCompression off;
+
+timeFormat      general;
+
+timePrecision   8;
+
+//~ maxCo           0.1;
+maxCo           0.8;
+maxAlphaCo      0.8;
+
+maxDeltaT       0.001;
+
+adjustTimeStep  yes;
+
+runTimeModifiable yes;
+
+
+// ************************************************************************* //

@@ -351,6 +351,8 @@ List<DynamicList<vector>> wallContactInfo::detectPossibleSMContact
     forAll(contactPoints,cP)
     {
         vector elementIndex(SM_().getSMCentroidIndex(contactPoints[cP]));
+        //-- skip points outside the SM bounding box
+        if (elementIndex[0] < 0) { continue; }
         if(!possibleContactElements.found(elementIndex))
         {
             possibleContactElements.insert(elementIndex);
@@ -418,19 +420,26 @@ List<DynamicList<vector>> wallContactInfo::detectPossibleSMContact
                     }
                 }
             }
-            const autoPtr<DynamicVectorList> helpPtr(nextToCheck.ptr());
-            nextToCheck.set(auxToCheck.ptr());
-            auxToCheck = helpPtr;
+            autoPtr<DynamicVectorList> helpPtr(nextToCheck.ptr()); // deleted const ...
+//zlobi deprecated set(), use reset()
+            nextToCheck.reset(auxToCheck.ptr());
+            // auxToCheck = helpPtr;
+            auxToCheck = std::move(helpPtr);
         }
         if(subContactElements().size() > 0)
         {
             baseSubContactList.append(subContactElements());
         }
-        for (auto it = contactElements().begin(); it != contactElements().end();)
+        DynamicVectorList& elems = contactElements();
+        for (auto it = elems.begin(); it != elems.end();)
         {
+            label idx = it - elems.begin();  // pointer arithmetic = index
+
             if (checkedOctreeFaces.found(*it))
             {
-                it = contactElements().erase(it);
+                // it = contactElements().remove(it);
+                elems.remove(idx);           // removes and shifts
+                it = elems.begin() + idx;    // refresh pointer
             }
             else
             {
@@ -519,7 +528,8 @@ void wallContactInfo::checkSMElement
         while(iC < contactPatches.size() and !SM_()[index].isMesh)
         {
 
-            isMeshLocC *= isInsidePlane(centroidPoint,contactPatches[iC]);
+            //~ isMeshLocC *= isInsidePlane(centroidPoint,contactPatches[iC]);//OF.com issues warning
+            isMeshLocC &= isInsidePlane(centroidPoint,contactPatches[iC]);
             iC++;
         }
 
@@ -537,7 +547,8 @@ void wallContactInfo::checkSMElement
                 bool isMeshLocV(true);
                 while(iC < contactPatches.size() and !SM_()(verticesLabels[vL]).isMesh)
                 {
-                    isMeshLocV *= isInsidePlane(vertexPoint,contactPatches[iC]);
+                    //~ isMeshLocV *= isInsidePlane(vertexPoint,contactPatches[iC]);
+                    isMeshLocV &= isInsidePlane(vertexPoint,contactPatches[iC]);
                     iC ++;
                 }
                 SM_()(verticesLabels[vL]).isMesh = isMeshLocV;
@@ -561,9 +572,11 @@ void wallContactInfo::checkElement
     bool allInBodyLocal(true);
 
     inMeshLocal =  inMeshLocal || SM_()[index].isMesh;
-    allInMeshLocal *= SM_()[index].isMesh;
+    //~ allInMeshLocal *= SM_()[index].isMesh;
+    allInMeshLocal &= SM_()[index].isMesh;
     inBodyLocal =  inBodyLocal || SM_()[index].isCBody;
-    allInBodyLocal *= SM_()[index].isCBody;
+    //~ allInBodyLocal *= SM_()[index].isCBody;
+    allInBodyLocal &= SM_()[index].isCBody;
     if(SM_()[index].isCBody && !SM_()[index].initPointSet)
     {
         SM_()[index].initPoint = SM_()[index].center;
@@ -574,9 +587,11 @@ void wallContactInfo::checkElement
     forAll(verticesLabels, vL)
     {
         inMeshLocal =  inMeshLocal || SM_()(verticesLabels[vL]).isMesh;
-        allInMeshLocal *= SM_()(verticesLabels[vL]).isMesh;
+        //~ allInMeshLocal *= SM_()(verticesLabels[vL]).isMesh;
+        allInMeshLocal &= SM_()(verticesLabels[vL]).isMesh;
         inBodyLocal =  inBodyLocal || SM_()(verticesLabels[vL]).isCBody;
-        allInBodyLocal *= SM_()(verticesLabels[vL]).isCBody;
+        //~ allInBodyLocal *= SM_()(verticesLabels[vL]).isCBody;
+        allInBodyLocal &= SM_()(verticesLabels[vL]).isCBody;
         if(SM_()(verticesLabels[vL]).isCBody && !SM_()[index].isCBody && !SM_()[index].initPointSet)
         {
             SM_()[index].initPoint = SM_()(verticesLabels[vL]).center;

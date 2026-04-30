@@ -120,6 +120,8 @@ namespace Foam
 
         // forces acting on the particle due to the fluid
         forces FCoupling_;
+        forces FCouplingOld_;
+        scalar couplingHistCoef_;
 
         // forces acting on the particle due to the contact
         forces FContact_;
@@ -150,10 +152,13 @@ namespace Foam
         );
 
         // update fluid-solid coupling
+        List<DynamicLabelList> haloCells_; 
+        
         void updateCoupling
         (
             volScalarField& body,
-            volVectorField& f
+            volVectorField& fPress,
+            volVectorField& fVisc
         );
 
         // auxiliary octree variables
@@ -259,6 +264,21 @@ namespace Foam
             DynamicLabelList cellsToIterate,
             DynamicLabelList startLevel
         );
+        
+        void updateHaloCells
+        (
+            volVectorField& gradBody
+        );
+        void updateHaloCells
+        (
+            volVectorField& gradBody,
+            volScalarField& body
+        );
+        
+        void resetCouplingHistory()
+        {
+            couplingHistCoef_ = 1.0;
+        }
 
         // getters
 
@@ -363,7 +383,8 @@ namespace Foam
         void postPimpleUpdateImmersedBody
         (
             volScalarField& body,
-            volVectorField& f
+            volVectorField& fPress,
+            volVectorField& fVisc
         );
 
         // compute the mean and maximal body courant number (based on
@@ -404,7 +425,8 @@ namespace Foam
         void pimpleUpdate
         (
             volScalarField& body,
-            volVectorField& f
+            volVectorField& fPress,
+            volVectorField& fVisc
         );
 
         const bool& getSDBasedLambda() const
@@ -435,7 +457,7 @@ namespace Foam
             ibContactClass_->inContactWithStatic(inContact);
         }
 
-        void chceckBodyOp();
+        void checkBodyOp();
 
         void setRestartSim
         (
@@ -491,6 +513,17 @@ namespace Foam
             AxisOld_  = Axis_;
             omegaOld_ = omega_;
         }
+        
+        // function to update the average fluid density on the body
+        void updateRhoF(volScalarField& rho);
+        void updateRhoF(scalar rho);
+        void updateRhoF
+        (
+            volScalarField& alpha,
+            volScalarField& body,
+            const scalar rho1,
+            const scalar rho2
+        );
 
         void writeIbInfo()
         {
@@ -502,6 +535,11 @@ namespace Foam
         }
 
         vectorField getUatIbPoints();
+        
+        const List<DynamicLabelList>& getHaloCells() const
+        {
+            return haloCells_;
+        }
     };
 }
 #endif

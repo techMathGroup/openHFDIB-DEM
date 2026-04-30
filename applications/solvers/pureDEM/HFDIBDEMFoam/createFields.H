@@ -59,7 +59,21 @@ volScalarField refineF
 
 #include "createPhi.H"
 
-#include "readGravitationalAcceleration.H"
+// Q (MI, 20250611): do we want to even keep this here? for fluid, we
+//                   should include this through fvOptions and for
+//                   solids, we might want to load this when initializing
+//                   the DEM part of the code
+uniformDimensionedVectorField g
+(
+    IOobject
+    (
+        "g",
+        runTime.constant(),
+        mesh,
+        IOobject::MUST_READ,
+        IOobject::NO_WRITE
+    )
+);
 
 IOdictionary transportProperties
 (
@@ -73,10 +87,14 @@ IOdictionary transportProperties
     )
 );
 
-dimensionedScalar rho = dimensionedScalar(
-  transportProperties.lookup("rho")
+const dimensionedScalar rho
+(
+    transportProperties.getOrDefault<dimensionedScalar>("rho", 1.0)
 );
-
+if (not transportProperties.found("rho"))
+{
+    Info << " -- no entry for fluid density found in transportProperties, defaulting to 1.0" << endl;
+}
 IOdictionary HFDIBDEMDict
 (
     IOobject

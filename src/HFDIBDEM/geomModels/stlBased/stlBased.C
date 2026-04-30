@@ -56,8 +56,8 @@ bodySurfMesh_
 stlPath_(stlPath)
 {
     historyPoints_ = bodySurfMesh_.points();
-    triSurf_.set(new triSurface(bodySurfMesh_));
-    triSurfSearch_.set(new triSurfaceSearch(triSurf_()));
+    triSurf_.reset(new triSurface(bodySurfMesh_));                      //OF.com: set -> reset
+    triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
 }
 //---------------------------------------------------------------------------//
 vector stlBased::addModelReturnRandomPosition
@@ -96,7 +96,7 @@ vector stlBased::addModelReturnRandomPosition
     scalar ranNum = 0;
     for (int i=0;i<3;i++)
     {
-        ranNum = 2.0*maxScales[i]*randGen.scalar01() - 1.0*maxScales[i];
+        ranNum = 2.0*maxScales[i]*randGen.sample01<scalar>() - 1.0*maxScales[i];
         ranVec[i] = ranNum;
     }
 
@@ -205,43 +205,62 @@ void stlBased::synchronPos(label owner)
 //---------------------------------------------------------------------------//
 volumeType stlBased::getVolumeType(subVolume& sv, bool cIb)
 {
-    const indexedOctree<treeDataTriSurface>& tree = triSurfSearch_->tree();
-    const treeDataTriSurface& shapes = tree.shapes();
+    auto& info = sv.getVolumeInfo(cIb);
 
-    autoPtr<labelList>& shapesIn = sv.getVolumeInfo(cIb).shapesIn_;
-
-    if (shapesIn.empty())
+    if (!info.shapesIn_.valid())
     {
+        const indexedOctree<treeDataTriSurface>& tree = triSurfSearch_->tree();
+
         std::shared_ptr<subVolume> parentSV = sv.parentSV();
         if (parentSV)
         {
-            const labelList& parentShapesIn = *(parentSV->getVolumeInfo(cIb).shapesIn_);
-            labelHashSet shapesInSV;
-
-            forAll(parentShapesIn, i)
+            const auto& infoParent = parentSV->getVolumeInfo(cIb);
+            if (infoParent.shapesIn_.valid())
             {
-                label shapeI = parentShapesIn[i];
-                if (shapes.overlaps(shapeI, sv))
+                const labelList& parentShapesIn = infoParent.shapesIn_();
+                if (parentShapesIn.size() == 0)
                 {
-                    shapesInSV.insert(shapeI);
+                    info.shapesIn_.reset(new labelList(0));
+                }
+                else
+                {
+                    const treeDataTriSurface& shapes = tree.shapes();
+                    labelList shapesIn(parentShapesIn.size());
+                    label nShapesIn = 0;
+
+                    forAll(parentShapesIn, i)
+                    {
+                        const label shapeI = parentShapesIn[i];
+                        if (shapes.overlaps(shapeI, sv))
+                        {
+                            shapesIn[nShapesIn++] = shapeI;
+                        }
+                    }
+
+                    shapesIn.setSize(nShapesIn);
+                    info.shapesIn_.reset(new labelList(shapesIn));
                 }
             }
-
-            shapesIn.reset(new labelList(shapesInSV.toc()));
+            else
+            {
+                info.shapesIn_.reset(new labelList(tree.findBox(sv)));
+            }
         }
         else
         {
-            shapesIn.reset(new labelList(tree.findBox(sv)));
+            info.shapesIn_.reset(new labelList(tree.findBox(sv)));
         }
     }
 
-    if (shapesIn->size() > 0)
+    const labelList& shapesIn = info.shapesIn_();
+
+    if (shapesIn.size() > 0)                                            //OF.com: mixed, inside, outside -> MIXED, INSIDE, OUTSIDE
     {
-        return volumeType::mixed;
+        return volumeType::MIXED;
     }
 
     return pointInside(sv.midpoint())
-            ? volumeType::inside : volumeType::outside;
+            ? volumeType::INSIDE : volumeType::OUTSIDE;
 }
 //---------------------------------------------------------------------------//
 bool stlBased::limitFinalSubVolume
@@ -253,7 +272,7 @@ bool stlBased::limitFinalSubVolume
 {
     limBBox = boundBox(sv.min(), sv.max());
     const autoPtr<labelList>& shapesIn = sv.getVolumeInfo(cIb).shapesIn_;
-    if (shapesIn.empty())
+    if (shapesIn->empty())
     {
         return false;
     }
@@ -263,7 +282,7 @@ bool stlBased::limitFinalSubVolume
     forAll(*shapesIn, i)
     {
         getIntersectionPoints((*shapesIn)[i], sv, intersectionPoints);
-        normal += (*triSurf_)[(*shapesIn)[i]].area(triSurf_->points());
+        normal += (*triSurf_)[(*shapesIn)[i]].areaNormal(triSurf_->points());
     }
 
     if (intersectionPoints.size() == 0)

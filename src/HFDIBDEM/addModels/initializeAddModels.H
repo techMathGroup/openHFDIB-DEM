@@ -16,7 +16,8 @@
         // check if the immersedDict_ contains bodyGeom
         if (HFDIBDEMDict_.subDict(bodyName).found("bodyGeom"))
         {
-            word input = HFDIBDEMDict_.subDict(bodyName).lookup("bodyGeom");
+
+            word input = word(HFDIBDEMDict_.subDict(bodyName).lookup("bodyGeom"));
             bodyGeom = input;
             InfoH << iB_Info << "Found bodyGeom for " << bodyName
                 << ", the body is: " << bodyGeom << endl;
@@ -42,7 +43,8 @@
         }
         else if(bodyGeom == "sphere")
         {
-            vector startPosition = HFDIBDEMDict_.subDict(bodyName).subDict("sphere").lookup("startPosition");
+
+            vector startPosition = vector(HFDIBDEMDict_.subDict(bodyName).subDict("sphere").lookup("startPosition"));
             scalar radius = readScalar(HFDIBDEMDict_.subDict(bodyName).subDict("sphere").lookup("radius"));
 
             bodyGeomModel = std::unique_ptr<sphereBody>(

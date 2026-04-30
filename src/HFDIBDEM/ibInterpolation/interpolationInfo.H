@@ -77,7 +77,7 @@ namespace Foam
 
         List<point>& getIbPoints()
         {
-            if(ibPointsPtr_.empty())
+            if(ibPointsPtr_->empty())
             {
                 setIntpInfo();
             }

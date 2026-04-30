@@ -62,7 +62,10 @@ class addModelOnceFromFile
     bool                    bodyAdded_;
 
     fileName                fileName_;
+
+    //there might be a problem in OF2406 and similar
     IFstream                ifStream_;
+
 
     word                    bodyGeom_;
     scalar                  thrSurf_;
@@ -107,8 +110,6 @@ class addModelOnceFromFile
         return bodyAdded_;
     }
 };
-
-// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 } // End namespace Foam
 

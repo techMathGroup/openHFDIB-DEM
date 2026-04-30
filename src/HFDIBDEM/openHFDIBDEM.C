@@ -171,7 +171,8 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 
     if(demDic.found("rotationModel"))
     {
-        word rotModel = demDic.lookup("rotationModel");
+
+        word rotModel = word(demDic.lookup("rotationModel"));
         if(rotModel == "chen2012")
         {
             contactModelInfo::setRotationModel(0);
@@ -184,14 +185,14 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         {
             Info << "Rotation Model not recognized, setting to default mindlin1953" << endl;
             contactModelInfo::setRotationModel(1);
-        }    
+        }
     }
     else
     {
         Info << "Rotation Model not recognized, setting to default mindlin1953" << endl;
         contactModelInfo::setRotationModel(1);
     }
-    
+
 
     Info <<" -- Coefficient for characteristic Lenght Lc is set to : "<< contactModelInfo::getLcCoeff() << endl;
 
@@ -199,9 +200,9 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     List<word> patchNames = patchDic.toc();
     forAll(patchNames, patchI)
     {
-        word patchMaterial = patchDic.subDict(patchNames[patchI]).lookup("material");
-        vector patchNVec = patchDic.subDict(patchNames[patchI]).lookup("nVec");
-        vector planePoint = patchDic.subDict(patchNames[patchI]).lookup("planePoint");
+        word patchMaterial = word(patchDic.subDict(patchNames[patchI]).lookup("material"));
+        vector patchNVec   = vector(patchDic.subDict(patchNames[patchI]).lookup("nVec"));
+        vector planePoint  = vector(patchDic.subDict(patchNames[patchI]).lookup("planePoint"));
 
         wallPlaneInfo::wallPlaneInfo_insert(
             patchNames[patchI],
@@ -222,9 +223,9 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         List<word> cyclicPatchNames = cyclicPatchDic.toc();
         forAll(cyclicPatchNames, patchI)
         {
-            vector patchNVec = cyclicPatchDic.subDict(cyclicPatchNames[patchI]).lookup("nVec");
-            vector planePoint = cyclicPatchDic.subDict(cyclicPatchNames[patchI]).lookup("planePoint");
-            word neighbourPatch = cyclicPatchDic.subDict(cyclicPatchNames[patchI]).lookup("neighbourPatch");
+            vector patchNVec    = vector(cyclicPatchDic.subDict(cyclicPatchNames[patchI]).lookup("nVec"));
+            vector planePoint   = vector(cyclicPatchDic.subDict(cyclicPatchNames[patchI]).lookup("planePoint"));
+            word neighbourPatch = word(cyclicPatchDic.subDict(cyclicPatchNames[patchI]).lookup("neighbourPatch"));
 
             cyclicPlaneInfo::insert(
                 cyclicPatchNames[patchI],
@@ -238,7 +239,7 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 
     if (HFDIBDEMDict_.found("geometricD"))
     {
-        geometricD = HFDIBDEMDict_.lookup("geometricD");
+        geometricD = vector(HFDIBDEMDict_.lookup("geometricD"));
     }
     else
     {
@@ -312,13 +313,14 @@ void openHFDIBDEM::initialize
 
         if(HFDIBinterpDict_.found("method"))
         {
-            word intMethod = HFDIBinterpDict_.lookup("method");
+            word intMethod = word(HFDIBinterpDict_.lookup("method"));
 
             if(intMethod == "leastSquares")
             {
                 dictionary lsCoeffsDict
                     = HFDIBinterpDict_.subDict("leastSquaresCoeffs");
-                ibInterp_.set(new leastSquaresInt(
+
+                ibInterp_.reset(new leastSquaresInt(
                     mesh_,
                     readScalar(lsCoeffsDict.lookup("distFactor")),
                     readScalar(lsCoeffsDict.lookup("radiusFactor")),
@@ -328,7 +330,7 @@ void openHFDIBDEM::initialize
             }
             else if(intMethod == "line")
             {
-                ibInterp_.set(new lineInt(HFDIBinterpDict_));
+                ibInterp_.reset(new lineInt(HFDIBinterpDict_));
             }
         }
     }
@@ -338,7 +340,8 @@ void openHFDIBDEM::initialize
     // initialize addModels
     addModels_.setSize(bodyNames_.size());
     immersedBodies_.setSize(0);                                         //on the fly creation
-    refineF *= 0;
+
+    refineF *= 0.0;
     recomputeM0_ = recomputeM0;
 
     if(!startTime0)
@@ -347,7 +350,7 @@ void openHFDIBDEM::initialize
             mkDir(recordOutDir_);
         else
         {
-            fileNameList entries(readDir(recordOutDir_,fileType::directory)); // OF version 8, For version 6 use fileName::DIRECTORY instead of fileType::directory
+            fileNameList entries(readDir(recordOutDir_,fileName::DIRECTORY)); // OF version 8, For version 6 a 2406 use fileName::DIRECTORY
             scalar runTimeS(stod(runTime));
             forAll(entries,entry)
             {
@@ -509,20 +512,22 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
             immersedBodies_[bodyId].updateOldMovementVars();
         }
     }
-
+    
+    
+    volVectorField gradBody(fvc::grad(body));
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            immersedBodies_[bodyId].chceckBodyOp();
+            immersedBodies_[bodyId].updateHaloCells(gradBody);
+            immersedBodies_[bodyId].checkBodyOp();
         }
     }
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::preUpdateBodies
 (
-    volScalarField& body,
-    volVectorField& f
+    volScalarField& body
 )
 {
     forAll (immersedBodies_,bodyId)
@@ -542,7 +547,9 @@ void openHFDIBDEM::preUpdateBodies
 void openHFDIBDEM::postUpdateBodies
 (
     volScalarField& body,
-    volVectorField& f
+    volVectorField& gradBody,
+    volVectorField& fPress,
+    volVectorField& fVisc
 )
 {
     forAll (immersedBodies_,bodyId)
@@ -550,7 +557,8 @@ void openHFDIBDEM::postUpdateBodies
         if (immersedBodies_[bodyId].getIsActive())
         {
             immersedBodies_[bodyId].clearIntpInfo();
-            immersedBodies_[bodyId].postPimpleUpdateImmersedBody(body,f);
+            immersedBodies_[bodyId].updateHaloCells(gradBody);
+            immersedBodies_[bodyId].postPimpleUpdateImmersedBody(body,fPress,fVisc);
         }
     }
 }
@@ -561,7 +569,7 @@ void openHFDIBDEM::recreateBodies
     volScalarField& refineF
 )
 {
-    refineF *= 0;
+    refineF *= 0.0;
     preCalculateCellPoints();
     forAll (addModels_,modelI)
     {
@@ -591,9 +599,12 @@ void openHFDIBDEM::recreateBodies
     }
 }
 //---------------------------------------------------------------------------//
-void openHFDIBDEM::interpolateIB( volVectorField & V
-                              ,volVectorField & Vs
-                              ,volScalarField & body)
+void openHFDIBDEM::interpolateIB
+( 
+    volVectorField & V,
+    volVectorField & Vs,
+    volScalarField & body
+)
 {
     if(ibInterp_.valid())
     {
@@ -890,6 +901,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
                 cIb.updateContactForces(cF);
                 cIb.getWallCntInfo().clearOldContact();
+                
+                cIb.resetCouplingHistory();
             }
         }
 
@@ -1068,6 +1081,9 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
                 immersedBodies_[cInd].updateContactForces(cF);
                 immersedBodies_[tInd].updateContactForces(tF);
+                
+                immersedBodies_[cInd].resetCouplingHistory();
+                immersedBodies_[tInd].resetCouplingHistory();
             }
             else
             {
@@ -1194,14 +1210,15 @@ void openHFDIBDEM::addRemoveBodies
 void openHFDIBDEM::updateFSCoupling
 (
     volScalarField& body,
-    volVectorField& f
+    volVectorField& fPress,
+    volVectorField& fVisc
 )
 {
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            immersedBodies_[bodyId].pimpleUpdate(body,f);
+            immersedBodies_[bodyId].pimpleUpdate(body,fPress,fVisc);
         }
     }
 }
@@ -1243,7 +1260,7 @@ void openHFDIBDEM::restartSimulation
         // check if the immersedDict_ contains bodyGeom
         if (HFDIBDEMDict_.subDict(bodyName).found("bodyGeom"))
         {
-            word input = HFDIBDEMDict_.subDict(bodyName).lookup("bodyGeom");
+            word input = word(HFDIBDEMDict_.subDict(bodyName).lookup("bodyGeom"));
             bodyGeom = input;
             InfoH << iB_Info << "Found bodyGeom for "
                 << bodyName << ", the body is: " << bodyGeom << endl;
@@ -1267,7 +1284,7 @@ void openHFDIBDEM::restartSimulation
         }
         else if(bodyGeom == "sphere")
         {
-            vector startPosition = bodyDict.subDict("sphere").lookup("position");
+            vector startPosition = vector(bodyDict.subDict("sphere").lookup("position"));
             scalar radius = readScalar(bodyDict.subDict("sphere").lookup("radius"));
 
             bodyGeomModel = std::make_shared<sphereBody>(mesh_,startPosition,radius,thrSurf);
@@ -1381,3 +1398,30 @@ void openHFDIBDEM::setSolverInfo()
     solverInfo::setOnlyDEM(true);
 }
 //---------------------------------------------------------------------------//
+void openHFDIBDEM::updateBodiesRhoF(volScalarField& rho)
+{
+    forAll (immersedBodies_,bodyId)
+    {
+        immersedBodies_[bodyId].updateRhoF(rho);
+    }
+}
+void openHFDIBDEM::updateBodiesRhoF(scalar rho)
+{
+    forAll (immersedBodies_,bodyId)
+    {
+        immersedBodies_[bodyId].updateRhoF(rho);
+    }
+}
+void openHFDIBDEM::updateBodiesRhoF
+(
+    volScalarField& alpha,
+    volScalarField& body,
+    const scalar rho1,
+    const scalar rho2
+)
+{
+    forAll (immersedBodies_,bodyId)
+    {
+        immersedBodies_[bodyId].updateRhoF(alpha,body,rho1,rho2);
+    }
+}

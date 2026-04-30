@@ -54,6 +54,7 @@ class subVolumeProperties
     center(center)
     {}
 
+    // const point center;
     const point center;
     bool isCBody=false;
     bool isTBody=false;

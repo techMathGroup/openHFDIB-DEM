@@ -74,7 +74,7 @@ std::shared_ptr<geomModel> addModelOnce::addBody
 
     reduce(canAddBodyI, andOp<bool>());
 
-    //bodyAdded_ = canAddBodyI;
+    //bodyAdded_ = canAddBodyI;                                         //Q (MI. 20250611): what happened here?
     bodyAdded_ = true;
     return geomModel_->getCopy();
 }

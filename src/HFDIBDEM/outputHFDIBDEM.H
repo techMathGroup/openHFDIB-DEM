@@ -71,7 +71,7 @@ namespace outputHFDIBDEM
         bool print;
         bool printParDEM;
 
-        HashTable<bool, outputType,Hash<label>> outputTable;
+        HashTable<bool, outputType,Hash<outputType>> outputTable;
 
         public:
         // Constructors ----------------------------------------------------

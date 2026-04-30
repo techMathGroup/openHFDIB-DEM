@@ -101,7 +101,7 @@ fieldCurrentValue_(0),
 allActiveCellsInMesh_(true),
 randGen_(clock::getTime())
 {
-	init();
+    init();
 }
 
 addModelRepeatRandomPosition::~addModelRepeatRandomPosition()
@@ -157,8 +157,8 @@ void addModelRepeatRandomPosition::init()
 	}
 	else if (addDomain_ == "boundBox")
 	{
-		minBound_       = (addDomainCoeffs_.lookup("minBound"));
-		maxBound_       = (addDomainCoeffs_.lookup("maxBound"));
+		minBound_       = vector(addDomainCoeffs_.lookup("minBound"));
+		maxBound_       = vector(addDomainCoeffs_.lookup("maxBound"));
 		boundBoxActive_ = true;
         initializeBoundBox();
         InfoH << addModel_Info << "-- addModelMessage-- "
@@ -246,7 +246,7 @@ void addModelRepeatRandomPosition::init()
 	}
 	else if (rotationMode_ == "fixedAxisRandomRotation")
 	{
-		axisOfRot_       = (rotationModeCoeffs_.lookup("axis"));
+		axisOfRot_       = vector(rotationModeCoeffs_.lookup("axis"));
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "source STL will be rotated by a random angle around a fixed axis upon addition" << endl;
 		InfoH << "-- addModelMessage-- " << "set rotation axis: "
@@ -334,7 +334,6 @@ std::shared_ptr<geomModel> addModelRepeatRandomPosition::addBody
             << " PiRad around axis " << axisOfRot_ << endl;
 
         geomModel_->bodyRotatePoints(rotAngle,axisOfRot_);
-        //~ CoM = gSum(bodySurfMesh.coordinates())/bodySurfMesh.size();
     }
 
     // scale
@@ -439,17 +438,17 @@ void addModelRepeatRandomPosition::initializeCellZone()
 //---------------------------------------------------------------------------//
 void addModelRepeatRandomPosition::updateCellZoneBoundBox()
 {
-		boundBox cellZoneBounds(cellZonePoints_[Pstream::myProcNo()]);
+    boundBox cellZoneBounds(cellZonePoints_[Pstream::myProcNo()]);
 
-        reduce(cellZoneBounds.min(), minOp<vector>());
-        reduce(cellZoneBounds.max(), maxOp<vector>());
+    reduce(cellZoneBounds.min(), minOp<vector>());
+    reduce(cellZoneBounds.max(), maxOp<vector>());
 
-        if (Pstream::myProcNo() == 0)
-        {
-            minBound_ = cellZoneBounds_.min();
-            maxBound_ = cellZoneBounds_.max();
-            cellZoneBounds_ = boundBox(minBound_,maxBound_);
-        }
+    if (Pstream::myProcNo() == 0)
+    {
+        minBound_ = cellZoneBounds_.min();
+        maxBound_ = cellZoneBounds_.max();
+        cellZoneBounds_ = boundBox(minBound_,maxBound_);
+    }
 }
 //---------------------------------------------------------------------------//
 void addModelRepeatRandomPosition::initializeBoundBox()
@@ -558,55 +557,55 @@ labelList addModelRepeatRandomPosition::getBBoxCellsByOctTree
 //---------------------------------------------------------------------------//
 scalar addModelRepeatRandomPosition::checkLambdaFraction(const volScalarField& body)
 {
-	scalarList lambdaIntegrate(Pstream::nProcs());
+    scalarList lambdaIntegrate(Pstream::nProcs());
     scalarList volumeIntegrate(Pstream::nProcs());
-	scalar lambdaFraction(0);
+    scalar lambdaFraction(0);
     forAll (lambdaIntegrate,k)
     {
         lambdaIntegrate[k] = 0;
         volumeIntegrate[k] = 0;
     }
-	forAll (cellsInBoundBox_[Pstream::myProcNo()],k)
-	{
-		label cell = cellsInBoundBox_[Pstream::myProcNo()][k];
-		lambdaIntegrate[Pstream::myProcNo()] += mesh_.V()[cell]*body[cell];
-		volumeIntegrate[Pstream::myProcNo()] += mesh_.V()[cell];
-	}
-	lambdaFraction = gSum(lambdaIntegrate)/gSum(volumeIntegrate);
-	InfoH << addModel_Info << "-- addModelMessage-- "
-        << "lambda fraction in controlled region: " << lambdaFraction<< endl;
-	return lambdaFraction;
+    forAll (cellsInBoundBox_[Pstream::myProcNo()],k)
+    {
+        label cell = cellsInBoundBox_[Pstream::myProcNo()][k];
+        lambdaIntegrate[Pstream::myProcNo()] += mesh_.V()[cell]*body[cell];
+        volumeIntegrate[Pstream::myProcNo()] += mesh_.V()[cell];
+    }
+    lambdaFraction = gSum(lambdaIntegrate)/gSum(volumeIntegrate);
+    InfoH << addModel_Info << "-- addModelMessage-- "
+          << "lambda fraction in controlled region: " << lambdaFraction<< endl;
+    return lambdaFraction;
 }
 //---------------------------------------------------------------------------//
 scalar addModelRepeatRandomPosition::returnRandomAngle()
 {
-    scalar ranNum = 2.0*randGen_.scalar01() - 1.0;
+    scalar ranNum = 2.0*randGen_.sample01<scalar>() - 1.0;
     scalar angle  = ranNum*Foam::constant::mathematical::pi;
-	return angle;
+    return angle;
 }
 //---------------------------------------------------------------------------//
 scalar addModelRepeatRandomPosition::returnRandomScale()
 {
-	scalar ranNum       = randGen_.scalar01();
-	scalar scaleDiff    = maxScale_ - minScale_;
+    scalar ranNum       = randGen_.sample01<scalar>();
+    scalar scaleDiff    = maxScale_ - minScale_;
     scalar scaleFactor  = minScale_ + ranNum*scaleDiff;
-	InfoH << addModel_Info << "-- addModelMessage-- "
-        <<"random scaleFactor " << scaleFactor <<endl;
-	return scaleFactor;
+    InfoH << addModel_Info << "-- addModelMessage-- "
+          <<"random scaleFactor " << scaleFactor <<endl;
+    return scaleFactor;
 }
 //---------------------------------------------------------------------------//
 vector addModelRepeatRandomPosition::returnRandomRotationAxis()
 {
-	vector  axisOfRotation(vector::zero);
-	scalar ranNum = 0;
+    vector  axisOfRotation(vector::zero);
+    scalar ranNum = 0;
 
-	for (int i=0;i<3;i++)
-	{
-		ranNum = randGen_.scalar01();
-		axisOfRotation[i] = ranNum;
-	}
+    for (int i=0;i<3;i++)
+    {
+        ranNum = randGen_.sample01<scalar>();
+        axisOfRotation[i] = ranNum;
+    }
 
-	axisOfRotation /=mag(axisOfRotation);
-	return axisOfRotation;
+    axisOfRotation /=mag(axisOfRotation);
+    return axisOfRotation;
 }
 //---------------------------------------------------------------------------//

@@ -83,7 +83,6 @@ namespace Foam
         // Public variables --------------------------------------------
 
         // Public methods ----------------------------------------------
-        //~ void init();
 
         void createImmersedBody
         (

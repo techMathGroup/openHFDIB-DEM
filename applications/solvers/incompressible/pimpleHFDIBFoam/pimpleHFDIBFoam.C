@@ -34,8 +34,12 @@ Description
 
 #include "fvCFD.H"
 #include "dynamicFvMesh.H"
+
 #include "singlePhaseTransportModel.H"
-#include "kinematicMomentumTransportModel.H"
+#include "turbulentTransportModel.H"
+#include "simpleControl.H"
+#include "fvOptions.H"
+
 #include "pimpleControl.H"
 #include "CorrectPhi.H"
 #include "fvOptions.H"
@@ -45,6 +49,7 @@ Description
 #include "triSurfaceMesh.H"
 #include "openHFDIBDEM.H"
 #include "clockTime.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 int main(int argc, char *argv[])
@@ -75,7 +80,7 @@ int main(int argc, char *argv[])
     openHFDIBDEM  HFDIBDEM(mesh);
     HFDIBDEM.initialize(lambda,U,refineF,maxRefinementLevel,runTime.timeName());
     #include "initialMeshRefinement.H"
-    
+
     if(HFDIBDEM.getRecordFirstTime())
     {
         HFDIBDEM.setRecordFirstTime(false);
@@ -88,7 +93,7 @@ int main(int argc, char *argv[])
     scalar DEMTime_(0.0);
     scalar suplTime_(0.0);
 
-    while (pimple.run(runTime))
+    while (runTime.run())
     {
         #include "readDyMControls.H"
 
@@ -108,17 +113,33 @@ int main(int argc, char *argv[])
 
         clockTime createBodiesTime; // OS time efficiency testing
         HFDIBDEM.createBodies(lambda,refineF);
+        HFDIBDEM.updateBodiesRhoF(rho.value());
         suplTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
-        
+
         clockTime preUpdateBodiesTime; // OS time efficiency testing
-        HFDIBDEM.preUpdateBodies(lambda,f);
+        HFDIBDEM.preUpdateBodies(lambda);
         suplTime_ += preUpdateBodiesTime.timeIncrement(); // OS time efficiency testing
+        
+        // --- pre-compute gradient of lambda field (force updates)
+        volVectorField gradLambda(fvc::grad(lambda));
+        gradLambda.correctBoundaryConditions();        
+        
+        // --- construct surface field where the momentum source should
+        //     be switched on
+        forAll(surface, sI)
+        {
+            if (lambda[sI] > thrSurf)
+                surface[sI] = 1;
+            else
+                surface[sI] = 0;
+        }
+        surface.correctBoundaryConditions();
 
         clockTime pimpleRunClockTime; // OS time efficiency testing
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
-            if (pimple.firstPimpleIter() || moveMeshOuterCorrectors)
+            if (pimple.firstIter() || moveMeshOuterCorrectors)
             {
                 mesh.update();
 
@@ -143,11 +164,22 @@ int main(int argc, char *argv[])
                         #include "meshCourantNo.H"
                     }
 
-                    lambda *= 0;
+                    lambda *= 0.0;
+
                     HFDIBDEM.recreateBodies(lambda,refineF);
+                    
+                    volVectorField gradLambda(fvc::grad(lambda));                    
+                    forAll(surface, sI)
+                    {
+                        if (lambda[sI] > thrSurf)
+                            surface[sI] = 1;
+                        else
+                            surface[sI] = 0;
+                    }
+                    gradLambda.correctBoundaryConditions();
+                    surface.correctBoundaryConditions();
                 }
 
-                f *= lambda;
             }
 
             #include "UEqn.H"
@@ -167,12 +199,28 @@ int main(int argc, char *argv[])
         CFDTime_ += pimpleRunClockTime.timeIncrement();
         Info << "updating HFDIBDEM" << endl;
         clockTime postUpdateBodiesTime;
-        HFDIBDEM.postUpdateBodies(lambda,f);
+        
+        fDragVisc = (f - fvc::grad(p))*rho;
+        fDragPress= -gradLambda*p*rho;
+        
+        fDragPress.correctBoundaryConditions();
+        fDragVisc.correctBoundaryConditions();
+        
+        for (label pass=0; pass<=fDragSmoothingIter; pass++)
+        {
+            fDragPress = fvc::average(fvc::interpolate(fDragPress));
+            fDragVisc  = fvc::average(fvc::interpolate(fDragVisc));
+            fDragPress.correctBoundaryConditions();
+            fDragVisc.correctBoundaryConditions();
+        }
+        
+        HFDIBDEM.postUpdateBodies(lambda,gradLambda,fDragPress,fDragVisc);
         suplTime_ += postUpdateBodiesTime.timeIncrement();
 
 
         clockTime addRemoveTime;
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
+        HFDIBDEM.updateBodiesRhoF(rho.value());
         suplTime_ += addRemoveTime.timeIncrement();
 
         clockTime updateDEMTime;
@@ -194,9 +242,9 @@ int main(int argc, char *argv[])
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
 
-    Info<< " CFDTime_                 = " << CFDTime_             << " s \n" <<
-           " Solver suplementary time = " << suplTime_            << " s \n" << 
-           " DEMTime_                 = " << DEMTime_             << " s \n" << endl;
+        Info<< " CFDTime_                 = " << CFDTime_             << " s \n" <<
+               " Solver suplementary time = " << suplTime_            << " s \n" << 
+               " DEMTime_                 = " << DEMTime_             << " s \n" << endl;
     }
 
     Info<< "End\n" << endl;

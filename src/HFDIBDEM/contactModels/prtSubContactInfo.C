@@ -160,7 +160,8 @@ void prtSubContactInfo::setVMInfo(const virtualMeshInfo& vmInfo)
 
     vmInfo_->sV = vmInfo.sV;
     vmInfo_->subVolumeV = vmInfo.subVolumeV;
-    vmInfo_->startingPoint = vmInfo.startingPoint;
+    // vmInfo_->startingPoint = std::move(vmInfo.startingPoint);
+    vmInfo_->startingPoint.reset(new point(*vmInfo.startingPoint));
 }
 //---------------------------------------------------------------------------//
 std::shared_ptr<virtualMeshInfo>& prtSubContactInfo::getVMInfo()

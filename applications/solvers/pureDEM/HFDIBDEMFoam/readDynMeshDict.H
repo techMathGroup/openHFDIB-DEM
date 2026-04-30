@@ -26,7 +26,7 @@ if (dynamicFvMeshTypeName!=stMesh)
     if (dynamicFvMeshTypeName==rfMesh)
     {
         maxRefinementLevel = readLabel(dynamicMeshDict.subDict("dynamicRefineFvMeshCoeffs").lookup("maxRefinement"));
-        
+
         Info << "Will try to refine mesh based on the bodies location" << endl;
     }
 }

@@ -86,7 +86,7 @@ class bbMatrix
     {
         if (!bbMatrix_[sVI[0]][sVI[1]][sVI[2]].valid())
         {
-            bbMatrix_[sVI[0]][sVI[1]][sVI[2]].set(
+            bbMatrix_[sVI[0]][sVI[1]][sVI[2]].reset(                    //OF.com: set -> reset
                 new subVolumeProperties(getPointInMesh(sVI))
             );
         }

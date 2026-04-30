@@ -5,8 +5,9 @@ CorrectPhi
     p,
     dimensionedScalar("rAUf", dimTime, 1),
     geometricZeroField(),
-    pimple,
-    true
+    pimple
+//zlobi    true
 );
+
 
 #include "continuityErrs.H"

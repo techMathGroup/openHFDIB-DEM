@@ -49,28 +49,68 @@ namespace Foam
 struct ibSubVolumeInfo
 {
     ibSubVolumeInfo():
-        volumeType_(volumeType::unknown)
+        volumeType_(volumeType::UNKNOWN)
     {}
 
-    ibSubVolumeInfo(volumeType vType)
+    explicit ibSubVolumeInfo(volumeType vType)
+    :
+        volumeType_(volumeType::UNKNOWN)
     {
         switch(vType)
         {
-            case volumeType::unknown:
-            case volumeType::mixed:
-                volumeType_ = volumeType::unknown;
+            case volumeType::UNKNOWN:
+            case volumeType::MIXED:
+                volumeType_ = volumeType::UNKNOWN;
                 break;
-            case volumeType::inside:
-                volumeType_ = volumeType::inside;
+            case volumeType::INSIDE:
+                volumeType_ = volumeType::INSIDE;
                 break;
-            case volumeType::outside:
-                volumeType_ = volumeType::outside;
+            case volumeType::OUTSIDE:
+                volumeType_ = volumeType::OUTSIDE;
+                break;
+            default:
+                volumeType_ = volumeType::UNKNOWN;
                 break;
         }
     }
 
     volumeType volumeType_;
     autoPtr<labelList> shapesIn_;
+    
+    // --- copy ctor (deep copy of shapesIn_) ---
+    ibSubVolumeInfo(const ibSubVolumeInfo& other)
+    :
+        volumeType_(other.volumeType_),
+        shapesIn_
+        (
+            other.shapesIn_.valid()
+            ? autoPtr<labelList>(new labelList(*other.shapesIn_))
+            : autoPtr<labelList>()
+        )
+    {}
+
+    // --- copy assignment (deep copy of shapesIn_) ---
+    ibSubVolumeInfo& operator=(const ibSubVolumeInfo& other)
+    {
+        if (this != &other)
+        {
+            volumeType_ = other.volumeType_;
+
+            // reset current storage
+            shapesIn_.clear();
+
+            if (other.shapesIn_.valid())
+            {
+                shapesIn_.reset(new labelList(*other.shapesIn_));
+            }
+            // else shapesIn_ remains empty (invalid)
+        }
+        return *this;
+    }
+
+    // --- move operations (transfer ownership of autoPtr) ---
+    ibSubVolumeInfo(ibSubVolumeInfo&&) noexcept = default;
+    ibSubVolumeInfo& operator=(ibSubVolumeInfo&&) noexcept = default;
 };
 
 /*---------------------------------------------------------------------------*\
@@ -80,8 +120,8 @@ class subVolume : public treeBoundBox
 {
     private:
 
-    std::shared_ptr<subVolume> parentSV_;
-    List<subVolume> childSubVolumes_;
+    std::weak_ptr<subVolume> parentSV_;
+    List<autoPtr<subVolume>> childSubVolumes_;                          //This is a List of autoPtr, which requires manual deep-copy
 
     ibSubVolumeInfo cVolumeInfo_;
     ibSubVolumeInfo tVolumeInfo_;
@@ -101,7 +141,7 @@ class subVolume : public treeBoundBox
     subVolume
     (
         const boundBox bb,
-        const std::shared_ptr<subVolume> parentSV,
+        const std::shared_ptr<subVolume>& parentSV,
         const volumeType cVolumeType,
         const volumeType tVolumeType
     );
@@ -114,16 +154,25 @@ class subVolume : public treeBoundBox
     ibSubVolumeInfo& cVolumeInfo();
     ibSubVolumeInfo& tVolumeInfo();
 
-    List<subVolume>& childSubVolumes();
+    //~ List<subVolume>& childSubVolumes();
+    List<autoPtr<subVolume>>& childSubVolumes();
+    
     bool hasChildSubVolumes() const;
 
-    std::shared_ptr<subVolume>& parentSV();
+    std::shared_ptr<subVolume> parentSV() const;
 
     ibSubVolumeInfo& getVolumeInfo(bool cIb);
     const ibSubVolumeInfo& getVolumeInfo(bool cIb) const;
 
     void setAsEdge();
     bool isEdge() const;
+        
+    // Make copy/move operations available -------------------------
+    subVolume(const subVolume& other);                                  //defined in .C
+    subVolume& operator=(const subVolume& other);                       //defined in .C
+    subVolume(subVolume&&) noexcept = default;
+    subVolume& operator=(subVolume&&) noexcept = default;
+
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

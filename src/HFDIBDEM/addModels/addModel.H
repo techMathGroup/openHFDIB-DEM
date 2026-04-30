@@ -41,7 +41,7 @@ Contributors
 
 #include "dictionary.H"
 #include "fvCFD.H"
-// #include "fvMesh.H"
+#include "fvMesh.H"
 #include "triSurfaceMesh.H"
 
 #include "geomModel.H"
@@ -124,7 +124,7 @@ class addModel
     virtual std::shared_ptr<geomModel> addBody(
         const volScalarField& body,
         PtrList<immersedBody>& immersedBodies
-        ) = 0;
+    ) = 0;
     // Note: needs to provide a properly scaled/oriented/translated
     //       triSurface that will be used for IB initialization
 

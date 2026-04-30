@@ -41,6 +41,10 @@ Contributors
 #include "interpolationInfo.H"
 #include "intPoint.H"
 
+#include "processorPolyPatch.H"
+
+
+
 namespace Foam
 {
     class lineIntInfo
@@ -53,8 +57,8 @@ namespace Foam
 
         private:
 
-        autoPtr<List<List<intPoint>>> intPointsPtr_; // Points used for interp.
-        autoPtr<List<List<vector>>> intVelocPtr_; // Velocity at int points
+        autoPtr<List<List<intPoint>>> intPointsPtr_;                    // Points used for interp.
+        autoPtr<List<List<vector>>> intVelocPtr_;                       // Velocity at int points
 
         intPoint  findIntPoint
         (

@@ -80,7 +80,6 @@ class addModelRepeatSamePosition
     ~addModelRepeatSamePosition();
 
     // Public methods ----------------------------------------------
-    //~ void init();
 
     bool shouldAddBody(const volScalarField& body);
 

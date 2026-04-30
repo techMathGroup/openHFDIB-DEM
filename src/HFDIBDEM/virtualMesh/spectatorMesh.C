@@ -45,15 +45,38 @@ matrixSize_(matrixSize),
 bBox_(bBox),
 charCellSize_(charCellSize)
 {
+    // Note (MI): here, implementation was changed by PK, probrably
+    //            for clarity? -> ASK
+    
     // InfoH << DEM_Info << "SM is Alive" << endl;
-    centroidMatrix_ = List<List<List<autoPtr<sMProperties>>>>(matrixSize[0],
-        List<List<autoPtr<sMProperties>>>(matrixSize[1],
-        List<autoPtr<sMProperties>>(matrixSize[2])));
-
-    vertexMatrix_ = List<List<List<autoPtr<sMProperties>>>>(matrixSize[0]+1,
-        List<List<autoPtr<sMProperties>>>(matrixSize[1]+1,
-        List<autoPtr<sMProperties>>(matrixSize[2]+1)));
-    // InfoH << DEM_Info << "SM is Alive I " << endl;
+    // centroidMatrix_ = List<List<List<autoPtr<sMProperties>>>>(matrixSize[0],
+    //     List<List<autoPtr<sMProperties>>>(matrixSize[1],
+    //     List<autoPtr<sMProperties>>(matrixSize[2])));
+    
+    // vertexMatrix_ = List<List<List<autoPtr<sMProperties>>>>(matrixSize[0]+1,
+    //     List<List<autoPtr<sMProperties>>>(matrixSize[1]+1,
+    //     List<autoPtr<sMProperties>>(matrixSize[2]+1)));
+    
+    centroidMatrix_.setSize(matrixSize_[0]);
+    vertexMatrix_.setSize(matrixSize_[0]);
+    forAll(centroidMatrix_, i)
+    {
+        centroidMatrix_[i].setSize(matrixSize_[1]);
+        forAll(centroidMatrix_[i], j)
+        {
+            centroidMatrix_[i][j].setSize(matrixSize_[2]);
+        }
+    }        
+    // Note (MI): vertex grid is (N+1) per dimension
+    vertexMatrix_.setSize(matrixSize_[0]+1);
+    forAll(vertexMatrix_, i)
+    {
+        vertexMatrix_[i].setSize(matrixSize_[1]+1);
+        forAll(vertexMatrix_[i], j)
+        {
+            vertexMatrix_[i][j].setSize(matrixSize_[2]+1);
+        }
+    }
 }
 spectatorMesh::~spectatorMesh()
 {

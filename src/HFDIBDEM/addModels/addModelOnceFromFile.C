@@ -33,6 +33,12 @@ Contributors
 
 #include <memory>
 
+
+
+#include "IFstream.H"
+#include "OSspecific.H"
+
+
 using namespace Foam;
 
 //---------------------------------------------------------------------------//
@@ -60,7 +66,7 @@ thrSurf_(thrSurf)
     if(!ifStream_.opened())
     {
         FatalErrorIn("addModelOnceFromFile::addModelOnceFromFile()")
-        << "Can not open IFstream for file: "
+        << "Cannot open IFstream for file: "
         << fileName_.toAbsolute() << nl << exit(FatalError);
     }
 
@@ -109,7 +115,7 @@ std::shared_ptr<geomModel> addModelOnceFromFile::addBody
     if(line == "")
     {
         InfoH << addModel_Info << "-- addModelMessage-- "
-            << "Skipping empty line at " << ifStream_.lineNumber() - 1 <<endl;
+              << "Skipping empty line at " << ifStream_.lineNumber() - 1 <<endl;
         bodyAdded_ = false;
         return geomModel_->getCopy();
     }
@@ -122,17 +128,6 @@ std::shared_ptr<geomModel> addModelOnceFromFile::addBody
     {
         addSTL(line);
     }
-
-    // volScalarField helpBodyField_ = body;
-    // geomModel_->createImmersedBody(
-    //     helpBodyField_,
-    //     octreeField_,
-    //     cellPoints_
-    // );
-
-    // bool canAddBodyI = !isBodyInContact(immersedBodies);
-
-    // reduce(canAddBodyI, andOp<bool>());
 
     bodyAdded_ = true;
     return geomModel_->getCopy();

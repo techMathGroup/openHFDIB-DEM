@@ -106,7 +106,7 @@ randGen_(clock::getTime())
     {
         finishedAddition_ = true;
     }
-	init();
+    init();
 }
 
 addModelOnceScatter::~addModelOnceScatter()
@@ -121,56 +121,56 @@ void addModelOnceScatter::init()
     cellZonePoints_.setSize(Pstream::nProcs());
 
 
-	if (addModeI_ == "multiBody")
-	{
-		partPerAdd_ = (readLabel(addModeICoeffs_.lookup("partPerAdd")));
+    if (addModeI_ == "multiBody")
+    {
+        partPerAdd_ = (readLabel(addModeICoeffs_.lookup("partPerAdd")));
         multiBody_  = true;
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "addModel will initialize simulation with "
             << partPerAdd_ << " randomly scattered bodies" << endl;
-	}
-	else if (addModeI_ == "fieldBased")
-	{
-		fieldValue_ = (readScalar(addModeICoeffs_.lookup("fieldValue")));
+    }
+    else if (addModeI_ == "fieldBased")
+    {
+        fieldValue_ = (readScalar(addModeICoeffs_.lookup("fieldValue")));
         fieldBased_ = true;
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "addModel will fill domain up to preset volume fraction" << endl;
-		InfoH << "-- addModelMessage-- "
+        InfoH << "-- addModelMessage-- "
             << "preset volume fraction: " << fieldValue_ << endl;
-	}
+    }
     else
     {
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "notImplemented, will crash" << endl;
     }
 
-	if (addDomain_ == "cellZone")
-	{
-		zoneName_ = (word(addDomainCoeffs_.lookup("zoneName")));
-		cellZoneActive_ = true;
+    if (addDomain_ == "cellZone")
+    {
+        zoneName_ = (word(addDomainCoeffs_.lookup("zoneName")));
+        cellZoneActive_ = true;
         initializeCellZone();
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "cellZone based addition zone" << endl;
-	}
-	else if (addDomain_ == "boundBox")
-	{
-		minBound_       = (addDomainCoeffs_.lookup("minBound"));
-		maxBound_       = (addDomainCoeffs_.lookup("maxBound"));
-		boundBoxActive_ = true;
+    }
+    else if (addDomain_ == "boundBox")
+    {
+        minBound_       = vector(addDomainCoeffs_.lookup("minBound"));
+        maxBound_       = vector(addDomainCoeffs_.lookup("maxBound"));
+        boundBoxActive_ = true;
         initializeBoundBox();
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "boundBox based addition zone" << endl;
-	}
-	else if (addDomain_ == "domain")
-	{
-		InfoH << addModel_Info << "-- addModelMessage-- "
+    }
+    else if (addDomain_ == "domain")
+    {
+        InfoH << addModel_Info << "-- addModelMessage-- "
             << "notImplemented, will crash" << endl;
-	}
+    }
     else
     {
-		InfoH << addModel_Info << "-- addModelMessage-- "
+        InfoH << addModel_Info << "-- addModelMessage-- "
             << "notImplemented, will crash" << endl;
-	}
+    }
 
     // check, if the whole zone is in the mesh
     scalarList procZoneVols(Pstream::nProcs());
@@ -195,66 +195,66 @@ void addModelOnceScatter::init()
              << "addition zone completely immersed in mesh -> OK" << endl;
     }
 
-	if (scalingMode_ == "noScaling")
-	{
-		scaleParticles_ = false;
+    if (scalingMode_ == "noScaling")
+    {
+        scaleParticles_ = false;
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "all particles will have the same scale" << endl;
-	}
-	else if (scalingMode_ == "randomScaling")
-	{
-		minScale_               = (readScalar(scalingModeCoeffs_.lookup("minScale")));
-		maxScale_               = (readScalar(scalingModeCoeffs_.lookup("maxScale")));
-		scaleParticles_         = false;
-		scaleRandomApplication_ = true;
+    }
+    else if (scalingMode_ == "randomScaling")
+    {
+        minScale_               = (readScalar(scalingModeCoeffs_.lookup("minScale")));
+        maxScale_               = (readScalar(scalingModeCoeffs_.lookup("maxScale")));
+        scaleParticles_         = false;
+        scaleRandomApplication_ = true;
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "particles will be randomly scaled" << endl;
-	}
-	else if (scalingMode_ == "scaleToFit")
-	{
-		minScaleFit_        = (readScalar(scalingModeCoeffs_.lookup("minScale")));
-		scaleStep_          = (readScalar(scalingModeCoeffs_.lookup("scaleStep")));
-		nTriesBeforeScaling_= (readScalar(scalingModeCoeffs_.lookup("nTriesBeforeScaling")));
+    }
+    else if (scalingMode_ == "scaleToFit")
+    {
+        minScaleFit_        = (readScalar(scalingModeCoeffs_.lookup("minScale")));
+        scaleStep_          = (readScalar(scalingModeCoeffs_.lookup("scaleStep")));
+        nTriesBeforeScaling_= (readScalar(scalingModeCoeffs_.lookup("nTriesBeforeScaling")));
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "particles will be downscaled to better fill the domain" << endl;
-		InfoH << "-- addModelMessage-- " << "nTriesBeforeDownScaling: "
+        InfoH << "-- addModelMessage-- " << "nTriesBeforeDownScaling: "
             << nTriesBeforeScaling_ << endl;
-		scaleParticles_ = true;
-	}
+        scaleParticles_ = true;
+    }
     else
     {
-		InfoH << addModel_Info << "-- addModelMessage-- "
+        InfoH << addModel_Info << "-- addModelMessage-- "
             << "notImplemented, will crash" << endl;
-	}
+    }
 
-	if (rotationMode_ == "noRotation")
-	{
-		rotateParticles_ = false;
-		randomAxis_      = false;
+    if (rotationMode_ == "noRotation")
+    {
+        rotateParticles_ = false;
+        randomAxis_      = false;
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "source STL will not be rotated upon addition" << endl;
-	}
-	else if (rotationMode_ == "randomRotation")
-	{
-		rotateParticles_ = true;
-		randomAxis_      = true;
+    }
+    else if (rotationMode_ == "randomRotation")
+    {
+        rotateParticles_ = true;
+        randomAxis_      = true;
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "source STL will be randomly rotated upon addition" << endl;
-	}
-	else if (rotationMode_ == "fixedAxisRandomRotation")
-	{
-		axisOfRot_       = (rotationModeCoeffs_.lookup("axis"));
+    }
+    else if (rotationMode_ == "fixedAxisRandomRotation")
+    {
+        axisOfRot_       = vector(rotationModeCoeffs_.lookup("axis"));
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "source STL will be rotated by a random angle around a fixed axis upon addition" << endl;
-		InfoH << "-- addModelMessage-- " << "set rotation axis: " << axisOfRot_ << endl;
-		rotateParticles_ = true;
-		randomAxis_      = false;
-	}
+        InfoH << "-- addModelMessage-- " << "set rotation axis: " << axisOfRot_ << endl;
+        rotateParticles_ = true;
+        randomAxis_      = false;
+    }
     else
     {
-		InfoH << addModel_Info << "-- addModelMessage-- "
+        InfoH << addModel_Info << "-- addModelMessage-- "
             << "notImplemented, will crash" << endl;
-	}
+    }
 }
 
 //---------------------------------------------------------------------------//
@@ -362,40 +362,40 @@ std::shared_ptr<geomModel> addModelOnceScatter::addBody
     bodyAdded_ = (canAddBodyI);
 
     if(!bodyAdded_)
-	{
-		scaleCorrectionCounter_++;
-	}
+    {
+        scaleCorrectionCounter_++;
+    }
 
-	if(bodyAdded_)
-	{
-		if(multiBody_)
-		{
-			InfoH << addModel_Info << "-- addModelMessage-- "
+    if(bodyAdded_)
+    {
+        if(multiBody_)
+        {
+            InfoH << addModel_Info << "-- addModelMessage-- "
                 << "addedOnTimeLevel:  " << addedOnTimeLevel_<< endl;
-			addedOnTimeLevel_++;
-		}
+            addedOnTimeLevel_++;
+        }
 
-		scaleCorrectionCounter_ = 0;
+        scaleCorrectionCounter_ = 0;
 
-	}
+    }
 
-	InfoH << addModel_Info << "-- addModelMessage-- "
+    InfoH << addModel_Info << "-- addModelMessage-- "
         << "bodyAdditionAttemptNr  : " << bodyAdditionAttemptCounter_<< endl;
-	InfoH << "-- addModelMessage-- "
+    InfoH << "-- addModelMessage-- "
         << "sameScaleAttempts      : " << scaleCorrectionCounter_<< endl;
 
-	if(scaleCorrectionCounter_ > nTriesBeforeScaling_ && scaleParticles_)
-	{
-		scaleApplication_ = true;
-		rescaleRequirement_ = true;
-		scalingFactor_++;
-		scaleStep_ = pow(scaleStep_,scalingFactor_);
-		if(scaleStep_<minScaleFit_)
-		{
-			scaleStep_=minScaleFit_;
-		}
-		scaleCorrectionCounter_ = 0;
-	}
+    if(scaleCorrectionCounter_ > nTriesBeforeScaling_ && scaleParticles_)
+    {
+        scaleApplication_ = true;
+        rescaleRequirement_ = true;
+        scalingFactor_++;
+        scaleStep_ = pow(scaleStep_,scalingFactor_);
+        if(scaleStep_<minScaleFit_)
+        {
+            scaleStep_=minScaleFit_;
+        }
+        scaleCorrectionCounter_ = 0;
+    }
 
     return geomModel_->getCopy();
 }
@@ -404,23 +404,23 @@ std::shared_ptr<geomModel> addModelOnceScatter::addBody
 void addModelOnceScatter::initializeCellZone()
 {
 
-	label zoneID = mesh_.cellZones().findZoneID(zoneName_);
-	InfoH << addModel_Info << "-- addModelMessage-- "
+    label zoneID = mesh_.cellZones().findZoneID(zoneName_);
+    InfoH << addModel_Info << "-- addModelMessage-- "
         << "label of the cellZone " << zoneID << endl;
 
-	const labelList& cellZoneCells = mesh_.cellZones()[zoneID];
+    const labelList& cellZoneCells = mesh_.cellZones()[zoneID];
     cellsInBoundBox_[Pstream::myProcNo()] = cellZoneCells;
 
-	const pointField& cp = mesh_.C();
-	const pointField fCp(cp,cellsInBoundBox_[Pstream::myProcNo()]);
-	cellZonePoints_[Pstream::myProcNo()] = fCp;
+    const pointField& cp = mesh_.C();
+    const pointField fCp(cp,cellsInBoundBox_[Pstream::myProcNo()]);
+    cellZonePoints_[Pstream::myProcNo()] = fCp;
 
-	updateCellZoneBoundBox();
+    updateCellZoneBoundBox();
 }
 //---------------------------------------------------------------------------//
 void addModelOnceScatter::updateCellZoneBoundBox()
 {
-		boundBox cellZoneBounds(cellZonePoints_[Pstream::myProcNo()]);
+        boundBox cellZoneBounds(cellZonePoints_[Pstream::myProcNo()]);
 
         reduce(cellZoneBounds.min(), minOp<vector>());
         reduce(cellZoneBounds.max(), maxOp<vector>());
@@ -503,55 +503,55 @@ labelList addModelOnceScatter::getBBoxCellsByOctTree
 //---------------------------------------------------------------------------//
 scalar addModelOnceScatter::checkLambdaFraction(const volScalarField& body)
 {
-	scalarList lambdaIntegrate(Pstream::nProcs());
+    scalarList lambdaIntegrate(Pstream::nProcs());
     scalarList volumeIntegrate(Pstream::nProcs());
-	scalar lambdaFraction(0);
+    scalar lambdaFraction(0);
     forAll (lambdaIntegrate,k)
     {
         lambdaIntegrate[k] = 0;
         volumeIntegrate[k] = 0;
     }
-	forAll (cellsInBoundBox_[Pstream::myProcNo()],k)
-	{
-		label cell = cellsInBoundBox_[Pstream::myProcNo()][k];
-		lambdaIntegrate[Pstream::myProcNo()] += mesh_.V()[cell]*body[cell];
-		volumeIntegrate[Pstream::myProcNo()] += mesh_.V()[cell];
-	}
-	lambdaFraction = gSum(lambdaIntegrate)/gSum(volumeIntegrate);
-	InfoH << addModel_Info << "-- addModelMessage-- "
+    forAll (cellsInBoundBox_[Pstream::myProcNo()],k)
+    {
+        label cell = cellsInBoundBox_[Pstream::myProcNo()][k];
+        lambdaIntegrate[Pstream::myProcNo()] += mesh_.V()[cell]*body[cell];
+        volumeIntegrate[Pstream::myProcNo()] += mesh_.V()[cell];
+    }
+    lambdaFraction = gSum(lambdaIntegrate)/gSum(volumeIntegrate);
+    InfoH << addModel_Info << "-- addModelMessage-- "
         << "lambda fraction in controlled region: " << lambdaFraction<< endl;
-	return lambdaFraction;
+    return lambdaFraction;
 }
 //---------------------------------------------------------------------------//
 scalar addModelOnceScatter::returnRandomAngle()
 {
-    scalar ranNum = 2.0*randGen_.scalar01() - 1.0;
+    scalar ranNum = 2.0*randGen_.sample01<scalar>() - 1.0;
     scalar angle  = ranNum*Foam::constant::mathematical::pi;
-	return angle;
+    return angle;
 }
 //---------------------------------------------------------------------------//
 scalar addModelOnceScatter::returnRandomScale()
 {
-	scalar ranNum       = randGen_.scalar01();
-	scalar scaleDiff    = maxScale_ - minScale_;
+    scalar ranNum       = randGen_.sample01<scalar>();
+    scalar scaleDiff    = maxScale_ - minScale_;
     scalar scaleFactor  = minScale_ + ranNum*scaleDiff;
-	InfoH << addModel_Info << "-- addModelMessage-- "
-        <<"random scaleFactor " << scaleFactor <<endl;
-	return scaleFactor;
+    InfoH << addModel_Info << "-- addModelMessage-- "
+          <<"random scaleFactor " << scaleFactor <<endl;
+    return scaleFactor;
 }
 //---------------------------------------------------------------------------//
 vector addModelOnceScatter::returnRandomRotationAxis()
 {
-	vector  axisOfRotation(vector::zero);
-	scalar ranNum = 0;
+    vector  axisOfRotation(vector::zero);
+    scalar ranNum = 0;
 
-	for (int i=0;i<3;i++)
-	{
-		ranNum = randGen_.scalar01();
-		axisOfRotation[i] = ranNum;
-	}
+    for (int i=0;i<3;i++)
+    {
+        ranNum = randGen_.sample01<scalar>();
+        axisOfRotation[i] = ranNum;
+    }
 
-	axisOfRotation /=mag(axisOfRotation);
-	return axisOfRotation;
+    axisOfRotation /=mag(axisOfRotation);
+    return axisOfRotation;
 }
 //---------------------------------------------------------------------------//

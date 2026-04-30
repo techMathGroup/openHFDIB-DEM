@@ -87,7 +87,7 @@ void clusterBody::calculateGeometricalProperties
     volScalarField& body
 )
 {
-    M_      = scalar(0);
+    M_      = scalar(0.0);
     I_      = symmTensor::zero;
 
     for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
@@ -103,7 +103,7 @@ void clusterBody::calculateGeometricalPropertiesParallel
     volScalarField& body
 )
 {
-    M_      = scalar(0);
+    M_      = scalar(0.0);
     I_      = symmTensor::zero;
 
     for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
@@ -116,7 +116,7 @@ void clusterBody::calculateGeometricalPropertiesParallel
 //---------------------------------------------------------------------------//
 void clusterBody::setMassAndInertia()
 {
-    M_      = scalar(0);
+    M_      = scalar(0.0);
     I_      = symmTensor::zero;
 
     for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)

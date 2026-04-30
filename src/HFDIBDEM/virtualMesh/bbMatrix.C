@@ -49,9 +49,23 @@ bBox_(bBox),
 charCellSize_(charCellSize),
 subVolumeV_(subVolumeV)
 {
-    bbMatrix_ = List<List<List<autoPtr<subVolumeProperties>>>>(matrixSize_[0],
-        List<List<autoPtr<subVolumeProperties>>>(matrixSize_[1],
-        List<autoPtr<subVolumeProperties>>(matrixSize_[2])));
+    // Note (MI): here, implementation was changed by PK, probrably
+    //            for clarity? -> ASK
+    
+    
+    // bbMatrix_ = List<List<List<autoPtr<subVolumeProperties>>>>(matrixSize_[0],
+        // List<List<autoPtr<subVolumeProperties>>>(matrixSize_[1],
+        // List<autoPtr<subVolumeProperties>>(matrixSize_[2])));
+
+    bbMatrix_.setSize(matrixSize_[0]);
+    forAll(bbMatrix_, i)
+    {
+        bbMatrix_[i].setSize(matrixSize_[1]);
+        forAll(bbMatrix_[i], j)
+        {
+            bbMatrix_[i][j].setSize(matrixSize_[2]);
+        }
+    }        
 }
 bbMatrix::~bbMatrix()
 {

@@ -88,7 +88,7 @@ bodyId_(bodyId)
                 pow(virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision(),3)
             )  
         );
-        vmWInfoList_.append(vmWInfo);
+        vmWInfoList_.append(std::move(vmWInfo));
     }
 
     forAll(planeBBData,pBD)
@@ -118,7 +118,7 @@ bodyId_(bodyId)
                 pow(virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision(),3)
             )
         );
-        vmPlaneInfoList_.append(vmWInfo);
+        vmPlaneInfoList_.append(std::move(vmWInfo));
     }
 }
 

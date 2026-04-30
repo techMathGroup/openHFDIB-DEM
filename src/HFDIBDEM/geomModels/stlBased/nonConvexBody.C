@@ -133,7 +133,7 @@ void nonConvexBody::createImmersedBody
     // first loop, construction of body field and identification of
     // the number of inside and surface cells
     const pointField& pp = mesh_.points();
-    forAll (bBoxCells[Pstream::myProcNo()],bCellI)                       //go only through bBox
+    forAll (bBoxCells[Pstream::myProcNo()],bCellI)                      //go only through bBox
     {
         label cellI(bBoxCells[Pstream::myProcNo()][bCellI]);
 
@@ -205,7 +205,7 @@ void nonConvexBody::createImmersedBody
 
     // gather partial volume from other processors
     Pstream::gatherList(ibPartialVolume_, 0);
-    Pstream::scatter(ibPartialVolume_, 0);
+    Pstream::broadcast(ibPartialVolume_, 0);                            //OF.com: scatter -> broadcast
 
     for (label i = 0; i < ibPartialVolume_.size(); i++)
     {

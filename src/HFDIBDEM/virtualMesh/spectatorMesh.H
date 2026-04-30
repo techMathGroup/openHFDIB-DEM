@@ -83,9 +83,18 @@ class spectatorMesh
 //-----------------------------operator-------------------------------//
     sMProperties& operator[](const vector& sVI)
     {
+        if (   sVI[0] < 0 || sVI[0] >= matrixSize_[0]
+            || sVI[1] < 0 || sVI[1] >= matrixSize_[1]
+            || sVI[2] < 0 || sVI[2] >= matrixSize_[2])
+        {
+            FatalErrorInFunction
+                << "centroid index " << sVI
+                << " out of range " << matrixSize_
+                << exit(FatalError);
+        }
         if (!centroidMatrix_[sVI[0]][sVI[1]][sVI[2]].valid())
         {
-            centroidMatrix_[sVI[0]][sVI[1]][sVI[2]].set(
+            centroidMatrix_[sVI[0]][sVI[1]][sVI[2]].reset(
                 new sMProperties(getCentroidPoint(sVI))
             );
         }
@@ -94,9 +103,18 @@ class spectatorMesh
 //-----------------------------operator-------------------------------// 
    sMProperties& operator()(const vector& sVI)
     {
+        if (   sVI[0] < 0 || sVI[0] >= matrixSize_[0]+1
+            || sVI[1] < 0 || sVI[1] >= matrixSize_[1]+1
+            || sVI[2] < 0 || sVI[2] >= matrixSize_[2]+1)
+        {
+            FatalErrorInFunction
+                << "vertex index " << sVI
+                << " out of range " << (matrixSize_+vector::one)
+                << exit(FatalError);
+        }
         if (!vertexMatrix_[sVI[0]][sVI[1]][sVI[2]].valid())
         {
-            vertexMatrix_[sVI[0]][sVI[1]][sVI[2]].set(
+            vertexMatrix_[sVI[0]][sVI[1]][sVI[2]].reset(
                 new sMProperties(getVertexPoint(sVI))
             );
         }
@@ -127,7 +145,7 @@ class spectatorMesh
     List<vector> faceNeighbourElements
     (
         vector& elementIndex
-    );    
+    );
 
     List<vector> elementVertexIndexies
     (
