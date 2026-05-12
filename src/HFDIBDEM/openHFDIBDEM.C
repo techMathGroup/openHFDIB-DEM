@@ -95,6 +95,24 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         solverInfo::setNSolidsTreshnold(readLabel(HFDIBDEMDict_.lookup("nSolidsInDomain")));
     }
 
+    if(HFDIBDEMDict_.found("weightDragOverLambdaCeil"))
+    {
+        solverInfo::setDragOverLambdaCeil(readBool(HFDIBDEMDict_.lookup("weightDragOverLambdaCeil")));
+        if(solverInfo::getDragOverLambdaCeil())
+        {
+            Info << " -- Drag force is integrated over the immersedbody cells intergration is over the whole cells" << endl;
+        }
+        else
+        {
+            Info << " -- Drag force is integrated over the immersedbody cells and weighted by solid volume fraction" << endl;
+        }
+    }
+    else
+    {
+        Info << " -- Drag force is integrated over the immersedbody cells and weighted by solid volume fraction" << endl;
+    }
+
+
     dictionary demDic = HFDIBDEMDict_.subDict("DEM");
     dictionary materialsDic = demDic.subDict("materials");
     List<word> materialsNames = materialsDic.toc();

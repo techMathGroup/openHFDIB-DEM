@@ -516,19 +516,37 @@ void immersedBody::updateCoupling
                 *mesh_.V()[cellI];
         }
     }
-
-    forAll (surfLists, i)
+    if(solverInfo::getDragOverLambdaCeil())
     {
-        DynamicLabelList& surfListI = surfLists[i];
-        forAll (surfListI, surfCell)
+        forAll (surfLists, i)
         {
-            label cellI = surfListI[surfCell];
+            DynamicLabelList& surfListI = surfLists[i];
+            forAll (surfListI, surfCell)
+            {
+                label cellI = surfListI[surfCell];
 
-            FV -=  body[cellI]*f[cellI]*mesh_.V()[cellI];
-            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^(body[cellI]*f[cellI])
-                *mesh_.V()[cellI]);
+                FV -=  f[cellI]*mesh_.V()[cellI];
+                TA -=  ((mesh_.C()[cellI] - refCoMList[i])^(body[cellI]*f[cellI])
+                    *mesh_.V()[cellI]);
+            }
         }
     }
+    else
+    {
+        forAll (surfLists, i)
+        {
+            DynamicLabelList& surfListI = surfLists[i];
+            forAll (surfListI, surfCell)
+            {
+                label cellI = surfListI[surfCell];
+
+                FV -=  body[cellI]*f[cellI]*mesh_.V()[cellI];
+                TA -=  ((mesh_.C()[cellI] - refCoMList[i])^(body[cellI]*f[cellI])
+                    *mesh_.V()[cellI]);
+            }
+        }
+    }
+
 
   reduce(FV, sumOp<vector>());
   reduce(TA, sumOp<vector>());
