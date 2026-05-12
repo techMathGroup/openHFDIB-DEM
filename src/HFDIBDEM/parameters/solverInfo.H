@@ -60,9 +60,9 @@ class solverInfo
         nSolidsTreshnold_ = nSolidsTreshold;
     }
 
-    static void setDragOverLambdaCeil(bool weightDragOverLambdaCeil)
+    static void setDragOverLambdaCeil(bool weightDragByLambda )
     {
-        weightDragOverLambdaCeil_ = weightDragOverLambdaCeil;
+        weightDragByLambda_ = weightDragByLambda ;
     }
 
     static bool getOnlyDEM()
@@ -75,14 +75,14 @@ class solverInfo
         return nSolidsTreshnold_;
     }
 
-    static bool getDragOverLambdaCeil()
+    static bool getDragWeightByLambda()
     {
-        return weightDragOverLambdaCeil_;
+        return weightDragByLambda_;
     }
 
     static bool onlyDEM_;
     static label nSolidsTreshnold_;
-    static bool weightDragOverLambdaCeil_;
+    static bool weightDragByLambda_;
 
 
 };

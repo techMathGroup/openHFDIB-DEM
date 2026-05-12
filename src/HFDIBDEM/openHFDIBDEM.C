@@ -95,21 +95,21 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         solverInfo::setNSolidsTreshnold(readLabel(HFDIBDEMDict_.lookup("nSolidsInDomain")));
     }
 
-    if(HFDIBDEMDict_.found("weightDragOverLambdaCeil"))
+    if(HFDIBDEMDict_.found("weightDragByLambda"))
     {
-        solverInfo::setDragOverLambdaCeil(readBool(HFDIBDEMDict_.lookup("weightDragOverLambdaCeil")));
-        if(solverInfo::getDragOverLambdaCeil())
+        solverInfo::setDragOverLambdaCeil(readBool(HFDIBDEMDict_.lookup("weightDragByLambda")));
+        if(solverInfo::getDragWeightByLambda())
         {
-            Info << " -- Drag force is integrated over the immersedbody cells intergration is over the whole cells" << endl;
+            Info << " -- Drag force is integrated over the immersedbody cells and weighted by solid volume fraction"  << endl;
         }
         else
         {
-            Info << " -- Drag force is integrated over the immersedbody cells and weighted by solid volume fraction" << endl;
+            Info << " -- Drag force is integrated over the immersedbody cells intergration is over the whole cells" << endl;
         }
     }
     else
     {
-        Info << " -- Drag force is integrated over the immersedbody cells and weighted by solid volume fraction" << endl;
+        Info << " -- Switch not found, assuming intergration over the immersedbody cells and weighted by solid volume fraction" << endl;
     }
 
 

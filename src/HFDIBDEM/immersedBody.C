@@ -516,7 +516,7 @@ void immersedBody::updateCoupling
                 *mesh_.V()[cellI];
         }
     }
-    if(solverInfo::getDragOverLambdaCeil())
+    if(solverInfo::getDragWeightByLambda())
     {
         forAll (surfLists, i)
         {
@@ -525,7 +525,7 @@ void immersedBody::updateCoupling
             {
                 label cellI = surfListI[surfCell];
 
-                FV -=  f[cellI]*mesh_.V()[cellI];
+                FV -=  body[cellI]*f[cellI]*mesh_.V()[cellI];
                 TA -=  ((mesh_.C()[cellI] - refCoMList[i])^(body[cellI]*f[cellI])
                     *mesh_.V()[cellI]);
             }
@@ -540,7 +540,7 @@ void immersedBody::updateCoupling
             {
                 label cellI = surfListI[surfCell];
 
-                FV -=  body[cellI]*f[cellI]*mesh_.V()[cellI];
+                FV -=  f[cellI]*mesh_.V()[cellI];
                 TA -=  ((mesh_.C()[cellI] - refCoMList[i])^(body[cellI]*f[cellI])
                     *mesh_.V()[cellI]);
             }
