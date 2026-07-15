@@ -177,6 +177,7 @@ namespace Foam
         // auxiliary variables
         tensor  totRotMatrix_;
         bool    sdBasedLambda_;
+        word    overlayLambda_;
         // bool    isInCollision_ = false;
         scalar  intSpan_;
         scalar  charCellSize_;                                          //characteristic cell size over surface

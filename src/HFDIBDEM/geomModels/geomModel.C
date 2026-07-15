@@ -314,7 +314,19 @@ void geomModel::correctSurfCells
             }
             ibPartialVolume_[Pstream::myProcNo()] += 1;
 
-            body[cCell] += cBody;
+            if (overlayLambda_ == "add")
+            {
+                body[cCell] += cBody;
+            }
+            else if (overlayLambda_ == "max")
+            {
+                // take maximum of what was there and what cBody wants
+                body[cCell] = max(body[cCell], cBody);
+            }
+            else // not sure what is wanted default behavior
+            {
+                body[cCell] += cBody;
+            }
 
             // clip the body field values
             body[cCell] = min(max(0.0,body[cCell]),1.0);

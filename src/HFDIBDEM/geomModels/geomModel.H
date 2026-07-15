@@ -108,6 +108,7 @@ namespace Foam
         scalar  intSpan_;
         bool    sdBasedLambda_;
         boundBox curMeshBounds_;
+        word overlayLambda_;
 
         //cachedNeighbours_ may cost problems in OF.com
         // autoPtr<HashTable<const labelList&, label, Hash<label>>> cachedNeighbours_;
@@ -331,6 +332,8 @@ namespace Foam
         void setIntSpan(scalar intSpan){intSpan_ = intSpan;}
 
         void setSdBasedLambda(bool sdBasedLambda){sdBasedLambda_ = sdBasedLambda;}
+
+        void setOverlayLambda(word overlayLambda){overlayLambda_ = overlayLambda;}
 
         void resetHashTable(){cachedNeighbours_.clear();}
 

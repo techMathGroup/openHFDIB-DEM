@@ -124,6 +124,10 @@ if (immersedDict_.found("sdBasedLambda"))
 {
     sdBasedLambda_ = readBool(immersedDict_.lookup("sdBasedLambda"));
 }
+if (immersedDict_.found("overlayLambda"))
+{
+    immersedDict_.lookup("overlayLambda") >> overlayLambda_;
+}
 if (immersedDict_.found("interfaceSpan"))
 {
     intSpan_ = readScalar(immersedDict_.lookup("interfaceSpan"));
@@ -140,6 +144,7 @@ if (immersedDict_.found("timesToSetStatic"))
 // set up body geometry
 geomModel_->setIntSpan(intSpan_);
 geomModel_->setSdBasedLambda(sdBasedLambda_);
+geomModel_->setOverlayLambda(overlayLambda_);
 geomModel_->setRhoS(dimensionedScalar(immersedDict_.get<dimensionedScalar>("rho")));
 geomModel_->setRefineBuffers(refineBuffers_);
 
