@@ -55,15 +55,13 @@ namespace Foam
         intPoint():
         iPoint_(vector::zero),
         iCell_(0),
-        iProc_(-1),
-        iVel_(vector::zero)
+        iProc_(-1)
         {};
 
-        intPoint(point iPoint, label iCell, label iProc, vector iVel):
+        intPoint(point iPoint, label iCell, label iProc):
         iPoint_(iPoint),
         iCell_(iCell),
-        iProc_(iProc),
-        iVel_(iVel)
+        iProc_(iProc)
         {};
 
         ~intPoint(){};
