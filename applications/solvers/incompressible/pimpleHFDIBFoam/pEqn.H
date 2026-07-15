@@ -73,14 +73,5 @@ fvc::makeRelative(phi, U);
 HFDIBDEM.updateFSCoupling(lambda,f);
 HFDIBDEM.interpolateIB(U,Ui,lambda);
 
-//Ui -= (Ui - U)*(1-lambda);
-
-forAll(surface, sI)
-{
-    if (lambda[sI] > 0)
-        surface[sI] = 1;
-    else
-        surface[sI] = 0;
-}
-
-f += 0.8*surface*(Ui - U)/runTime.deltaT();
+f += 0.8*(Ui - U)/runTime.deltaT();
+f *= surface;
