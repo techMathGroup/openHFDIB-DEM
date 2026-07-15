@@ -133,8 +133,8 @@ int main(int argc, char *argv[])
             else
                 surface[sI] = 0;
         }
-        
         surface.correctBoundaryConditions();
+        f *= surface;
 
         clockTime pimpleRunClockTime; // OS time efficiency testing
         // --- Pressure-velocity PIMPLE corrector loop
@@ -180,7 +180,6 @@ int main(int argc, char *argv[])
                     gradLambda.correctBoundaryConditions();
                     surface.correctBoundaryConditions();
                 }
-
             }
 
             #include "UEqn.H"

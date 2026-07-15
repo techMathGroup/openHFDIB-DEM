@@ -17,6 +17,10 @@ UEqn.relax();
 
 fvOptions.constrain(UEqn);
 
+// Direct forcing term computation
+f = surface*(UEqn.A()*Ui - UEqn.H() + fvc::grad(p));
+f.correctBoundaryConditions(); 
+
 if (pimple.momentumPredictor())
 {
     solve(UEqn == -fvc::grad(p) + f);

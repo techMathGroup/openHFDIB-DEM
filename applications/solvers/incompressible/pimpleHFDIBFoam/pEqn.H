@@ -74,4 +74,4 @@ HFDIBDEM.updateFSCoupling(lambda,f);
 HFDIBDEM.interpolateIB(U,Ui,lambda);
 
 f += 0.8*(Ui - U)/runTime.deltaT();
-f *= surface;
+// f *= surface;
