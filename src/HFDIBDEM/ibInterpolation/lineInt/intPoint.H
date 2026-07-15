@@ -49,19 +49,32 @@ namespace Foam
         label iCell_ = 0;
         label iProc_ = -1;
 
+        // info about origin surface cell
+        label oProc_ = -1;
+        label oLabel_ = -1;
+
+        // is this point the last from origin cell
+        bool last_ = true;
+
         // velocity in interpolation point
         vector iVel_ = vector::zero;
 
         intPoint():
         iPoint_(vector::zero),
         iCell_(0),
-        iProc_(-1)
+        iProc_(-1),
+        oProc_(-1),
+        oLabel_(-1),
+        last_(true)
         {};
 
-        intPoint(point iPoint, label iCell, label iProc):
+        intPoint(point iPoint, label iCell, label iProc, label oProc, label oLabel, bool last):
         iPoint_(iPoint),
         iCell_(iCell),
-        iProc_(iProc)
+        iProc_(iProc),
+        oProc_(oProc),
+        oLabel_(oLabel),
+        last_(last)
         {};
 
         ~intPoint(){};

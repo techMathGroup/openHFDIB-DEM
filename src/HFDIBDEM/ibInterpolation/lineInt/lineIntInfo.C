@@ -75,7 +75,10 @@ void lineIntInfo::setIntpInfo()
         (
             ibPoints[cellI],
             scell,
-            Pstream::myProcNo()
+            Pstream::myProcNo(),
+            Pstream::myProcNo(),
+            cellI,
+            false
         );
         point cPoint;
 
@@ -175,7 +178,10 @@ intPoint lineIntInfo::findIntPoint
     (
         endP,
         fromP.iCell_,
-        fromP.iProc_
+        fromP.iProc_,
+        fromP.oProc_,
+        fromP.oLabel_,
+        fromP.last_
     );
 
     if(fromP.iProc_ == Pstream::myProcNo())
@@ -406,7 +412,10 @@ void lineIntInfo::syncIntPoints()
             (
                 cPoint,
                 cellLabelRecv[proci][ibpI],
-                proci
+                proci,
+                proci, // dummy entry, preparation for future changes
+                -1, // dummy entry, preparation for future changes
+                false // dummy entry, preparation for future changes
             );
 
             intPoint foundP =
@@ -519,7 +528,10 @@ void lineIntInfo::syncIntPoints()
             (
                 intPointCmpl[proci][iPointI],
                 intCellCmpl[proci][iPointI],
-                intProcCmpl[proci][iPointI]
+                intProcCmpl[proci][iPointI],
+                intProcCmpl[proci][iPointI], // dummy entry, preparation for future changes
+                -1, // dummy entry, preparation for future changes
+                false // dummy entry, preparation for future changes
             );
 
             intPoints[labelCmpl[proci][iPointI]][orderCmpl[proci][iPointI]]
