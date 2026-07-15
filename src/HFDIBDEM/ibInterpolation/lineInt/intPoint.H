@@ -42,21 +42,28 @@ namespace Foam
 {
     struct intPoint
     {
+        // interpolation point
         point iPoint_ = vector::zero;
+
+        // info about cell with interpolation point
         label iCell_ = 0;
         label iProc_ = -1;
+
+        // velocity in interpolation point
         vector iVel_ = vector::zero;
 
         intPoint():
         iPoint_(vector::zero),
         iCell_(0),
-        iProc_(-1)
+        iProc_(-1),
+        iVel_(vector::zero)
         {};
 
         intPoint(point iPoint, label iCell, label iProc):
         iPoint_(iPoint),
         iCell_(iCell),
-        iProc_(iProc)
+        iProc_(iProc),
+        iVel_(vector::zero)
         {};
 
         ~intPoint(){};
