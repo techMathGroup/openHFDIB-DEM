@@ -59,11 +59,11 @@ namespace Foam
         iVel_(vector::zero)
         {};
 
-        intPoint(point iPoint, label iCell, label iProc):
+        intPoint(point iPoint, label iCell, label iProc, vector iVel):
         iPoint_(iPoint),
         iCell_(iCell),
         iProc_(iProc),
-        iVel_(vector::zero)
+        iVel_(iVel)
         {};
 
         ~intPoint(){};
