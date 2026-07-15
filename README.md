@@ -3,7 +3,7 @@ Version 3.0
 
 About openHFDIB-DEM
 -------------------
-openHFDIB-DEM is a free, open-source CFD-DEM library based on OpenFOAM (https://openfoam.org) and capable of simulating flows laden with arbitrarily-shaped solids. The code is developed mostly by members of the techMathGroup of the Institute of Thermomechanics of the Czech Academy of Sciences (https://www.it.cas.cz/) and members of the Monolith group of the University of Chemistry and Technology, Prague (https://monolith.vscht.cz).
+openHFDIB-DEM is a free, open-source CFD-DEM library based on OpenFOAM (https://openfoam.com) and capable of simulating flows laden with arbitrarily-shaped solids. The code is developed mostly by members of the techMathGroup (https://techmathgroup.isoz.eu) of the Institute of Thermomechanics of the Czech Academy of Sciences (https://www.it.cas.cz/) and members of the Monolith group of the University of Chemistry and Technology, Prague (https://monolith.vscht.cz).
 
 The main contributors are:
 * Martin Isoz (https://github.com/MartinIsoz)
@@ -36,11 +36,11 @@ Code capabilities
 
 Compatibility
 -------------
-The code is prepared for compilation with OpenFOAMv8 (https://openfoam.org/version/8/)
+The code is prepared for compilation with OpenFOAM v2412 (https://www.openfoam.com/news/main-news/openfoam-v2412)
 
 Compilation
 -----------
-Note: the scripts have to be ran from terminals with sourced OpenFOAMv8
+Note: the scripts have to be ran from terminals with sourced OpenFOAM v2412
 
 * compileAll.sh     -> compiles openHFDIB-DEM and pimpleHFDIBDEM solver
 * compileLib.sh     -> compiles openHFDIB-DEM library only
@@ -55,6 +55,8 @@ For any questions regarding specific cases or code capabilities, we kindly ask y
 Finally, doxygen documentation for the library is available at http://docs.isoz.eu.
 
 For the installation guide and detailed tutorials, see our "Wiki" page (https://github.com/techMathGroup/openHFDIB-DEM/wiki/)
+
+Introductory course for OpenHFDIB-DEM usage (compatible with OpenFOAM v2412) is available at https://github.com/techMathGroup/openHFDIB-DEM_Workshop with a related YouTube course: https://youtube.com/playlist?list=PLyB3_fxgRQeJlf7x8SO8BU94tpXlnaGrf&si=R-FZiiwmthm6y8qj
 
 If you need to contact the authors in matters regarding openHFDIB-DEM, please do so via email: openhfdib-dem@it.cas.cz
 
