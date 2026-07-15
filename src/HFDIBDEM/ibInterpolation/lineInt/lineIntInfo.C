@@ -540,3 +540,129 @@ void lineIntInfo::syncIntPoints()
     }
 }
 //---------------------------------------------------------------------------//
+void lineIntInfo::sendAndRecvIntPoints
+(
+    List<DynamicList<point>>& ibPointsToSend,
+    List<DynamicList<vector>>& ibNormalsToSend,
+    List<DynamicList<intPoint>>& intPointsToSend,
+    List<DynamicList<point>>& ibPointsRecv,
+    List<DynamicList<vector>>& ibNormalsRecv,
+    List<DynamicList<intPoint>>& intPointsRecv
+)
+{
+    PstreamBuffers pBufsIbPoints(Pstream::commsTypes::nonBlocking);
+    PstreamBuffers pBufsIbNormals(Pstream::commsTypes::nonBlocking);
+    PstreamBuffers pBufsIntPoints(Pstream::commsTypes::nonBlocking);
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            UOPstream sendIbPoints(proci, pBufsIbPoints);
+            UOPstream sendIbNormals(proci, pBufsIbNormals);
+            UOPstream sendIntPoints(proci, pBufsIntPoints);
+            sendIbPoints << ibPointsToSend[proci];
+            sendIbNormals << ibNormalsToSend[proci];
+            sendIntPoints << intPointsToSend[proci];
+        }
+    }
+
+    pBufsIbPoints.finishedSends();
+    pBufsIbNormals.finishedSends();
+    pBufsIntPoints.finishedSends();
+
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            UIPstream recvIbPoints(proci, pBufsIbPoints);
+            UIPstream recvIbNormals(proci, pBufsIbNormals);
+            UIPstream recvIntPoints(proci, pBufsIntPoints);
+            DynamicList<point> recIbPoints (recvIbPoints);
+            DynamicList<point> recIbNormals (recvIbNormals);
+            DynamicList<intPoint> recIntPoints (recvIntPoints);
+            ibPointsRecv[proci] = recIbPoints;
+            ibNormalsRecv[proci] = recIbNormals;
+            intPointsRecv[proci] = recIntPoints;
+        }
+    }
+
+    pBufsIbPoints.clear();
+    pBufsIbNormals.clear();
+    pBufsIntPoints.clear();
+}
+//---------------------------------------------------------------------------//
+void lineIntInfo::returnSolvedIntPoints
+(
+    List<DynamicList<intPoint>>& intPointsToCont,
+    List<DynamicList<intPoint>>& intPointsRecv,
+    List<DynamicList<intPoint>>& intPointsSolved
+)
+{
+    // prepare list to return
+    List<DynamicList<intPoint>> intPointsToRetr(Pstream::nProcs());
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        forAll(intPointsToCont[proci], iInfo)
+        {
+            // get the label of the processor of origin
+            label oProc = intPointsToCont[proci][iInfo].oProc_;
+
+            // save to solved 
+            if (Pstream::myProcNo() == oProc)
+            {
+                intPointsSolved[oProc].append(intPointsToCont[proci][iInfo]);
+            }
+
+            // add to return
+            else
+            {
+                intPointsToRetr[oProc].append(intPointsToCont[proci][iInfo]);
+            }
+        }
+
+        forAll(intPointsRecv[proci], iInfo)
+        {
+            // get the label of the processor of origin
+            label oProc = intPointsRecv[proci][iInfo].oProc_;
+
+            // save to solved 
+            if (Pstream::myProcNo() == oProc)
+            {
+                intPointsSolved[oProc].append(intPointsRecv[proci][iInfo]);
+            }
+
+            // add to return
+            else
+            {
+                intPointsToRetr[oProc].append(intPointsRecv[proci][iInfo]);
+            }
+        }
+    }
+
+    // send
+    PstreamBuffers pBufsIntPoints(Pstream::commsTypes::nonBlocking);
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            UOPstream sendIntPoints(proci, pBufsIntPoints);
+            sendIntPoints << intPointsToRetr[proci];
+        }
+    }
+
+    pBufsIntPoints.finishedSends();
+
+    // recieve
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            UIPstream recvIntPoints(proci, pBufsIntPoints);
+            DynamicList<intPoint> recIntPoints (recvIntPoints);
+            intPointsSolved[proci] = recIntPoints;
+        }
+    }
+
+    pBufsIntPoints.clear();
+}
+//---------------------------------------------------------------------------//

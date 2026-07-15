@@ -90,7 +90,25 @@ namespace Foam
             label cToCheck
         );
 
+        // Syncing functions
         void syncIntPoints();
+
+        void sendAndRecvIntPoints
+        (
+            List<DynamicList<point>>& ibPointsToSend,
+            List<DynamicList<vector>>& ibNormalsToSend,
+            List<DynamicList<intPoint>>& intPointsToSend,
+            List<DynamicList<point>>& ibPointsRecv,
+            List<DynamicList<vector>>& ibNormalsRecv,
+            List<DynamicList<intPoint>>& intPointsRecv
+        );
+
+        void returnSolvedIntPoints
+        (
+            List<DynamicList<intPoint>>& intPointsToCont,
+            List<DynamicList<intPoint>>& intPointsRecv,
+            List<DynamicList<intPoint>>& intPointsSolved
+        );
 
         public:
 
