@@ -59,6 +59,7 @@ namespace Foam
         // velocity in interpolation point
         vector iVel_ = vector::zero;
 
+        // Constructor
         intPoint():
         iPoint_(vector::zero),
         iCell_(0),
@@ -68,6 +69,7 @@ namespace Foam
         last_(true)
         {};
 
+        // Copy constructor
         intPoint(point iPoint, label iCell, label iProc, label oProc, label oLabel, bool last):
         iPoint_(iPoint),
         iCell_(iCell),
@@ -77,7 +79,41 @@ namespace Foam
         last_(last)
         {};
 
+        // Destructor
         ~intPoint(){};
+
+        // Operators
+        friend bool operator==(const intPoint& aP, const intPoint& bP)
+        {
+            return aP.iPoint_ == bP.iPoint_ &&
+                   aP.iCell_ == bP.iCell_ &&
+                   aP.iProc_ == bP.iProc_ &&
+                   aP.oProc_ == bP.oProc_ &&
+                   aP.oLabel_ == bP.oLabel_ &&
+                   aP.last_ == bP.last_ &&
+                   aP.iVel_ == bP.iVel_;
+        }
+
+        friend bool operator!=(const intPoint& aP, const intPoint& bP)
+        {
+            return !(aP==bP);
+        }
+
+        friend Foam::Ostream& operator<<(Foam::Ostream& os, const intPoint& iP)
+        {
+            return os << iP.iPoint_ << token::SPACE
+                      << iP.iCell_ << token::SPACE
+                      << iP.iProc_ << token::SPACE
+                      << iP.oProc_ << token::SPACE
+                      << iP.oLabel_ << token::SPACE
+                      << iP.last_ << token::SPACE
+                      << iP.iVel_;
+        }
+
+        friend Foam::Istream& operator>>(Foam::Istream& is, intPoint& iP)
+        {
+            return is >> iP.iPoint_ >> iP.iCell_ >> iP.iProc_ >> iP.oProc_ >> iP.oLabel_ >> iP.last_ >> iP.iVel_;
+        }
     };
 }
 #endif
