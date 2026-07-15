@@ -133,6 +133,7 @@ int main(int argc, char *argv[])
             else
                 surface[sI] = 0;
         }
+        
         surface.correctBoundaryConditions();
 
         clockTime pimpleRunClockTime; // OS time efficiency testing
@@ -200,21 +201,22 @@ int main(int argc, char *argv[])
         Info << "updating HFDIBDEM" << endl;
         clockTime postUpdateBodiesTime;
         
-        fDragVisc = (f - fvc::grad(p))*rho;
-        fDragPress= -gradLambda*p*rho;
+        // fDragVisc = (f - fvc::grad(p))*rho;
+        // fDragPress= -gradLambda*p*rho;
         
-        fDragPress.correctBoundaryConditions();
-        fDragVisc.correctBoundaryConditions();
+        // fDragPress.correctBoundaryConditions();
+        // fDragVisc.correctBoundaryConditions();
         
-        for (label pass=0; pass<=fDragSmoothingIter; pass++)
-        {
-            fDragPress = fvc::average(fvc::interpolate(fDragPress));
-            fDragVisc  = fvc::average(fvc::interpolate(fDragVisc));
-            fDragPress.correctBoundaryConditions();
-            fDragVisc.correctBoundaryConditions();
-        }
+        // for (label pass=0; pass<=fDragSmoothingIter; pass++)
+        // {
+        //     fDragPress = fvc::average(fvc::interpolate(fDragPress));
+        //     fDragVisc  = fvc::average(fvc::interpolate(fDragVisc));
+        //     fDragPress.correctBoundaryConditions();
+        //     fDragVisc.correctBoundaryConditions();
+        // }
         
-        HFDIBDEM.postUpdateBodies(lambda,gradLambda,fDragPress,fDragVisc);
+        // HFDIBDEM.postUpdateBodies(lambda,gradLambda,fDragPress,fDragVisc);
+        HFDIBDEM.postUpdateBodies(lambda,f);
         suplTime_ += postUpdateBodiesTime.timeIncrement();
 
 

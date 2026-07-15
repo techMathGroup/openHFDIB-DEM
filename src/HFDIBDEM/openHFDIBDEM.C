@@ -92,7 +92,7 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 
     if(HFDIBDEMDict_.found("nSolidsInDomain"))
     {
-        solverInfo::setNSolidsTreshnold(readLabel(HFDIBDEMDict_.lookup("nSolidsInDomain")));
+        solverInfo::setNSolidsThreshold(readLabel(HFDIBDEMDict_.lookup("nSolidsInDomain")));
     }
 
     dictionary demDic = HFDIBDEMDict_.subDict("DEM");
@@ -386,7 +386,7 @@ void openHFDIBDEM::initialize
         label maxAdditions(1000);
         label cAddition(0);
 
-        while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions and immersedBodies_.size() < solverInfo::getNSolidsTreshnold())
+        while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions and immersedBodies_.size() < solverInfo::getNSolidsThreshold())
         {
             InfoH << addModel_Info << "addModel invoked action, trying to add new body" << endl;
             std::shared_ptr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));
@@ -424,6 +424,7 @@ void openHFDIBDEM::initialize
                 }
                 verletList_.addBodyToVList(immersedBodies_[addIBPos]);
                 InfoH << addModel_Info << "Body based on: " << bodyName << " successfully added" << endl;
+                InfoH << addModel_Info << "Current count of solids within the domain : " << immersedBodies_.size() << endl;
                 cAddition = 0;
             }
             else
@@ -563,6 +564,22 @@ void openHFDIBDEM::postUpdateBodies
     }
 }
 //---------------------------------------------------------------------------//
+void openHFDIBDEM::postUpdateBodies
+(
+    volScalarField& body,
+    volVectorField& f
+)
+{
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            immersedBodies_[bodyId].clearIntpInfo();
+            immersedBodies_[bodyId].postPimpleUpdateImmersedBody(body,f);
+        }
+    }
+}
+//---------------------------------------------------------------------------//
 void openHFDIBDEM::recreateBodies
 (
     volScalarField& body,
@@ -580,6 +597,68 @@ void openHFDIBDEM::recreateBodies
         if (immersedBodies_[bodyId].getIsActive())
         {
             immersedBodies_[bodyId].recreateBodyField(body,refineF);
+        }
+    }
+    DynamicList<scalar> particleMasses;
+    DynamicList<label> particleCells;
+    DynamicList<symmTensor> particleInertiaTensors;
+    
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            immersedBodies_[bodyId].syncImmersedBodyParralell1(body,refineF);
+            if (immersedBodies_[bodyId].getGeomModel().isCluster())
+            {
+                clusterBody& cBody = dynamic_cast<clusterBody&>(immersedBodies_[bodyId].getGeomModel());
+                std::vector<std::shared_ptr<geomModel>>& cBodies = cBody.getClusterBodies();
+                for (auto& cB : cBodies)
+                {
+                    particleMasses.append(cB->getM());
+                    particleCells.append(cB->getNCells());
+                    particleInertiaTensors.append(cB->getI());
+                }
+            }
+            else
+            {
+                particleMasses.append(immersedBodies_[bodyId].getGeomModel().getM());
+                particleCells.append(immersedBodies_[bodyId].getGeomModel().getNCells());
+                particleInertiaTensors.append(immersedBodies_[bodyId].getGeomModel().getI());
+            }
+        }
+    }
+    reduce(particleMasses,sumOp<List<scalar>>());
+    reduce(particleCells,sumOp<List<label>>());
+    reduce(particleInertiaTensors,sumOp<List<symmTensor>>());
+
+    label bodyIndex(0);
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            if (immersedBodies_[bodyId].getGeomModel().isCluster())
+            {
+                clusterBody& cBody = dynamic_cast<clusterBody&>(immersedBodies_[bodyId].getGeomModel());
+                std::vector<std::shared_ptr<geomModel>>& cBodies = cBody.getClusterBodies();
+                for (auto& cB : cBodies)
+                {
+                    cB->setM(particleMasses[bodyIndex]);
+                    cB->setNCells(particleCells[bodyIndex]);
+                    cB->setI(particleInertiaTensors[bodyIndex]);
+                    bodyIndex++;
+                }
+                cBody.setMassAndInertia();
+            }
+            else
+            {
+                immersedBodies_[bodyId].getGeomModel().setM(particleMasses[bodyIndex]);
+                immersedBodies_[bodyId].getGeomModel().setNCells(particleCells[bodyIndex]);
+                immersedBodies_[bodyId].getGeomModel().setI(particleInertiaTensors[bodyIndex]);
+                bodyIndex++;
+            }
+
+            immersedBodies_[bodyId].syncImmersedBodyParralell2(body,refineF);
+            immersedBodies_[bodyId].checkIfInDomain(body);
         }
     }
     forAll (immersedBodies_,bodyId)
@@ -1219,6 +1298,21 @@ void openHFDIBDEM::updateFSCoupling
         if (immersedBodies_[bodyId].getIsActive())
         {
             immersedBodies_[bodyId].pimpleUpdate(body,fPress,fVisc);
+        }
+    }
+}
+//---------------------------------------------------------------------------//
+void openHFDIBDEM::updateFSCoupling
+(
+    volScalarField& body,
+    volVectorField& f
+)
+{
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            immersedBodies_[bodyId].pimpleUpdate(body,f);
         }
     }
 }

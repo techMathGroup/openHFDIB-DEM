@@ -487,8 +487,29 @@ void immersedBody::postPimpleUpdateImmersedBody
 )
 {
     // update Vel_, Axis_ and omega_
-    updateCoupling(body,fPress,fVisc);
+    if(!solverInfo::getOnlyDEM()) // if only DEM is not active update the movement of the body
+    {
+        updateCoupling(body,fPress,fVisc);
+    }
+    // move FCouplingOld_ here -> update
+
+    Vel_ = VelOld_;
+    Axis_ = AxisOld_;
+    omega_ = omegaOld_;
     
+    FCouplingOld_ = FCoupling_;
+}//---------------------------------------------------------------------------//
+void immersedBody::postPimpleUpdateImmersedBody
+(
+    volScalarField& body,
+    volVectorField& f
+)
+{
+    // update Vel_, Axis_ and omega_
+    if(!solverInfo::getOnlyDEM()) // if only DEM is not active update the movement of the body
+    {
+        updateCoupling(body,f);
+    }
     // move FCouplingOld_ here -> update
 
     Vel_ = VelOld_;
@@ -604,18 +625,6 @@ void immersedBody::updateCoupling
     //~ const DynamicLabelList& intList(getInternalCellList()[Pstream::myProcNo()]);
     const DynamicLabelList& surfList(getSurfaceCellList()[Pstream::myProcNo()]);
 
-    //~ forAll(intList, i)
-    //~ {
-        //~ label cellI = intList[i];
-        
-        //~ vector fCellPress = fPress[cellI];
-        //~ vector fCellVisc  = fVisc[cellI];
-        
-        //~ FV -= (fCellPress + fCellVisc)*mesh_.V()[cellI];
-        //~ FV -= (fCellVisc)*mesh_.V()[cellI];
-        //~ TA -= ((mesh_.C()[cellI] - CoM)^fCellVisc)*mesh_.V()[cellI];
-    //~ }
-
     forAll(surfList, i)
     {
         label cellI = surfList[i];
@@ -654,6 +663,62 @@ void immersedBody::updateCoupling
     couplingHistCoef_ = max(couplingHistCoef_*0.95, 0.5);
     
     Info << "======= COUPLING COEF IS: " << couplingHistCoef_ << endl;
+}
+//---------------------------------------------------------------------------//
+void immersedBody::updateCoupling
+(
+    volScalarField& body,
+    volVectorField& f
+)
+{
+    vector FV(vector::zero);
+    vector TA(vector::zero);
+    
+
+    List<DynamicLabelList> intLists;
+    List<DynamicLabelList> surfLists;
+    DynamicVectorList refCoMList;
+
+    geomModel_->getReferencedLists(
+        intLists,
+        surfLists,
+        refCoMList
+    );
+
+    forAll (intLists, i)
+    {
+        DynamicLabelList& intListI = intLists[i];
+        forAll (intListI, intCell)
+        {
+            label cellI = intListI[intCell];
+
+            FV -=  f[cellI]*mesh_.V()[cellI];
+            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])
+                *mesh_.V()[cellI];
+        }
+    }
+
+    forAll (surfLists, i)
+    {
+        DynamicLabelList& surfListI = surfLists[i];
+        forAll (surfListI, surfCell)
+        {
+            label cellI = surfListI[surfCell];
+
+            FV -=  f[cellI]*mesh_.V()[cellI];
+            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^(body[cellI]*f[cellI])
+                *mesh_.V()[cellI]);
+        }
+    }
+    
+    reduce(FV, sumOp<vector>());
+    reduce(TA, sumOp<vector>());
+    
+
+    FV *= rhoF_.value();
+    TA *= rhoF_.value();
+
+    FCoupling_ = forces(FV, TA);    
 }
 //---------------------------------------------------------------------------//
 // update movement variables of the body
@@ -1182,6 +1247,16 @@ void immersedBody::pimpleUpdate
 )
 {
     updateCoupling(body, fPress, fVisc);
+    updateMovement(VelOld_, AxisOld_, omegaOld_);
+}
+//---------------------------------------------------------------------------//
+void immersedBody::pimpleUpdate
+(
+    volScalarField& body,
+    volVectorField& f
+)
+{
+    updateCoupling(body, f);
     updateMovement(VelOld_, AxisOld_, omegaOld_);
 }
 //---------------------------------------------------------------------------//

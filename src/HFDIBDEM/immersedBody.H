@@ -161,6 +161,12 @@ namespace Foam
             volVectorField& fVisc
         );
 
+        void updateCoupling
+        (
+            volScalarField& body,
+            volVectorField& f
+        );
+
         // auxiliary octree variables
         Field<label> octreeField_;
         label cellToStartInCreateIB_;
@@ -387,6 +393,12 @@ namespace Foam
             volVectorField& fVisc
         );
 
+        void postPimpleUpdateImmersedBody
+        (
+            volScalarField& body,
+            volVectorField& f
+        );
+
         // compute the mean and maximal body courant number (based on
         // the body linear velocity)
         void computeBodyCoNumber();
@@ -427,6 +439,12 @@ namespace Foam
             volScalarField& body,
             volVectorField& fPress,
             volVectorField& fVisc
+        );
+
+        void pimpleUpdate
+        (
+            volScalarField& body,
+            volVectorField& f
         );
 
         const bool& getSDBasedLambda() const

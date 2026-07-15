@@ -55,9 +55,9 @@ class solverInfo
         onlyDEM_ = onlyDEM;
     }
 
-    static void setNSolidsTreshnold(label nSolidsTreshold)
+    static void setNSolidsThreshold(label nSolidsThreshold)
     {
-        nSolidsTreshnold_ = nSolidsTreshold;
+        nSolidsThreshold_ = nSolidsThreshold;
     }
 
     static bool getOnlyDEM()
@@ -65,13 +65,13 @@ class solverInfo
         return onlyDEM_;
     }
 
-    static label getNSolidsTreshnold()
+    static label getNSolidsThreshold()
     {
-        return nSolidsTreshnold_;
+        return nSolidsThreshold_;
     }
 
     static bool onlyDEM_;
-    static label nSolidsTreshnold_;
+    static label nSolidsThreshold_;
 
 };
 

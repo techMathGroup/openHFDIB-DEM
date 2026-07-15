@@ -53,6 +53,7 @@ while (pimple.correctNonOrthogonal())
     }
 }
 
+
 #include "continuityErrs.H"
 
 // Explicitly relax pressure for momentum corrector
@@ -69,6 +70,17 @@ fvc::correctUf(Uf, U, phi);
 // Make the fluxes relative to the mesh motion
 fvc::makeRelative(phi, U);
 
-// Update U based on new U values and old Ui
+HFDIBDEM.updateFSCoupling(lambda,f);
 HFDIBDEM.interpolateIB(U,Ui,lambda);
 
+//Ui -= (Ui - U)*(1-lambda);
+
+forAll(surface, sI)
+{
+    if (lambda[sI] > 0)
+        surface[sI] = 1;
+    else
+        surface[sI] = 0;
+}
+
+f += 0.8*surface*(Ui - U)/runTime.deltaT();

@@ -164,11 +164,23 @@ namespace Foam
         volVectorField& fVisc
     );
 
+    void postUpdateBodies
+    (
+        volScalarField& body,
+        volVectorField& f
+    );
+
     void updateFSCoupling
     (
         volScalarField& body,
         volVectorField& fPress,
         volVectorField& fVisc
+    );
+
+    void updateFSCoupling
+    (
+        volScalarField& body,
+        volVectorField& f
     );
 
     void recreateBodies(volScalarField& body,volScalarField& refineF);

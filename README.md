@@ -1,17 +1,16 @@
-# !!! this is not a production version of the code, assume that everything is broken and use the official repository: https://github.com/techMathGroup/openHFDIB-DEM !!!
-
 # openHFDIB-DEM
-Preparation for porting openHFDIB-DEM to openfoam.com
+Version 3.0 
 
 About openHFDIB-DEM
 -------------------
 openHFDIB-DEM is a free, open-source CFD-DEM library based on OpenFOAM (https://openfoam.org) and capable of simulating flows laden with arbitrarily-shaped solids. The code is developed mostly by members of the techMathGroup of the Institute of Thermomechanics of the Czech Academy of Sciences (https://www.it.cas.cz/) and members of the Monolith group of the University of Chemistry and Technology, Prague (https://monolith.vscht.cz).
 
 The main contributors are:
-* Martin Isoz         (https://github.com/MartinIsoz)
-* Martin Kotouč Šourek       (https://github.com/MartinKotoucSourek)
-* Ondřej Studeník     (https://github.com/OStudenik)
-* Petr Kočí           (https://monolith.vscht.cz)
+* Martin Isoz (https://github.com/MartinIsoz)
+* Ondřej Studeník (https://github.com/OStudenik)
+* Lucie Kubíčková (https://github.com/LucieKubickova/)
+* Martin Kotouč Šourek (https://github.com/MartinKotoucSourek)
+* Petr Kočí (https://monolith.vscht.cz)
 
 The implementation itself is based on the Hybrid Fictitious Domain-Immersed Boundary (HFDIB)
 coupled with the Discrete Element Method (DEM). The initial HFDIB implementation spans from the work of Federico Municchi (https://github.com/fmuni/openHFDIB). However, the code was heavily modified. The DEM implementation for arbitrarily shaped solids into OpenFOAM is original.

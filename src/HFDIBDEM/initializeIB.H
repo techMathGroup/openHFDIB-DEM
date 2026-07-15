@@ -129,6 +129,7 @@ if (immersedDict_.found("timesToSetStatic"))
 geomModel_->setIntSpan(intSpan_);
 geomModel_->setSdBasedLambda(sdBasedLambda_);
 geomModel_->setRhoS(dimensionedScalar(immersedDict_.get<dimensionedScalar>("rho")));
+geomModel_->setRefineBuffers(refineBuffers_);
 
 string material = word(immersedDict_.lookup("material"));
 

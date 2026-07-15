@@ -67,7 +67,7 @@ void convexBody::createImmersedBody
         new DynamicLabelList);
 
     label tableSize = 128;
-    if(cachedNeighbours_.valid())
+    if(cachedNeighbours_.valid() && getRefineBuffers() <= 0)
     {
         tableSize = cachedNeighbours_().toc().size()*1.5;
     }
