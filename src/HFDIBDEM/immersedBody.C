@@ -54,6 +54,8 @@ Contributors
 #include "fvMeshSubset.H"
 #include "solverInfo.H" 
 
+#include "interpolationTable.H"
+
 #define ORDER 2
 
 using namespace Foam;
@@ -837,6 +839,27 @@ void immersedBody::updateMovementComp
         if ((newAxis & Axis_) < 0) Axis_ *= (-1.0);;
     };
 
+    auto updatePositionByTable = [&]()
+    {
+        vector F(FCoupling_.F);
+        F *= 0.0; // no force
+
+        scalar time = mesh_.time().value();
+
+        dictionary functionDict = immersedDict_.subDict("prescribedPosTableBody");
+        dictionary posIntTableDict = functionDict.subDict("posIntTableDict");
+        interpolationTable<vector> posIntTable = interpolationTable<vector>(posIntTableDict);
+
+        if(geomModel_->getM0() > 0)
+        {
+            vector posNew = posIntTable(time);
+            vector posOld = posIntTable(time-deltaT);
+
+            // update velocity
+            Vel_ = (posNew - posOld)/deltaT;
+        }
+    };
+
     if (bodyOperation_ == 0 or bodyOperation_ == 3)
     {
         return;
@@ -854,6 +877,11 @@ void immersedBody::updateMovementComp
     else if (bodyOperation_ == 4)
     {
         updateRotationFixedAxis();
+        return;
+    }
+    else if (bodyOperation_ == 6)
+    {
+        updatePositionByTable();
         return;
     }
 

@@ -72,6 +72,18 @@ else if (immersedDict_.found("fullyCoupledBody"))
 
     InfoH << iB_Info << bodyName_ << " is fully coupled with fluid phase." << endl;
 }
+else if (immersedDict_.found("prescribedPosTableBody"))
+{
+    bodyOperation_ = 6;
+
+    Vel_   = vector(immersedDict_.subDict("prescribedPosTableBody").lookup("velocity"));
+    Axis_ = vector(immersedDict_.subDict("prescribedPosTableBody").lookup("axis"));
+    omega_  = readScalar(
+                immersedDict_.subDict("prescribedPosTableBody").lookup("omega")
+            );
+
+    InfoH << iB_Info << bodyName_ << " has prescribed center of mass position by an interpolation table." << endl;
+}
 else
 {
     InfoH << iB_Info << "No body operation was found for " << bodyName_ << endl
