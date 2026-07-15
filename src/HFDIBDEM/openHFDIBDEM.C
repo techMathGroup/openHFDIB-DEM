@@ -442,6 +442,16 @@ void openHFDIBDEM::initialize
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
 {
+    // reset all bodies before recreation
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            immersedBodies_[bodyId].resetBody(body);
+        }
+    }
+
+    // recreate all bodies after contact update
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())

@@ -1079,6 +1079,15 @@ vectorField immersedBody::getUatIbPoints()
     return ibPointsVal;
 }
 //---------------------------------------------------------------------------//
+// function to reset body
+void immersedBody::resetBody
+(
+    volScalarField& body
+)
+{
+    geomModel_->resetBody(body);
+}
+//---------------------------------------------------------------------------//
 // function to move the body after the contact
 void immersedBody::postContactUpdateBodyField
 (
@@ -1086,8 +1095,6 @@ void immersedBody::postContactUpdateBodyField
     volScalarField& refineF
 )
 {
-    geomModel_->resetBody(body);
-
     createImmersedBody(body,refineF,false);
 }
 //---------------------------------------------------------------------------//

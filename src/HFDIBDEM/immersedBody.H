@@ -356,6 +356,11 @@ namespace Foam
             return geomModel_->getInternalCellList();
         };
 
+        void resetBody
+        (
+            volScalarField& body
+        );
+
         void postContactUpdateBodyField
         (
             volScalarField& body,
