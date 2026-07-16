@@ -87,8 +87,6 @@ void lineIntInfo::setIntpInfo()
         );
         intPoints[cellI][0] = cIntPoint;
 
-        Pout << cellI << " " << Pstream::myProcNo() << endl;
-
         // save for looping lists
         ibPointsToSolve[Pstream::myProcNo()].append(ibPoints[cellI]);
         ibNormalsToSolve[Pstream::myProcNo()].append(ibNormals[cellI]);
