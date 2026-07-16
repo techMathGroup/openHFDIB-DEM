@@ -47,6 +47,8 @@ Contributors
 #include "triSurfaceMesh.H"
 #include "triangleFuncs.H"
 
+#include "processorPolyPatch.H"
+
 #include "contactType.H"
 #include "subVolume.H"
 #include "verletPoint.H"
