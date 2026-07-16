@@ -92,10 +92,12 @@ void lineInt::correctVelocity
 
             case 1:
             {
-                vector VP1 = intPoints[ibp][0].iVel_ - ibPointsVal[ibp];
+                //~ vector VP1 = intPoints[ibp][0].iVel_ - ibPointsVal[ibp];
+                vector VP1 = intPoints[ibp][1].iVel_ - ibPointsVal[ibp]; // first int point is surface point
 
                 // distance between interpolation points
-                scalar deltaR = mag(intPoints[ibp][0].iPoint_ - ibPoints[ibp]);
+                //~ scalar deltaR = mag(intPoints[ibp][0].iPoint_ - ibPoints[ibp]);
+                scalar deltaR = mag(intPoints[ibp][1].iPoint_ - ibPoints[ibp]); // first int point is surface point
 
                 // cell center to surface distance
                 scalar ds = mag(mesh.C()[cellI] - ibPoints[ibp]);
@@ -108,13 +110,18 @@ void lineInt::correctVelocity
 
             case 2:
             {
-                vector VP1 =  intPoints[ibp][0].iVel_ - ibPointsVal[ibp];
-                vector VP2 =  intPoints[ibp][1].iVel_ - ibPointsVal[ibp];
+                //~ vector VP1 =  intPoints[ibp][0].iVel_ - ibPointsVal[ibp];
+                //~ vector VP2 =  intPoints[ibp][1].iVel_ - ibPointsVal[ibp];
+                vector VP1 =  intPoints[ibp][1].iVel_ - ibPointsVal[ibp]; // first int point is surface point
+                vector VP2 =  intPoints[ibp][2].iVel_ - ibPointsVal[ibp]; // first int point is surface point
 
                 // distance between interpolation points
-                scalar deltaR1 = mag(intPoints[ibp][0].iPoint_ - ibPoints[ibp]);
-                scalar deltaR2 = mag(intPoints[ibp][1].iPoint_
-                        - intPoints[ibp][0].iPoint_);
+                //~ scalar deltaR1 = mag(intPoints[ibp][0].iPoint_ - ibPoints[ibp]);
+                //~ scalar deltaR2 = mag(intPoints[ibp][1].iPoint_
+                //~         - intPoints[ibp][0].iPoint_);
+                scalar deltaR1 = mag(intPoints[ibp][1].iPoint_ - ibPoints[ibp]); // first int point is surface point
+                scalar deltaR2 = mag(intPoints[ibp][2].iPoint_ // first int point is surface point
+                        - intPoints[ibp][1].iPoint_); // first int point is surface point
 
                 // cell center to surface distance
                 scalar ds = mag(mesh.C()[cellI] - ibPoints[ibp]);

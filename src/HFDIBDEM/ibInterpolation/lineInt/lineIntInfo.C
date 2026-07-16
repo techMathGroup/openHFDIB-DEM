@@ -56,6 +56,11 @@ void lineIntInfo::setIntpInfo()
     List<vector>& ibNormals = getIbNormals();
     List<List<intPoint>>& intPoints = getIntPoints();
 
+    // prepare lists of points to solve
+    List<DynamicList<point>> ibPointsToSolve(Pstream::nProcs()); // include this as a part of the intPoint struct?
+    List<DynamicList<vector>> ibNormalsToSolve(Pstream::nProcs()); // include this as a part of the intPoint struct?
+    List<DynamicList<intPoint>> intPointsToSolve(Pstream::nProcs());
+
     // create temporary unit surface normals
     forAll (cSurfCells, cellI)
     {
@@ -70,7 +75,7 @@ void lineIntInfo::setIntpInfo()
             ibNormals[cellI]
         );
 
-        intPoints[cellI].setSize(ORDER);
+        intPoints[cellI].setSize(ORDER+1);
         intPoint cIntPoint
         (
             ibPoints[cellI],
@@ -80,26 +85,216 @@ void lineIntInfo::setIntpInfo()
             cellI,
             false
         );
-        point cPoint;
+        intPoints[cellI][0] = cIntPoint;
 
-        for(label i = 0; i < ORDER; ++i)
+        Pout << cellI << " " << Pstream::myProcNo() << endl;
+
+        // save for looping lists
+        ibPointsToSolve[Pstream::myProcNo()].append(ibPoints[cellI]);
+        ibNormalsToSolve[Pstream::myProcNo()].append(ibNormals[cellI]);
+        intPointsToSolve[Pstream::myProcNo()].append(cIntPoint);
+    }
+
+    // go by orders
+    for(label i = 0; i < ORDER; ++i)
+    {
+        // lists to send
+        List<DynamicList<point>> ibPointsToSend(Pstream::nProcs());
+        List<DynamicList<vector>> ibNormalsToSend(Pstream::nProcs());
+        List<DynamicList<intPoint>> intPointsToSend(Pstream::nProcs());
+
+        // lists to continue
+        List<DynamicList<point>> ibPointsToCont(Pstream::nProcs());
+        List<DynamicList<vector>> ibNormalsToCont(Pstream::nProcs());
+        List<DynamicList<intPoint>> intPointsToCont(Pstream::nProcs());
+
+        // loop over processors
+        for (label proci = 0; proci < Pstream::nProcs(); proci++)
         {
-            cPoint = cIntPoint.iPoint_;
-            do {
-                cPoint += ibNormals[cellI]*intDist;
-            } while(pointInCell(cPoint, cIntPoint.iCell_));
-
-            intPoints[cellI][i] = findIntPoint(cIntPoint, cPoint);
-            correctIntPoint(ibPoints[cellI], intPoints[cellI][i]);
-            cIntPoint = intPoints[cellI][i];
-
-            if(cIntPoint.iProc_ != Pstream::myProcNo())
+            // loop over interpolation points
+            forAll(intPointsToSolve[proci], iInfo)
             {
-                break;
+                // latest interpolation point
+                intPoint cIntPoint = intPointsToSolve[proci][iInfo];
+                point cPoint = cIntPoint.iPoint_;
+                scalar intDist = Foam::pow(mesh_.V()[cIntPoint.iCell_],0.333);
+
+                do {
+                    cPoint += ibNormalsToSolve[proci][iInfo]*intDist;
+                } while(pointInCell(cPoint, cIntPoint.iCell_));
+
+                // new interpolation points
+                intPoint nIntPoint = findIntPoint(cIntPoint, cPoint);
+                correctIntPoint(ibPointsToSolve[proci][iInfo], nIntPoint);
+
+                // check for cells at domain boundary
+                if (nIntPoint.iProc_ == -1)
+                {
+                    intPoints[cIntPoint.oLabel_][i].last_ = true;
+                }
+
+                // check if to send or keep
+                else if (Pstream::myProcNo() != nIntPoint.iProc_)
+                {
+                    ibPointsToSend[nIntPoint.iProc_].append(ibPointsToSolve[proci][iInfo]);
+                    ibNormalsToSend[nIntPoint.iProc_].append(ibNormalsToSolve[proci][iInfo]);
+                    intPointsToSend[nIntPoint.iProc_].append(nIntPoint);
+                }
+
+                else
+                {
+                    ibPointsToCont[proci].append(ibPointsToSolve[proci][iInfo]);
+                    ibNormalsToCont[proci].append(ibNormalsToSolve[proci][iInfo]);
+                    intPointsToCont[proci].append(nIntPoint);
+                }
             }
         }
+
+        // sync with others
+        List<DynamicList<point>> ibPointsRecv(Pstream::nProcs());
+        List<DynamicList<vector>> ibNormalsRecv(Pstream::nProcs());
+        List<DynamicList<intPoint>> intPointsRecv(Pstream::nProcs());
+        sendAndRecvIntPoints(
+                ibPointsToSend,
+                ibNormalsToSend,
+                intPointsToSend,
+                ibPointsRecv,
+                ibNormalsRecv,
+                intPointsRecv);
+
+        // clear lists
+        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+        {
+            ibPointsToSend[proci].clear();
+            ibNormalsToSend[proci].clear();
+            intPointsToSend[proci].clear();
+        }
+
+        // finished solving of recieved points
+        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+        {
+            forAll(intPointsRecv[proci], iInfo)
+            {
+                // get face label
+                label faceI = intPointsRecv[proci][iInfo].iCell_;
+                label cellI(0);
+
+                // get cell label
+                forAll(mesh_.boundaryMesh(), patchi)
+                {
+                    const polyPatch& cPatch = mesh_.boundaryMesh()[patchi];
+                    if (cPatch.type() == "processor")
+                    {
+                        const processorPolyPatch& procPatch
+                            = refCast<const processorPolyPatch>(cPatch);
+
+                        label sProc = (Pstream::myProcNo() == procPatch.myProcNo())
+                            ? procPatch.neighbProcNo() : procPatch.myProcNo();
+
+                        if (sProc == proci)
+                        {
+                            cellI = mesh_.faceOwner()[cPatch.start() + faceI];
+                        }
+                    }
+                }
+
+                // save
+                intPointsRecv[proci][iInfo].iCell_ = cellI;
+
+                // find interpolation point
+                intPoint cIntPoint
+                (
+                    intPointsRecv[proci][iInfo].iPoint_,
+                    cellI,
+                    Pstream::myProcNo(),
+                    intPointsRecv[proci][iInfo].oProc_,
+                    intPointsRecv[proci][iInfo].oLabel_,
+                    intPointsRecv[proci][iInfo].last_
+                );
+
+                vector dir = cIntPoint.iPoint_ - ibPointsRecv[proci][iInfo];
+                dir /= mag(dir);
+                correctIntPoint(ibPointsRecv[proci][iInfo], cIntPoint);
+
+                intPointsRecv[proci][iInfo] = cIntPoint;
+            }
+        }
+
+        // return solved interpolation points to processor of origin
+        List<DynamicList<intPoint>> intPointsSolved(Pstream::nProcs());
+        returnSolvedIntPoints(intPointsToCont, intPointsRecv, intPointsSolved);
+
+        // save solved points
+        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+        {
+            forAll(intPointsSolved[proci], iInfo)
+            {
+                // get the original label
+                label oLabel = intPointsSolved[proci][iInfo].oLabel_;
+
+                // save int point
+                intPoints[oLabel][i+1] = intPointsSolved[proci][iInfo];
+            }
+        }
+
+        // clear lists and prepare for next order solution
+        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+        {
+            ibPointsToSolve[proci].clear();
+            ibNormalsToSolve[proci].clear();
+            intPointsToSolve[proci].clear();
+
+            forAll(intPointsToCont[proci], iInfo)
+            {
+                ibPointsToSolve[proci].append(ibPointsToCont[proci][iInfo]);
+                ibNormalsToSolve[proci].append(ibNormalsToCont[proci][iInfo]);
+                intPointsToSolve[proci].append(intPointsToCont[proci][iInfo]);
+            }
+
+            // clear lists
+            ibPointsToCont[proci].clear();
+            ibNormalsToCont[proci].clear();
+            intPointsToCont[proci].clear();
+        }
+
+        // add recieved points
+        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+        {
+            forAll(intPointsRecv[proci], iInfo)
+            {
+                ibPointsToSolve[proci].append(ibPointsRecv[proci][iInfo]);
+                ibNormalsToSolve[proci].append(ibNormalsRecv[proci][iInfo]);
+                intPointsToSolve[proci].append(intPointsRecv[proci][iInfo]);
+            }
+
+            // clear lists
+            ibPointsRecv[proci].clear();
+            ibNormalsRecv[proci].clear();
+            intPointsRecv[proci].clear();
+        }
     }
-    syncIntPoints();
+
+    // old setting of interpolation points
+    //~     point cPoint;
+
+    //~     for(label i = 0; i < ORDER; ++i)
+    //~     {
+    //~         cPoint = cIntPoint.iPoint_;
+    //~         do {
+    //~             cPoint += ibNormals[cellI]*intDist;
+    //~         } while(pointInCell(cPoint, cIntPoint.iCell_));
+
+    //~         intPoints[cellI][i] = findIntPoint(cIntPoint, cPoint);
+    //~         correctIntPoint(ibPoints[cellI], intPoints[cellI][i]);
+    //~         cIntPoint = intPoints[cellI][i];
+
+    //~         if(cIntPoint.iProc_ != Pstream::myProcNo())
+    //~         {
+    //~             break;
+    //~         }
+    //~     }
+    //~ }
+    //~ syncIntPoints();
 }
 //---------------------------------------------------------------------------//
 void lineIntInfo::correctIntPoint
