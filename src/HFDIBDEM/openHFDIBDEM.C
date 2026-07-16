@@ -333,6 +333,17 @@ void openHFDIBDEM::initialize
                 ibInterp_.reset(new lineInt(HFDIBinterpDict_));
             }
         }
+
+        else
+        {
+            InfoH << basic_Info << "No interpolation method specified, using line as default" << endl;
+            ibInterp_.reset(new lineInt(HFDIBinterpDict_));
+        }
+    }
+
+    else
+    {
+        InfoH << basic_Info << "Dictionary interpolationSchemes not found, interpolation at IB not initialized" << endl;
     }
 
     bool startTime0(runTime == "0");
