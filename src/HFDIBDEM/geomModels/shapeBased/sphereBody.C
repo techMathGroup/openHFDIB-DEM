@@ -66,6 +66,8 @@ void sphereBody::createImmersedBody
         new DynamicLabelList(1,cellInIB));
     autoPtr<DynamicLabelList> auxToCheck(
         new DynamicLabelList);
+    autoPtr<List<DynamicLabelList>> neighboursToSend(
+        new List<DynamicLabelList>(Pstream::nProcs()));
 
     label tableSize = 128;
     if(cachedNeighbours_.valid() && getRefineBuffers() <= 0)
@@ -81,16 +83,26 @@ void sphereBody::createImmersedBody
     HashTable<bool, label, Hash<label>> cellInside(tableSize);
 
     label iterCount(0);label iterMax(mesh_.nCells());
-    while (nextToCheck().size() > 0 and iterCount++ < iterMax)
+    label nextSize = nextToCheck().size();
+    reduce(nextSize, maxOp<label>());
+
+    while (nextSize > 0 and iterCount++ < iterMax)
     {
+        // clear neighbors found in previous iteration
         auxToCheck().clear();
+
+        // loop over neighbors to check found in previous iteration
         forAll (nextToCheck(),cellToCheck)
         {
+            // get cell label
             label cCell = nextToCheck()[cellToCheck];
+
+            // continue if it was not visited
             if (!cellInside.found(cCell))
             {
                 iterCount++;
 
+                // if inside body add neighbors to check
                 if(pointInside(cp[cCell]))
                 {
                     cellInside.set(cCell, true);
@@ -105,6 +117,39 @@ void sphereBody::createImmersedBody
                         cachedNeighbours_().insert(cCell, neigh);
                         auxToCheck().append(neigh);
                     }
+
+                    // add processor neighbors
+                    forAll(mesh_.cells()[cCell], fI)
+                    {
+                        // get face label
+                        label faceI = mesh_.cells()[cCell][fI];
+
+                        // check if face is a processor face
+                        if(!mesh_.isInternalFace(faceI))
+                        {
+                            // get the patch the face belongs to
+                            label facePatchI(mesh_.boundaryMesh().whichPatch(faceI));
+                            const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchI];
+
+                            // check if it is a processor boundary
+                            if (cPatch.type() == "processor")
+                            {
+                                // get the processor patch
+                                const processorPolyPatch& procPatch
+                                    = refCast<const processorPolyPatch>(cPatch);
+
+                                // get the neighboring processor id
+                                label iProc = (Pstream::myProcNo() == procPatch.myProcNo())
+                                    ? procPatch.neighbProcNo() : procPatch.myProcNo();
+
+                                // get local face value
+                                label iFace = cPatch.whichFace(faceI);
+
+                                // save to send
+                                neighboursToSend()[iProc].append(iFace);
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -112,9 +157,70 @@ void sphereBody::createImmersedBody
                 }
             }
         }
+
+        // send processor neighbors to add to next to check 
+        PstreamBuffers pBufsIFaces(Pstream::commsTypes::nonBlocking);
+        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+        {
+            if(proci != Pstream::myProcNo())
+            {
+                UOPstream sendIFaces(proci, pBufsIFaces);
+                sendIFaces << neighboursToSend()[proci];
+                neighboursToSend()[proci].clear();
+            }
+        }
+
+        pBufsIFaces.finishedSends();
+
+        // recieve and add to aux to check
+        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+        {
+            if (proci != Pstream::myProcNo())
+            {
+                UIPstream recvIFaces(proci, pBufsIFaces);
+                DynamicList<label> recIFaces (recvIFaces);
+
+                // find cells for faces
+                forAll(recIFaces, rFace)
+                {
+                    // get the cell label
+                    label faceI = recIFaces[rFace]; // local face labels
+
+                    // find the respective cell 
+                    forAll(mesh_.boundaryMesh(), patchI)
+                    {
+                        if (isA<processorPolyPatch>(mesh_.boundaryMesh()[patchI]))
+                        {
+                            const processorPolyPatch& procPatch
+                                = refCast<const processorPolyPatch>(mesh_.boundaryMesh()[patchI]);
+
+                            // get the neighboring processor id
+                            label iProc = (Pstream::myProcNo() == procPatch.myProcNo())
+                                ? procPatch.neighbProcNo() : procPatch.myProcNo();
+
+                            if (iProc == proci)
+                            {
+                                // get the cell label
+                                label rCellI = mesh_.boundaryMesh()[patchI].faceCells()[faceI];
+                                auxToCheck().append(rCellI);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // clear buffer
+        pBufsIFaces.clear();
+
+        // clean up and prep for next iter
         autoPtr<DynamicLabelList> helpPtr(nextToCheck.ptr()); // removed const Type pointer
         nextToCheck.reset(auxToCheck.ptr()); // issue set -> reset compiler warning
         auxToCheck = std::move(helpPtr); // added std::move
+
+        // check if all processors finished 
+        nextSize = nextToCheck().size();
+        reduce(nextSize, maxOp<label>());
     }
 
     DynamicLabelList keyToErase;
