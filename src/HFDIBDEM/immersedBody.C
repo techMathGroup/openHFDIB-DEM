@@ -143,6 +143,8 @@ void immersedBody::createImmersedBody
     {
         syncCreateImmersedBody(body, refineF);
     }
+
+    intpInfo_->setIntpInfo();
 }
 //---------------------------------------------------------------------------//
 void immersedBody::syncCreateImmersedBody
