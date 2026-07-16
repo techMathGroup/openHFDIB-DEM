@@ -625,39 +625,45 @@ void immersedBody::updateCoupling
     vector TA(vector::zero);
     
     // calcualate viscous force and torque
-    const vector& CoM(geomModel_->getCoM());
-    
-    //~ const DynamicLabelList& intList(getInternalCellList()[Pstream::myProcNo()]);
-    const DynamicLabelList& surfList(getSurfaceCellList()[Pstream::myProcNo()]);
+    List<DynamicLabelList> intLists;
+    List<DynamicLabelList> surfLists;
+    DynamicVectorList refCoMList;
 
-    forAll(surfList, i)
+    geomModel_->getReferencedLists(
+        intLists,
+        surfLists,
+        refCoMList
+    );
+
+    forAll (intLists, i)
     {
-        label cellI = surfList[i];
-        
-        vector fCellPress = body[cellI]*fPress[cellI];
-        vector fCellVisc  = body[cellI]*fVisc[cellI];
-        
-        FV -= (fCellPress + fCellVisc)*mesh_.V()[cellI];
-        TA -= ((mesh_.C()[cellI] - CoM)^fCellVisc)*mesh_.V()[cellI];
+        DynamicLabelList& intListI = intLists[i];
+        forAll (intListI, intCell)
+        {
+            label cellI = intListI[intCell];
+
+            vector fCellPress = body[cellI]*fPress[cellI];
+
+            FV -= (fCellPress)*mesh_.V()[cellI];
+            // TA -= ((mesh_.C()[cellI] - refCoMList[i])^fCellPress)
+            //     *mesh_.V()[cellI];
+        }
     }
-    
-    
-    const DynamicLabelList& haloList(haloCells_[Pstream::myProcNo()]);
-    
-    forAll(haloList, i)
+
+    forAll (surfLists, i)
     {
-        label cellI = haloList[i];
-        
-        vector fCellPress = fPress[cellI];
-        vector fCellVisc  = fVisc[cellI];
-        
-        // scalar scaleFact  = Foam::pow(mesh_.V()[cellI],0.3333);
-        // scalar scaleFact  = max(1.0-12.0*Foam::pow(mag(body[cellI]-0.5),4.0),0);//increase weight of surfCells
-        scalar scaleFact  = Foam::exp(-Foam::pow(body[cellI] - 0.5,4.0)/(2.0*Foam::pow(0.15,2.0)));//increase weight of surfCells
-        
-        
-        FV -= scaleFact*(fCellPress + fCellVisc)*mesh_.V()[cellI];
-        TA -= scaleFact*((mesh_.C()[cellI] - CoM)^fCellVisc)*mesh_.V()[cellI];
+        DynamicLabelList& surfListI = surfLists[i];
+        forAll (surfListI, surfCell)
+        {
+            label cellI = surfListI[surfCell];
+
+            vector fCellVisc = body[cellI]*fVisc[cellI];
+            vector fCellPress = body[cellI]*fPress[cellI];
+
+            FV -= (fCellVisc + fCellPress)*mesh_.V()[cellI];
+            TA -= ((mesh_.C()[cellI] - refCoMList[i])^fCellVisc)
+                *mesh_.V()[cellI];
+        }
     }
     
     reduce(FV, sumOp<vector>());

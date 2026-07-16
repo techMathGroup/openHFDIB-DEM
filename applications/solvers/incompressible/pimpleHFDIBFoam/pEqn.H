@@ -73,5 +73,7 @@ fvc::makeRelative(phi, U);
 HFDIBDEM.updateFSCoupling(lambda,f);
 HFDIBDEM.interpolateIB(U,Ui,lambda);
 
-f += 0.8*(Ui - U)/runTime.deltaT();
+// f += 0.8*(Ui - U)/runTime.deltaT();
+// Note (MI): this continuous forcing term makes the particle movement
+//            dependent on the number of PISO loop correctors
 // f *= surface;
