@@ -205,22 +205,23 @@ int main(int argc, char *argv[])
         }
         // hfdib-dem code modification
         // --- compute viscous forces and update coupling
-        volVectorField gradLambda(fvc::grad(lambda));        
-        fDragPress = -gradLambda*p;
+        // volVectorField gradLambda(fvc::grad(lambda));        
+        // fDragPress = -gradLambda*p;
         
-        volTensorField gradU = fvc::grad(U);
-        volTensorField tau = -mixture.mu()*(gradU + gradU.T());
-        fDragVisc = -gradLambda & tau;
+        // volTensorField gradU = fvc::grad(U);
+        // volTensorField tau = -mixture.mu()*(gradU + gradU.T());
+        // fDragVisc = -gradLambda & tau;
         
-        for (label pass=0; pass<=fDragSmoothingIter; pass++)
-        {
-            fDragPress = fvc::average(fvc::interpolate(fDragPress));
-            fDragVisc  = fvc::average(fvc::interpolate(fDragVisc));
-            fDragPress.correctBoundaryConditions();
-            fDragVisc.correctBoundaryConditions();
-        }
+        // for (label pass=0; pass<=fDragSmoothingIter; pass++)
+        // {
+        //     fDragPress = fvc::average(fvc::interpolate(fDragPress));
+        //     fDragVisc  = fvc::average(fvc::interpolate(fDragVisc));
+        //     fDragPress.correctBoundaryConditions();
+        //     fDragVisc.correctBoundaryConditions();
+        // }
         
-        HFDIBDEM.postUpdateBodies(lambda,gradLambda,fDragPress,fDragVisc);
+        // HFDIBDEM.postUpdateBodies(lambda,gradLambda,fDragPress,fDragVisc);
+        HFDIBDEM.postUpdateBodies(lambda,f);
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
         HFDIBDEM.updateBodiesRhoF(rho);
         // HFDIBDEM.updateBodiesRhoF(alpha1,lambda,rho1.value(),rho2.value());

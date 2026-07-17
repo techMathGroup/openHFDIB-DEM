@@ -190,48 +190,26 @@ int main(int argc, char *argv[])
         
         // hfdib-dem code modification
         // --- compute viscous forces and update coupling
-        volVectorField gradLambda(fvc::grad(lambda));
-        //~ scalar omega1(0.5);                                             //formulation weight
-        //~ scalar omega1(0.5);                                             //formulation weight
-        //~ scalar omega1(0.0);                                             //formulation weight
-        //~ scalar omega1(1.0);                                             //formulation weight
+        // volVectorField gradLambda(fvc::grad(lambda));        
+        // fDragPress = -gradLambda*p;
         
-        //~ fDragPress = fvc::grad(p);
-        //~ fDragPress = -fvc::grad(lambda)*p;
-        //~ fDragPress = -0.0*gradLambda*p;
-        //~ fDragPress = -fvc::ddt(U);
-        //~ fDragVisc  = -fvc::div(turbulence->devReff());
-        //~ fDragVisc  = -gradLambda & turbulence->devReff();
-        //~ fDragVisc  = f;
-        //~ fDragPress = -0.5*omega1*(fvc::ddt(U) - f);
-        //~ fDragVisc  = fDragPress;
-        //~ fDragPress+= (1.0-omega1)*fvc::grad(p);
-        //~ fDragVisc += (1.0-omega1)*fvc::div(turbulence->devRhoReff());      //this sign might actually be correct
-        //~ fDragPress*= 0.0;
-        //~ fDragVisc *= 0.0;
+        // volTensorField gradU = fvc::grad(U);
+        // volTensorField tau = -mixture.mu()*(gradU + gradU.T());
+        // fDragVisc = -gradLambda & tau;
         
-        //~ fDragPress = 0.5*f/rho;
-        //~ fDragVisc  = fDragPress;
+        // for (label pass=0; pass<=fDragSmoothingIter; pass++)
+        // {
+        //     fDragPress = fvc::average(fvc::interpolate(fDragPress));
+        //     fDragVisc  = fvc::average(fvc::interpolate(fDragVisc));
+        //     fDragPress.correctBoundaryConditions();
+        //     fDragVisc.correctBoundaryConditions();
+        // }
         
-        fDragPress = -gradLambda*p;
-        
-        volTensorField gradU = fvc::grad(U);
-        volTensorField tau = -mixture.mu()*(gradU + gradU.T());
-        fDragVisc = -gradLambda & tau;
-        
-        //~ fDragPress /= rho;
-        //~ fDragVisc  /= rho;
-        for (label pass=0; pass<=fDragSmoothingIter; pass++)
-        {
-            fDragPress = fvc::average(fvc::interpolate(fDragPress));
-            fDragVisc  = fvc::average(fvc::interpolate(fDragVisc));
-            fDragPress.correctBoundaryConditions();
-            fDragVisc.correctBoundaryConditions();
-        }
-        
-        HFDIBDEM.postUpdateBodies(lambda,gradLambda,fDragPress,fDragVisc);
+        // HFDIBDEM.postUpdateBodies(lambda,gradLambda,fDragPress,fDragVisc);
+        HFDIBDEM.postUpdateBodies(lambda,f);
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
         HFDIBDEM.updateBodiesRhoF(rho);
+        // HFDIBDEM.updateBodiesRhoF(alpha1,lambda,rho1.value(),rho2.value());
         HFDIBDEM.updateDEM(lambda,refineF);
         Info << "updated HFDIBDEM" << endl;
 

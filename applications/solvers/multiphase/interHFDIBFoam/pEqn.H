@@ -90,11 +90,3 @@
 
 // hfdib-dem modifications
 HFDIBDEM.interpolateIB(U,Ui,lambda);
-
-forAll(surface, sI)
-{
-    if (lambda[sI] > thrSurf)
-        surface[sI] = 1;
-    else
-        surface[sI] = 0;
-}
