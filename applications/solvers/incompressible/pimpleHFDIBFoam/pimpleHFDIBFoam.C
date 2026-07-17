@@ -181,8 +181,18 @@ int main(int argc, char *argv[])
                     surface.correctBoundaryConditions();
                 }
             }
-
+            
             #include "UEqn.H"
+            // #include "UEqn_alt.H"
+            // Note (MI): alternative formulation of direct forcing
+            //            coupling - UEqn is reconstructed in each
+            //            iteration of the direct forcing loop
+            // => may play a role if high-resolution schemes are used
+            //    for the convection term
+            // => a switch may be created in the future to properly test
+            //    this and maybe let the user choose
+            // for a small test case, the original formulation is approx
+            // 10% faster than the alternative one
 
             // --- Pressure corrector loop
             while (pimple.correct())
