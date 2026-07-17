@@ -76,7 +76,6 @@ void sphereBody::createImmersedBody
     }
     else
     {
-        // cachedNeighbours_ = new HashTable<const labelList&, label, Hash<label>>;
         cachedNeighbours_.reset(new HashTable<labelList, label, Hash<label>>);
     }
 
