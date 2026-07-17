@@ -79,6 +79,23 @@ void convexBody::createImmersedBody
         cachedNeighbours_.reset(new HashTable<labelList, label, Hash<label>>);
     }
 
+    // initialize cache for processor neighbours
+    if(!procNeighbours_.valid())
+    {
+        procNeighbours_.reset(new HashTable<DynamicList<labelList>, label, Hash<label>>);
+    }
+
+    // get number of empty directions
+    label nEmpty(0);
+    forAll(mesh_.boundaryMesh(), patchI)
+    {
+        const polyPatch& cPatch = mesh_.boundaryMesh()[patchI];
+        if (cPatch.type() == "empty")
+        {
+            nEmpty += 1;
+        }
+    }
+
     HashTable<bool, label, Hash<label>> cellInside(tableSize);
 
     label iterCount(0);label iterMax(mesh_.nCells());
@@ -117,7 +134,26 @@ void convexBody::createImmersedBody
                         auxToCheck().append(neigh);
                     }
 
+                    // if number of neighbours equals number of faces, skip processors 
+                    label nProcFaces = mesh_.cells()[cCell].size() - mesh_.cellCells()[cCell].size();
+                    nProcFaces -= nEmpty;
+                    if(nProcFaces == 0)
+                    {
+                        continue;
+                    }
+
+                    // check processor neighbours
+                    if(procNeighbours_.valid() && procNeighbours_().found(cCell))
+                    {
+                        DynamicList<labelList>& procFaces = procNeighbours_()[cCell];
+                        forAll(procFaces, pI)
+                        {
+                            neighboursToSend()[procFaces[pI][0]].append(procFaces[pI][1]);
+                        }
+                    }
+
                     // add processor neighbors
+                    DynamicList<labelList> procFaces;
                     forAll(mesh_.cells()[cCell], fI)
                     {
                         // get face label
@@ -145,10 +181,12 @@ void convexBody::createImmersedBody
                                 label iFace = cPatch.whichFace(faceI);
 
                                 // save to send
+                                procFaces.append({iProc, iFace});
                                 neighboursToSend()[iProc].append(iFace);
                             }
                         }
                     }
+                    procNeighbours_().insert(cCell, procFaces);
                 }
                 else
                 {
@@ -222,6 +260,7 @@ void convexBody::createImmersedBody
         reduce(nextSize, maxOp<label>());
     }
 
+    // clear cached neighbours of cells that have not center inside body
     DynamicLabelList keyToErase;
     for(auto it = cachedNeighbours_().begin(); it != cachedNeighbours_().end(); ++it)
     {
@@ -231,6 +270,17 @@ void convexBody::createImmersedBody
         }
     }
     cachedNeighbours_().erase(keyToErase);
+
+    // clear processor neighbours of cells that have not center inside body
+    keyToErase.clear();
+    for(auto it = procNeighbours_().begin(); it != procNeighbours_().end(); ++it)
+    {
+        if(!cellInside.found(it.key()))
+        {
+            keyToErase.append(it.key());
+        }
+    }
+    procNeighbours_().erase(keyToErase);
 
     DynamicLabelList potentSurfCells = 
         getPotentSurfCells(
@@ -247,11 +297,9 @@ void convexBody::createImmersedBody
         cellPoints
     );
 
-    if(intCells_
-    [Pstream::myProcNo()].size() > 0)
+    if(intCells_[Pstream::myProcNo()].size() > 0)
     {
-        cellToStartInCreateIB_ = min(intCells_
-        [Pstream::myProcNo()]);
+        cellToStartInCreateIB_ = min(intCells_[Pstream::myProcNo()]);
     }
 }
 //---------------------------------------------------------------------------//
@@ -298,7 +346,7 @@ label convexBody::getCellInBody
         }
         autoPtr<DynamicLabelList> helpPtr(nextToCheck.ptr());
         nextToCheck.reset(auxToCheck.ptr());
-        auxToCheck =std::move(helpPtr);
+        auxToCheck = std::move(helpPtr);
     }
     return -1;
 }

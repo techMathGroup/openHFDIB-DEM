@@ -116,6 +116,7 @@ namespace Foam
         // autoPtr<HashTable<const labelList&, label, Hash<label>>> cachedNeighbours_;
         autoPtr<HashTable<labelList, label, Hash<label>>> cachedNeighbours_;
         // HashTable<labelList, label, Hash<label>> cachedNeighbours_;
+        autoPtr<HashTable<DynamicList<labelList>, label, Hash<label>>> procNeighbours_;
 
         //body mass
         scalar M_;

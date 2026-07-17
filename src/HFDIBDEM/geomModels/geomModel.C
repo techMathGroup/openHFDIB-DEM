@@ -195,7 +195,13 @@ DynamicList<label> geomModel::getPotentSurfCells
 )
 {
     const labelList foundCells = cellInside.toc();
-    DynamicLabelList potentSurfCells(foundCells.size()/2);
+    boolList anyOutsides(foundCells.size(), false);
+
+    autoPtr<List<DynamicLabelList>> neighboursToSend(
+        new List<DynamicLabelList>(Pstream::nProcs()));
+    autoPtr<List<DynamicLabelList>> procCellsToCheck(
+        new List<DynamicLabelList>(Pstream::nProcs()));
+        
     forAll(foundCells, cellI)
     {
         label cCell = foundCells[cellI];
@@ -204,32 +210,150 @@ DynamicList<label> geomModel::getPotentSurfCells
         {
             const labelList& neigh = cachedNeighbours_()[cCell];        //may cost problems in OF.com compilation/computation
 
-            bool anyOutside = false;
             forAll(neigh, neighI)
             {
                 if(!cellInside[neigh[neighI]])
                 {
-                    anyOutside = true;
+                    anyOutsides[cellI] = true;
                     break;
                 }
             }
 
-            if(anyOutside)
+            if (!anyOutsides[cellI] && procNeighbours_().found(cCell))
             {
-                potentSurfCells.append(cCell);
-            }
-            else
-            {
-                intCells_[Pstream::myProcNo()].append(cCell);
-                ibPartialVolume_[Pstream::myProcNo()] += 1;
-                body[cCell] = 1.0;
+                DynamicList<labelList>& procFaces = procNeighbours_()[cCell];
+                forAll(procFaces, pI)
+                {
+                    neighboursToSend()[procFaces[pI][0]].append(procFaces[pI][1]);
+                    procCellsToCheck()[procFaces[pI][0]].append(cellI);
+                }
             }
         }
         else
         {
+            anyOutsides[cellI] = true;
+        }
+    }
+
+    // send processor neighbours
+    PstreamBuffers pBufsIFaces(Pstream::commsTypes::nonBlocking);
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if(proci != Pstream::myProcNo())
+        {
+            UOPstream sendIFaces(proci, pBufsIFaces);
+            sendIFaces << neighboursToSend()[proci];
+            neighboursToSend()[proci].clear();
+        }
+    }
+
+    pBufsIFaces.finishedSends();
+
+    // recieve and return
+    List<DynamicList<bool>> anyOutToRetr(Pstream::nProcs());
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            UIPstream recvIFaces(proci, pBufsIFaces);
+            DynamicList<label> recIFaces (recvIFaces);
+
+            // find cells for faces
+            forAll(recIFaces, rFace)
+            {
+                // get the cell label
+                label faceI = recIFaces[rFace]; // local face labels
+
+                // find the respective cell 
+                forAll(mesh_.boundaryMesh(), patchI)
+                {
+                    if (isA<processorPolyPatch>(mesh_.boundaryMesh()[patchI]))
+                    {
+                        const processorPolyPatch& procPatch
+                            = refCast<const processorPolyPatch>(mesh_.boundaryMesh()[patchI]);
+
+                        // get the neighboring processor id
+                        label iProc = (Pstream::myProcNo() == procPatch.myProcNo())
+                            ? procPatch.neighbProcNo() : procPatch.myProcNo();
+
+                        if (iProc == proci)
+                        {
+                            // get the cell label
+                            label rCellI = mesh_.boundaryMesh()[patchI].faceCells()[faceI];
+                            if (!cellInside[rCellI])
+                            {
+                                anyOutToRetr[iProc].append(true);
+                            }
+                            else
+                            {
+                                anyOutToRetr[iProc].append(false);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if(proci != Pstream::myProcNo())
+        {
+            UOPstream sendAnyOuts(proci, pBufsIFaces);
+            sendAnyOuts << anyOutToRetr[proci];
+            anyOutToRetr[proci].clear();
+        }
+    }
+
+    pBufsIFaces.finishedSends();
+
+    List<DynamicList<bool>> anyOutsidesCmpl(Pstream::nProcs());
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            UIPstream recvAnyOuts(proci, pBufsIFaces);
+            DynamicList<bool> recAnyOuts (recvAnyOuts);
+            anyOutsidesCmpl[proci] = recAnyOuts;
+        }
+    }
+
+    // clear buffer
+    pBufsIFaces.clear();
+
+    // complete anyOutsides with data from other processors
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            forAll(anyOutsidesCmpl[proci], rCell)
+            {
+                bool anyOutside = anyOutsidesCmpl[proci][rCell];
+                label cCell = procCellsToCheck()[proci][rCell];
+                if (anyOutside)
+                {
+                    anyOutsides[cCell] = true;
+                }
+            }
+        }
+    }
+
+    // sort cells in surface and internal cells
+    DynamicLabelList potentSurfCells(foundCells.size()/2);
+    forAll(foundCells, cellI)
+    {
+        label cCell = foundCells[cellI];
+
+        if(anyOutsides[cellI])
+        {
             potentSurfCells.append(cCell);
         }
-
+        else
+        {
+            intCells_[Pstream::myProcNo()].append(cCell);
+            ibPartialVolume_[Pstream::myProcNo()] += 1;
+            body[cCell] = 1.0;
+        }
     }
 
     return potentSurfCells;
