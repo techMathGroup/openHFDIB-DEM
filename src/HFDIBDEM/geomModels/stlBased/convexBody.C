@@ -48,22 +48,24 @@ void convexBody::createImmersedBody
     // find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;
 
+    label nextSize = 1;
     if(!isBBoxInMesh())
     {
-        return;
+        nextSize = 0;
     }
 
     label cellInIB = getCellInBody(octreeField);
+
     if(cellInIB == -1)
     {
-        return;
+        nextSize = 0;
     }
 
     // get the list of cell centroids
     const pointField& cp = mesh_.C();
 
     autoPtr<DynamicLabelList> nextToCheck(
-        new DynamicLabelList(1,cellInIB));
+        new DynamicLabelList(nextSize,cellInIB));
     autoPtr<DynamicLabelList> auxToCheck(
         new DynamicLabelList);
     autoPtr<List<DynamicLabelList>> neighboursToSend(
@@ -99,9 +101,7 @@ void convexBody::createImmersedBody
     HashTable<bool, label, Hash<label>> cellInside(tableSize);
 
     label iterCount(0);label iterMax(mesh_.nCells());
-    label nextSize = nextToCheck().size();
     reduce(nextSize, maxOp<label>());
-
     while (nextSize > 0 and iterCount++ < iterMax)
     {
         // clear neighbors found in previous iteration
