@@ -158,7 +158,8 @@ void lineIntInfo::setIntpInfo()
                 intPointsToSend,
                 ibPointsRecv,
                 ibNormalsRecv,
-                intPointsRecv);
+                intPointsRecv
+            );
 
         // clear lists
         for (label proci = 0; proci < Pstream::nProcs(); proci++)
