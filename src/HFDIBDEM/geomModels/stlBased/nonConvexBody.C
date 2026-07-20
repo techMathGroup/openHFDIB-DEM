@@ -96,10 +96,28 @@ void nonConvexBody::createImmersedBody
     octreeField *= 0;
     List<DynamicLabelList> bBoxCells(Pstream::nProcs());
 
+    // prepare for sending
+    autoPtr<List<DynamicLabelList>> neighboursToSend(
+        new List<DynamicLabelList>(Pstream::nProcs()));
+
+    // get number of empty directions
+    label nEmpty(0);
+    forAll(mesh_.boundaryMesh(), patchI)
+    {
+        const polyPatch& cPatch = mesh_.boundaryMesh()[patchI];
+        if (cPatch.type() == "empty")
+        {
+            nEmpty += 1;
+        }
+    }
+
     bool isInsideBB(false);
     labelList nextToCheck(1,0);
     label iterCount(0);label iterMax(mesh_.nCells());
-    while ((nextToCheck.size() > 0 or not isInsideBB) && iterCount < iterMax)
+
+    label nextSize = nextToCheck.size();
+    reduce(nextSize, maxOp<label>());
+    while ((nextSize > 0 or not isInsideBB) && iterCount < iterMax)
     {
         iterCount++;
         DynamicLabelList auxToCheck;
@@ -116,8 +134,129 @@ void nonConvexBody::createImmersedBody
                     octreeField
                 )
             );
+
+            if (!isInsideBB)
+            {
+                continue;
+            }
+
+            // get cell label
+            label cCell = nextToCheck[cellToCheck];
+
+            // if number of neighbours equals number of faces, skip processors 
+            label nProcFaces = mesh_.cells()[cCell].size() - mesh_.cellCells()[cCell].size();
+            nProcFaces -= nEmpty;
+            if(nProcFaces == 0)
+            {
+                continue;
+            }
+
+            // add processor neighbors
+            DynamicList<labelList> procFaces;
+            forAll(mesh_.cells()[cCell], fI)
+            {
+                // get face label
+                label faceI = mesh_.cells()[cCell][fI];
+
+                // check if face is a processor face
+                if(!mesh_.isInternalFace(faceI))
+                {
+                    // get the patch the face belongs to
+                    label facePatchI(mesh_.boundaryMesh().whichPatch(faceI));
+                    const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchI];
+
+                    // check if it is a processor boundary
+                    if (cPatch.type() == "processor")
+                    {
+                        // get the processor patch
+                        const processorPolyPatch& procPatch
+                            = refCast<const processorPolyPatch>(cPatch);
+
+                        // get the neighboring processor id
+                        label iProc = (Pstream::myProcNo() == procPatch.myProcNo())
+                            ? procPatch.neighbProcNo() : procPatch.myProcNo();
+
+                        // get local face value
+                        label iFace = cPatch.whichFace(faceI);
+
+                        // save to send
+                        procFaces.append({iProc, iFace});
+                        neighboursToSend()[iProc].append(iFace);
+                    }
+                }
+            }
         }
+
+        // send processor neighbors to add to next to check 
+        PstreamBuffers pBufsIFaces(Pstream::commsTypes::nonBlocking);
+        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+        {
+            if(proci != Pstream::myProcNo())
+            {
+                UOPstream sendIFaces(proci, pBufsIFaces);
+                sendIFaces << neighboursToSend()[proci];
+                neighboursToSend()[proci].clear();
+            }
+        }
+
+        pBufsIFaces.finishedSends();
+
+        // recieve and add to aux to check
+        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+        {
+            if (proci != Pstream::myProcNo())
+            {
+                UIPstream recvIFaces(proci, pBufsIFaces);
+                DynamicList<label> recIFaces (recvIFaces);
+
+                // find cells for faces
+                forAll(recIFaces, rFace)
+                {
+                    // get the cell label
+                    label faceI = recIFaces[rFace]; // local face labels
+
+                    // find the respective cell 
+                    forAll(mesh_.boundaryMesh(), patchI)
+                    {
+                        if (isA<processorPolyPatch>(mesh_.boundaryMesh()[patchI]))
+                        {
+                            const processorPolyPatch& procPatch
+                                = refCast<const processorPolyPatch>(mesh_.boundaryMesh()[patchI]);
+
+                            // get the neighboring processor id
+                            label iProc = (Pstream::myProcNo() == procPatch.myProcNo())
+                                ? procPatch.neighbProcNo() : procPatch.myProcNo();
+
+                            if (iProc == proci)
+                            {
+                                // get the cell label
+                                label rCellI = mesh_.boundaryMesh()[patchI].faceCells()[faceI];
+                                auxToCheck.append(
+                                    getBBoxCellsByOctTree(
+                                        rCellI,
+                                        isInsideBB,
+                                        expMinBBox,
+                                        expMaxBBox,
+                                        bBoxCells,
+                                        octreeField
+                                    )
+                                );
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        // clear buffer
+        pBufsIFaces.clear();
+
+        // next iteration
         nextToCheck = auxToCheck;
+
+        // check if all processors finished 
+        nextSize = nextToCheck.size();
+        reduce(nextSize, maxOp<label>());
     }
 
     // get cell centers inside the body bounding box
