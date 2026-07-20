@@ -227,7 +227,7 @@ void stlBased::getClosestPointAndNormal
     }
     else
     {
-        InfoH << basic_Info << "Missing the closest point!" << endl;
+        InfoH << basic_Info << "triSurfSearch: Missing the closest point on stl surface" << endl;
         normal = startPoint - getCoM();
         closestPoint = getCoM();
     }
