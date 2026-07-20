@@ -203,6 +203,36 @@ void stlBased::synchronPos(label owner)
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
 }
 //---------------------------------------------------------------------------//
+void stlBased::getClosestPointAndNormal
+(
+    const point& startPoint,
+    const vector& span,
+    point& closestPoint,
+    vector& normal
+)
+{
+    // get nearest point on surface from contact center
+    pointIndexHit ibPointIndexHit = triSurfSearch_().nearest(startPoint, span);
+    List<pointIndexHit> ibPointIndexHitList(1,ibPointIndexHit);
+    vectorField normalVectorField;
+
+    // get contact normal direction
+    const triSurfaceMesh& ibTempMesh( bodySurfMesh_);
+    ibTempMesh.getNormal(ibPointIndexHitList,normalVectorField);
+
+    if(ibPointIndexHit.hit())
+    {
+        normal = normalVectorField[0];
+        closestPoint = ibPointIndexHit.hitPoint();
+    }
+    else
+    {
+        InfoH << basic_Info << "Missing the closest point!" << endl;
+        normal = startPoint - getCoM();
+        closestPoint = getCoM();
+    }
+}
+//---------------------------------------------------------------------------//
 volumeType stlBased::getVolumeType(subVolume& sv, bool cIb)
 {
     auto& info = sv.getVolumeInfo(cIb);

@@ -183,29 +183,7 @@ namespace Foam
             const vector& span,
             point& closestPoint,
             vector& normal
-        ) final override
-        {
-            // get nearest point on surface from contact center
-            pointIndexHit ibPointIndexHit = triSurfSearch_().nearest(startPoint, span);
-            List<pointIndexHit> ibPointIndexHitList(1,ibPointIndexHit);
-            vectorField normalVectorField;
-
-            // get contact normal direction
-            const triSurfaceMesh& ibTempMesh( bodySurfMesh_);
-            ibTempMesh.getNormal(ibPointIndexHitList,normalVectorField);
-
-            if(ibPointIndexHit.hit())
-            {
-                normal = normalVectorField[0];
-                closestPoint = ibPointIndexHit.hitPoint();
-            }
-            else
-            {
-                InfoH << basic_Info << "Missing the closest point!" << endl;
-                normal = startPoint - getCoM();
-                closestPoint = getCoM();
-            }
-        }
+        ) final override;
 
         bool limitFinalSubVolume
         (
