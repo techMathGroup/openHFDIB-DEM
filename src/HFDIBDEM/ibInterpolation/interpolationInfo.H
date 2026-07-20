@@ -77,10 +77,10 @@ namespace Foam
 
         List<point>& getIbPoints()
         {
-            if(ibPointsPtr_->empty())
-            {
-                setIntpInfo();
-            }
+            //~ if(ibPointsPtr_->empty())
+            //~ {
+            //~     setIntpInfo();
+            //~ }
             return ibPointsPtr_();
         }
 
