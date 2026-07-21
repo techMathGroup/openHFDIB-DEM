@@ -151,9 +151,6 @@ namespace Foam
             volVectorField& f
         );
 
-        // update fluid-solid coupling
-        List<DynamicLabelList> haloCells_; 
-        
         void updateCoupling
         (
             volScalarField& body,
@@ -164,7 +161,39 @@ namespace Foam
         void updateCoupling
         (
             volScalarField& body,
+            volVectorField& fPress,
+            volVectorField& fVisc,
+            const bool applyAddedMass
+        );
+
+        void updateCoupling
+        (
+            volScalarField& body,
             volVectorField& f
+        );
+
+        void updateCoupling
+        (
+            volScalarField& body,
+            volVectorField& f,
+            const bool applyAddedMass
+        );
+
+        void updateCoupling
+        (
+            volScalarField& body,
+            volVectorField& f,
+            volScalarField& rho,
+            const bool applyAddedMass
+        );
+
+        void resetPostPimpleState();
+
+        void applyAddedMassScaling
+        (
+            const vector& FV,
+            const vector& FAdded,
+            const bool applyAddedMass
         );
 
         // auxiliary octree variables
@@ -205,7 +234,6 @@ namespace Foam
             List<labelList>& cellPoints
         );
 
-        // Destructors -------------------------------------------------
         ~immersedBody();
 
         // Public methods ----------------------------------------------
@@ -270,16 +298,6 @@ namespace Foam
             volScalarField& refineF,
             DynamicLabelList cellsToIterate,
             DynamicLabelList startLevel
-        );
-        
-        void updateHaloCells
-        (
-            volVectorField& gradBody
-        );
-        void updateHaloCells
-        (
-            volVectorField& gradBody,
-            volScalarField& body
         );
         
         void resetCouplingHistory()
@@ -402,7 +420,30 @@ namespace Foam
         void postPimpleUpdateImmersedBody
         (
             volScalarField& body,
+            volVectorField& fPress,
+            volVectorField& fVisc,
+            const bool applyAddedMass
+        );
+
+        void postPimpleUpdateImmersedBody
+        (
+            volScalarField& body,
             volVectorField& f
+        );
+
+        void postPimpleUpdateImmersedBody
+        (
+            volScalarField& body,
+            volVectorField& f,
+            const bool applyAddedMass
+        );
+
+        void postPimpleUpdateImmersedBody
+        (
+            volScalarField& body,
+            volVectorField& f,
+            volScalarField& rho,
+            const bool applyAddedMass
         );
 
         // compute the mean and maximal body courant number (based on
@@ -559,11 +600,6 @@ namespace Foam
         }
 
         vectorField getUatIbPoints();
-        
-        const List<DynamicLabelList>& getHaloCells() const
-        {
-            return haloCells_;
-        }
     };
 }
 #endif

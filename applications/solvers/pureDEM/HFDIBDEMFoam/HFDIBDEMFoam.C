@@ -120,7 +120,7 @@ int main(int argc, char *argv[])
 
         // clockTime postUpdateBodiesTime;
         volVectorField gradLambda(fvc::grad(lambda));
-        HFDIBDEM.postUpdateBodies(lambda,gradLambda,f,f);               //MI: here, we should clean up interfaces
+        HFDIBDEM.postUpdateBodies(lambda,f,f);                          //MI: here, we should clean up interfaces
         // postUpdateTime_ += postUpdateBodiesTime.timeIncrement();
 
         // clockTime addRemoveTime;

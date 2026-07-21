@@ -129,6 +129,18 @@ int main(int argc, char *argv[])
         // HFDIBDEM.updateBodiesRhoF(alpha1,lambda,rho1.value(),rho2.value());
         HFDIBDEM.preUpdateBodies(lambda);
 
+        // --- construct surface field where the momentum source should
+        //     be switched on
+        forAll(surface, sI)
+        {
+            if (lambda[sI] > thrSurf)
+                surface[sI] = 1;
+            else
+                surface[sI] = 0;
+        }
+        surface.correctBoundaryConditions();
+        f *= surface;
+
         // --- Pressure-velocity PIMPLE corrector loop
         while (pimple.loop())
         {
@@ -177,6 +189,21 @@ int main(int argc, char *argv[])
                     {
                         #include "meshCourantNo.H"
                     }
+
+                    lambda *= 0.0;
+
+                    HFDIBDEM.recreateBodies(lambda,refineF);
+                    
+                    volVectorField gradLambda(fvc::grad(lambda));                    
+                    forAll(surface, sI)
+                    {
+                        if (lambda[sI] > thrSurf)
+                            surface[sI] = 1;
+                        else
+                            surface[sI] = 0;
+                    }
+                    gradLambda.correctBoundaryConditions();
+                    surface.correctBoundaryConditions();
                 }
             }
 
@@ -204,24 +231,29 @@ int main(int argc, char *argv[])
             }
         }
         // hfdib-dem code modification
+        // --- store previous iterations for added mass
+        fDragPress.storePrevIter();
+        fDragVisc.storePrevIter();
         // --- compute viscous forces and update coupling
-        // volVectorField gradLambda(fvc::grad(lambda));        
-        // fDragPress = -gradLambda*p;
+        volVectorField gradLambda(fvc::grad(lambda));        
+        fDragPress = -gradLambda*p;
         
-        // volTensorField gradU = fvc::grad(U);
-        // volTensorField tau = -mixture.mu()*(gradU + gradU.T());
-        // fDragVisc = -gradLambda & tau;
+        volTensorField gradU = fvc::grad(U);
+        volTensorField tau = -mixture.mu()*(gradU + gradU.T());
+        fDragVisc = -gradLambda & tau;
         
-        // for (label pass=0; pass<=fDragSmoothingIter; pass++)
-        // {
-        //     fDragPress = fvc::average(fvc::interpolate(fDragPress));
-        //     fDragVisc  = fvc::average(fvc::interpolate(fDragVisc));
-        //     fDragPress.correctBoundaryConditions();
-        //     fDragVisc.correctBoundaryConditions();
-        // }
+        for (label pass=0; pass<=fDragSmoothingIter; pass++)
+        {
+            fDragPress = fvc::average(fvc::interpolate(fDragPress));
+            fDragVisc  = fvc::average(fvc::interpolate(fDragVisc));
+            fDragPress.correctBoundaryConditions();
+            fDragVisc.correctBoundaryConditions();
+        }
         
-        // HFDIBDEM.postUpdateBodies(lambda,gradLambda,fDragPress,fDragVisc);
-        HFDIBDEM.postUpdateBodies(lambda,f);
+        HFDIBDEM.postUpdateBodies(lambda,fDragPress,fDragVisc,true);
+        // HFDIBDEM.postUpdateBodies(lambda,fDragPress,fDragVisc,false);
+        // HFDIBDEM.postUpdateBodies(lambda,f,rho,true);
+        // HFDIBDEM.postUpdateBodies(lambda,f,rho,false);
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
         HFDIBDEM.updateBodiesRhoF(rho);
         // HFDIBDEM.updateBodiesRhoF(alpha1,lambda,rho1.value(),rho2.value());

@@ -29,13 +29,16 @@ const volVectorField neg_gradP_rgh(
     )
 );
 
+// float-stepper test implementation
+f.storePrevIter();
+
 f = surface*(UEqn.A()*Ui - UEqn.H() - neg_gradP_rgh);
 //~ f = surface*(UEqn.A()*Ui - UEqn.H() + fvc::grad(p));
 f.correctBoundaryConditions();  
 
 if (pimple.momentumPredictor())
 {
-    for (int i = 0; i < fDirectForcingIter; i++)
+    for (label i = 0; i < fDirectForcingIter; ++i)
     {
         if (max(mag(surface*(Ui - U))).value() < tolUEqn)
         {
@@ -49,8 +52,8 @@ if (pimple.momentumPredictor())
         fvOptions.correct(U);
 
         HFDIBDEM.interpolateIB(U,Ui,lambda);
-
         Ui.correctBoundaryConditions();
+
         // f += 0.8*surface*rho*(Ui - U)/runTime.deltaT(); 
         f = surface*(UEqn.A()*Ui - UEqn.H() - neg_gradP_rgh);
         f.correctBoundaryConditions(); 

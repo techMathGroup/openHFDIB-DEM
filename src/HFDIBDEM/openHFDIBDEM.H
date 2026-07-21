@@ -159,7 +159,6 @@ namespace Foam
     void postUpdateBodies
     (
         volScalarField& body,
-        volVectorField& gradBody,
         volVectorField& fPress,
         volVectorField& fVisc
     );
@@ -167,7 +166,30 @@ namespace Foam
     void postUpdateBodies
     (
         volScalarField& body,
+        volVectorField& fPress,
+        volVectorField& fVisc,
+        const bool applyAddedMass
+    );
+
+    void postUpdateBodies
+    (
+        volScalarField& body,
         volVectorField& f
+    );
+
+    void postUpdateBodies
+    (
+        volScalarField& body,
+        volVectorField& f,
+        const bool applyAddedMass
+    );
+
+    void postUpdateBodies
+    (
+        volScalarField& body,
+        volVectorField& f,
+        volScalarField& rho,
+        const bool applyAddedMass
     );
 
     void updateFSCoupling
