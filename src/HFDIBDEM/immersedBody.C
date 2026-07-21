@@ -272,34 +272,44 @@ void immersedBody::constructRefineField
     DynamicLabelList cellsToIterateC;
     DynamicLabelList cellsToIterateF;
 
-    List<DynamicLabelList> cellsToSendToProcs;
-    cellsToSendToProcs.setSize(Pstream::nProcs());
-    List<DynamicLabelList> cellsToSendToProcsLevel;
-    cellsToSendToProcsLevel.setSize(Pstream::nProcs());
+    List<DynamicLabelList> facesToSendToProcs;
+    facesToSendToProcs.setSize(Pstream::nProcs());
 
     for(label i = 0; i < refineBuffers_; i++)
     {
+        // filter only cells with current level
         forAll(cellsToIterate, cellI)
         {
             if(startLevel[cellI] == i)
+            {
                 cellsToIterateC.append(cellsToIterate[cellI]);
+                refineF[cellsToIterate[cellI]] = 1;
+            }
         }
 
+        // iterate over cells with current level and search for neighbors
         forAll(cellsToIterateC, cellI)
         {
+            // get cell faces
             labelList cellFaces(mesh_.cells()[cellsToIterateC[cellI]]);
             forAll(cellFaces, faceI)
             {
+                // for internal faces assign next level to neighbors and save
                 if (mesh_.isInternalFace(cellFaces[faceI]))
                 {
+                    // get cell label
                     label nCell(mesh_.owner()[cellFaces[faceI]]);
+
+                    // switch from owner to neighbor if needed
                     if(nCell == cellsToIterateC[cellI])
                     {
                         nCell = mesh_.neighbour()[cellFaces[faceI]];
                     }
 
+                    // if not included already
                     if(refineF[nCell] == 0)
                     {
+                        // in futher iterations add only cells outside of body
                         if(i > 0)
                         {
                             if(body[nCell] < SMALL)
@@ -308,6 +318,8 @@ void immersedBody::constructRefineField
                                 cellsToIterateF.append(nCell);
                             }
                         }
+
+                        // in first iteration add any neighbor
                         else
                         {
                             refineF[nCell] = 1;
@@ -315,6 +327,8 @@ void immersedBody::constructRefineField
                         }
                     }
                 }
+
+                // check for processor neighbors
                 else
                 {
                     label facePatchId(mesh_.boundaryMesh().whichPatch(
@@ -328,161 +342,110 @@ void immersedBody::constructRefineField
                             refCast<const processorPolyPatch>(cPatch);
                         if (procPatch.myProcNo() == Pstream::myProcNo())
                         {
-                            cellsToSendToProcs[procPatch.neighbProcNo()].append(
+                            // send patch local face id
+                            facesToSendToProcs[procPatch.neighbProcNo()].append(
                                 cPatch.whichFace(cellFaces[faceI])
                             );
-                            cellsToSendToProcsLevel[procPatch.neighbProcNo()]
-                                .append(i+1);
                         }
                         else
                         {
-                            cellsToSendToProcs[procPatch.myProcNo()].append(
+                            facesToSendToProcs[procPatch.myProcNo()].append(
                                 cPatch.whichFace(cellFaces[faceI])
                             );
-                            cellsToSendToProcsLevel[procPatch.myProcNo()]
-                                .append(i+1);
                         }
                     }
                 }
             }
         }
+
+        // send faces to other procs 
+        PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
+        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+        {
+            if (proci != Pstream::myProcNo())
+            {
+                UOPstream send(proci, pBufs);
+                send << facesToSendToProcs[proci];
+                facesToSendToProcs[proci].clear();
+            }
+        }
+        pBufs.finishedSends();
+
+        // recieve faces from other procs
+        List<DynamicLabelList> facesReceivedFromProcs(Pstream::nProcs());
+        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+        {
+            if (proci != Pstream::myProcNo())
+            {
+                UIPstream recv(proci, pBufs);
+                DynamicLabelList recList (recv);
+                facesReceivedFromProcs[proci] = recList;
+            }
+        }
+        pBufs.clear();
+
+        // convert to cell labels
+        List<DynamicLabelList> cellLabelRecv(Pstream::nProcs());
+        forAll (mesh_.boundaryMesh(), patchi)
+        {
+            const polyPatch& cPatch = mesh_.boundaryMesh()[patchi];
+            if (cPatch.type() == "processor")
+            {
+                const processorPolyPatch& procPatch
+                    = refCast<const processorPolyPatch>(cPatch);
+
+                label sProc = (Pstream::myProcNo() == procPatch.myProcNo())
+                    ? procPatch.neighbProcNo() : procPatch.myProcNo();
+
+                cellLabelRecv[sProc].setSize(facesReceivedFromProcs[sProc].size());
+                forAll(facesReceivedFromProcs[sProc], faceI)
+                {
+                    cellLabelRecv[sProc][faceI]
+                        = mesh_.faceOwner()[cPatch.start()
+                        + facesReceivedFromProcs[sProc][faceI]];
+                }
+            }
+        }
+
+        forAll(cellLabelRecv, proci)
+        {
+            if (proci == Pstream::myProcNo())
+            {
+                continue;
+            }
+
+            // loop over received cells
+            forAll(cellLabelRecv[proci], cellI)
+            {
+                // get cell label
+                label nCell(cellLabelRecv[proci][cellI]);
+
+                // if not included already
+                if(refineF[nCell] == 0)
+                {
+                    // in futher iterations add only cells outside of body
+                    if(i > 0)
+                    {
+                        if(body[nCell] < SMALL)
+                        {
+                            refineF[nCell] = 1;
+                            cellsToIterateF.append(nCell);
+                        }
+                    }
+
+                    // in first iteration add any neighbor
+                    else
+                    {
+                        refineF[nCell] = 1;
+                        cellsToIterateF.append(nCell);
+                    }
+                }
+            }
+        }
+
+        // prepare for next iteration
         cellsToIterateC = cellsToIterateF;
         cellsToIterateF.clear();
-    }
-
-    List<DynamicLabelList> facesReceivedFromProcs;
-    List<DynamicLabelList> cellsReceivedFromProcsLevel;
-
-    // send points that are not on this proc to other proc
-    PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
-    for (label proci = 0; proci < Pstream::nProcs(); proci++)
-    {
-        if (proci != Pstream::myProcNo())
-        {
-            UOPstream send(proci, pBufs);
-            send << cellsToSendToProcs[proci];
-        }
-    }
-    pBufs.finishedSends();
-    // recieve points from other procs
-    for (label proci = 0; proci < Pstream::nProcs(); proci++)
-    {
-        if (proci != Pstream::myProcNo())
-        {
-            UIPstream recv(proci, pBufs);
-            DynamicLabelList recList (recv);
-            facesReceivedFromProcs.append(recList);
-        }
-        else
-        {
-            DynamicLabelList recList;
-            facesReceivedFromProcs.append(recList);
-        }
-    }
-    pBufs.clear();
-
-    for (label proci = 0; proci < Pstream::nProcs(); proci++)
-    {
-        if (proci != Pstream::myProcNo())
-        {
-
-            UOPstream send(proci, pBufs);
-            send << cellsToSendToProcsLevel[proci];
-        }
-    }
-    pBufs.finishedSends();
-
-    // recieve points from other procs
-    for (label proci = 0; proci < Pstream::nProcs(); proci++)
-    {
-        if (proci != Pstream::myProcNo())
-        {
-            UIPstream recv(proci, pBufs);
-            DynamicLabelList recList (recv);
-            cellsReceivedFromProcsLevel.append(recList);
-        }
-        else
-        {
-            DynamicLabelList recList;
-            cellsReceivedFromProcsLevel.append(recList);
-        }
-    }
-    pBufs.clear();
-
-
-    DynamicLabelList newCellsToIterate;
-    DynamicLabelList newCellsToIterateStartLevel;
-
-    // check if some point from other proc is on this processor
-    for (label otherProci = 0;
-        otherProci < facesReceivedFromProcs.size();
-        otherProci++
-    )
-    {
-        for (label faceI = 0;
-            faceI < facesReceivedFromProcs[otherProci].size();
-            faceI++
-        )
-        {
-            label cellProcI(0);
-            forAll (mesh_.boundaryMesh(), patchi)
-            {
-                const polyPatch& cPatch = mesh_.boundaryMesh()[patchi];
-                if (cPatch.type() == "processor")
-                {
-                    const processorPolyPatch& procPatch =
-                        refCast<const processorPolyPatch>(cPatch);
-
-                    if (procPatch.myProcNo() == Pstream::myProcNo()
-                        && procPatch.neighbProcNo() == otherProci)
-                    {
-                        cellProcI = mesh_.faceOwner()[cPatch.start()
-                            + facesReceivedFromProcs[otherProci][faceI]];
-                        if(refineF[cellProcI] == 0)
-                        {
-                            newCellsToIterate.append(cellProcI);
-                            newCellsToIterateStartLevel.append(
-                                cellsReceivedFromProcsLevel[otherProci][faceI]
-                            );
-                        }
-                        break;
-                    }
-                    else if (procPatch.myProcNo() == otherProci
-                        && procPatch.neighbProcNo() == Pstream::myProcNo())
-                    {
-                        cellProcI = mesh_.faceOwner()[cPatch.start()
-                            + facesReceivedFromProcs[otherProci][faceI]];
-                        if(refineF[cellProcI] == 0)
-                        {
-                            newCellsToIterate.append(cellProcI);
-                            newCellsToIterateStartLevel.append(
-                                cellsReceivedFromProcsLevel[otherProci][faceI]
-                            );
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-    }
-
-    bool contBool(false);
-    if(newCellsToIterate.size() > 0)
-    {
-        contBool = true;
-    }
-
-    reduce(contBool, orOp<bool>());
-
-    if(contBool)
-    {
-        constructRefineField
-        (
-            body,
-            refineF,
-            newCellsToIterate,
-            newCellsToIterateStartLevel
-        );
     }
 }
 //---------------------------------------------------------------------------//
