@@ -128,7 +128,9 @@ void lineIntInfo::setIntpInfo()
                 // check for cells at domain boundary
                 if (nIntPoint.iProc_ == -1)
                 {
-                    intPoints[cIntPoint.oLabel_][i].last_ = true;
+                    // pass to next interpolation point, keeping default iProc_ at -1
+                    // iProc_ check by getIntOrder function
+                    continue;
                 }
 
                 // check if to send or keep
