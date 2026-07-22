@@ -580,8 +580,9 @@ namespace Foam
         }
         
         // function to update the average fluid density on the body
-        void updateRhoF(volScalarField& rho);
         void updateRhoF(scalar rho);
+        void updateRhoF(volScalarField& rho);
+        void updateRhoF(volScalarField& rho, volScalarField& body);
         void updateRhoF
         (
             volScalarField& alpha,

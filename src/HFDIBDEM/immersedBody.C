@@ -595,49 +595,6 @@ void immersedBody::updateCoupling
     Info << "======= COUPLING COEF IS: " << couplingHistCoef_ << endl;
 }
 //---------------------------------------------------------------------------//
-void immersedBody::applyAddedMassScaling
-(
-    const vector& FV,
-    const vector& FAdded,
-    const bool applyAddedMass
-)
-{
-    if (!applyAddedMass)
-    {
-        return;
-    }
-
-    const scalar massSign = ((FV & FAdded) < 0.0) ? -1.0 : 1.0;
-    const scalar massAdded = massSign*mag(FAdded)/(mag(a_) + SMALL);
-    InfoH << iB_Info << "-- body: " << bodyId_ << " massAdded: " << massAdded
-        << " m0: " << geomModel_->getM0() << endl;
-    const scalar m0 = geomModel_->getM0();
-    InfoH << iB_Info << "-- body: " << bodyId_ << " orig coupling force: " << FCoupling_.F << " orig coupling torque: " << FCoupling_.T << endl;
-    if ((m0 + massAdded) > SMALL)
-    {
-        const scalar scale = m0/(m0 + massAdded);
-        FCoupling_.F /= scale;
-        FCoupling_.T /= scale;
-    }
-    InfoH << iB_Info << "-- body: " << bodyId_ << " scld coupling force: " << FCoupling_.F << " scld coupling torque: " << FCoupling_.T << endl;
-}
-//---------------------------------------------------------------------------//
-void immersedBody::resetPostPimpleState()
-{
-    Vel_ = VelOld_;
-    Axis_ = AxisOld_;
-    omega_ = omegaOld_;
-    FCouplingOld_ = FCoupling_;
-}
-void immersedBody::updateCoupling
-(
-    volScalarField& body,
-    volVectorField& f
-)
-{
-    updateCoupling(body, f, false);
-}
-//---------------------------------------------------------------------------//
 void immersedBody::updateCoupling
 (
     volScalarField& body,
@@ -697,24 +654,13 @@ void immersedBody::updateCoupling
     TA *= rhoF_.value();
     FAdded *= rhoF_.value();
 
-    FCoupling_ = forces(FV, TA);
+    FCoupling_ = couplingHistCoef_*forces(FV, TA) + (1.0-couplingHistCoef_)*FCouplingOld_;
 
-    if (applyAddedMass)
-    {
-        const scalar massSign = ((FV & FAdded) < 0.0) ? -1.0 : 1.0;
-        const scalar massAdded = massSign*mag(FAdded)/(mag(a_) + SMALL);
-        InfoH << iB_Info << "-- body: " << bodyId_ << " massAdded: " << massAdded
-            << " m0: " << geomModel_->getM0() << endl;
-        const scalar m0 = geomModel_->getM0();
-        InfoH << iB_Info << "-- body: " << bodyId_ << " orig coupling force: " << FCoupling_.F << " orig coupling torque: " << FCoupling_.T << endl;
-        if (m0 > SMALL)
-        {
-            const scalar scale = m0/(m0 + massAdded);
-            FCoupling_.F /= scale;
-            FCoupling_.T /= scale;
-        }
-        InfoH << iB_Info << "-- body: " << bodyId_ << " scld coupling force: " << FCoupling_.F << " scld coupling torque: " << FCoupling_.T << endl;
-    }
+    applyAddedMassScaling(FV, FAdded, applyAddedMass);
+
+    couplingHistCoef_ = max(couplingHistCoef_*0.95, 0.5);
+    
+    Info << "======= COUPLING COEF IS: " << couplingHistCoef_ << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateCoupling
@@ -775,22 +721,56 @@ void immersedBody::updateCoupling
     reduce(FAdded, sumOp<vector>());
     
 
-    FCoupling_ = forces(FV, TA);
+    FCoupling_ = couplingHistCoef_*forces(FV, TA) + (1.0-couplingHistCoef_)*FCouplingOld_;
 
-    if (applyAddedMass)
+    applyAddedMassScaling(FV, FAdded, applyAddedMass);
+
+    couplingHistCoef_ = max(couplingHistCoef_*0.95, 0.5);
+    
+    Info << "======= COUPLING COEF IS: " << couplingHistCoef_ << endl;
+}
+//---------------------------------------------------------------------------//
+void immersedBody::applyAddedMassScaling
+(
+    const vector& FV,
+    const vector& FAdded,
+    const bool applyAddedMass
+)
+{
+    if (!applyAddedMass)
     {
-        const scalar massSign = ((FV & FAdded) < 0.0) ? -1.0 : 1.0;
-        const scalar massAdded = massSign*mag(FAdded)/(mag(a_) + SMALL);
-        InfoH << iB_Info << "body: " << bodyId_ << " massAdded: " << massAdded
-            << " m0: " << geomModel_->getM0() << endl;
-        const scalar m0 = geomModel_->getM0();
-        if (m0 > SMALL)
-        {
-            const scalar scale = m0/(m0 + massAdded);
-            FCoupling_.F /= scale;
-            FCoupling_.T /= scale;
-        }
+        return;
     }
+
+    const scalar massSign = ((FV & FAdded) < 0.0) ? -1.0 : 1.0;
+    const scalar massAdded = massSign*mag(FAdded)/(mag(a_) + SMALL);
+    InfoH << iB_Info << "-- body: " << bodyId_ << " massAdded: " << massAdded
+        << " m0: " << geomModel_->getM0() << endl;
+    const scalar m0 = geomModel_->getM0();
+    InfoH << iB_Info << "-- body: " << bodyId_ << " orig coupling force: " << FCoupling_.F << " orig coupling torque: " << FCoupling_.T << endl;
+    if ((m0 + massAdded) > SMALL)
+    {
+        const scalar scale = m0/(m0 + massAdded);
+        FCoupling_.F /= scale;
+        FCoupling_.T /= scale;
+    }
+    InfoH << iB_Info << "-- body: " << bodyId_ << " scld coupling force: " << FCoupling_.F << " scld coupling torque: " << FCoupling_.T << endl;
+}
+//---------------------------------------------------------------------------//
+void immersedBody::resetPostPimpleState()
+{
+    Vel_ = VelOld_;
+    Axis_ = AxisOld_;
+    omega_ = omegaOld_;
+    FCouplingOld_ = FCoupling_;
+}
+void immersedBody::updateCoupling
+(
+    volScalarField& body,
+    volVectorField& f
+)
+{
+    updateCoupling(body, f, false);
 }
 //---------------------------------------------------------------------------//
 // update movement variables of the body
@@ -1451,6 +1431,13 @@ void immersedBody::checkBodyOp()
 }
 
 //---------------------------------------------------------------------------//
+void immersedBody::updateRhoF
+(
+    scalar rho
+)
+{    
+    rhoF_ = rho;
+}
 void immersedBody::updateRhoF                                           //variant_1 for VOF
 (
     volScalarField& rho
@@ -1476,19 +1463,7 @@ void immersedBody::updateRhoF                                           //varian
     // - in this version, no correction for the presence of solid in the
     //   surface cells is taken into account
     
-    // compute the weighted average of density    
-    //~ forAll (intLists, i)
-    //~ {
-        //~ DynamicLabelList& intListI = intLists[i];
-        //~ forAll (intListI, intCell)
-        //~ {
-            //~ label cellI = intListI[intCell];
-            
-            //~ rhoFAux += rho[cellI]*mesh_.V()[cellI];
-            //~ bodyVol += mesh_.V()[cellI];
-        //~ }
-    //~ }
-    
+    // compute the weighted average of density       
     forAll (surfLists, i)
     {
         DynamicLabelList& surfListI = surfLists[i];
@@ -1514,13 +1489,6 @@ void immersedBody::updateRhoF                                           //varian
         rhoF_ = 1.0;
     }
     Info << "Body " << bodyId_ << ": rhoF = " << rhoF_ << endl;
-}
-void immersedBody::updateRhoF
-(
-    scalar rho
-)
-{    
-    rhoF_ = rho;
 }
 void immersedBody::updateRhoF                                           //variant_2 for VOF
 (
@@ -1594,7 +1562,57 @@ void immersedBody::updateRhoF                                           //varian
     {
         rhoF_ = 1.0;
     }
+    Info << "Body " << bodyId_ << ": rhoF = " << rhoF_ << endl;    
+}
+void immersedBody::updateRhoF                                           //variant_3 for VOF
+(
+    volScalarField& rho,
+    volScalarField& body
+)
+{
+    scalar fluidMass(0);
+    scalar fluidVol(0);
+    
+    List<DynamicLabelList> intLists;
+    List<DynamicLabelList> surfLists;
+    DynamicVectorList refCoMList;
+    
+    geomModel_->getReferencedLists(
+        intLists,
+        surfLists,
+        refCoMList
+    );
+    
+    // Note (MI): in this case, we do not want to take into account the
+    //            fluid composition inside the particle (frozen alpha field)
+    // - we calculate the density of the surrounding fluid only from
+    //   surface cells
+    // - weighting of the cell is done based on the fluid volume fraction
+    
+    // compute the weighted average of density        
+    forAll (surfLists, i)
+    {
+        DynamicLabelList& surfListI = surfLists[i];
+        forAll (surfListI, surfCell)
+        {
+            label cellI = surfListI[surfCell];
+            
+            fluidMass += rho[cellI] * mesh_.V()[cellI] * (1.0 - body[cellI]);;
+            fluidVol += mesh_.V()[cellI] * (1.0 - body[cellI]);
+        }
+    }
+    
+    reduce(fluidMass, sumOp<scalar>());
+    reduce(fluidVol, sumOp<scalar>());
+    
+    
+    if (fluidVol > SMALL)
+    {
+        rhoF_ = fluidMass/fluidVol;
+    }
+    else
+    {
+        rhoF_ = 1.0;
+    }
     Info << "Body " << bodyId_ << ": rhoF = " << rhoF_ << endl;
-    
-    
 }

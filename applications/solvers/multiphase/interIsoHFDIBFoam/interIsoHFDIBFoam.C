@@ -255,7 +255,8 @@ int main(int argc, char *argv[])
         // HFDIBDEM.postUpdateBodies(lambda,f,rho,true);
         // HFDIBDEM.postUpdateBodies(lambda,f,rho,false);
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
-        HFDIBDEM.updateBodiesRhoF(rho);
+        // HFDIBDEM.updateBodiesRhoF(rho);
+        HFDIBDEM.updateBodiesRhoF(rho,lambda);
         // HFDIBDEM.updateBodiesRhoF(alpha1,lambda,rho1.value(),rho2.value());
         HFDIBDEM.updateDEM(lambda,refineF);
         Info << "updated HFDIBDEM" << endl;
