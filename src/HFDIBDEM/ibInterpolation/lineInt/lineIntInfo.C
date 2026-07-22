@@ -82,8 +82,7 @@ void lineIntInfo::setIntpInfo()
             scell,
             Pstream::myProcNo(),
             Pstream::myProcNo(),
-            cellI,
-            false
+            cellI
         );
         intPoints[cellI][0] = cIntPoint;
 
@@ -209,8 +208,7 @@ void lineIntInfo::setIntpInfo()
                     cellI,
                     Pstream::myProcNo(),
                     intPointsRecv[proci][iInfo].oProc_,
-                    intPointsRecv[proci][iInfo].oLabel_,
-                    intPointsRecv[proci][iInfo].last_
+                    intPointsRecv[proci][iInfo].oLabel_
                 );
 
                 vector dir = cIntPoint.iPoint_ - ibPointsRecv[proci][iInfo];
@@ -354,8 +352,7 @@ intPoint lineIntInfo::findIntPoint
         fromP.iCell_,
         fromP.iProc_,
         fromP.oProc_,
-        fromP.oLabel_,
-        fromP.last_
+        fromP.oLabel_
     );
 
     if(fromP.iProc_ == Pstream::myProcNo())

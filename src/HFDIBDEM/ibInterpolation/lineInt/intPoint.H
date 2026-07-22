@@ -53,9 +53,6 @@ namespace Foam
         label oProc_ = -1;
         label oLabel_ = -1;
 
-        // is this point the last from origin cell
-        bool last_ = true;
-
         // velocity in interpolation point
         vector iVel_ = vector::zero;
 
@@ -65,18 +62,16 @@ namespace Foam
         iCell_(0),
         iProc_(-1),
         oProc_(-1),
-        oLabel_(-1),
-        last_(true)
+        oLabel_(-1)
         {};
 
         // Copy constructor
-        intPoint(point iPoint, label iCell, label iProc, label oProc, label oLabel, bool last):
+        intPoint(point iPoint, label iCell, label iProc, label oProc, label oLabel):
         iPoint_(iPoint),
         iCell_(iCell),
         iProc_(iProc),
         oProc_(oProc),
-        oLabel_(oLabel),
-        last_(last)
+        oLabel_(oLabel)
         {};
 
         // Destructor
@@ -90,7 +85,6 @@ namespace Foam
                    aP.iProc_ == bP.iProc_ &&
                    aP.oProc_ == bP.oProc_ &&
                    aP.oLabel_ == bP.oLabel_ &&
-                   aP.last_ == bP.last_ &&
                    aP.iVel_ == bP.iVel_;
         }
 
@@ -106,13 +100,12 @@ namespace Foam
                       << iP.iProc_ << token::SPACE
                       << iP.oProc_ << token::SPACE
                       << iP.oLabel_ << token::SPACE
-                      << iP.last_ << token::SPACE
                       << iP.iVel_;
         }
 
         friend Foam::Istream& operator>>(Foam::Istream& is, intPoint& iP)
         {
-            return is >> iP.iPoint_ >> iP.iCell_ >> iP.iProc_ >> iP.oProc_ >> iP.oLabel_ >> iP.last_ >> iP.iVel_;
+            return is >> iP.iPoint_ >> iP.iCell_ >> iP.iProc_ >> iP.oProc_ >> iP.oLabel_ >> iP.iVel_;
         }
     };
 }
