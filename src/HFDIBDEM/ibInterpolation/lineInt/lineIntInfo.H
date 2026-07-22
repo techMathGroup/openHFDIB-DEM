@@ -91,8 +91,6 @@ namespace Foam
         );
 
         // Syncing functions
-        void syncIntPoints();
-
         void sendAndRecvIntPoints
         (
             List<DynamicList<point>>& ibPointsToSend,
