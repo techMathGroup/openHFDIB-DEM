@@ -103,16 +103,16 @@ namespace Foam
 
         std::shared_ptr<geomModel> getCopy() final override
         {
-            std::shared_ptr<nonConvexBody> convexBodyModel =
+            std::shared_ptr<nonConvexBody> nonConvexBodyModel =
                 std::make_shared<nonConvexBody>(mesh_,stlPath_,thrSurf_);
 
-            convexBodyModel->initVars(bodySurfMesh_.points(), thrSurf_, intSpan_, sdBasedLambda_);
-            convexBodyModel->setRhoS(rhoS_);
-            convexBodyModel->setM0(M0_);
-            convexBodyModel->getSurfaceCellList() = surfCells_;
-            convexBodyModel->getInternalCellList() = intCells_;
+            nonConvexBodyModel->initVars(bodySurfMesh_.points(), thrSurf_, intSpan_, sdBasedLambda_);
+            nonConvexBodyModel->setRhoS(rhoS_);
+            nonConvexBodyModel->setM0(M0_);
+            nonConvexBodyModel->getSurfaceCellList() = surfCells_;
+            nonConvexBodyModel->getInternalCellList() = intCells_;
 
-            return convexBodyModel;
+            return nonConvexBodyModel;
         }
     };
 }
