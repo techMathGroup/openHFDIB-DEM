@@ -537,11 +537,13 @@ void immersedBody::updateCoupling
     // calcualate viscous force and torque
     List<DynamicLabelList> intLists;
     List<DynamicLabelList> surfLists;
+    List<DynamicLabelList> haloLists;
     DynamicVectorList refCoMList;
 
     geomModel_->getReferencedLists(
         intLists,
         surfLists,
+        haloLists,
         refCoMList
     );
 
@@ -609,11 +611,13 @@ void immersedBody::updateCoupling
 
     List<DynamicLabelList> intLists;
     List<DynamicLabelList> surfLists;
+    List<DynamicLabelList> haloLists;
     DynamicVectorList refCoMList;
 
     geomModel_->getReferencedLists(
         intLists,
         surfLists,
+        haloLists,
         refCoMList
     );
 
@@ -678,11 +682,13 @@ void immersedBody::updateCoupling
 
     List<DynamicLabelList> intLists;
     List<DynamicLabelList> surfLists;
+    List<DynamicLabelList> haloLists;
     DynamicVectorList refCoMList;
 
     geomModel_->getReferencedLists(
         intLists,
         surfLists,
+        haloLists,
         refCoMList
     );
 
@@ -1036,11 +1042,13 @@ void immersedBody::updateVectorField
 
     List<DynamicLabelList> intLists;
     List<DynamicLabelList> surfLists;
+    List<DynamicLabelList> haloLists;
     DynamicVectorList refCoMList;
 
     geomModel_->getReferencedLists(
         intLists,
         surfLists,
+        haloLists,
         refCoMList
     );
 
@@ -1448,11 +1456,13 @@ void immersedBody::updateRhoF                                           //varian
     
     List<DynamicLabelList> intLists;
     List<DynamicLabelList> surfLists;
+    List<DynamicLabelList> haloLists;
     DynamicVectorList refCoMList;
     
     geomModel_->getReferencedLists(
         intLists,
         surfLists,
+        haloLists,
         refCoMList
     );
     
@@ -1504,11 +1514,13 @@ void immersedBody::updateRhoF                                           //varian
     
     List<DynamicLabelList> intLists;
     List<DynamicLabelList> surfLists;
+    List<DynamicLabelList> haloLists;
     DynamicVectorList refCoMList;
     
     geomModel_->getReferencedLists(
         intLists,
         surfLists,
+        haloLists,
         refCoMList
     );
     
@@ -1575,11 +1587,13 @@ void immersedBody::updateRhoF                                           //varian
     
     List<DynamicLabelList> intLists;
     List<DynamicLabelList> surfLists;
+    List<DynamicLabelList> haloLists;
     DynamicVectorList refCoMList;
     
     geomModel_->getReferencedLists(
         intLists,
         surfLists,
+        haloLists,
         refCoMList
     );
     

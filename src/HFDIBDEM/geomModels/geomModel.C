@@ -61,6 +61,7 @@ rhoS_("rho",dimensionSet(1,-3,0,0,0,0,0),1.0)
 {
     surfCells_.setSize(Pstream::nProcs());
     intCells_.setSize(Pstream::nProcs());
+    haloCells_.setSize(Pstream::nProcs());
 }
 geomModel::~geomModel()
 {
@@ -167,6 +168,7 @@ void geomModel::resetBody(volScalarField& body)
 
     surfCells_[Pstream::myProcNo()].clear();
     intCells_[Pstream::myProcNo()].clear();
+    haloCells_[Pstream::myProcNo()].clear();
     }
 //---------------------------------------------------------------------------//
 bool geomModel::isBBoxInMesh()
@@ -454,6 +456,155 @@ void geomModel::correctSurfCells
 
             // clip the body field values
             body[cCell] = min(max(0.0,body[cCell]),1.0);
+        }
+    }
+}
+//---------------------------------------------------------------------------//
+void geomModel::findHaloCells
+(
+    volScalarField& body
+)
+{
+    // prepare hashtable for halo cells
+    HashTable<bool, label, Hash<label>> isHaloCell(surfCells_[Pstream::myProcNo()].size()*6);
+
+    // prepare faces to send
+    List<DynamicLabelList> facesToSendToProcs(Pstream::nProcs());
+
+    // loop over surface cells
+    forAll(surfCells_[Pstream::myProcNo()], cellI)
+    {
+        // get the cell label
+        label cCell = surfCells_[Pstream::myProcNo()][cellI];
+
+        // get cell faces
+        labelList cellFaces(mesh_.cells()[cCell]);
+        forAll(cellFaces, faceI)
+        {
+            // save internal neighbor 
+            if (mesh_.isInternalFace(cellFaces[faceI]))
+            {
+                // get cell label
+                label nCell(mesh_.owner()[cellFaces[faceI]]);
+
+                // switch from owner to neighbor if needed
+                if(nCell == cCell)
+                {
+                    nCell = mesh_.neighbour()[cellFaces[faceI]];
+                }
+                
+                // add if not already included
+                if (!isHaloCell.found(nCell))
+                {
+                    if (body[nCell] < SMALL)
+                    {
+                        isHaloCell.set(nCell, true);
+                        haloCells_[Pstream::myProcNo()].append(nCell);
+                    }
+                }
+            }
+
+            // check for processor neighbors
+            else
+            {
+                label facePatchId(mesh_.boundaryMesh().whichPatch(
+                    cellFaces[faceI]
+                ));
+
+                const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchId];
+                if (cPatch.type() == "processor")
+                {
+                    const processorPolyPatch& procPatch =
+                        refCast<const processorPolyPatch>(cPatch);
+                    if (procPatch.myProcNo() == Pstream::myProcNo())
+                    {
+                        // send patch local face id
+                        facesToSendToProcs[procPatch.neighbProcNo()].append(
+                            cPatch.whichFace(cellFaces[faceI])
+                        );
+                    }
+                    else
+                    {
+                        facesToSendToProcs[procPatch.myProcNo()].append(
+                            cPatch.whichFace(cellFaces[faceI])
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    // send faces to other procs 
+    PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            UOPstream send(proci, pBufs);
+            send << facesToSendToProcs[proci];
+            facesToSendToProcs[proci].clear();
+        }
+    }
+    pBufs.finishedSends();
+
+    // recieve faces from other procs
+    List<DynamicLabelList> facesReceivedFromProcs(Pstream::nProcs());
+    for (label proci = 0; proci < Pstream::nProcs(); proci++)
+    {
+        if (proci != Pstream::myProcNo())
+        {
+            UIPstream recv(proci, pBufs);
+            DynamicLabelList recList (recv);
+            facesReceivedFromProcs[proci] = recList;
+        }
+    }
+    pBufs.clear();
+
+    // convert to cell labels
+    List<DynamicLabelList> cellLabelRecv(Pstream::nProcs());
+    forAll (mesh_.boundaryMesh(), patchi)
+    {
+        const polyPatch& cPatch = mesh_.boundaryMesh()[patchi];
+        if (cPatch.type() == "processor")
+        {
+            const processorPolyPatch& procPatch
+                = refCast<const processorPolyPatch>(cPatch);
+
+            label sProc = (Pstream::myProcNo() == procPatch.myProcNo())
+                ? procPatch.neighbProcNo() : procPatch.myProcNo();
+
+            cellLabelRecv[sProc].setSize(facesReceivedFromProcs[sProc].size());
+            forAll(facesReceivedFromProcs[sProc], faceI)
+            {
+                cellLabelRecv[sProc][faceI]
+                    = mesh_.faceOwner()[cPatch.start()
+                    + facesReceivedFromProcs[sProc][faceI]];
+            }
+        }
+    }
+
+    // loop over recieved cells and save neighbors
+    forAll(cellLabelRecv, proci)
+    {
+        if (proci == Pstream::myProcNo())
+        {
+            continue;
+        }
+
+        // loop over received cells
+        forAll(cellLabelRecv[proci], cellI)
+        {
+            label cCell = cellLabelRecv[proci][cellI];
+
+            // add if not already included
+            if (!isHaloCell.found(cCell))
+            {
+                if (body[cCell] < SMALL)
+                {
+                    isHaloCell.set(cCell, true);
+                    haloCells_[Pstream::myProcNo()].append(cCell);
+                }
+            }
         }
     }
 }

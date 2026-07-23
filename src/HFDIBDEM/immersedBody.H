@@ -370,6 +370,11 @@ namespace Foam
             return geomModel_->getSurfaceCellList();
         };
 
+        List<DynamicLabelList>& getHaloCellList()
+        {
+            return geomModel_->getHaloCellList();
+        };
+
         List<DynamicLabelList>& getInternalCellList()
         {
             return geomModel_->getInternalCellList();
