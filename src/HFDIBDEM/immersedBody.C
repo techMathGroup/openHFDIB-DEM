@@ -1597,25 +1597,22 @@ void immersedBody::updateRhoF                                           //varian
     scalar fluidMass(0);
     scalar fluidVol(0);
     
-    List<DynamicLabelList> intLists;
-    List<DynamicLabelList> surfLists;
+    // List<DynamicLabelList> intLists;
+    // List<DynamicLabelList> surfLists;
     // List<DynamicLabelList> haloLists;
-    DynamicVectorList refCoMList;
+    // DynamicVectorList refCoMList;
     
-    geomModel_->getReferencedLists(
-        intLists,
-        surfLists,
-        // haloLists,
-        refCoMList
-    );
-
-    // const DynamicVectorList& relevantRefCoMList(
-    //     geomModel_->getRefCoMList()
+    // geomModel_->getReferencedLists(
+    //     intLists,
+    //     surfLists,
+    //     haloLists,
+    //     refCoMList
     // );
 
-    // const List<DynamicLabelList>& relevantSurfLists(
-    //     geomModel_->getHaloCellList()
-    // );
+    List<DynamicLabelList> relevantLists;
+    geomModel_->getReferencedHaloCellList(relevantLists);
+    DynamicVectorList refCoMList;
+    geomModel_->getReferencedCoMList(refCoMList);
     
     // Note (MI): in this case, we do not want to take into account the
     //            fluid composition inside the particle (frozen alpha field)
@@ -1624,13 +1621,13 @@ void immersedBody::updateRhoF                                           //varian
     // - weighting of the cell is done based on the fluid volume fraction
     
     // compute the weighted average of density        
-    forAll (surfLists, i)
+    forAll (relevantLists, i)
     {
-        DynamicLabelList& surfListI = surfLists[i];
-        forAll (surfListI, surfCell)
+        DynamicLabelList& relevantListI = relevantLists[i];
+        forAll (relevantListI, rCell)
         {
-            label cellI = surfListI[surfCell];
-            
+            label cellI = relevantListI[rCell];
+
             fluidMass += rho[cellI] * mesh_.V()[cellI] * (1.0 - body[cellI]);;
             fluidVol += mesh_.V()[cellI] * (1.0 - body[cellI]);
         }

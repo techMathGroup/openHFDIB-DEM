@@ -169,6 +169,11 @@ namespace Foam
 
         virtual std::shared_ptr<geomModel> getCopy() = 0;
 
+        virtual List<DynamicLabelList>& getInternalCellList()
+        {
+            return intCells_;
+        };
+
         virtual List<DynamicLabelList>& getSurfaceCellList()
         {
             return surfCells_;
@@ -192,9 +197,32 @@ namespace Foam
             referenceCoM.resize(1, getCoM());
         };
 
-        virtual List<DynamicLabelList>& getInternalCellList()
+        virtual void getReferencedInternalCellList(
+            List<DynamicLabelList>& intLists
+        )
         {
-            return intCells_;
+            intLists.resize(1, intCells_[Pstream::myProcNo()]);
+        };
+
+        virtual void getReferencedSurfaceCellList(
+            List<DynamicLabelList>& surfLists
+        )
+        {
+            surfLists.resize(1, surfCells_[Pstream::myProcNo()]);
+        };
+
+        virtual void getReferencedHaloCellList(
+            List<DynamicLabelList>& haloLists
+        )
+        {
+            haloLists.resize(1, haloCells_[Pstream::myProcNo()]);
+        };
+
+        virtual void getReferencedCoMList(
+            DynamicVectorList& referenceCoM
+        )
+        {
+            referenceCoM.resize(1, getCoM());
         };
 
         virtual vector addModelReturnRandomPosition(
