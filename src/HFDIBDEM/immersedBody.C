@@ -608,7 +608,7 @@ void immersedBody::updateCoupling
 
     couplingHistCoef_ = max(couplingHistCoef_*0.95, 0.5);
     
-    Info << "======= COUPLING COEF IS: " << couplingHistCoef_ << endl;
+    InfoH << iB_Info << "-- body: " << bodyId_ << ": COUPLING COEF =  " << couplingHistCoef_ << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateCoupling
@@ -687,7 +687,7 @@ void immersedBody::updateCoupling
 
     couplingHistCoef_ = max(couplingHistCoef_*0.95, 0.5);
     
-    Info << "======= COUPLING COEF IS: " << couplingHistCoef_ << endl;
+    InfoH << iB_Info << "-- body: " << bodyId_ << ": COUPLING COEF =  " << couplingHistCoef_ << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateCoupling
@@ -722,11 +722,11 @@ void immersedBody::updateCoupling
         {
             label cellI = intListI[intCell];
 
-            FV -= f[cellI]*mesh_.V()[cellI]*rho[cellI];
+            FV -= f[cellI]*mesh_.V()[cellI]/rho[cellI];
             TA -= ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])
-                *mesh_.V()[cellI]*rho[cellI];
+                *mesh_.V()[cellI]/rho[cellI];
             FAdded -= (f.prevIter()[cellI] - f[cellI])
-                *mesh_.V()[cellI]*rho[cellI];
+                *mesh_.V()[cellI]/rho[cellI];
         }
     }
 
@@ -737,17 +737,21 @@ void immersedBody::updateCoupling
         {
             label cellI = surfListI[surfCell];
 
-            FV -= f[cellI]*mesh_.V()[cellI]*rho[cellI];
+            FV -= f[cellI]*mesh_.V()[cellI]/rho[cellI];
             TA -= ((mesh_.C()[cellI] - refCoMList[i])^(body[cellI]*f[cellI]))
-                *mesh_.V()[cellI]*rho[cellI];
+                *mesh_.V()[cellI]/rho[cellI];
             FAdded -= (f.prevIter()[cellI] - f[cellI])
-                *mesh_.V()[cellI]*rho[cellI];
+                *mesh_.V()[cellI]/rho[cellI];
         }
     }
     
     reduce(FV, sumOp<vector>());
     reduce(TA, sumOp<vector>());
     reduce(FAdded, sumOp<vector>());
+
+    FV *= rhoF_.value();
+    TA *= rhoF_.value();
+    FAdded *= rhoF_.value();
     
 
     FCoupling_ = couplingHistCoef_*forces(FV, TA) + (1.0-couplingHistCoef_)*FCouplingOld_;
@@ -756,7 +760,7 @@ void immersedBody::updateCoupling
 
     couplingHistCoef_ = max(couplingHistCoef_*0.95, 0.5);
     
-    Info << "======= COUPLING COEF IS: " << couplingHistCoef_ << endl;
+    InfoH << iB_Info << "-- body: " << bodyId_ << ": COUPLING COEF =  " << couplingHistCoef_ << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::applyAddedMassScaling
@@ -775,16 +779,9 @@ void immersedBody::applyAddedMassScaling
     const scalar massSign = ((FV & FAdded) < 0.0) ? 1.0 : -1.0;
     scalar massAdded = min(1.0*m0, mag(FAdded)/(mag(a_) + SMALL));
     massAdded *= massSign;
-    // const scalar massAdded = massSign*mag(FAdded)/(mag(a_) + SMALL);
     InfoH << iB_Info << "-- body: " << bodyId_ << " massAdded: " << massAdded
         << " m0: " << m0 << endl;
     InfoH << iB_Info << "-- body: " << bodyId_ << " orig coupling force: " << FCoupling_.F << " orig coupling torque: " << FCoupling_.T << endl;
-    // if (mag(m0 + massAdded) > SMALL)
-    // {
-        // const scalar scale = m0/(m0 + massAdded);
-        // FCoupling_.F /= scale;
-        // FCoupling_.T /= scale;
-    // }
     const scalar scale = (m0 + massAdded)/m0;
     FCoupling_.F *= scale;
     FCoupling_.T *= scale;
@@ -1458,137 +1455,7 @@ void immersedBody::updateRhoF
 {    
     rhoF_ = rho;
 }
-void immersedBody::updateRhoF                                           //variant_1 for VOF
-(
-    volScalarField& rho
-)
-{
-    scalar rhoFAux(0);
-    scalar bodyVol(0);
-    
-    List<DynamicLabelList> intLists;
-    List<DynamicLabelList> surfLists;
-    List<DynamicLabelList> haloLists;
-    DynamicVectorList refCoMList;
-    
-    geomModel_->getReferencedLists(
-        intLists,
-        surfLists,
-        haloLists,
-        refCoMList
-    );
-    
-    // Note (MI): in this case, we do not want to take into account the
-    //            fluid composition inside the particle
-    // - we calculate the density of the surrounding fluid only from
-    //   surface cells
-    // - in this version, no correction for the presence of solid in the
-    //   surface cells is taken into account
-    
-    // compute the weighted average of density       
-    forAll (surfLists, i)
-    {
-        DynamicLabelList& surfListI = surfLists[i];
-        forAll (surfListI, surfCell)
-        {
-            label cellI = surfListI[surfCell];
-            
-            rhoFAux += rho[cellI]*mesh_.V()[cellI];
-            bodyVol += mesh_.V()[cellI];
-        }
-    }
-    
-    reduce(rhoFAux, sumOp<scalar>());
-    reduce(bodyVol, sumOp<scalar>());
-    
-    
-    if (bodyVol > SMALL)
-    {
-        rhoF_ = rhoFAux/bodyVol;
-    }
-    else
-    {
-        rhoF_ = 1.0;
-    }
-    Info << "Body " << bodyId_ << ": rhoF = " << rhoF_ << endl;
-}
-void immersedBody::updateRhoF                                           //variant_2 for VOF
-(
-    volScalarField& alpha,
-    volScalarField& body,
-    const scalar rho1,
-    const scalar rho2
-)
-{
-    scalar rhoFAux(0);
-    scalar bodyVol(0);
-    scalar epsFluidMin(1e-1);
-    
-    List<DynamicLabelList> intLists;
-    List<DynamicLabelList> surfLists;
-    List<DynamicLabelList> haloLists;
-    DynamicVectorList refCoMList;
-    
-    geomModel_->getReferencedLists(
-        intLists,
-        surfLists,
-        haloLists,
-        refCoMList
-    );
-    
-    // Note (MI): in this case, we do not want to take into account the
-    //            fluid composition inside the particle
-    // - we calculate the density of the surrounding fluid only from
-    //   surface cells
-    // - here, I am attempting to remove the solid volume from the alpha
-    //   field computation through a simple correction (alphaF)
-    // - this is probrably/most definitely not correct but might improve
-    //   the behavior over the variant _1
-    
-    forAll (surfLists, i)
-    {
-        DynamicLabelList& surfListI = surfLists[i];
-        forAll (surfListI, surfCell)
-        {
-            label cellI = surfListI[surfCell];
-
-            const scalar fluidFrac =
-                max(scalar(1) - body[cellI], scalar(0));
-
-            if (fluidFrac <= epsFluidMin)
-            {
-                continue;
-            }
-
-            const scalar alphaF =
-                min
-                (
-                    max(alpha[cellI]/fluidFrac, scalar(0)),
-                    scalar(1)
-                );
-
-            const scalar fluidVol = fluidFrac*mesh_.V()[cellI];
-
-            rhoFAux += (alphaF*rho1 + (1.0 - alphaF)*rho2)*fluidVol;
-            bodyVol += fluidVol;
-        }
-    }
-    
-    reduce(rhoFAux, sumOp<scalar>());
-    reduce(bodyVol, sumOp<scalar>());
-    
-    
-    if (bodyVol > SMALL)
-    {
-        rhoF_ = rhoFAux/bodyVol;
-    }
-    else
-    {
-        rhoF_ = 1.0;
-    }
-    Info << "Body " << bodyId_ << ": rhoF = " << rhoF_ << endl;    
-}
-void immersedBody::updateRhoF                                           //variant_3 for VOF
+void immersedBody::updateRhoF                                           //variant for VOF
 (
     volScalarField& rho,
     volScalarField& body
@@ -1596,18 +1463,6 @@ void immersedBody::updateRhoF                                           //varian
 {
     scalar fluidMass(0);
     scalar fluidVol(0);
-    
-    // List<DynamicLabelList> intLists;
-    // List<DynamicLabelList> surfLists;
-    // List<DynamicLabelList> haloLists;
-    // DynamicVectorList refCoMList;
-    
-    // geomModel_->getReferencedLists(
-    //     intLists,
-    //     surfLists,
-    //     haloLists,
-    //     refCoMList
-    // );
 
     List<DynamicLabelList> relevantLists;
     geomModel_->getReferencedHaloCellList(relevantLists);
@@ -1617,7 +1472,7 @@ void immersedBody::updateRhoF                                           //varian
     // Note (MI): in this case, we do not want to take into account the
     //            fluid composition inside the particle (frozen alpha field)
     // - we calculate the density of the surrounding fluid only from
-    //   surface cells
+    //   HALO cells
     // - weighting of the cell is done based on the fluid volume fraction
     
     // compute the weighted average of density        
@@ -1628,8 +1483,8 @@ void immersedBody::updateRhoF                                           //varian
         {
             label cellI = relevantListI[rCell];
 
-            fluidMass += rho[cellI] * mesh_.V()[cellI] * (1.0 - body[cellI]);;
-            fluidVol += mesh_.V()[cellI] * (1.0 - body[cellI]);
+            fluidMass += rho[cellI]*mesh_.V()[cellI]*(1.0 - body[cellI]);
+            fluidVol  += mesh_.V()[cellI]*(1.0 - body[cellI]);
         }
     }
     
@@ -1645,5 +1500,5 @@ void immersedBody::updateRhoF                                           //varian
     {
         rhoF_ = 1.0;
     }
-    Info << "Body " << bodyId_ << ": rhoF = " << rhoF_ << endl;
+    InfoH << iB_Info << "-- body: " << bodyId_ << ": rhoF = " << rhoF_ << endl;
 }

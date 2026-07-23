@@ -240,7 +240,6 @@ int main(int argc, char *argv[])
         DEMTime_ += updateDEMTime.timeIncrement();
         Info << "updated HFDIBDEM" << endl;
 
-
         runTime.write();
 
         clockTime writeBodiesInfoTime;

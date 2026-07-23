@@ -267,11 +267,6 @@ int main(int argc, char *argv[])
         // HFDIBDEM.postUpdateBodies(lambda,f,rho,true);
 
         f.storePrevIter();
-        forAll (f, cellI)
-        {
-            f[cellI] /= rho[cellI];
-        }
-        f.correctBoundaryConditions();
         HFDIBDEM.postUpdateBodies(lambda,f,rho,false);
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
         // HFDIBDEM.updateBodiesRhoF(rho);
