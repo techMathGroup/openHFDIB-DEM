@@ -248,20 +248,8 @@ namespace Foam
 
     void setSolverInfo();
     
-    void updateBodiesRhoF(scalar rho);
-    void updateBodiesRhoF(volScalarField& rho);
-    void updateBodiesRhoF(
-        volScalarField& rho,
-        volScalarField& body
-    );
-    void updateBodiesRhoF
-    (
-        volScalarField& alpha,
-        volScalarField& body,
-        const scalar rho1,
-        const scalar rho2
-    );
-
+    void updateBodiesRhoF(const scalar rho);
+    void updateBodiesRhoF(const volScalarField& rho, const volScalarField& body);
  };
 }
 

@@ -694,6 +694,16 @@ void immersedBody::updateCoupling
 (
     volScalarField& body,
     volVectorField& f,
+    volScalarField& rho
+)
+{
+    updateCoupling(body, f, rho, false);
+}
+//---------------------------------------------------------------------------//
+void immersedBody::updateCoupling
+(
+    volScalarField& body,
+    volVectorField& f,
     volScalarField& rho,
     const bool applyAddedMass
 )
@@ -722,11 +732,16 @@ void immersedBody::updateCoupling
         {
             label cellI = intListI[intCell];
 
-            FV -= f[cellI]*mesh_.V()[cellI]/rho[cellI];
+            // FV -= f[cellI]*mesh_.V()[cellI]/rho[cellI];
+            // TA -= ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])
+            //     *mesh_.V()[cellI]/rho[cellI];
+            // FAdded -= (f.prevIter()[cellI] - f[cellI])
+            //     *mesh_.V()[cellI]/rho[cellI];
+            FV -= f[cellI]*mesh_.V()[cellI];
             TA -= ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])
-                *mesh_.V()[cellI]/rho[cellI];
+                *mesh_.V()[cellI];
             FAdded -= (f.prevIter()[cellI] - f[cellI])
-                *mesh_.V()[cellI]/rho[cellI];
+                *mesh_.V()[cellI];
         }
     }
 
@@ -737,11 +752,16 @@ void immersedBody::updateCoupling
         {
             label cellI = surfListI[surfCell];
 
-            FV -= f[cellI]*mesh_.V()[cellI]/rho[cellI];
+            // FV -= f[cellI]*mesh_.V()[cellI]/rho[cellI];
+            // TA -= ((mesh_.C()[cellI] - refCoMList[i])^(body[cellI]*f[cellI]))
+            //     *mesh_.V()[cellI]/rho[cellI];
+            // FAdded -= (f.prevIter()[cellI] - f[cellI])
+            //     *mesh_.V()[cellI]/rho[cellI];
+            FV -= f[cellI]*mesh_.V()[cellI];
             TA -= ((mesh_.C()[cellI] - refCoMList[i])^(body[cellI]*f[cellI]))
-                *mesh_.V()[cellI]/rho[cellI];
+                *mesh_.V()[cellI];
             FAdded -= (f.prevIter()[cellI] - f[cellI])
-                *mesh_.V()[cellI]/rho[cellI];
+                *mesh_.V()[cellI];
         }
     }
     
@@ -749,9 +769,9 @@ void immersedBody::updateCoupling
     reduce(TA, sumOp<vector>());
     reduce(FAdded, sumOp<vector>());
 
-    FV *= rhoF_.value();
-    TA *= rhoF_.value();
-    FAdded *= rhoF_.value();
+    // FV *= rhoF_.value();
+    // TA *= rhoF_.value();
+    // FAdded *= rhoF_.value();
     
 
     FCoupling_ = couplingHistCoef_*forces(FV, TA) + (1.0-couplingHistCoef_)*FCouplingOld_;
@@ -1450,15 +1470,15 @@ void immersedBody::checkBodyOp()
 //---------------------------------------------------------------------------//
 void immersedBody::updateRhoF
 (
-    scalar rho
+    const scalar rho
 )
 {    
     rhoF_ = rho;
 }
 void immersedBody::updateRhoF                                           //variant for VOF
 (
-    volScalarField& rho,
-    volScalarField& body
+    const volScalarField& rho,
+    const volScalarField& body
 )
 {
     scalar fluidMass(0);

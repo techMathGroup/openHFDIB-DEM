@@ -21,7 +21,7 @@ Ui.correctBoundaryConditions();
 volVectorField ghf_gradRho(
     fvc::reconstruct(
         ghf*fvc::snGrad(rho) * mesh.magSf()
-    ) * (1.0 - surface) 
+    ) * (1.0 - lambda) 
 );
 ghf_gradRho.correctBoundaryConditions();
 

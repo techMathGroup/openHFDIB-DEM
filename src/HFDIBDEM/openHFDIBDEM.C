@@ -1568,14 +1568,7 @@ void openHFDIBDEM::setSolverInfo()
     solverInfo::setOnlyDEM(true);
 }
 //---------------------------------------------------------------------------//
-void openHFDIBDEM::updateBodiesRhoF(scalar rho)
-{
-    forAll (immersedBodies_,bodyId)
-    {
-        immersedBodies_[bodyId].updateRhoF(rho);
-    }
-}
-void openHFDIBDEM::updateBodiesRhoF(volScalarField& rho)
+void openHFDIBDEM::updateBodiesRhoF(const scalar rho)
 {
     forAll (immersedBodies_,bodyId)
     {
@@ -1584,25 +1577,12 @@ void openHFDIBDEM::updateBodiesRhoF(volScalarField& rho)
 }
 void openHFDIBDEM::updateBodiesRhoF
 (
-    volScalarField& rho,
-    volScalarField& body
+    const volScalarField& rho,
+    const volScalarField& body
 )
 {
     forAll (immersedBodies_,bodyId)
     {
         immersedBodies_[bodyId].updateRhoF(rho,body);
-    }
-}
-void openHFDIBDEM::updateBodiesRhoF
-(
-    volScalarField& alpha,
-    volScalarField& body,
-    const scalar rho1,
-    const scalar rho2
-)
-{
-    forAll (immersedBodies_,bodyId)
-    {
-        immersedBodies_[bodyId].updateRhoF(alpha,body,rho1,rho2);
     }
 }

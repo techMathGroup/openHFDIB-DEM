@@ -125,8 +125,7 @@ int main(int argc, char *argv[])
         
         // hfdib-dem code modification
         HFDIBDEM.createBodies(lambda,refineF);
-        HFDIBDEM.updateBodiesRhoF(rho);
-        // HFDIBDEM.updateBodiesRhoF(alpha1,lambda,rho1.value(),rho2.value());
+        HFDIBDEM.updateBodiesRhoF(rho,lambda);
         HFDIBDEM.preUpdateBodies(lambda);
 
         // --- construct surface field where the momentum source should
@@ -230,6 +229,7 @@ int main(int argc, char *argv[])
                 turbulence->correct();
             }
         }
+        
         // hfdib-dem code modification
         // --- store previous iterations for added mass
         // fDragPress.storePrevIter();

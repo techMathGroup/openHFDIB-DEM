@@ -12,8 +12,8 @@
 
     // -- correction to allow for free phase passing through solids
     // alpha1 = (1.0-lambda)*alpha1 + lambda*alpha1.prevIter();
-    alpha1 = (1.0-surface)*alpha1 + surface*alpha1.prevIter();
-    alpha1.correctBoundaryConditions();
+    // alpha1 = (1.0-surface)*alpha1 + surface*alpha1.prevIter();
+    // alpha1.correctBoundaryConditions();
 
     // Making U absolute again after advection step
     if (mesh.moving())
