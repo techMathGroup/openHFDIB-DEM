@@ -232,28 +232,47 @@ int main(int argc, char *argv[])
         }
         // hfdib-dem code modification
         // --- store previous iterations for added mass
-        fDragPress.storePrevIter();
-        fDragVisc.storePrevIter();
-        // --- compute viscous forces and update coupling
-        volVectorField gradLambda(fvc::grad(lambda));        
-        fDragPress = -gradLambda*p;
+        // fDragPress.storePrevIter();
+        // fDragVisc.storePrevIter();
+        // // --- compute viscous forces and update coupling
+        // volVectorField gradLambda(fvc::grad(lambda));        
+        // fDragPress = -gradLambda*p;
         
-        volTensorField gradU = fvc::grad(U);
-        volTensorField tau = -mixture.mu()*(gradU + gradU.T());
-        fDragVisc = -gradLambda & tau;
+        // volTensorField gradU = fvc::grad(U);
+        // volTensorField tau = -mixture.mu()*(gradU + gradU.T());
+        // fDragVisc = -gradLambda & tau;
+
+        // fDragPress.correctBoundaryConditions();
+        // fDragVisc.correctBoundaryConditions();
         
-        for (label pass=0; pass<=fDragSmoothingIter; pass++)
-        {
-            fDragPress = fvc::average(fvc::interpolate(fDragPress));
-            fDragVisc  = fvc::average(fvc::interpolate(fDragVisc));
-            fDragPress.correctBoundaryConditions();
-            fDragVisc.correctBoundaryConditions();
-        }
+        // for (label pass=0; pass<=fDragSmoothingIter; pass++)
+        // {
+        //     fDragPress = fvc::average(fvc::interpolate(fDragPress));
+        //     fDragVisc  = fvc::average(fvc::interpolate(fDragVisc));
+        //     fDragPress.correctBoundaryConditions();
+        //     fDragVisc.correctBoundaryConditions();
+        // }
+
+        // forAll (fDragPress, cellI)
+        // {
+        //     fDragPress[cellI] /= rho[cellI];
+        //     fDragVisc[cellI]  /= rho[cellI];
+        // }
+
+        // fDragPress.correctBoundaryConditions();
+        // fDragVisc.correctBoundaryConditions();
         
-        HFDIBDEM.postUpdateBodies(lambda,fDragPress,fDragVisc,true);
+        // HFDIBDEM.postUpdateBodies(lambda,fDragPress,fDragVisc,true);
         // HFDIBDEM.postUpdateBodies(lambda,fDragPress,fDragVisc,false);
         // HFDIBDEM.postUpdateBodies(lambda,f,rho,true);
-        // HFDIBDEM.postUpdateBodies(lambda,f,rho,false);
+
+        f.storePrevIter();
+        forAll (f, cellI)
+        {
+            f[cellI] /= rho[cellI];
+        }
+        f.correctBoundaryConditions();
+        HFDIBDEM.postUpdateBodies(lambda,f,rho,false);
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
         // HFDIBDEM.updateBodiesRhoF(rho);
         HFDIBDEM.updateBodiesRhoF(rho,lambda);

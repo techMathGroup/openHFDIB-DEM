@@ -234,6 +234,7 @@ namespace Foam
             List<labelList>& cellPoints
         );
 
+        // Destructors -------------------------------------------------
         ~immersedBody();
 
         // Public methods ----------------------------------------------

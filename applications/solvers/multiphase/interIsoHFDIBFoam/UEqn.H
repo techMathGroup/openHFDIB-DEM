@@ -18,16 +18,26 @@ volScalarField UA(UEqn.A());
 HFDIBDEM.interpolateIB(U,Ui,lambda);
 Ui.correctBoundaryConditions();
 
-const volVectorField neg_gradP_rgh(
+volVectorField ghf_gradRho(
+    fvc::reconstruct(
+        ghf*fvc::snGrad(rho) * mesh.magSf()
+    ) * (1.0 - surface) 
+);
+ghf_gradRho.correctBoundaryConditions();
+
+// const volVectorField neg_gradP_rgh(
+volVectorField neg_gradP_rgh(
     fvc::reconstruct
     (
         (
             mixture.surfaceTensionForce()
-          - ghf*fvc::snGrad(rho)
+        //   - ghf*fvc::snGrad(rho)
           - fvc::snGrad(p_rgh)
         ) * mesh.magSf()
     )
 );
+neg_gradP_rgh -= ghf_gradRho;
+neg_gradP_rgh.correctBoundaryConditions();
 
 // float-stepper test implementation
 f.storePrevIter();

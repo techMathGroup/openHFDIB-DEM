@@ -11,7 +11,8 @@
     advector.advect(Sp, Su);
 
     // -- correction to allow for free phase passing through solids
-    alpha1 = (1.0-lambda)*alpha1 + lambda*alpha1.prevIter();
+    // alpha1 = (1.0-lambda)*alpha1 + lambda*alpha1.prevIter();
+    alpha1 = (1.0-surface)*alpha1 + surface*alpha1.prevIter();
     alpha1.correctBoundaryConditions();
 
     // Making U absolute again after advection step
@@ -29,7 +30,8 @@
     // rhoPhi = fvc::interpolate(alpha1*rho1 + alpha2*rho2)*phi;           //prevents entry into liquid
     scalar blend = 0.99;                                                //blending increases stability (slightly)
     // rhoPhi = blend * rhoPhi + (1.0 - blend) * fvc::interpolate(alpha1*rho1 + alpha2*rho2)*phi;
-    surfaceScalarField lambdaF(fvc::interpolate(lambda));
+    // surfaceScalarField lambdaF(fvc::interpolate(lambda));
+    surfaceScalarField lambdaF(fvc::interpolate(surface));
     rhoPhi =
       (1.0 - lambdaF)*rhoPhi                                            //outside of solids, use isoAdvector rhoPhi
     + lambdaF*(blend * rhoPhi                                           //inside solids, blend isoAdvector rhoPhi with fvc interpolation

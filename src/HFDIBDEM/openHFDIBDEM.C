@@ -543,6 +543,9 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
             immersedBodies_[bodyId].checkBodyOp();
         }
     }
+
+    body.correctBoundaryConditions();
+    refineF.correctBoundaryConditions();
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::preUpdateBodies

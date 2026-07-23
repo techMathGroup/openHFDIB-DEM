@@ -512,6 +512,14 @@ void immersedBody::postPimpleUpdateImmersedBody
     resetPostPimpleState();
 }
 //---------------------------------------------------------------------------//
+void immersedBody::resetPostPimpleState()
+{
+    Vel_ = VelOld_;
+    Axis_ = AxisOld_;
+    omega_ = omegaOld_;
+    FCouplingOld_ = FCoupling_;
+}
+//---------------------------------------------------------------------------//
 void immersedBody::updateCoupling
 (
     volScalarField& body,
@@ -585,6 +593,12 @@ void immersedBody::updateCoupling
     reduce(FV, sumOp<vector>());
     reduce(TA, sumOp<vector>());
     reduce(FAdded, sumOp<vector>());
+
+    FV *= rhoF_.value();
+    TA *= rhoF_.value();
+    FAdded *= rhoF_.value();
+
+    FAdded = FCouplingOld_.F - FV;
     
     FCoupling_ = couplingHistCoef_*forces(FV, TA) + (1.0-couplingHistCoef_)*FCouplingOld_;
 
@@ -593,6 +607,15 @@ void immersedBody::updateCoupling
     couplingHistCoef_ = max(couplingHistCoef_*0.95, 0.5);
     
     Info << "======= COUPLING COEF IS: " << couplingHistCoef_ << endl;
+}
+//---------------------------------------------------------------------------//
+void immersedBody::updateCoupling
+(
+    volScalarField& body,
+    volVectorField& f
+)
+{
+    updateCoupling(body, f, false);
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateCoupling
@@ -742,35 +765,24 @@ void immersedBody::applyAddedMassScaling
         return;
     }
 
-    const scalar massSign = ((FV & FAdded) < 0.0) ? -1.0 : 1.0;
-    const scalar massAdded = massSign*mag(FAdded)/(mag(a_) + SMALL);
-    InfoH << iB_Info << "-- body: " << bodyId_ << " massAdded: " << massAdded
-        << " m0: " << geomModel_->getM0() << endl;
     const scalar m0 = geomModel_->getM0();
+    const scalar massSign = ((FV & FAdded) < 0.0) ? 1.0 : -1.0;
+    scalar massAdded = min(1.0*m0, mag(FAdded)/(mag(a_) + SMALL));
+    massAdded *= massSign;
+    // const scalar massAdded = massSign*mag(FAdded)/(mag(a_) + SMALL);
+    InfoH << iB_Info << "-- body: " << bodyId_ << " massAdded: " << massAdded
+        << " m0: " << m0 << endl;
     InfoH << iB_Info << "-- body: " << bodyId_ << " orig coupling force: " << FCoupling_.F << " orig coupling torque: " << FCoupling_.T << endl;
-    if ((m0 + massAdded) > SMALL)
-    {
-        const scalar scale = m0/(m0 + massAdded);
-        FCoupling_.F /= scale;
-        FCoupling_.T /= scale;
-    }
+    // if (mag(m0 + massAdded) > SMALL)
+    // {
+        // const scalar scale = m0/(m0 + massAdded);
+        // FCoupling_.F /= scale;
+        // FCoupling_.T /= scale;
+    // }
+    const scalar scale = (m0 + massAdded)/m0;
+    FCoupling_.F *= scale;
+    FCoupling_.T *= scale;
     InfoH << iB_Info << "-- body: " << bodyId_ << " scld coupling force: " << FCoupling_.F << " scld coupling torque: " << FCoupling_.T << endl;
-}
-//---------------------------------------------------------------------------//
-void immersedBody::resetPostPimpleState()
-{
-    Vel_ = VelOld_;
-    Axis_ = AxisOld_;
-    omega_ = omegaOld_;
-    FCouplingOld_ = FCoupling_;
-}
-void immersedBody::updateCoupling
-(
-    volScalarField& body,
-    volVectorField& f
-)
-{
-    updateCoupling(body, f, false);
 }
 //---------------------------------------------------------------------------//
 // update movement variables of the body
@@ -1575,13 +1587,23 @@ void immersedBody::updateRhoF                                           //varian
     
     List<DynamicLabelList> intLists;
     List<DynamicLabelList> surfLists;
+    // List<DynamicLabelList> haloLists;
     DynamicVectorList refCoMList;
     
     geomModel_->getReferencedLists(
         intLists,
         surfLists,
+        // haloLists,
         refCoMList
     );
+
+    // const DynamicVectorList& relevantRefCoMList(
+    //     geomModel_->getRefCoMList()
+    // );
+
+    // const List<DynamicLabelList>& relevantSurfLists(
+    //     geomModel_->getHaloCellList()
+    // );
     
     // Note (MI): in this case, we do not want to take into account the
     //            fluid composition inside the particle (frozen alpha field)
