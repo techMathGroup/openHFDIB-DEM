@@ -100,6 +100,9 @@ namespace Foam
         // body internal cells
         List<DynamicLabelList>  intCells_;
 
+        // body halo cells
+        List<DynamicLabelList>  haloCells_;
+
         //list to find the owner of the IB
         DynamicLabelList ibPartialVolume_;
         label owner_;
@@ -171,14 +174,21 @@ namespace Foam
             return surfCells_;
         };
 
+        virtual List<DynamicLabelList>& getHaloCellList()
+        {
+            return haloCells_;
+        };
+
         virtual void getReferencedLists(
             List<DynamicLabelList>& intLists,
             List<DynamicLabelList>& surfLists,
+            List<DynamicLabelList>& haloLists,
             DynamicVectorList& referenceCoM
         )
         {
             intLists.resize(1, intCells_[Pstream::myProcNo()]);
             surfLists.resize(1, surfCells_[Pstream::myProcNo()]);
+            haloLists.resize(1, haloCells_[Pstream::myProcNo()]);
             referenceCoM.resize(1, getCoM());
         };
 
@@ -442,6 +452,11 @@ namespace Foam
             DynamicLabelList& potentSurfCells,
             HashTable<bool, label, Hash<label>>& cellInside,
             List<labelList>& cellPoints
+        );
+
+        void findHaloCells
+        (
+            volScalarField& body
         );
 
         virtual List<std::shared_ptr<boundBox>> getBBoxes();

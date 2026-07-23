@@ -110,6 +110,7 @@ namespace Foam
             nonConvexBodyModel->setRhoS(rhoS_);
             nonConvexBodyModel->setM0(M0_);
             nonConvexBodyModel->getSurfaceCellList() = surfCells_;
+            nonConvexBodyModel->getHaloCellList() = haloCells_;
             nonConvexBodyModel->getInternalCellList() = intCells_;
 
             return nonConvexBodyModel;

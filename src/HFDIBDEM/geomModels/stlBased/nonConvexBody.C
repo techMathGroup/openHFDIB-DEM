@@ -84,6 +84,7 @@ void nonConvexBody::createImmersedBody
     // clear old list contents
     intCells_[Pstream::myProcNo()].clear();
     surfCells_[Pstream::myProcNo()].clear();
+    haloCells_[Pstream::myProcNo()].clear();
 
     // reduce computational domain to the body bounding box
     scalar inflFact(2*sqrt(mesh_.magSf()[0]));
@@ -355,5 +356,8 @@ void nonConvexBody::createImmersedBody
             break;
         }
     }
+
+    // look for halo cells
+    findHaloCells(body);
 }
 //---------------------------------------------------------------------------//

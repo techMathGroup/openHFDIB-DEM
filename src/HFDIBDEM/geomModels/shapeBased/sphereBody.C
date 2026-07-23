@@ -45,6 +45,8 @@ void sphereBody::createImmersedBody
     // clear old list contents
     intCells_[Pstream::myProcNo()].clear();
     surfCells_[Pstream::myProcNo()].clear();
+    haloCells_[Pstream::myProcNo()].clear();
+
     // find the processor with most of this IB inside
     ibPartialVolume_[Pstream::myProcNo()] = 0;
 
@@ -301,6 +303,9 @@ void sphereBody::createImmersedBody
     {
         cellToStartInCreateIB_ = min(intCells_[Pstream::myProcNo()]);
     }
+
+    // look for halo cells
+    findHaloCells(body);
 }
 //---------------------------------------------------------------------------//
 // Find first cell with center inside the body

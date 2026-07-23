@@ -125,6 +125,7 @@ namespace Foam
             sphereBodyModel->setRhoS(rhoS_);
             sphereBodyModel->setM0(M0_);
             sphereBodyModel->getSurfaceCellList() = surfCells_;
+            sphereBodyModel->getHaloCellList() = haloCells_;
             sphereBodyModel->getInternalCellList() = intCells_;
 
             return sphereBodyModel;

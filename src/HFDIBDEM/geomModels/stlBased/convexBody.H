@@ -106,6 +106,7 @@ namespace Foam
             convexBodyModel->setRhoS(rhoS_);
             convexBodyModel->setM0(M0_);
             convexBodyModel->getSurfaceCellList() = surfCells_;
+            convexBodyModel->getHaloCellList() = haloCells_;
             convexBodyModel->getInternalCellList() = intCells_;
 
             return convexBodyModel;

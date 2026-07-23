@@ -69,6 +69,19 @@ void clusterBody::updateSurfList()
     }
 }
 //---------------------------------------------------------------------------//
+void clusterBody::updateHaloList()
+{
+    haloCells_.clear();
+    haloCells_.setSize(Pstream::nProcs());
+
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
+    {
+        haloCells_[Pstream::myProcNo()].append(
+            gModel->getHaloCellList()[Pstream::myProcNo()]
+        );
+    }
+}
+//---------------------------------------------------------------------------//
 void clusterBody::updateIntList()
 {
     intCells_.clear();

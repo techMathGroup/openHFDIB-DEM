@@ -110,6 +110,14 @@ namespace Foam
             return surfCells_;
         };
 
+        void updateHaloList();
+
+        virtual List<DynamicLabelList>& getHaloCellList() final override
+        {
+            updateHaloList();
+            return haloCells_;
+        };
+
         void updateIntList();
 
         virtual List<DynamicLabelList>& getInternalCellList() final override
