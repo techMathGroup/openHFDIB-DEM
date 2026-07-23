@@ -70,6 +70,7 @@ fvc::correctUf(Uf, U, phi);
 // Make the fluxes relative to the mesh motion
 fvc::makeRelative(phi, U);
 
+f.storePrevIter();
 HFDIBDEM.updateFSCoupling(lambda,f);
 HFDIBDEM.interpolateIB(U,Ui,lambda);
 
