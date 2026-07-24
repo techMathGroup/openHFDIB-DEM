@@ -126,13 +126,7 @@ int main(int argc, char *argv[])
         
         // --- construct surface field where the momentum source should
         //     be switched on
-        forAll(surface, sI)
-        {
-            if (lambda[sI] > thrSurf)
-                surface[sI] = 1;
-            else
-                surface[sI] = 0;
-        }
+        HFDIBDEM.updateSurface(thrSurf,lambda,surface);
         surface.correctBoundaryConditions();
         f *= surface;
 
@@ -168,15 +162,8 @@ int main(int argc, char *argv[])
                     lambda *= 0.0;
 
                     HFDIBDEM.recreateBodies(lambda,refineF);
-                    
+                    HFDIBDEM.updateSurface(thrSurf,lambda,surface);
                     volVectorField gradLambda(fvc::grad(lambda));                    
-                    forAll(surface, sI)
-                    {
-                        if (lambda[sI] > thrSurf)
-                            surface[sI] = 1;
-                        else
-                            surface[sI] = 0;
-                    }
                     gradLambda.correctBoundaryConditions();
                     surface.correctBoundaryConditions();
                 }

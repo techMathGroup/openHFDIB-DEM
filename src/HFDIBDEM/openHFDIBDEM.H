@@ -144,12 +144,38 @@ namespace Foam
     // scalar prtContactReduceTime_ = 0.0;
     // scalar demItegrationTime_ = 0.0;
 
-    void initialize(volScalarField& body,volVectorField& U,volScalarField& refineF,label recomputeM0, word runTime);
+    void initialize(
+        volScalarField& body,
+        volVectorField& U,
+        volScalarField& refineF,
+        label recomputeM0, 
+        word runTime
+    );
 
     void createBodies
     (
         volScalarField& body,
         volScalarField& refineF
+    );
+
+    void updateSurface
+    (
+        const scalar surfaceThreshold,
+        const volScalarField& body,
+        volScalarField& surface
+    );
+
+    void updateSurface
+    (
+        const scalar surfaceThreshold,
+        const volScalarField& body,
+        volScalarField& surface,
+        surfaceScalarField& surfaceF
+    );
+
+    void updateGlobalFluidDensity(
+        const volScalarField& body,
+        volScalarField& rho
     );
 
     void preUpdateBodies
@@ -162,7 +188,6 @@ namespace Foam
         volVectorField& fPress,
         volVectorField& fVisc
     );
-
     void postUpdateBodies
     (
         volScalarField& body,
@@ -170,25 +195,16 @@ namespace Foam
         volVectorField& fVisc,
         const bool applyAddedMass
     );
-
     void postUpdateBodies
     (
         volScalarField& body,
         volVectorField& f
     );
-
     void postUpdateBodies
     (
         volScalarField& body,
         volVectorField& f,
-        const bool applyAddedMass
-    );
-
-    void postUpdateBodies
-    (
-        volScalarField& body,
-        volVectorField& f,
-        volScalarField& rho,
+        const bool kinematicForce,
         const bool applyAddedMass
     );
 
@@ -198,11 +214,24 @@ namespace Foam
         volVectorField& fPress,
         volVectorField& fVisc
     );
-
+    void updateFSCoupling
+    (
+        volScalarField& body,
+        volVectorField& fPress,
+        volVectorField& fVisc,
+        const bool applyAddedMass
+    );
     void updateFSCoupling
     (
         volScalarField& body,
         volVectorField& f
+    );
+    void updateFSCoupling
+    (
+        volScalarField& body,
+        volVectorField& f,
+        const bool kinematicForce,
+        const bool applyAddedMass
     );
 
     void recreateBodies(volScalarField& body,volScalarField& refineF);

@@ -145,18 +145,11 @@ namespace Foam
         int     bodyOperation_;
 
         // update immersed body info
-        void  updateImmersedBody
-        (
-            volScalarField& body,
-            volVectorField& f
-        );
-
-        void updateCoupling
-        (
-            volScalarField& body,
-            volVectorField& fPress,
-            volVectorField& fVisc
-        );
+        // void  updateImmersedBody
+        // (
+        //     volScalarField& body,
+        //     volVectorField& f
+        // );
 
         void updateCoupling
         (
@@ -169,30 +162,11 @@ namespace Foam
         void updateCoupling
         (
             volScalarField& body,
-            volVectorField& f
-        );
-
-        void updateCoupling
-        (
-            volScalarField& body,
             volVectorField& f,
+            const bool kinematicForce,
             const bool applyAddedMass
         );
 
-        void updateCoupling
-        (
-            volScalarField& body,
-            volVectorField& f,
-            volScalarField& rho
-        );
-
-        void updateCoupling
-        (
-            volScalarField& body,
-            volVectorField& f,
-            volScalarField& rho,
-            const bool applyAddedMass
-        );
 
         void resetPostPimpleState();
 
@@ -427,13 +401,6 @@ namespace Foam
         (
             volScalarField& body,
             volVectorField& fPress,
-            volVectorField& fVisc
-        );
-
-        void postPimpleUpdateImmersedBody
-        (
-            volScalarField& body,
-            volVectorField& fPress,
             volVectorField& fVisc,
             const bool applyAddedMass
         );
@@ -441,21 +408,8 @@ namespace Foam
         void postPimpleUpdateImmersedBody
         (
             volScalarField& body,
-            volVectorField& f
-        );
-
-        void postPimpleUpdateImmersedBody
-        (
-            volScalarField& body,
             volVectorField& f,
-            const bool applyAddedMass
-        );
-
-        void postPimpleUpdateImmersedBody
-        (
-            volScalarField& body,
-            volVectorField& f,
-            volScalarField& rho,
+            const bool kinematicForce,
             const bool applyAddedMass
         );
 
@@ -498,13 +452,22 @@ namespace Foam
         (
             volScalarField& body,
             volVectorField& fPress,
-            volVectorField& fVisc
+            volVectorField& fVisc,
+            const bool applyAddedMass
         );
 
         void pimpleUpdate
         (
             volScalarField& body,
-            volVectorField& f
+            volVectorField& f,
+            const bool kinematicForce,
+            const bool applyAddedMass
+        );
+
+        void updateLocalFluidDensity
+        (
+            const volScalarField& body,
+            volScalarField& rho
         );
 
         const bool& getSDBasedLambda() const

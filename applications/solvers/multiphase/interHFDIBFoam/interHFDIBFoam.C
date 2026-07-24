@@ -128,14 +128,7 @@ int main(int argc, char *argv[])
 
         // --- construct surface field where the momentum source should
         //     be switched on
-        forAll(surface, sI)
-        {
-            if (lambda[sI] > thrSurf)
-                surface[sI] = 1;
-            else
-                surface[sI] = 0;
-        }
-        surface.correctBoundaryConditions();
+        HFDIBDEM.updateSurface(thrSurf,lambda,surface,surfaceF);
         f *= surface;
 
         // --- Pressure-velocity PIMPLE corrector loop
@@ -181,17 +174,7 @@ int main(int argc, char *argv[])
                     lambda *= 0.0;
 
                     HFDIBDEM.recreateBodies(lambda,refineF);
-                    
-                    volVectorField gradLambda(fvc::grad(lambda));                    
-                    forAll(surface, sI)
-                    {
-                        if (lambda[sI] > thrSurf)
-                            surface[sI] = 1;
-                        else
-                            surface[sI] = 0;
-                    }
-                    gradLambda.correctBoundaryConditions();
-                    surface.correctBoundaryConditions();
+                    HFDIBDEM.updateSurface(thrSurf,lambda,surface,surfaceF);
                 }
             }
             
@@ -251,7 +234,7 @@ int main(int argc, char *argv[])
         // HFDIBDEM.postUpdateBodies(lambda,f,rho,true);
 
         f.storePrevIter();
-        HFDIBDEM.postUpdateBodies(lambda,f,rho,false);
+        HFDIBDEM.postUpdateBodies(lambda,f,false,false);
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
         // HFDIBDEM.updateBodiesRhoF(rho);
         HFDIBDEM.updateBodiesRhoF(rho,lambda);

@@ -548,6 +548,51 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
     refineF.correctBoundaryConditions();
 }
 //---------------------------------------------------------------------------//
+void openHFDIBDEM::updateSurface
+(
+    const scalar surfaceThreshold,
+    const volScalarField& body,
+    volScalarField& surface
+)
+{
+    forAll(surface, sI)
+    {
+        if (body[sI] > surfaceThreshold)
+            surface[sI] = 1;
+        else
+            surface[sI] = 0;
+    }
+    surface.correctBoundaryConditions();
+}
+//---------------------------------------------------------------------------//
+void openHFDIBDEM::updateSurface
+(
+    const scalar surfaceThreshold,
+    const volScalarField& body,
+    volScalarField& surface,
+    surfaceScalarField& surfaceF
+)
+{
+    updateSurface(surfaceThreshold, body, surface);
+    surfaceF = fvc::interpolate(surface);
+    surfaceF.correctBoundaryConditions();
+}
+//---------------------------------------------------------------------------//
+void openHFDIBDEM::updateGlobalFluidDensity(
+    const volScalarField& body,
+    volScalarField& rho
+)
+{
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            immersedBodies_[bodyId].updateLocalFluidDensity(body,rho);
+        }
+    }
+    rho.correctBoundaryConditions();
+}
+//---------------------------------------------------------------------------//
 void openHFDIBDEM::preUpdateBodies
 (
     volScalarField& body
@@ -589,7 +634,6 @@ void openHFDIBDEM::postUpdateBodies
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            immersedBodies_[bodyId].clearIntpInfo();
             immersedBodies_[bodyId].postPimpleUpdateImmersedBody
             (
                 body,
@@ -597,6 +641,7 @@ void openHFDIBDEM::postUpdateBodies
                 fVisc,
                 applyAddedMass
             );
+            immersedBodies_[bodyId].clearIntpInfo();
         }
     }
 }
@@ -607,13 +652,14 @@ void openHFDIBDEM::postUpdateBodies
     volVectorField& f
 )
 {
-    postUpdateBodies(body, f, false);
+    postUpdateBodies(body, f, false, false);
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::postUpdateBodies
 (
     volScalarField& body,
     volVectorField& f,
+    const bool kinematicForce,
     const bool applyAddedMass
 )
 {
@@ -621,37 +667,14 @@ void openHFDIBDEM::postUpdateBodies
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            immersedBodies_[bodyId].clearIntpInfo();
             immersedBodies_[bodyId].postPimpleUpdateImmersedBody
             (
                 body,
                 f,
+                kinematicForce,
                 applyAddedMass
             );
-        }
-    }
-}
-//---------------------------------------------------------------------------//
-void openHFDIBDEM::postUpdateBodies
-(
-    volScalarField& body,
-    volVectorField& f,
-    volScalarField& rho,
-    const bool applyAddedMass
-)
-{
-    forAll (immersedBodies_,bodyId)
-    {
-        if (immersedBodies_[bodyId].getIsActive())
-        {
             immersedBodies_[bodyId].clearIntpInfo();
-            immersedBodies_[bodyId].postPimpleUpdateImmersedBody
-            (
-                body,
-                f,
-                rho,
-                applyAddedMass
-            );
         }
     }
 }
@@ -1373,7 +1396,24 @@ void openHFDIBDEM::updateFSCoupling
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            immersedBodies_[bodyId].pimpleUpdate(body,fPress,fVisc);
+            immersedBodies_[bodyId].pimpleUpdate(body,fPress,fVisc,false);
+        }
+    }
+}
+//---------------------------------------------------------------------------//
+void openHFDIBDEM::updateFSCoupling
+(
+    volScalarField& body,
+    volVectorField& fPress,
+    volVectorField& fVisc,
+    const bool applyAddedMass
+)
+{
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            immersedBodies_[bodyId].pimpleUpdate(body,fPress,fVisc,applyAddedMass);
         }
     }
 }
@@ -1388,7 +1428,24 @@ void openHFDIBDEM::updateFSCoupling
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            immersedBodies_[bodyId].pimpleUpdate(body,f);
+            immersedBodies_[bodyId].pimpleUpdate(body,f,false,false);
+        }
+    }
+}
+//---------------------------------------------------------------------------//
+void openHFDIBDEM::updateFSCoupling
+(
+    volScalarField& body,
+    volVectorField& f,
+    const bool kinematicForce,
+    const bool applyAddedMass
+)
+{
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            immersedBodies_[bodyId].pimpleUpdate(body,f,kinematicForce,applyAddedMass);
         }
     }
 }

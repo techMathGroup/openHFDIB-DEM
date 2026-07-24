@@ -103,6 +103,7 @@ volScalarField surface
     mesh,
     dimensionedScalar("zero",dimless,0)
 );
+surfaceScalarField surfaceF(fvc::interpolate(surface));
 
 #include "createPhi.H"
 
