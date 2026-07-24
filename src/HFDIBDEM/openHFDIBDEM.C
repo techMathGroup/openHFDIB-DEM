@@ -290,6 +290,30 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 
     }
 
+    //loading fluid properties
+    Info <<" -- Reading fluid properties from constant/transportProperties" << endl;
+    if(transportProperties_.found("rho"))
+    {
+        rhoF_ = transportProperties_.lookup("rho");
+        Info <<" -- fluid density set to : "<< rhoF_.value() << endl;
+    }
+    else
+    {
+        // rhoF_ = dimensionedScalar("rho",dimDensity,1.0);
+        Info <<" -- fluid density not found. Using default: "<< rhoF_.value() << endl;
+    }
+
+    if(transportProperties_.found("nu"))
+    {
+        nuF_ = transportProperties_.lookup("nu");
+        Info <<" -- fluid kinematic viscosity set to : "<< nuF_.value() << endl;
+    }
+    else
+    {
+        // nuF_ = dimensionedScalar("nu",dimensionSet(0, 2, -1, 0, 0, 0, 0),1.0e-5);
+        Info <<" -- fluid kinematic viscosity not found. Using default : "<< nuF_.value() << endl;
+    }
+
     recordOutDir_ = mesh_.time().rootPath() + "/" + mesh_.time().globalCaseName() + "/bodiesInfo";
 }
 //---------------------------------------------------------------------------//

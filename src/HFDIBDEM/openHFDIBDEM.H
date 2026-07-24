@@ -126,6 +126,10 @@ namespace Foam
     //record simulation for start from lastTime possibility
     bool recordSimulation_;
     bool recordFirstTimeStep_ = false;
+
+    dimensionedScalar rhoF_= dimensionedScalar("rhoF",dimensionSet(1, -3, 0, 0, 0, 0, 0),1.0);
+    dimensionedScalar nuF_= dimensionedScalar("nu",dimensionSet(0, 2, -1, 0, 0, 0, 0),1e-5);
+
     word recordOutDir_;
 
     public:
@@ -209,6 +213,16 @@ namespace Foam
     void writeFirtsTimeBodiesInfo();
     
     void setSolverInfo();
+
+    dimensionedScalar getRhoF()
+    {
+        return rhoF_;
+    }
+
+    dimensionedScalar getNuF()
+    {
+        return nuF_;
+    }
 
  };
 }
