@@ -616,10 +616,10 @@ void immersedBody::updateCoupling                                       //full i
         {
             label cellI = surfListI[surfCell];
 
-            scalar fScale = 2.0*body[cellI];                            //0 for empty cell, 2 for full
+            scalar fScale = 1.0*body[cellI]+0.5;
 
             FV -=  fScale*f[cellI]*mesh_.V()[cellI];
-            TA -=  ((ibPoints[i] - refCoMList[i])^(f[cellI])
+            TA -=  ((ibPoints[surfCell] - refCoMList[i])^(f[cellI])
                 *mesh_.V()[cellI]);
             FAdded -= (f.prevIter()[cellI] - f[cellI])*mesh_.V()[cellI];//under construction
         }
