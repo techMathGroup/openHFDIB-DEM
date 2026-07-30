@@ -15,7 +15,7 @@
     alpha1 = (1.0-surface)*alpha1 + surface*alpha1.prevIter();
     // alpha1 = (1.0-surface-lambda)*alpha1 + (surface-lambda)*alpha1.prevIter();
     // alpha1 = (1.0-surface)*alpha1 + surface*(alpha1.prevIter()+alpha1)*0.5;
-    alpha1.correctBoundaryConditions();
+    // alpha1.correctBoundaryConditions();
 
     // Making U absolute again after advection step
     if (mesh.moving())
@@ -47,6 +47,15 @@
     //            much as possible of the isoAdvector rhoPhi
 
     mixture.correct();
+
+    // HFDIBDEM.updateGlobalFluidDensity(lambda,rho);
+    // rhoPhi = (1.0 - surfaceF)*rhoPhi + surfaceF*fvc::interpolate(rho)*phi;
+    // surfaceScalarField lambdaF(fvc::interpolate(lambda));
+    // rhoPhi = (1.0 - lambdaF)*rhoPhi + lambdaF*fvc::interpolate(rho)*phi;
+    // volScalarField rhoS(rho);
+    // HFDIBDEM.updateGlobalFluidDensity(lambda,rho,rhoS);
+    // surfaceScalarField lambdaF(fvc::interpolate(lambda));
+    // rhoPhi = (1.0 - lambdaF)*rhoPhi + lambdaF*fvc::interpolate(rhoS)*phi;
 }
 
 scalar domainFraction = 0;

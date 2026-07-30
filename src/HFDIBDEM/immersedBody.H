@@ -469,6 +469,12 @@ namespace Foam
             const volScalarField& body,
             volScalarField& rho
         );
+        void updateLocalFluidDensity
+        (
+            const volScalarField& body,
+            volScalarField& rho,
+            volScalarField& rhoS
+        );
 
         const bool& getSDBasedLambda() const
         {

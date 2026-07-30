@@ -42,10 +42,59 @@ neg_gradP_rgh -= ghf_gradRho;
 neg_gradP_rgh.correctBoundaryConditions();
 
 // float-stepper test implementation
+scalar fCoeff = 0.8;
 f.storePrevIter();
-f = surface*(UEqn.A()*Ui - UEqn.H() - neg_gradP_rgh);
-//~ f = surface*(UEqn.A()*Ui - UEqn.H() + fvc::grad(p));
+// f = surface*(UEqn.A()*Ui - UEqn.H() - neg_gradP_rgh);
+f = (1.0-fCoeff)*f + fCoeff*surface*(UEqn.A()*Ui - UEqn.H() - neg_gradP_rgh);
 f.correctBoundaryConditions();  
+
+// surfaceScalarField phiSolid(fvc::flux(Ui));
+// surfaceScalarField rhoPhiSolid = 
+//     fvc::interpolate(rhoSolidExcess)*phiSolid;
+// surfaceScalarField rhoPhiSolid = 
+//     fvc::interpolate(rhoSolidExcess)*phi;
+// f+= fvc::div(rhoPhiSolid, U, "div(phiSolid,U)") + fvc::ddt(rhoS, U);
+// f.correctBoundaryConditions();
+
+// volVectorField solidConvCorr
+// (
+//     IOobject
+//     (
+//         "solidConvCorr",
+//         runTime.timeName(),
+//         mesh,
+//         IOobject::NO_READ,
+//         IOobject::AUTO_WRITE
+//     ),
+//     fvc::div(rhoPhiSolid, U, "div(phiSolid,U)")
+// );
+
+// volVectorField solidDdtCorr
+// (
+//     IOobject
+//     (
+//         "solidDdtCorr",
+//         runTime.timeName(),
+//         mesh,
+//         IOobject::NO_READ,
+//         IOobject::AUTO_WRITE
+//     ),
+//     // fvc::ddt(rhoSolidExcess, U)
+//     (rhoSolidExcess*fvc::ddt(lambda) - lambda*fvc::ddt(rho))*U
+// );
+
+// volVectorField solidMomentumCorr
+// (
+//     IOobject
+//     (
+//         "solidMomentumCorr",
+//         runTime.timeName(),
+//         mesh,
+//         IOobject::NO_READ,
+//         IOobject::AUTO_WRITE
+//     ),
+//     0*solidConvCorr + 0*solidDdtCorr
+// );
 
 if (pimple.momentumPredictor())
 {
@@ -56,17 +105,34 @@ if (pimple.momentumPredictor())
             Info << "HFDIBDEM: U converged to Ui within max tolerance " << tolUEqn << endl;
             break;
         }
+        
+        // Info<< "convection:         " << max(mag(fvc::div(rhoPhi,U))).value() << endl;
+        // Info<< "solid momentum:     " << max(mag(solidMomentumCorr)).value() << endl;
+        // Info<< "solid convection:   " << max(mag(solidConvCorr)).value() << endl;
+        // Info<< "solid ddt:          " << max(mag(solidDdtCorr)).value() << endl;
 
         Info << "Looping over UEqn, iteration: " << i << endl;
-        solve(UEqn == neg_gradP_rgh + f);
+        solve(UEqn == neg_gradP_rgh + f);// - solidMomentumCorr);
 
         fvOptions.correct(U);
 
         HFDIBDEM.interpolateIB(U,Ui,lambda);
         Ui.correctBoundaryConditions();
 
-        // f += 0.8*surface*rho*(Ui - U)/runTime.deltaT(); 
-        f = surface*(UEqn.A()*Ui - UEqn.H() - neg_gradP_rgh);
+        // solidConvCorr = fvc::div(rhoPhiSolid, U, "div(phiSolid,U)");
+        // solidDdtCorr = fvc::ddt(rhoS, U);
+        // solidDdtCorr = (rhoSolidExcess*fvc::ddt(lambda) - lambda*fvc::ddt(rho))*U;
+        // solidMomentumCorr = solidConvCorr + solidDdtCorr;
+
+        // phiSolid = fvc::flux(Ui);
+        // rhoPhiSolid =
+        //         fvc::interpolate(rhoSolidExcess)*phiSolid;
+        // rhoPhiSolid =
+        //         fvc::interpolate(rhoSolidExcess)*phi;
+
+        f = (1.0-fCoeff)*f + fCoeff*surface*(UEqn.A()*Ui - UEqn.H() - neg_gradP_rgh);
+        // f+= fvc::div(rhoPhiSolid, Ui, "div(phiSolid,U)") + fvc::ddt(rhoS, Ui);
+        // f+= fvc::div(rhoPhiSolid, U, "div(phiSolid,U)") + fvc::ddt(rhoS, U);
         f.correctBoundaryConditions(); 
 
         if (i == fDirectForcingIter - 1)
@@ -76,4 +142,4 @@ if (pimple.momentumPredictor())
     }
 }
 
-UEqn -= f;
+UEqn -= f;// - solidMomentumCorr;

@@ -594,19 +594,19 @@ void immersedBody::updateCoupling                                       //full i
         refCoMList
     );
 
-    // forAll (intLists, i)
-    // {
-    //     DynamicLabelList& intListI = intLists[i];
-    //     forAll (intListI, intCell)
-    //     {
-    //         label cellI = intListI[intCell];
+    forAll (intLists, i)
+    {
+        DynamicLabelList& intListI = intLists[i];
+        forAll (intListI, intCell)
+        {
+            label cellI = intListI[intCell];
 
-    //         FV -=  f[cellI]*mesh_.V()[cellI];
-    //         TA -=  ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])
-    //             *mesh_.V()[cellI];
-    //         FAdded -= (f.prevIter()[cellI] - f[cellI])*mesh_.V()[cellI];
-    //     }
-    // }
+            FV -=  f[cellI]*mesh_.V()[cellI];
+            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])
+                *mesh_.V()[cellI];
+            FAdded -= (f.prevIter()[cellI] - f[cellI])*mesh_.V()[cellI];
+        }
+    }
 
     const List<point>& ibPoints = intpInfo_->getIbPoints();             //get surface points
     forAll (surfLists, i)
@@ -619,7 +619,7 @@ void immersedBody::updateCoupling                                       //full i
             scalar fScale = 1.0*body[cellI]+0.5;
 
             FV -=  fScale*f[cellI]*mesh_.V()[cellI];
-            TA -=  ((ibPoints[surfCell] - refCoMList[i])^(f[cellI])
+            TA -=  ((ibPoints[surfCell] - refCoMList[i])^(fScale*f[cellI])
                 *mesh_.V()[cellI]);
             FAdded -= (f.prevIter()[cellI] - f[cellI])*mesh_.V()[cellI];//under construction
         }
@@ -635,6 +635,14 @@ void immersedBody::updateCoupling                                       //full i
         TA *= rhoF_.value();
         FAdded *= rhoF_.value();
     }
+
+    // scalar rhoS = geomModel_->getRhoS().value();
+    // FV /= rhoS;
+    // TA /= rhoS;
+    // FAdded /= rhoS;
+    // FV *= rhoF_.value();
+    // TA *= rhoF_.value();
+    // FAdded *= rhoF_.value();
 
     FCoupling_ = couplingHistCoef_*forces(FV, TA) + (1.0-couplingHistCoef_)*FCouplingOld_;
 
@@ -707,6 +715,49 @@ void immersedBody::updateLocalFluidDensity
         {
             label cellI = surfListI[surfCell];
             rho[cellI]  = body[cellI] * rhoS + (1.0 - body[cellI]) * rho[cellI];
+        }
+    }
+}
+void immersedBody::updateLocalFluidDensity
+(
+    const volScalarField& body,
+    volScalarField& rho,
+    volScalarField& rhoS
+)
+{
+    List<DynamicLabelList> intLists;
+    List<DynamicLabelList> surfLists;
+    List<DynamicLabelList> haloLists;
+    DynamicVectorList refCoMList;
+
+    geomModel_->getReferencedLists(
+        intLists,
+        surfLists,
+        haloLists,
+        refCoMList
+    );
+
+    scalar rhoSVal = geomModel_->getRhoS().value();
+
+    forAll (intLists, i)
+    {
+        DynamicLabelList& intListI = intLists[i];
+        forAll (intListI, intCell)
+        {
+            label cellI = intListI[intCell];
+            rho[cellI]  = rhoSVal;
+            rhoS[cellI] = rhoSVal;
+        }
+    }
+
+    forAll (surfLists, i)
+    {
+        DynamicLabelList& surfListI = surfLists[i];
+        forAll (surfListI, surfCell)
+        {
+            label cellI = surfListI[surfCell];
+            rho[cellI]  = body[cellI] * rhoSVal + (1.0 - body[cellI]) * rho[cellI];
+            rhoS[cellI] = rhoSVal;
         }
     }
 }

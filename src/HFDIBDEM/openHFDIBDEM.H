@@ -177,6 +177,11 @@ namespace Foam
         const volScalarField& body,
         volScalarField& rho
     );
+    void updateGlobalFluidDensity(
+        const volScalarField& body,
+        volScalarField& rho,
+        volScalarField& rhoS
+    );
 
     void preUpdateBodies
     (

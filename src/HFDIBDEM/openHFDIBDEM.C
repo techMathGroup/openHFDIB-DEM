@@ -593,6 +593,23 @@ void openHFDIBDEM::updateGlobalFluidDensity(
     rho.correctBoundaryConditions();
 }
 //---------------------------------------------------------------------------//
+void openHFDIBDEM::updateGlobalFluidDensity(
+    const volScalarField& body,
+    volScalarField& rho,
+    volScalarField& rhoS
+)
+{
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            immersedBodies_[bodyId].updateLocalFluidDensity(body,rho,rhoS);
+        }
+    }
+    rho.correctBoundaryConditions();
+    rhoS.correctBoundaryConditions();
+}
+//---------------------------------------------------------------------------//
 void openHFDIBDEM::preUpdateBodies
 (
     volScalarField& body

@@ -121,6 +121,10 @@ int main(int argc, char *argv[])
 
         ++runTime;
 
+        lambda.storeOldTimes();
+        rho.storeOldTimes();
+
+
         Info<< "Time = " << runTime.timeName() << nl << endl;
         
         // hfdib-dem code modification
@@ -195,7 +199,37 @@ int main(int argc, char *argv[])
 
             mixture.correct();
 
-            // HFDIBDEM.updateGlobalFluidDensity(lambda,rho);
+            // volScalarField rhoS(rho);
+            // HFDIBDEM.updateGlobalFluidDensity(lambda,rho,rhoS);
+            // surfaceScalarField phiSolid(fvc::flux(Ui));
+            // volScalarField rhoSolidExcess
+            // (
+            //     lambda
+            //    *
+            //    (
+            //       rhoS
+            //     - (alpha1*rho1 + alpha2*rho2)
+            //    )
+            // );
+            // surfaceScalarField rhoPhiSolid =
+            //     fvc::interpolate(rhoSolidExcess)*phiSolid;
+
+            // Note (MI): at this moment, both alpha and lambda are 
+            //            frozen at the given timestep
+            // volScalarField rhoS(rho);
+            // HFDIBDEM.updateGlobalFluidDensity(lambda,rhoS);
+            // volScalarField rhoSolidExcess(rhoS-rho);
+            // rhoSolidExcess.correctBoundaryConditions();
+            // Info<< max(rhoSolidExcess).value() << endl;
+            // (
+            //     lambda
+            //    *
+            //    (
+            //       rhoS
+            //     - (alpha1*rho1 + alpha2*rho2)
+            //    )
+            // );
+            
 
             if (pimple.frozenFlow())
             {
@@ -214,6 +248,9 @@ int main(int argc, char *argv[])
             {
                 turbulence->correct();
             }
+
+            // f -= solidMomentumCorr;
+            // f.correctBoundaryConditions();
         }
 
         // hfdib-dem code modification
@@ -253,6 +290,14 @@ int main(int argc, char *argv[])
         // HFDIBDEM.postUpdateBodies(lambda,f,rho,true);
 
         f.storePrevIter();
+        // forAll (f, cellI)
+        // {
+        //     f[cellI] /= rho[cellI];
+        // }
+        // f.correctBoundaryConditions();
+        HFDIBDEM.postUpdateBodies(lambda,f,false,false);
+        f = 0.5*(f + f.prevIter());
+        f.correctBoundaryConditions();
         HFDIBDEM.postUpdateBodies(lambda,f,false,false);
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
         // HFDIBDEM.updateBodiesRhoF(rho);
