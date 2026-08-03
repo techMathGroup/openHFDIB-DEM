@@ -62,6 +62,7 @@ rhoS_("rho",dimensionSet(1,-3,0,0,0,0,0),1.0)
     surfCells_.setSize(Pstream::nProcs());
     intCells_.setSize(Pstream::nProcs());
     haloCells_.setSize(Pstream::nProcs());
+    surfToHaloLabels_.setSize(Pstream::nProcs());
 }
 geomModel::~geomModel()
 {
@@ -164,6 +165,7 @@ void geomModel::resetBody(volScalarField& body)
     forAll (surfCells_[Pstream::myProcNo()],cellI)
     {
         body[surfCells_[Pstream::myProcNo()][cellI]] = 0;
+        surfToHaloLabels_[Pstream::myProcNo()][cellI].clear();
     }
 
     surfCells_[Pstream::myProcNo()].clear();
@@ -466,10 +468,13 @@ void geomModel::findHaloCells
 )
 {
     // prepare hashtable for halo cells
-    HashTable<bool, label, Hash<label>> isHaloCell(surfCells_[Pstream::myProcNo()].size()*6);
+    HashTable<label, label, Hash<label>> isHaloCell(surfCells_[Pstream::myProcNo()].size()*6);
 
     // prepare faces to send
     List<DynamicLabelList> facesToSendToProcs(Pstream::nProcs());
+
+    // prepare mapping from surface to halo cells
+    surfToHaloLabels_[Pstream::myProcNo()].setSize(surfCells_[Pstream::myProcNo()].size());
 
     // loop over surface cells
     forAll(surfCells_[Pstream::myProcNo()], cellI)
@@ -498,9 +503,16 @@ void geomModel::findHaloCells
                 {
                     if (body[nCell] < SMALL)
                     {
-                        isHaloCell.set(nCell, true);
                         haloCells_[Pstream::myProcNo()].append(nCell);
+                        isHaloCell.set(nCell, haloCells_[Pstream::myProcNo()].size()-1);
+                        surfToHaloLabels_[Pstream::myProcNo()][cellI].append(haloCells_[Pstream::myProcNo()].size()-1);
                     }
+                }
+
+                else
+                {
+                    label loc = isHaloCell.at(nCell);
+                    surfToHaloLabels_[Pstream::myProcNo()][cellI].append(loc);
                 }
             }
 
@@ -603,6 +615,7 @@ void geomModel::findHaloCells
                 {
                     isHaloCell.set(cCell, true);
                     haloCells_[Pstream::myProcNo()].append(cCell);
+                    // surf to halo cells mapping not done in parallel
                 }
             }
         }

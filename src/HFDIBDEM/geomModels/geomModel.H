@@ -103,6 +103,9 @@ namespace Foam
         // body halo cells
         List<DynamicLabelList>  haloCells_;
 
+        // label mapping from surface to halo cells
+        List<List<DynamicLabelList>>  surfToHaloLabels_;
+
         //list to find the owner of the IB
         DynamicLabelList ibPartialVolume_;
         label owner_;
@@ -182,6 +185,11 @@ namespace Foam
         virtual List<DynamicLabelList>& getHaloCellList()
         {
             return haloCells_;
+        };
+
+        virtual List<List<DynamicLabelList>>& getSurfToHaloLabels()
+        {
+            return surfToHaloLabels_;
         };
 
         virtual void getReferencedLists(
