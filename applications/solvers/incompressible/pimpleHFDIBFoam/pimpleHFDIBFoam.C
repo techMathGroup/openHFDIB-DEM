@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
     Info << "\nInitializing HFDIBDEM\n" << endl;
     openHFDIBDEM  HFDIBDEM(mesh);
     HFDIBDEM.initialize(lambda,U,refineF,maxRefinementLevel,runTime.timeName());
-    #include "initialMeshRefinement.H"
+    // #include "initialMeshRefinement.H"
 
     if(HFDIBDEM.getRecordFirstTime())
     {
@@ -92,6 +92,8 @@ int main(int argc, char *argv[])
     scalar CFDTime_(0.0);
     scalar DEMTime_(0.0);
     scalar suplTime_(0.0);
+
+    bool didInitialRefinement(false);
 
     while (runTime.run())
     {
@@ -113,6 +115,11 @@ int main(int argc, char *argv[])
 
         clockTime createBodiesTime; // OS time efficiency testing
         HFDIBDEM.createBodies(lambda,refineF);
+        if (!didInitialRefinement)
+        {
+            #include "initialMeshRefinement.H"
+            didInitialRefinement = true;
+        }
         HFDIBDEM.updateBodiesRhoF(rho.value());
         suplTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
 

@@ -397,7 +397,11 @@ void openHFDIBDEM::initialize
         label maxAdditions(1000);
         label cAddition(0);
 
-        while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions and immersedBodies_.size() < solverInfo::getNSolidsThreshold())
+        // Note (MI): add solid body only if the number of immersed 
+        //            bodies is below the threshold (if set)
+        // Note (MI): the second condition is required to avoid skipping
+        //            addition of all the bodies on first time step
+        while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions and (solverInfo::getNSolidsThreshold() < 0 or immersedBodies_.size() < solverInfo::getNSolidsThreshold()))
         {
             InfoH << addModel_Info << "addModel invoked action, trying to add new body" << endl;
             std::shared_ptr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));
@@ -449,6 +453,9 @@ void openHFDIBDEM::initialize
     }
 
     verletList_.initialSorting();
+
+    body.correctBoundaryConditions();
+    refineF.correctBoundaryConditions();
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
@@ -631,9 +638,9 @@ void openHFDIBDEM::preUpdateBodies
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::postUpdateBodies
 (
-    volScalarField& body,
-    volVectorField& fPress,
-    volVectorField& fVisc
+    const volScalarField& body,
+    const volVectorField& fPress,
+    const volVectorField& fVisc
 )
 {
     postUpdateBodies(body, fPress, fVisc, false);
@@ -641,9 +648,9 @@ void openHFDIBDEM::postUpdateBodies
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::postUpdateBodies
 (
-    volScalarField& body,
-    volVectorField& fPress,
-    volVectorField& fVisc,
+    const volScalarField& body,
+    const volVectorField& fPress,
+    const volVectorField& fVisc,
     const bool applyAddedMass
 )
 {
@@ -665,8 +672,8 @@ void openHFDIBDEM::postUpdateBodies
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::postUpdateBodies
 (
-    volScalarField& body,
-    volVectorField& f
+    const volScalarField& body,
+    const volVectorField& f
 )
 {
     postUpdateBodies(body, f, false, false);
@@ -674,8 +681,8 @@ void openHFDIBDEM::postUpdateBodies
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::postUpdateBodies
 (
-    volScalarField& body,
-    volVectorField& f,
+    const volScalarField& body,
+    const volVectorField& f,
     const bool kinematicForce,
     const bool applyAddedMass
 )
@@ -688,6 +695,32 @@ void openHFDIBDEM::postUpdateBodies
             (
                 body,
                 f,
+                kinematicForce,
+                applyAddedMass
+            );
+            immersedBodies_[bodyId].clearIntpInfo();
+        }
+    }
+}
+//---------------------------------------------------------------------------//
+void openHFDIBDEM::postUpdateBodies
+(
+    const volScalarField& body,
+    const volVectorField& f,
+    const volScalarField& rho,
+    const bool kinematicForce,
+    const bool applyAddedMass
+)
+{
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            immersedBodies_[bodyId].postPimpleUpdateImmersedBody
+            (
+                body,
+                f,
+                rho,
                 kinematicForce,
                 applyAddedMass
             );
@@ -1343,7 +1376,9 @@ void openHFDIBDEM::addRemoveBodies
         label maxAdditions(50);
         label cAddition(0);
 
-        while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions)
+        // Note (MI): add solid body only if the number of immersed 
+        //            bodies is below the threshold (if set)
+        while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions and (solverInfo::getNSolidsThreshold() < 0 or immersedBodies_.size() < solverInfo::getNSolidsThreshold()))
         {
             InfoH << addModel_Info << "addModel invoked action, trying to add new body" << endl;
             std::shared_ptr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));

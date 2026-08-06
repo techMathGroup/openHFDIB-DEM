@@ -189,26 +189,35 @@ namespace Foam
     );
     void postUpdateBodies
     (
-        volScalarField& body,
-        volVectorField& fPress,
-        volVectorField& fVisc
+        const volScalarField& body,
+        const volVectorField& fPress,
+        const volVectorField& fVisc
     );
     void postUpdateBodies
     (
-        volScalarField& body,
-        volVectorField& fPress,
-        volVectorField& fVisc,
+        const volScalarField& body,
+        const volVectorField& fPress,
+        const volVectorField& fVisc,
         const bool applyAddedMass
     );
     void postUpdateBodies
     (
-        volScalarField& body,
-        volVectorField& f
+        const volScalarField& body,
+        const volVectorField& f
     );
     void postUpdateBodies
     (
-        volScalarField& body,
-        volVectorField& f,
+        const volScalarField& body,
+        const volVectorField& f,
+        const bool kinematicForce,
+        const bool applyAddedMass
+    );
+
+    void postUpdateBodies
+    (
+        const volScalarField& body,
+        const volVectorField& f,
+        const volScalarField& rho,
         const bool kinematicForce,
         const bool applyAddedMass
     );

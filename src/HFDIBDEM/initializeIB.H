@@ -136,6 +136,7 @@ if (immersedDict_.found("refineBuffers"))
 {
     refineBuffers_ = readLabel(immersedDict_.lookup("refineBuffers"));
 }
+Info << "refineBuffers_: " << refineBuffers_ << endl;
 if (immersedDict_.found("timesToSetStatic"))
 {
     timesToSetStatic_ = readLabel(immersedDict_.lookup("timesToSetStatic"));

@@ -1,9 +1,15 @@
+Info << "Running initial mesh refinement for maxRefinementLevel: " << maxRefinementLevel << endl;
 for (label level=0;level<maxRefinementLevel+1;level++)
 {
+    
     mesh.update();
+
+    Info << "mesh.changing(): " << mesh.changing() << endl;
+    // Info << refineF << endl;
 
     if (mesh.changing())
     {
+        Info << "Mesh changed, updating immersed bodies" << endl;
         MRF.update();
 
         if (correctPhi)
@@ -22,8 +28,8 @@ for (label level=0;level<maxRefinementLevel+1;level++)
         {
             #include "meshCourantNo.H"
         }
-//zlobi nula bez tecky
-        lambda *= 0.;
+
+        lambda *= 0.0;
         HFDIBDEM.recreateBodies(lambda,refineF);
     }
 }

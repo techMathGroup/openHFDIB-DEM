@@ -153,16 +153,25 @@ namespace Foam
 
         void updateCoupling
         (
-            volScalarField& body,
-            volVectorField& fPress,
-            volVectorField& fVisc,
+            const volScalarField& body,
+            const volVectorField& fPress,
+            const volVectorField& fVisc,
             const bool applyAddedMass
         );
 
         void updateCoupling
         (
-            volScalarField& body,
-            volVectorField& f,
+            const volScalarField& body,
+            const volVectorField& f,
+            const bool kinematicForce,
+            const bool applyAddedMass
+        );
+
+        void updateCoupling
+        (
+            const volScalarField& body,
+            const volVectorField& f,
+            const volScalarField& rho,
             const bool kinematicForce,
             const bool applyAddedMass
         );
@@ -399,16 +408,25 @@ namespace Foam
 
         void postPimpleUpdateImmersedBody
         (
-            volScalarField& body,
-            volVectorField& fPress,
-            volVectorField& fVisc,
+            const volScalarField& body,
+            const volVectorField& fPress,
+            const volVectorField& fVisc,
             const bool applyAddedMass
         );
 
         void postPimpleUpdateImmersedBody
         (
-            volScalarField& body,
-            volVectorField& f,
+            const volScalarField& body,
+            const volVectorField& f,
+            const bool kinematicForce,
+            const bool applyAddedMass
+        );
+
+        void postPimpleUpdateImmersedBody
+        (
+            const volScalarField& body,
+            const volVectorField& f,
+            const volScalarField& rho,
             const bool kinematicForce,
             const bool applyAddedMass
         );
