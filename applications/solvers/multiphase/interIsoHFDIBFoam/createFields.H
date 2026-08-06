@@ -107,6 +107,21 @@ surfaceScalarField surfaceF(fvc::interpolate(surface));
 
 #include "createPhi.H"
 
+Info<< "Reading/calculating immersed face flux field phi\n" << endl;
+ 
+ surfaceScalarField phii
+ (
+     IOobject
+     (
+         "phii",
+         runTime.timeName(),
+         mesh,
+         IOobject::READ_IF_PRESENT,
+         IOobject::AUTO_WRITE
+     ),
+     fvc::flux(Ui)
+ );
+
 
 Info<< "Reading transportProperties\n" << endl;
 immiscibleIncompressibleTwoPhaseMixture mixture(U, phi);
@@ -145,6 +160,18 @@ surfaceScalarField rhoPhi
         IOobject::NO_WRITE
     ),
     fvc::interpolate(rho)*phi
+);
+surfaceScalarField rhoPhii
+(
+    IOobject
+    (
+        "rhoPhii",
+        runTime.timeName(),
+        mesh,
+        IOobject::NO_READ,
+        IOobject::NO_WRITE
+    ),
+    fvc::interpolate(rho)*phii
 );
 
 // hfdib-dem-related field creation

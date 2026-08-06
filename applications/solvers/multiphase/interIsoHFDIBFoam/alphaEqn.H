@@ -3,10 +3,11 @@
     if (mesh.moving())
     {
         U -= fvc::reconstruct(mesh.phi());
+        Ui -= fvc::reconstruct(mesh.phi());
     }
 
     // Updating alpha1
-    alpha1.storePrevIter();
+    // alpha1.storePrevIter();
     #include "alphaSuSp.H"
     advector.advect(Sp, Su);
 
@@ -21,6 +22,7 @@
     if (mesh.moving())
     {
         U += fvc::reconstruct(mesh.phi());
+        Ui += fvc::reconstruct(mesh.phi());
     }
 
     // -- original rhoPhi update, nicely consistent with isoAdvector
