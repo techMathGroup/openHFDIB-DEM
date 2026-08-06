@@ -1,0 +1,86 @@
+solid ./constant/triSurface/rectangle_022.stl
+facet normal 0.000000 0.000000 -0.001920
+  outer loop
+    vertex 0.217000 -0.123333 -0.005000
+    vertex 0.217000 -0.003333 -0.005000
+    vertex 0.233000 -0.123333 -0.005000
+  endloop
+endfacet
+facet normal 0.000000 0.000000 -0.001920
+  outer loop
+    vertex 0.233000 -0.123333 -0.005000
+    vertex 0.217000 -0.003333 -0.005000
+    vertex 0.233000 -0.003333 -0.005000
+  endloop
+endfacet
+facet normal 0.000000 0.000000 0.001920
+  outer loop
+    vertex 0.217000 -0.123333 0.005000
+    vertex 0.233000 -0.123333 0.005000
+    vertex 0.217000 -0.003333 0.005000
+  endloop
+endfacet
+facet normal -0.000000 0.000000 0.001920
+  outer loop
+    vertex 0.217000 -0.003333 0.005000
+    vertex 0.233000 -0.123333 0.005000
+    vertex 0.233000 -0.003333 0.005000
+  endloop
+endfacet
+facet normal 0.000000 -0.000160 0.000000
+  outer loop
+    vertex 0.217000 -0.123333 -0.005000
+    vertex 0.233000 -0.123333 -0.005000
+    vertex 0.217000 -0.123333 0.005000
+  endloop
+endfacet
+facet normal 0.000000 -0.000160 0.000000
+  outer loop
+    vertex 0.233000 -0.123333 -0.005000
+    vertex 0.233000 -0.123333 0.005000
+    vertex 0.217000 -0.123333 0.005000
+  endloop
+endfacet
+facet normal 0.000000 0.000160 -0.000000
+  outer loop
+    vertex 0.233000 -0.003333 -0.005000
+    vertex 0.217000 -0.003333 -0.005000
+    vertex 0.233000 -0.003333 0.005000
+  endloop
+endfacet
+facet normal 0.000000 0.000160 0.000000
+  outer loop
+    vertex 0.217000 -0.003333 -0.005000
+    vertex 0.217000 -0.003333 0.005000
+    vertex 0.233000 -0.003333 0.005000
+  endloop
+endfacet
+facet normal -0.001200 0.000000 0.000000
+  outer loop
+    vertex 0.217000 -0.123333 -0.005000
+    vertex 0.217000 -0.123333 0.005000
+    vertex 0.217000 -0.003333 -0.005000
+  endloop
+endfacet
+facet normal -0.001200 0.000000 0.000000
+  outer loop
+    vertex 0.217000 -0.003333 -0.005000
+    vertex 0.217000 -0.123333 0.005000
+    vertex 0.217000 -0.003333 0.005000
+  endloop
+endfacet
+facet normal 0.001200 0.000000 0.000000
+  outer loop
+    vertex 0.233000 -0.123333 -0.005000
+    vertex 0.233000 -0.003333 -0.005000
+    vertex 0.233000 -0.123333 0.005000
+  endloop
+endfacet
+facet normal 0.001200 0.000000 -0.000000
+  outer loop
+    vertex 0.233000 -0.003333 -0.005000
+    vertex 0.233000 -0.003333 0.005000
+    vertex 0.233000 -0.123333 0.005000
+  endloop
+endfacet
+endsolid ./constant/triSurface/rectangle_022.stl

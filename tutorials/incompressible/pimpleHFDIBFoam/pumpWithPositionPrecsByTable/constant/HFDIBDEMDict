@@ -1,0 +1,3083 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+  =========                 |
+  \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox
+   \\    /   O peration     | Website:  https://openfoam.org
+    \\  /    A nd           | Version:  6
+     \\/     M anipulation  |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      HFDIBDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+bodyNames ( 
+    "rectangle_000"
+    "rectangle_001"
+    "rectangle_002"
+    "rectangle_003"
+    "rectangle_004"
+    "rectangle_005"
+    "rectangle_006"
+    "rectangle_007"
+    "rectangle_008"
+    "rectangle_009"
+    "rectangle_010"
+    "rectangle_011"
+    "rectangle_012"
+    "rectangle_013"
+    "rectangle_014"
+    "rectangle_015"
+    "rectangle_016"
+    "rectangle_017"
+    "rectangle_018"
+    "rectangle_019"
+    "rectangle_020"
+    "rectangle_021"
+    "rectangle_022"
+    "rectangle_023"
+    "rectangle_024"
+    "rectangle_025"
+    "rectangle_026"
+    "rectangle_027"
+    "rectangle_028"
+    "rectangle_029"
+    "rectangle_030"
+    "rectangle_031"
+    "rectangle_032"
+    "rectangle_033"
+    "rectangle_034"
+    "rectangle_035"
+    "rectangle_036"
+    "rectangle_037"
+    "rectangle_038"
+    "rectangle_039"
+    "rectangle_040"
+    "rectangle_041"
+    "rectangle_042"
+    "rectangle_043"
+    "rectangle_044"
+    "rectangle_045"
+    "rectangle_046"
+    "rectangle_047"
+    "rectangle_048"
+    "rectangle_049"
+    "rectangle_050"
+    "rectangle_051"
+    "rectangle_052"
+    "rectangle_053"
+    "rectangle_054"
+    "rectangle_055"
+    "rectangle_056"
+    "rectangle_057"
+    "rectangle_058"
+    "rectangle_059"
+    "rectangle_060"
+    "rectangle_061"
+    "rectangle_062"
+    "rectangle_063"
+    "rectangle_064"
+    "rectangle_065"
+    "rectangle_066"
+    "rectangle_067"
+    "rectangle_068"
+    "rectangle_069"
+);
+
+surfaceThreshold    1e-4;
+stepDEM     1.0;
+geometricD (1 1 -1);
+recordSimulation true;
+recordFirstTimeStep false;
+nDirectForcingIterations 10;
+
+interpolationSchemes
+{
+    method  line;
+    U       cellPointFace;
+}
+
+outputSetup
+{
+    basic true;
+    iB  false;
+    DEM false;
+    addModel false;
+    parallelDEM false;
+}
+
+DEM
+{
+    LcCoeff 4.0;
+	rotationModel chen2012;
+	// rotationModel mindlin1953	
+    materials
+    {
+        particle
+        {
+            Y       1e7;
+            nu      0.3;
+            mu      0.05;
+            adhN    0;
+            eps     0.5;
+        }
+
+        wall
+        {
+            Y       1e7;
+            nu      0.2;
+            mu      0;
+            adhN    0;
+            eps     0.5;
+        }
+    }
+
+    collisionPatches
+    {
+    }
+}
+
+rectangle_000
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_000";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_001
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_001";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_002
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_002";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_003
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_003";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_004
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_004";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_005
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_005";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_006
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_006";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_007
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_007";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_008
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_008";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_009
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_009";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_010
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_010";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_011
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_011";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_012
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_012";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_013
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_013";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_014
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_014";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_015
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_015";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_016
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_016";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_017
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_017";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_018
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_018";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_019
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_019";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_020
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_020";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_021
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_021";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_022
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_022";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_023
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_023";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_024
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_024";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_025
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_025";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_026
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_026";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_027
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_027";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_028
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_028";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_029
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_029";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_030
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_030";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_031
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_031";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_032
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_032";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_033
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_033";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_034
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_034";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_035
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_035";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_036
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_036";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_037
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_037";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_038
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_038";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_039
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_039";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_040
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_040";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_041
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_041";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_042
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_042";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_043
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_043";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_044
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_044";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_045
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_045";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_046
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_046";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_047
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_047";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_048
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_048";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_049
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_049";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_050
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_050";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_051
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_051";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_052
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_052";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_053
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_053";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_054
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_054";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_055
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_055";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_056
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_056";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_057
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_057";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_058
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_058";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_059
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_059";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_060
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_060";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_061
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_061";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_062
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_062";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_063
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_063";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_064
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_064";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_065
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_065";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_066
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_066";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_067
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_067";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_068
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_068";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+rectangle_069
+{
+    prescribedPosTableBody
+    {
+        axis     (0 0 -1);
+        velocity (0 0 0);
+        omega    0;
+        posIntTableDict
+        {
+            file "$FOAM_CASE/constant/posIntTables/rectangle_069";
+        }
+    }
+    rho         rho [1 -3 0 0 0 0 0] 3950;
+    U
+    {
+    	BC  noSlip;
+    }
+    material particle;
+    bodyGeom convex;
+    updateTorque false;
+    sdBasedLambda false;
+    overlayLambda max;
+    interfaceSpan 1.0;
+    startSynced false;
+    refineBuffers 2;
+    timesToSetStatic -1;
+    bodyAddition
+    {
+    	addModel once;
+    	distributionCoeffs
+    	{
+    		addMode fieldBased;
+            stlBaseSize        1e-5;
+    		fieldBasedCoeffs
+    		{
+    			fieldName lambda;
+    			fieldValue 0.05;
+    		}
+    	}
+    }
+}
+
+// ************************************************************************* //
