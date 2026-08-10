@@ -78,7 +78,7 @@ namespace Foam
         )
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual std::shared_ptr<geomModel> getCopy() = 0;
@@ -92,13 +92,13 @@ namespace Foam
         virtual void bodyMovePoints(vector translVec)
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual void bodyScalePoints(scalar scaleFac)
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual void bodyRotatePoints
@@ -108,26 +108,26 @@ namespace Foam
         )
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual void resetBody()
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual vector getCoM()
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
             return vector::zero;
         }
 
         virtual boundBox getBounds()
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
             boundBox bound;
             return bound;
         }
@@ -135,19 +135,19 @@ namespace Foam
         virtual void synchronPos(label owner)
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual void writeBodyInfo(label bodyId, IOdictionary& dict, word path)
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual boolList pointInside(pointField pointI)
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
             return {false};
         }
 
@@ -155,7 +155,7 @@ namespace Foam
         virtual bool pointInside(point pointI)
         {
             InfoH << iB_Info << "-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
             return false;
         }
 
@@ -168,13 +168,13 @@ namespace Foam
         )
         {
             InfoH << iB_Info << "-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual pointField sampleSurfacePoints()
         {
             InfoH << iB_Info << "-- shapeModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
             pointField returnField;
             return returnField;
         }
@@ -182,7 +182,7 @@ namespace Foam
         virtual void setCoM()
         {
             InfoH << iB_Info << "-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
     };
 }

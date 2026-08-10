@@ -106,16 +106,16 @@ class addModel
     // -- init
     virtual void init()
     {
-        InfoH << addModel_Info << "-- addModelMessage-- "
-            << "notIplemented"<<endl;
+        InfoH << addModel_Info << "1 -- addModelMessage-- "
+            << "notImplemented"<<endl;
     }
     // Note: rewrite this function if you need initialization
     //       and place it into constructor
 
     virtual bool shouldAddBody(const volScalarField& body)
     {
-        InfoH << addModel_Info << "-- addModelMessage-- "
-            << "notIplemented"<<endl;
+        InfoH << addModel_Info << "2 -- addModelMessage-- "
+            << "notImplemented"<<endl;
         return false;
     }
     // Note: check current conditions in simulation and return
@@ -131,15 +131,15 @@ class addModel
     // -- getters
     virtual word getAddMode()
     {
-        InfoH << addModel_Info << "-- addModelMessage-- "
-            << "notIplemented"<<endl;
+        InfoH << addModel_Info << "3 -- addModelMessage-- "
+            << "notImplemented"<<endl;
         return "NO";
     }
 
     virtual bool getBodyAdded()
     {
-        InfoH << addModel_Info << "-- addModelMessage-- "
-            << "notIplemented"<<endl;
+        InfoH << addModel_Info << "4 -- addModelMessage-- "
+            << "notImplemented"<<endl;
         return false;
     }
     // Note: this has to return true if addBody ends with SUCCESS,
@@ -147,8 +147,8 @@ class addModel
 
     virtual void recreateBoundBox()
     {
-        InfoH << addModel_Info << "-- addModelMessage-- "
-            << "notIplemented"<<endl;
+        InfoH << addModel_Info << "5 -- addModelMessage-- "
+            << "notImplemented"<<endl;
     }
 
     bool isBodyInContact(PtrList<immersedBody>& immersedBodies);

@@ -193,7 +193,7 @@ namespace Foam
         virtual void writeBodyInfo(label bodyId, IOdictionary& dict, word path)
         {
             InfoH << iB_Info << "-- geomModelMessage-- "
-                << "custer body writeBodyInfo notIplemented"<<endl;
+                << "custer body writeBodyInfo notImplemented"<<endl;
         }
     };
 }

@@ -100,7 +100,7 @@ namespace Foam
         )
         {
             InfoH << iB_Info << "-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual std::shared_ptr<geomModel> getCopy() = 0;

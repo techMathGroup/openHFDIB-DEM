@@ -167,7 +167,7 @@ namespace Foam
         )
         {
             InfoH << iB_Info << "1-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual std::shared_ptr<geomModel> getCopy() = 0;
@@ -240,20 +240,20 @@ namespace Foam
         )
         {
             InfoH << iB_Info << "2-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
             return vector::zero;
         }
 
         virtual void bodyMovePoints(vector translVec)
         {
             InfoH << iB_Info << "3-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual void bodyScalePoints(scalar scaleFac)
         {
             InfoH << iB_Info << "4-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual void bodyRotatePoints
@@ -263,26 +263,26 @@ namespace Foam
         )
         {
             InfoH << iB_Info << "5-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual void resetBody()
         {
             InfoH << iB_Info << "6-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual vector getCoM()
         {
             InfoH << iB_Info << "7-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
             return vector::zero;
         }
 
         virtual boundBox getBounds()
         {
             InfoH << iB_Info << "8-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
             boundBox bound;
             return bound;
         }
@@ -290,33 +290,33 @@ namespace Foam
         virtual void synchronPos(label owner = -1)
         {
             InfoH << iB_Info << "9-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual void writeBodyInfo(label bodyId, IOdictionary& dict, word path)
         {
             InfoH << iB_Info << "10-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual boolList pointInside(pointField pointI)
         {
             InfoH << iB_Info << "11-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
             return {false};
         }
 
         virtual bool pointInside(point pointI)
         {
             InfoH << iB_Info << "12-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
             return false;
         }
 
         virtual volumeType getVolumeType(subVolume& sv, bool cIb)
         {
             InfoH << iB_Info << "13-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
             return volumeType::UNKNOWN;
         }
 
@@ -334,7 +334,7 @@ namespace Foam
         )
         {
             InfoH << iB_Info << "14-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         virtual bool limitFinalSubVolume
@@ -345,14 +345,14 @@ namespace Foam
         )
         {
             InfoH << iB_Info << "15-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
             return false;
         }
 
         virtual void setCoM()
         {
             InfoH << iB_Info << "16-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         constexpr contactType getcType()
@@ -508,7 +508,7 @@ namespace Foam
         virtual  void setBodyPosition(pointField pos)
         {
             InfoH << iB_Info << "22-- geomModelMessage-- "
-                << "notIplemented"<<endl;
+                << "notImplemented"<<endl;
         }
 
         void setRefineBuffers(label refineBuffers)
