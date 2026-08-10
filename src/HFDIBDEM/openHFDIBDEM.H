@@ -157,6 +157,16 @@ namespace Foam
         volScalarField& body,
         volScalarField& refineF
     );
+    void recreateBodies
+    (
+        volScalarField& body,
+        volScalarField& refineF
+    );
+    void createBodiesComputeDynamicsVars
+    (
+        volScalarField& body,
+        volScalarField& refineF
+    );
 
     void updateSurface
     (
@@ -248,7 +258,6 @@ namespace Foam
         const bool applyAddedMass
     );
 
-    void recreateBodies(volScalarField& body,volScalarField& refineF);
     // void for DEM inner-loops
     void updateDEM(volScalarField& body,volScalarField& refineF);
 

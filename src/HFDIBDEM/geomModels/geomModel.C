@@ -85,16 +85,7 @@ void geomModel::calculateGeometricalProperties
     //Get CellCount At Each SubDomain
     nCells_ = intCells_[Pstream::myProcNo()].size() + surfCells_[Pstream::myProcNo()].size();
 
-    // collect from processors
-    reduce(M_, sumOp<scalar>());
-    //reduce(tmpCom,  sumOp<vector>());
-    reduce(I_,  sumOp<symmTensor>());
-    //collect cellCount actros processors
-    reduce(nCells_, sumOp<label>());
-    /*if(M_ > 0)
-    {
-        CoM_ = tmpCom / M_;
-    }*/
+    reduceGeometricalProperties();
 }
 //---------------------------------------------------------------------------//
 void geomModel::calculateGeometricalPropertiesParallel
@@ -114,6 +105,20 @@ void geomModel::calculateGeometricalPropertiesParallel
     //Get CellCount At Each SubDomain
     nCells_ = intCells_[Pstream::myProcNo()].size() + surfCells_[Pstream::myProcNo()].size();
 
+}
+//---------------------------------------------------------------------------//
+void geomModel::reduceGeometricalProperties()
+{
+    // collect from processors
+    reduce(M_, sumOp<scalar>());
+    reduce(I_,  sumOp<symmTensor>());
+    reduce(nCells_, sumOp<label>());
+
+    // Note (MI): helper function to allow for future simplification
+    //            of calls to calculateGeometricalPropertiesParallel
+    //            and calculateGeometricalProperties
+    //            -> these two now differ only by a call to 
+    //               reduceGeometricalProperties
 }
 //---------------------------------------------------------------------------//
 void geomModel::addToMAndI

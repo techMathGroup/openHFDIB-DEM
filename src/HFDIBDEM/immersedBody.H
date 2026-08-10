@@ -508,7 +508,7 @@ namespace Foam
 
         void checkIfInDomain(volScalarField& body);
 
-        const label& getrecomputeM0() const
+        const label& getRecomputeM0() const
         {
             return recomputeM0_;
         }

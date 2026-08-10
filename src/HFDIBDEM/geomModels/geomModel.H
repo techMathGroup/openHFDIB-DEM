@@ -397,6 +397,7 @@ namespace Foam
             volScalarField& body
         );
 
+        virtual void reduceGeometricalProperties();
 
 
         //evaluate center of mass and inertia tensor

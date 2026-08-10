@@ -151,6 +151,10 @@ void immersedBody::syncCreateImmersedBody
 )
 {
     syncImmersedBodyGeometry(body, refineF);
+    // Note (MI): during simplification, calculateGeometricalProperties
+    //            was replaced by calculateGeometricalPropertiesParallel
+    //            and this replacement WAS NOT tested (a problem might
+    //            appear for clusterBodies)
     syncImmersedBodyRefinement(body, refineF);
 }
 //---------------------------------------------------------------------------//
