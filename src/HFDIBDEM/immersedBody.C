@@ -150,55 +150,11 @@ void immersedBody::syncCreateImmersedBody
     volScalarField& refineF
 )
 {
-    geomModel_->setOwner();
-    InfoH << iB_Info << "body: " << bodyId_
-        << " owner: " << geomModel_->getOwner() << endl;
-
-    InfoH << iB_Info << "Computing geometrical properties" << endl;
-    geomModel_->calculateGeometricalProperties(body);
-
-    // update body courant number
-    computeBodyCoNumber();
-
-    InfoH << iB_Info << "-- body: " << bodyId_
-        << " current center of mass position: " << geomModel_->getCoM() << endl;
-
-    const List<DynamicLabelList>& surfCells = geomModel_->getSurfaceCellList();
-    DynamicLabelList zeroList(surfCells[Pstream::myProcNo()].size(), 0);
-
-    constructRefineField
-    (
-        body,
-        refineF,
-        surfCells[Pstream::myProcNo()],
-        zeroList
-    );
-
-    scalarList charCellSizeL(Pstream::nProcs(),1e4);
-    forAll (surfCells[Pstream::myProcNo()],sCellI)
-    {
-        label cellI = surfCells[Pstream::myProcNo()][sCellI];
-        charCellSizeL[Pstream::myProcNo()] =
-            min
-            (
-                charCellSizeL[Pstream::myProcNo()],
-                Foam::pow(mesh_.V()[cellI],0.3333)
-            );
-    }
-    forAll(charCellSizeL,indl)
-    {
-        if(charCellSizeL[indl] > 5e3)
-        {
-            charCellSizeL[indl] = -1.0;
-        }
-    }
-
-    charCellSize_ = gMax(charCellSizeL);
-    InfoH << iB_Info << "Body characteristic cell size: "
-        << charCellSize_ << endl;
+    syncImmersedBodyGeometry(body, refineF);
+    syncImmersedBodyRefinement(body, refineF);
 }
 //---------------------------------------------------------------------------//
-void immersedBody::syncImmersedBodyParralell1
+void immersedBody::syncImmersedBodyGeometry
 (
     volScalarField& body,
     volScalarField& refineF
@@ -212,7 +168,7 @@ void immersedBody::syncImmersedBodyParralell1
     geomModel_->calculateGeometricalPropertiesParallel(body);
 }
 //---------------------------------------------------------------------------//
-void immersedBody::syncImmersedBodyParralell2
+void immersedBody::syncImmersedBodyRefinement
 (
     volScalarField& body,
     volScalarField& refineF
@@ -959,16 +915,16 @@ void immersedBody::updateMovementComp
         {
             // compute current acceleration (assume constant over timeStep)
 
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" ParticelMass    : " << geomModel_->getM0() << endl;
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" Acting Force    : " << F << endl;
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" Coupling Force  : " << FCoupling_.F << endl;
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" G-B Force       : " << FG << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" mass            : " << geomModel_->getM0() << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" acting force    : " << F << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" coupling force  : " << FCoupling_.F << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" grav/buyo force : " << FG << endl;
             
             a_  = F/(geomModel_->getM0());
             
             // update body linear velocity
             Vel_ = Vel + deltaT*a_;
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" accelaration  : " << a_ << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" accelaration    : " << a_ << endl;
         }
     };
 

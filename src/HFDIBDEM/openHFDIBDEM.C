@@ -486,7 +486,7 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            immersedBodies_[bodyId].syncImmersedBodyParralell1(body,refineF);
+            immersedBodies_[bodyId].syncImmersedBodyGeometry(body,refineF);
             if (immersedBodies_[bodyId].getGeomModel().isCluster())
             {
                 clusterBody& cBody = dynamic_cast<clusterBody&>(immersedBodies_[bodyId].getGeomModel());
@@ -536,7 +536,7 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
                 bodyIndex++;
             }
 
-            immersedBodies_[bodyId].syncImmersedBodyParralell2(body,refineF);
+            immersedBodies_[bodyId].syncImmersedBodyRefinement(body,refineF);
             immersedBodies_[bodyId].checkIfInDomain(body);
             immersedBodies_[bodyId].updateOldMovementVars();
         }
@@ -756,7 +756,7 @@ void openHFDIBDEM::recreateBodies
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            immersedBodies_[bodyId].syncImmersedBodyParralell1(body,refineF);
+            immersedBodies_[bodyId].syncImmersedBodyGeometry(body,refineF);
             if (immersedBodies_[bodyId].getGeomModel().isCluster())
             {
                 clusterBody& cBody = dynamic_cast<clusterBody&>(immersedBodies_[bodyId].getGeomModel());
@@ -806,7 +806,7 @@ void openHFDIBDEM::recreateBodies
                 bodyIndex++;
             }
 
-            immersedBodies_[bodyId].syncImmersedBodyParralell2(body,refineF);
+            immersedBodies_[bodyId].syncImmersedBodyRefinement(body,refineF);
             immersedBodies_[bodyId].checkIfInDomain(body);
         }
     }
@@ -822,7 +822,7 @@ void openHFDIBDEM::recreateBodies
                 immersedBodies_[bodyId].recomputedM0();
             }
             InfoH << iB_Info << "-- body "
-                << immersedBodies_[bodyId].getBodyId() << " Re-created" << endl;
+                << immersedBodies_[bodyId].getBodyId() << " re-created" << endl;
         }
     }
 }

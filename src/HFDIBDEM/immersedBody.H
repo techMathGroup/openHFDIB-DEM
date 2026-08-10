@@ -271,13 +271,13 @@ namespace Foam
             volScalarField& refineF
         );
 
-        void syncImmersedBodyParralell1
+        void syncImmersedBodyGeometry
         (
             volScalarField& body,
             volScalarField& refineF
         );
 
-        void syncImmersedBodyParralell2
+        void syncImmersedBodyRefinement
         (
             volScalarField& body,
             volScalarField& refineF
