@@ -167,7 +167,6 @@ int main(int argc, char *argv[])
                     }
 
                     lambda *= 0.0;
-
                     HFDIBDEM.recreateBodies(lambda,refineF);
                     HFDIBDEM.updateSurface(thrSurf,lambda,surface);
                     volVectorField gradLambda(fvc::grad(lambda));                    

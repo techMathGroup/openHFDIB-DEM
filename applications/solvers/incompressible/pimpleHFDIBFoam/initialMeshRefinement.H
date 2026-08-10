@@ -4,9 +4,6 @@ for (label level=0;level<maxRefinementLevel+1;level++)
     
     mesh.update();
 
-    Info << "mesh.changing(): " << mesh.changing() << endl;
-    // Info << refineF << endl;
-
     if (mesh.changing())
     {
         Info << "Mesh changed, updating immersed bodies" << endl;
