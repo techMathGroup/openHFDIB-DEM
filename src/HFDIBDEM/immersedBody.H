@@ -68,19 +68,19 @@ namespace Foam
         typedef DynamicList<point> DynamicPointList;
 
         // name of the body
-        word    bodyName_;
+        word bodyName_;
 
         // is the particle active in the simulation
-        bool    isActive_;
+        bool isActive_;
 
         // body set-up
-        dictionary&             immersedDict_;
+        dictionary& immersedDict_;
 
         // mesh reference
-        const  fvMesh&   mesh_;
+        const fvMesh& mesh_;
 
         // fluid properties
-        dictionary&             transportProperties_;
+        dictionary& transportProperties_;
 
         // body geometry
         std::shared_ptr<geomModel> geomModel_;
@@ -136,13 +136,16 @@ namespace Foam
         dimensionedScalar rhoF_;
 
         // integer to identify current body
-        label   bodyId_;
+        label bodyId_;
+
+        // word with bodyId string for better outputs
+        word bodyIdStr_;
 
         // auxiliary switch - do I want to update the torques?
-        bool    updateTorque_;
+        bool updateTorque_;
 
         // operation to perform
-        int     bodyOperation_;
+        int bodyOperation_;
 
         // update immersed body info
         // void  updateImmersedBody
@@ -194,18 +197,18 @@ namespace Foam
         bool    startSynced_;
 
         // auxiliary variables
-        tensor  totRotMatrix_;
-        bool    sdBasedLambda_;
-        word    overlayLambda_;
+        tensor totRotMatrix_;
+        bool sdBasedLambda_;
+        word overlayLambda_;
         // bool    isInCollision_ = false;
-        scalar  intSpan_;
-        scalar  charCellSize_;                                          //characteristic cell size over surface
-        label   refineBuffers_;                                         //number of refine buffers around body
-        label   recomputeM0_;                                           //how many times rocompute M0_ because of refinement
-        label   timesToSetStatic_;
-        vector  staticContactPost_;
-        protected:
+        scalar intSpan_;
+        scalar charCellSize_;                                           //characteristic cell size over surface
+        label refineBuffers_;                                           //number of refine buffers around body
+        label recomputeM0_;                                             //how many times rocompute M0_ because of refinement
+        label timesToSetStatic_;
+        vector staticContactPost_;
 
+        protected:
 
         public:
 
@@ -282,6 +285,8 @@ namespace Foam
             volScalarField& body,
             volScalarField& refineF
         );
+
+        void computeCharCellSize();
 
         void constructRefineField
         (

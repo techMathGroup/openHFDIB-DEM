@@ -1,9 +1,16 @@
+// for 2D case, remove unused directions from the rotation axis
 if (mesh_.nGeometricD() < 3)
 {
     const vector validDirs = (mesh_.geometricD() + Vector<label>::one)/2;
     Axis_ -= validDirs;
 }
 Axis_ /= mag(Axis_);
+
+// format bodyIdStr_ for better outputs
+while (bodyIdStr_.size() < 4)
+{
+    bodyIdStr_ = " " + bodyIdStr_;
+}
 
 // read the body operation name from immersedDict_
 if (immersedDict_.found("staticBody"))

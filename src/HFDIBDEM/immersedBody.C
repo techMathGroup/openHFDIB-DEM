@@ -92,9 +92,9 @@ alpha_(vector::zero),
 totalAngle_(vector::zero),
 couplingHistCoef_(1.0),
 CoNum_(0.0),
-//~ rhoF_(dimensionedScalar(transportProperties_.lookup("rho"))),
 rhoF_(1.0),
 bodyId_(bodyId),
+bodyIdStr_(Foam::name(bodyId_)),
 updateTorque_(false),
 bodyOperation_(0),
 octreeField_(mesh_.nCells(), 0),
@@ -113,7 +113,7 @@ staticContactPost_(vector::zero)
     #include "initializeIB.H"
 
     InfoH << iB_Info << "Finished body initialization" << endl;
-    InfoH << basic_Info << "New bodyID: " << bodyId_ << " name: "
+    InfoH << basic_Info << "New bodyID: " << bodyIdStr_ << " name: "
         << bodyName_ << " rhoS: " << geomModel_->getRhoS()
         << " dC: " << getDC() << endl;
 }
@@ -165,7 +165,7 @@ void immersedBody::syncImmersedBodyGeometry
 )
 {
     geomModel_->setOwner();
-    InfoH << iB_Info << "body: " << bodyId_
+    InfoH << iB_Info << "body " << bodyIdStr_
         << " owner: " << geomModel_->getOwner() << endl;
 
     InfoH << iB_Info << "Computing geometrical properties" << endl;
@@ -181,7 +181,7 @@ void immersedBody::syncImmersedBodyRefinement
     // update body courant number
     // computeBodyCoNumber();
 
-    InfoH << iB_Info << "-- body: " << bodyId_
+    InfoH << iB_Info << "-- body " << bodyIdStr_
         << " current center of mass position: " << geomModel_->getCoM() << endl;
 
     const List<DynamicLabelList>& surfCells = geomModel_->getSurfaceCellList();
@@ -195,15 +195,41 @@ void immersedBody::syncImmersedBodyRefinement
         zeroList
     );
 
+    computeCharCellSize();
+
+}
+//---------------------------------------------------------------------------//
+void immersedBody::computeCharCellSize()
+{
+    const List<DynamicLabelList>& surfCells = geomModel_->getSurfaceCellList();
+
     scalarList charCellSizeL(Pstream::nProcs(),1e4);
     forAll (surfCells[Pstream::myProcNo()],sCellI)
     {
         label cellI = surfCells[Pstream::myProcNo()][sCellI];
+        
+        scalar cellMeasure = mesh_.V()[cellI];
+        label nGeometricD = mesh_.nGeometricD();
+
+        if (!case3D)
+        {
+            scalar emptyThickness = 1.0;
+            forAll(emptyDir,dirI)                                       //this is based on settings from HFDIBDEMDict, not actual mesh
+            {                                                           //plus: adaptively refined meshes can be treated as 2D
+                if (emptyDir[dirI])                                     //minus: forces user to check both mesh and HFDIBDEMDict
+                {
+                    emptyThickness *= mesh_.bounds().span()[dirI];
+                    nGeometricD--;
+                }
+            }     
+            cellMeasure /= emptyThickness;
+        }
+
         charCellSizeL[Pstream::myProcNo()] =
             min
             (
                 charCellSizeL[Pstream::myProcNo()],
-                Foam::pow(mesh_.V()[cellI],0.3333)
+                Foam::pow(cellMeasure,1.0/nGeometricD)
             );
     }
     forAll(charCellSizeL,indl)
@@ -214,9 +240,9 @@ void immersedBody::syncImmersedBodyRefinement
         }
     }
 
-    charCellSize_ = gMax(charCellSizeL);
-    InfoH << iB_Info << "Body characteristic cell size: "
-        << charCellSize_ << endl;
+    charCellSize_ = gMax(charCellSizeL);                                //I want to be sure to always go to another cells
+    InfoH << iB_Info << "-- body " << bodyIdStr_
+        << " characteristic cell size: " << charCellSize_ << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::constructRefineField
@@ -543,7 +569,7 @@ void immersedBody::updateCoupling
 
     couplingHistCoef_ = max(couplingHistCoef_*0.95, 0.5);
     
-    InfoH << iB_Info << "-- body: " << bodyId_ << ": COUPLING COEF =  " << couplingHistCoef_ << endl;
+    InfoH << iB_Info << "-- body " << bodyIdStr_ << " coupling coefficient: " << couplingHistCoef_ << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateCoupling                                       //full interface
@@ -639,7 +665,7 @@ void immersedBody::updateCoupling                                       //full i
 
     couplingHistCoef_ = max(couplingHistCoef_*0.95, 0.5);
     
-    InfoH << iB_Info << "-- body: " << bodyId_ << ": COUPLING COEF =  " << couplingHistCoef_ << endl;
+    InfoH << iB_Info << "-- body " << bodyIdStr_ << " coupling coefficient: " << couplingHistCoef_ << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateCoupling                                       //full interface
@@ -754,7 +780,7 @@ void immersedBody::updateCoupling                                       //full i
 
     couplingHistCoef_ = max(couplingHistCoef_*0.95, 0.5);
     
-    InfoH << iB_Info << "-- body: " << bodyId_ << ": COUPLING COEF =  " << couplingHistCoef_ << endl;
+    InfoH << iB_Info << "-- body " << bodyIdStr_ << " coupling coefficient: " << couplingHistCoef_ << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::applyAddedMassScaling
@@ -774,13 +800,13 @@ void immersedBody::applyAddedMassScaling
     // scalar massAdded = min(1.0*m0, mag(FAdded)/(mag(a_) + SMALL));
     scalar massAdded = mag(FAdded)/(mag(a_) + SMALL);
     massAdded *= massSign;
-    InfoH << iB_Info << "-- body: " << bodyId_ << " massAdded: " << massAdded
+    InfoH << iB_Info << "-- body " << bodyIdStr_ << " massAdded: " << massAdded
         << " m0: " << m0 << endl;
-    InfoH << iB_Info << "-- body: " << bodyId_ << " orig coupling force: " << FCoupling_.F << " orig coupling torque: " << FCoupling_.T << endl;
+    InfoH << iB_Info << "-- body " << bodyIdStr_ << " orig coupling force: " << FCoupling_.F << " orig coupling torque: " << FCoupling_.T << endl;
     const scalar scale = (m0 + massAdded)/m0;
     FCoupling_.F *= scale;
     FCoupling_.T *= scale;
-    InfoH << iB_Info << "-- body: " << bodyId_ << " scld coupling force: " << FCoupling_.F << " scld coupling torque: " << FCoupling_.T << endl;
+    InfoH << iB_Info << "-- body " << bodyIdStr_ << " scld coupling force: " << FCoupling_.F << " scld coupling torque: " << FCoupling_.T << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateLocalFluidDensity
@@ -919,16 +945,16 @@ void immersedBody::updateMovementComp
         {
             // compute current acceleration (assume constant over timeStep)
 
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" mass            : " << geomModel_->getM0() << endl;
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" acting force    : " << F << endl;
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" coupling force  : " << FCoupling_.F << endl;
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" grav/buyo force : " << FG << endl;
+            InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" mass            : " << geomModel_->getM0() << endl;
+            InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" acting force    : " << F << endl;
+            InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" coupling force  : " << FCoupling_.F << endl;
+            InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" grav/buyo force : " << FG << endl;
             
             a_  = F/(geomModel_->getM0());
             
             // update body linear velocity
             Vel_ = Vel + deltaT*a_;
-            InfoH << iB_Info <<"-- body "<< bodyId_ <<" accelaration    : " << a_ << endl;
+            InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" accelaration    : " << a_ << endl;
         }
     };
 
@@ -1106,15 +1132,15 @@ void immersedBody::moveImmersedBody
 void immersedBody::printBodyInfo()
 {
     InfoH << iB_Info;
-    InfoH << "-- body " << bodyId_ << " CoM                  : "
+    InfoH << "-- body " << bodyIdStr_ << " CoM                  : "
         << geomModel_->getCoM() << endl;
-    InfoH << "-- body " << bodyId_ << " linear velocity      : "
+    InfoH << "-- body " << bodyIdStr_ << " linear velocity      : "
         << Vel_ << endl;
-    InfoH << "-- body " << bodyId_ << " angluar velocity     : "
+    InfoH << "-- body " << bodyIdStr_ << " angluar velocity     : "
         << omega_ << endl;
-    InfoH << "-- body " << bodyId_ << " axis of rotation     : "
+    InfoH << "-- body " << bodyIdStr_ << " axis of rotation     : "
         << Axis_ << endl;
-    InfoH << "-- body " << bodyId_ << " total rotation matrix: "
+    InfoH << "-- body " << bodyIdStr_ << " total rotation matrix: "
         << totRotMatrix_ << endl;
 }
 //---------------------------------------------------------------------------//
@@ -1303,7 +1329,7 @@ void immersedBody::computeBodyCoNumber()
         meanCoNum_ /= auxCntr;
     }
 
-    InfoH << iB_Info << "-- body " << bodyId_
+    InfoH << iB_Info << "-- body " << bodyIdStr_
         << " Courant Number mean: " << meanCoNum_
         << " max: " << CoNum_ << endl;
 
@@ -1317,9 +1343,9 @@ void immersedBody::printMomentum()
     vector p(geomModel_->getM()*Vel_);
 
     InfoH << iB_Info;
-    InfoH << "-- body " << bodyId_ << "  linear momentum:" << p
+    InfoH << "-- body " << bodyIdStr_ << "  linear momentum:" << p
          << " magnitude: " << mag(p) <<endl;
-    InfoH << "-- body " << bodyId_ << " angular momentum:" << L
+    InfoH << "-- body " << bodyIdStr_ << " angular momentum:" << L
          << " magnitude: " << mag(L) <<endl;
 }
 //---------------------------------------------------------------------------//
@@ -1329,17 +1355,17 @@ void immersedBody::printStats()
     vector L(geomModel_->getI()&(Axis_*omega_));
     vector p(geomModel_->getM()*Vel_);
 
-    InfoH << iB_Info << "-- body " << bodyId_ << "  linear momentum:" << p
+    InfoH << iB_Info << "-- body " << bodyIdStr_ << "  linear momentum:" << p
         << " magnitude: " << mag(p) <<endl;
-    InfoH << "-- body " << bodyId_ << " angular momentum:" << L
+    InfoH << "-- body " << bodyIdStr_ << " angular momentum:" << L
         << " magnitude: " << mag(L) <<endl;
-    InfoH << basic_Info << "-- body " << bodyId_ << " CoM :"
+    InfoH << basic_Info << "-- body " << bodyIdStr_ << " CoM :"
         << geomModel_->getCoM() << endl;
-    InfoH << basic_Info << "-- body " << bodyId_ << "  linear velocity:"
+    InfoH << basic_Info << "-- body " << bodyIdStr_ << "  linear velocity:"
         << Vel_ << " magnitude: " << mag(Vel_) <<endl;
-    InfoH << "-- body " << bodyId_ << " angular velocity:" << omega_
+    InfoH << "-- body " << bodyIdStr_ << " angular velocity:" << omega_
         << " magnitude: " << mag(omega_) <<endl;
-    InfoH << "-- body " << bodyId_ << "    rotation axis:" << Axis_
+    InfoH << "-- body " << bodyIdStr_ << "    rotation axis:" << Axis_
         << " magnitude: " << mag(Axis_) <<endl;
 }
 //---------------------------------------------------------------------------//
@@ -1415,7 +1441,7 @@ void immersedBody::initSyncWithFlow(const volVectorField& U)
     omegaOld_   = omega_;
     AxisOld_    = Axis_;
     // print data:
-    InfoH << basic_Info << "-- body " << bodyId_
+    InfoH << basic_Info << "-- body " << bodyIdStr_
         << "initial movement variables:" << endl;
     printStats();
 }
@@ -1452,7 +1478,7 @@ void immersedBody::checkIfInDomain(volScalarField& body)
         geomModel_->resetBody(body);
     }
 
-    InfoH << iB_Info << "-- body " << bodyId_ << " current M/M0: "
+    InfoH << iB_Info << "-- body " << bodyIdStr_ << " current M/M0: "
         << geomModel_->getM()/geomModel_->getM0() << endl;
     // if only 1% of the initial particle mass remains in the domain, switch it off
     if (geomModel_->getM()/(geomModel_->getM0()+SMALL) < 1e-2 && case3D)
@@ -1464,7 +1490,7 @@ void immersedBody::checkIfInDomain(volScalarField& body)
     {
         switchActiveOff(body);
         geomModel_->resetBody(body);
-        InfoH << iB_Info << "-- body " << bodyId_ << " switched off" << endl;
+        InfoH << iB_Info << "-- body " << bodyIdStr_ << " switched off" << endl;
     }
 }
 //---------------------------------------------------------------------------//
@@ -1474,7 +1500,7 @@ void immersedBody::setRestartSim(vector vel, scalar angVel, vector axisRot, bool
     omega_ = angVel;
     Axis_ = axisRot;
     ibContactClass_->setTimeStepsInContWStatic(timesInContact);
-    InfoH << iB_Info << "-- body " << bodyId_
+    InfoH << iB_Info << "-- body " << bodyIdStr_
         << " timeStepsInContWStatic_: "
         << ibContactClass_->getTimeStepsInContWStatic() << endl;
     if(setStatic)
@@ -1482,7 +1508,7 @@ void immersedBody::setRestartSim(vector vel, scalar angVel, vector axisRot, bool
         bodyOperation_ = 0;
         omega_ = 0;
         Vel_ *= 0;
-        InfoH << basic_Info << "-- body " << bodyId_ << " set as Static" << endl;
+        InfoH << basic_Info << "-- body " << bodyIdStr_ << " set as Static" << endl;
     }
 }
 //---------------------------------------------------------------------------//
@@ -1500,7 +1526,7 @@ void immersedBody::checkBodyOp()
     if(ibContactClass_->checkInContactWithStatic())
     {
         ibContactClass_->setTimeStepsInContWStatic(ibContactClass_->getTimeStepsInContWStatic() + 1);
-        InfoH << iB_Info << "-- body " << bodyId_
+        InfoH << iB_Info << "-- body " << bodyIdStr_
             << " timeStepsInContWStatic_: "
             << ibContactClass_->getTimeStepsInContWStatic() << endl;
 
@@ -1522,7 +1548,7 @@ void immersedBody::checkBodyOp()
             bodyOperation_ = 0;
             omega_ = 0;
             Vel_ *= 0;
-            InfoH << basic_Info << "-- body " << bodyId_ << " set as Static" << endl;
+            InfoH << basic_Info << "-- body " << bodyIdStr_ << " set as Static" << endl;
         }
     }
 
@@ -1585,5 +1611,5 @@ void immersedBody::updateRhoF                                           //varian
     {
         rhoF_ = 1.0;
     }
-    InfoH << iB_Info << "-- body: " << bodyId_ << ": rhoF = " << rhoF_ << endl;
+    InfoH << iB_Info << "-- body: " << bodyIdStr_ << ": rhoF = " << rhoF_ << endl;
 }
