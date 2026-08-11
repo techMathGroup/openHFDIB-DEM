@@ -219,6 +219,10 @@ void immersedBody::computeCharCellSize()
                 if (emptyDir[dirI])                                     //minus: forces user to check both mesh and HFDIBDEMDict
                 {
                     emptyThickness *= mesh_.bounds().span()[dirI];
+                    if (refineBuffers_ > 1)
+                    {
+                        emptyThickness /= (refineBuffers_ - 1);
+                    }
                     nGeometricD--;
                 }
             }     
