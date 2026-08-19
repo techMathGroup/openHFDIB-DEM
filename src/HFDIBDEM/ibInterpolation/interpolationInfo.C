@@ -43,7 +43,8 @@ interpolationInfo::interpolationInfo
 )
 :
 mesh_(mesh),
-geomModel_(gModel)
+geomModel_(gModel),
+charCellSize_(1.0)
 {}
 
 interpolationInfo::~interpolationInfo()

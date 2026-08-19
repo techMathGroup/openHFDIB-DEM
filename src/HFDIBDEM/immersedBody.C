@@ -141,10 +141,18 @@ void immersedBody::createImmersedBody
         syncCreateImmersedBody(body, refineF);
     }
 
+    computeCharCellSize();                                              //used in intpInfo_->setIntpInfo()
+    // Note (MI): in theory, it should be enough to compute body
+    //            characteristic cell size only once - after the first
+    //            creation on a sufficiently refined mesh
+    // => we should look into this in future
+    // Note (MI): computeCharCellSize() has gMax in it - is it efficient?
+    intpInfo_->setCharCellSize(charCellSize_);                          //set characteristic cell size to find interpolation points
+
     intpInfo_->setIntpInfo();
 }
 //---------------------------------------------------------------------------//
-void immersedBody::syncCreateImmersedBody
+void immersedBody::syncCreateImmersedBody                               //Note (MI): the name does not reflect the content
 (
     volScalarField& body,
     volScalarField& refineF
@@ -194,8 +202,6 @@ void immersedBody::syncImmersedBodyRefinement
         surfCells[Pstream::myProcNo()],
         zeroList
     );
-
-    computeCharCellSize();
 
 }
 //---------------------------------------------------------------------------//

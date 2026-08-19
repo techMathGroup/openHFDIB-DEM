@@ -468,17 +468,26 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
             immersedBodies_[bodyId].resetBody(body);
         }
     }
+    Info << "!! -- bodies reset" << endl;
 
     // recreate all bodies after contact update
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            immersedBodies_[bodyId].postContactUpdateBodyField(body,refineF);
+            immersedBodies_[bodyId].createImmersedBody
+            (
+                body,
+                refineF,
+                false                                                   //create without "synchronization"
+            );
         }
     }
+    Info << "!! -- bodies created" << endl;
 
     createBodiesComputeDynamicsVars(body, refineF);
+
+    Info << "!! -- black magic happened" << endl;
 
     forAll (immersedBodies_,bodyId)
     {
@@ -524,7 +533,7 @@ void openHFDIBDEM::recreateBodies
                 immersedBodies_[bodyId].recomputedM0();
             }
             InfoH << iB_Info << "-- body "
-                << immersedBodies_[bodyId].getBodyId() << " re-created" << endl;
+                << immersedBodies_[bodyId].getBodyIdStr() << " re-created" << endl;
         }
     }
 }

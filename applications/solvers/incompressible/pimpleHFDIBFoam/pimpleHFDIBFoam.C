@@ -114,6 +114,7 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         clockTime createBodiesTime; // OS time efficiency testing
+        Info << "Creating immersed bodies" << endl;
         HFDIBDEM.createBodies(lambda,refineF);
         if (!didInitialRefinement)
         {
@@ -166,6 +167,7 @@ int main(int argc, char *argv[])
                         #include "meshCourantNo.H"
                     }
 
+                    Info << "Recreating immersed bodies after mesh update" << endl;
                     lambda *= 0.0;
                     HFDIBDEM.recreateBodies(lambda,refineF);
                     HFDIBDEM.updateSurface(thrSurf,lambda,surface);

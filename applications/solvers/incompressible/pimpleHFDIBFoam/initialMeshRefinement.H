@@ -6,7 +6,6 @@ for (label level=0;level<maxRefinementLevel+1;level++)
 
     if (mesh.changing())
     {
-        Info << "Mesh changed, updating immersed bodies" << endl;
         MRF.update();
 
         if (correctPhi)
@@ -26,6 +25,7 @@ for (label level=0;level<maxRefinementLevel+1;level++)
             #include "meshCourantNo.H"
         }
 
+        Info << "Recreating immersed bodies after mesh update" << endl;
         lambda *= 0.0;
         HFDIBDEM.recreateBodies(lambda,refineF);
     }

@@ -114,7 +114,7 @@ void lineIntInfo::setIntpInfo()
                 // latest interpolation point
                 intPoint cIntPoint = intPointsToSolve[proci][iInfo];
                 point cPoint = cIntPoint.iPoint_;
-                scalar intDist = Foam::pow(mesh_.V()[cIntPoint.iCell_],0.333);
+                scalar& intDist = charCellSize_;                        //use IB characteristic cell size
 
                 do {
                     cPoint += ibNormalsToSolve[proci][iInfo]*intDist;

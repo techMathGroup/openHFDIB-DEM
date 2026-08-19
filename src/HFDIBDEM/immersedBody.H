@@ -326,6 +326,11 @@ namespace Foam
             return bodyId_;
         }
 
+        const word& getBodyIdStr() const
+        {
+            return bodyIdStr_;
+        }
+
         const vector& getVel()  const
         {
             return Vel_;

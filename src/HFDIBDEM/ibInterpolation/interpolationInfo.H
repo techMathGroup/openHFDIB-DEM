@@ -60,8 +60,9 @@ namespace Foam
         // geomModel reference
         std::shared_ptr<geomModel>& geomModel_;
 
-        autoPtr<List<point>> ibPointsPtr_; // cellIbPoint mapping
-        autoPtr<List<vector>> ibNormalsPtr_; // cellIbNormal mapping
+        autoPtr<List<point>> ibPointsPtr_;                              //cellIbPoint mapping
+        autoPtr<List<vector>> ibNormalsPtr_;                            //cellIbNormal mapping
+        scalar charCellSize_;
 
         public:
 
@@ -100,6 +101,11 @@ namespace Foam
         {
             ibPointsPtr_.clear();
             ibNormalsPtr_.clear();
+        }
+
+        void setCharCellSize(scalar charCellSize)
+        {
+            charCellSize_ = charCellSize;
         }
     };
 }
