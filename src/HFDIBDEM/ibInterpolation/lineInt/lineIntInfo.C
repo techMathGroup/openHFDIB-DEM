@@ -49,12 +49,14 @@ lineIntInfo::~lineIntInfo()
 //---------------------------------------------------------------------------//
 void lineIntInfo::setIntpInfo()
 {
+    Info << "!! --> entry check !!" << endl;
     const DynamicLabelList& cSurfCells = getSurfCells();
 
     resetIntpInfo(cSurfCells.size());
     List<point>& ibPoints = getIbPoints();
     List<vector>& ibNormals = getIbNormals();
     List<List<intPoint>>& intPoints = getIntPoints();
+    const scalar& intDist = charCellSize_;                              //use IB characteristic cell size - const in method
 
     // prepare lists of points to solve
     List<DynamicList<point>> ibPointsToSolve(Pstream::nProcs()); // include this as a part of the intPoint struct?
@@ -62,6 +64,7 @@ void lineIntInfo::setIntpInfo()
     List<DynamicList<intPoint>> intPointsToSolve(Pstream::nProcs());
 
     // create temporary unit surface normals
+    Info << "!! --> forAll cSurfCells check !!" << endl;
     forAll (cSurfCells, cellI)
     {
         // get surface cell label
@@ -93,6 +96,7 @@ void lineIntInfo::setIntpInfo()
     }
 
     // go by orders
+    Info << "!! --> finding int points check !!" << endl;
     for(label i = 0; i < ORDER; ++i)
     {
         // lists to send
@@ -108,20 +112,24 @@ void lineIntInfo::setIntpInfo()
         // loop over processors
         for (label proci = 0; proci < Pstream::nProcs(); proci++)
         {
+            Info << "!!   |-> loop over intPointsToSolve !!" << endl;
             // loop over interpolation points
             forAll(intPointsToSolve[proci], iInfo)
             {
                 // latest interpolation point
                 intPoint cIntPoint = intPointsToSolve[proci][iInfo];
                 point cPoint = cIntPoint.iPoint_;
-                scalar& intDist = charCellSize_;                        //use IB characteristic cell size
 
+                Info << "!!     |-> entering while loop" << endl;
                 do {
                     cPoint += ibNormalsToSolve[proci][iInfo]*intDist;
                 } while(pointInCell(cPoint, cIntPoint.iCell_));
+                Info << "       |-> came out of while loop -- !!" << endl;
 
                 // new interpolation points
+                Info << "!!     |-> findIntPoint call" << endl;
                 intPoint nIntPoint = findIntPoint(cIntPoint, cPoint);
+                Info << "       |-> nIntPoint found -- !!" << endl;
                 correctIntPoint(ibPointsToSolve[proci][iInfo], nIntPoint);
 
                 // check for cells at domain boundary
@@ -149,6 +157,7 @@ void lineIntInfo::setIntpInfo()
             }
         }
 
+        Info << "!!   |-> proc-proc communication !!" << endl;
         // sync with others
         List<DynamicList<point>> ibPointsRecv(Pstream::nProcs());
         List<DynamicList<vector>> ibNormalsRecv(Pstream::nProcs());
@@ -170,7 +179,7 @@ void lineIntInfo::setIntpInfo()
             intPointsToSend[proci].clear();
         }
 
-        // finished solving of recieved points
+        // finished solving of received points
         for (label proci = 0; proci < Pstream::nProcs(); proci++)
         {
             forAll(intPointsRecv[proci], iInfo)
@@ -272,6 +281,8 @@ void lineIntInfo::setIntpInfo()
             intPointsRecv[proci].clear();
         }
     }
+
+    Info << "!! --> exit check !!" << endl;
 }
 //---------------------------------------------------------------------------//
 void lineIntInfo::correctIntPoint
@@ -361,6 +372,7 @@ intPoint lineIntInfo::findIntPoint
         while(!pointInCell(retP.iPoint_, retP.iCell_))
         {
             faceInDir = getFaceInDir(retP, faceInDir);
+            Info << "!!         |-> faceInDir: " << faceInDir << "; retP.iPoint_: " << retP.iPoint_ << "; retP.iCell_: " << retP.iCell_ << endl;
             if (!mesh_.isInternalFace(faceInDir))
             {
                 label facePatchId(mesh_.boundaryMesh().whichPatch(faceInDir));

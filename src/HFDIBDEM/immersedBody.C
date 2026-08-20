@@ -149,7 +149,9 @@ void immersedBody::createImmersedBody
     // Note (MI): computeCharCellSize() has gMax in it - is it efficient?
     intpInfo_->setCharCellSize(charCellSize_);                          //set characteristic cell size to find interpolation points
 
+    Info << "!! -- attempting to set interpolation info -- !!" << endl;
     intpInfo_->setIntpInfo();
+    Info << "!! -- finished setting interpolation info -- !!" << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::syncCreateImmersedBody                               //Note (MI): the name does not reflect the content

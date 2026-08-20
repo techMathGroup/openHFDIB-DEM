@@ -995,12 +995,14 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 if(cIb.getbodyOperation() != 0)
                 {
                     // detect wall contact
-                    if(detectWallContact
-                    (
-                        mesh_,
-                        cIb.getibContactClass(),
-                        cIb.getWallCntInfo()
-                    ))
+                    if(
+                        detectWallContact
+                        (
+                            mesh_,
+                            cIb.getibContactClass(),
+                            cIb.getWallCntInfo()
+                        )
+                    )
                     {
                         cIb.getibContactClass().setWallContact(true);
                         cIb.getibContactClass().inContactWithStatic(true);
@@ -1018,11 +1020,16 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         {
             label wallContactPerProc(ceil(double(wallContactIB.size())/Pstream::nProcs()));
             // Info <<" wallContactPerProc : "<< wallContactPerProc << endl;
-            if( wallContactIB.size() <= Pstream::nProcs())
+            if(wallContactIB.size() <= Pstream::nProcs())
             {
                 wallContactPerProc = 1;
             }
-            for(int assignProc = Pstream::myProcNo()*wallContactPerProc; assignProc < min((Pstream::myProcNo()+1)*wallContactPerProc,wallContactIB.size()); assignProc++)
+            for
+            (
+                int assignProc = Pstream::myProcNo()*wallContactPerProc; 
+                assignProc < min((Pstream::myProcNo()+1)*wallContactPerProc,wallContactIB.size()); 
+                assignProc++
+            )
             {
                 immersedBody& cIb(immersedBodies_[wallContactIB[assignProc]]);
                 if(cIb.getGeomModel().getcType() != sphere && cIb.getGeomModel().getcType() != cluster)
@@ -1105,7 +1112,9 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             label tInd(cPair.second());
             bool tStatic(immersedBodies_[tInd].getbodyOperation() == 0);
 
-            if((immersedBodies_[cInd].getIsActive() && immersedBodies_[tInd].getIsActive())
+            if
+            (
+                (immersedBodies_[cInd].getIsActive() && immersedBodies_[tInd].getIsActive())
                 &&
                 !(cStatic && tStatic)
             )
@@ -1142,12 +1151,17 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         if(contactList.size() > 0 )
         {
             label contactPerProc(ceil(double(contactList.size())/Pstream::nProcs()));
-            if( contactList.size() <= Pstream::nProcs())
+            if(contactList.size() <= Pstream::nProcs())
             {
                 contactPerProc = 1;
             }
 
-            for(int assignProc = Pstream::myProcNo()*contactPerProc; assignProc < min((Pstream::myProcNo()+1)*contactPerProc,contactList.size()); assignProc++)
+            for
+            (
+                int assignProc = Pstream::myProcNo()*contactPerProc; 
+                assignProc < min((Pstream::myProcNo()+1)*contactPerProc,contactList.size()); 
+                assignProc++
+            )
             {
                 prtSubContactInfo* sCI = contactList[assignProc];
                 const Tuple2<label, label>& cPair = sCI->getCPair();
