@@ -468,7 +468,6 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
             immersedBodies_[bodyId].resetBody(body);
         }
     }
-    Info << "!! -- bodies reset" << endl;
 
     // recreate all bodies after contact update
     forAll (immersedBodies_,bodyId)
@@ -483,11 +482,8 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
             );
         }
     }
-    Info << "!! -- bodies created" << endl;
 
     createBodiesComputeDynamicsVars(body, refineF);
-
-    Info << "!! -- black magic happened" << endl;
 
     forAll (immersedBodies_,bodyId)
     {
