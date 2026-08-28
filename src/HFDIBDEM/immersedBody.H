@@ -445,6 +445,8 @@ namespace Foam
         // the body linear velocity)
         void computeBodyCoNumber();
 
+        scalar computeBodyLinCoNumber();
+
         // print out body linear and angular momentum for control
         void printMomentum();
 

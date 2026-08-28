@@ -64,7 +64,6 @@ int main(int argc, char *argv[])
     openHFDIBDEM  HFDIBDEM(mesh);
     HFDIBDEM.initialize(lambda,U,refineF,maxRefinementLevel,runTime.timeName());
     HFDIBDEM.setSolverInfo();
-    #include "initialMeshRefinement.H"
 
     Info<< "\nStarting time loop\n" << endl;
     // OS time efficiency testing
@@ -85,11 +84,16 @@ int main(int argc, char *argv[])
         HFDIBDEM.writeFirtsTimeBodiesInfo();
     }
 
+    scalar DEMTime_(0.0);
+
+    bool doInitialMeshRefinement(runTime.timeIndex() == 0);
+
     while (runTime.run())
     {
 
         #include "readDyMControls.H"
-        #include "CourantNo.H"
+        CoNum = HFDIBDEM.computeBodiesLinCourantNo();
+        Info<< "bodies linear Courant Number max: " << CoNum << endl;
         #include "setDeltaT.H"
 
         runTime++;
@@ -98,6 +102,11 @@ int main(int argc, char *argv[])
 
         clockTime createBodiesTime; // OS time efficiency testing
         HFDIBDEM.createBodies(lambda,refineF);
+        if (doInitialMeshRefinement)
+        {
+            #include "initialMeshRefinement.H"
+            doInitialMeshRefinement = false;
+        }
         createBodiesTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
 
         // clockTime preUpdateBodiesTime; // OS time efficiency testing
@@ -128,10 +137,12 @@ int main(int argc, char *argv[])
         // addRemoveTime_ += addRemoveTime.timeIncrement();
 
         // clockTime updateDEMTime;
+        // HFDIBDEM.updateDEM(lambda,refineF);
+        clockTime updateDEMTime;
         HFDIBDEM.updateDEM(lambda,refineF);
-        // updateDEMTime_ += updateDEMTime.timeIncrement();
-
+        DEMTime_ += updateDEMTime.timeIncrement();
         Info << "updated HFDIBDEM" << endl;
+        // updateDEMTime_ += updateDEMTime.timeIncrement();
 
         runTime.write();
 
@@ -145,7 +156,8 @@ int main(int argc, char *argv[])
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
-        Info << "createBodiesTime    = " << createBodiesTime_    << " s " << endl;
+        Info << " createBodiesTime         = " << createBodiesTime_    << " s \n" << // endl;
+                " DEMTime_                 = " << DEMTime_             << " s \n" << endl;
 
     // Info<< "preUpdateTime       = " << preUpdateTime_       << " s \n"
     //     << "createBodiesTime    = " << createBodiesTime_    << " s \n"

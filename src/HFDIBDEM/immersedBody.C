@@ -1344,6 +1344,12 @@ void immersedBody::computeBodyCoNumber()
         << " max: " << CoNum_ << endl;
 
 }
+scalar immersedBody::computeBodyLinCoNumber()
+{
+    scalar VelMag(mag(Vel_));
+
+    return VelMag*mesh_.time().deltaT().value()/charCellSize_;
+}
 
 //---------------------------------------------------------------------------//
 // print out body linear and angular momentum

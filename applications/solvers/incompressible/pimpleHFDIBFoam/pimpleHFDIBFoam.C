@@ -93,7 +93,7 @@ int main(int argc, char *argv[])
     scalar DEMTime_(0.0);
     scalar suplTime_(0.0);
 
-    bool didInitialRefinement(false);
+    bool doInitialMeshRefinement(runTime.timeIndex() == 0);
 
     while (runTime.run())
     {
@@ -116,10 +116,10 @@ int main(int argc, char *argv[])
         clockTime createBodiesTime; // OS time efficiency testing
         Info << "Creating immersed bodies" << endl;
         HFDIBDEM.createBodies(lambda,refineF);
-        if (!didInitialRefinement)
+        if (doInitialMeshRefinement)
         {
             #include "initialMeshRefinement.H"
-            didInitialRefinement = true;
+            doInitialMeshRefinement = false;
         }
         HFDIBDEM.updateBodiesRhoF(rho.value());
         suplTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
@@ -220,10 +220,10 @@ int main(int argc, char *argv[])
         // }
         
         // HFDIBDEM.postUpdateBodies(lambda,gradLambda,fDragPress,fDragVisc);
-        HFDIBDEM.postUpdateBodies(lambda,f);
+        // HFDIBDEM.postUpdateBodies(lambda,f);
 
         // HFDIBDEM.updateFSCoupling(lambda, f, true, false);
-        // HFDIBDEM.postUpdateBodies(lambda, f, true, false).
+        HFDIBDEM.postUpdateBodies(lambda, f, true, false);
 
         suplTime_ += postUpdateBodiesTime.timeIncrement();
 

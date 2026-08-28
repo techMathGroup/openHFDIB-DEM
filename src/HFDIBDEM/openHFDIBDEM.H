@@ -302,6 +302,8 @@ namespace Foam
     
     void updateBodiesRhoF(const scalar rho);
     void updateBodiesRhoF(const volScalarField& rho, const volScalarField& body);
+
+    scalar computeBodiesLinCourantNo();
  };
 }
 

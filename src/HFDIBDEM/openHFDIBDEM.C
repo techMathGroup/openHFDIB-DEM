@@ -1664,3 +1664,16 @@ void openHFDIBDEM::updateBodiesRhoF
         immersedBodies_[bodyId].updateRhoF(rho,body);
     }
 }
+//---------------------------------------------------------------------------//
+scalar openHFDIBDEM::computeBodiesLinCourantNo()
+{
+    scalar maxCoNum(0);
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive())
+        {
+            maxCoNum = max(maxCoNum, immersedBodies_[bodyId].computeBodyLinCoNumber());
+        }
+    }
+    return maxCoNum;
+}

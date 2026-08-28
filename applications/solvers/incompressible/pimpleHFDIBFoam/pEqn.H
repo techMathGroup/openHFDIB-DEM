@@ -71,8 +71,8 @@ fvc::correctUf(Uf, U, phi);
 fvc::makeRelative(phi, U);
 
 f.storePrevIter();
-HFDIBDEM.updateFSCoupling(lambda,f);
-// HFDIBDEM.updateFSCoupling(lambda, f, true, false);
+// HFDIBDEM.updateFSCoupling(lambda,f);
+HFDIBDEM.updateFSCoupling(lambda, f, true, false);
 HFDIBDEM.interpolateIB(U,Ui,lambda);
 
 // f += 0.8*(Ui - U)/runTime.deltaT();
