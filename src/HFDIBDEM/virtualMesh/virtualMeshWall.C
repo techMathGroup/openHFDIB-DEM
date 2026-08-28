@@ -44,10 +44,13 @@ virtualMeshWall::virtualMeshWall
 :
 cGeomModel_(cGeomModel),
 vMeshWallInfo_(vMeshWallInfo),
-bbMatrix_(vMeshWallInfo.subVolumeNVector,
+bbMatrix_
+(
+    vMeshWallInfo.subVolumeNVector,
     vMeshWallInfo.bBox,
     vMeshWallInfo.charCellSize,
-    vMeshWallInfo.subVolumeV)
+    vMeshWallInfo.subVolumeV
+)
 {}
 
 virtualMeshWall::~virtualMeshWall()
