@@ -1347,8 +1347,9 @@ void immersedBody::computeBodyCoNumber()
 scalar immersedBody::computeBodyLinCoNumber()
 {
     scalar VelMag(mag(Vel_));
+    scalar safetyFactor(1.2);
 
-    return VelMag*mesh_.time().deltaT().value()/charCellSize_;
+    return safetyFactor*VelMag*mesh_.time().deltaT().value()/charCellSize_;
 }
 
 //---------------------------------------------------------------------------//
