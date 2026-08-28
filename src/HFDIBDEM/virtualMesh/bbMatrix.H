@@ -136,6 +136,11 @@ class bbMatrix
         return subVolumeV_;
     }
 
+    vector getMatrixSize() const
+    {
+        return matrixSize_;
+    }
+
     scalar getCharCellSize()
     {
         return charCellSize_;

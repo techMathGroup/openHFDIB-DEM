@@ -221,6 +221,10 @@ int main(int argc, char *argv[])
         
         // HFDIBDEM.postUpdateBodies(lambda,gradLambda,fDragPress,fDragVisc);
         HFDIBDEM.postUpdateBodies(lambda,f);
+
+        // HFDIBDEM.updateFSCoupling(lambda, f, true, false);
+        // HFDIBDEM.postUpdateBodies(lambda, f, true, false).
+
         suplTime_ += postUpdateBodiesTime.timeIncrement();
 
 

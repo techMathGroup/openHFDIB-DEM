@@ -143,6 +143,23 @@ class virtualMeshWall
 
     DynamicPointList edgeSubVolumesPoints_;
 
+    // Append a neighbour sub-volume to the next flood-fill layer only if it
+    // has not been visited yet (toCheck == true). Without this guard the
+    // floods re-queue already-processed sub-volumes and their frontiers grow
+    // without bound on large virtual meshes.
+    void checkAndAppend
+    (
+        const vector& svI,
+        DynamicVectorList& auxToCheck
+    );
+
+    // Same as checkAndAppend but using face neighbours
+    void checkAndAppendFace
+    (
+        const vector& svI,
+        DynamicVectorList& auxToCheck
+    );
+
     public:
     
     vector contactCenter_ = vector::zero;

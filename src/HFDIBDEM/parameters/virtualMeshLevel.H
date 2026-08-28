@@ -72,9 +72,26 @@ class virtualMeshLevel
         return charCellSize_;
     }
 
+    static void setMaxSubVolumes(const scalar maxSubVolumes)
+    {
+        maxSubVolumes_ = maxSubVolumes;
+    }
+
+    static scalar getMaxSubVolumes()
+    {
+        return maxSubVolumes_;
+    }
+
     static scalar virtualMeshLevel_;
     static scalar levelOfDivision_;
     static scalar charCellSize_;
+
+    // Upper bound on the number of sub-volumes a single wall virtual mesh
+    // may span. Exceeding it triggers a FatalError at virtual-mesh creation
+    // (see wallSubContactInfo), and bounds the flood-fill iteration caps
+    // (see virtualMeshWall). Configurable via the virtualMesh dict entry
+    // maxSubVolumes.
+    static scalar maxSubVolumes_;
 
 };
 

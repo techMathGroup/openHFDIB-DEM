@@ -54,6 +54,62 @@ virtualMeshWall::~virtualMeshWall()
 {
 }
 //---------------------------------------------------------------------------//
+namespace
+{
+// Upper bound on the number of sub-volumes a single flood-fill over the
+// wall virtual mesh may visit. With the push-guard each sub-volume is
+// visited at most once, so a full scan of the matrix is a guaranteed
+// terminating bound that never truncates a legitimate search. The bound is
+// additionally limited by virtualMeshLevel::maxSubVolumes_ so that an
+// accidentally huge virtual mesh cannot monopolise a time step. Computed in
+// double to avoid 32-bit label overflow on large matrices.
+label maxVSIter(const vector& matrixSize)
+{
+    scalar nSV =
+        matrixSize.x()*matrixSize.y()*matrixSize.z();
+
+    nSV = min(nSV, max(virtualMeshLevel::getMaxSubVolumes(), scalar(1)));
+
+    return label(min(nSV, scalar(labelMax)));
+}
+}
+//---------------------------------------------------------------------------//
+void virtualMeshWall::checkAndAppend
+(
+    const vector& svI,
+    DynamicVectorList& auxToCheck
+)
+{
+    vector svIM(svI);
+    List<vector> nbrSVI(bbMatrix_.cornerNeighbourSubVolumes(svIM));
+
+    forAll (nbrSVI, nI)
+    {
+        if (bbMatrix_[nbrSVI[nI]].toCheck)
+        {
+            auxToCheck.append(nbrSVI[nI]);
+        }
+    }
+}
+//---------------------------------------------------------------------------//
+void virtualMeshWall::checkAndAppendFace
+(
+    const vector& svI,
+    DynamicVectorList& auxToCheck
+)
+{
+    vector svIM(svI);
+    List<vector> nbrSVI(bbMatrix_.faceNeighbourSubVolumes(svIM));
+
+    forAll (nbrSVI, nI)
+    {
+        if (bbMatrix_[nbrSVI[nI]].toCheck)
+        {
+            auxToCheck.append(nbrSVI[nI]);
+        }
+    }
+}
+//---------------------------------------------------------------------------//
 bool virtualMeshWall::detectFirstContactPoint()
 {
     autoPtr<DynamicVectorList> nextToCheck(
@@ -65,6 +121,10 @@ bool virtualMeshWall::detectFirstContactPoint()
     nextToCheck->append(bbMatrix_.getSVIndexForPoint_Wall(vMeshWallInfo_.getStartingPoint()));
     nextToCheck->append(bbMatrix_.cornerNeighbourSubVolumes(nextToCheck()[0]));
     // InfoH << DEM_Info << " -- VM firstSV : " << nextToCheck()[0] << " point " << bbMatrix_[nextToCheck()[0]].center << endl;
+
+    const label iterMax(maxVSIter(bbMatrix_.getMatrixSize()));
+    label iterCount(0);
+
     while (nextToCheck->size() > 0)
     {
         auxToCheck->clear();
@@ -75,6 +135,7 @@ bool virtualMeshWall::detectFirstContactPoint()
             {
                 continue;
             }
+            iterCount++;
             checkSubVolume(cSubVolume);
 
             if (cSubVolume.isCBody)
@@ -85,11 +146,28 @@ bool virtualMeshWall::detectFirstContactPoint()
                 return true;
 
             }
-            auxToCheck().append(bbMatrix_.cornerNeighbourSubVolumes(nextToCheck()[sV]));
+            checkAndAppend(nextToCheck()[sV], auxToCheck());
         }
         autoPtr<DynamicVectorList> helpPtr(nextToCheck.ptr()); // removing const
         nextToCheck.reset(auxToCheck.ptr()); //set -> reset
         auxToCheck = std::move(helpPtr); // adding std::move
+        // Only a genuine truncation: cap reached with unvisited sub-volumes
+        // still on the frontier. If the frontier is empty the scan completed
+        // normally (possibly consuming the whole matrix) and no warning fits.
+        if (iterCount >= iterMax && nextToCheck->size() > 0)
+        {
+            WarningInFunction
+                << "virtualMeshWall::detectFirstContactPoint: flood-fill "
+                << "visit cap " << iterMax << " reached without finding a "
+                << "contact point — no contact is reported this check. "
+                << "Virtual mesh bBox: " << bbMatrix_.getBBox()
+                << ", matrixSize: " << bbMatrix_.getMatrixSize()
+                << ", startingPoint: " << vMeshWallInfo_.getStartingPoint()
+                << ". Consider lowering virtualMesh level, increasing "
+                << "virtualMesh charCellSize, or raising maxSubVolumes."
+                << endl;
+            return false;
+        }
     }
     return false;
 }
@@ -105,6 +183,10 @@ bool virtualMeshWall::detectFirstFaceContactPoint()
     nextToCheck->append(bbMatrix_.getSVIndexForPoint_Wall(vMeshWallInfo_.getStartingPoint()));
     nextToCheck->append(bbMatrix_.faceNeighbourSubVolumes(nextToCheck()[0]));
     // InfoH << DEM_Info << " -- VM firstSV : " << nextToCheck()[0] << " point " << bbMatrix_[nextToCheck()[0]].center << endl;
+
+    const label iterMax(maxVSIter(bbMatrix_.getMatrixSize()));
+    label iterCount(0);
+
     while (nextToCheck->size() > 0)
     {
         auxToCheck->clear();
@@ -115,6 +197,7 @@ bool virtualMeshWall::detectFirstFaceContactPoint()
             {
                 continue;
             }
+            iterCount++;
             checkSubVolume(cSubVolume);
 
             if (cSubVolume.isCBody)
@@ -125,11 +208,27 @@ bool virtualMeshWall::detectFirstFaceContactPoint()
                 return true;
 
             }
-            auxToCheck().append(bbMatrix_.faceNeighbourSubVolumes(nextToCheck()[sV]));
+            checkAndAppendFace(nextToCheck()[sV], auxToCheck());
         }
         autoPtr<DynamicVectorList> helpPtr(nextToCheck.ptr());
         nextToCheck.reset(auxToCheck.ptr());
         auxToCheck = std::move(helpPtr);
+        // Only a genuine truncation: cap reached with unvisited sub-volumes
+        // still on the frontier (see detectFirstContactPoint).
+        if (iterCount >= iterMax && nextToCheck->size() > 0)
+        {
+            WarningInFunction
+                << "virtualMeshWall::detectFirstFaceContactPoint: flood-fill "
+                << "visit cap " << iterMax << " reached without finding a "
+                << "contact point — no contact is reported this check. "
+                << "Virtual mesh bBox: " << bbMatrix_.getBBox()
+                << ", matrixSize: " << bbMatrix_.getMatrixSize()
+                << ", startingPoint: " << vMeshWallInfo_.getStartingPoint()
+                << ". Consider lowering virtualMesh level, increasing "
+                << "virtualMesh charCellSize, or raising maxSubVolumes."
+                << endl;
+            return false;
+        }
     }
     return false;
 }
@@ -144,6 +243,9 @@ scalar virtualMeshWall::evaluateContact()
         new DynamicVectorList);
     nextToCheck->append(bbMatrix_.getSVIndexForPoint_Wall(vMeshWallInfo_.getStartingPoint()));
     label iterCount(0);
+
+    const label iterMax(maxVSIter(bbMatrix_.getMatrixSize()));
+
     while (nextToCheck().size() > 0)
     {
         auxToCheck().clear();
@@ -151,23 +253,40 @@ scalar virtualMeshWall::evaluateContact()
         forAll (nextToCheck(),sV)
         {
             subVolumeProperties& cSubVolume = bbMatrix_[nextToCheck()[sV]];
-            iterCount++;
             if (!cSubVolume.toCheck)
             {
                 continue;
             }
+            iterCount++;
 
             checkSubVolume(cSubVolume);
             if (cSubVolume.isCBody)
             {
                 volumeCount++;
                 contactCenter_ += cSubVolume.center;
-                auxToCheck->append(bbMatrix_.faceNeighbourSubVolumes(nextToCheck()[sV]));
+                checkAndAppendFace(nextToCheck()[sV], auxToCheck());
             }
         }
         autoPtr<DynamicVectorList> helpPtr(nextToCheck.ptr());
         nextToCheck.reset(auxToCheck.ptr());
         auxToCheck = std::move(helpPtr);
+        // Only a genuine truncation: cap reached with unvisited sub-volumes
+        // still on the frontier (see detectFirstContactPoint).
+        if (iterCount >= iterMax && nextToCheck().size() > 0)
+        {
+            WarningInFunction
+                << "virtualMeshWall::evaluateContact: flood-fill visit cap "
+                << iterMax << " reached — contact volume is truncated to "
+                << volumeCount << " sub-volumes and the reported contact "
+                << "force may be underestimated. "
+                << "Virtual mesh bBox: " << bbMatrix_.getBBox()
+                << ", matrixSize: " << bbMatrix_.getMatrixSize()
+                << ", startingPoint: " << vMeshWallInfo_.getStartingPoint()
+                << ". Consider lowering virtualMesh level, increasing "
+                << "virtualMesh charCellSize, or raising maxSubVolumes."
+                << endl;
+            break;
+        }
     }
     if (volumeCount > 0)
     {

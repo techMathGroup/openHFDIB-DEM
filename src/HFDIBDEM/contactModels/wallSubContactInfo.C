@@ -39,6 +39,51 @@ Contributors
 #include "contactModelInfo.H"
 using namespace Foam;
 //---------------------------------------------------------------------------//
+namespace
+{
+// Stop before a wall virtual mesh that could never be processed in a
+// reasonable time (or memory) gets allocated. The bound is
+// virtualMeshLevel::maxSubVolumes_ (virtualMesh dict entry maxSubVolumes).
+// The product is computed in double to avoid 32-bit label overflow.
+void checkVMSize
+(
+    const vector& subVolumeNVector,
+    const boundBox& bB,
+    const word& what
+)
+{
+    scalar nSV =
+        max(subVolumeNVector.x(), scalar(1))
+       *max(subVolumeNVector.y(), scalar(1))
+       *max(subVolumeNVector.z(), scalar(1));
+
+    if (nSV <= max(virtualMeshLevel::getMaxSubVolumes(), scalar(1)))
+    {
+        return;
+    }
+
+    FatalErrorIn("void Foam::checkVMSize()")
+        << "The " << what << " wall virtual mesh would span " << nSV
+        << " sub-volumes, exceeding the limit of "
+        << virtualMeshLevel::getMaxSubVolumes() << endl
+        << "    subVolumeNVector: " << subVolumeNVector << endl
+        << "    virtual mesh bBox: " << bB << endl
+        << "    virtualMesh level: " << virtualMeshLevel::getVirtualMeshLevel()
+        << " (levelOfDivision: "
+        << virtualMeshLevel::getLevelOfDivision() << ")" << endl
+        << "    virtualMesh charCellSize: "
+        << virtualMeshLevel::getCharCellSize() << endl
+        << "    sub-volume edge: "
+        << virtualMeshLevel::getCharCellSize()
+        /(virtualMeshLevel::getLevelOfDivision()) << endl
+        << "Reduce the extent of the wall virtual mesh (e.g. body thickness "
+        << "in the empty direction for pseudo-2D cases, or the wall-normal "
+        << "extent), lower virtualMesh level, increase virtualMesh "
+        << "charCellSize, or raise maxSubVolumes if this is intentional."
+        << exit(FatalError);
+}
+}
+//---------------------------------------------------------------------------//
 wallSubContactInfo::wallSubContactInfo
 (
     List<Tuple2<point,boundBox>> contactBBData,
@@ -77,7 +122,8 @@ bodyId_(bodyId)
             }
             // Pout <<" Corrected subVolumeNVector "<< subVolumeNVector << endl;
         }
-     
+
+        checkVMSize(subVolumeNVector, contactBBData[cBD].second(), "body-contact");
 
         autoPtr<virtualMeshWallInfo> vmWInfo(
             new virtualMeshWallInfo(
@@ -106,8 +152,10 @@ bodyId_(bodyId)
                 subVolumeNVector[i] = 1;
                 planeBBData[pBD].second().min()[i] -=virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision()*0.5;
                 planeBBData[pBD].second().max()[i] +=virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision()*0.5;
-            }  
+            }
         }
+
+        checkVMSize(subVolumeNVector, planeBBData[pBD].second(), "plane-contact");
 
         autoPtr<virtualMeshWallInfo> vmWInfo(
             new virtualMeshWallInfo(

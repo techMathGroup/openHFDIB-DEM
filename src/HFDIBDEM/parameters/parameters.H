@@ -75,6 +75,7 @@ std::map<string, string> cyclicPlaneInfo::cyclicPatchPairs_ =
 scalar virtualMeshLevel::virtualMeshLevel_ = 1;
 scalar virtualMeshLevel::levelOfDivision_ = 1;
 scalar virtualMeshLevel::charCellSize_ = 1;
+scalar virtualMeshLevel::maxSubVolumes_ = 5e6;
 scalar contactModelInfo::LcCoeff_ = 4.0;
 label  solverInfo::nSolidsThreshold_ = 1000;
 bool solverInfo::onlyDEM_ = false;
