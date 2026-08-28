@@ -289,7 +289,11 @@ void getWallContactVars_ArbShape(
 
         if(virtMeshWall.detectFirstContactPoint())
         {
-            intersectVolume += virtMeshWall.evaluateContact();
+            // emptyScale restores the full extruded volume of a contact
+            // patch whose virtual mesh was clipped to one layer in the
+            // empty direction (pseudo-2D); it is 1 otherwise
+            intersectVolume +=
+                virtMeshWall.evaluateContact()*vmWInfo->getEmptyScale();
             contactCenters().append(virtMeshWall.getContactCenter());
         }
     }
@@ -317,7 +321,10 @@ void getWallContactVars_ArbShape(
 
             if(virtMeshPlane->detectFirstFaceContactPoint())
             {
-                scalar contactAreaLoc = (virtMeshPlane->evaluateContact()/vmWInfo->getSVVolume())*(pow(vmWInfo->getSVVolume(),2.0/3));
+                // count of wetted plane faces x face area; emptyScale
+                // restores the full patch extent along the (pseudo-2D)
+                // empty direction if this plane VM was clipped there
+                scalar contactAreaLoc = (virtMeshPlane->evaluateContact()*vmWInfo->getEmptyScale()/vmWInfo->getSVVolume())*(pow(vmWInfo->getSVVolume(),2.0/3));
                 contactAreas().append(contactAreaLoc);
                 contactPlaneCenters().append(virtMeshPlane->getContactCenter());
             }

@@ -62,7 +62,8 @@ struct virtualMeshWallInfo
     startingPoint(vector::zero),
     subVolumeNVector(vector::zero),
     charCellSize(0),
-    subVolumeV(0)
+    subVolumeV(0),
+    emptyScale(1)
 
     {}
     virtualMeshWallInfo(
@@ -70,12 +71,14 @@ struct virtualMeshWallInfo
         point startingPoint,
         vector subVolumeNVector,
         scalar charCellSize,
-        scalar subVolumeV):
+        scalar subVolumeV,
+        scalar emptyScale = 1):
     bBox(bBox),
     startingPoint(startingPoint),
     subVolumeNVector(subVolumeNVector),
     charCellSize(charCellSize),
-    subVolumeV(subVolumeV)
+    subVolumeV(subVolumeV),
+    emptyScale(emptyScale)
     {}
 
     const point& getStartingPoint()
@@ -86,6 +89,17 @@ struct virtualMeshWallInfo
     const scalar& getSVVolume()
     {
         return subVolumeV;
+    }
+
+    // Pseudo-2D support: when the bBox was clipped in the empty direction
+    // to a single sub-volume layer, the flood finds only the 2D footprint
+    // of the contact patch. For bodies extruded in the empty direction the
+    // patch is uniform there, so multiplying the flooded volume by
+    // emptyScale = originalExtent/subVolumeEdge restores the physical
+    // volume (and, via volume/subVolumeV, the physical area) exactly.
+    const scalar& getEmptyScale()
+    {
+        return emptyScale;
     }
 
     const scalar& getCharCellSize()
@@ -119,7 +133,8 @@ struct virtualMeshWallInfo
     point startingPoint;
     vector subVolumeNVector;
     scalar charCellSize;
-    scalar subVolumeV;    
+    scalar subVolumeV;
+    scalar emptyScale;
 };
 
 /*---------------------------------------------------------------------------*\

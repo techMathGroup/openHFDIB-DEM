@@ -82,6 +82,54 @@ void checkVMSize
         << "charCellSize, or raise maxSubVolumes if this is intentional."
         << exit(FatalError);
 }
+
+// Pseudo-2D: clip a wall virtual mesh bBox to a single sub-volume layer in
+// the empty direction and return the volume/area rescaling factor. The
+// contact patch of an extruded body is uniform along the empty direction,
+// so flooding one layer and multiplying the result by
+// emptyScale = originalSpan/subVolumeEdge reproduces the 3D volume (and,
+// after division by subVolumeV, the 3D patch area) exactly, while removing
+// the bodyThickness/subVolumeEdge factor from every flood. Bodies already
+// thinner than ~1.5 sub-volume edges (incl. the zero-span case handled
+// above) are left untouched with emptyScale = 1. The starting point is
+// clamped into the clipped slab. No-op for 3D cases.
+scalar clipEmptyDirection
+(
+    boundBox& bB,
+    point& startingPoint
+)
+{
+    if (case3D || emptyDim < 0 || emptyDim > 2)
+    {
+        return 1.0;
+    }
+
+    scalar sv =
+        virtualMeshLevel::getCharCellSize()
+       /virtualMeshLevel::getLevelOfDivision();
+
+    scalar origSpan = bB.span()[emptyDim];
+
+    if (origSpan <= 1.5*sv)
+    {
+        return 1.0;
+    }
+
+    scalar mid = 0.5*(bB.min()[emptyDim] + bB.max()[emptyDim]);
+    bB.min()[emptyDim] = mid - 0.5*sv;
+    bB.max()[emptyDim] = mid + 0.5*sv;
+
+    if
+    (
+        startingPoint[emptyDim] < bB.min()[emptyDim]
+     || startingPoint[emptyDim] > bB.max()[emptyDim]
+    )
+    {
+        startingPoint[emptyDim] = mid;
+    }
+
+    return origSpan/sv;
+}
 }
 //---------------------------------------------------------------------------//
 wallSubContactInfo::wallSubContactInfo
@@ -103,6 +151,15 @@ bodyId_(bodyId)
 {
     forAll(contactBBData,cBD)
     {
+        scalar emptyScale
+        (
+            clipEmptyDirection
+            (
+                contactBBData[cBD].second(),
+                contactBBData[cBD].first()
+            )
+        );
+
         vector subVolumeNVector = vector(
             floor((contactBBData[cBD].second().span()[0]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision()),
             floor((contactBBData[cBD].second().span()[1]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision()),
@@ -131,14 +188,30 @@ bodyId_(bodyId)
                 contactBBData[cBD].first(),
                 subVolumeNVector,
                 virtualMeshLevel::getCharCellSize(),
-                pow(virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision(),3)
-            )  
+                pow(virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision(),3),
+                emptyScale
+            )
         );
         vmWInfoList_.append(std::move(vmWInfo));
     }
 
     forAll(planeBBData,pBD)
     {
+        const scalar svEdge
+        (
+            virtualMeshLevel::getCharCellSize()
+           /virtualMeshLevel::getLevelOfDivision()
+        );
+
+        scalar emptyScale
+        (
+            clipEmptyDirection
+            (
+                planeBBData[pBD].second(),
+                planeBBData[pBD].first()
+            )
+        );
+
         vector subVolumeNVector = vector(
             ceil((planeBBData[pBD].second().span()[0]/virtualMeshLevel::getCharCellSize()))*virtualMeshLevel::getLevelOfDivision(),
             ceil((planeBBData[pBD].second().span()[1]/virtualMeshLevel::getCharCellSize()))*virtualMeshLevel::getLevelOfDivision(),
@@ -147,11 +220,32 @@ bodyId_(bodyId)
 
         for(int i=0;i<3;i++)
         {
+            // Original single-layer fix for the degenerate (wall-normal)
+            // direction of the projected plane box
             if(subVolumeNVector[i] == planeBBData[pBD].second().minDim())
-            {                
+            {
                 subVolumeNVector[i] = 1;
-                planeBBData[pBD].second().min()[i] -=virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision()*0.5;
-                planeBBData[pBD].second().max()[i] +=virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision()*0.5;
+                planeBBData[pBD].second().min()[i] -= svEdge*0.5;
+                planeBBData[pBD].second().max()[i] += svEdge*0.5;
+            }
+            // Pseudo-2D: collapse a clipped empty-direction slab (exactly
+            // one sub-volume edge) to a single layer instead of
+            // levelOfDivision layers
+            else if
+            (
+                !case3D
+             && i == emptyDim
+             && planeBBData[pBD].second().span()[i] <= 1.5*svEdge
+            )
+            {
+                subVolumeNVector[i] = 1;
+                scalar mid = 0.5*
+                (
+                    planeBBData[pBD].second().min()[i]
+                   +planeBBData[pBD].second().max()[i]
+                );
+                planeBBData[pBD].second().min()[i] = mid - 0.5*svEdge;
+                planeBBData[pBD].second().max()[i] = mid + 0.5*svEdge;
             }
         }
 
@@ -163,7 +257,8 @@ bodyId_(bodyId)
                 planeBBData[pBD].first(),
                 subVolumeNVector,
                 virtualMeshLevel::getCharCellSize(),
-                pow(virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision(),3)
+                pow(virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision(),3),
+                emptyScale
             )
         );
         vmPlaneInfoList_.append(std::move(vmWInfo));
