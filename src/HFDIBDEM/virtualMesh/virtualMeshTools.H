@@ -30,6 +30,9 @@ Description
     overflow guards), used by both the wall and the particle-particle
     contact paths
 
+    Note (MI): current idea is to potentially use this class for 
+               future additional helpers
+
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)

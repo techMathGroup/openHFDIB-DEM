@@ -22,14 +22,6 @@ License
     You should have received a copy of the GNU Lesser General Public License
     along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
 
-InNamspace
-    Foam
-
-Description
-    shared helpers for the virtual meshes (pseudo-2D clipping and
-    overflow guards), used by both the wall and the particle-particle
-    contact paths
-
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)
