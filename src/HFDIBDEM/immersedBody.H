@@ -24,7 +24,8 @@ InNamespace
     Foam
 Contributors
     Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
+    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef immersedBody_H

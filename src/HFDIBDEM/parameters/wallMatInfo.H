@@ -29,8 +29,9 @@ Description
     Static class for storing wall material information
 
 Contributors
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
-    Ondřej Studeník (2020-*)
+    Federico Municchi (2016),
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
+    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef wallMatInfo_H
