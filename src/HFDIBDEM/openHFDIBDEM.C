@@ -505,6 +505,9 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
             immersedBodies_[bodyId].checkBodyOp();
         }
     }
+
+    // make the counter rank-uniform
+    reduce(nBodiesRemovedLastStep_, maxOp<label>());
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::recreateBodies
@@ -547,6 +550,9 @@ void openHFDIBDEM::recreateBodies
                 << immersedBodies_[bodyId].getBodyIdStr() << " re-created" << endl;
         }
     }
+
+    // make the counter rank-uniform
+    reduce(nBodiesRemovedLastStep_, maxOp<label>());
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::createBodiesComputeDynamicsVars(
@@ -1419,6 +1425,9 @@ void openHFDIBDEM::addRemoveBodies
             }
         }
     }
+
+    // make the counter rank-uniform
+    reduce(nBodiesAddedLastStep_, maxOp<label>());
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::updateFSCoupling
