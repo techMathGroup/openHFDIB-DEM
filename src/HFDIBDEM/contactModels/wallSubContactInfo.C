@@ -34,103 +34,10 @@ Contributors
 #include "interAdhesion.H"
 #include "wallMatInfo.H"
 
-#include "virtualMeshLevel.H"
+#include "virtualMeshTools.H"
 #include "wallPlaneInfo.H"
 #include "contactModelInfo.H"
 using namespace Foam;
-//---------------------------------------------------------------------------//
-namespace
-{
-// Stop before a wall virtual mesh that could never be processed in a
-// reasonable time (or memory) gets allocated. The bound is
-// virtualMeshLevel::maxSubVolumes_ (virtualMesh dict entry maxSubVolumes).
-// The product is computed in double to avoid 32-bit label overflow.
-void checkVMSize
-(
-    const vector& subVolumeNVector,
-    const boundBox& bB,
-    const word& what
-)
-{
-    scalar nSV =
-        max(subVolumeNVector.x(), scalar(1))
-       *max(subVolumeNVector.y(), scalar(1))
-       *max(subVolumeNVector.z(), scalar(1));
-
-    if (nSV <= max(virtualMeshLevel::getMaxSubVolumes(), scalar(1)))
-    {
-        return;
-    }
-
-    FatalErrorIn("void Foam::checkVMSize()")
-        << "The " << what << " wall virtual mesh would span " << nSV
-        << " sub-volumes, exceeding the limit of "
-        << virtualMeshLevel::getMaxSubVolumes() << endl
-        << "    subVolumeNVector: " << subVolumeNVector << endl
-        << "    virtual mesh bBox: " << bB << endl
-        << "    virtualMesh level: " << virtualMeshLevel::getVirtualMeshLevel()
-        << " (levelOfDivision: "
-        << virtualMeshLevel::getLevelOfDivision() << ")" << endl
-        << "    virtualMesh charCellSize: "
-        << virtualMeshLevel::getCharCellSize() << endl
-        << "    sub-volume edge: "
-        << virtualMeshLevel::getCharCellSize()
-        /(virtualMeshLevel::getLevelOfDivision()) << endl
-        << "Reduce the extent of the wall virtual mesh (e.g. body thickness "
-        << "in the empty direction for pseudo-2D cases, or the wall-normal "
-        << "extent), lower virtualMesh level, increase virtualMesh "
-        << "charCellSize, or raise maxSubVolumes if this is intentional."
-        << exit(FatalError);
-}
-
-// Pseudo-2D: clip a wall virtual mesh bBox to a single sub-volume layer in
-// the empty direction and return the volume/area rescaling factor. The
-// contact patch of an extruded body is uniform along the empty direction,
-// so flooding one layer and multiplying the result by
-// emptyScale = originalSpan/subVolumeEdge reproduces the 3D volume (and,
-// after division by subVolumeV, the 3D patch area) exactly, while removing
-// the bodyThickness/subVolumeEdge factor from every flood. Bodies already
-// thinner than ~1.5 sub-volume edges (incl. the zero-span case handled
-// above) are left untouched with emptyScale = 1. The starting point is
-// clamped into the clipped slab. No-op for 3D cases.
-scalar clipEmptyDirection
-(
-    boundBox& bB,
-    point& startingPoint
-)
-{
-    if (case3D || emptyDim < 0 || emptyDim > 2)
-    {
-        return 1.0;
-    }
-
-    scalar sv =
-        virtualMeshLevel::getCharCellSize()
-       /virtualMeshLevel::getLevelOfDivision();
-
-    scalar origSpan = bB.span()[emptyDim];
-
-    if (origSpan <= 1.5*sv)
-    {
-        return 1.0;
-    }
-
-    scalar mid = 0.5*(bB.min()[emptyDim] + bB.max()[emptyDim]);
-    bB.min()[emptyDim] = mid - 0.5*sv;
-    bB.max()[emptyDim] = mid + 0.5*sv;
-
-    if
-    (
-        startingPoint[emptyDim] < bB.min()[emptyDim]
-     || startingPoint[emptyDim] > bB.max()[emptyDim]
-    )
-    {
-        startingPoint[emptyDim] = mid;
-    }
-
-    return origSpan/sv;
-}
-}
 //---------------------------------------------------------------------------//
 wallSubContactInfo::wallSubContactInfo
 (

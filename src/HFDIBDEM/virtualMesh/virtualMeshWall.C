@@ -31,7 +31,7 @@ Contributors
 \*---------------------------------------------------------------------------*/
 #include "virtualMeshWall.H"
 
-#include "virtualMeshLevel.H"
+#include "virtualMeshTools.H"
 
 using namespace Foam;
 
@@ -55,26 +55,6 @@ bbMatrix_
 
 virtualMeshWall::~virtualMeshWall()
 {
-}
-//---------------------------------------------------------------------------//
-namespace
-{
-// Upper bound on the number of sub-volumes a single flood-fill over the
-// wall virtual mesh may visit. With the push-guard each sub-volume is
-// visited at most once, so a full scan of the matrix is a guaranteed
-// terminating bound that never truncates a legitimate search. The bound is
-// additionally limited by virtualMeshLevel::maxSubVolumes_ so that an
-// accidentally huge virtual mesh cannot monopolise a time step. Computed in
-// double to avoid 32-bit label overflow on large matrices.
-label maxVSIter(const vector& matrixSize)
-{
-    scalar nSV =
-        matrixSize.x()*matrixSize.y()*matrixSize.z();
-
-    nSV = min(nSV, max(virtualMeshLevel::getMaxSubVolumes(), scalar(1)));
-
-    return label(min(nSV, scalar(labelMax)));
-}
 }
 //---------------------------------------------------------------------------//
 void virtualMeshWall::checkAndAppend
