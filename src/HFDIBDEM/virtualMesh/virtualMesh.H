@@ -23,10 +23,62 @@ License
     along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
 
 InNamspace
-    contactModel
+    Foam
 
 Description
-    methods to solve particle-particle contact
+    Geometric resolution of contact between two immersed bodies of
+    arbitrary shape, evaluated on an adaptive octree "virtual mesh".
+
+    Fundamentals
+    ~~~~~~~~~~~~
+    - The virtual mesh is an axis-aligned octree superimposed on the
+      intersection of the two bodies' bounding boxes. It is independent
+      of the CFD mesh: its refinement is controlled solely by the
+      virtualMesh dict entries (level, charCellSize) and by the geometry
+      of the contacting pair.
+
+    - Each octree node (subVolume) carries, for each of the two bodies
+      separately, a volumeType classification -- INSIDE, OUTSIDE or
+      MIXED -- obtained through geomModel::getVolumeType(). A node
+      classified as MIXED (i.e. cut by the body surface) is refined
+      into its eight octants; refinement stops once the node volume
+      drops below the sub-volume resolution subVolumeV.
+
+    - The contact volume is assembled as the sum of the volumes of all
+      leaf sub-volumes classified INSIDE with respect to both bodies
+      simultaneously. At leaf level, the axis-aligned bounding boxes
+      obtained from geomModel::limitFinalSubVolume() replace the raw
+      octant boxes, so the leaf estimate follows the local surface
+      orientation rather than the octree frame.
+
+    - The contact normal and area are derived from the set of "edge"
+      sub-volumes (leaves that remain MIXED for both bodies): a
+      covariance-based best-fit plane through their midpoints provides
+      the normal, and an angular sector sweep of the points projected
+      into that plane constructs a convex hull whose area estimates the
+      contact area. For non-convex bodies the edge sub-volumes are first
+      clustered into connected subContacts and the estimate is carried
+      out per cluster.
+
+    - Temporal coherence: the virtualMeshInfo (root sub-volume,
+      resolution, starting point, pseudo-2D emptyScale) is owned by the
+      calling prtSubContactInfo and persists across time steps. The
+      cached starting point (i) warm-starts the contact search and
+      (ii) underpins the matching of a new sub-contact to its
+      predecessor, which preserves the tangential-force history.
+
+    - Pseudo-2D support: in quasi-2D setups the pair bounding box is
+      clipped to a single sub-volume layer in the empty direction before
+      the octree is built, and the resulting volume/area are rescaled by
+      emptyScale = originalSpan/subVolumeEdge. This is exact for bodies
+      extruded uniformly along the empty direction and reduces the
+      traversal cost by the clipped factor.
+
+    - Overflow safety: the traversal is bounded by a visit cap
+      (8*rootVolume/subVolumeV, further limited by the virtualMesh
+      dict entry maxSubVolumes). The cap is truncation-only: a
+      complete scan of any admissible octree stays below it, so the
+      cap can never truncate a legitimate search.
 
 SourceFiles
     virtualMesh.C

@@ -25,6 +25,92 @@ License
 InNamspace
     Foam
 
+Description
+    Algorithmic details of the particle-particle virtual mesh.
+
+    Contact detection (detectFirstContactPoint)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Depth-first descent of the octree rooted at the pair bounding box:
+
+      - classify node against both bodies (ensureVolumeType; the
+        per-body result is cached in the node's ibSubVolumeInfo, so
+        the shared tree is classified once per body and per node);
+
+      - prune:  OUTSIDE either body           -> no contact below;
+      - accept: INSIDE both bodies            -> contact;
+      - refine: MIXED (either body)           -> recurse into 8 octants.
+
+    At leaf resolution (node volume < subVolumeV) the MIXED case is
+    resolved by limitFinalSubVolume(): the leaf contributes contact
+    iff the geometry-restricted bounding boxes of the two bodies
+    overlap. Before recursing, the octant containing the previous
+    starting point is rotated to the front of the child list, which
+    warm-starts the descent towards the expected contact location.
+
+    Contact evaluation (evaluateContact / inspectSubVolume)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    Same traversal, accumulating three quantities:
+
+      - contactVolume:   sum over leaves of the volume of the
+                         cross-section boundBox of the two
+                         geometry-restricted leaf boxes
+                         (INSIDE x INSIDE leaves contribute their full
+                         node volume);
+      - contactCenter:   volume-weighted mean of the leaf contributions;
+      - edge points:     midpoints of leaves that remain MIXED for both
+                         bodies (directly, or whose children produced
+                         edge points -- the flag propagates upwards).
+
+    Normal and area from the edge points (get3DcontactNormalAndSurface)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      - normal:  eigenvector of the smallest eigenvalue of the
+                 edge-point covariance matrix (closed-form weighted
+                 cross-product form); falls back to the analytic
+                 surface normal at the contact centre obtained from
+                 tGeomModel_.getClosestPointAndNormal();
+      - area:    points are projected onto the best-fit plane, swept
+                 in 4 x 15 angular sectors around the contact centre,
+                 the outermost point per sector is kept and the
+                 resulting convex polygon is closed; the area is the
+                 sum of the triangle fan (centre, sector_i,
+                 sector_i+1);
+      - non-convex bodies: edge sub-volumes are first grouped into
+                 connected subContacts (findsubContacts merges
+                 face-adjacent leaves, canCombineSubContacts), the
+                 normal/area evaluation runs per cluster and the
+                 results are volume-weighted averages.
+
+    Pseudo-2D and overflow handling
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    The pair bounding box arrives already clipped to a single
+    sub-volume layer in the empty direction (see prtContactInfo::
+    getContacts_ArbShape), and the evaluated volume/area are rescaled
+    by vMeshInfo_.emptyScale at the caller. Within this class the
+    traversal is unchanged -- the octree is simply shallower in the
+    empty direction.
+
+    The visit cap (iterMax_, see virtualMesh.H) counts every node
+    entered by detectFirstVolumeInContact and inspectSubVolume. Past
+    the cap the traversal stops: detection reports no contact, the
+    evaluation returns a truncated volume (both warn once). Because
+    the cap is derived from the tree geometry alone (8*rootVolume/
+    subVolumeV, min maxSubVolumes), a complete scan of an admissible
+    tree never reaches it.
+
+    Sketch of the shared classification states
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+                         +------------------+
+                         |   root subVol   |
+                         +--------+---------+
+                                  | classify vs body c / body t
+                     +------------+------------+------------+
+                     |            |            |            |
+                  OUTSIDE      INSIDE       MIXED      (leaf res.)
+                  (prune)     (contact)    (refine)    limitFinal
+                                                      SubVolume -> leaf
+                                                      bbox overlap
+
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
     Ondřej Studeník (2020-*)

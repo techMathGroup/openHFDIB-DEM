@@ -23,13 +23,63 @@ License
     along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
 
 InNamspace
-    contactModel
+    Foam
 
 Description
-    methods to solve particle-particle contact
+    Geometric resolution of contact between an immersed body of
+    arbitrary shape and a planar wall, evaluated on a structured
+    "virtual mesh".
+
+    Fundamentals
+    ~~~~~~~~~~~~
+    - The virtual mesh is a regular Cartesian lattice of sub-volumes
+      (bbMatrix) superimposed on a wall-aligned bounding box of the
+      body. It is independent of the CFD mesh: its resolution is
+      controlled solely by the virtualMesh dict entries (level,
+      charCellSize) via the sub-volume edge
+      charCellSize/levelOfDivision.
+
+    - A sub-volume is classified with a single centroid test,
+      geomModel::pointInside(); a sub-volume whose centroid lies
+      inside the body marks the contact. There is no adaptive
+      refinement: accuracy is set by the uniform sub-volume edge,
+      which is typically finer than the CFD mesh near the surface.
+
+    - The contact volume is obtained by a flood fill over the
+      sub-volume lattice, seeded at the starting point and expanding
+      through face neighbours of classified sub-volumes. The reported
+      volume is (number of inside sub-volumes) x subVolumeV.
+
+    - Two flood variants exist: corner-neighbour expansion for
+      locating a first contact point (detectFirstContactPoint) and
+      face-neighbour expansion for evaluating the connected contact
+      volume/area (detectFirstFaceContactPoint, evaluateContact).
+      Each sub-volume carries a toCheck flag; a sub-volume is queued
+      at most once, so every flood terminates after at most one full
+      lattice scan.
+
+    - Wall-alignment of the box: the bounding boxes handed to this
+      class have already been projected onto the wall plane (see
+      wallContactInfo::findContactAreas / correctSMBBforWall), so the
+      lattice itself resolves the contact patch in the plane tangent
+      to the wall.
+
+    - Pseudo-2D support: in quasi-2D setups the box is clipped to a
+      single sub-volume layer in the empty direction and the flooded
+      volume/area are rescaled by emptyScale =
+      originalSpan/subVolumeEdge. This is exact for bodies extruded
+      uniformly along the empty direction and removes the
+      bodyThickness/subVolumeEdge factor from every flood.
+
+    - Overflow safety: every flood is bounded by a visit cap
+      (lattice sub-volume count, further limited by the virtualMesh
+      dict entry maxSubVolumes). The cap is truncation-only: with the
+      single-queue guard each flood visits each sub-volume at most
+      once, so a complete lattice scan can never exceed the cap and
+      the cap can never truncate a legitimate search.
 
 SourceFiles
-    virtualMesh.C
+    virtualMeshWall.C
 
 Contributors
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
