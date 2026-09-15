@@ -254,6 +254,18 @@ void prtContactInfo::syncContactList()
                 reduce(vmInfoToSync.sV.max(), sumOp<vector>());
                 reduce(vmInfoToSync.subVolumeV, sumOp<scalar>());
 
+                // emptyScale must be reduced with the same zero-init
+                // pattern as the starting point below: on ranks other
+                // than the owning one the default-constructed vmInfoToSync
+                // carries 1, which a plain sumOp would add to the result
+                scalar emptyScaleToReduce(0);
+                if (procI == Pstream::myProcNo())
+                {
+                    emptyScaleToReduce = vmInfoToSync.getEmptyScale();
+                }
+                reduce(emptyScaleToReduce, sumOp<scalar>());
+                vmInfoToSync.emptyScale = emptyScaleToReduce;
+
                 point startPointToReduce = vmInfoToSync.getStartingPoint();
                 if (procI != Pstream::myProcNo())
                 {

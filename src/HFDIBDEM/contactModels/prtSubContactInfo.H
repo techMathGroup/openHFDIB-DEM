@@ -151,7 +151,7 @@ class prtSubContactInfo
         return outForce_;
     }
 
-    void setVMInfo(boundBox& bBox, scalar subVolumeV);
+    void setVMInfo(boundBox& bBox, scalar subVolumeV, scalar emptyScale = 1);
 
     void setVMInfo(const virtualMeshInfo& vmInfo);
 
