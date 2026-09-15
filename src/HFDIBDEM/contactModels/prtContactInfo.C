@@ -33,6 +33,7 @@ Contributors
 
 #include "interAdhesion.H"
 #include "virtualMeshLevel.H"
+#include "virtualMeshTools.H"
 #include "contactModelInfo.H"
 
 using namespace Foam;
@@ -194,8 +195,44 @@ void prtContactInfo::getContacts_ArbShape
     scalar subVolumeLength = charCellSize/virtualMeshLevel::getLevelOfDivision();
     scalar subVolumeV = pow(subVolumeLength,3);
 
+    // match the sub-contact BEFORE clipping the box: contact-history
+    // matching tests whether the previous starting point lies inside the
+    // bounding box, which the clipped slab could fail
     newContactList_.emplace_back(matchSubContact(subCbBox, physicalProperties_, contactPair_));
-    newContactList_.back()->setVMInfo(subCbBox, subVolumeV);
+
+    // overflow guard: the octree refines until sV.volume() < subVolumeV,
+    // so leaves can be as small as subVolumeV/8 (children are 1/8 of a
+    // split node), and counting internal nodes adds at most ~14%; hence
+    // 8*volume/subVolumeV is a safe upper bound on visited sub-volumes
+    // and the guard never rejects a mesh a complete scan could finish
+    checkVMLeafCount
+    (
+        8*subCbBox.volume()/subVolumeV,
+        subCbBox,
+        "particle-contact"
+    );
+
+    // Pseudo-2D: clip the pair bounding box to a single sub-volume layer
+    // in the empty direction (no-op in 3D). Clipping reuses (and clamps)
+    // the matched sub-contact's starting point so the tangential-force
+    // history survives; a fresh sub-contact starts from the box midpoint.
+    scalar emptyScale(1);
+    if (newContactList_.back()->getVMInfo())
+    {
+        std::shared_ptr<virtualMeshInfo>& vmInfo
+            = newContactList_.back()->getVMInfo();
+
+        point sPoint(vmInfo->getStartingPoint());
+        emptyScale = clipEmptyDirection(subCbBox, sPoint);
+        vmInfo->startingPoint.reset(new point(sPoint));
+    }
+    else
+    {
+        point sPoint(subCbBox.midpoint());
+        emptyScale = clipEmptyDirection(subCbBox, sPoint);
+    }
+
+    newContactList_.back()->setVMInfo(subCbBox, subVolumeV, emptyScale);
     return;
 }
 //---------------------------------------------------------------------------//
