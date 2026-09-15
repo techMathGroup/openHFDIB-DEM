@@ -70,6 +70,8 @@ Description
     You should have received a copy of the GNU General Public License
     along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
 \*---------------------------------------------------------------------------*/
+
+
 #include "fvCFD.H"
 #include "dynamicFvMesh.H"
 #include "isoAdvection.H"
@@ -125,7 +127,13 @@ int main(int argc, char *argv[])
     Info << "\nInitializing HFDIBDEM\n" << endl;
     openHFDIBDEM  HFDIBDEM(mesh);
     HFDIBDEM.initialize(lambda,U,refineF,maxRefinementLevel,runTime.timeName());
-    #include "initialMeshRefinement.H"
+    if(HFDIBDEM.getRecordFirstTime())
+    {
+        HFDIBDEM.setRecordFirstTime(false);
+        HFDIBDEM.writeBodiesInfo();
+    }
+
+    bool doInitialMeshRefinement(runTime.timeIndex() == 0);
 
     // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
     Info<< "\nStarting time loop\n" << endl;
@@ -147,6 +155,12 @@ int main(int argc, char *argv[])
         
         // hfdib-dem code modification
         HFDIBDEM.createBodies(lambda,refineF);
+        if (doInitialMeshRefinement)
+        {
+            Info << "Running initial mesh refinement for maxRefinementLevel: " << maxRefinementLevel << endl;
+            #include "meshRefinementLoop.H"
+            doInitialMeshRefinement = false;
+        }
         HFDIBDEM.updateBodiesRhoF(rho,lambda);
         HFDIBDEM.preUpdateBodies(lambda);
 
@@ -296,6 +310,11 @@ int main(int argc, char *argv[])
         // HFDIBDEM.updateBodiesRhoF(rho);
         HFDIBDEM.updateBodiesRhoF(rho,lambda);
         // HFDIBDEM.updateBodiesRhoF(alpha1,lambda,rho1.value(),rho2.value());
+        if (HFDIBDEM.nBodiesAddedLastStep() > 0 || HFDIBDEM.nBodiesRemovedLastStep() > 0)
+        {
+            Info << "Running add/remove bodies-invoked mesh refinement for maxRefinementLevel: " << maxRefinementLevel << endl;
+            #include "meshRefinementLoop.H"
+        }
         HFDIBDEM.updateDEM(lambda,refineF);
         Info << "updated HFDIBDEM" << endl;
 

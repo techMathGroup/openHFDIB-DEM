@@ -136,7 +136,8 @@ int main(int argc, char *argv[])
         HFDIBDEM.createBodies(lambda,refineF);
         if (doInitialMeshRefinement)
         {
-            #include "initialMeshRefinement.H"
+            Info << "Running initial mesh refinement for maxRefinementLevel: " << maxRefinementLevel << endl;
+            #include "meshRefinementLoop.H"
             doInitialMeshRefinement = false;
         }
         HFDIBDEM.updateBodiesRhoF(rho.value());
@@ -249,6 +250,11 @@ int main(int argc, char *argv[])
         clockTime addRemoveTime;
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
         HFDIBDEM.updateBodiesRhoF(rho.value());
+        if (HFDIBDEM.nBodiesAddedLastStep() > 0 || HFDIBDEM.nBodiesRemovedLastStep() > 0)
+        {
+            Info << "Running add/remove bodies-invoked mesh refinement for maxRefinementLevel: " << maxRefinementLevel << endl;
+            #include "meshRefinementLoop.H"
+        }
         suplTime_ += addRemoveTime.timeIncrement();
 
         clockTime updateDEMTime;
