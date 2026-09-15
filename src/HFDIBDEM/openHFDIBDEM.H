@@ -10,19 +10,19 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
+    openHFDIB-DEM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License (Version 3) as published
+    by the Free Software Foundation.
 
-    Everyone is permitted to copy and distribute verbatim copies of this license
-    document, but changing it is not allowed.
+    openHFDIB-DEM is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
 
-    This version of the GNU Lesser General Public License incorporates the terms
-    and conditions of version 3 of the GNU General Public License, supplemented
-    by the additional permissions listed below.
+    You should have received a copy of the GNU General Public License
+    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
 
-    You should have received a copy of the GNU Lesser General Public License
-    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
-
-InNamspace
+InNamespace
     Foam
 
 Description
@@ -125,6 +125,10 @@ namespace Foam
     bool recordSimulation_;
     bool recordFirstTimeStep_ = false;
     word recordOutDir_;
+
+    // counters, reset once per time step, tracking addRemoveBodies activity
+    label nBodiesAddedLastStep_ = 0;
+    label nBodiesRemovedLastStep_ = 0;
 
     public:
 
@@ -294,6 +298,18 @@ namespace Foam
     void setRecordFirstTime( bool setUp)
     {
         recordFirstTimeStep_ = setUp;
+    }
+
+    // number of bodies added by addRemoveBodies during the last time step
+    label nBodiesAddedLastStep() const
+    {
+        return nBodiesAddedLastStep_;
+    }
+
+    // number of bodies switched off (left the domain) during the last time step
+    label nBodiesRemovedLastStep() const
+    {
+        return nBodiesRemovedLastStep_;
     }
 
     void writeFirtsTimeBodiesInfo();

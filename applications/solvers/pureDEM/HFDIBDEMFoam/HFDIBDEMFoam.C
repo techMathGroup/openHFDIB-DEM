@@ -29,6 +29,24 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
+
+/*---------------------------------------------------------------------------*\
+    Note
+
+    This file has been modified and extended as part of openHFDIB-DEM.
+
+    openHFDIB-DEM is free software: you can redistribute it and/or modify it
+    under the terms of the GNU General Public License (Version 3) as published
+    by the Free Software Foundation.
+
+    openHFDIB-DEM is distributed in the hope that it will be useful, but
+    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+    for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+\*---------------------------------------------------------------------------*/
 #include "fvCFD.H"
 #include "dynamicFvMesh.H"
 #include "openHFDIBDEM.H"
@@ -104,7 +122,8 @@ int main(int argc, char *argv[])
         HFDIBDEM.createBodies(lambda,refineF);
         if (doInitialMeshRefinement)
         {
-            #include "initialMeshRefinement.H"
+            Info << "Running initial mesh refinement for maxRefinementLevel: " << maxRefinementLevel << endl;
+            #include "meshRefinementLoop.H"
             doInitialMeshRefinement = false;
         }
         createBodiesTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
@@ -134,6 +153,11 @@ int main(int argc, char *argv[])
 
         // clockTime addRemoveTime;
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
+        if (HFDIBDEM.nBodiesAddedLastStep() > 0 || HFDIBDEM.nBodiesRemovedLastStep() > 0)
+        {
+            Info << "Running add/remove bodies-invoked mesh refinement for maxRefinementLevel: " << maxRefinementLevel << endl;
+            #include "meshRefinementLoop.H"
+        }
         // addRemoveTime_ += addRemoveTime.timeIncrement();
 
         // clockTime updateDEMTime;
