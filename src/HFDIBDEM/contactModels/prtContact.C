@@ -342,7 +342,13 @@ void getPrtContactVars_ArbShape(
     vector normalVector = vector::zero;
     scalar contactArea(0);
 
-    intersectedVolume = virtMesh.evaluateContact();
+    // emptyScale restores the full extruded extent of the contact patch
+    // along the (pseudo-2D) empty direction if the virtual mesh was
+    // clipped there; it is 1 otherwise. The edge points span only the
+    // clipped layer, so the swept-hull area is the 2D footprint and must
+    // be scaled the same way as the volume (cf. the plane area formula in
+    // wallContact.C).
+    intersectedVolume = virtMesh.evaluateContact()*vmInfo->getEmptyScale();
 
     if(virtMesh.getEdgeSVPoints().size() <= 4)
     {
@@ -358,7 +364,7 @@ void getPrtContactVars_ArbShape(
                 ||
                 tClass.getGeomModel().getcType() == nonConvex
             );
-        contactArea = surfaceAndNormal.first();
+        contactArea = surfaceAndNormal.first()*vmInfo->getEmptyScale();
         normalVector = surfaceAndNormal.second();
         contactCenter = virtMesh.getContactCenter();
     }
