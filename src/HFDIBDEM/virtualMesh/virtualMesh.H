@@ -58,12 +58,14 @@ struct virtualMeshInfo
 {
     virtualMeshInfo():
     sV(boundBox()),
-    subVolumeV(0)
+    subVolumeV(0),
+    emptyScale(1)
     {}
 
     virtualMeshInfo(const virtualMeshInfo& vMeshInfo):
     sV(vMeshInfo.sV),
-    subVolumeV(vMeshInfo.subVolumeV)
+    subVolumeV(vMeshInfo.subVolumeV),
+    emptyScale(vMeshInfo.emptyScale)
     {
         if (vMeshInfo.startingPoint.valid())
         {
@@ -71,15 +73,17 @@ struct virtualMeshInfo
         }
     }
 
-    virtualMeshInfo(boundBox& bBox, scalar subVolumeV):
+    virtualMeshInfo(boundBox& bBox, scalar subVolumeV, scalar emptyScale = 1):
     sV(bBox),
-    subVolumeV(subVolumeV)
+    subVolumeV(subVolumeV),
+    emptyScale(emptyScale)
     {}
 
     void operator= (const virtualMeshInfo& vMeshInfo)
     {
         sV = vMeshInfo.sV;
         subVolumeV = vMeshInfo.subVolumeV;
+        emptyScale = vMeshInfo.emptyScale;
 
         if (vMeshInfo.startingPoint.valid())
         {
@@ -102,8 +106,20 @@ struct virtualMeshInfo
         return sV;
     }
 
+    // Pseudo-2D support: when the bBox was clipped in the empty direction
+    // to a single sub-volume layer, the traversal finds only the 2D
+    // footprint of the contact patch. For bodies extruded in the empty
+    // direction the patch is uniform there, so multiplying the traversed
+    // volume/area by emptyScale = originalExtent/subVolumeEdge restores
+    // the physical values exactly. 1 otherwise.
+    const scalar& getEmptyScale() const
+    {
+        return emptyScale;
+    }
+
     subVolume sV;
     scalar subVolumeV;
+    scalar emptyScale;
     autoPtr<point> startingPoint;
 };
 
