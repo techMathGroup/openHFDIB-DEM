@@ -110,6 +110,8 @@ class addModelRepeatSamePosition
         return addMode_;
     }
 
+    void recreateBoundBox();
+
     bool getBodyAdded(){return bodyAdded_;}
 };
 

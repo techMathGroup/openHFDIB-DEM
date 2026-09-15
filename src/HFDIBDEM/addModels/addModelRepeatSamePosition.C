@@ -106,3 +106,11 @@ std::shared_ptr<geomModel> addModelRepeatSamePosition::addBody
 
     return geomModel_->getCopy();
 }
+//---------------------------------------------------------------------------//
+void addModelRepeatSamePosition::recreateBoundBox()
+{
+    // no random bounding box to recompute in this model, but the octreeField_
+    // must be re-sized after a mesh change (e.g. refinement) so that the
+    // candidate-cell search in addBody does not write out of bounds
+    octreeField_ = Field<label>(mesh_.nCells(), 0);
+}
