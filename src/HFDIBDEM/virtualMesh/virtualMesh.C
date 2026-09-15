@@ -33,6 +33,7 @@ Contributors
 
 #include "subVolume.H"
 #include "virtualMeshLevel.H"
+#include "virtualMeshTools.H"
 
 using namespace Foam;
 
@@ -67,11 +68,39 @@ virtualMesh::virtualMesh
 :
 cGeomModel_(cGeomModel),
 tGeomModel_(tGeomModel),
-vMeshInfo_(vMeshInfo)
+vMeshInfo_(vMeshInfo),
+iterCount_(0),
+iterMax_
+(
+    maxVSIter
+    (
+        8.0*vMeshInfo.sV.volume()
+       /max(vMeshInfo.subVolumeV, VSMALL)
+    )
+),
+truncated_(false)
 {}
 
 virtualMesh::~virtualMesh()
 {}
+//---------------------------------------------------------------------------//
+void virtualMesh::warnTruncated(const word& where)
+{
+    truncated_ = true;
+
+    WarningInFunction
+        << "virtualMesh::" << where << ": octree visit cap " << iterMax_
+        << " reached — "
+        << (where == "inspectSubVolume"
+            ? "the contact volume is truncated and the reported contact "
+               "force may be underestimated"
+            : "no contact is reported this check")
+        << ". Virtual mesh bBox: " << vMeshInfo_.sV
+        << ", subVolumeV: " << vMeshInfo_.subVolumeV
+        << ". Consider lowering virtualMesh level, increasing virtualMesh "
+        << "charCellSize, or raising maxSubVolumes."
+        << endl;
+}
 //---------------------------------------------------------------------------//
 bool virtualMesh::detectFirstContactPoint()
 {
@@ -85,6 +114,15 @@ bool virtualMesh::detectFirstContactPoint()
 //---------------------------------------------------------------------------//
 bool virtualMesh::detectFirstVolumeInContact(subVolume& sV, bool& startPointFound)
 {
+    if (++iterCount_ > iterMax_ && !truncated_)
+    {
+        warnTruncated("detectFirstVolumeInContact");
+    }
+    if (iterCount_ > iterMax_)
+    {
+        return false;
+    }
+
     ibSubVolumeInfo& cInfo = sV.cVolumeInfo();
     ibSubVolumeInfo& tInfo = sV.tVolumeInfo();
 
@@ -218,6 +256,15 @@ void virtualMesh::inspectSubVolume(
     DynamicPointList& edgePoints
 )
 {
+    if (++iterCount_ > iterMax_ && !truncated_)
+    {
+        warnTruncated("inspectSubVolume");
+    }
+    if (iterCount_ > iterMax_)
+    {
+        return;
+    }
+
     ibSubVolumeInfo& cInfo = sV.cVolumeInfo();
     ibSubVolumeInfo& tInfo = sV.tVolumeInfo();
 

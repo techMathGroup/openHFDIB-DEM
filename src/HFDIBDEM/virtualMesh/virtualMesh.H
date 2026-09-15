@@ -45,6 +45,7 @@ Contributors
 #include "clockTime.H"
 #include "subVolume.H"
 #include "subContact.H"
+#include "virtualMeshLevel.H"
 
 
 // #include "fvMesh.H"
@@ -143,6 +144,19 @@ class virtualMesh
 
     point contactCenter_;
     DynamicPointList edgeSubVolumesPoints_;
+
+    // Truncation-only visit cap (mirrors maxVSIter in virtualMeshWall):
+    // a complete scan of this octree visits at most
+    // 8*rootVolume/subVolumeV sub-volumes (leaves can be as small as
+    // subVolumeV/8 and internal nodes add ~14% at most), so the cap can
+    // only fire on a genuinely truncated traversal, never on a legitimate
+    // one. iterMax_ is additionally limited by maxSubVolumes.
+    label iterCount_;
+    label iterMax_;
+    bool truncated_;
+
+    //- Warn (once per traversal) that the visit cap was reached
+    void warnTruncated(const word& where);
 
     public:
 
