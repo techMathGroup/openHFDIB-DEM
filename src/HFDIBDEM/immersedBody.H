@@ -350,6 +350,25 @@ namespace Foam
             return Axis_;
         }
 
+        const forces& getFContact() const
+        {
+            return FContact_;
+        }
+
+        const forces& getFCoupling() const
+        {
+            return FCoupling_;
+        }
+
+        const scalar& getCharCellSize() const
+        {
+            return charCellSize_;
+        }
+
+        // conservative upper bound on the displacement of any body point
+        // during the coming time step deltaT (adaptiveStepDEM).
+        scalar computeSweepDistance(scalar deltaT);
+
         const scalar& getCoNum()   const
         {
             return CoNum_;

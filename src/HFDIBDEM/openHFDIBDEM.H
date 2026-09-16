@@ -113,6 +113,9 @@ namespace Foam
     // DEM step
     scalar stepDEM_;
 
+    // switch for the adaptive DEM time step (contact-potential test)
+    bool adaptiveDEM_;
+
     // how many times rocompute M0_ because of mesh refinement
     label recomputeM0_;
 
@@ -265,6 +268,11 @@ namespace Foam
 
     // void for DEM inner-loops
     void updateDEM(volScalarField& body,volScalarField& refineF);
+
+    // conservative test whether any body can come into contact with
+    // another body or a wall during the coming CFD time step
+    // (adaptiveStepDEM); returns true when sub-cycling is needed
+    bool computeContactPotential();
 
     prtContactInfo& getPrtcInfo(Tuple2<label,label> cPair);
 

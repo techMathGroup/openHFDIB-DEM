@@ -302,3 +302,126 @@ void verletList::update(PtrList<immersedBody>& ibs)
     }
 }
 //---------------------------------------------------------------------------//
+bool verletList::computePotentialContact
+(
+    PtrList<immersedBody>& ibs,
+    const HashTable<scalar,label,Hash<label>>& sweepDist,
+    const HashSet<label,Hash<label>>& hardFlags
+)
+{
+    // per-coordinate overlap of sweep-inflated intervals; a pair is a
+    // potential contact if it overlaps in every non-empty coordinate
+    cPairHasSet overlapCnt[3];
+
+    for (label coord = 0; coord < 3; ++coord)
+    {
+        if (coord == emptyDim) continue;
+
+        // build displaced interval endpoints (copies - the live Verlet
+        // points alias the shared bboxes and must not be touched)
+        struct sweptPoint
+        {
+            label bodyId;
+            scalar pos;
+            bool isMin;
+        };
+        std::vector<sweptPoint> swept;
+        swept.reserve(2*verletBoxes_.size());
+
+        for (const auto& vBox : verletBoxes_)
+        {
+            const label bId(vBox->getBodyId());
+
+            if (!ibs[bId].getIsActive()) continue;
+
+            scalar s(0);
+            if (hardFlags.found(bId))
+            {
+                s = GREAT;
+            }
+            else if (sweepDist.found(bId))
+            {
+                s = sweepDist[bId];
+            }
+
+            swept.push_back({bId, vBox->getBBox()->min()[coord] - s, true});
+            swept.push_back({bId, vBox->getBBox()->max()[coord] + s, false});
+        }
+
+        std::sort(swept.begin(), swept.end(),
+            [](const sweptPoint& a, const sweptPoint& b)
+            {
+                return a.pos < b.pos;
+            });
+
+        // sweep: an opened (min not yet closed) body overlaps every later
+        // min before its own max is reached
+        std::unordered_set<label> opened;
+        for (const sweptPoint& p : swept)
+        {
+            if (p.isMin)
+            {
+                for (const label oId : opened)
+                {
+                    if (oId == p.bodyId) continue;
+
+                    overlapCnt[coord].insert(
+                        cPair(min(oId, p.bodyId), max(oId, p.bodyId)));
+                }
+                opened.insert(p.bodyId);
+            }
+            else
+            {
+                opened.erase(p.bodyId);
+            }
+        }
+    }
+
+    // intersect the coordinate sets. NOTE: every non-empty dimension
+    // participates - an empty overlap set in an active coordinate means
+    // no pair overlaps in that coordinate and empties the result. Only
+    // the empty (2D) dimension is excluded. The first active coordinate
+    // seeds the candidates (unconditionally, even if it is empty).
+    cPairHasSet candidates;
+    bool seeded(false);
+    for (label coord = 0; coord < 3; ++coord)
+    {
+        if (coord == emptyDim) continue;
+
+        if (!seeded)
+        {
+            candidates = overlapCnt[coord];
+            seeded = true;
+        }
+        else
+        {
+            cPairHasSet intersected;
+            for (const cPair& pair : overlapCnt[coord])
+            {
+                if (candidates.find(pair) != candidates.end())
+                {
+                    intersected.insert(pair);
+                }
+            }
+            candidates = std::move(intersected);
+        }
+    }
+
+    for (const cPair& pair : candidates)
+    {
+        if (!ibs[pair.first].getIsActive() || !ibs[pair.second].getIsActive())
+        {
+            continue;
+        }
+
+        bool cStatic(ibs[pair.first].getbodyOperation() == 0);
+        bool tStatic(ibs[pair.second].getbodyOperation() == 0);
+
+        if (cStatic && tStatic) continue;
+
+        return true;
+    }
+
+    return false;
+}
+//---------------------------------------------------------------------------//

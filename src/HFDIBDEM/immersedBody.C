@@ -1362,7 +1362,87 @@ scalar immersedBody::computeBodyLinCoNumber()
 
     return safetyFactor*VelMag*mesh_.time().deltaT().value()/charCellSize_;
 }
+//---------------------------------------------------------------------------//
+scalar immersedBody::computeSweepDistance(scalar deltaT)
+{
+    //--- prescribed bodies (rotation/translation from dict or tables):
+    //    their velocity is not the integrated Vel_ - evaluate the actual
+    //    motion the integrator will apply during this step.
+    scalar sTrans(0);
 
+    if (bodyOperation_ == 6)
+    {
+        // position from an interpolation table: bound the step displacement
+        // directly from the table entries at the step edges
+        dictionary functionDict = immersedDict_.subDict("prescribedPosTableBody");
+        dictionary posIntTableDict = functionDict.subDict("posIntTableDict");
+        interpolationTable<vector> posIntTable = interpolationTable<vector>(posIntTableDict);
+
+        const scalar t(mesh_.time().value());
+        vector posNew = posIntTable(t + deltaT);
+        vector posOld = posIntTable(t);
+        sTrans = mag(posNew - posOld);
+    }
+    else if (bodyOperation_ == 1 or bodyOperation_ == 3 or bodyOperation_ == 4)
+    {
+        // prescribed translation (operations 1/3/4): Vel_ is never
+        // integrated, the translation is exactly |Vel_|*deltaT
+        sTrans = mag(Vel_)*deltaT;
+    }
+    else if (bodyOperation_ == 5 or bodyOperation_ == 2)
+    {
+        //--- free translation (operation 5: free body; operation 2:
+        //    prescribed rotation with force-integrated translation):
+        //    explicit-Euler trajectory with the acceleration assembled in
+        //    updateMovementComp. For a contact-free body FCoupling_ is
+        //    frozen over the CFD step, gravity is constant and FContact_
+        //    is zero (such bodies are hard-flagged as potential before
+        //    this is used), hence a is constant and
+        //    |dx| <= (|Vel| + |a|*deltaT)*deltaT.
+        vector FG(vector::zero);
+        const uniformDimensionedVectorField& g =
+            mesh_.lookupObject<uniformDimensionedVectorField>("g");
+
+        if(!solverInfo::getOnlyDEM())
+        {
+            FG = geomModel_->getM0()*(1.0-rhoF_.value()
+            /geomModel_->getRhoS().value())*g.value();
+        }
+        else
+        {
+            FG = geomModel_->getM0()*g.value();
+        }
+
+        vector a(vector::zero);
+        if(geomModel_->getM0() > SMALL)
+        {
+            a = (FCoupling_.F + FG)/geomModel_->getM0();
+        }
+
+        sTrans = (mag(Vel_) + mag(a)*deltaT)*deltaT;
+    }
+
+    //--- rotation: a material point at distance r from the CoM is displaced
+    //    by at most r*omega*deltaT; r is bounded by the bbox half-diagonal
+    //    measured from the CoM (body is always inside its bounding box)
+    boundBox bb(geomModel_->getBounds());
+    pointField bbPoints(bb.points());
+    vector CoM(geomModel_->getCoM());
+
+    scalar rMax(0);
+    forAll(bbPoints, bP)
+    {
+        rMax = max(rMax, mag(bbPoints[bP] - CoM));
+    }
+
+    scalar sRot(omega_*rMax*deltaT);
+
+    //--- safety margin on top of the numerical scales involved
+    //    (charCellSize covers bbox/rounding slack of the body geometry)
+    scalar eps(0.5*virtualMeshLevel::getCharCellSize());
+
+    return sTrans + sRot + eps;
+}
 //---------------------------------------------------------------------------//
 // print out body statistics
 void immersedBody::printStats()

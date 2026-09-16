@@ -79,6 +79,7 @@ transportProperties_
 bodyNames_(HFDIBDEMDict_.lookup("bodyNames")),
 prtcInfoTable_(0),
 stepDEM_(readScalar(HFDIBDEMDict_.lookup("stepDEM"))),
+adaptiveDEM_(HFDIBDEMDict_.lookupOrDefault<bool>("adaptiveStepDEM", false)),
 recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 {
     materialProperties::matProps_insert(
@@ -901,9 +902,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 {
                     verletList_.removeBodyFromVList(immersedBodies_[bodyId]);
 
-                    scalar thrSurf(readScalar(HFDIBDEMDict_.lookup("surfaceThreshold")));
                     std::shared_ptr<periodicBody> newPeriodicBody
-                        = std::make_shared<periodicBody>(mesh_, thrSurf);
+                        = std::make_shared<periodicBody>(mesh_);
 
                     newPeriodicBody->setRhoS(immersedBodies_[bodyId].getGeomModel().getRhoS());
                     std::shared_ptr<geomModel> iBcopy(immersedBodies_[bodyId].getGeomModel().getCopy());
@@ -935,7 +935,19 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
     scalar deltaTime(mesh_.time().deltaT().value());
     scalar pos(0.0);
-    scalar step(stepDEM_);
+    scalar step
+    (
+        adaptiveDEM_ && !computeContactPotential()
+        ? 1.0
+        : stepDEM_
+    );
+
+    if (adaptiveDEM_)
+    {
+        InfoH << DEM_Info << " adaptiveStepDEM: contact potential "
+            << (step < 1.0 ? "detected" : "not detected")
+            << ", DEM step: " << step << endl;
+    }
     // scalar timeStep(step*deltaTime);
     List<DynamicList<pointField>> bodiesPositionList(Pstream::nProcs());
     // Infos <<bodiesPositionList.size() << endl;
@@ -1332,6 +1344,173 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
     }
 }
 //---------------------------------------------------------------------------//
+bool openHFDIBDEM::computeContactPotential()
+{
+    const scalar deltaTime(mesh_.time().deltaT().value());
+
+    // bodies that are always sub-cycled (their acceleration is not frozen
+    // over the CFD step or their motion cannot be bounded by the sweep
+    // distance): residual contact force, cluster/periodic geometry,
+    // active wall contact, or proximity to a cyclic plane
+    HashSet<label,Hash<label>> hardFlags;
+    // sweep distances for the remaining bodies
+    HashTable<scalar,label,Hash<label>> sweepDist;
+
+    const HashTable<List<vector>,string,Hash<string>>& cyclicPlanes(
+        cyclicPlaneInfo::getCyclicPlaneInfo());
+    const HashTable<List<vector>,string,Hash<string>>& wallPlanes(
+        wallPlaneInfo::getWallPlaneInfo());
+
+    forAll (immersedBodies_, ib)
+    {
+        immersedBody& cIb(immersedBodies_[ib]);
+
+        if (!cIb.getIsActive()) continue;
+
+        bool hardFlag(false);
+
+        // residual contact force from the previous step: acceleration
+        // evolves with the contact and cannot be bounded
+        if (mag(cIb.getFContact().F) > SMALL
+            || mag(cIb.getFContact().T) > SMALL)
+        {
+            hardFlag = true;
+        }
+
+        // clusters/periodic bodies span cyclic planes
+        if (cIb.getGeomModel().isCluster())
+        {
+            hardFlag = true;
+        }
+
+        // body currently in wall contact (keeps resolving the contact)
+        if (cIb.checkWallContact())
+        {
+            hardFlag = true;
+        }
+
+        const scalar s(cIb.computeSweepDistance(deltaTime));
+        sweepDist.insert(ib, s);
+
+        // inflating the bbox by s for the plane tests below is only
+        // meaningful for soft bodies; hard-flagged bodies are always
+        // sub-cycled and need no test
+        if (hardFlag)
+        {
+            hardFlags.insert(ib);
+            continue;
+        }
+
+        //--- wall contact potential: the body stays inside bbox XOR ball(s)
+        //    during the step; the swept region reaches plane (n, p0) if
+        //    the most outboard bbox corner is within s of the plane.
+        //    This generalizes the corner-plane test of
+        //    wallContactInfo::detectWallContact to the whole step.
+        if (wallPlanes.size() > 0)
+        {
+            const stringList wallNames(wallPlanes.toc());
+
+            if (cIb.getGeomModel().getcType() == sphere)
+            {
+                const vector CoM(cIb.getGeomModel().getCoM());
+                const scalar rad(cIb.getGeomModel().getDC()/2.0);
+
+                forAll(wallNames, wI)
+                {
+                    const List<vector>& planeInfo(wallPlanes[wallNames[wI]]);
+                    const vector& n(planeInfo[0]);
+                    const vector& p0(planeInfo[1]);
+
+                    // signed distance of the outboard sphere point (the
+                    // one closest to crossing the plane; nVec points from
+                    // the fluid into the wall, so the fluid side is
+                    // negative); potential iff it has come within s of
+                    // the plane, i.e. the distance has risen above -s
+                    if (((CoM - p0) & n) + rad > -s)
+                    {
+                        hardFlag = true;
+                        break;
+                    }
+                }
+            }
+            else
+            {
+                pointField bbPoints(cIb.getGeomModel().getBounds().points());
+
+                forAll(wallNames, wI)
+                {
+                    const List<vector>& planeInfo(wallPlanes[wallNames[wI]]);
+                    const vector& n(planeInfo[0]);
+                    const vector& p0(planeInfo[1]);
+
+                    scalar dOut(-GREAT);
+                    forAll(bbPoints, bP)
+                    {
+                        dOut = max(dOut, ((bbPoints[bP] - p0) & n));
+                    }
+
+                    if (dOut > -s)
+                    {
+                        hardFlag = true;
+                        break;
+                    }
+                }
+            }
+
+            if (hardFlag)
+            {
+                hardFlags.insert(ib);
+                continue;
+            }
+        }
+
+        //--- cyclic proximity: the body may meet its own periodic image,
+        //    which the pairwise test cannot see
+        if (cyclicPlanes.size() > 0)
+        {
+            pointField bbPoints(cIb.getGeomModel().getBounds().points());
+            const stringList cyclicNames(cyclicPlanes.toc());
+
+            forAll(cyclicNames, cI)
+            {
+                const List<vector>& planeInfo(cyclicPlanes[cyclicNames[cI]]);
+                const vector& n(planeInfo[0]);
+                const vector& p0(planeInfo[1]);
+
+                scalar dOut(-GREAT);
+                forAll(bbPoints, bP)
+                {
+                    dOut = max(dOut, ((bbPoints[bP] - p0) & n));
+                }
+
+                if (dOut > -s)
+                {
+                    hardFlag = true;
+                    break;
+                }
+            }
+
+            if (hardFlag)
+            {
+                hardFlags.insert(ib);
+                continue;
+            }
+        }
+    }
+
+    bool anyPotential(hardFlags.size() > 0);
+
+    anyPotential = anyPotential
+        || verletList_.computePotentialContact(immersedBodies_, sweepDist, hardFlags);
+
+    // bodies are replicated across ranks but their force state is only
+    // as synchronized as postUpdateBodies makes it: one reduce closes
+    // any residual rank divergence in the classification
+    reduce(anyPotential, orOp<bool>());
+
+    return anyPotential;
+}
+//---------------------------------------------------------------------------//
 prtContactInfo& openHFDIBDEM::getPrtcInfo(Tuple2<label,label> cPair)
 {
     if(!prtcInfoTable_.found(cPair))
@@ -1503,7 +1682,6 @@ void openHFDIBDEM::restartSimulation
 {
     word timePath(recordOutDir_+"/"+runTime);
     fileNameList files(readDir(timePath));
-    scalar thrSurf(readScalar(HFDIBDEMDict_.lookup("surfaceThreshold")));
 
     forAll(files,f)
     {
@@ -1546,19 +1724,19 @@ void openHFDIBDEM::restartSimulation
         if(bodyGeom == "convex")
         {
             word stlPath(timePath + "/stlFiles/"+bodyId+".stl");
-            bodyGeomModel = std::make_shared<convexBody>(mesh_,stlPath,thrSurf);
+            bodyGeomModel = std::make_shared<convexBody>(mesh_,stlPath);
         }
         else if(bodyGeom == "nonConvex")
         {
             word stlPath(timePath + "/stlFiles/"+bodyId+".stl");
-            bodyGeomModel = std::make_shared<nonConvexBody>(mesh_,stlPath,thrSurf);
+            bodyGeomModel = std::make_shared<nonConvexBody>(mesh_,stlPath);
         }
         else if(bodyGeom == "sphere")
         {
             vector startPosition = vector(bodyDict.subDict("sphere").lookup("position"));
             scalar radius = readScalar(bodyDict.subDict("sphere").lookup("radius"));
 
-            bodyGeomModel = std::make_shared<sphereBody>(mesh_,startPosition,radius,thrSurf);
+            bodyGeomModel = std::make_shared<sphereBody>(mesh_,startPosition,radius);
         }
         else
         {
@@ -1566,7 +1744,7 @@ void openHFDIBDEM::restartSimulation
             InfoH << iB_Info << "bodyGeom: " << bodyGeom
                 << " not supported, using bodyGeom nonConvex" << endl;
             bodyGeom = "nonConvex";
-            bodyGeomModel = std::make_shared<nonConvexBody>(mesh_,stlPath,thrSurf);
+            bodyGeomModel = std::make_shared<nonConvexBody>(mesh_,stlPath);
         }
 
         label newIBSize(immersedBodies_.size()+1);
