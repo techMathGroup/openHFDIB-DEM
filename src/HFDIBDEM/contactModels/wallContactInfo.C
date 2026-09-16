@@ -456,17 +456,17 @@ boundBox wallContactInfo::getSCBBox
     DynamicVectorList& subContactAreas
 )
 {
-    pointField contactArea;
+    boundBox sCBBox(boundBox::invertedBox);
     forAll(subContactAreas,sCE)
     {
-        contactArea.append(SM_()[subContactAreas[sCE]].center);
+        sCBBox.add(SM_()[subContactAreas[sCE]].center);
         List<vector> vertexList = SM_().elementVertexIndexies(subContactAreas[sCE]);
         forAll(vertexList,vL)
         {
-            contactArea.append(SM_()(vertexList[vL]).center);
+            sCBBox.add(SM_()(vertexList[vL]).center);
         }
     }
-    return boundBox(contactArea,false);
+    return sCBBox;
 }
 //---------------------------------------------------------------------------//
 boundBox wallContactInfo::constructVMBox
