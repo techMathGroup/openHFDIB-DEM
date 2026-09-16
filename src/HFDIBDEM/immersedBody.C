@@ -233,7 +233,14 @@ void immersedBody::computeCharCellSize()
                     {
                         emptyThickness /= (refineBuffers_ - 1);
                     }
-                    nGeometricD--;
+                    // the mesh already discounts a genuinely empty direction
+                    // (empty patches) in nGeometricD: decrement only for
+                    // dict-declared empty directions the mesh itself does not
+                    // report as empty (pseudo-2D/thick meshes)
+                    if (mesh_.geometricD()[dirI] != -1)
+                    {
+                        nGeometricD--;
+                    }
                 }
             }     
             cellMeasure /= emptyThickness;
