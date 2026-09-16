@@ -298,14 +298,14 @@ void nonConvexBody::createImmersedBody
         {
             cBody+=0.5;
         }
-        if (cBody > thrSurf_)
+        if (cBody > SMALL)
         {
-            if (cBody > (1.0-thrSurf_))
+            if (cBody > (1.0-SMALL))
             {
                 intCells_[Pstream::myProcNo()].append(cellI);
                 cellToStartInCreateIB_ = cellI;
             }
-            else if (cBody  <= (1.0-thrSurf_))
+            else if (cBody  <= (1.0-SMALL))
             {
                 surfCells_[Pstream::myProcNo()].append(cellI);
                 if (sdBasedLambda_)

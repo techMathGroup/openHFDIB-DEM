@@ -86,8 +86,7 @@ namespace Foam
         (
             const  fvMesh&   mesh,
             const contactType cType,
-            word      stlPath,
-            scalar  thrSurf
+            word      stlPath
         );
 
         // Destructors -------------------------------------------------
@@ -193,13 +192,12 @@ namespace Foam
             boundBox& limBBox
         ) final override;
 
-        void initVars(pointField surfPoints, scalar thrSurf, scalar intSpan, bool sdBasedLambda)
+        void initVars(pointField surfPoints, scalar intSpan, bool sdBasedLambda)
         {
             bodySurfMesh_.movePoints(surfPoints);
             triSurf_.reset(new triSurface(bodySurfMesh_));
             triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
             historyPoints_ = surfPoints;
-            thrSurf_ = thrSurf;
             intSpan_ = intSpan;
             sdBasedLambda_ = sdBasedLambda;
         }

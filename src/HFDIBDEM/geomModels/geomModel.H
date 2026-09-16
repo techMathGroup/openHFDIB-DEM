@@ -112,7 +112,6 @@ namespace Foam
         label owner_;
 
         label cellToStartInCreateIB_;
-        scalar  thrSurf_;
 
         scalar  intSpan_;
         bool    sdBasedLambda_;
@@ -153,8 +152,7 @@ namespace Foam
         geomModel
         (
             const  fvMesh&   mesh,
-            const contactType cType,
-            scalar  thrSurf = 1
+            const contactType cType
         );
 
         // Destructors -------------------------------------------------

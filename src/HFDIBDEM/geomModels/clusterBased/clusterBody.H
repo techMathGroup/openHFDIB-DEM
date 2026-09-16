@@ -65,15 +65,13 @@ namespace Foam
         // Constructors ------------------------------------------------
         clusterBody
         (
-            const  fvMesh&   mesh,
-            scalar  thrSurf = 1
+            const  fvMesh&   mesh
         )
         :
         geomModel
         (
             mesh,
-            cluster,
-            thrSurf
+            cluster
         )
         {}
 

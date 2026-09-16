@@ -38,8 +38,7 @@ using namespace Foam;
 geomModel::geomModel
 (
     const  fvMesh&   mesh,
-    const contactType cType,
-    scalar  thrSurf
+    const contactType cType
 )
 :
 contactType_(cType),
@@ -47,7 +46,6 @@ mesh_(mesh),
 ibPartialVolume_(Pstream::nProcs(), 0),
 owner_(0),
 cellToStartInCreateIB_(0),
-thrSurf_(thrSurf),
 intSpan_(2.0),
 sdBasedLambda_(false),
 curMeshBounds_(mesh_.points(),false),
@@ -413,9 +411,9 @@ void geomModel::correctSurfCells
             }
         }
 
-        if (cBody > thrSurf_)
+        if (cBody > SMALL)
         {
-            if (cBody > (1.0-thrSurf_))
+            if (cBody > (1.0-SMALL))
             {
                 intCells_[Pstream::myProcNo()].append(cCell);
             }

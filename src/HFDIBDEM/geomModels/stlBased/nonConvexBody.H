@@ -64,16 +64,14 @@ namespace Foam
         nonConvexBody
         (
             const  fvMesh&   mesh,
-            word      stlPath,
-            scalar  thrSurf = 1
+            word      stlPath
         )
         :
         stlBased
         (
             mesh,
             nonConvex,
-            stlPath,
-            thrSurf
+            stlPath
         ){}
 
         // Destructors -------------------------------------------------
@@ -105,9 +103,9 @@ namespace Foam
         std::shared_ptr<geomModel> getCopy() final override
         {
             std::shared_ptr<nonConvexBody> nonConvexBodyModel =
-                std::make_shared<nonConvexBody>(mesh_,stlPath_,thrSurf_);
+                std::make_shared<nonConvexBody>(mesh_,stlPath_);
 
-            nonConvexBodyModel->initVars(bodySurfMesh_.points(), thrSurf_, intSpan_, sdBasedLambda_);
+            nonConvexBodyModel->initVars(bodySurfMesh_.points(), intSpan_, sdBasedLambda_);
             nonConvexBodyModel->setRhoS(rhoS_);
             nonConvexBodyModel->setM0(M0_);
             nonConvexBodyModel->getSurfaceCellList() = surfCells_;

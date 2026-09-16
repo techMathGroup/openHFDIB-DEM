@@ -39,11 +39,10 @@ stlBased::stlBased
 (
     const  fvMesh&   mesh,
     const contactType cType,
-    word      stlPath,
-    scalar  thrSurf
+    word      stlPath
 )
 :
-geomModel(mesh,cType,thrSurf),
+geomModel(mesh,cType),
 bodySurfMesh_
 (
     IOobject

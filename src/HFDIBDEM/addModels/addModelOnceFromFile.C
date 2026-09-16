@@ -50,8 +50,7 @@ addModelOnceFromFile::addModelOnceFromFile
     const bool startTime0,
     std::unique_ptr<geomModel> bodyGeomModel,
     List<labelList>& cellPoints,
-    word& bodyGeom,
-    scalar thrSurf
+    word& bodyGeom
 )
 :
 addModel(mesh, std::move(bodyGeomModel), cellPoints),
@@ -61,8 +60,7 @@ coeffsDict_(addModelDict_.subDict(addMode_+"Coeffs")),
 bodyAdded_(false),
 fileName_("constant/" + (word(coeffsDict_.lookup("fileName")))),
 ifStream_(fileName_.toAbsolute()),
-bodyGeom_(bodyGeom),
-thrSurf_(thrSurf)
+bodyGeom_(bodyGeom)
 {
     if(!ifStream_.opened())
     {
@@ -95,13 +93,13 @@ void addModelOnceFromFile::addSTL(string& line)
     {
         word stlPath("constant/triSurface/" + line);
         geomModel_ = std::unique_ptr<convexBody>
-            (new convexBody(mesh_, stlPath, thrSurf_));
+            (new convexBody(mesh_, stlPath));
     }
     else
     {
         word stlPath("constant/triSurface/" + line);
         geomModel_ = std::unique_ptr<nonConvexBody>
-            (new nonConvexBody(mesh_, stlPath, thrSurf_));
+            (new nonConvexBody(mesh_, stlPath));
     }
 }
 //---------------------------------------------------------------------------//

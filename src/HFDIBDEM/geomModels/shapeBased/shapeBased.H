@@ -64,8 +64,7 @@ namespace Foam
         shapeBased
         (
             const  fvMesh&   mesh,
-            const contactType cType,
-            scalar  thrSurf
+            const contactType cType
         );
 
         // Destructors -------------------------------------------------

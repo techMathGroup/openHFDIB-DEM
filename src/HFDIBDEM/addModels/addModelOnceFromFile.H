@@ -69,7 +69,6 @@ class addModelOnceFromFile
 
 
     word                    bodyGeom_;
-    scalar                  thrSurf_;
 
     // Private Member Functions ------------------------------------
 
@@ -87,8 +86,7 @@ class addModelOnceFromFile
         const bool startTime0,
         std::unique_ptr<geomModel> bodyGeomModel,
         List<labelList>& cellPoints,
-        word& bodyGeom,
-        scalar thrSurf
+        word& bodyGeom
     );
 
     // Destructors -------------------------------------------------

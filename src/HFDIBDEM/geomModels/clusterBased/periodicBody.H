@@ -64,14 +64,12 @@ namespace Foam
         // Constructors ------------------------------------------------
         periodicBody
         (
-            const  fvMesh&   mesh,
-            scalar  thrSurf = 1
+            const  fvMesh&   mesh
         )
         :
         clusterBody
         (
-            mesh,
-            thrSurf
+            mesh
         )
         {}
 
@@ -88,8 +86,7 @@ namespace Foam
         {
             std::shared_ptr<periodicBody> periodicGeomModel = std::make_shared<periodicBody>
             (
-                mesh_,
-                thrSurf_
+                mesh_
             );
 
             periodicGeomModel->ibGeomModelList = ibGeomModelList;

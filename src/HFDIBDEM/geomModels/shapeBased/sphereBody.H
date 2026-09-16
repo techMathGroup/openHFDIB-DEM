@@ -75,15 +75,13 @@ namespace Foam
         (
             const  fvMesh&   mesh,
             vector startPos,
-            scalar radius,
-            scalar  thrSurf = 1
+            scalar radius
         )
         :
         shapeBased
         (
             mesh,
-            sphere,
-            thrSurf
+            sphere
         ),
         position_(startPos),
         radius_(radius),
@@ -120,7 +118,7 @@ namespace Foam
         std::shared_ptr<geomModel> getCopy() final override
         {
             std::shared_ptr<sphereBody> sphereBodyModel =
-                std::make_shared<sphereBody>(mesh_,position_,radius_,thrSurf_);
+                std::make_shared<sphereBody>(mesh_,position_,radius_);
 
             sphereBodyModel->initVars(intSpan_,sdBasedLambda_);
             sphereBodyModel->setRhoS(rhoS_);
