@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
         // clockTime meshChangingTime; // OS time efficiency testing
         if (mesh.changing())
         {
-            lambda *= 0.;
+            lambda *= 0.0;
             HFDIBDEM.recreateBodies(lambda,refineF);
         }
         // meshChangingTime_ += meshChangingTime.timeIncrement(); // OS time efficiency testing
