@@ -78,7 +78,6 @@ timeBetweenUsage_(0),
 partPerAdd_(0),
 fieldValue_(0),
 addedOnTimeLevel_(0),
-partPerAddTemp_(0),
 
 zoneName_(),
 minBound_(vector::zero),
@@ -86,16 +85,10 @@ maxBound_(vector::zero),
 
 bodyAdditionAttemptCounter_(0),
 
-succesfulladition_(false),
-restartPartCountTemp_(false),
-reapeatedAddition_(false),
-firstTimeRunning_(true),
 cellZoneActive_(false),
 boundBoxActive_(false),
-octreeField_(mesh_.nCells(), 0),
 timeBased_(false),
 fieldBased_(false),
-fieldCurrentValue_(0),
 allActiveCellsInMesh_(true),
 randGen_(clock::getTime())
 {
@@ -196,8 +189,6 @@ void addModelDistribution::init()
         InfoH << addModel_Info << "-- addModelMessage-- "
              << "addition zone completely immersed in mesh -> OK" << endl;
     }
-
-    partPerAddTemp_ = partPerAdd_;
 }
 
 //---------------------------------------------------------------------------//
@@ -304,7 +295,6 @@ std::shared_ptr<geomModel> addModelDistribution::addBody
 				useNTimes_--;
 				InfoH << addModel_Info << "-- addModelMessage-- "
                     << " useNTimes: " << useNTimes_<<  endl;
-				reapeatedAddition_ = false;
 			}
 		}
 
@@ -343,12 +333,11 @@ void addModelDistribution::updateCellZoneBoundBox()
         reduce(cellZoneBounds.min(), minOp<vector>());
         reduce(cellZoneBounds.max(), maxOp<vector>());
 
-        if (Pstream::myProcNo() == 0)
-        {
-            minBound_ = cellZoneBounds_.min();
-            maxBound_ = cellZoneBounds_.max();
-            cellZoneBounds_ = boundBox(minBound_,maxBound_);
-        }
+        // the reduce() above leaves all processors with identical global
+        // bounds, so the members can be updated everywhere
+        minBound_ = cellZoneBounds.min();
+        maxBound_ = cellZoneBounds.max();
+        cellZoneBounds_ = boundBox(minBound_,maxBound_);
 }
 //---------------------------------------------------------------------------//
 void addModelDistribution::initializeBoundBox()
@@ -532,7 +521,10 @@ Tuple2<label, scalar> addModelDistribution::returnScaleFactor()
             break;
         }
     }
-    scalar factor(particleSize_[missingPart - 1] + (particleSize_[missingPart] - particleSize_[missingPart - 1]) * randGen_.sample01<scalar>());
+    // interpolate the sampled scale between the neighbouring size bins;
+    // clamp the lower bin so that bin 0 does not read particleSize_[-1]
+    label lowerBin(max(missingPart - 1, 0));
+    scalar factor(particleSize_[lowerBin] + (particleSize_[missingPart] - particleSize_[lowerBin]) * randGen_.sample01<scalar>());
     factor *= convertToMeters_/stlBaseSize_;
 
     Tuple2<label, scalar> returnValue(missingPart, factor);

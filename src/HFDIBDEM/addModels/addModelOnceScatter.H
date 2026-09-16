@@ -100,18 +100,11 @@ class addModelOnceScatter
 
     bool scaleApplication_;
     bool scaleRandomApplication_;
-    bool rescaleRequirement_;
-    bool succesfulladition_;
     scalar scalingFactor_;
-    bool restartPartCountTemp_;
-    bool reapeatedAddition_;
-    bool firstTimeRunning_;
     bool cellZoneActive_;
     bool boundBoxActive_;
-    Field<label>octreeField_;
     bool multiBody_;
     bool fieldBased_;
-    scalar fieldCurrentValue_;
 
     List<DynamicLabelList>  cellsInBoundBox_;
     List<pointField>        cellZonePoints_;

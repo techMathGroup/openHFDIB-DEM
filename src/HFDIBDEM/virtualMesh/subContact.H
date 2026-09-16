@@ -23,10 +23,14 @@ License
     along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
 
 InNamespace
-    contactModel
+    Foam
+
+Class
+    subContact
 
 Description
-    cass storing subContact information
+    Aggregated contact information over a group of contacting
+    sub-volumes (one contact patch between two bodies).
 
 Contributors
     Federico Municchi (2016),

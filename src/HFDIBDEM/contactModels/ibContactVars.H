@@ -34,8 +34,8 @@ Contributors
     Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef contactVars_H
-#define contactVars_H
+#ifndef ibContactVars_H
+#define ibContactVars_H
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 

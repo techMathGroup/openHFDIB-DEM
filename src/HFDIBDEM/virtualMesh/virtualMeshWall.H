@@ -207,8 +207,6 @@ class virtualMeshWall
 
     bbMatrix bbMatrix_;
 
-    DynamicPointList edgeSubVolumesPoints_;
-
     // Append a neighbour sub-volume to the next flood-fill layer only if it
     // has not been visited yet (toCheck == true). Without this guard the
     // floods re-queue already-processed sub-volumes and their frontiers grow
@@ -252,17 +250,7 @@ class virtualMeshWall
 
     void resetSubVolume(subVolumeProperties& subVolume);
 
-    vector shiftEdgeSubVolume
-    (
-        vector& subVolumeIndex
-    );
-
     label getInternalSV();
-
-    DynamicPointList& getEdgeSVPoints()
-    {
-        return edgeSubVolumesPoints_;
-    }
 
     vector& getContactCenter()
     {

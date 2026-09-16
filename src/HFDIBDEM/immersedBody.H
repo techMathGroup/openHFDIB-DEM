@@ -451,9 +451,6 @@ namespace Foam
 
         scalar computeBodyLinCoNumber();
 
-        // print out body linear and angular momentum for control
-        void printMomentum();
-
         // print out body statistics for control
         void printStats();
 

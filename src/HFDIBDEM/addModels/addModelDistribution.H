@@ -85,7 +85,6 @@ class addModelDistribution
     label		partPerAdd_;
 	scalar		fieldValue_;
     label		addedOnTimeLevel_;
-    label		partPerAddTemp_;
 
 	word		zoneName_;
     vector		minBound_;
@@ -94,16 +93,10 @@ class addModelDistribution
 	int 		bodyAdditionAttemptCounter_;
 	int 		scaleCorrectionCounter_;
 
-	bool 		succesfulladition_;
-	bool		restartPartCountTemp_;
-	bool		reapeatedAddition_;
-	bool		firstTimeRunning_;
 	bool 		cellZoneActive_;
 	bool		boundBoxActive_;
-	Field<label>octreeField_;
 	bool		timeBased_;
 	bool		fieldBased_;
-	scalar		fieldCurrentValue_;
 
     List<DynamicLabelList>  cellsInBoundBox_;
     List<pointField>        cellZonePoints_;

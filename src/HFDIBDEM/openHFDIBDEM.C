@@ -1163,8 +1163,6 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         List<bool> contactResolved(contactList.size(),false);
         List<label> contactResolvedcKey(contactList.size(),0);
         List<label> contactResolvedtKey(contactList.size(),0);
-        bool syncedData(true);
-        reduce(syncedData, orOp<bool>());
 
         if(contactList.size() > 0 )
         {

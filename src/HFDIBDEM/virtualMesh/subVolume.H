@@ -23,10 +23,14 @@ License
     along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
 
 InNamespace
-    contactModel
+    Foam
+
+Class
+    subVolume
 
 Description
-    methods to solve particle-particle contact
+    Octree node of the virtual mesh: one cubic sub-volume
+    with lazy-split children and per-body volume classification.
 
 Contributors
     Federico Municchi (2016),

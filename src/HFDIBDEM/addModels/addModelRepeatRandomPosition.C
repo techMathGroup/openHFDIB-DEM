@@ -65,7 +65,6 @@ timeBetweenUsage_(0),
 partPerAdd_(0),
 fieldValue_(0),
 addedOnTimeLevel_(0),
-partPerAddTemp_(0),
 
 zoneName_(),
 minBound_(vector::zero),
@@ -87,18 +86,11 @@ scaleCorrectionCounter_(0),
 
 scaleApplication_(false),
 scaleRandomApplication_(false),
-rescaleRequirement_(false),
-succesfulladition_(false),
 scalingFactor_(0),
-restartPartCountTemp_(false),
-reapeatedAddition_(false),
-firstTimeRunning_(true),
 cellZoneActive_(false),
 boundBoxActive_(false),
-octreeField_(mesh_.nCells(), 0),
 timeBased_(false),
 fieldBased_(false),
-fieldCurrentValue_(0),
 allActiveCellsInMesh_(true),
 randGen_(clock::getTime())
 {
@@ -260,8 +252,6 @@ void addModelRepeatRandomPosition::init()
 		InfoH << addModel_Info << "-- addModelMessage-- "
             << "notImplemented, will crash" << endl;
 	}
-
-	partPerAddTemp_ = partPerAdd_;
 }
 
 //---------------------------------------------------------------------------//
@@ -390,7 +380,6 @@ std::shared_ptr<geomModel> addModelRepeatRandomPosition::addBody
 				useNTimes_--;
 				InfoH << "-- addModelMessage-- "
                     <<" useNTimes: " << useNTimes_<<  endl;
-				reapeatedAddition_ = false;
 			}
 		}
 
@@ -406,7 +395,6 @@ std::shared_ptr<geomModel> addModelRepeatRandomPosition::addBody
 	if(scaleCorrectionCounter_ > nTriesBeforeScaling_ && scaleParticles_)
 	{
 		scaleApplication_ = true;
-		rescaleRequirement_ = true;
 		scalingFactor_++;
 		scaleStep_ = pow(scaleStep_,scalingFactor_);
 		if(scaleStep_<minScaleFit_)
@@ -444,12 +432,11 @@ void addModelRepeatRandomPosition::updateCellZoneBoundBox()
     reduce(cellZoneBounds.min(), minOp<vector>());
     reduce(cellZoneBounds.max(), maxOp<vector>());
 
-    if (Pstream::myProcNo() == 0)
-    {
-        minBound_ = cellZoneBounds_.min();
-        maxBound_ = cellZoneBounds_.max();
-        cellZoneBounds_ = boundBox(minBound_,maxBound_);
-    }
+    // the reduce() above leaves all processors with identical global
+    // bounds, so the members can be updated everywhere
+    minBound_ = cellZoneBounds.min();
+    maxBound_ = cellZoneBounds.max();
+    cellZoneBounds_ = boundBox(minBound_,maxBound_);
 }
 //---------------------------------------------------------------------------//
 void addModelRepeatRandomPosition::initializeBoundBox()

@@ -37,8 +37,8 @@ Contributors
     Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
 \*---------------------------------------------------------------------------*/
 
-#ifndef prtPrtContact_H
-#define prtPrtContact_H
+#ifndef prtContact_H
+#define prtContact_H
 
 #include "dictionary.H"
 #include "fvCFD.H"

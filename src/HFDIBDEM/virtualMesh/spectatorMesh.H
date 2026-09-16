@@ -23,13 +23,17 @@ License
     along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
 
 InNamespace
-    contactModel
+    Foam
+
+Class
+    spectatorMesh
 
 Description
-    methods to solve particle-particle contact
+    Regular lattice used to observe the mesh-surface side of
+    wall contacts; classification of its elements is stored in sMProperties.
 
 SourceFiles
-    wallContactInfo.C
+    spectatorMesh.C
 
 Contributors
     Federico Municchi (2016),

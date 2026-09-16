@@ -23,13 +23,17 @@ License
     along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
 
 InNamespace
-    contactModel
+    Foam
+
+Class
+    subVolumeProperties
 
 Description
-    methods to solve particle-particle contact
+    Classification flags of a single virtual-mesh sub-volume
+    (contacting/target body containment, edge status).
 
 SourceFiles
-    virtualMesh.C
+    subVolume.C
 
 Contributors
     Federico Municchi (2016),

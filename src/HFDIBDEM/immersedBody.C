@@ -1364,19 +1364,6 @@ scalar immersedBody::computeBodyLinCoNumber()
 }
 
 //---------------------------------------------------------------------------//
-// print out body linear and angular momentum
-void immersedBody::printMomentum()
-{
-    vector L(geomModel_->getI()&(Axis_*omega_));
-    vector p(geomModel_->getM()*Vel_);
-
-    InfoH << iB_Info;
-    InfoH << "-- body " << bodyIdStr_ << "  linear momentum:" << p
-         << " magnitude: " << mag(p) <<endl;
-    InfoH << "-- body " << bodyIdStr_ << " angular momentum:" << L
-         << " magnitude: " << mag(L) <<endl;
-}
-//---------------------------------------------------------------------------//
 // print out body statistics
 void immersedBody::printStats()
 {

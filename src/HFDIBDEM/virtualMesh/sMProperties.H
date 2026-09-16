@@ -23,10 +23,14 @@ License
     along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
 
 InNamespace
-    contactModel
+    Foam
+
+Class
+    sMProperties
 
 Description
-    methods to solve particle-particle contact
+    Classification state of a single spectator-mesh element
+    (centre point, body/mesh containment, visited flag, STL hit).
 
 SourceFiles
     spectatorMesh.C

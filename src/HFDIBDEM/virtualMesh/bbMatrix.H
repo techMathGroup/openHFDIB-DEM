@@ -23,13 +23,17 @@ License
     along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
 
 InNamespace
-    contactModel
+    Foam
+
+Class
+    bbMatrix
 
 Description
-    methods to solve particle-particle contact
+    Lattice of uniform sub-volumes covering a bounding box;
+    index <-> sub-volume-centre mapping for the virtual mesh.
 
 SourceFiles
-    virtualMesh.C
+    bbMatrix.C
 
 Contributors
     Federico Municchi (2016),
