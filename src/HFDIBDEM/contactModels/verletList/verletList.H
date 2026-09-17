@@ -126,18 +126,22 @@ class verletList
     // solve potential intersections
     void update(PtrList<immersedBody>& ibs);
 
-    // Conservative contact-potential test (adaptiveStepDEM): true if any
-    // pair of bodies whose bounding boxes, each inflated by the per-body
-    // sweep distance sweepDist[i], overlaps in every non-empty coordinate.
-    bool computePotentialContact
+    // Conservative contact-potential test (adaptiveStepDEM): fills
+    // potentialBodies with the bodies (both pair members, static ones
+    // included) of every pair whose bounding boxes, each inflated by the
+    // per-body sweep distance sweepDist[i], overlap in every non-empty
+    // coordinate. Callers use it to sort bodies into the sub-cycled /
+    // single-stepped sets.
+    // Note (MI): bodies listed in hardFlags are always sub-cycled
+    // Note (MI): the test never mutates the live Verlet list
+    //            (displaced intervals are built as copies)
+    void computePotentialBodies
     (
         PtrList<immersedBody>& ibs,
         const HashTable<scalar,label,Hash<label>>& sweepDist,
-        const HashSet<label,Hash<label>>& hardFlags
+        const HashSet<label,Hash<label>>& hardFlags,
+        HashSet<label,Hash<label>>& potentialBodies
     );
-    // Note (MI): bodies listed in hardFlags are always sub-cycled
-    // Note (MI): the test never mutates the live Verlet list 
-    //            (displaced intervals are built as copies)
 
     cPairHasSet::iterator begin()
     {

@@ -302,13 +302,16 @@ void verletList::update(PtrList<immersedBody>& ibs)
     }
 }
 //---------------------------------------------------------------------------//
-bool verletList::computePotentialContact
+void verletList::computePotentialBodies
 (
     PtrList<immersedBody>& ibs,
     const HashTable<scalar,label,Hash<label>>& sweepDist,
-    const HashSet<label,Hash<label>>& hardFlags
+    const HashSet<label,Hash<label>>& hardFlags,
+    HashSet<label,Hash<label>>& potentialBodies
 )
 {
+    potentialBodies.clear();
+
     // per-coordinate overlap of sweep-inflated intervals; a pair is a
     // potential contact if it overlaps in every non-empty coordinate
     cPairHasSet overlapCnt[3];
@@ -419,9 +422,10 @@ bool verletList::computePotentialContact
 
         if (cStatic && tStatic) continue;
 
-        return true;
+        // report both pair members (static ones included - the
+        // caller filters static bodies out of the movement sets)
+        potentialBodies.insert(pair.first);
+        potentialBodies.insert(pair.second);
     }
-
-    return false;
 }
 //---------------------------------------------------------------------------//

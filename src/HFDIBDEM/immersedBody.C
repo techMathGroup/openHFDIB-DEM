@@ -1363,7 +1363,12 @@ scalar immersedBody::computeBodyLinCoNumber()
     return safetyFactor*VelMag*mesh_.time().deltaT().value()/charCellSize_;
 }
 //---------------------------------------------------------------------------//
-scalar immersedBody::computeSweepDistance(scalar deltaT)
+scalar immersedBody::computeSweepDistance
+(
+    scalar deltaT,
+    scalar safetyTrans,
+    scalar safetyRot
+)
 {
     //--- prescribed bodies (rotation/translation from dict or tables):
     //    their velocity is not the integrated Vel_ - evaluate the actual
@@ -1424,7 +1429,13 @@ scalar immersedBody::computeSweepDistance(scalar deltaT)
 
     //--- rotation: a material point at distance r from the CoM is displaced
     //    by at most r*omega*deltaT; r is bounded by the bbox half-diagonal
-    //    measured from the CoM (body is always inside its bounding box)
+    //    measured from the CoM (body is always inside its bounding box).
+    //    The rotation contribution is scaled by a larger safety factor
+    //    than the translation one (safetyRot > safetyTrans): rotation
+    //    moves contact points tangentially around the body, which the
+    //    tight-bbox overlap tests of the live Verlet list can only catch
+    //    after the fact, so the a-priori bound is kept correspondingly
+    //    looser.
     boundBox bb(geomModel_->getBounds());
     pointField bbPoints(bb.points());
     vector CoM(geomModel_->getCoM());
@@ -1441,7 +1452,7 @@ scalar immersedBody::computeSweepDistance(scalar deltaT)
     //    (charCellSize covers bbox/rounding slack of the body geometry)
     scalar eps(0.5*virtualMeshLevel::getCharCellSize());
 
-    return sTrans + sRot + eps;
+    return safetyTrans*sTrans + safetyRot*sRot + eps;
 }
 //---------------------------------------------------------------------------//
 // print out body statistics

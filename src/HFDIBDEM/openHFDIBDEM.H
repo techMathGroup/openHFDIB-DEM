@@ -116,6 +116,16 @@ namespace Foam
     // switch for the adaptive DEM time step (contact-potential test)
     bool adaptiveDEM_;
 
+    // safety factors for the conservative sweep distance used when
+    // sorting bodies into the sub-cycled / single-stepped sets:
+    //  - translation: bounds |Vel|*dt (+ |a|*dt^2 for free bodies) with
+    //    a margin for the force state drifting over the CFD step
+    //  - rotation: bounds omega*rMax*dt with a larger margin - rotation
+    //    moves contact points tangentially, which the tight-bbox tests
+    //    of the live Verlet list only catch after the fact
+    scalar sweepSafetyTrans_;
+    scalar sweepSafetyRot_;
+
     // how many times rocompute M0_ because of mesh refinement
     label recomputeM0_;
 
@@ -269,10 +279,16 @@ namespace Foam
     // void for DEM inner-loops
     void updateDEM(volScalarField& body,volScalarField& refineF);
 
-    // conservative test whether any body can come into contact with
-    // another body or a wall during the coming CFD time step
-    // (adaptiveStepDEM); returns true when sub-cycling is needed
-    bool computeContactPotential();
+    // adaptiveStepDEM: sort bodies into the sub-cycled set A (contact
+    // potential with another body or a wall during the coming CFD time
+    // step) and the single-stepped set B (no potential). Both sets
+    // exclude static bodies and are rank-uniform (reduced over all
+    // processors).
+    void computeAdaptiveSets
+    (
+        HashSet<label,Hash<label>>& subCycle,
+        HashSet<label,Hash<label>>& singleStep
+    );
 
     prtContactInfo& getPrtcInfo(Tuple2<label,label> cPair);
 

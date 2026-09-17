@@ -80,6 +80,8 @@ bodyNames_(HFDIBDEMDict_.lookup("bodyNames")),
 prtcInfoTable_(0),
 stepDEM_(readScalar(HFDIBDEMDict_.lookup("stepDEM"))),
 adaptiveDEM_(HFDIBDEMDict_.lookupOrDefault<bool>("adaptiveStepDEM", false)),
+sweepSafetyTrans_(HFDIBDEMDict_.lookupOrDefault<scalar>("sweepSafetyTrans", 1.5)),
+sweepSafetyRot_(HFDIBDEMDict_.lookupOrDefault<scalar>("sweepSafetyRot", 3.0)),
 recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 {
     materialProperties::matProps_insert(
@@ -935,17 +937,33 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
     scalar deltaTime(mesh_.time().deltaT().value());
     scalar pos(0.0);
+
+    // adaptive DEM stepping (adaptiveStepDEM): bodies are sorted into the
+    // sub-cycled set A (contact potential during this CFD time step) and
+    // the single-stepped set B (contact-free). Set A integrates with
+    // stepDEM, set B with one step per CFD step: it moves in the first
+    // loop iteration with the full deltaTime. The loop count is driven
+    // by set A; without any potential the loop runs once with step = 1.
+    HashSet<label,Hash<label>> subCycleSet;
+    HashSet<label,Hash<label>> singleStepSet;
+
+    if (adaptiveDEM_)
+    {
+        computeAdaptiveSets(subCycleSet, singleStepSet);
+    }
+
     scalar step
     (
-        adaptiveDEM_ && !computeContactPotential()
+        adaptiveDEM_ && subCycleSet.empty()
         ? 1.0
         : stepDEM_
     );
 
     if (adaptiveDEM_)
     {
-        InfoH << DEM_Info << " adaptiveStepDEM: contact potential "
-            << (step < 1.0 ? "detected" : "not detected")
+        InfoH << DEM_Info << " adaptiveStepDEM: "
+            << subCycleSet.size() << " sub-cycled / "
+            << singleStepSet.size() << " single-stepped bodies"
             << ", DEM step: " << step << endl;
     }
     // scalar timeStep(step*deltaTime);
@@ -964,13 +982,29 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         InfoH << basic_Info << " DEM - CFD Time: "
             << mesh_.time().value() + deltaTime*pos << endl;
 
+        // single-stepped bodies move only in the first loop
+        // iteration (pos == 0), with the full CFD time step - their
+        // DEM step is 1. Both the gather and the scatter loops below
+        // must skip the same bodies to keep the position-list indices
+        // aligned across processors.
+        const bool firstIter(pos < SMALL);
+
+        auto ibSingleStep = [&](label ib) -> bool
+        {
+            return adaptiveDEM_ && singleStepSet.found(ib);
+        };
+
         forAll (immersedBodies_,ib)
         {
-            immersedBodies_[ib].updateMovement(deltaTime*step*0.5);
+            if (ibSingleStep(ib) && !firstIter) continue;
+
+            const scalar ibStep(ibSingleStep(ib) ? 1.0 : step);
+
+            immersedBodies_[ib].updateMovement(deltaTime*ibStep*0.5);
 
             if(Pstream::myProcNo() == 0 )
             {
-                immersedBodies_[ib].moveImmersedBody(deltaTime*step);
+                immersedBodies_[ib].moveImmersedBody(deltaTime*ibStep);
                 if(immersedBodies_[ib].getGeomModel().getcType() != cluster)
                 {
                     bodiesPositionList[Pstream::myProcNo()].append(immersedBodies_[ib].getGeomModel().getBodyPoints());
@@ -993,6 +1027,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         label bodyIndex(0);
         forAll (immersedBodies_,ib)
         {
+            if (ibSingleStep(ib) && !firstIter) continue;
+
             if(immersedBodies_[ib].getGeomModel().getcType() != cluster)
             {
                 immersedBodies_[ib].getGeomModel().setBodyPosition(bodiesPositionList[0][bodyIndex++]);
@@ -1323,7 +1359,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
         forAll (immersedBodies_,ib)
         {
-            immersedBodies_[ib].updateMovement(deltaTime*step*0.5);
+            if (ibSingleStep(ib) && !firstIter) continue;
+
+            const scalar ibStep(ibSingleStep(ib) ? 1.0 : step);
+
+            immersedBodies_[ib].updateMovement(deltaTime*ibStep*0.5);
             immersedBodies_[ib].printBodyInfo();
             // immersedBodies_[ib].computeBodyCoNumber();
             // if (maxCoNum < immersedBodies_[ib].getCoNum())
@@ -1344,14 +1384,21 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
     }
 }
 //---------------------------------------------------------------------------//
-bool openHFDIBDEM::computeContactPotential()
+void openHFDIBDEM::computeAdaptiveSets
+(
+    HashSet<label,Hash<label>>& subCycle,
+    HashSet<label,Hash<label>>& singleStep
+)
 {
+    subCycle.clear();
+    singleStep.clear();
+
     const scalar deltaTime(mesh_.time().deltaT().value());
 
     // bodies that are always sub-cycled (their acceleration is not frozen
     // over the CFD step or their motion cannot be bounded by the sweep
     // distance): residual contact force, cluster/periodic geometry,
-    // active wall contact, or proximity to a cyclic plane
+    // active wall contact, or proximity to a wall/cyclic plane
     HashSet<label,Hash<label>> hardFlags;
     // sweep distances for the remaining bodies
     HashTable<scalar,label,Hash<label>> sweepDist;
@@ -1366,6 +1413,10 @@ bool openHFDIBDEM::computeContactPotential()
         immersedBody& cIb(immersedBodies_[ib]);
 
         if (!cIb.getIsActive()) continue;
+
+        // static bodies are neither sub-cycled nor single-stepped - they
+        // do not integrate at all, they only act as contact obstacles
+        if (cIb.getbodyOperation() == 0) continue;
 
         bool hardFlag(false);
 
@@ -1389,7 +1440,15 @@ bool openHFDIBDEM::computeContactPotential()
             hardFlag = true;
         }
 
-        const scalar s(cIb.computeSweepDistance(deltaTime));
+        const scalar s
+        (
+            cIb.computeSweepDistance
+            (
+                deltaTime,
+                sweepSafetyTrans_,
+                sweepSafetyRot_
+            )
+        );
         sweepDist.insert(ib, s);
 
         // inflating the bbox by s for the plane tests below is only
@@ -1424,8 +1483,8 @@ bool openHFDIBDEM::computeContactPotential()
                     // signed distance of the outboard sphere point (the
                     // one closest to crossing the plane; nVec points from
                     // the fluid into the wall, so the fluid side is
-                    // negative); potential iff it has come within s of
-                    // the plane, i.e. the distance has risen above -s
+                    // negative); potential iff it has come within s of the
+                    // plane, i.e. the distance has risen above -s
                     if (((CoM - p0) & n) + rad > -s)
                     {
                         hardFlag = true;
@@ -1498,17 +1557,77 @@ bool openHFDIBDEM::computeContactPotential()
         }
     }
 
-    bool anyPotential(hardFlags.size() > 0);
+    //--- pairwise potential: both members of every sweep-inflated pair
+    //    are sub-cycled
+    HashSet<label,Hash<label>> potentialBodies;
+    verletList_.computePotentialBodies
+    (
+        immersedBodies_,
+        sweepDist,
+        hardFlags,
+        potentialBodies
+    );
 
-    anyPotential = anyPotential
-        || verletList_.computePotentialContact(immersedBodies_, sweepDist, hardFlags);
+    // hard flags go to the sub-cycled set directly
+    {
+        const labelList hardFlagList(hardFlags.toc());
+        forAll(hardFlagList, hI)
+        {
+            subCycle.insert(hardFlagList[hI]);
+        }
+    }
+
+    // pair members (static members included in the verlet output are
+    // filtered here since they never integrate)
+    {
+        const labelList potentialList(potentialBodies.toc());
+        forAll(potentialList, pI)
+        {
+            const label ib(potentialList[pI]);
+
+            if (immersedBodies_[ib].getbodyOperation() == 0) continue;
+
+            subCycle.insert(ib);
+        }
+    }
+
+    // remaining active, non-static bodies: no contact potential - one
+    // DEM step per CFD step
+    forAll (immersedBodies_, ib)
+    {
+        immersedBody& cIb(immersedBodies_[ib]);
+
+        if (!cIb.getIsActive()) continue;
+        if (cIb.getbodyOperation() == 0) continue;
+        if (subCycle.found(ib)) continue;
+
+        singleStep.insert(ib);
+    }
 
     // bodies are replicated across ranks but their force state is only
-    // as synchronized as postUpdateBodies makes it: one reduce closes
-    // any residual rank divergence in the classification
-    reduce(anyPotential, orOp<bool>());
+    // as synchronized as postUpdateBodies makes it: one reduce closes any
+    // residual rank divergence so the sets are rank-uniform before they
+    // gate per-body movement
+    {
+        List<label> setFlag(immersedBodies_.size(), 0);
 
-    return anyPotential;
+        forAll(immersedBodies_, ib)
+        {
+            if (subCycle.found(ib)) setFlag[ib] = 2;
+            else if (singleStep.found(ib)) setFlag[ib] = 1;
+        }
+
+        reduce(setFlag, maxOp<List<label>>());
+
+        subCycle.clear();
+        singleStep.clear();
+
+        forAll(setFlag, ib)
+        {
+            if (setFlag[ib] == 2) subCycle.insert(ib);
+            else if (setFlag[ib] == 1) singleStep.insert(ib);
+        }
+    }
 }
 //---------------------------------------------------------------------------//
 prtContactInfo& openHFDIBDEM::getPrtcInfo(Tuple2<label,label> cPair)
