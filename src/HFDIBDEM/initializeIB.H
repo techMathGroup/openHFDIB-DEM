@@ -149,6 +149,26 @@ if (immersedDict_.found("timesToSetStatic"))
     timesToSetStatic_ = readLabel(immersedDict_.lookup("timesToSetStatic"));
 }
 
+// body creation strategy: connectivity (default) | legacy
+word bodyCreation("connectivity");
+if (immersedDict_.found("bodyCreation"))
+{
+    bodyCreation = word(immersedDict_.lookup("bodyCreation"));
+    if (bodyCreation != "connectivity" && bodyCreation != "legacy")
+    {
+        InfoH << iB_Info << "Unknown bodyCreation: " << bodyCreation
+            << ", using connectivity" << endl;
+        bodyCreation = "connectivity";
+    }
+}
+geomModel_->setBodyCreation(bodyCreation);
+
+// Note (MI): caused by the connectivity-based body creation;
+// make sure the CoM is valid from construction (stlBased bodies keep
+// CoM_ = (0,0,0) until calculateGeometricalProperties, which runs AFTER
+// the first createImmersedBody -> seed resolution would query a wrong CoM)
+geomModel_->setCoM();
+
 // set up body geometry
 geomModel_->setIntSpan(intSpan_);
 geomModel_->setSdBasedLambda(sdBasedLambda_);

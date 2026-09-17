@@ -940,10 +940,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
     // adaptive DEM stepping (adaptiveStepDEM): bodies are sorted into the
     // sub-cycled set A (contact potential during this CFD time step) and
-    // the single-stepped set B (contact-free). Set A integrates with
-    // stepDEM, set B with one step per CFD step: it moves in the first
-    // loop iteration with the full deltaTime. The loop count is driven
-    // by set A; without any potential the loop runs once with step = 1.
+    // the single-stepped set B (contact-free).
     HashSet<label,Hash<label>> subCycleSet;
     HashSet<label,Hash<label>> singleStepSet;
 
@@ -983,10 +980,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             << mesh_.time().value() + deltaTime*pos << endl;
 
         // single-stepped bodies move only in the first loop
-        // iteration (pos == 0), with the full CFD time step - their
-        // DEM step is 1. Both the gather and the scatter loops below
-        // must skip the same bodies to keep the position-list indices
-        // aligned across processors.
+        // iteration (pos == 0, stepDEM = 1)
         const bool firstIter(pos < SMALL);
 
         auto ibSingleStep = [&](label ib) -> bool
@@ -1605,9 +1599,7 @@ void openHFDIBDEM::computeAdaptiveSets
     }
 
     // bodies are replicated across ranks but their force state is only
-    // as synchronized as postUpdateBodies makes it: one reduce closes any
-    // residual rank divergence so the sets are rank-uniform before they
-    // gate per-body movement
+    // as synchronized as postUpdateBodies makes it
     {
         List<label> setFlag(immersedBodies_.size(), 0);
 
@@ -1908,6 +1900,8 @@ void openHFDIBDEM::preCalculateCellPoints()
     forAll (immersedBodies_,bodyId)
     {
         immersedBodies_[bodyId].getGeomModel().resetHashTable();
+        // mesh changed -> cached seeds and count baselines are invalid
+        immersedBodies_[bodyId].getGeomModel().resetSeeds();
     }
 }
 //---------------------------------------------------------------------------//

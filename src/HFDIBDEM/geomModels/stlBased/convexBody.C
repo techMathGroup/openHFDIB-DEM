@@ -36,7 +36,7 @@ using namespace Foam;
 
 //---------------------------------------------------------------------------//
 // create immersed body for convex body
-void convexBody::createImmersedBody
+void convexBody::createImmersedBodyLegacy
 (
     volScalarField& body,
     Field<label>& octreeField,

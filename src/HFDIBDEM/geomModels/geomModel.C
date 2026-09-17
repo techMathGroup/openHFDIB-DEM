@@ -56,7 +56,10 @@ CoM_(vector::zero),
 I_(symmTensor::zero),
 bBox_(std::make_shared<boundBox>()),
 dC_(0.0),
-rhoS_("rho",dimensionSet(1,-3,0,0,0,0,0),1.0)
+rhoS_("rho",dimensionSet(1,-3,0,0,0,0,0),1.0),
+surfSeed_(-1),
+nCellsPrev_(-1),
+bodyCreation_("connectivity")
 {
     surfCells_.setSize(Pstream::nProcs());
     intCells_.setSize(Pstream::nProcs());
@@ -65,6 +68,23 @@ rhoS_("rho",dimensionSet(1,-3,0,0,0,0,0),1.0)
 }
 geomModel::~geomModel()
 {
+}
+//---------------------------------------------------------------------------//
+// dispatch between connectivity-based and legacy body creation
+void geomModel::createImmersedBody
+(
+    volScalarField& body,
+    Field<label>& octreeField,
+    List<labelList>& cellPoints
+)
+{
+    if (bodyCreation_ != "legacy"
+        && createImmersedBodyConnectivity(body, octreeField, cellPoints))
+    {
+        return;
+    }
+
+    createImmersedBodyLegacy(body, octreeField, cellPoints);
 }
 //---------------------------------------------------------------------------//
 void geomModel::calculateGeometricalProperties

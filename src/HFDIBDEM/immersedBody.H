@@ -367,8 +367,7 @@ namespace Foam
 
         // conservative upper bound on the displacement of any body point
         // during the coming time step deltaT (adaptiveStepDEM). safetyTrans
-        // and safetyRot scale the translation and rotation contributions;
-        // the caller supplies the (dict-tunable) factors.
+        // and safetyRot are dict-tunable factors.
         scalar computeSweepDistance
         (
             scalar deltaT,

@@ -75,7 +75,7 @@ labelList nonConvexBody::getBBoxCellsByOctTree
 }
 //---------------------------------------------------------------------------//
 // create immersed body for convex body
-void nonConvexBody::createImmersedBody
+void nonConvexBody::createImmersedBodyLegacy
 (
     volScalarField& body,
     Field<label>& octreeField,

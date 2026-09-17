@@ -83,7 +83,7 @@ namespace Foam
 
         // Public methods ----------------------------------------------
 
-        void createImmersedBody
+        void createImmersedBodyLegacy
         (
             volScalarField& body,
             Field<label>& octreeField,
@@ -108,6 +108,7 @@ namespace Foam
             nonConvexBodyModel->initVars(bodySurfMesh_.points(), intSpan_, sdBasedLambda_);
             nonConvexBodyModel->setRhoS(rhoS_);
             nonConvexBodyModel->setM0(M0_);
+            nonConvexBodyModel->setBodyCreation(bodyCreation_);
             nonConvexBodyModel->getSurfaceCellList() = surfCells_;
             nonConvexBodyModel->getHaloCellList() = haloCells_;
             nonConvexBodyModel->getInternalCellList() = intCells_;

@@ -84,6 +84,8 @@ namespace Foam
 
         // Public methods ----------------------------------------------
 
+        // cluster creation recurses into the sub-models' createImmersedBody,
+        // which dispatches between connectivity and legacy per sub-model
         void createImmersedBody
         (
             volScalarField& body,
@@ -146,6 +148,8 @@ namespace Foam
         ) = 0;
 
         virtual vector getCoM() = 0;
+
+        void setCoM() override;
 
         boundBox getBounds() final override;
 

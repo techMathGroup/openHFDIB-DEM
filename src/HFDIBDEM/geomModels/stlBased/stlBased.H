@@ -92,17 +92,6 @@ namespace Foam
         // Destructors -------------------------------------------------
         virtual ~stlBased(){}
 
-        virtual void createImmersedBody
-        (
-            volScalarField& body,
-            Field<label>& octreeField,
-            List<labelList>& cellPoints
-        )
-        {
-            InfoH << iB_Info << "-- geomModelMessage-- "
-                << "notImplemented"<<endl;
-        }
-
         virtual std::shared_ptr<geomModel> getCopy() = 0;
 
         vector addModelReturnRandomPosition(

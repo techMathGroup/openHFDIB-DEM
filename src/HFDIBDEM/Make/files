@@ -1,4 +1,5 @@
 geomModels/geomModel.C
+geomModels/createBodyConnectivity.C
 geomModels/stlBased/stlBased.C
 geomModels/stlBased/convexBody.C
 geomModels/stlBased/nonConvexBody.C

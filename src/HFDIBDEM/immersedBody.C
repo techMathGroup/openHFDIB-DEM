@@ -1431,11 +1431,7 @@ scalar immersedBody::computeSweepDistance
     //    by at most r*omega*deltaT; r is bounded by the bbox half-diagonal
     //    measured from the CoM (body is always inside its bounding box).
     //    The rotation contribution is scaled by a larger safety factor
-    //    than the translation one (safetyRot > safetyTrans): rotation
-    //    moves contact points tangentially around the body, which the
-    //    tight-bbox overlap tests of the live Verlet list can only catch
-    //    after the fact, so the a-priori bound is kept correspondingly
-    //    looser.
+    //    than the translation one  - rotations are just more problematic
     boundBox bb(geomModel_->getBounds());
     pointField bbPoints(bb.points());
     vector CoM(geomModel_->getCoM());

@@ -144,7 +144,25 @@ namespace Foam
         //body density
         dimensionedScalar rhoS_;
 
-        label   refineBuffers_; 
+        label   refineBuffers_;
+
+        // cached seed for the connectivity-based creation (first surf cell
+        // of the last successful creation); -1 = invalid
+        label surfSeed_;
+
+        // total cell count of the last successful connectivity-based
+        // creation; -1 = no baseline (count audit disabled)
+        label nCellsPrev_;
+
+        // creation mode: "connectivity" (default) | "legacy"
+        word bodyCreation_;
+
+        // mark encoding for the connectivity-based creation (octreeField_)
+        static constexpr label MARK_NONE        = 0;
+        static constexpr label MARK_SURF        = 1;                    // partial coverage
+        static constexpr label MARK_SHELL_INT   = 2;                    // int, face-adjacent to surf
+        static constexpr label MARK_FILLED_INT  = 3;                    // int, filled by connectivity
+        static constexpr label MARK_OUTSIDE     = 4;                    // classified, no coverage
 
         public:
 
@@ -159,6 +177,15 @@ namespace Foam
         virtual ~geomModel();
 
         virtual void createImmersedBody
+        (
+            volScalarField& body,
+            Field<label>& octreeField,
+            List<labelList>& cellPoints
+        );
+
+        // legacy: per-model flood-fill implementations, renamed from
+        // createImmersedBody; called by the dispatcher above on fallback
+        virtual void createImmersedBodyLegacy
         (
             volScalarField& body,
             Field<label>& octreeField,
@@ -495,6 +522,47 @@ namespace Foam
             volScalarField& body
         );
 
+        // ---------- shared connectivity-based creation ----------
+
+        // returns false -> caller falls back to legacy
+        bool createImmersedBodyConnectivity
+        (
+            volScalarField& body,
+            Field<label>& octreeField,
+            List<labelList>& cellPoints
+        );
+
+        // phase 0: resolve a seed cell (cached surf seed, then findCell)
+        label resolveSeed
+        (
+            const pointField& cp,
+            List<labelList>& cellPoints
+        );
+
+        // phase 0: march from a fully-covered seed to a partial (ring) cell
+        label marchToRing(label seed, const pointField& cp);
+
+        // vertex-based lambda with shared-vertex cache
+        // (extracted from correctSurfCells); centerInside reports the
+        // pointInside test on the cell centre (sdBasedLambda sign)
+        scalar evaluateLambda
+        (
+            label cCell,
+            List<labelList>& cellPoints,
+            HashTable<bool, label, Hash<label>>& verticesStatus,
+            bool& centerInside
+        );
+
+        // one cell step along dir (getFaceInDir pattern from lineIntInfo)
+        label walkOneCell(label cCell, const vector& dir);
+
+        // shared processor-face exchange (will also serve legacy code later)
+        void exchangeFaceLabels
+        (
+            List<DynamicLabelList>& facesToSend,                        // cleared by the call
+            List<DynamicLabelList>& facesRecv
+        );
+
         virtual List<std::shared_ptr<boundBox>> getBBoxes();
 
         virtual pointField getBodyPoints()
@@ -519,6 +587,14 @@ namespace Foam
         label getRefineBuffers()
         {
             return refineBuffers_;
+        }
+
+        void setBodyCreation(word bodyCreation) { bodyCreation_ = bodyCreation; }
+
+        void resetSeeds()
+        {
+            surfSeed_ = -1;
+            nCellsPrev_ = -1;
         }
 
     };

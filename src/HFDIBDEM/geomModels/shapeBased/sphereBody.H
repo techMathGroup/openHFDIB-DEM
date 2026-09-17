@@ -103,7 +103,7 @@ namespace Foam
 
         // Public methods ----------------------------------------------
 
-        void createImmersedBody
+        void createImmersedBodyLegacy
         (
             volScalarField& body,
             Field<label>& octreeField,
@@ -123,6 +123,7 @@ namespace Foam
             sphereBodyModel->initVars(intSpan_,sdBasedLambda_);
             sphereBodyModel->setRhoS(rhoS_);
             sphereBodyModel->setM0(M0_);
+            sphereBodyModel->setBodyCreation(bodyCreation_);
             sphereBodyModel->getSurfaceCellList() = surfCells_;
             sphereBodyModel->getHaloCellList() = haloCells_;
             sphereBodyModel->getInternalCellList() = intCells_;

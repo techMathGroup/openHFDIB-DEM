@@ -35,7 +35,8 @@ Contributors
 using namespace Foam;
 
 //---------------------------------------------------------------------------//
-// create immersed body for convex body
+// create immersed body for a cluster: recurse into the sub-models; each
+// sub-model dispatches between connectivity and legacy on its own
 void clusterBody::createImmersedBody
 (
     volScalarField& body,
@@ -144,6 +145,17 @@ vector clusterBody::getCoM()
 {
     return ibGeomModelList[0]->getCoM();
 }
+//---------------------------------------------------------------------------//
+void clusterBody::setCoM()
+{
+    // recurse: the cluster CoM reads through to the first sub-model, so the
+    // sub-models' CoMs must be valid (mirrors calculateGeometricalProperties)
+    for(std::shared_ptr<geomModel>& gModel : ibGeomModelList)
+    {
+        gModel->setCoM();
+    }
+}
+//---------------------------------------------------------------------------//
 //---------------------------------------------------------------------------//
 boundBox clusterBody::getBounds()
 {
