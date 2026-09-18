@@ -58,6 +58,32 @@
                 new nonConvexBody(mesh_,stlPath));
         }
 
+        // propagate the per-body creation mode to the master
+        // geomModel: getCopy() carries it over to every added body,
+        // but without this the dict entry would be silently ignored
+        // (constructor default is "connectivity")
+        {
+            word bodyCreation("connectivity");
+            if (HFDIBDEMDict_.subDict(bodyName).found("bodyCreation"))
+            {
+                bodyCreation = word
+                    (HFDIBDEMDict_.subDict(bodyName)
+                        .lookup("bodyCreation"));
+                if
+                (
+                    bodyCreation != "connectivity"
+                    && bodyCreation != "legacy"
+                )
+                {
+                    InfoH << iB_Info << "Unknown bodyCreation: "
+                        << bodyCreation
+                        << ", using connectivity" << endl;
+                    bodyCreation = "connectivity";
+                }
+            }
+            bodyGeomModel->setBodyCreation(bodyCreation);
+        }
+
         InfoH << addModel_Info << "-- addModelMessage-- "
             << "trying to set addModel: " << howToAdd << endl;
 

@@ -343,14 +343,17 @@ void openHFDIBDEM::initialize
 
         else
         {
-            InfoH << basic_Info << "No interpolation method specified, using line as default" << endl;
+            InfoH << basic_Info << "WARN: No interpolation"
+                << " method specified, using line as default" << endl;
             ibInterp_.reset(new lineInt(HFDIBinterpDict_));
         }
     }
 
     else
     {
-        InfoH << basic_Info << "Dictionary interpolationSchemes not found, interpolation at IB not initialized" << endl;
+        InfoH << basic_Info << "WARN: Dictionary"
+            << " interpolationSchemes not found, interpolation"
+            << " at IB not initialized" << endl;
     }
 
     bool startTime0(runTime == "0");
@@ -1856,6 +1859,31 @@ void openHFDIBDEM::restartSimulation
                 << " not supported, using bodyGeom nonConvex" << endl;
             bodyGeom = "nonConvex";
             bodyGeomModel = std::make_shared<nonConvexBody>(mesh_,stlPath);
+        }
+
+        // propagate the per-body creation mode to the
+        // restart-constructed geomModel (initializeIB.H path is not
+        // taken here, so the dict entry would be silently ignored)
+        {
+            word bodyCreation("connectivity");
+            if (HFDIBDEMDict_.subDict(bodyName).found("bodyCreation"))
+            {
+                bodyCreation = word
+                    (HFDIBDEMDict_.subDict(bodyName)
+                        .lookup("bodyCreation"));
+                if
+                (
+                    bodyCreation != "connectivity"
+                    && bodyCreation != "legacy"
+                )
+                {
+                    InfoH << iB_Info << "Unknown bodyCreation: "
+                        << bodyCreation
+                        << ", using connectivity" << endl;
+                    bodyCreation = "connectivity";
+                }
+            }
+            bodyGeomModel->setBodyCreation(bodyCreation);
         }
 
         label newIBSize(immersedBodies_.size()+1);

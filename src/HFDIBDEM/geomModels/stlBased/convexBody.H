@@ -108,6 +108,7 @@ namespace Foam
             convexBodyModel->getSurfaceCellList() = surfCells_;
             convexBodyModel->getHaloCellList() = haloCells_;
             convexBodyModel->getInternalCellList() = intCells_;
+            convexBodyModel->getSurfToHaloLabels() = surfToHaloLabels_;
 
             return convexBodyModel;
         }

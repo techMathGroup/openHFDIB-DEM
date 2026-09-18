@@ -570,7 +570,7 @@ void geomModel::findHaloCells
         }
     }
 
-    // send faces to other procs 
+    // send faces to other procs
     PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
     for (label proci = 0; proci < Pstream::nProcs(); proci++)
     {

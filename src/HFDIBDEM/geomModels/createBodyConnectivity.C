@@ -101,7 +101,13 @@ label geomModel::resolveSeed
     }
 
     // 2. cold path: rank-local findCell on the body points.
-    meshSearch searchEng(mesh_);
+    // cell-search engine is cached: constructing a meshSearch builds a
+    // full cell octree, which must not happen on every creation call
+    if (!cellSearchEng_.valid())
+    {
+        cellSearchEng_.reset(new meshSearch(mesh_));
+    }
+    meshSearch& searchEng(cellSearchEng_());
 
     pointField candidates(1, getCoM());
     {
@@ -298,6 +304,26 @@ bool geomModel::createImmersedBodyConnectivity
     intCells_[Pstream::myProcNo()].clear();
     haloCells_[Pstream::myProcNo()].clear();
 
+    // ---- bodies fully outside the mesh (e.g. periodic ghosts in a
+    // cluster) legitimately cover zero cells: report success with empty
+    // lists instead of falling back (legacy would also find nothing)
+    // NOTE: isBBoxInMesh() tests against the rank-local mesh bounds,
+    // so the decision must be made collective: a body overlapping only
+    // another rank's subdomain must NOT return here (it would skip the
+    // collective reduces in phases 0-3 and deadlock the body-holding
+    // ranks); only a body outside every rank's bounds may return,
+    // uniformly on all ranks
+    {
+        bool bboxInMesh(isBBoxInMesh());
+        reduce(bboxInMesh, orOp<bool>());
+        if (!bboxInMesh)
+        {
+            ibPartialVolume_[Pstream::myProcNo()] = 0;
+            findHaloCells(body);
+            return true;
+        }
+    }
+
     octreeField *= 0;
 
     ibPartialVolume_[Pstream::myProcNo()] = 0;
@@ -343,6 +369,12 @@ bool geomModel::createImmersedBodyConnectivity
     }
 
     HashTable<bool, label, Hash<label>> verticesStatus(128);
+
+    // surf cells with center inside and fractional coverage: legacy
+    // keeps such cells as int (lambda 1.0) unless a face-neighbour's
+    // center is outside; recorded here for phase 1.5 below
+    DynamicLabelList reclassCells;
+    DynamicScalarList reclassLambda;
 
     // frontier split by the class of the enqueuing sender:
     //  - fromSurf:   enqueued by a surf (or seed) sender -> an int-classified
@@ -391,7 +423,17 @@ bool geomModel::createImmersedBodyConnectivity
             if (cBody <= SMALL)                                         // outside this body
             {
                 octreeField[cCell] = MARK_OUTSIDE;
+                if (centerInside)
+                {
+                    octreeField[cCell] |= MARK_CENTER_IN;
+                }
                 continue;                                               // no propagation
+            }
+
+            // record the center status for phase 1.5
+            if (centerInside)
+            {
+                octreeField[cCell] |= MARK_CENTER_IN;
             }
 
             bool isSurf = (cBody < 1.0 - SMALL);
@@ -421,12 +463,12 @@ bool geomModel::createImmersedBodyConnectivity
 
             if (isSurf)
             {
-                octreeField[cCell] = MARK_SURF;
+                octreeField[cCell] |= MARK_SURF;
                 surfCells_[Pstream::myProcNo()].append(cCell);
             }
             else
             {
-                octreeField[cCell] = MARK_SHELL_INT;
+                octreeField[cCell] |= MARK_SHELL_INT;
                 intCells_[Pstream::myProcNo()].append(cCell);
             }
             ibPartialVolume_[Pstream::myProcNo()] += 1;
@@ -447,6 +489,14 @@ bool geomModel::createImmersedBodyConnectivity
 
             // clip the body field values
             body[cCell] = min(max(0.0,body[cCell]),1.0);
+
+            if (isSurf && centerInside)
+            {
+                // re-classification candidate (phase 1.5);
+                // recorded lambda is the value written above
+                reclassCells.append(cCell);
+                reclassLambda.append(cBody);
+            }
 
             // ---- propagate: enqueue in-rank face-neighbours ----
             const labelList& cFaces = mesh_.cells()[cCell];
@@ -519,12 +569,21 @@ bool geomModel::createImmersedBodyConnectivity
             if (cBody <= SMALL)
             {
                 octreeField[cCell] = MARK_OUTSIDE;
+                if (centerInside)
+                {
+                    octreeField[cCell] |= MARK_CENTER_IN;
+                }
                 continue;
+            }
+
+            if (centerInside)
+            {
+                octreeField[cCell] |= MARK_CENTER_IN;
             }
 
             if (cBody < 1.0 - SMALL)
             {
-                octreeField[cCell] = MARK_SURF;
+                octreeField[cCell] |= MARK_SURF;
                 surfCells_[Pstream::myProcNo()].append(cCell);
                 ibPartialVolume_[Pstream::myProcNo()] += 1;
 
@@ -565,6 +624,14 @@ bool geomModel::createImmersedBodyConnectivity
                 }
                 body[cCell] = min(max(0.0,body[cCell]),1.0);
 
+                if (centerInside)
+                {
+                    // re-classification candidate (phase 1.5);
+                    // recorded lambda is the value written above
+                    reclassCells.append(cCell);
+                    reclassLambda.append(cBody);
+                }
+
                 // re-enter through the propagating surf path
                 const labelList& cFaces = mesh_.cells()[cCell];
                 forAll(cFaces, fI)
@@ -601,6 +668,10 @@ bool geomModel::createImmersedBodyConnectivity
             }
 
             octreeField[cCell] = MARK_FILLED_INT;
+            if (centerInside)
+            {
+                octreeField[cCell] |= MARK_CENTER_IN;
+            }
             intCells_[Pstream::myProcNo()].append(cCell);
             ibPartialVolume_[Pstream::myProcNo()] += 1;
             body[cCell] = 1.0;
@@ -643,6 +714,237 @@ bool geomModel::createImmersedBodyConnectivity
         reduce(nextSize, maxOp<label>());
     }
 
+    // ============== phase 1.5: legacy-parity re-classification
+    // legacy keeps a center-inside cell with fractional vertex
+    // coverage as int (lambda 1.0) unless one of its face-neighbours
+    // has its center outside the body; only then is it a true surf
+    // cell; restore that semantics for phase 1 candidates
+    // NOTE: the guard must be collective - the probe exchange inside
+    // is a global communication round, so ranks without candidates
+    // must also enter it (with empty lists) whenever any rank has them
+    {
+        label anyCandidates(reclassCells.size());
+        reduce(anyCandidates, sumOp<label>());
+        if (anyCandidates == 0)
+        {
+            // no rank has candidates: the exchange below would be a
+            // no-op on every rank; skip it uniformly on all ranks
+        }
+        else
+        {
+        // probe faces on processor boundaries: needed to ask the
+        // neighbouring rank for the neighbour's center status
+        List<DynamicLabelList> probeFaces(Pstream::nProcs());
+
+        forAll(reclassCells, rI)
+        {
+            label cCell = reclassCells[rI];
+            bool anyNeighborOutside(false);
+
+            const labelList& cFaces = mesh_.cells()[cCell];
+            forAll(cFaces, fI)
+            {
+                label faceI = cFaces[fI];
+                if (mesh_.isInternalFace(faceI))
+                {
+                    label nCell(mesh_.owner()[faceI]);
+                    if (nCell == cCell)
+                    {
+                        nCell = mesh_.neighbour()[faceI];
+                    }
+                    // visited mark present but center bit absent ->
+                    // the neighbour was evaluated and its center is
+                    // outside (no break: the full face order must be
+                    // kept so the probe replies align with the scan)
+                    if (octreeField[nCell] != MARK_NONE
+                        && !(octreeField[nCell] & MARK_CENTER_IN))
+                    {
+                        anyNeighborOutside = true;
+                    }
+                }
+                else
+                {
+                    label facePatchI(mesh_.boundaryMesh().whichPatch(faceI));
+                    const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchI];
+                    if (cPatch.type() == "processor")
+                    {
+                        const processorPolyPatch& procPatch
+                            = refCast<const processorPolyPatch>(cPatch);
+                        label iProc = (Pstream::myProcNo() == procPatch.myProcNo())
+                            ? procPatch.neighbProcNo() : procPatch.myProcNo();
+                        label iFace = cPatch.whichFace(faceI);
+                        probeFaces[iProc].append(iFace);
+                    }
+                }
+            }
+
+            if (anyNeighborOutside)
+            {
+                // true surf cell: keep the phase-1 classification, but
+                // mark it resolved so the post-exchange pass skips it
+                reclassLambda[rI] = -VGREAT;
+            }
+        }
+
+        // ---- exchange: ask the neighbouring ranks for the
+        // octreeField entry (class + center bit) of the cells behind
+        // my probe faces; reply order matches the probe order per
+        // processor pair, so the k-th reply belongs to the k-th probe
+        // face sent to that rank
+        {
+            // round 1: send the probe faces
+            PstreamBuffers pBufs1(Pstream::commsTypes::nonBlocking);
+            for (label proci = 0; proci < Pstream::nProcs(); proci++)
+            {
+                if (proci != Pstream::myProcNo())
+                {
+                    UOPstream sendFaces(proci, pBufs1);
+                    sendFaces << probeFaces[proci];
+                }
+            }
+            pBufs1.finishedSends();
+
+            // for each received probe face, prepare the reply: the
+            // local octreeField entry of the cell behind that face
+            List<DynamicLabelList> replyMarks(Pstream::nProcs());
+            for (label proci = 0; proci < Pstream::nProcs(); proci++)
+            {
+                if (proci == Pstream::myProcNo())
+                {
+                    continue;
+                }
+                UIPstream recvFaces(proci, pBufs1);
+                DynamicLabelList recFaces(recvFaces);
+
+                forAll(recFaces, fI)
+                {
+                    label sCell(-1);
+                    forAll(mesh_.boundaryMesh(), patchI)
+                    {
+                        const polyPatch& cPatch = mesh_.boundaryMesh()[patchI];
+                        if (cPatch.type() == "processor")
+                        {
+                            const processorPolyPatch& procPatch
+                                = refCast<const processorPolyPatch>(cPatch);
+                            label sProc = (Pstream::myProcNo() == procPatch.myProcNo())
+                                ? procPatch.neighbProcNo() : procPatch.myProcNo();
+                            if (sProc == proci)
+                            {
+                                sCell = mesh_.faceOwner()
+                                    [cPatch.start() + recFaces[fI]];
+                                break;
+                            }
+                        }
+                    }
+                    if (sCell != -1)
+                    {
+                        replyMarks[proci].append(octreeField[sCell]);
+                    }
+                }
+            }
+            pBufs1.clear();
+
+            // round 2: send the replies back
+            PstreamBuffers pBufs2(Pstream::commsTypes::nonBlocking);
+            for (label proci = 0; proci < Pstream::nProcs(); proci++)
+            {
+                if (proci != Pstream::myProcNo())
+                {
+                    UOPstream sendMarks(proci, pBufs2);
+                    sendMarks << replyMarks[proci];
+                }
+            }
+            pBufs2.finishedSends();
+
+            List<DynamicLabelList> marksRecv(Pstream::nProcs());
+            for (label proci = 0; proci < Pstream::nProcs(); proci++)
+            {
+                if (proci != Pstream::myProcNo())
+                {
+                    UIPstream recvMarks(proci, pBufs2);
+                    DynamicLabelList recMarks(recvMarks);
+                    marksRecv[proci] = recMarks;
+                }
+            }
+            pBufs2.clear();
+
+            // ---- resolve the remaining candidates with remote bits
+            // the probe faces were appended in (candidate, face) order
+            // during the local scan above; re-scanning the candidates'
+            // processor faces in the same order and consuming the
+            // reply lists with a per-pair cursor keeps each reply
+            // aligned with the probe it belongs to
+            List<label> markScan(Pstream::nProcs(), 0);
+
+            forAll(reclassCells, rI)
+            {
+                bool resolvedLocal = (reclassLambda[rI] == -VGREAT);
+                label cCell = reclassCells[rI];
+                bool anyNeighborOutside(resolvedLocal);
+
+                const labelList& cFaces = mesh_.cells()[cCell];
+                forAll(cFaces, fI)
+                {
+                    label faceI = cFaces[fI];
+                    if (mesh_.isInternalFace(faceI))
+                    {
+                        continue;                                       //checked locally above
+                    }
+                    label facePatchI(mesh_.boundaryMesh().whichPatch(faceI));
+                    const polyPatch& cPatch = mesh_.boundaryMesh()[facePatchI];
+                    if (cPatch.type() != "processor")
+                    {
+                        continue;
+                    }
+                    const processorPolyPatch& procPatch
+                        = refCast<const processorPolyPatch>(cPatch);
+                    label iProc = (Pstream::myProcNo() == procPatch.myProcNo())
+                        ? procPatch.neighbProcNo() : procPatch.myProcNo();
+
+                    if (markScan[iProc] >= marksRecv[iProc].size())
+                    {
+                        continue;                                       //no reply: probe unanswered
+                    }
+                    label nMark = marksRecv[iProc][markScan[iProc]++];
+                    if (nMark != MARK_NONE && !(nMark & MARK_CENTER_IN))
+                    {
+                        anyNeighborOutside = true;
+                    }
+                }
+
+                if (resolvedLocal || anyNeighborOutside)
+                {
+                    reclassLambda[rI] = -VGREAT;
+                    continue;
+                }
+
+                // no inside-center neighbour with an outside center:
+                // demote to int, fix the lambda by delta-add,
+                // move the cell between the lists
+                octreeField[cCell] = MARK_SHELL_INT
+                    | (octreeField[cCell] & MARK_CENTER_IN);
+                body[cCell] += (1.0 - reclassLambda[rI]);
+                body[cCell] = min(max(0.0, body[cCell]), 1.0);
+                intCells_[Pstream::myProcNo()].append(cCell);
+            }
+
+            // compact the surf list: drop the demoted cells
+            {
+                DynamicLabelList compacted;
+                forAll(surfCells_[Pstream::myProcNo()], cI)
+                {
+                    label cCell = surfCells_[Pstream::myProcNo()][cI];
+                    if ((octreeField[cCell] & MASK_CLASS) == MARK_SURF)
+                    {
+                        compacted.append(cCell);
+                    }
+                }
+                surfCells_[Pstream::myProcNo()] = compacted;
+            }
+        }
+        }
+    }
+
     // ================= phase 2: interior fill =================
     // pure connectivity from the filled-int layer; ZERO geometry tests.
     // spread through face-neighbors until no more unclassified cells 
@@ -651,7 +953,7 @@ bool geomModel::createImmersedBodyConnectivity
     forAll(intCells_[Pstream::myProcNo()], cI)
     {
         label cCell = intCells_[Pstream::myProcNo()][cI];
-        if (octreeField[cCell] == MARK_FILLED_INT)
+        if ((octreeField[cCell] & MASK_CLASS) == MARK_FILLED_INT)
         {
             fillFrontier.append(cCell);
         }
@@ -740,7 +1042,7 @@ bool geomModel::createImmersedBodyConnectivity
         forAll(intLst, cI)
         {
             label cCell = intLst[cI];
-            if (octreeField[cCell] != MARK_FILLED_INT)
+            if ((octreeField[cCell] & MASK_CLASS) != MARK_FILLED_INT)
             {
                 continue;
             }
@@ -755,7 +1057,7 @@ bool geomModel::createImmersedBodyConnectivity
                     {
                         nCell = mesh_.neighbour()[faceI];
                     }
-                    if (octreeField[nCell] == MARK_OUTSIDE)
+                    if ((octreeField[nCell] & MASK_CLASS) == MARK_OUTSIDE)
                     {
                         anomaly = true;
                         break;
@@ -827,9 +1129,22 @@ bool geomModel::createImmersedBodyConnectivity
     }
 
     // ---- success: update caches for next step ----
+    // NOTE: surfSeed_ must be a cell that PASSES the lambda test (the
+    // resolveSeed fast path rejects a seed whose lambda is ~0); a
+    // surf cell with all vertices and center outside would kill the
+    // fast path every step -> full meshSearch octree rebuild
     if (surfCells_[Pstream::myProcNo()].size() > 0)
     {
         surfSeed_ = surfCells_[Pstream::myProcNo()][0];
+        forAll(surfCells_[Pstream::myProcNo()], cI)
+        {
+            if ((octreeField[surfCells_[Pstream::myProcNo()][cI]] & MASK_CLASS)
+                == MARK_SURF)
+            {
+                surfSeed_ = surfCells_[Pstream::myProcNo()][cI];
+                break;
+            }
+        }
     }
     if (intCells_[Pstream::myProcNo()].size() > 0)
     {

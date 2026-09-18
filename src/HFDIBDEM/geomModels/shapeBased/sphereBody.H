@@ -127,6 +127,7 @@ namespace Foam
             sphereBodyModel->getSurfaceCellList() = surfCells_;
             sphereBodyModel->getHaloCellList() = haloCells_;
             sphereBodyModel->getInternalCellList() = intCells_;
+            sphereBodyModel->getSurfToHaloLabels() = surfToHaloLabels_;
 
             return sphereBodyModel;
         }

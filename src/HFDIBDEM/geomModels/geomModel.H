@@ -49,6 +49,7 @@ Contributors
 #include "triangleFuncs.H"
 
 #include "processorPolyPatch.H"
+#include "meshSearch.H"
 
 #include "contactType.H"
 #include "subVolume.H"
@@ -157,12 +158,20 @@ namespace Foam
         // creation mode: "connectivity" (default) | "legacy"
         word bodyCreation_;
 
+        // cached cell-search engine for the connectivity creation;
+        // the meshSearch construction builds a full cell octree
+        // (~O(nCells) per build), so it must NOT be rebuilt on every
+        // createImmersedBody call - invalidated by resetSeeds()
+        autoPtr<meshSearch> cellSearchEng_;
+
         // mark encoding for the connectivity-based creation (octreeField_)
         static constexpr label MARK_NONE        = 0;
         static constexpr label MARK_SURF        = 1;                    // partial coverage
         static constexpr label MARK_SHELL_INT   = 2;                    // int, face-adjacent to surf
         static constexpr label MARK_FILLED_INT  = 3;                    // int, filled by connectivity
         static constexpr label MARK_OUTSIDE     = 4;                    // classified, no coverage
+        static constexpr label MASK_CLASS       = 7;                    // low 3 bits: class
+        static constexpr label MARK_CENTER_IN   = 8;                    // bit: center inside
 
         public:
 
@@ -595,6 +604,7 @@ namespace Foam
         {
             surfSeed_ = -1;
             nCellsPrev_ = -1;
+            cellSearchEng_.clear();                                    //OF.com: reset
         }
 
     };
