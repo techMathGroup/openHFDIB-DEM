@@ -115,11 +115,26 @@ void nonConvexBody::createImmersedBodyLegacy
 
     bool isInsideBB(false);
     labelList nextToCheck(1,0);
-    label iterCount(0);label iterMax(mesh_.nCells());
+    label iterCount(0);
+    // rank-local nCells() would make the safety bound another rank-local
+    // termination clause — share the largest bound across ranks instead
+    // (>= every rank's own cell count, so no rank's walk gets truncated)
+    label iterMax(mesh_.nCells());
+    reduce(iterMax, maxOp<label>());
 
     label nextSize = nextToCheck.size();
     reduce(nextSize, maxOp<label>());
-    while ((nextSize > 0 or not isInsideBB) && iterCount < iterMax)
+    // NOTE: isInsideBB is rank-local, but the loop termination must be
+    // global: the loop body (processor-face exchange via PstreamBuffers)
+    // and the tail (reduce) are collectives, so all ranks must evaluate
+    // this condition the same number of times. A rank-local flag here
+    // lets ranks exit at different iterations and the collectives cross
+    // (deadlock on decompositions where the body bbox spans only some
+    // of the ranks). The reduce is hoisted out of the condition because
+    // "or" short-circuits: ranks with a non-empty frontier would skip
+    // the collective while empty-frontier ranks enter it.
+    bool anyInsideBB(returnReduceOr(isInsideBB));
+    while ((nextSize > 0 or not anyInsideBB) && iterCount < iterMax)
     {
         iterCount++;
         DynamicLabelList auxToCheck;
@@ -256,9 +271,10 @@ void nonConvexBody::createImmersedBodyLegacy
         // next iteration
         nextToCheck = auxToCheck;
 
-        // check if all processors finished 
+        // check if all processors finished
         nextSize = nextToCheck.size();
         reduce(nextSize, maxOp<label>());
+        anyInsideBB = returnReduceOr(isInsideBB);
     }
 
     // get cell centers inside the body bounding box
