@@ -581,7 +581,7 @@ void immersedBody::updateCoupling
             vector fCellPress = body[cellI]*fPress[cellI];
 
             FV -= (fCellVisc + fCellPress)*mesh_.V()[cellI];
-            TA -= ((ibPoints[i] - refCoMList[i])^(fCellVisc + fCellPress))
+            TA -= ((ibPoints[surfCell] - refCoMList[i])^(fCellVisc + fCellPress))
                 *mesh_.V()[cellI];
             FAdded -= body[cellI]
                 *((fVisc.prevIter()[cellI] - fVisc[cellI])
