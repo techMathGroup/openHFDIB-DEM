@@ -167,6 +167,13 @@ void immersedBody::syncCreateImmersedBody                               //Note (
     //            was replaced by calculateGeometricalPropertiesParallel
     //            and this replacement WAS NOT tested (a problem might
     //            appear for clusterBodies)
+    // Note (MI): unlike the createBodies path, the callers of
+    //            this function (init/add/restart) run
+    //            computeBodyCharPars right after -> M_ must be
+    //            reduced here, otherwise M0_ is set from a
+    //            rank-local mass (0 on ranks without body cells)
+    //            and checkIfInDomain divides by zero
+    geomModel_->reduceGeometricalProperties();
     syncImmersedBodyRefinement(body, refineF);
 }
 //---------------------------------------------------------------------------//
@@ -213,13 +220,22 @@ void immersedBody::computeCharCellSize()
 {
     const List<DynamicLabelList>& surfCells = geomModel_->getSurfaceCellList();
 
+    // NOTE (MI): mesh_.nGeometricD() lazily runs calcDirections which
+    // performs collective communication (returnReduceOr + reduce on
+    // empty/wedge patch statistics) - it must be called by all ranks
+    // uniformly; keeping it inside the surfCells loop below triggered
+    // the collective only on ranks with a non-empty surf list and
+    // mismatched the collective sequence on refined (topologically
+    // changed, cache-invalidated) meshes -> MPI_ERR_TRUNCATE
+    const label nGeometricDMesh = mesh_.nGeometricD();
+
     scalarList charCellSizeL(Pstream::nProcs(),1e4);
     forAll (surfCells[Pstream::myProcNo()],sCellI)
     {
         label cellI = surfCells[Pstream::myProcNo()][sCellI];
-        
+
         scalar cellMeasure = mesh_.V()[cellI];
-        label nGeometricD = mesh_.nGeometricD();
+        label nGeometricD = nGeometricDMesh;                            //reset per cell
 
         if (!case3D)
         {
@@ -1581,7 +1597,7 @@ void immersedBody::checkIfInDomain(volScalarField& body)
     }
 
     InfoH << iB_Info << "-- body " << bodyIdStr_ << " current M/M0: "
-        << geomModel_->getM()/geomModel_->getM0() << endl;
+        << geomModel_->getM()/(geomModel_->getM0()+SMALL) << endl;
     // if only 1% of the initial particle mass remains in the domain, switch it off
     if (geomModel_->getM()/(geomModel_->getM0()+SMALL) < 1e-2 && case3D)
     {
