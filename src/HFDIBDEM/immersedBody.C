@@ -618,92 +618,25 @@ void immersedBody::updateCoupling                                       //full i
     const bool applyAddedMass
 )
 {
-    vector FV(vector::zero);
-    vector TA(vector::zero);
-    vector FAdded(vector::zero);
-
-
-    List<DynamicLabelList> intLists;
-    List<DynamicLabelList> surfLists;
-    List<DynamicLabelList> haloLists;
-    DynamicVectorList refCoMList;
-
-    geomModel_->getReferencedLists(
-        intLists,
-        surfLists,
-        haloLists,
-        refCoMList
-    );
-
-    // forAll (intLists, i)
-    // {
-    //     DynamicLabelList& intListI = intLists[i];
-    //     forAll (intListI, intCell)
-    //     {
-    //         label cellI = intListI[intCell];
-
-    //         FV -=  f[cellI]*mesh_.V()[cellI];
-    //         TA -=  ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])
-    //             *mesh_.V()[cellI];
-    //         FAdded -= (f.prevIter()[cellI] - f[cellI])*mesh_.V()[cellI];
-    //     }
-    // }
-
-    const List<point>& ibPoints = intpInfo_->getIbPoints();             //get surface points
-    forAll (surfLists, i)
+    fluidContext fCtx
     {
-        DynamicLabelList& surfListI = surfLists[i];
-        forAll (surfListI, surfCell)
-        {
-            label cellI = surfListI[surfCell];
-
-            // scalar fScale = 1.0*body[cellI]+0.5;
-            // vector fCell = (1.0 - body[cellI])*f[cellI];
-            scalar fScale = 1.0;
-            vector fCell =  f[cellI]*mesh_.V()[cellI];
-            fCell *= fScale; 
-
-            // FV -=  fScale*f[cellI]*mesh_.V()[cellI];
-            // TA -=  ((ibPoints[surfCell] - refCoMList[i])^(fScale*f[cellI])
-            //     *mesh_.V()[cellI]);
-            // FAdded -= (f.prevIter()[cellI] - f[cellI])*mesh_.V()[cellI];//under construction
-
-            FV -=  fCell;
-            TA -=  (ibPoints[intpInfo_->findIbPoint(cellI)] - refCoMList[i])^fCell;
-            FAdded -= (f.prevIter()[cellI] - f[cellI])*mesh_.V()[cellI];//under construction
-        }
-    }
-
-    reduce(FV, sumOp<vector>());
-    reduce(TA, sumOp<vector>());
-    reduce(FAdded, sumOp<vector>());
-
-    if (kinematicForce)
+        &body,
+        &f,
+        nullptr,
+        fluidSituation::singlePhase,
+        kinematicForce,
+        applyAddedMass
+    };
+    solidContext sCtx
     {
-        FV *= rhoF_.value();
-        TA *= rhoF_.value();
-        FAdded *= rhoF_.value();
-    }
+        &FCoupling_,
+        &FCouplingOld_,
+        &couplingHistCoef_,
+        &rhoF_,
+        &a_
+    };
 
-    scalar rhoS = geomModel_->getRhoS().value();
-    // FV /= rhoS;
-    // TA /= rhoS;
-    // FAdded /= rhoS;
-    // FV *= rhoF_.value();
-    // TA *= rhoF_.value();
-    // FAdded *= rhoF_.value();
-
-    // FAdded = FCouplingOld_.F - FV;
-
-    FAdded *= rhoF_.value()/rhoS;
-
-    FCoupling_ = couplingHistCoef_*forces(FV, TA) + (1.0-couplingHistCoef_)*FCouplingOld_;
-
-    applyAddedMassScaling(FV, FAdded, applyAddedMass);
-
-    couplingHistCoef_ = max(couplingHistCoef_*0.95, 0.5);
-    
-    InfoH << iB_Info << "-- body " << bodyIdStr_ << " coupling coefficient: " << couplingHistCoef_ << endl;
+    couplingModel_->updateCoupling(fCtx, sCtx);
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateCoupling                                       //full interface

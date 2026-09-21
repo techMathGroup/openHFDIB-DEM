@@ -55,6 +55,8 @@ Contributors
 #include "interpolationInfo.H"
 #include "ibInterpolation.H"
 
+#include "fluidSolidCoupling.H"
+
 #include "virtualMesh.H"
 namespace Foam
 {
@@ -91,6 +93,9 @@ namespace Foam
 
         // Interpolation Info
         autoPtr<interpolationInfo> intpInfo_;
+
+        // fluid-solid coupling model
+        autoPtr<fluidSolidCoupling> couplingModel_;
 
         // contact models
         autoPtr<ibContactClass> ibContactClass_;

@@ -304,7 +304,10 @@ int main(int argc, char *argv[])
             fDragVisc.correctBoundaryConditions();
         }
 
-        HFDIBDEM.postUpdateBodies(lambda,fDragPress,fDragVisc,false);
+        // HFDIBDEM.postUpdateBodies(lambda,fDragPress,fDragVisc,false);
+
+        volVectorField fDrag = fDragPress + fDragVisc;
+        HFDIBDEM.postUpdateBodies(lambda,fDrag,false,false);
 
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
         // HFDIBDEM.updateBodiesRhoF(rho);

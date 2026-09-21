@@ -186,6 +186,19 @@ if(ibIntp.valid())
     ));
 }
 
+// fluid-solid coupling model (IB for now, see fluidSolidCoupling)
+if(intpInfo_.valid())
+{
+    couplingModel_ = fluidSolidCoupling::New
+    (
+        immersedDict_,
+        mesh_,
+        geomModel_,
+        intpInfo_(),
+        bodyIdStr_
+    );
+}
+
 ibContactClass_.reset(new ibContactClass(
     geomModel_,
     material
