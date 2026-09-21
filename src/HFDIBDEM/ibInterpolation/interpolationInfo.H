@@ -63,7 +63,42 @@ namespace Foam
 
         autoPtr<List<point>> ibPointsPtr_;                              //cellIbPoint mapping
         autoPtr<List<vector>> ibNormalsPtr_;                            //cellIbNormal mapping
+        autoPtr<labelList> ibCellLabelsPtr_;                            //ibPointCell mapping
+        autoPtr<HashTable<label, label, Hash<label>>> cellToIbPointPtr_;
         scalar charCellSize_;
+
+        protected:
+
+        //-- reset the base arrays shared by all interpolation types
+        void resetIntpInfoBase(label newSize)
+        {
+            ibPointsPtr_.reset(new List<point>(newSize, vector::zero));
+            ibNormalsPtr_.reset(new List<vector>(newSize, vector::zero));
+            ibCellLabelsPtr_.reset(new labelList(newSize, -1));
+            cellToIbPointPtr_.reset(
+                new HashTable<label, label, Hash<label>>(2*newSize));
+        }
+
+        //-- record the surfCell-ibPoint correspondence
+        void setIbCellLabels(const DynamicLabelList& cSurfCells)
+        {
+            labelList& ibCellLabels = ibCellLabelsPtr_();
+            HashTable<label, label, Hash<label>>& cellToIbPoint
+                = cellToIbPointPtr_();
+
+            forAll(cSurfCells, cellI)
+            {
+                ibCellLabels[cellI] = cSurfCells[cellI];
+
+                if (!cellToIbPoint.insert(cSurfCells[cellI], cellI))
+                {
+                    FatalErrorInFunction
+                        << "surface cell " << cSurfCells[cellI]
+                        << " appears twice in the surface cell list"
+                        << abort(FatalError);
+                }
+            }
+        }
 
         public:
 
@@ -91,6 +126,27 @@ namespace Foam
             return ibNormalsPtr_();
         }
 
+        // get ibPoint index from the mesh cell label
+        label findIbPoint(label cellI) const
+        {
+            if (!cellToIbPointPtr_.valid())
+            {
+                FatalErrorInFunction
+                    << "interpolation info was cleared, setIntpInfo needed"
+                    << abort(FatalError);
+            }
+
+            if (!cellToIbPointPtr_().found(cellI))
+            {
+                FatalErrorInFunction
+                    << "no ibPoint for cell " << cellI
+                    << " - surface cells changed since setIntpInfo"
+                    << abort(FatalError);
+            }
+
+            return cellToIbPointPtr_()[cellI];
+        }
+
         virtual void setIntpInfo() = 0;
 
         const DynamicLabelList& getSurfCells() const
@@ -102,6 +158,8 @@ namespace Foam
         {
             ibPointsPtr_.clear();
             ibNormalsPtr_.clear();
+            ibCellLabelsPtr_.clear();
+            cellToIbPointPtr_.clear();
         }
 
         void setCharCellSize(scalar charCellSize)

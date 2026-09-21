@@ -109,8 +109,7 @@ namespace Foam
 
         void resetIntpInfo(label newSize)
         {
-            ibPointsPtr_.reset(new List<point>(newSize, vector::zero));
-            ibNormalsPtr_.reset(new List<vector>(newSize, vector::zero));
+            resetIntpInfoBase(newSize);
             cellCellsPtr_.reset(new labelListList(newSize));
             ibFacesPtr_.reset(new DynamicLabelList());
             ibFaceFlipsPtr_.reset(new DynamicList<bool>());

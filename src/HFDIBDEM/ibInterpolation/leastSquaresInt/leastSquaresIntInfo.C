@@ -64,6 +64,7 @@ void leastSquaresIntInfo::setIntpInfo()
     const DynamicLabelList& cSurfCells = getSurfCells();
 
     resetIntpInfo(cSurfCells.size());
+    setIbCellLabels(cSurfCells);
     List<point>& ibPoints = getIbPoints();
     List<vector>& ibNormals = getIbNormals();
     labelListList& cellCells = getCellCells();

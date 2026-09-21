@@ -125,8 +125,7 @@ namespace Foam
 
         void resetIntpInfo(label newSize)
         {
-            ibPointsPtr_.reset(new List<point>(newSize, vector::zero));
-            ibNormalsPtr_.reset(new List<point>(newSize, vector::zero));
+            resetIntpInfoBase(newSize);
             intPointsPtr_.reset(new List<List<intPoint>>(newSize));
             intVelocPtr_.reset(new List<List<vector>>(newSize));
         }

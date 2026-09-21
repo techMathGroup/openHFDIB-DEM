@@ -581,7 +581,8 @@ void immersedBody::updateCoupling
             vector fCellPress = body[cellI]*fPress[cellI];
 
             FV -= (fCellVisc + fCellPress)*mesh_.V()[cellI];
-            TA -= ((ibPoints[surfCell] - refCoMList[i])^(fCellVisc + fCellPress))
+            TA -= ((ibPoints[intpInfo_->findIbPoint(cellI)] - refCoMList[i])
+                ^(fCellVisc + fCellPress))
                 *mesh_.V()[cellI];
             FAdded -= body[cellI]
                 *((fVisc.prevIter()[cellI] - fVisc[cellI])
@@ -668,7 +669,7 @@ void immersedBody::updateCoupling                                       //full i
             // FAdded -= (f.prevIter()[cellI] - f[cellI])*mesh_.V()[cellI];//under construction
 
             FV -=  fCell;
-            TA -=  (ibPoints[surfCell] - refCoMList[i])^fCell;
+            TA -=  (ibPoints[intpInfo_->findIbPoint(cellI)] - refCoMList[i])^fCell;
             FAdded -= (f.prevIter()[cellI] - f[cellI])*mesh_.V()[cellI];//under construction
         }
     }
@@ -783,7 +784,7 @@ void immersedBody::updateCoupling                                       //full i
             // FAdded -= (f.prevIter()[cellI] - f[cellI])*mesh_.V()[cellI];//under construction
 
             FV -=  fCell;
-            TA -=  (ibPoints[surfCell] - refCoMList[i])^fCell;
+            TA -=  (ibPoints[intpInfo_->findIbPoint(cellI)] - refCoMList[i])^fCell;
             FAdded -= (f.prevIter()[cellI] - f[cellI])*mesh_.V()[cellI];//under construction
         }
     }
@@ -1273,13 +1274,9 @@ vectorField immersedBody::getUatIbPoints()
     vectorField ibPointsVal(ibPoints.size());
     forAll(ibPoints, pointI)
     {
-        // vector planarVec =  geomModel_->getLVec(ibPoints[pointI])
-        //                     - Axis_*(
-        //                     (geomModel_->getLVec(ibPoints[pointI]))&Axis_);
-
-        vector planarVec =  ibPoints[pointI] - geomModel_->getCoM()
+        vector planarVec =  geomModel_->getLVec(ibPoints[pointI])
                             - Axis_*(
-                            (ibPoints[pointI]-geomModel_->getCoM())&Axis_);
+                            (geomModel_->getLVec(ibPoints[pointI]))&Axis_);
 
         vector VSvalue = (-(planarVec^Axis_)*omega_ + Vel_);
         ibPointsVal[pointI] = VSvalue;
