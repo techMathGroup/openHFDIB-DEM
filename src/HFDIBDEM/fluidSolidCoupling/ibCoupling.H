@@ -92,7 +92,6 @@ class ibCoupling
     void updateCouplingVOF
     (
         const fluidContext& ctx,
-        solidContext& sCtx,
         const volVectorField& f,
         List<DynamicLabelList>& intLists,
         List<DynamicLabelList>& surfLists,
@@ -108,7 +107,7 @@ class ibCoupling
     void updateCouplingTail
     (
         const fluidContext& ctx,
-        solidContext& sCtx,
+        const vector& a,
         const vector& FV,
         const vector& TA,
         const vector& FAdded
@@ -122,7 +121,7 @@ class ibCoupling
     (
         const fvMesh& mesh,
         std::shared_ptr<geomModel>& geomModel,
-        interpolationInfo& intpInfo,
+        interpolationInfo* intpInfo,
         const word& bodyIdStr
     );
 
@@ -135,7 +134,7 @@ class ibCoupling
     void updateCoupling
     (
         const fluidContext& ctx,
-        solidContext& sCtx
+        const vector& a
     );
 };
 

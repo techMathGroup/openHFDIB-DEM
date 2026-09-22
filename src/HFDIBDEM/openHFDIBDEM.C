@@ -1845,6 +1845,11 @@ void openHFDIBDEM::restartSimulation
         immersedBodies_[addIBPos].createImmersedBody(body,refineF);
         immersedBodies_[addIBPos].computeBodyCharPars();
         immersedBodies_[addIBPos].setRestartSim(Vel,omega,Axis,isStatic,timeStepsInContWStatic);
+
+        // coupling state (optional entries: restart files keep the
+        //  constructor defaults)
+        immersedBodies_[addIBPos].getCouplingModel().readCouplingInfo(bodyDict);
+
         verletList_.addBodyToVList(immersedBodies_[addIBPos]);
     }
 }

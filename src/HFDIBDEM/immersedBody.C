@@ -94,9 +94,7 @@ VelOld_(vector::zero),
 a_(vector::zero),
 alpha_(vector::zero),
 totalAngle_(vector::zero),
-couplingHistCoef_(1.0),
 CoNum_(0.0),
-rhoF_(1.0),
 bodyId_(bodyId),
 bodyIdStr_(Foam::name(bodyId_)),
 updateTorque_(false),
@@ -509,7 +507,7 @@ void immersedBody::resetPostPimpleState()
     Vel_ = VelOld_;
     Axis_ = AxisOld_;
     omega_ = omegaOld_;
-    FCouplingOld_ = FCoupling_;
+    couplingModel_->resetPostPimpleState();
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateCoupling                                       //full interface
@@ -529,16 +527,8 @@ void immersedBody::updateCoupling                                       //full i
         kinematicForce,
         applyAddedMass
     };
-    solidContext sCtx
-    {
-        &FCoupling_,
-        &FCouplingOld_,
-        &couplingHistCoef_,
-        &rhoF_,
-        &a_
-    };
 
-    couplingModel_->updateCoupling(fCtx, sCtx);
+    couplingModel_->updateCoupling(fCtx, a_);
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateCoupling                                       //full interface
@@ -559,16 +549,8 @@ void immersedBody::updateCoupling                                       //full i
         kinematicForce,
         applyAddedMass
     };
-    solidContext sCtx
-    {
-        &FCoupling_,
-        &FCouplingOld_,
-        &couplingHistCoef_,
-        &rhoF_,
-        &a_
-    };
 
-    couplingModel_->updateCoupling(fCtx, sCtx);
+    couplingModel_->updateCoupling(fCtx, a_);
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateLocalFluidDensity
@@ -681,20 +663,24 @@ void immersedBody::updateMovementComp
     scalar omega
 )
 {
+    // coupling state lives in the coupling model
+    const dimensionedScalar& rhoF(couplingModel_->getRhoF());
+    const forces& FCoupling(couplingModel_->getFCoupling());
+
     auto updateTranslation = [&]()
     {
 
         const uniformDimensionedVectorField& g =
             mesh_.lookupObject<uniformDimensionedVectorField>("g");
-            
+
         vector FG(vector::zero);
         if(!solverInfo::getOnlyDEM())
-            FG = geomModel_->getM0()*(1.0-rhoF_.value()
+            FG = geomModel_->getM0()*(1.0-rhoF.value()
             /geomModel_->getRhoS().value())*g.value();
         else
             FG = geomModel_->getM0()*g.value();
 
-        vector F(FCoupling_.F);
+        vector F(FCoupling.F);
         F += FContact_.F;
         F += FG;
 
@@ -709,7 +695,7 @@ void immersedBody::updateMovementComp
 
             InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" mass            : " << geomModel_->getM0() << endl;
             InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" acting force    : " << F << endl;
-            InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" coupling force  : " << FCoupling_.F << endl;
+            InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" coupling force  : " << FCoupling.F << endl;
             InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" grav/buyo force : " << FG << endl;
             
             a_  = F/(geomModel_->getM0());
@@ -724,7 +710,7 @@ void immersedBody::updateMovementComp
     {
         if(mag(geomModel_->getI()) > 0)
         {
-            vector T(FCoupling_.T);
+            vector T(FCoupling.T);
             T += FContact_.T;
 
             // update body angular acceleration
@@ -758,7 +744,7 @@ void immersedBody::updateMovementComp
 
     auto updateRotationFixedAxis = [&]()
     {
-        vector T(FCoupling_.T);
+        vector T(FCoupling.T);
         T += FContact_.T;
 
         // update body angular velocity
@@ -773,7 +759,7 @@ void immersedBody::updateMovementComp
 
     auto updatePositionByTable = [&]()
     {
-        vector F(FCoupling_.F);
+        vector F(FCoupling.F);
         F *= 0.0; // no force
 
         scalar time = mesh_.time().value();
@@ -1107,6 +1093,10 @@ scalar immersedBody::computeSweepDistance
     scalar safetyRot
 )
 {
+    // coupling state lives in the coupling model
+    const dimensionedScalar& rhoF(couplingModel_->getRhoF());
+    const forces& FCoupling(couplingModel_->getFCoupling());
+
     //--- prescribed bodies (rotation/translation from dict or tables):
     //    their velocity is not the integrated Vel_ - evaluate the actual
     //    motion the integrator will apply during this step.
@@ -1147,7 +1137,7 @@ scalar immersedBody::computeSweepDistance
 
         if(!solverInfo::getOnlyDEM())
         {
-            FG = geomModel_->getM0()*(1.0-rhoF_.value()
+            FG = geomModel_->getM0()*(1.0-rhoF.value()
             /geomModel_->getRhoS().value())*g.value();
         }
         else
@@ -1158,7 +1148,7 @@ scalar immersedBody::computeSweepDistance
         vector a(vector::zero);
         if(geomModel_->getM0() > SMALL)
         {
-            a = (FCoupling_.F + FG)/geomModel_->getM0();
+            a = (FCoupling.F + FG)/geomModel_->getM0();
         }
 
         sTrans = (mag(Vel_) + mag(a)*deltaT)*deltaT;
@@ -1382,61 +1372,3 @@ void immersedBody::checkBodyOp()
     ibContactClass_->inContactWithStatic(false);
 }
 
-//---------------------------------------------------------------------------//
-void immersedBody::updateRhoF
-(
-    const scalar rho
-)
-{    
-    rhoF_ = rho;
-}
-void immersedBody::updateRhoF                                           //variant for VOF
-(
-    const volScalarField& rho,
-    const volScalarField& body
-)
-{
-    scalar fluidMass(0);
-    scalar fluidVol(0);
-
-    List<DynamicLabelList> relevantLists;
-    geomModel_->getReferencedHaloCellList(relevantLists);
-    // geomModel_->getReferencedInternalCellList(relevantLists);
-    DynamicVectorList refCoMList;
-    geomModel_->getReferencedCoMList(refCoMList);
-    
-    // Note (MI): in this case, we do not want to take into account the
-    //            fluid composition inside the particle (frozen alpha field)
-    // - we calculate the density of the surrounding fluid only from
-    //   HALO cells
-    // - weighting of the cell is done based on the fluid volume fraction
-    
-    // compute the weighted average of density        
-    forAll (relevantLists, i)
-    {
-        DynamicLabelList& relevantListI = relevantLists[i];
-        forAll (relevantListI, rCell)
-        {
-            label cellI = relevantListI[rCell];
-
-            fluidMass += rho[cellI]*mesh_.V()[cellI]*(1.0 - body[cellI]);
-            fluidVol  += mesh_.V()[cellI]*(1.0 - body[cellI]);
-            // fluidMass += rho[cellI]*mesh_.V()[cellI];
-            // fluidVol  += mesh_.V()[cellI];
-        }
-    }
-    
-    reduce(fluidMass, sumOp<scalar>());
-    reduce(fluidVol, sumOp<scalar>());
-    
-    
-    if (fluidVol > SMALL)
-    {
-        rhoF_ = fluidMass/fluidVol;
-    }
-    else
-    {
-        rhoF_ = 1.0;
-    }
-    InfoH << iB_Info << "-- body: " << bodyIdStr_ << ": rhoF = " << rhoF_ << endl;
-}

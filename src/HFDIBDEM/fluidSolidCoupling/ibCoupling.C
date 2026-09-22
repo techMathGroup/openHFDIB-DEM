@@ -61,7 +61,7 @@ ibCoupling::ibCoupling
 (
     const fvMesh& mesh,
     std::shared_ptr<geomModel>& geomModel,
-    interpolationInfo& intpInfo,
+    interpolationInfo* intpInfo,
     const word& bodyIdStr
 )
 :
@@ -78,13 +78,22 @@ ibCoupling::~ibCoupling()
 void ibCoupling::updateCoupling
 (
     const fluidContext& ctx,
-    solidContext& sCtx
+    const vector& a
 )
 {
     if (!ctx.f)
     {
         FatalErrorInFunction
             << "ibCoupling: no force field in the fluid context"
+            << abort(FatalError);
+    }
+
+    if (!intpInfo_)
+    {
+        FatalErrorInFunction
+            << "ibCoupling: no interpolation info for body "
+            << bodyIdStr_
+            << " - IB coupling requires an interpolation scheme"
             << abort(FatalError);
     }
 
@@ -106,7 +115,7 @@ void ibCoupling::updateCoupling
         refCoMList
     );
 
-    const List<point>& ibPoints = intpInfo_.getIbPoints();              //get surface points
+    const List<point>& ibPoints = intpInfo_->getIbPoints();            //get surface points
 
     if (ctx.situation == fluidSituation::singlePhase)
     {
@@ -128,7 +137,6 @@ void ibCoupling::updateCoupling
         updateCouplingVOF
         (
             ctx,
-            sCtx,
             f,
             intLists,
             surfLists,
@@ -141,7 +149,12 @@ void ibCoupling::updateCoupling
         );
     }
 
-    updateCouplingTail(ctx, sCtx, FV, TA, FAdded);
+    // sum the per-rank contributions before the tail (parallel coupling)
+    reduce(FV, sumOp<vector>());
+    reduce(TA, sumOp<vector>());
+    reduce(FAdded, sumOp<vector>());
+
+    updateCouplingTail(ctx, a, FV, TA, FAdded);
 }
 
 //---------------------------------------------------------------------------//
@@ -192,7 +205,7 @@ void ibCoupling::updateCouplingSinglePhase
             vector fCell =  f[cellI]*mesh_.V()[cellI];
             fCell *= fScale;
 
-            const vector& surfPoint = ibPoints[intpInfo_.findIbPoint(cellI)];
+            const vector& surfPoint = ibPoints[intpInfo_->findIbPoint(cellI)];
 
             FV -=  fCell;
             TA -=  (surfPoint - refCoMList[i])^fCell;
@@ -211,7 +224,6 @@ void ibCoupling::updateCouplingSinglePhase
 void ibCoupling::updateCouplingVOF
 (
     const fluidContext& ctx,
-    solidContext& sCtx,
     const volVectorField& f,
     List<DynamicLabelList>& intLists,
     List<DynamicLabelList>& surfLists,
@@ -232,7 +244,7 @@ void ibCoupling::updateCouplingVOF
 
     const volScalarField& rho = *ctx.rho;
     const volScalarField& body = *ctx.body;
-    const dimensionedScalar& rhoF = *sCtx.rhoF;
+    const dimensionedScalar& rhoF = rhoF_;
 
     List<List<DynamicLabelList>>& surfToHaloAddressing
         = geomModel_->getSurfToHaloLabels();
@@ -285,7 +297,7 @@ void ibCoupling::updateCouplingVOF
             fCell *= fScale;
 
             FV -=  fCell;
-            TA -=  (ibPoints[intpInfo_.findIbPoint(cellI)] - refCoMList[i])^fCell;
+            TA -=  (ibPoints[intpInfo_->findIbPoint(cellI)] - refCoMList[i])^fCell;
             if (ctx.applyAddedMass)
             {
                 FAdded -= (f.prevIter()[cellI] - f[cellI])
@@ -299,17 +311,16 @@ void ibCoupling::updateCouplingVOF
 void ibCoupling::updateCouplingTail
 (
     const fluidContext& ctx,
-    solidContext& sCtx,
+    const vector& a,
     const vector& FV,
     const vector& TA,
     const vector& FAdded
 )
 {
-    forces& FCoupling = *sCtx.FCoupling;
-    const forces& FCouplingOld = *sCtx.FCouplingOld;
-    scalar& couplingHistCoef = *sCtx.couplingHistCoef;
-    dimensionedScalar& rhoF = *sCtx.rhoF;
-    const vector& a = *sCtx.a;
+    forces& FCoupling = FCoupling_;
+    const forces& FCouplingOld = FCouplingOld_;
+    scalar& couplingHistCoef = couplingHistCoef_;
+    dimensionedScalar& rhoF = rhoF_;
 
     vector FVl(FV);
     vector TAl(TA);

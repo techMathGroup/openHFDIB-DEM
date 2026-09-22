@@ -41,8 +41,6 @@ Contributors
 #include "volFieldsFwd.H"
 #include "dimensionedScalar.H"
 
-#include "forces.H"
-
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -64,17 +62,6 @@ struct fluidContext
     fluidSituation situation;                                         //solver type
     bool kinematicForce;                                    //multiply output by rhoF
     bool applyAddedMass;                                     //added-mass scaling
-};
-
-//- coupling state owned by immersedBody (until the state move). The
-//- model computes into it; pointers are refreshed by the caller per call
-struct solidContext
-{
-    forces* FCoupling;                                             //output force
-    const forces* FCouplingOld;                             //previous iteration
-    scalar* couplingHistCoef;                                 //history coefficient
-    dimensionedScalar* rhoF;                                       //fluid density
-    const vector* a;                                            //body acceleration
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

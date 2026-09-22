@@ -75,11 +75,20 @@ class fluidSolidCoupling
     // geomModel replacement, e.g. the periodic-body swap)
     std::shared_ptr<geomModel>& geomModel_;
 
-    // interpolation info of the owning body (ibPoints, findIbPoint)
-    interpolationInfo& intpInfo_;
+    // interpolation info of the owning body (ibPoints, findIbPoint);
+    // null for bodies created without an interpolation scheme - only
+    // the coupling physics needs it, the state below does not
+    interpolationInfo* intpInfo_;
 
     // bodyId string for output
     const word& bodyIdStr_;
+
+    // coupling state (moved from immersedBody, step C)
+
+    forces FCoupling_;
+    forces FCouplingOld_;
+    scalar couplingHistCoef_;
+    dimensionedScalar rhoF_;
 
     public:
 
@@ -89,7 +98,7 @@ class fluidSolidCoupling
     (
         const fvMesh& mesh,
         std::shared_ptr<geomModel>& geomModel,
-        interpolationInfo& intpInfo,
+        interpolationInfo* intpInfo,
         const word& bodyIdStr
     );
 
@@ -99,13 +108,61 @@ class fluidSolidCoupling
 
     // Member functions -------------------------------------------
 
-    //- compute the coupling force on the body from the fluid context,
-    //- writing into the coupling state handed over by the caller
+    //- compute the coupling force on the body from the fluid context
     virtual void updateCoupling
     (
         const fluidContext& ctx,
-        solidContext& sCtx
+        const vector& a
     ) = 0;
+
+    //- coupling force history accessors (movement / print consumers)
+    const forces& getFCoupling() const
+    {
+        return FCoupling_;
+    }
+
+    const forces& getFCouplingOld() const
+    {
+        return FCouplingOld_;
+    }
+
+    //- fluid density seen by the body (buoyancy consumers)
+    const dimensionedScalar& getRhoF() const
+    {
+        return rhoF_;
+    }
+
+    //- reset the under-relaxation history after a contact event
+    void resetCouplingHistory()
+    {
+        couplingHistCoef_ = 1.0;
+    }
+
+    //- carry the current coupling force into the old-iteration slot
+    //- (per PIMPLE outer iteration)
+    void resetPostPimpleState()
+    {
+        FCouplingOld_ = FCoupling_;
+    }
+
+    //- update the fluid density seen by the body (single-phase
+    //- solvers: constant fluid density)
+    void updateRhoF(const scalar rho)
+    {
+        rhoF_ = rho;
+    }
+
+    //- update the fluid density seen by the body (VOF solvers:
+    //- halo-cell fluid-volume-weighted average)
+    void updateRhoF(const volScalarField& rho, const volScalarField& body);
+
+    //- write the coupling state into the restart record
+    //- (entries are optional for readers: lookupOrDefault with
+    //- constructor defaults keeps old restart files loadable)
+    void writeCouplingInfo(dictionary& dict) const;
+
+    //- read the coupling state back from a restart record
+    void readCouplingInfo(const dictionary& dict);
 
     //- select and construct a coupling model from the body dictionary
     static autoPtr<fluidSolidCoupling> New
@@ -113,7 +170,7 @@ class fluidSolidCoupling
         const dictionary& bodyDict,
         const fvMesh& mesh,
         std::shared_ptr<geomModel>& geomModel,
-        interpolationInfo& intpInfo,
+        interpolationInfo* intpInfo,
         const word& bodyIdStr
     );
 };

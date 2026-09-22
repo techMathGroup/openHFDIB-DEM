@@ -178,26 +178,27 @@ geomModel_->setRefineBuffers(refineBuffers_);
 
 string material = word(immersedDict_.lookup("material"));
 
+interpolationInfo* intpInfoPtr(nullptr);
 if(ibIntp.valid())
 {
     intpInfo_.reset(ibIntp().createIntpInfo(                            //OF.com: set -> reset
         mesh_,
         geomModel_
     ));
+    intpInfoPtr = &intpInfo_();
 }
 
-// fluid-solid coupling model (IB for now, see fluidSolidCoupling)
-if(intpInfo_.valid())
-{
-    couplingModel_ = fluidSolidCoupling::New
-    (
-        immersedDict_,
-        mesh_,
-        geomModel_,
-        intpInfo_(),
-        bodyIdStr_
-    );
-}
+// fluid-solid coupling model (IB for now, see fluidSolidCoupling).
+// constructed always - it owns the coupling state; the IB physics
+// fatals on a missing interpolation scheme (ibCoupling::updateCoupling)
+couplingModel_ = fluidSolidCoupling::New
+(
+    immersedDict_,
+    mesh_,
+    geomModel_,
+    intpInfoPtr,
+    bodyIdStr_
+);
 
 ibContactClass_.reset(new ibContactClass(
     geomModel_,

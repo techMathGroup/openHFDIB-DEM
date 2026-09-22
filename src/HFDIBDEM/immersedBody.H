@@ -127,11 +127,6 @@ namespace Foam
         // total Rodrigues angle of the body
         vector totalAngle_;
 
-        // forces acting on the particle due to the fluid
-        forces FCoupling_;
-        forces FCouplingOld_;
-        scalar couplingHistCoef_;
-
         // forces acting on the particle due to the contact
         forces FContact_;
 
@@ -140,9 +135,6 @@ namespace Foam
 
         // mean body Courant number based on its linear velocity
         scalar meanCoNum_;
-
-        // fluid density
-        dimensionedScalar rhoF_;
 
         // integer to identify current body
         label bodyId_;
@@ -292,7 +284,12 @@ namespace Foam
         
         void resetCouplingHistory()
         {
-            couplingHistCoef_ = 1.0;
+            couplingModel_->resetCouplingHistory();
+        }
+
+        fluidSolidCoupling& getCouplingModel()
+        {
+            return couplingModel_();
         }
 
         // getters
@@ -347,7 +344,7 @@ namespace Foam
 
         const forces& getFCoupling() const
         {
-            return FCoupling_;
+            return couplingModel_->getFCoupling();
         }
 
         const scalar& getCharCellSize() const
@@ -580,6 +577,7 @@ namespace Foam
             dict.add("static",bodyOperation_ == 0);
             dict.add("timeStepsInContWStatic", ibContactClass_
                 ->getTimeStepsInContWStatic());
+            couplingModel_->writeCouplingInfo(dict);
             geomModel_->writeBodyInfo(bodyId_,dict, path);
         }
 
@@ -592,8 +590,15 @@ namespace Foam
         }
         
         // function to update the average fluid density on the body
-        void updateRhoF(const scalar rho);
-        void updateRhoF(const volScalarField& rho, const volScalarField& body);
+        void updateRhoF(const scalar rho)
+        {
+            couplingModel_->updateRhoF(rho);
+        }
+
+        void updateRhoF(const volScalarField& rho, const volScalarField& body)
+        {
+            couplingModel_->updateRhoF(rho, body);
+        }
 
         void writeIbInfo()
         {
