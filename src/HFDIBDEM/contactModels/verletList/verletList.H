@@ -143,6 +143,21 @@ class verletList
         HashSet<label,Hash<label>>& potentialBodies
     );
 
+    // Pair-level companion of computePotentialBodies (adaptive DEM
+    // time-step sizing): fills inflatedPairs with every pair whose
+    // bounding boxes, each inflated by the per-body sweep distance,
+    // overlap in every non-empty coordinate. Pairs with a hard-flagged
+    // member are skipped (they are inflated by GREAT and would pair
+    // with every body in the case); pairs of two static bodies are
+    // skipped. The callers' set classification is not affected.
+    void computeInflatedPairs
+    (
+        PtrList<immersedBody>& ibs,
+        const HashTable<scalar,label,Hash<label>>& sweepDist,
+        const HashSet<label,Hash<label>>& hardFlags,
+        cPairHasSet& inflatedPairs
+    );
+
     cPairHasSet::iterator begin()
     {
         return posCntList_.begin();

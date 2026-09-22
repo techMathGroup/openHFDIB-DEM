@@ -126,6 +126,47 @@ namespace Foam
     scalar sweepSafetyTrans_;
     scalar sweepSafetyRot_;
 
+    // switch for the two-tier deltaTDEM estimator inside adaptiveStepDEM
+    // (false restores the legacy stepDEM fraction of the CFD step)
+    bool useDEMdtEstimator_;
+
+    // estimator model for potential (not yet occurring) contacts:
+    // conservative - first-touch area estimated geometrically as
+    // areaCoeff*h^2 (most conservative for non-spherical solids);
+    // velocityAware - capped by the hertz peak contact area
+    // pi*R*deltaMax(v). ongoing contacts always use their cached
+    // contact state (tier D)
+    bool dtEstimatorVelocityAware_;
+
+    // c_A multiplier on h^2 in the tier-C area estimate
+    scalar dtAreaCoeff_;
+
+    // multiplier on the tangential stiffness when sizing the step
+    // (1 = full conservatism; the implemented tangential law carries
+    // an empirical 200x tuning factor that makes it govern)
+    scalar dtTangentialFactor_;
+
+    // floor on the estimated deltaTDEM (0 = off). binding means the
+    // estimated stability bound is being exceeded - warned in the log
+    scalar dtMinDEMdt_;
+
+    // cap on the DEM subcycle count (0 = unlimited). binding means the
+    // estimated stability bound is being exceeded - warned in the log
+    label dtMaxDEMSubCycles_;
+
+    // report the used/hertz/rayleigh step line every N CFD steps
+    label dtReportInterval_;
+
+    // per-CTFD-step estimate of the DEM step (stepDEM_ * min pair
+    // stability step), computed in computeAdaptiveSets when the
+    // estimator is on; GREAT when no pair constrains
+    scalar deltaTDEM_;
+
+    // hertz contact-duration and rayleigh surface-wave steps of the
+    // same pair set (diagnostics only, never used for sizing)
+    scalar dtDiagHertz_;
+    scalar dtDiagRayleigh_;
+
     // how many times rocompute M0_ because of mesh refinement
     label recomputeM0_;
 
@@ -257,12 +298,35 @@ namespace Foam
     // potential with another body or a wall during the coming CFD time
     // step) and the single-stepped set B (no potential). Both sets
     // exclude static bodies and are rank-uniform (reduced over all
-    // processors).
+    // processors). hardFlags/sweepDist report the internal
+    // classification for the DEM dt estimator.
     void computeAdaptiveSets
     (
         HashSet<label,Hash<label>>& subCycle,
-        HashSet<label,Hash<label>>& singleStep
+        HashSet<label,Hash<label>>& singleStep,
+        HashSet<label,Hash<label>>& hardFlags,
+        HashTable<scalar,label,Hash<label>>& sweepDist
     );
+
+    // adaptiveStepDEM + useDEMdtEstimator: compute the system DEM step
+    // deltaTDEM_ = stepDEM_ * min over pairs of the pair stability step.
+    // tier D: pairs with an ongoing contact use their cached contact
+    // state; tier C: remaining potential pairs and wall-approaching
+    // bodies use the estimator model (exact pair materials, masses and
+    // charCellSize always known, first-touch area estimated). also
+    // computes the hertz/rayleigh diagnostic steps (never used for
+    // sizing). min and governing pair are reduced across ranks.
+    void computeDEMdtEstimate
+    (
+        const HashSet<label,Hash<label>>& subCycle,
+        const HashSet<label,Hash<label>>& hardFlags,
+        const HashTable<scalar,label,Hash<label>>& sweepDist
+    );
+
+    // upper bound on the contact-point speed magnitude of a body
+    // (|Vel| + |omega|*rMax) - the same terms as the rotational part
+    // of the sweep distance, used for the tier-C approach speed
+    scalar pairApproachSpeed(immersedBody& ib) const;
 
     prtContactInfo& getPrtcInfo(Tuple2<label,label> cPair);
 

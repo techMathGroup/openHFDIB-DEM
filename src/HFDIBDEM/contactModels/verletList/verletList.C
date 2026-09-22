@@ -429,3 +429,120 @@ void verletList::computePotentialBodies
     }
 }
 //---------------------------------------------------------------------------//
+void verletList::computeInflatedPairs
+(
+    PtrList<immersedBody>& ibs,
+    const HashTable<scalar,label,Hash<label>>& sweepDist,
+    const HashSet<label,Hash<label>>& hardFlags,
+    cPairHasSet& inflatedPairs
+)
+{
+    inflatedPairs.clear();
+
+    // same sweep-and-prune as computePotentialBodies, but the output is
+    // the pair list itself and hard-flagged bodies are excluded from the
+    // sweep altogether: their GREAT-inflated intervals would pair them
+    // with every body in the case and pin the DEM time step through
+    // phantom constraints
+    cPairHasSet overlapCnt[3];
+
+    for (label coord = 0; coord < 3; ++coord)
+    {
+        if (coord == emptyDim) continue;
+
+        struct sweptPoint
+        {
+            label bodyId;
+            scalar pos;
+            bool isMin;
+        };
+        std::vector<sweptPoint> swept;
+        swept.reserve(2*verletBoxes_.size());
+
+        for (const auto& vBox : verletBoxes_)
+        {
+            const label bId(vBox->getBodyId());
+
+            if (!ibs[bId].getIsActive()) continue;
+            if (hardFlags.found(bId)) continue;
+
+            scalar s(0);
+            if (sweepDist.found(bId))
+            {
+                s = sweepDist[bId];
+            }
+
+            swept.push_back({bId, vBox->getBBox()->min()[coord] - s, true});
+            swept.push_back({bId, vBox->getBBox()->max()[coord] + s, false});
+        }
+
+        std::sort(swept.begin(), swept.end(),
+            [](const sweptPoint& a, const sweptPoint& b)
+            {
+                return a.pos < b.pos;
+            });
+
+        std::unordered_set<label> opened;
+        for (const sweptPoint& p : swept)
+        {
+            if (p.isMin)
+            {
+                for (const label oId : opened)
+                {
+                    if (oId == p.bodyId) continue;
+
+                    overlapCnt[coord].insert(
+                        cPair(min(oId, p.bodyId), max(oId, p.bodyId)));
+                }
+                opened.insert(p.bodyId);
+            }
+            else
+            {
+                opened.erase(p.bodyId);
+            }
+        }
+    }
+
+    // intersect the coordinate sets (same logic as
+    // computePotentialBodies)
+    cPairHasSet candidates;
+    bool seeded(false);
+    for (label coord = 0; coord < 3; ++coord)
+    {
+        if (coord == emptyDim) continue;
+
+        if (!seeded)
+        {
+            candidates = overlapCnt[coord];
+            seeded = true;
+        }
+        else
+        {
+            cPairHasSet intersected;
+            for (const cPair& pair : overlapCnt[coord])
+            {
+                if (candidates.find(pair) != candidates.end())
+                {
+                    intersected.insert(pair);
+                }
+            }
+            candidates = std::move(intersected);
+        }
+    }
+
+    for (const cPair& pair : candidates)
+    {
+        if (!ibs[pair.first].getIsActive() || !ibs[pair.second].getIsActive())
+        {
+            continue;
+        }
+
+        bool cStatic(ibs[pair.first].getbodyOperation() == 0);
+        bool tStatic(ibs[pair.second].getbodyOperation() == 0);
+
+        if (cStatic && tStatic) continue;
+
+        inflatedPairs.insert(pair);
+    }
+}
+//---------------------------------------------------------------------------//

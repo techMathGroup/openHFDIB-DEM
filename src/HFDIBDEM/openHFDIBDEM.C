@@ -44,6 +44,7 @@ Contributors
 #include <iostream>
 #include "defineExternVars.H"
 #include "parameters.H"
+#include "demTimeStepInfo.H"
 
 #define ORDER 2
 
@@ -80,8 +81,18 @@ bodyNames_(HFDIBDEMDict_.lookup("bodyNames")),
 prtcInfoTable_(0),
 stepDEM_(readScalar(HFDIBDEMDict_.lookup("stepDEM"))),
 adaptiveDEM_(HFDIBDEMDict_.lookupOrDefault<bool>("adaptiveStepDEM", false)),
-sweepSafetyTrans_(HFDIBDEMDict_.lookupOrDefault<scalar>("sweepSafetyTrans", 1.5)),
-sweepSafetyRot_(HFDIBDEMDict_.lookupOrDefault<scalar>("sweepSafetyRot", 3.0)),
+useDEMdtEstimator_(true),
+dtEstimatorVelocityAware_(true),
+dtAreaCoeff_(1.0),
+dtTangentialFactor_(1.0),
+dtMinDEMdt_(0.0),
+dtMaxDEMSubCycles_(0),
+dtReportInterval_(1),
+deltaTDEM_(GREAT),
+dtDiagHertz_(GREAT),
+dtDiagRayleigh_(GREAT),
+sweepSafetyTrans_(1.5),
+sweepSafetyRot_(3.0),
 recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
 {
     materialProperties::matProps_insert(
@@ -97,6 +108,70 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     if(HFDIBDEMDict_.found("nSolidsInDomain"))
     {
         solverInfo::setNSolidsThreshold(readLabel(HFDIBDEMDict_.lookup("nSolidsInDomain")));
+    }
+
+    //--- adaptiveStepDEM settings. sweepSafety* are read from the
+    //    sub-dict when present; a top-level occurrence in an old case
+    //    is honored with a deprecation warning
+    if (HFDIBDEMDict_.found("adaptiveStepDEMDict"))
+    {
+        dictionary asdDic(HFDIBDEMDict_.subDict("adaptiveStepDEMDict"));
+
+        useDEMdtEstimator_ =
+            asdDic.lookupOrDefault<bool>("useDEMdtEstimator", true);
+
+        word dtEstimator(asdDic.lookupOrDefault<word>("DEMdtEstimator", "velocityAware"));
+        if (dtEstimator == "velocityAware")
+        {
+            dtEstimatorVelocityAware_ = true;
+        }
+        else if (dtEstimator == "conservative")
+        {
+            dtEstimatorVelocityAware_ = false;
+        }
+        else
+        {
+            FatalIOErrorInFunction(HFDIBDEMDict_)
+                << "unknown DEMdtEstimator " << dtEstimator
+                << ", expected conservative or velocityAware"
+                << exit(FatalIOError);
+        }
+
+        sweepSafetyTrans_ =
+            asdDic.lookupOrDefault<scalar>("sweepSafetyTrans", 1.5);
+        sweepSafetyRot_ =
+            asdDic.lookupOrDefault<scalar>("sweepSafetyRot", 3.0);
+
+        dtAreaCoeff_ = asdDic.lookupOrDefault<scalar>("areaCoeff", 1.0);
+        dtTangentialFactor_ =
+            asdDic.lookupOrDefault<scalar>("tangentialFactor", 1.0);
+        dtMinDEMdt_ = asdDic.lookupOrDefault<scalar>("minDEMdt", 0.0);
+        dtMaxDEMSubCycles_ = asdDic.lookupOrDefault<label>("maxDEMSubCycles", 0);
+        dtReportInterval_ = asdDic.lookupOrDefault<label>("dtReportInterval", 1);
+    }
+    else
+    {
+        if (HFDIBDEMDict_.found("sweepSafetyTrans"))
+        {
+            sweepSafetyTrans_ =
+                readScalar(HFDIBDEMDict_.lookup("sweepSafetyTrans"));
+
+            WarningInFunction
+                << "top-level sweepSafetyTrans is deprecated, move it "
+                << "into the adaptiveStepDEMDict sub-dictionary"
+                << endl;
+        }
+
+        if (HFDIBDEMDict_.found("sweepSafetyRot"))
+        {
+            sweepSafetyRot_ =
+                readScalar(HFDIBDEMDict_.lookup("sweepSafetyRot"));
+
+            WarningInFunction
+                << "top-level sweepSafetyRot is deprecated, move it "
+                << "into the adaptiveStepDEMDict sub-dictionary"
+                << endl;
+        }
     }
 
     dictionary demDic = HFDIBDEMDict_.subDict("DEM");
@@ -913,11 +988,21 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
     HashSet<label,Hash<label>> subCycleSet;
     HashSet<label,Hash<label>> singleStepSet;
 
+    // classification internals reused by the dt estimator
+    HashSet<label,Hash<label>> hardFlags;
+    HashTable<scalar,label,Hash<label>> sweepDist;
+
     if (adaptiveDEM_)
     {
-        computeAdaptiveSets(subCycleSet, singleStepSet);
+        computeAdaptiveSets(subCycleSet, singleStepSet, hardFlags, sweepDist);
     }
-
+    // DEM step selection:
+    // - estimator on: deltaTDEM from the pair stability steps
+    //   (computed in computeDEMdtEstimate, floor + caps + stepDEM
+    //   safety factor applied there); GREAT means no pair constrains
+    //   and the legacy fraction applies
+    // - estimator off or empty sub-cycled set: legacy behavior
+    //   (stepDEM fraction of the CFD step; 1.0 for an empty set)
     scalar step
     (
         adaptiveDEM_ && subCycleSet.empty()
@@ -927,10 +1012,41 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
     if (adaptiveDEM_)
     {
-        InfoH << DEM_Info << " adaptiveStepDEM: "
-            << subCycleSet.size() << " sub-cycled / "
-            << singleStepSet.size() << " single-stepped bodies"
-            << ", DEM step: " << step << endl;
+        if (useDEMdtEstimator_ && !subCycleSet.empty())
+        {
+            computeDEMdtEstimate(subCycleSet, hardFlags, sweepDist);
+
+            step = min(deltaTDEM_/deltaTime, 1.0);
+
+            // report the subcycle count and apply the cap
+            label nSub(ceil(1.0/max(step, VSMALL)));
+
+            if (dtMaxDEMSubCycles_ > 0 && nSub > dtMaxDEMSubCycles_)
+            {
+                nSub = dtMaxDEMSubCycles_;
+                step = 1.0/scalar(nSub);
+
+                WarningInFunction
+                    << "DEM subcycles capped at maxDEMSubCycles "
+                    << dtMaxDEMSubCycles_
+                    << ": the estimated stability bound is being "
+                    << "exceeded"
+                    << endl;
+            }
+
+            InfoH << DEM_Info << " adaptiveStepDEM: "
+                << subCycleSet.size() << " sub-cycled / "
+                << singleStepSet.size() << " single-stepped bodies"
+                << ", DEM subcycles: " << nSub
+                << ", DEM step: " << step << endl;
+        }
+        else
+        {
+            InfoH << DEM_Info << " adaptiveStepDEM: "
+                << subCycleSet.size() << " sub-cycled / "
+                << singleStepSet.size() << " single-stepped bodies"
+                << ", DEM step: " << step << endl;
+        }
     }
     // scalar timeStep(step*deltaTime);
     List<DynamicList<pointField>> bodiesPositionList(Pstream::nProcs());
@@ -1350,21 +1466,17 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 void openHFDIBDEM::computeAdaptiveSets
 (
     HashSet<label,Hash<label>>& subCycle,
-    HashSet<label,Hash<label>>& singleStep
+    HashSet<label,Hash<label>>& singleStep,
+    HashSet<label,Hash<label>>& hardFlags,
+    HashTable<scalar,label,Hash<label>>& sweepDist
 )
 {
     subCycle.clear();
     singleStep.clear();
+    hardFlags.clear();
+    sweepDist.clear();
 
     const scalar deltaTime(mesh_.time().deltaT().value());
-
-    // bodies that are always sub-cycled (their acceleration is not frozen
-    // over the CFD step or their motion cannot be bounded by the sweep
-    // distance): residual contact force, cluster/periodic geometry,
-    // active wall contact, or proximity to a wall/cyclic plane
-    HashSet<label,Hash<label>> hardFlags;
-    // sweep distances for the remaining bodies
-    HashTable<scalar,label,Hash<label>> sweepDist;
 
     const HashTable<List<vector>,string,Hash<string>>& cyclicPlanes(
         cyclicPlaneInfo::getCyclicPlaneInfo());
@@ -1589,6 +1701,362 @@ void openHFDIBDEM::computeAdaptiveSets
             else if (setFlag[ib] == 1) singleStep.insert(ib);
         }
     }
+}
+//---------------------------------------------------------------------------//
+void openHFDIBDEM::computeDEMdtEstimate
+(
+    const HashSet<label,Hash<label>>& subCycle,
+    const HashSet<label,Hash<label>>& hardFlags,
+    const HashTable<scalar,label,Hash<label>>& sweepDist
+)
+{
+    deltaTDEM_ = GREAT;
+    dtDiagHertz_ = GREAT;
+    dtDiagRayleigh_ = GREAT;
+
+    // governing pair bookkeeping for the log (argmin with the reduce)
+    label govC(-1);
+    label govT(-1);
+    label govTier(-1);
+
+    //--- tier D + tier C over pairs: actual verlet overlaps first
+    //    (ongoing contacts live in prtcInfoTable_), then the
+    //    sweep-inflated potential pairs. hard-flagged members are
+    //    excluded from the inflated set (their GREAT sweep would pair
+    //    them with everything)
+    {
+        // actual overlaps (posCntList_ iteration)
+        for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
+        {
+            const Tuple2<label, label> cPair
+            (
+                Tuple2<label, label>(it->first, it->second)
+            );
+
+            if (prtcInfoTable_.found(cPair))
+            {
+                // tier D: cached contact state from the previous
+                // substep. bodies with residual contact force are
+                // hard-flagged and their pairs keep the cached state
+                // only if the contact actually resolved
+                std::vector<std::shared_ptr<prtSubContactInfo>>& subCList
+                    = prtcInfoTable_[cPair]->getPrtSCList();
+
+                for (auto sC : subCList)
+                {
+                    if (mag(sC->getprtCntVars().contactVolume_) > SMALL)
+                    {
+                        scalar dtPair(sC->getPairDtCrit(dtTangentialFactor_));
+
+                        if (dtPair < deltaTDEM_)
+                        {
+                            deltaTDEM_ = dtPair;
+                            govC = cPair.first();
+                            govT = cPair.second();
+                            govTier = 0;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                // tier C from the actual overlap: the pair geometry is
+                // already interpenetrating its bboxes
+                // (handled with the inflated pairs below to avoid
+                // double evaluation - actual overlaps without an
+                // ongoing contact are rare: contact broke last step)
+            }
+        }
+
+        // sweep-inflated potential pairs minus hard-flagged members
+        std::unordered_set<std::pair<label,label>, hashFunction> inflatedPairs;
+        verletList_.computeInflatedPairs
+        (
+            immersedBodies_,
+            sweepDist,
+            hardFlags,
+            inflatedPairs
+        );
+
+        for (const auto& pair : inflatedPairs)
+        {
+            const Tuple2<label, label> cPair
+            (
+                Tuple2<label, label>(pair.first, pair.second)
+            );
+
+            if (prtcInfoTable_.found(cPair)) continue;  // tier D covered above
+
+            immersedBody& cIb(immersedBodies_[pair.first]);
+            immersedBody& tIb(immersedBodies_[pair.second]);
+
+            if (!cIb.getIsActive() || !tIb.getIsActive()) continue;
+
+            // exact pair materials
+            const materialInfo& cMat(cIb.getibContactClass().getMatInfo());
+            const materialInfo& tMat(tIb.getibContactClass().getMatInfo());
+
+            const scalar aY
+            (
+                1.0/((1.0 - sqr(cMat.getNu()))/cMat.getY()
+                    + (1.0 - sqr(tMat.getNu()))/tMat.getY())
+            );
+            const scalar aG
+            (
+                1.0/(2.0*(2.0 - cMat.getNu())*(1.0 + cMat.getNu())/cMat.getY()
+                    + 2.0*(2.0 - tMat.getNu())*(1.0 + tMat.getNu())/tMat.getY())
+            );
+
+            const scalar Mc(cIb.getGeomModel().getM0());
+            const scalar Mt(tIb.getGeomModel().getM0());
+            const scalar reduceM
+            (
+                (Mc + Mt) > SMALL ? Mc*Mt/(Mc + Mt) : GREAT
+            );
+
+            // mesh scale of the contact zone
+            const scalar h
+            (
+                min
+                (
+                    cIb.getCharCellSize(),
+                    tIb.getCharCellSize()
+                )
+            );
+
+            // equivalent radii from body masses and densities (bodies
+            // have no direct volume accessor; rho = M/V with V from
+            // the mass accumulation would need geomModel internals)
+            const scalar rC
+            (
+                demTimeStepInfo::equivRadius
+                (
+                    Mc/max(cIb.getGeomModel().getRhoS().value(), SMALL)
+                )
+            );
+            const scalar rT
+            (
+                demTimeStepInfo::equivRadius
+                (
+                    Mt/max(tIb.getGeomModel().getRhoS().value(), SMALL)
+                )
+            );
+            const scalar R(demTimeStepInfo::harmonicRadius(rC, rT));
+
+            // approach-speed upper bound from the same terms as the
+            // sweep distance (Vel + omega*rMax per body)
+            const scalar vN
+            (
+                pairApproachSpeed(cIb) + pairApproachSpeed(tIb)
+            );
+
+            const scalar aEst
+            (
+                demTimeStepInfo::aEst
+                (
+                    h,
+                    R,
+                    reduceM,
+                    aY,
+                    vN,
+                    dtAreaCoeff_,
+                    dtEstimatorVelocityAware_
+                )
+            );
+
+            const scalar dtPair
+            (
+                demTimeStepInfo::pairDtCrit
+                (
+                    demTimeStepInfo::effK
+                    (
+                        aY,
+                        aEst*h,      // volume ~ area * one cell depth
+                        aG,
+                        aEst,
+                        h,           // Lc_est = h (agreed most conservative)
+                        dtTangentialFactor_
+                    ),
+                    reduceM
+                )
+            );
+
+            if (dtPair < deltaTDEM_)
+            {
+                deltaTDEM_ = dtPair;
+                govC = pair.first;
+                govT = pair.second;
+                govTier = 1;
+            }
+
+            // hertz contact-duration diagnostic for the same pair
+            const scalar dtH
+            (
+                demTimeStepInfo::hertzContactDt(reduceM, aY, R, vN)
+            );
+            if (dtH < dtDiagHertz_) dtDiagHertz_ = dtH;
+        }
+
+        // rayleigh diagnostic: min over sub-cycled bodies
+        {
+            const labelList subList(subCycle.toc());
+            forAll(subList, sI)
+            {
+                immersedBody& cIb(immersedBodies_[subList[sI]]);
+
+                if (!cIb.getIsActive()) continue;
+
+                const scalar M0(cIb.getGeomModel().getM0());
+                const materialInfo& cMat
+                (
+                    cIb.getibContactClass().getMatInfo()
+                );
+
+                // stiffest partner over all case materials + walls
+                // gives the smallest rayleigh step (conservative
+                // diagnostic reading)
+                scalar aGMin(GREAT);
+                const HashTable<materialInfo,string,Hash<string>>& matProps
+                (
+                    materialProperties::getMatProps()
+                );
+                for
+                (
+                    auto mIter = matProps.cbegin();
+                    mIter != matProps.cend();
+                    ++mIter
+                )
+                {
+                    const materialInfo& pMat(mIter());
+                    aGMin = min
+                    (
+                        aGMin,
+                        1.0/(2.0*(2.0 - cMat.getNu())*(1.0 + cMat.getNu())/cMat.getY()
+                            + 2.0*(2.0 - pMat.getNu())*(1.0 + pMat.getNu())/pMat.getY())
+                    );
+                }
+
+                const scalar R
+                (
+                    demTimeStepInfo::equivRadius
+                    (
+                        M0/max(cIb.getGeomModel().getRhoS().value(), SMALL)
+                    )
+                );
+
+                // effective density of the equivalent sphere (the
+                // body may not fill it; the diagnostic stays
+                // well-defined either way)
+                const scalar rhoEff
+                (
+                    M0/max
+                    (
+                        4.0/3.0*Foam::constant::mathematical::pi*pow3(R),
+                        VSMALL
+                    )
+                );
+
+                const scalar dtR
+                (
+                    demTimeStepInfo::rayleighDt
+                    (
+                        rhoEff,
+                        aGMin,
+                        cMat.getNu(),
+                        R
+                    )
+                );
+                if (dtR < dtDiagRayleigh_) dtDiagRayleigh_ = dtR;
+            }
+        }
+    }
+
+    //--- parallel reduce: min dt over ranks; the governing pair ids
+    //    are rank-local, so collect them per rank and let the master
+    //    pick the row of the minimum, then scatter the winner
+    {
+        List<scalar> dtPerRank(Pstream::nProcs(), GREAT);
+        List<label> govPerRank(3*Pstream::nProcs(), -1);
+
+        dtPerRank[Pstream::myProcNo()] = deltaTDEM_;
+        govPerRank[3*Pstream::myProcNo()] = govTier;
+        govPerRank[3*Pstream::myProcNo() + 1] = govC;
+        govPerRank[3*Pstream::myProcNo() + 2] = govT;
+
+        Pstream::gatherList(dtPerRank, 0);
+        Pstream::scatterList(dtPerRank, 0);
+        Pstream::gatherList(govPerRank, 0);
+        Pstream::scatterList(govPerRank, 0);
+
+        label winRank(0);
+        for (label rI = 1; rI < Pstream::nProcs(); ++rI)
+        {
+            if (dtPerRank[rI] < dtPerRank[winRank]) winRank = rI;
+        }
+
+        deltaTDEM_ = dtPerRank[winRank];
+        govTier = govPerRank[3*winRank];
+        govC = govPerRank[3*winRank + 1];
+        govT = govPerRank[3*winRank + 2];
+
+        reduce(dtDiagHertz_, minOp<scalar>());
+        reduce(dtDiagRayleigh_, minOp<scalar>());
+    }
+
+    //--- floors and caps
+    if (dtMinDEMdt_ > 0 && deltaTDEM_ < dtMinDEMdt_)
+    {
+        WarningInFunction
+            << "estimated deltaTDEM " << deltaTDEM_
+            << " below minDEMdt " << dtMinDEMdt_
+            << ": clamping - the estimated stability bound is being "
+            << "exceeded"
+            << endl;
+        deltaTDEM_ = dtMinDEMdt_;
+    }
+
+    //--- apply the stepDEM safety factor
+    deltaTDEM_ *= stepDEM_;
+
+    //--- reporting (governing pair label is rank-local after the
+    //    reduce; report only ids that survived)
+    if (govTier >= 0)
+    {
+        InfoH << DEM_Info << " used stepDEM: " << deltaTDEM_
+            << " (pair " << govC << "-" << govT
+            << ", tier " << (govTier == 0 ? "D" : "C") << ")"
+            << "; Hertz-based stepDEM: " << dtDiagHertz_
+            << "; Rayleigh-based stepDEM: " << dtDiagRayleigh_
+            << endl;
+    }
+    else
+    {
+        InfoH << DEM_Info << " used stepDEM: " << deltaTDEM_
+            << "; Hertz-based stepDEM: " << dtDiagHertz_
+            << "; Rayleigh-based stepDEM: " << dtDiagRayleigh_
+            << endl;
+    }
+}
+//---------------------------------------------------------------------------//
+scalar openHFDIBDEM::pairApproachSpeed(immersedBody& ib) const
+{
+    // upper bound on the contact-point speed magnitude from the same
+    // terms as computeSweepDistance (no accel term - contacts that
+    // start within this CFD step see at most the current velocity)
+    const ibContactVars& cVars(ib.getContactVars());
+
+    scalar rMax(0);
+    {
+        boundBox bb(ib.getGeomModel().getBounds());
+        pointField bbPoints(bb.points());
+        vector CoM(ib.getGeomModel().getCoM());
+        forAll(bbPoints, bP)
+        {
+            rMax = max(rMax, mag(bbPoints[bP] - CoM));
+        }
+    }
+
+    return mag(cVars.Vel_) + mag(cVars.omega_)*rMax;
 }
 //---------------------------------------------------------------------------//
 prtContactInfo& openHFDIBDEM::getPrtcInfo(Tuple2<label,label> cPair)
