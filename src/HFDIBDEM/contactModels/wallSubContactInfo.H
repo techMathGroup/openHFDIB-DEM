@@ -50,6 +50,7 @@ Contributors
 #include "materialInfo.H"
 #include "physicalProperties.H"
 #include "forces.H"
+#include "demTimeStepInfo.H"
 #include "spectatorMesh.H"
 #include "virtualMeshWall.H"
 
@@ -171,6 +172,34 @@ class wallSubContactInfo
     vector getFNd(wallContactVars& wallCntvar);
 
     vector getFt(wallContactVars& wallCntvar, scalar deltaT);
+
+    // stability step of this wall contact from the cached contact
+    // state (tier D of the adaptive DEM time-step estimator). the
+    // wall mass is infinite, so the reduced mass is the full body
+    // mass M0, not the M0/2 kept in reduceM_ for the force laws.
+    // tangentialFactor scales the tangential branch (1 = full
+    // conservatism); damping sits inside the stepDEM safety factor.
+    scalar getPairDtCrit
+    (
+        wallContactVars& wallCntvar,
+        ibContactVars& cVars,
+        scalar tangentialFactor = 1.0
+    )
+    {
+        return demTimeStepInfo::pairDtCrit
+        (
+            demTimeStepInfo::effK
+            (
+                wallCntvar.getMeanCntPar().aY_,
+                wallCntvar.contactVolume_,
+                wallCntvar.getMeanCntPar().aG_,
+                wallCntvar.contactArea_,
+                wallCntvar.Lc_,
+                tangentialFactor
+            ),
+            cVars.M0_
+        );
+    }
 
     forces& getOutForce()
     {

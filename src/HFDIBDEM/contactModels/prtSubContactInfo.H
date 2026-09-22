@@ -50,6 +50,7 @@ Contributors
 #include "virtualMesh.H"
 #include "physicalProperties.H"
 #include "forces.H"
+#include "demTimeStepInfo.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -182,6 +183,28 @@ class prtSubContactInfo
     scalar& getLc()
     {
         return Lc_;
+    }
+
+    // stability step of this contact from the cached contact state
+    // (tier D of the adaptive DEM time-step estimator). the governing
+    // stiffness is taken from the implemented force laws with the
+    // tangential branch scaled by tangentialFactor (1 = full
+    // conservatism). damping sits inside the stepDEM safety factor.
+    scalar getPairDtCrit(scalar tangentialFactor = 1.0)
+    {
+        return demTimeStepInfo::pairDtCrit
+        (
+            demTimeStepInfo::effK
+            (
+                physicalProperties_.aY_,
+                prtCntVars_.contactVolume_,
+                physicalProperties_.aG_,
+                prtCntVars_.contactArea_,
+                Lc_,
+                tangentialFactor
+            ),
+            physicalProperties_.reduceM_
+        );
     }
 
     void syncData();
