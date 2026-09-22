@@ -9,3 +9,8 @@ python3 -m unittest discover -s tests/virtualMesh -p "test_*.py" -v
 # solver-level regression tests (need OpenFOAM env: blockMesh, decomposePar,
 # HFDIBDEMFoam, mpirun); skipped automatically if the tools are missing
 python3 -m unittest discover -s tests/HFDIBDEMFoam -p "test_*.py" -v
+
+# fluidSolidCoupling regression (needs OpenFOAM env: pimpleHFDIBFoam,
+# interIsoHFDIBFoam, blockMesh, setFields, decomposePar, mpirun);
+# skips with a stale-binary reason if the solver predates libHFDIBDEM.so
+python3 -m unittest discover -s tests/fluidSolidCoupling -p "test_*.py" -v
