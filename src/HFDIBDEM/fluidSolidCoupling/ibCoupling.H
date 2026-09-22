@@ -72,8 +72,25 @@ class ibCoupling
 
     // Private member functions -----------------------------------
 
-    // Note (MI): the assemblies should be identical/similar for both
-    //            situations, but the physics is not clear yet.
+    // Note (MI): the assemblies differ only in the fScale physics
+    //            (and the interior-cell treatment); the per-cell
+    //            accumulation is shared. Full unification waits on
+    //            clarity about the physics.
+    //- per-cell force accumulation shared by the VOF and single-phase
+    //- assemblies (only the fScale physics differs between the paths)
+    void accumulateCellForce
+    (
+        const fluidContext& ctx,
+        const volVectorField& f,
+        const label cellI,
+        const vector& fCell,
+        const point& torqueRef,
+        const vector& refCoM,
+        vector& FV,
+        vector& TA,
+        vector& FAdded
+    );
+
     //- single-phase force assembly (surf cells only)
     void updateCouplingSinglePhase
     (

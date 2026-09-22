@@ -28,12 +28,12 @@ Description
     immersed-boundary coupling model
 
 Note (MI, 20260922):
-    - currently, the implementations for VOF and single-phase
-      are slightly different but mostly doubled
-    - the difference in implementation comes from uncertainty about
+    - the implementations for VOF and single-phase differ only in
+      the per-cell force scale (fScale physics) and whether interior
+      cells contribute; the per-cell accumulation is shared
+      (accumulateCellForce)
+    - the remaining difference comes from uncertainty about
       physics modeling
-    - also, the updateCouplingTail() should be made more generic and
-      shared between the two implementations
 
 SourceFiles
     ibCoupling.C
@@ -158,6 +158,33 @@ void ibCoupling::updateCoupling
 }
 
 //---------------------------------------------------------------------------//
+void ibCoupling::accumulateCellForce
+(
+    const fluidContext& ctx,
+    const volVectorField& f,
+    const label cellI,
+    const vector& fCell,
+    const point& torqueRef,
+    const vector& refCoM,
+    vector& FV,
+    vector& TA,
+    vector& FAdded
+)
+{
+    FV -=  fCell;
+    TA -=  (torqueRef - refCoM)^fCell;
+    // Note (MI): f.prevIter() is only valid when the solver stored
+    //            it; accumulate added-mass force only when needed
+    // Note (MI): f is the only reason that a reference to the full
+    //            volVectorField is needed
+    if (ctx.applyAddedMass)
+    {
+        FAdded -= (f.prevIter()[cellI] - f[cellI])
+            *mesh_.V()[cellI];//under construction
+    }
+}
+
+//---------------------------------------------------------------------------//
 void ibCoupling::updateCouplingSinglePhase
 (
     const fluidContext& ctx,
@@ -207,15 +234,18 @@ void ibCoupling::updateCouplingSinglePhase
 
             const vector& surfPoint = ibPoints[intpInfo_->findIbPoint(cellI)];
 
-            FV -=  fCell;
-            TA -=  (surfPoint - refCoMList[i])^fCell;
-            // Note (MI): f.prevIter() is only valid when the solver stored
-            //            it; accumulate added-mass force only when needed
-            if (ctx.applyAddedMass)
-            {
-                FAdded -= (f.prevIter()[cellI] - f[cellI])
-                    *mesh_.V()[cellI];//under construction
-            }
+            accumulateCellForce
+            (
+                ctx,
+                f,
+                cellI,
+                fCell,
+                surfPoint,
+                refCoMList[i],
+                FV,
+                TA,
+                FAdded
+            );
         }
     }
 }
@@ -260,13 +290,18 @@ void ibCoupling::updateCouplingVOF
             vector fCell =  f[cellI]*mesh_.V()[cellI];
             fCell *= fScale;
 
-            FV -=  fCell;
-            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^fCell);
-            if (ctx.applyAddedMass)
-            {
-                FAdded -= (f.prevIter()[cellI] - f[cellI])
-                    *mesh_.V()[cellI];
-            }
+            accumulateCellForce
+            (
+                ctx,
+                f,
+                cellI,
+                fCell,
+                mesh_.C()[cellI],
+                refCoMList[i],
+                FV,
+                TA,
+                FAdded
+            );
         }
     }
 
@@ -296,13 +331,20 @@ void ibCoupling::updateCouplingVOF
             vector fCell =  f[cellI]*mesh_.V()[cellI];
             fCell *= fScale;
 
-            FV -=  fCell;
-            TA -=  (ibPoints[intpInfo_->findIbPoint(cellI)] - refCoMList[i])^fCell;
-            if (ctx.applyAddedMass)
-            {
-                FAdded -= (f.prevIter()[cellI] - f[cellI])
-                    *mesh_.V()[cellI];//under construction
-            }
+            const vector& surfPoint = ibPoints[intpInfo_->findIbPoint(cellI)];
+            
+            accumulateCellForce
+            (
+                ctx,
+                f,
+                cellI,
+                fCell,
+                surfPoint,
+                refCoMList[i],
+                FV,
+                TA,
+                FAdded
+            );
         }
     }
 }
