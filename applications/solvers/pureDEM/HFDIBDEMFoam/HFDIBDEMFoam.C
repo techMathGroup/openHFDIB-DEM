@@ -126,15 +126,15 @@ int main(int argc, char *argv[])
             #include "meshRefinementLoop.H"
             doInitialMeshRefinement = false;
         }
-        createBodiesTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
+        createBodiesTime_ += createBodiesTime.timeIncrement();          // OS time efficiency testing
 
         // clockTime preUpdateBodiesTime; // OS time efficiency testing
         HFDIBDEM.preUpdateBodies(lambda);
-        // preUpdateTime_ += preUpdateBodiesTime.timeIncrement(); // OS time efficiency testing
+        // preUpdateTime_ += preUpdateBodiesTime.timeIncrement();       // OS time efficiency testing
 
         // clockTime meshUpdateTime; // OS time efficiency testing
         mesh.update();
-        // meshUpdateTime_ += meshUpdateTime.timeIncrement(); // OS time efficiency testing
+        // meshUpdateTime_ += meshUpdateTime.timeIncrement();           // OS time efficiency testing
 
         // clockTime meshChangingTime; // OS time efficiency testing
         if (mesh.changing())
@@ -142,13 +142,13 @@ int main(int argc, char *argv[])
             lambda *= 0.0;
             HFDIBDEM.recreateBodies(lambda,refineF);
         }
-        // meshChangingTime_ += meshChangingTime.timeIncrement(); // OS time efficiency testing
+        // meshChangingTime_ += meshChangingTime.timeIncrement();       // OS time efficiency testing
 
         Info << "updating HFDIBDEM" << endl;
 
         // clockTime postUpdateBodiesTime;
         volVectorField gradLambda(fvc::grad(lambda));
-        HFDIBDEM.postUpdateBodies(lambda,f,f);                          //MI: here, we should clean up interfaces
+        HFDIBDEM.postUpdateBodies(lambda,f,false,false);                //MI: here, we should clean up interfaces
         // postUpdateTime_ += postUpdateBodiesTime.timeIncrement();
 
         // clockTime addRemoveTime;

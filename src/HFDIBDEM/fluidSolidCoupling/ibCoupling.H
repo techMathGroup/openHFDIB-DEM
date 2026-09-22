@@ -70,6 +70,50 @@ class ibCoupling
     typedef DynamicList<vector> DynamicVectorList;
     typedef DynamicList<point> DynamicPointList;
 
+    // Private member functions -----------------------------------
+
+    // Note (MI): the assemblies should be identical/similar for both
+    //            situations, but the physics is not clear yet.
+    //- single-phase force assembly (surf cells only)
+    void updateCouplingSinglePhase
+    (
+        const fluidContext& ctx,
+        const volVectorField& f,
+        List<DynamicLabelList>& intLists,
+        List<DynamicLabelList>& surfLists,
+        DynamicVectorList& refCoMList,
+        const List<point>& ibPoints,
+        vector& FV,
+        vector& TA,
+        vector& FAdded
+    );
+
+    //- VOF force assembly (int + surf cells, halo density estimate)
+    void updateCouplingVOF
+    (
+        const fluidContext& ctx,
+        solidContext& sCtx,
+        const volVectorField& f,
+        List<DynamicLabelList>& intLists,
+        List<DynamicLabelList>& surfLists,
+        List<DynamicLabelList>& haloLists,
+        DynamicVectorList& refCoMList,
+        const List<point>& ibPoints,
+        vector& FV,
+        vector& TA,
+        vector& FAdded
+    );
+
+    //- shared post-processing: scaling, under-relaxation, added mass
+    void updateCouplingTail
+    (
+        const fluidContext& ctx,
+        solidContext& sCtx,
+        const vector& FV,
+        const vector& TA,
+        const vector& FAdded
+    );
+
     public:
 
     // Constructors -----------------------------------------------

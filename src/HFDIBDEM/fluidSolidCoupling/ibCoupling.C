@@ -27,6 +27,14 @@ InNamespace
 Description
     immersed-boundary coupling model
 
+Note (MI, 20260922):
+    - currently, the implementations for VOF and single-phase
+      are slightly different but mostly doubled
+    - the difference in implementation comes from uncertainty about
+      physics modeling
+    - also, the updateCouplingTail() should be made more generic and
+      shared between the two implementations
+
 SourceFiles
     ibCoupling.C
 
@@ -73,13 +81,6 @@ void ibCoupling::updateCoupling
     solidContext& sCtx
 )
 {
-    if (ctx.situation == fluidSituation::voF)
-    {
-        FatalErrorInFunction
-            << "ibCoupling: the voF situation is not implemented yet"
-            << abort(FatalError);
-    }
-
     if (!ctx.f)
     {
         FatalErrorInFunction
@@ -88,11 +89,6 @@ void ibCoupling::updateCoupling
     }
 
     const volVectorField& f = *ctx.f;
-    forces& FCoupling = *sCtx.FCoupling;
-    const forces& FCouplingOld = *sCtx.FCouplingOld;
-    scalar& couplingHistCoef = *sCtx.couplingHistCoef;
-    dimensionedScalar& rhoF = *sCtx.rhoF;
-    const vector& a = *sCtx.a;
 
     vector FV(vector::zero);
     vector TA(vector::zero);
@@ -110,6 +106,58 @@ void ibCoupling::updateCoupling
         refCoMList
     );
 
+    const List<point>& ibPoints = intpInfo_.getIbPoints();              //get surface points
+
+    if (ctx.situation == fluidSituation::singlePhase)
+    {
+        updateCouplingSinglePhase
+        (
+            ctx,
+            f,
+            intLists,
+            surfLists,
+            refCoMList,
+            ibPoints,
+            FV,
+            TA,
+            FAdded
+        );
+    }
+    else
+    {
+        updateCouplingVOF
+        (
+            ctx,
+            sCtx,
+            f,
+            intLists,
+            surfLists,
+            haloLists,
+            refCoMList,
+            ibPoints,
+            FV,
+            TA,
+            FAdded
+        );
+    }
+
+    updateCouplingTail(ctx, sCtx, FV, TA, FAdded);
+}
+
+//---------------------------------------------------------------------------//
+void ibCoupling::updateCouplingSinglePhase
+(
+    const fluidContext& ctx,
+    const volVectorField& f,
+    List<DynamicLabelList>& intLists,
+    List<DynamicLabelList>& surfLists,
+    DynamicVectorList& refCoMList,
+    const List<point>& ibPoints,
+    vector& FV,
+    vector& TA,
+    vector& FAdded
+)
+{
     // Note (MI): current idea is that action-reaction force
     //            between solid and fluid happens only on the body
     //            surface, what happens inside is solid-to-solid??
@@ -127,7 +175,6 @@ void ibCoupling::updateCoupling
     //     }
     // }
 
-    const List<point>& ibPoints = intpInfo_.getIbPoints();             //get surface points
     forAll (surfLists, i)
     {
         DynamicLabelList& surfListI = surfLists[i];
@@ -149,41 +196,152 @@ void ibCoupling::updateCoupling
 
             FV -=  fCell;
             TA -=  (surfPoint - refCoMList[i])^fCell;
-            FAdded -= (f.prevIter()[cellI] - f[cellI])*mesh_.V()[cellI];//under construction
+            // Note (MI): f.prevIter() is only valid when the solver stored
+            //            it; accumulate added-mass force only when needed
+            if (ctx.applyAddedMass)
+            {
+                FAdded -= (f.prevIter()[cellI] - f[cellI])
+                    *mesh_.V()[cellI];//under construction
+            }
+        }
+    }
+}
+
+//---------------------------------------------------------------------------//
+void ibCoupling::updateCouplingVOF
+(
+    const fluidContext& ctx,
+    solidContext& sCtx,
+    const volVectorField& f,
+    List<DynamicLabelList>& intLists,
+    List<DynamicLabelList>& surfLists,
+    List<DynamicLabelList>& haloLists,
+    DynamicVectorList& refCoMList,
+    const List<point>& ibPoints,
+    vector& FV,
+    vector& TA,
+    vector& FAdded
+)
+{
+    if (!ctx.rho || !ctx.body)
+    {
+        FatalErrorInFunction
+            << "ibCoupling: no density or body field in the fluid context"
+            << abort(FatalError);
+    }
+
+    const volScalarField& rho = *ctx.rho;
+    const volScalarField& body = *ctx.body;
+    const dimensionedScalar& rhoF = *sCtx.rhoF;
+
+    List<List<DynamicLabelList>>& surfToHaloAddressing
+        = geomModel_->getSurfToHaloLabels();
+
+    forAll (intLists, i)
+    {
+        DynamicLabelList& intListI = intLists[i];
+        forAll (intListI, intCell)
+        {
+            label cellI = intListI[intCell];
+
+            scalar fScale = rhoF.value()/rho[cellI];
+            vector fCell =  f[cellI]*mesh_.V()[cellI];
+            fCell *= fScale;
+
+            FV -=  fCell;
+            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^fCell);
+            if (ctx.applyAddedMass)
+            {
+                FAdded -= (f.prevIter()[cellI] - f[cellI])
+                    *mesh_.V()[cellI];
+            }
         }
     }
 
-    reduce(FV, sumOp<vector>());
-    reduce(TA, sumOp<vector>());
-    reduce(FAdded, sumOp<vector>());
+    forAll (surfLists, i)
+    {
+        DynamicLabelList& surfListI = surfLists[i];
+        DynamicLabelList& haloListI = haloLists[i];
+        forAll (surfListI, surfCell)
+        {
+            label cellI = surfListI[surfCell];
+            DynamicLabelList& surfToHalo = surfToHaloAddressing[Pstream::myProcNo()][surfCell];
+
+            scalar fluidMass(0);
+            scalar fluidVol(0);
+            forAll (surfToHalo, haloCell)
+            {
+                label sToHI = surfToHalo[haloCell];
+                label cellH = haloListI[sToHI];
+                fluidMass += rho[cellH]*mesh_.V()[cellH]*(1.0 - body[cellH]);
+                fluidVol += mesh_.V()[cellH]*(1.0 - body[cellH]);
+            }
+            scalar surfFluidRho = fluidMass/(fluidVol + SMALL);
+
+            // scalar fScale = 1.0*body[cellI]+0.5;
+            // vector fCell = (1.0 - body[cellI])*f[cellI];
+            scalar fScale = surfFluidRho/rho[cellI];
+            vector fCell =  f[cellI]*mesh_.V()[cellI];
+            fCell *= fScale;
+
+            FV -=  fCell;
+            TA -=  (ibPoints[intpInfo_.findIbPoint(cellI)] - refCoMList[i])^fCell;
+            if (ctx.applyAddedMass)
+            {
+                FAdded -= (f.prevIter()[cellI] - f[cellI])
+                    *mesh_.V()[cellI];//under construction
+            }
+        }
+    }
+}
+
+//---------------------------------------------------------------------------//
+void ibCoupling::updateCouplingTail
+(
+    const fluidContext& ctx,
+    solidContext& sCtx,
+    const vector& FV,
+    const vector& TA,
+    const vector& FAdded
+)
+{
+    forces& FCoupling = *sCtx.FCoupling;
+    const forces& FCouplingOld = *sCtx.FCouplingOld;
+    scalar& couplingHistCoef = *sCtx.couplingHistCoef;
+    dimensionedScalar& rhoF = *sCtx.rhoF;
+    const vector& a = *sCtx.a;
+
+    vector FVl(FV);
+    vector TAl(TA);
+    vector FAddedl(FAdded);
 
     if (ctx.kinematicForce)
     {
-        FV *= rhoF.value();
-        TA *= rhoF.value();
-        FAdded *= rhoF.value();
+        FVl *= rhoF.value();
+        TAl *= rhoF.value();
+        FAddedl *= rhoF.value();
     }
 
     scalar rhoS = geomModel_->getRhoS().value();
-    // FV /= rhoS;
-    // TA /= rhoS;
-    // FAdded /= rhoS;
-    // FV *= rhoF.value();
-    // TA *= rhoF.value();
-    // FAdded *= rhoF.value();
+    // FVl /= rhoS;
+    // TAl /= rhoS;
+    // FAddedl /= rhoS;
+    // FVl *= rhoF.value();
+    // TAl *= rhoF.value();
+    // FAddedl *= rhoF.value();
 
-    // FAdded = FCouplingOld.F - FV;
+    // FAddedl = FCouplingOld.F - FVl;
 
-    FAdded *= rhoF.value()/rhoS;
+    FAddedl *= rhoF.value()/rhoS;
 
-    FCoupling = couplingHistCoef*forces(FV, TA) + (1.0-couplingHistCoef)*FCouplingOld;
+    FCoupling = couplingHistCoef*forces(FVl, TAl) + (1.0-couplingHistCoef)*FCouplingOld;
 
     if (ctx.applyAddedMass)
     {
         const scalar m0 = geomModel_->getM0();
-        const scalar massSign = ((FV & FAdded) < 0.0) ? -1.0 : 1.0;
-        // scalar massAdded = min(1.0*m0, mag(FAdded)/(mag(a_) + SMALL));
-        scalar massAdded = mag(FAdded)/(mag(a) + SMALL);
+        const scalar massSign = ((FVl & FAddedl) < 0.0) ? -1.0 : 1.0;
+        // scalar massAdded = min(1.0*m0, mag(FAddedl)/(mag(a_) + SMALL));
+        scalar massAdded = mag(FAddedl)/(mag(a) + SMALL);
         massAdded *= massSign;
         InfoH << iB_Info << "-- body " << bodyIdStr_ << " massAdded: " << massAdded
             << " m0: " << m0 << endl;

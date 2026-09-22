@@ -166,14 +166,6 @@ namespace Foam
         void updateCoupling
         (
             const volScalarField& body,
-            const volVectorField& fPress,
-            const volVectorField& fVisc,
-            const bool applyAddedMass
-        );
-
-        void updateCoupling
-        (
-            const volScalarField& body,
             const volVectorField& f,
             const bool kinematicForce,
             const bool applyAddedMass
@@ -190,13 +182,6 @@ namespace Foam
 
 
         void resetPostPimpleState();
-
-        void applyAddedMassScaling
-        (
-            const vector& FV,
-            const vector& FAdded,
-            const bool applyAddedMass
-        );
 
         // auxiliary octree variables
         Field<label> octreeField_;
@@ -453,14 +438,6 @@ namespace Foam
         void postPimpleUpdateImmersedBody
         (
             const volScalarField& body,
-            const volVectorField& fPress,
-            const volVectorField& fVisc,
-            const bool applyAddedMass
-        );
-
-        void postPimpleUpdateImmersedBody
-        (
-            const volScalarField& body,
             const volVectorField& f,
             const bool kinematicForce,
             const bool applyAddedMass
@@ -508,14 +485,6 @@ namespace Foam
         }
 
         void initSyncWithFlow(const volVectorField& U);
-
-        void pimpleUpdate
-        (
-            volScalarField& body,
-            volVectorField& fPress,
-            volVectorField& fVisc,
-            const bool applyAddedMass
-        );
 
         void pimpleUpdate
         (

@@ -717,40 +717,6 @@ void openHFDIBDEM::preUpdateBodies
 void openHFDIBDEM::postUpdateBodies
 (
     const volScalarField& body,
-    const volVectorField& fPress,
-    const volVectorField& fVisc
-)
-{
-    postUpdateBodies(body, fPress, fVisc, false);
-}
-//---------------------------------------------------------------------------//
-void openHFDIBDEM::postUpdateBodies
-(
-    const volScalarField& body,
-    const volVectorField& fPress,
-    const volVectorField& fVisc,
-    const bool applyAddedMass
-)
-{
-    forAll (immersedBodies_,bodyId)
-    {
-        if (immersedBodies_[bodyId].getIsActive())
-        {
-            immersedBodies_[bodyId].postPimpleUpdateImmersedBody
-            (
-                body,
-                fPress,
-                fVisc,
-                applyAddedMass
-            );
-            immersedBodies_[bodyId].clearIntpInfo();
-        }
-    }
-}
-//---------------------------------------------------------------------------//
-void openHFDIBDEM::postUpdateBodies
-(
-    const volScalarField& body,
     const volVectorField& f
 )
 {
@@ -1720,39 +1686,6 @@ void openHFDIBDEM::addRemoveBodies
 
     // make the counter rank-uniform
     reduce(nBodiesAddedLastStep_, maxOp<label>());
-}
-//---------------------------------------------------------------------------//
-void openHFDIBDEM::updateFSCoupling
-(
-    volScalarField& body,
-    volVectorField& fPress,
-    volVectorField& fVisc
-)
-{
-    forAll (immersedBodies_,bodyId)
-    {
-        if (immersedBodies_[bodyId].getIsActive())
-        {
-            immersedBodies_[bodyId].pimpleUpdate(body,fPress,fVisc,false);
-        }
-    }
-}
-//---------------------------------------------------------------------------//
-void openHFDIBDEM::updateFSCoupling
-(
-    volScalarField& body,
-    volVectorField& fPress,
-    volVectorField& fVisc,
-    const bool applyAddedMass
-)
-{
-    forAll (immersedBodies_,bodyId)
-    {
-        if (immersedBodies_[bodyId].getIsActive())
-        {
-            immersedBodies_[bodyId].pimpleUpdate(body,fPress,fVisc,applyAddedMass);
-        }
-    }
 }
 //---------------------------------------------------------------------------//
 void openHFDIBDEM::updateFSCoupling
