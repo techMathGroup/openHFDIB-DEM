@@ -262,7 +262,9 @@ vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
     // compute tangential force
     if(contactModelInfo::getUseMindlinRotationalModel())
     {
-        
+
+        // 200 is an empirical tuning factor (cc92e39), not from
+        // mindlin theory - see demTimeStepInfo::tangTune_
         scalar kT = 200*8*meanCntPar.aG_*(wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL));
         vector deltaFt(kT*Vt*deltaT + 2*meanCntPar.reduceBeta_*sqrt(kT*reduceM_)*Vt);
         wallCntvar.FtPrev_ = - FtLastS - deltaFt;

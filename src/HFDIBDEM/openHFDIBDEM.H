@@ -26,8 +26,8 @@ InNamespace
     Foam
 
 Description
-    implementation of the HFDIB method (Municchi and Radl, 2016) in OpenFOAM
-    extended by connection with (level-set) DEM (Isoz and Sourek, 2020)
+    implementation of the HFDIB method (Municchi and Radl, 2018) in OpenFOAM
+    extended by connection with (level-set) DEM (Isoz and Sourek, 2022)
 
 
 SourceFiles
@@ -130,12 +130,9 @@ namespace Foam
     // (false restores the legacy stepDEM fraction of the CFD step)
     bool useDEMdtEstimator_;
 
-    // estimator model for potential (not yet occurring) contacts:
-    // conservative - first-touch area estimated geometrically as
-    // areaCoeff*h^2 (most conservative for non-spherical solids);
-    // velocityAware - capped by the hertz peak contact area
-    // pi*R*deltaMax(v). ongoing contacts always use their cached
-    // contact state (tier D)
+    // estimator model for potential contacts: conservative uses
+    // areaCoeff*h^2, velocityAware caps it by the hertz peak contact
+    // area pi*R*deltaMax(v)
     bool dtEstimatorVelocityAware_;
 
     // c_A multiplier on h^2 in the tier-C area estimate
@@ -157,9 +154,8 @@ namespace Foam
     // report the used/hertz/rayleigh step line every N CFD steps
     label dtReportInterval_;
 
-    // per-CTFD-step estimate of the DEM step (stepDEM_ * min pair
-    // stability step), computed in computeAdaptiveSets when the
-    // estimator is on; GREAT when no pair constrains
+    // per-CFD-step DEM step estimate (stepDEM_ * min pair stability
+    // step); GREAT when no pair constrains
     scalar deltaTDEM_;
 
     // hertz contact-duration and rayleigh surface-wave steps of the
@@ -308,14 +304,10 @@ namespace Foam
         HashTable<scalar,label,Hash<label>>& sweepDist
     );
 
-    // adaptiveStepDEM + useDEMdtEstimator: compute the system DEM step
-    // deltaTDEM_ = stepDEM_ * min over pairs of the pair stability step.
-    // tier D: pairs with an ongoing contact use their cached contact
-    // state; tier C: remaining potential pairs and wall-approaching
-    // bodies use the estimator model (exact pair materials, masses and
-    // charCellSize always known, first-touch area estimated). also
-    // computes the hertz/rayleigh diagnostic steps (never used for
-    // sizing). min and governing pair are reduced across ranks.
+    // compute the system DEM step: tier D pairs (ongoing contact)
+    // from their cached contact state, tier C potential pairs from
+    // the estimator model. hertz/rayleigh steps are diagnostics only.
+    // the min and its governing pair are reduced across ranks
     void computeDEMdtEstimate
     (
         const HashSet<label,Hash<label>>& subCycle,
@@ -324,8 +316,7 @@ namespace Foam
     );
 
     // upper bound on the contact-point speed magnitude of a body
-    // (|Vel| + |omega|*rMax) - the same terms as the rotational part
-    // of the sweep distance, used for the tier-C approach speed
+    // (|Vel| + |omega|*rMax), used for the tier-C approach speed
     scalar pairApproachSpeed(immersedBody& ib) const;
 
     prtContactInfo& getPrtcInfo(Tuple2<label,label> cPair);

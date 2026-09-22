@@ -121,7 +121,9 @@ vector prtSubContactInfo::getFt(scalar deltaT)
         //NewDefinition
     if(contactModelInfo::getUseMindlinRotationalModel())
     {
-        
+
+        // 200 is an empirical tuning factor (cc92e39), not from
+        // mindlin theory - see demTimeStepInfo::tangTune_
         scalar kT = 200*8*physicalProperties_.aG_*(prtCntVars_.contactArea_/(Lc_+SMALL));
         vector deltaFt(kT*Vt*deltaT + 2*physicalProperties_.reduceBeta_*sqrt(kT*physicalProperties_.reduceM_)*Vt);
         FtPrev_ = - FtLastS - deltaFt;

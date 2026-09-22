@@ -440,10 +440,9 @@ void verletList::computeInflatedPairs
     inflatedPairs.clear();
 
     // same sweep-and-prune as computePotentialBodies, but the output is
-    // the pair list itself and hard-flagged bodies are excluded from the
-    // sweep altogether: their GREAT-inflated intervals would pair them
-    // with every body in the case and pin the DEM time step through
-    // phantom constraints
+    // the pair list itself and hard-flagged bodies are excluded from
+    // the sweep: their GREAT-inflated intervals would pair them with
+    // every body and pin the DEM time step
     cPairHasSet overlapCnt[3];
 
     for (label coord = 0; coord < 3; ++coord)

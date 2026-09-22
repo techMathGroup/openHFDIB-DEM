@@ -1,8 +1,8 @@
 /*---------------------------------------------------------------------------*\
                         _   _ ____________ ___________    ______ ______ _    _
-                       | | | ||  ___|  _  \_   _| ___ \   |  _  \|  ___| |  \/  |
-  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /   | | | || |_  |  \/  | |
- / _ \| '_ \ / _ \| '_ \|  _  ||  _| | | | | | | ___ \---| | | ||  _| | |\/| |
+                       | | | ||  ___|  _  \_   _| ___ \   |  _  \|  ___| \  / |
+  ___  _ __   ___ _ __ | |_| || |_  | | | | | | | |_/ /   | | | || |_  |  \/  |
+ / _ \| '_ \ / _ \ '_ \|  _  ||  _| | | | | | | | ___ \---| | | ||  _| | |\/| |
 | (_) | |_) |  __/ | | | | | || |   | |/ / _| |_| |_/ /---| |/ / | |___| |  | |
  \___/| .__/ \___|_| |_\_| |_/\_|   |___/  \___/\____/    |___/  |_____|_|  |_|
       | |                     H ybrid F ictitious D omain - I mmersed B oundary
@@ -135,7 +135,7 @@ class demTimeStepInfo
     {
         return Foam::pow
         (
-            15.0*reduceM*sqr(v)/(16.0*aY*Foam::sqrt(R + VSMALL)),
+            15.0*reduceM*sqr(v)/(16.0*aY*Foam::sqrt(R + SMALL)),
             0.4
         );
     }
@@ -185,7 +185,7 @@ class demTimeStepInfo
     {
         return 2.87*Foam::pow
         (
-            sqr(reduceM)/(R*Foam::sqr(aY)*(v + VSMALL)),
+            sqr(reduceM)/(R*Foam::sqr(aY)*(v + SMALL)),
             0.2
         );
     }
@@ -200,7 +200,7 @@ class demTimeStepInfo
         const scalar R
     )
     {
-        return constant::mathematical::pi*R*Foam::sqrt(rho/(aG + VSMALL))
+        return constant::mathematical::pi*R*Foam::sqrt(rho/(aG + SMALL))
             /(0.1631*nu + 0.8766);
     }
 
@@ -209,14 +209,14 @@ class demTimeStepInfo
     {
         return Foam::cbrt
         (
-            3.0*volume/(4.0*constant::mathematical::pi) + VSMALL
+            3.0*volume/(4.0*constant::mathematical::pi) + SMALL
         );
     }
 
     // reduced (harmonic) radius of a pair from the body radii
     static scalar harmonicRadius(const scalar rC, const scalar rT)
     {
-        return rC*rT/(rC + rT + VSMALL);
+        return rC*rT/(rC + rT + SMALL);
     }
 };
 
