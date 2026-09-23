@@ -146,6 +146,22 @@ class prtSubContactInfo
 
     vector getFNd();
 
+    // tangential state of the previous sub-step
+    vector& getFtPrev()
+    {
+        return FtPrev_;
+    }
+
+    vector& getCVeli()
+    {
+        return cVeli_;
+    }
+
+    vector& getTVeli()
+    {
+        return tVeli_;
+    }
+
     // tangential force of the current sub-step; the coulomb
     // ceiling FtCeil (= mu*mag(FN) of this sub-contact) caps the
     // APPLIED force and the stored state FtPrev_ alike, so the

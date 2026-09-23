@@ -550,8 +550,7 @@ bool solveWallContact
     F += FNd;
     InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FN " << F << endl;
 
-    // the coulomb ceiling caps the applied force and the stored
-    // tangential state inside getFt
+    // the coulomb ceiling inside getFt() -> FtCeil = sCI.getMu(wallCntVar)*mag(F)
     vector Ft = sCI.getFt(wallCntVar, deltaT, sCI.getMu(wallCntVar)*mag(F));
     InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact Ft " << Ft << endl;
 

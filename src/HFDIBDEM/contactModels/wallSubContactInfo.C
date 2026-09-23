@@ -273,6 +273,12 @@ vector wallSubContactInfo::getFt
         scalar tangTune(1.0);
         scalar kT = tangTune*8*meanCntPar.aG_*(wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL));
         vector deltaFt(kT*Vt*deltaT + 2*meanCntPar.reduceBeta_*sqrt(kT*reduceM_)*Vt);
+        // the spring can stretch by at most one ceiling per
+        // sub-step
+        if (mag(deltaFt) > FtCeil)
+        {
+            deltaFt *= FtCeil/(mag(deltaFt) + SMALL);
+        }
         wallCntvar.FtPrev_ = - FtLastS - deltaFt;
     }
 
@@ -281,6 +287,11 @@ vector wallSubContactInfo::getFt
    
         vector Ftdi(meanCntPar.reduceBeta_*sqrt(meanCntPar.aG_*reduceM_*wallCntvar.Lc_)*Vt);
         Ftdi += meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT;
+        // same one-ceiling bound on the increment as above
+        if (mag(Ftdi) > FtCeil)
+        {
+            Ftdi *= FtCeil/(mag(Ftdi) + SMALL);
+        }
         wallCntvar.FtPrev_ = - FtLastS - Ftdi;
     }
 

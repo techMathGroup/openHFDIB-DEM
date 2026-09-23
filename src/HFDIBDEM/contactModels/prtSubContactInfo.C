@@ -127,6 +127,14 @@ vector prtSubContactInfo::getFt(scalar deltaT, scalar FtCeil)
         scalar tangTune(1.0);
         scalar kT = tangTune*8*physicalProperties_.aG_*(prtCntVars_.contactArea_/(Lc_+SMALL));
         vector deltaFt(kT*Vt*deltaT + 2*physicalProperties_.reduceBeta_*sqrt(kT*physicalProperties_.reduceM_)*Vt);
+        // the spring can stretch by at most one ceiling per
+        // sub-step: a fresh contact (or a slip reversal) builds
+        // the tangential force up to the coulomb limit, never
+        // across it within a single step
+        if (mag(deltaFt) > FtCeil)
+        {
+            deltaFt *= FtCeil/(mag(deltaFt) + SMALL);
+        }
         FtPrev_ = - FtLastS - deltaFt;
     }
 
@@ -134,6 +142,11 @@ vector prtSubContactInfo::getFt(scalar deltaT, scalar FtCeil)
     {
         vector Ftdi(- physicalProperties_.reduceBeta_*sqrt(physicalProperties_.aG_*physicalProperties_.reduceM_*Lc_)*Vt);
         Ftdi += physicalProperties_.aG_*Lc_*Vt*deltaT;
+        // same one-ceiling bound on the increment as above
+        if (mag(Ftdi) > FtCeil)
+        {
+            Ftdi *= FtCeil/(mag(Ftdi) + SMALL);
+        }
         FtPrev_ = - FtLastS- Ftdi;
     }
 
