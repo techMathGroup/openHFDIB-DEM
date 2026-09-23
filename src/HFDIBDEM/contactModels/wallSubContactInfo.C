@@ -243,7 +243,12 @@ vector wallSubContactInfo::getFNd(wallContactVars& wallCntvar)
 
 }
 //---------------------------------------------------------------------------//
-vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
+vector wallSubContactInfo::getFt
+(
+    wallContactVars& wallCntvar,
+    scalar deltaT,
+    scalar FtCeil
+)
 {
     physicalProperties& meanCntPar(wallCntvar.getMeanCntPar());
     // project last Ft into a new direction
@@ -277,6 +282,14 @@ vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
         vector Ftdi(meanCntPar.reduceBeta_*sqrt(meanCntPar.aG_*reduceM_*wallCntvar.Lc_)*Vt);
         Ftdi += meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT;
         wallCntvar.FtPrev_ = - FtLastS - Ftdi;
+    }
+
+    // coulomb cap feeds back into the stored state: the spring
+    // stops stretching at the sliding ceiling, so the applied
+    // force and the state can never disagree
+    if (mag(wallCntvar.FtPrev_) > FtCeil)
+    {
+        wallCntvar.FtPrev_ *= FtCeil/(mag(wallCntvar.FtPrev_) + SMALL);
     }
 
     return wallCntvar.FtPrev_;

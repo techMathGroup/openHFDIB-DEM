@@ -171,7 +171,16 @@ class wallSubContactInfo
 
     vector getFNd(wallContactVars& wallCntvar);
 
-    vector getFt(wallContactVars& wallCntvar, scalar deltaT);
+    // tangential force of the current sub-step; the coulomb
+    // ceiling FtCeil (= mu*mag(FN) of this sub-contact) caps the
+    // APPLIED force and the stored state FtPrev_ alike, so the
+    // spring stops stretching at the sliding limit
+    vector getFt
+    (
+        wallContactVars& wallCntvar,
+        scalar deltaT,
+        scalar FtCeil = GREAT
+    );
 
     // stability step of this wall contact from the cached contact
     // state (the contact class of the adaptive DEM time-step

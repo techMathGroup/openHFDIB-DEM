@@ -146,7 +146,11 @@ class prtSubContactInfo
 
     vector getFNd();
 
-    vector getFt(scalar deltaT);
+    // tangential force of the current sub-step; the coulomb
+    // ceiling FtCeil (= mu*mag(FN) of this sub-contact) caps the
+    // APPLIED force and the stored state FtPrev_ alike, so the
+    // spring stops stretching at the sliding limit
+    vector getFt(scalar deltaT, scalar FtCeil = GREAT);
 
     Tuple2<forces,forces>& getOutForce()
     {

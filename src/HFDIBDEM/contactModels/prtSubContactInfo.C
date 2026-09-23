@@ -102,7 +102,7 @@ vector prtSubContactInfo::getFNd()
 
 }
 //---------------------------------------------------------------------------//
-vector prtSubContactInfo::getFt(scalar deltaT)
+vector prtSubContactInfo::getFt(scalar deltaT, scalar FtCeil)
 {
     // compute relative tangential velocity
     vector FtLastP(FtPrev_ - (FtPrev_ & prtCntVars_.contactNormal_)
@@ -132,13 +132,19 @@ vector prtSubContactInfo::getFt(scalar deltaT)
 
     if(contactModelInfo::getUseChenRotationalModel())
     {
-        
         vector Ftdi(- physicalProperties_.reduceBeta_*sqrt(physicalProperties_.aG_*physicalProperties_.reduceM_*Lc_)*Vt);
         Ftdi += physicalProperties_.aG_*Lc_*Vt*deltaT;
         FtPrev_ = - FtLastS- Ftdi;
     }
 
-    
+    // coulomb cap feeds back into the stored state: the spring
+    // stops stretching at the sliding ceiling, so the applied
+    // force and the state can never disagree
+    if (mag(FtPrev_) > FtCeil)
+    {
+        FtPrev_ *= FtCeil/(mag(FtPrev_) + SMALL);
+    }
+
     return FtPrev_;
 }
 //---------------------------------------------------------------------------//
