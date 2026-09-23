@@ -89,6 +89,7 @@ Axis_(vector::one),
 AxisOld_(vector::one),
 omega_(0.0),
 omegaOld_(0.0),
+L_(vector::zero),
 Vel_(vector::zero),
 VelOld_(vector::zero),
 a_(vector::zero),
@@ -713,32 +714,23 @@ void immersedBody::updateMovementComp
             vector T(FCoupling.T);
             T += FContact_.T;
 
-            // update body angular acceleration
-            alpha_ = inv(geomModel_->getI()) & T;
-            // update body angular velocity
-            vector Omega(Axis*omega + deltaT*alpha_);
-            // split Omega into Axis_ and omega_
-            omega_ = mag(Omega);
+            const symmTensor& I(geomModel_->getI());
 
-            if (omega_ < SMALL)
-            {
-                Axis_ = vector::one;
-                if (!case3D)
-                {
-                    const vector validDirs = (geometricD + vector::one)/2;
-                    Axis_ -= validDirs;
-                }
-            }
-            else
-            {
-                Axis_ =  Omega/(omega_+SMALL);
-                if (!case3D)
-                {// in 2D, I need to keep only the part of the rotation axis
-                    const vector validDirs = (geometricD + vector::one)/2;
-                    Axis_ = cmptMultiply(vector::one-validDirs,Axis_);
-                }
-            }
-            Axis_ /= mag(Axis_);
+            // kick: integrate the angular momentum, not omega. the
+            // gyroscopic term omega ^ (I & omega) is implied by the
+            // post-rotation recovery w = inv(I_rotated) & L_ in
+            // rotateCachedInertia - the conservative kick-drift
+            // form of the space-frame euler equation. this exact
+            // form requires I to co-rotate every sub-step (rotateI)
+            // update body angular acceleration (for output/contact
+            // consumers reading alpha_)
+            L_ = (I & (Axis*omega)) + deltaT*T;
+            alpha_ = inv(I) & T;
+
+            // provisional member update with the current I: equals
+            // the explicit euler step for the torque part, so
+            // omega_/Axis_ read valid state right after the kick
+            splitOmega(inv(I) & L_);
         }
     };
 
@@ -892,6 +884,45 @@ void immersedBody::rotateCachedInertia
     if (mag(deltaT + 1.0) < SMALL) deltaT = mesh_.time().deltaT().value();
 
     geomModel_->rotateI(omega_*deltaT, Axis_);
+
+    // drift recovery: w = inv(I_rotated) & L_ applies the torque-free
+    // precession exactly (the gyroscopic term of the space-frame
+    // euler equation, in conservative form). |L| and the rotational
+    // energy are conserved identically in torque-free flight. the
+    // precession is not step-limited: for strongly anisotropic fast
+    // spinners a per-body bound dt <= C/lambda with
+    // lambda ~ omega*(I1-I3)/I1 could be added if free-flight
+    // accuracy ever matters - see rotation_dynamics_strategy.md (D2)
+    if (mag(geomModel_->getI()) > 0)
+    {
+        splitOmega(inv(geomModel_->getI()) & L_);
+    }
+}
+//---------------------------------------------------------------------------//
+// split an angular velocity vector into the omega_/Axis_ pair
+void immersedBody::splitOmega(const vector& w)
+{
+    omega_ = mag(w);
+
+    if (omega_ < SMALL)
+    {
+        Axis_ = vector::one;
+        if (!case3D)
+        {
+            const vector validDirs = (geometricD + vector::one)/2;
+            Axis_ -= validDirs;
+        }
+    }
+    else
+    {
+        Axis_ = w/(omega_+SMALL);
+        if (!case3D)
+        {// in 2D, I need to keep only the part of the rotation axis
+            const vector validDirs = (geometricD + vector::one)/2;
+            Axis_ = cmptMultiply(vector::one-validDirs,Axis_);
+        }
+    }
+    Axis_ /= mag(Axis_);
 }
 //---------------------------------------------------------------------------//
 void immersedBody::printBodyInfo()

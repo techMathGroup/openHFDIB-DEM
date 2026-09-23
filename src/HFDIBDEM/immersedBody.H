@@ -115,6 +115,12 @@ namespace Foam
         scalar omega_;
         scalar omegaOld_;
 
+        // angular momentum accumulator of the kick-drift rotation
+        // update - the fundamental rotation state between sub-steps.
+        // omega_/Axis_ are derived, recovered from L_ after each
+        // inertia rotation (rotateCachedInertia)
+        vector L_;
+
         // linear velocity
         vector Vel_;
         vector VelOld_;
@@ -232,6 +238,11 @@ namespace Foam
         (
             scalar deltaT = -1.0
         );
+
+        // split an angular velocity vector into the omega_/Axis_
+        // (magnitude, unit axis) pair. shared by the torque kick and
+        // the post-rotation recovery of the kick-drift update
+        void splitOmega(const vector& w);
 
         void printBodyInfo();
         
