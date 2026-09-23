@@ -1077,6 +1077,12 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
             immersedBodies_[ib].updateMovement(deltaTime*ibStep*0.5);
 
+            // rotate the cached inertia on all ranks with the same
+            // sub-step rotation moveImmersedBody applies on rank 0 -
+            // keeps I_ rank-uniform for the next updateMovement
+            // half-step without any communication
+            immersedBodies_[ib].rotateCachedInertia(deltaTime*ibStep);
+
             if(Pstream::myProcNo() == 0 )
             {
                 immersedBodies_[ib].moveImmersedBody(deltaTime*ibStep);

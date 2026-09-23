@@ -877,6 +877,23 @@ void immersedBody::moveImmersedBody
     //     << totRotMatrix_ << endl;
 }
 //---------------------------------------------------------------------------//
+// rotate cached inertia with the sub-step rotation
+void immersedBody::rotateCachedInertia
+(
+    scalar deltaT
+)
+{
+    // static bodies rotate neither. operations 2/3/6 have a prescribed
+    // rotation (omega_/Axis_ from dict, never torque-integrated) which
+    // moveImmersedBody does apply - the cached I_ must follow it like
+    // for free bodies
+    if (bodyOperation_ == 0) return;
+
+    if (mag(deltaT + 1.0) < SMALL) deltaT = mesh_.time().deltaT().value();
+
+    geomModel_->rotateI(omega_*deltaT, Axis_);
+}
+//---------------------------------------------------------------------------//
 void immersedBody::printBodyInfo()
 {
     InfoH << iB_Info;

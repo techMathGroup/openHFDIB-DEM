@@ -495,6 +495,31 @@ namespace Foam
             I_ = I;
         }
 
+        // rotate the cached world-frame inertia by a finite rotation
+        // (angle about axis, rodrigues formula). the similarity
+        // transform keeps I_ symmetric and preserves its spectrum;
+        // symm() absorbs round-off of the tensor product. runs
+        // identically on all ranks - the angle/axis pair is uniform
+        // across ranks and no communication is needed
+        void rotateI(const scalar angle, const vector& axis)
+        {
+            if (mag(angle) < SMALL) return;
+
+            const tensor rotMatrix
+            (
+                Foam::cos(angle)*tensor::I
+              + Foam::sin(angle)*tensor
+                (
+                    0.0,      -axis.z(),  axis.y(),
+                    axis.z(),  0.0,       -axis.x(),
+                   -axis.y(),  axis.x(),   0.0
+                )
+              + (1.0 - Foam::cos(angle))*(axis*axis)
+            );
+
+            I_ = symm(rotMatrix & I_ & rotMatrix.T());
+        }
+
         virtual void resetBody(volScalarField& body);
 
         virtual bool isCluster() const

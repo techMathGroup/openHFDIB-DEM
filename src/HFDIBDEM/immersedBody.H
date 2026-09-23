@@ -223,7 +223,16 @@ namespace Foam
         (
             scalar deltaT = -1.0
         );
-        
+
+        // rotate the cached world-frame inertia by the current
+        // sub-step rotation (omega_*deltaT about Axis_). must run on
+        // all ranks - unlike moveImmersedBody it is not guarded by a
+        // rank-0 test, so I_ stays rank-uniform without communication
+        void rotateCachedInertia
+        (
+            scalar deltaT = -1.0
+        );
+
         void printBodyInfo();
         
         //update body movement based on acting forces
