@@ -64,11 +64,10 @@ class demTimeStepInfo
 {
     public:
 
-    // tangential law tuning factor: 200 is an empirical correction
-    // introduced in cc92e39 (Ver2.6, rotation model correction), not a
-    // mindlin-theory value. it makes kT >> kN in all regimes, so the
-    // estimator is tangential-governed.
-    static constexpr scalar tangTune_ = 200.0;
+    // tangTune_ = 200 was an empirical tuning factor (cc92e39; Ondra),
+    // not from mindlin theory.
+    // with this, the estimator was governed by the tangential branch
+    static constexpr scalar tangTune_ = 1.0;
 
     // stiffness of the implemented normal law (getFNe form):
     // FNe = aY*contactVolume/Lc, hence kN = aY*contactVolume/Lc
@@ -83,7 +82,7 @@ class demTimeStepInfo
     }
 
     // stiffness of the implemented tangential law (mindlin branch of
-    // getFt): kT = 200*8*aG*contactArea/Lc
+    // getFt): kT = empiricalConstant*8*aG*contactArea/Lc               <- empiricalConstant = tangTune_
     static scalar contactKT
     (
         const scalar aG,
@@ -95,7 +94,7 @@ class demTimeStepInfo
     }
 
     // governing stiffness used for step sizing; tangentialFactor scales
-    // kT only (1 = full conservatism, 1/200 matches mindlin theory)
+    // kT only (1 = full conservatism)
     static scalar effK
     (
         const scalar aY,

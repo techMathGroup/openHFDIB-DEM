@@ -1018,7 +1018,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             step = min(deltaTDEM_/deltaTime, 1.0);
 
             // report the subcycle count and apply the cap
-            label nSub(ceil(1.0/max(step, VSMALL)));
+            label nSub(ceil(1.0/max(step, SMALL)));
 
             if (dtMaxDEMSubCycles_ > 0 && nSub > dtMaxDEMSubCycles_)
             {

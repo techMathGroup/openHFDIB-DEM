@@ -263,9 +263,10 @@ vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
     if(contactModelInfo::getUseMindlinRotationalModel())
     {
 
-        // 200 is an empirical tuning factor (cc92e39), not from
-        // mindlin theory - see demTimeStepInfo::tangTune_
-        scalar kT = 200*8*meanCntPar.aG_*(wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL));
+        // tangTune(200) was an empirical tuning factor (cc92e39; Ondra),
+        // not from mindlin theory - see demTimeStepInfo::tangTune_
+        scalar tangTune(1.0);
+        scalar kT = tangTune*8*meanCntPar.aG_*(wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL));
         vector deltaFt(kT*Vt*deltaT + 2*meanCntPar.reduceBeta_*sqrt(kT*reduceM_)*Vt);
         wallCntvar.FtPrev_ = - FtLastS - deltaFt;
     }
