@@ -121,10 +121,7 @@ vector prtSubContactInfo::getFt(scalar deltaT, scalar FtCeil)
         //NewDefinition
     if(contactModelInfo::getUseMindlinRotationalModel())
     {
-
-        // tangTune(200) was an empirical tuning factor (cc92e39; Ondra),
-        // not from mindlin theory - see demTimeStepInfo::tangTune_
-        scalar tangTune(1.0);
+        scalar tangTune(demTimeStepInfo::tangTune_);                    //read empirical mambo-jambo from demTimeStepInfo
         scalar kT = tangTune*8*physicalProperties_.aG_*(prtCntVars_.contactArea_/(Lc_+SMALL));
         vector deltaFt(kT*Vt*deltaT + 2*physicalProperties_.reduceBeta_*sqrt(kT*physicalProperties_.reduceM_)*Vt);
         // the spring can stretch by at most one ceiling per

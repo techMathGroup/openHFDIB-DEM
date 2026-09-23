@@ -267,10 +267,7 @@ vector wallSubContactInfo::getFt
     // compute tangential force
     if(contactModelInfo::getUseMindlinRotationalModel())
     {
-
-        // tangTune(200) was an empirical tuning factor (cc92e39; Ondra),
-        // not from mindlin theory - see demTimeStepInfo::tangTune_
-        scalar tangTune(1.0);
+        scalar tangTune(demTimeStepInfo::tangTune_);                    //read empirical mambo-jambo from demTimeStepInfo
         scalar kT = tangTune*8*meanCntPar.aG_*(wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL));
         vector deltaFt(kT*Vt*deltaT + 2*meanCntPar.reduceBeta_*sqrt(kT*reduceM_)*Vt);
         // the spring can stretch by at most one ceiling per

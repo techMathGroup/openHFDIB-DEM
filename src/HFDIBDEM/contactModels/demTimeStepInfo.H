@@ -64,9 +64,9 @@ class demTimeStepInfo
 {
     public:
 
-    // tangTune_ = 200 was an empirical tuning factor (cc92e39; Ondra),
-    // not from mindlin theory.
-    // with this, the estimator was governed by the tangential branch
+    // Note (MI): tangTune_ = 200 was an empirical tuning factor (cc92e39; Ondra),
+    // not from mindlin theory. if we want to plate with this, this
+    // is the source of truth for all the models
     static constexpr scalar tangTune_ = 1.0;
 
     // stiffness of the implemented normal law (getFNe form):
