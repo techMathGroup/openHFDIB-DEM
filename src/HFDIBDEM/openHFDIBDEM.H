@@ -334,6 +334,13 @@ namespace Foam
     // for static bodies so their rotational bound never governs
     scalar bodyIeff(immersedBody& ib) const;
 
+    // drop all contact bookkeeping of a switched-off body: the
+    // prtcInfoTable_ entries of every pair containing it (the
+    // Verlet-driven erase paths no longer see the body) and its
+    // Verlet-list entry. without this, stale sub-contacts keep
+    // feeding the DEM estimator after the body leaves the domain
+    void removeBodyContacts(label bodyId);
+
     prtContactInfo& getPrtcInfo(Tuple2<label,label> cPair);
 
     // interpolate vector field V using Vs for the surface values

@@ -614,6 +614,7 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
             if (!immersedBodies_[bodyId].getIsActive())
             {
                 nBodiesRemovedLastStep_++;
+                removeBodyContacts(bodyId);
             }
             immersedBodies_[bodyId].updateOldMovementVars();
             immersedBodies_[bodyId].checkBodyOp();
@@ -654,6 +655,7 @@ void openHFDIBDEM::recreateBodies
             if (!immersedBodies_[bodyId].getIsActive())
             {
                 nBodiesRemovedLastStep_++;
+                removeBodyContacts(bodyId);
             }
             if(immersedBodies_[bodyId].getRecomputeM0() > 0)
             {
@@ -1046,6 +1048,20 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             computeDEMdtEstimate(subCycleSet, hardFlags, sweepDist);
 
             step = min(deltaTDEM_/deltaTime, 1.0);
+
+            // a zero estimate means stale contact state (a
+            // switched-off body feeding the estimator); integrating
+            // would need 2^31 subcycles, so fall back to the
+            // conservative fixed step instead
+            if (step < SMALL)
+            {
+                WarningInFunction
+                    << "zero DEM stability estimate - stale contact"
+                    << " state suspected (body switch-off?),"
+                    << " falling back to a single DEM step"
+                    << endl;
+                step = 1.0;
+            }
 
             // report the subcycle count and apply the cap
             label nSub(ceil(1.0/max(step, SMALL)));
@@ -1776,6 +1792,15 @@ void openHFDIBDEM::computeDEMdtEstimate
                 Tuple2<label, label>(it->first, it->second)
             );
 
+            // defense in depth: a switched-off body's table entries
+            // are purged at switch-off, but never size from them
+            // even if one slips through
+            if (!immersedBodies_[cPair.first()].getIsActive()
+                || !immersedBodies_[cPair.second()].getIsActive())
+            {
+                continue;
+            }
+
             if (prtcInfoTable_.found(cPair))
             {
                 std::vector<std::shared_ptr<prtSubContactInfo>>& subCList
@@ -2173,6 +2198,10 @@ scalar openHFDIBDEM::bodyIeff(immersedBody& ib) const
     // stability step applies to them
     if (ib.getbodyOperation() == 0) return GREAT;
 
+    // switched-off bodies have a zeroed mass state; their stale
+    // contacts must not pull the estimate to zero
+    if (!ib.getIsActive()) return GREAT;
+
     return demTimeStepInfo::minEigenvalue(ib.getGeomModel().getI());
 }
 //---------------------------------------------------------------------------//
@@ -2189,6 +2218,27 @@ prtContactInfo& openHFDIBDEM::getPrtcInfo(Tuple2<label,label> cPair)
     }
 
     return prtcInfoTable_[cPair]();
+}
+//---------------------------------------------------------------------------//
+void openHFDIBDEM::removeBodyContacts(label bodyId)
+{
+    // collect first, erase second: the OpenFOAM HashTable erase
+    // invalidates the iterator (it returns bool, not the next
+    // position like std::map)
+    List<Tuple2<label,label>> keys;
+    for (auto it = prtcInfoTable_.begin(); it != prtcInfoTable_.end(); ++it)
+    {
+        if (it.key().first() == bodyId || it.key().second() == bodyId)
+        {
+            keys.append(it.key());
+        }
+    }
+    for (const auto& key : keys)
+    {
+        prtcInfoTable_.erase(key);
+    }
+
+    verletList_.removeBodyFromVList(immersedBodies_[bodyId]);
 }
 //---------------------------------------------------------------------------//
 // function to either add or remove bodies from the simulation
