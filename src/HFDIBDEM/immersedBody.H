@@ -327,6 +327,21 @@ namespace Foam
             }
         }
 
+        // re-populate the interpolation info after clearIntpInfo
+        // without re-creating the body: the coupling solvers clear
+        // the intp info every step and rely on the per-step
+        // createImmersedBody call to rebuild it - the static-body
+        // re-creation skip must preserve that (surfCells and
+        // charCellSize_ are unchanged for a skipped static body)
+        void refreshIntpInfo()
+        {
+            if(intpInfo_.valid())
+            {
+                intpInfo_->setCharCellSize(charCellSize_);
+                intpInfo_->setIntpInfo();
+            }
+        }
+
         const bool& checkWallContact() const
         {
             return ibContactClass_->checkWallContact();

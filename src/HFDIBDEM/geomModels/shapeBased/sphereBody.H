@@ -238,6 +238,12 @@ namespace Foam
         void setBodyPosition(pointField pos) final override
         {
             assert(pos.size() == 1 && "Only one point is allowed for sphere body");
+            // the DEM broadcast calls this each subcycle; skip the
+            // no-op case so static bodies keep their valid flag
+            if (pos[0] == position_)
+            {
+                return;
+            }
             position_ = pos[0];
             bodyFieldValid_ = false;                                    // points moved: cell lists and the body field are stale
         }

@@ -584,14 +584,23 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
     // recreate all bodies after contact update
     forAll (immersedBodies_,bodyId)
     {
-        if (immersedBodies_[bodyId].getIsActive() && recreateBody[bodyId])
+        if (immersedBodies_[bodyId].getIsActive())
         {
-            immersedBodies_[bodyId].createImmersedBody
-            (
-                body,
-                refineF,
-                false                                                   //create without "synchronization"
-            );
+            if (recreateBody[bodyId])
+            {
+                immersedBodies_[bodyId].createImmersedBody
+                (
+                    body,
+                    refineF,
+                    false                                               //create without "synchronization"
+                );
+            }
+            else
+            {
+                // skipped static body: refresh intpInfo from
+                // the (unchanged) cached surfCells here
+                immersedBodies_[bodyId].refreshIntpInfo();
+            }
         }
     }
 

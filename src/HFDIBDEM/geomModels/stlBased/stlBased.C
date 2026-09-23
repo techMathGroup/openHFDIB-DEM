@@ -556,10 +556,17 @@ void stlBased::intersectBb
 //---------------------------------------------------------------------------//
 void stlBased::setBodyPosition(pointField pos)
 {
+    // the DEM broadcast calls this for every body each subcycle with
+    // the points gathered from rank 0; for static bodies
+    // skip the rebuild
+    if (pos == bodySurfMesh_.points())
+    {
+        return;
+    }
+
     bodySurfMesh_.movePoints(pos);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
-    // points moved: cell lists and the body field are stale
-    bodyFieldValid_ = false;
+    bodyFieldValid_ = false;                                            // points moved: cell lists and the body field are stale
 }
 //---------------------------------------------------------------------------//
