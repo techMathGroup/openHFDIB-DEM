@@ -126,16 +126,16 @@ namespace Foam
     scalar sweepSafetyTrans_;
     scalar sweepSafetyRot_;
 
-    // switch for the two-tier deltaTDEM estimator inside adaptiveStepDEM
+    // switch for the deltaTDEM estimator inside adaptiveStepDEM
     // (false restores the legacy stepDEM fraction of the CFD step)
     bool useDEMdtEstimator_;
 
-    // estimator model for potential contacts: conservative uses
-    // areaCoeff*h^2, velocityAware caps it by the hertz peak contact
-    // area pi*R*deltaMax(v)
+    // pre-contact area estimate model: conservative uses areaCoeff*h^2,
+    // velocityAware caps it by the hertz peak contact area
+    // pi*R*deltaMax(v)
     bool dtEstimatorVelocityAware_;
 
-    // c_A multiplier on h^2 in the tier-C area estimate
+    // c_A multiplier on h^2 in the pre-contact area estimate
     scalar dtAreaCoeff_;
 
     // multiplier on the tangential stiffness when sizing the step
@@ -304,10 +304,11 @@ namespace Foam
         HashTable<scalar,label,Hash<label>>& sweepDist
     );
 
-    // compute the system DEM step: tier D pairs (ongoing contact)
-    // from their cached contact state, tier C potential pairs from
-    // the estimator model. hertz/rayleigh steps are diagnostics only.
-    // the min and its governing pair are reduced across ranks
+    // compute the system DEM step from two pair classes: contact
+    // (ongoing contact, cached contact state) and pre-contact
+    // (sweep-inflated pairs, estimated geometry). hertz/rayleigh
+    // steps are diagnostics only. the min and its governing pair are
+    // reduced across ranks
     void computeDEMdtEstimate
     (
         const HashSet<label,Hash<label>>& subCycle,
@@ -316,7 +317,7 @@ namespace Foam
     );
 
     // upper bound on the contact-point speed magnitude of a body
-    // (|Vel| + |omega|*rMax), used for the tier-C approach speed
+    // (|Vel| + |omega|*rMax), used for the pre-contact approach speed
     scalar pairApproachSpeed(immersedBody& ib) const;
 
     prtContactInfo& getPrtcInfo(Tuple2<label,label> cPair);

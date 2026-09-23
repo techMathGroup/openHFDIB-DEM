@@ -186,10 +186,11 @@ class prtSubContactInfo
     }
 
     // stability step of this contact from the cached contact state
-    // (tier D of the adaptive DEM time-step estimator). the governing
-    // stiffness is taken from the implemented force laws with the
-    // tangential branch scaled by tangentialFactor (1 = full
-    // conservatism). damping sits inside the stepDEM safety factor.
+    // (the contact class of the adaptive DEM time-step estimator).
+    // the governing stiffness is taken from the implemented force
+    // laws with the tangential branch scaled by tangentialFactor
+    // (1 = full conservatism). damping sits inside the stepDEM
+    // safety factor.
     scalar getPairDtCrit(scalar tangentialFactor = 1.0)
     {
         return demTimeStepInfo::pairDtCrit

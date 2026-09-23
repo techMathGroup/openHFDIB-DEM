@@ -1710,15 +1710,22 @@ void openHFDIBDEM::computeDEMdtEstimate
     dtDiagHertz_ = GREAT;
     dtDiagRayleigh_ = GREAT;
 
-    // governing pair bookkeeping for the log (argmin with the reduce)
+    // governing pair bookkeeping for the log (argmin with the
+    // reduce); govIsContact: 0 = contact, 1 = pre-contact, -1 = none
     label govC(-1);
     label govT(-1);
-    label govTier(-1);
+    label govIsContact(-1);
 
-    //--- tier D + tier C over pairs: ongoing contacts (in
-    //    prtcInfoTable_) first, then sweep-inflated potential pairs.
-    //    hard-flagged members are excluded from the inflated set
-    //    (their GREAT sweep would pair them with everything)
+    //--- the estimate runs over two pair classes:
+    //    contact - pairs with an ongoing contact (prtcInfoTable_):
+    //    sized from the cached contact state of the previous substep
+    //    (contactVolume_, contactArea_, Lc_, reduced moduli and mass)
+    //    pre-contact - sweep-inflated pairs that may first touch
+    //    within this CFD step: no contact object exists yet, so the
+    //    contact geometry is estimated (exact pair materials, masses
+    //    and charCellSize; first-touch area and Lc from h). hard-flagged
+    //    members are excluded from the inflated set (their GREAT sweep
+    //    would pair them with everything)
     {
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)
         {
@@ -1729,8 +1736,6 @@ void openHFDIBDEM::computeDEMdtEstimate
 
             if (prtcInfoTable_.found(cPair))
             {
-                // tier D: cached contact state from the previous
-                // substep
                 std::vector<std::shared_ptr<prtSubContactInfo>>& subCList
                     = prtcInfoTable_[cPair]->getPrtSCList();
 
@@ -1745,7 +1750,7 @@ void openHFDIBDEM::computeDEMdtEstimate
                             deltaTDEM_ = dtPair;
                             govC = cPair.first();
                             govT = cPair.second();
-                            govTier = 0;
+                            govIsContact = 0;
                         }
                     }
                 }
@@ -1769,7 +1774,7 @@ void openHFDIBDEM::computeDEMdtEstimate
                 Tuple2<label, label>(pair.first, pair.second)
             );
 
-            if (prtcInfoTable_.found(cPair)) continue;  // tier D covered above
+            if (prtcInfoTable_.found(cPair)) continue;                  // contact: covered above
 
             immersedBody& cIb(immersedBodies_[pair.first]);
             immersedBody& tIb(immersedBodies_[pair.second]);
@@ -1845,6 +1850,10 @@ void openHFDIBDEM::computeDEMdtEstimate
                 )
             );
 
+            // pre-contact assumptions: contact volume = area over one
+            // cell depth, Lc = h (the smallest possible Lc of any
+            // contact zone spanning the cell - the most conservative
+            // reading of the force laws)
             const scalar dtPair
             (
                 demTimeStepInfo::pairDtCrit
@@ -1852,10 +1861,10 @@ void openHFDIBDEM::computeDEMdtEstimate
                     demTimeStepInfo::effK
                     (
                         aY,
-                        aEst*h,                                         // volume ~ area * one cell depth
+                        aEst*h,
                         aG,
                         aEst,
-                        h,                                              // Lc_est = h (most conservative conservative)
+                        h,
                         dtTangentialFactor_
                     ),
                     reduceM
@@ -1867,7 +1876,7 @@ void openHFDIBDEM::computeDEMdtEstimate
                 deltaTDEM_ = dtPair;
                 govC = pair.first;
                 govT = pair.second;
-                govTier = 1;
+                govIsContact = 1;
             }
 
             // hertz contact-duration diagnostic for the same pair
@@ -1961,7 +1970,7 @@ void openHFDIBDEM::computeDEMdtEstimate
         );
 
         dtPerRank[Pstream::myProcNo()] = deltaTDEM_;
-        govPerRank[Pstream::myProcNo()][0] = govTier;
+        govPerRank[Pstream::myProcNo()][0] = govIsContact;
         govPerRank[Pstream::myProcNo()][1] = govC;
         govPerRank[Pstream::myProcNo()][2] = govT;
 
@@ -1977,7 +1986,7 @@ void openHFDIBDEM::computeDEMdtEstimate
         }
 
         deltaTDEM_ = dtPerRank[winRank];
-        govTier = govPerRank[winRank][0];
+        govIsContact = govPerRank[winRank][0];
         govC = govPerRank[winRank][1];
         govT = govPerRank[winRank][2];
 
@@ -2002,18 +2011,18 @@ void openHFDIBDEM::computeDEMdtEstimate
 
     if (mesh_.time().timeIndex() % max(dtReportInterval_, 1) == 0)
     {
-        if (govTier >= 0)
+        if (govIsContact >= 0)
         {
-            InfoH << DEM_Info << " used stepDEM: " << deltaTDEM_
+            InfoH << DEM_Info << " deltaTDEM estimate: " << deltaTDEM_
                 << " (pair " << govC << "-" << govT
-                << ", tier " << (govTier == 0 ? "D" : "C") << ")"
+                << ", " << (govIsContact == 0 ? "contact" : "pre-contact") << ")"
                 << "; Hertz-based stepDEM: " << dtDiagHertz_
                 << "; Rayleigh-based stepDEM: " << dtDiagRayleigh_
                 << endl;
         }
         else
         {
-            InfoH << DEM_Info << " used stepDEM: " << deltaTDEM_
+            InfoH << DEM_Info << " deltaTDEM estimate: " << deltaTDEM_
                 << "; Hertz-based stepDEM: " << dtDiagHertz_
                 << "; Rayleigh-based stepDEM: " << dtDiagRayleigh_
                 << endl;

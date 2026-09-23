@@ -174,11 +174,12 @@ class wallSubContactInfo
     vector getFt(wallContactVars& wallCntvar, scalar deltaT);
 
     // stability step of this wall contact from the cached contact
-    // state (tier D of the adaptive DEM time-step estimator). the
-    // wall mass is infinite, so the reduced mass is the full body
-    // mass M0, not the M0/2 kept in reduceM_ for the force laws.
-    // tangentialFactor scales the tangential branch (1 = full
-    // conservatism); damping sits inside the stepDEM safety factor.
+    // state (the contact class of the adaptive DEM time-step
+    // estimator). the wall mass is infinite, so the reduced mass is
+    // the full body mass M0, not the M0/2 kept in reduceM_ for the
+    // force laws. tangentialFactor scales the tangential branch
+    // (1 = full conservatism); damping sits inside the stepDEM
+    // safety factor.
     scalar getPairDtCrit
     (
         wallContactVars& wallCntvar,

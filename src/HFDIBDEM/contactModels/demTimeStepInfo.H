@@ -140,8 +140,7 @@ class demTimeStepInfo
         );
     }
 
-    // first-touch contact area estimate for potential (not yet
-    // occurring) contacts:
+    // first-touch contact area estimate for pre-contact pairs:
     // - conservative: aEst = areaCoeff*h^2 (h = min pair charCellSize)
     // - velocityAware: min of the above and the hertz peak area
     //   pi*R*deltaMax. a larger R gives a smaller deltaMax and a
