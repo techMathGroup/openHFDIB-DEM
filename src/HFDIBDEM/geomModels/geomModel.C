@@ -81,10 +81,12 @@ void geomModel::createImmersedBody
     if (bodyCreation_ != "legacy"
         && createImmersedBodyConnectivity(body, octreeField, cellPoints))
     {
+        bodyFieldValid_ = true;
         return;
     }
 
     createImmersedBodyLegacy(body, octreeField, cellPoints);
+    bodyFieldValid_ = true;
 }
 //---------------------------------------------------------------------------//
 void geomModel::calculateGeometricalProperties
@@ -195,6 +197,7 @@ void geomModel::resetBody(volScalarField& body)
     surfCells_[Pstream::myProcNo()].clear();
     intCells_[Pstream::myProcNo()].clear();
     haloCells_[Pstream::myProcNo()].clear();
+    bodyFieldValid_ = false;
     }
 //---------------------------------------------------------------------------//
 bool geomModel::isBBoxInMesh()

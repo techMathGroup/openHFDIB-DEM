@@ -56,6 +56,8 @@ void clusterBody::createImmersedBody
         Info << "Periodic body created" << " bbox: " << gModel->getBounds().min() << " " << gModel->getBounds().max() << endl;
         Info << "Periodic body created" << " intList: " << gModel->getInternalCellList()[Pstream::myProcNo()].size() << endl;
     }
+
+    bodyFieldValid_ = true;                                             // the sub-models set their own flags in their createImmersedBody + cluster mirror
 }
 //---------------------------------------------------------------------------//
 void clusterBody::updateSurfList()
@@ -247,6 +249,7 @@ void clusterBody::resetBody(volScalarField& body)
     {
         gModel->resetBody(body);
     }
+    bodyFieldValid_ = false;
 }
 //---------------------------------------------------------------------------//
 List<std::shared_ptr<boundBox>> clusterBody::getBBoxes()

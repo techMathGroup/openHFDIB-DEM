@@ -117,6 +117,7 @@ void stlBased::bodyMovePoints
     bodySurfMesh_.movePoints(bodyPoints);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
+    bodyFieldValid_ = false;                                            // points moved: cell lists and the body field are stale
 }
 //---------------------------------------------------------------------------//
 void stlBased::bodyScalePoints
@@ -142,6 +143,7 @@ void stlBased::bodyScalePoints
     bodySurfMesh_.movePoints(bodyPoints);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
+    bodyFieldValid_ = false;                                            // points moved/scaled/rotated/synced
 }
 //---------------------------------------------------------------------------//
 void stlBased::bodyRotatePoints
@@ -175,6 +177,7 @@ void stlBased::bodyRotatePoints
     bodySurfMesh_.movePoints(bodyPoints);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
+    bodyFieldValid_ = false;                                            // points moved/scaled/rotated/synced
 }
 //---------------------------------------------------------------------------//
 void stlBased::synchronPos(label owner)
@@ -201,6 +204,7 @@ void stlBased::synchronPos(label owner)
     bodySurfMesh_.movePoints(bodyPoints);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
+    bodyFieldValid_ = false;                                            // points moved/scaled/rotated/synced
 }
 //---------------------------------------------------------------------------//
 void stlBased::getClosestPointAndNormal
@@ -555,5 +559,7 @@ void stlBased::setBodyPosition(pointField pos)
     bodySurfMesh_.movePoints(pos);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
+    // points moved: cell lists and the body field are stale
+    bodyFieldValid_ = false;
 }
 //---------------------------------------------------------------------------//

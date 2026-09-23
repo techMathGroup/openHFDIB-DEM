@@ -239,6 +239,7 @@ namespace Foam
         {
             assert(pos.size() == 1 && "Only one point is allowed for sphere body");
             position_ = pos[0];
+            bodyFieldValid_ = false;                                    // points moved: cell lists and the body field are stale
         }
 
         pointField getBodyPoints() final override

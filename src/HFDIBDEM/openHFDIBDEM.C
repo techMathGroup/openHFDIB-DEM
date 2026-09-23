@@ -551,10 +551,31 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
     // createBodies runs first, so this is where it gets reset
     nBodiesRemovedLastStep_ = 0;
 
-    // reset all bodies before recreation
+    // static-body re-creation skip
+    // Note (MI): if required, make this a HFDIBDEMDict entry
+    const bool skipStaticRecreation(true);
+
+    // per-body re-creation decision, shared by the reset and the create
+    boolList recreateBody(immersedBodies_.size(), true);
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive())
+        {
+            if (skipStaticRecreation
+                && immersedBodies_[bodyId].getbodyOperation() == 0)
+            {
+                recreateBody[bodyId] = !immersedBodies_[bodyId]
+                    .getGeomModel().bodyFieldValid();
+            }
+
+            reduce(recreateBody[bodyId], andOp<bool>());
+        }
+    }
+
+    // reset all bodies before recreation
+    forAll (immersedBodies_,bodyId)
+    {
+        if (immersedBodies_[bodyId].getIsActive() && recreateBody[bodyId])
         {
             immersedBodies_[bodyId].resetBody(body);
         }
@@ -563,7 +584,7 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
     // recreate all bodies after contact update
     forAll (immersedBodies_,bodyId)
     {
-        if (immersedBodies_[bodyId].getIsActive())
+        if (immersedBodies_[bodyId].getIsActive() && recreateBody[bodyId])
         {
             immersedBodies_[bodyId].createImmersedBody
             (

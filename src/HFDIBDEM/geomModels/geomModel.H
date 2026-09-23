@@ -158,6 +158,13 @@ namespace Foam
         // creation mode: "connectivity" (default) | "legacy"
         word bodyCreation_;
 
+        // validity of the body field + cell lists: true after a
+        // creation, false after any point mutation or resetBody.
+        // lets createBodies skip the reset+re-create pair for static
+        // bodies on an unchanged mesh (recreateBodies re-arms it
+        // after topology changes)
+        bool bodyFieldValid_{false};
+
         // cached cell-search engine for the connectivity creation;
         // the meshSearch construction builds a full cell octree
         // (~O(nCells) per build), so it must NOT be rebuilt on every
@@ -624,6 +631,10 @@ namespace Foam
         }
 
         void setBodyCreation(word bodyCreation) { bodyCreation_ = bodyCreation; }
+
+        // see bodyFieldValid_ above
+        bool bodyFieldValid() const { return bodyFieldValid_; }
+        void setBodyFieldValid(bool valid) { bodyFieldValid_ = valid; }
 
         void resetSeeds()
         {
