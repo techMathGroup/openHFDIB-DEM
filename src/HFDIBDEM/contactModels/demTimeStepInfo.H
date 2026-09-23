@@ -217,6 +217,32 @@ class demTimeStepInfo
     {
         return rC*rT/(rC + rT + SMALL);
     }
+
+    // smallest principal moment of inertia: the rotation-invariant
+    // conservative Ieff.
+    static scalar minEigenvalue(const symmTensor& I)
+    {
+        const vector ev(eigenValues(I));
+
+        return min(min(ev.x(), ev.y()), ev.z());
+    }
+
+    // rotational stability step of a tangential contact: the
+    // tangential force kT*x on a lever arm r acts on the body
+    // inertia about the resulting torque axis
+    static scalar rotationalDtCrit
+    (
+        const scalar kT,
+        const scalar leverArm,
+        const scalar Ieff
+    )
+    {
+        const scalar kEff(kT*sqr(leverArm));
+
+        if (kEff < SMALL) return GREAT;                                 // unconstrained rotation
+
+        return 2.0*Foam::sqrt(Ieff/kEff);
+    }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

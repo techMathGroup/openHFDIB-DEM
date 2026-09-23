@@ -130,12 +130,12 @@ class prtSubContactInfo
         ibContactVars& tVars
     );
 
-    vector getcLVec()
+    vector& getcLVec()
     {
         return cLVec_;
     }
 
-    vector gettLVec()
+    vector& gettLVec()
     {
         return tLVec_;
     }
@@ -206,6 +206,44 @@ class prtSubContactInfo
             ),
             physicalProperties_.reduceM_
         );
+    }
+
+    // rotational stability step: the tangential force on the cached
+    // lever arms (cLVec_ for body c, tLVec_ for body t - the full
+    // length is the conservative rPerp)
+    scalar getPairDtCritRot
+    (
+        const scalar IeffC,
+        const scalar IeffT,
+        scalar tangentialFactor = 1.0,
+        scalar rotationalFactor = 1.0
+    )
+    {
+        const scalar kT
+        (
+            rotationalFactor*tangentialFactor
+                *demTimeStepInfo::contactKT
+                (
+                    physicalProperties_.aG_,
+                    prtCntVars_.contactArea_,
+                    Lc_
+                )
+        );
+
+        scalar dtPair(getPairDtCrit(tangentialFactor));
+
+        dtPair = min
+        (
+            dtPair,
+            demTimeStepInfo::rotationalDtCrit(kT, mag(cLVec_), IeffC)
+        );
+        dtPair = min
+        (
+            dtPair,
+            demTimeStepInfo::rotationalDtCrit(kT, mag(tLVec_), IeffT)
+        );
+
+        return dtPair;
     }
 
     void syncData();

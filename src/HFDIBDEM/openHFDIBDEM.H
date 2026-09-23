@@ -143,6 +143,10 @@ namespace Foam
     // an empirical 200x tuning factor that makes it govern)
     scalar dtTangentialFactor_;
 
+    // multiplier on the tangential stiffness of the rotational bound
+    // only (escape hatch if the rotational estimate is too tight)
+    scalar dtRotationalFactor_;
+
     // floor on the estimated deltaTDEM (0 = off). binding means the
     // estimated stability bound is being exceeded - warned in the log
     scalar dtMinDEMdt_;
@@ -319,6 +323,16 @@ namespace Foam
     // upper bound on the contact-point speed magnitude of a body
     // (|Vel| + |omega|*rMax), used for the pre-contact approach speed
     scalar pairApproachSpeed(immersedBody& ib) const;
+
+    // upper bound on the lever arm of any contact point of the body
+    // (bbox corner distance from the CoM); static bodies
+    // (bodyOperation_ == 0) return 0 - they are not integrated
+    // rotationally
+    scalar bodyRMax(immersedBody& ib) const;
+
+    // smallest principal moment of inertia (lambda_min of I); GREAT
+    // for static bodies so their rotational bound never governs
+    scalar bodyIeff(immersedBody& ib) const;
 
     prtContactInfo& getPrtcInfo(Tuple2<label,label> cPair);
 

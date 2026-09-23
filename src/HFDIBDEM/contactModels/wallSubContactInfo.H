@@ -202,6 +202,36 @@ class wallSubContactInfo
         );
     }
 
+    // rotational stability step: the tangential
+    // force on the cached lever arm lVec_ acts on the body's
+    // lambda_min inertia (the wall contributes no rotational mode).
+    scalar getPairDtCritRot
+    (
+        wallContactVars& wallCntvar,
+        ibContactVars& cVars,
+        scalar IeffC,
+        scalar tangentialFactor = 1.0,
+        scalar rotationalFactor = 1.0
+    )
+    {
+        const scalar kT
+        (
+            rotationalFactor*tangentialFactor
+                *demTimeStepInfo::contactKT
+                (
+                    wallCntvar.getMeanCntPar().aG_,
+                    wallCntvar.contactArea_,
+                    wallCntvar.Lc_
+                )
+        );
+
+        return min
+        (
+            getPairDtCrit(wallCntvar, cVars, tangentialFactor),
+            demTimeStepInfo::rotationalDtCrit(kT, mag(wallCntvar.lVec_), IeffC)
+        );
+    }
+
     forces& getOutForce()
     {
         return outForce_;

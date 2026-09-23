@@ -87,6 +87,7 @@ useDEMdtEstimator_(true),
 dtEstimatorVelocityAware_(true),
 dtAreaCoeff_(1.0),
 dtTangentialFactor_(1.0),
+dtRotationalFactor_(1.0),
 dtMinDEMdt_(0.0),
 dtMaxDEMSubCycles_(0),
 dtReportInterval_(1),
@@ -144,6 +145,8 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         dtAreaCoeff_ = asdDic.lookupOrDefault<scalar>("areaCoeff", 1.0);
         dtTangentialFactor_ =
             asdDic.lookupOrDefault<scalar>("tangentialFactor", 1.0);
+        dtRotationalFactor_ =
+            asdDic.lookupOrDefault<scalar>("rotationalFactor", 1.0);
         dtMinDEMdt_ = asdDic.lookupOrDefault<scalar>("minDEMdt", 0.0);
         dtMaxDEMSubCycles_ = asdDic.lookupOrDefault<label>("maxDEMSubCycles", 0);
         dtReportInterval_ = asdDic.lookupOrDefault<label>("dtReportInterval", 1);
@@ -1717,10 +1720,13 @@ void openHFDIBDEM::computeDEMdtEstimate
     dtDiagRayleigh_ = GREAT;
 
     // governing pair bookkeeping for the log (argmin with the
-    // reduce); govIsContact: 0 = contact, 1 = pre-contact, -1 = none
+    // reduce); govIsContact: 0 = contact, 1 = pre-contact, -1 = none;
+    // govIsRot: 1 = the rotational bound of the governing pair
+    // governs, 0 otherwise
     label govC(-1);
     label govT(-1);
     label govIsContact(-1);
+    label govIsRot(0);
 
     //--- the estimate runs over two pair classes:
     //    contact - pairs with an ongoing contact (prtcInfoTable_):
@@ -1749,7 +1755,39 @@ void openHFDIBDEM::computeDEMdtEstimate
                 {
                     if (mag(sC->getprtCntVars().contactVolume_) > SMALL)
                     {
-                        scalar dtPair(sC->getPairDtCrit(dtTangentialFactor_));
+                        // lambda_min(I) per body; GREAT for static
+                        // bodies, so their rotational bound never
+                        // governs
+                        const scalar iEffC
+                        (
+                            bodyIeff(immersedBodies_[cPair.first()])
+                        );
+                        const scalar iEffT
+                        (
+                            bodyIeff(immersedBodies_[cPair.second()])
+                        );
+
+                        // rotational bound of each body (tangential
+                        // force on the lever arm vs lambda_min(I))
+                        // enters the same min
+                        const scalar dtPair
+                        (
+                            sC->getPairDtCritRot
+                            (
+                                iEffC,
+                                iEffT,
+                                dtTangentialFactor_,
+                                dtRotationalFactor_
+                            )
+                        );
+
+                        // the bound governs rotationally when it is
+                        // below the translational one
+                        const bool isRot
+                        (
+                            dtPair
+                                < sC->getPairDtCrit(dtTangentialFactor_)
+                        );
 
                         if (dtPair < deltaTDEM_)
                         {
@@ -1757,6 +1795,7 @@ void openHFDIBDEM::computeDEMdtEstimate
                             govC = cPair.first();
                             govT = cPair.second();
                             govIsContact = 0;
+                            govIsRot = isRot;
                         }
                     }
                 }
@@ -1860,7 +1899,7 @@ void openHFDIBDEM::computeDEMdtEstimate
             // cell depth, Lc = h (the smallest possible Lc of any
             // contact zone spanning the cell - the most conservative
             // reading of the force laws)
-            const scalar dtPair
+            const scalar dtTrans
             (
                 demTimeStepInfo::pairDtCrit
                 (
@@ -1877,12 +1916,42 @@ void openHFDIBDEM::computeDEMdtEstimate
                 )
             );
 
+            // rotational bound: the same tangential stiffness
+            // estimate acting on the lever-arm upper bound of each
+            // body (bbox corner distance; 0 for static bodies) vs
+            // lambda_min(I) (GREAT for static bodies, so the bound
+            // never governs for them)
+            const scalar kT
+            (
+                dtRotationalFactor_*dtTangentialFactor_
+                    *demTimeStepInfo::contactKT(aG, aEst, h)
+            );
+            const scalar dtPair
+            (
+                min
+                (
+                    min
+                    (
+                        dtTrans,
+                        demTimeStepInfo::rotationalDtCrit
+                        (
+                            kT, bodyRMax(cIb), bodyIeff(cIb)
+                        )
+                    ),
+                    demTimeStepInfo::rotationalDtCrit
+                    (
+                        kT, bodyRMax(tIb), bodyIeff(tIb)
+                    )
+                )
+            );
+
             if (dtPair < deltaTDEM_)
             {
                 deltaTDEM_ = dtPair;
                 govC = pair.first;
                 govT = pair.second;
                 govIsContact = 1;
+                govIsRot = dtPair < dtTrans;
             }
 
             // hertz contact-duration diagnostic for the same pair
@@ -1972,13 +2041,14 @@ void openHFDIBDEM::computeDEMdtEstimate
         List<labelList> govPerRank
         (
             Pstream::nProcs(),
-            labelList(3, -1)
+            labelList(4, -1)
         );
 
         dtPerRank[Pstream::myProcNo()] = deltaTDEM_;
         govPerRank[Pstream::myProcNo()][0] = govIsContact;
         govPerRank[Pstream::myProcNo()][1] = govC;
         govPerRank[Pstream::myProcNo()][2] = govT;
+        govPerRank[Pstream::myProcNo()][3] = govIsRot;
 
         Pstream::gatherList(dtPerRank, 0);
         Pstream::scatterList(dtPerRank, 0);
@@ -1995,6 +2065,7 @@ void openHFDIBDEM::computeDEMdtEstimate
         govIsContact = govPerRank[winRank][0];
         govC = govPerRank[winRank][1];
         govT = govPerRank[winRank][2];
+        govIsRot = govPerRank[winRank][3];
 
         reduce(dtDiagHertz_, minOp<scalar>());
         reduce(dtDiagRayleigh_, minOp<scalar>());
@@ -2021,7 +2092,10 @@ void openHFDIBDEM::computeDEMdtEstimate
         {
             InfoH << DEM_Info << " deltaTDEM estimate: " << deltaTDEM_
                 << " (pair " << govC << "-" << govT
-                << ", " << (govIsContact == 0 ? "contact" : "pre-contact") << ")"
+                << ", "
+                << (govIsContact == 0 ? "contact" : "pre-contact")
+                << (govIsRot == 1 ? ", rotational" : "")
+                << ")"
                 << "; Hertz-based stepDEM: " << dtDiagHertz_
                 << "; Rayleigh-based stepDEM: " << dtDiagRayleigh_
                 << endl;
@@ -2042,18 +2116,34 @@ scalar openHFDIBDEM::pairApproachSpeed(immersedBody& ib) const
     // computeSweepDistance minus the accel contribution)
     const ibContactVars& cVars(ib.getContactVars());
 
+    return mag(cVars.Vel_) + mag(cVars.omega_)*bodyRMax(ib);
+}
+//---------------------------------------------------------------------------//
+scalar openHFDIBDEM::bodyRMax(immersedBody& ib) const
+{
+    // static bodies do not rotate, so their contact points have no
+    // lever arm
+    if (ib.getbodyOperation() == 0) return 0;
+
     scalar rMax(0);
+    boundBox bb(ib.getGeomModel().getBounds());
+    pointField bbPoints(bb.points());
+    vector CoM(ib.getGeomModel().getCoM());
+    forAll(bbPoints, bP)
     {
-        boundBox bb(ib.getGeomModel().getBounds());
-        pointField bbPoints(bb.points());
-        vector CoM(ib.getGeomModel().getCoM());
-        forAll(bbPoints, bP)
-        {
-            rMax = max(rMax, mag(bbPoints[bP] - CoM));
-        }
+        rMax = max(rMax, mag(bbPoints[bP] - CoM));
     }
 
-    return mag(cVars.Vel_) + mag(cVars.omega_)*rMax;
+    return rMax;
+}
+//---------------------------------------------------------------------------//
+scalar openHFDIBDEM::bodyIeff(immersedBody& ib) const
+{
+    // static bodies are not integrated rotationally, so no rotational
+    // stability step applies to them
+    if (ib.getbodyOperation() == 0) return GREAT;
+
+    return demTimeStepInfo::minEigenvalue(ib.getGeomModel().getI());
 }
 //---------------------------------------------------------------------------//
 prtContactInfo& openHFDIBDEM::getPrtcInfo(Tuple2<label,label> cPair)
