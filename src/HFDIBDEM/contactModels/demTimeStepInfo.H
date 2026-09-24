@@ -218,20 +218,11 @@ class demTimeStepInfo
     }
 
     // smallest principal moment of inertia: the rotation-invariant
-    // conservative Ieff.
-    // Foam::eigenValues clips near-degenerate roots of the
-    // characteristic cubic to the double root (verified:
-    // diag(a,a,a) + c on (x,z) returns a instead of a-c for c
-    // below ~1e-3*a) - exactly the two-equal-principal-moment
-    // shapes (spheres, cylinders, discs) - and the smallest
-    // eigenvalue then comes back too large, the unconservative
-    // direction for the stability step. the Gershgorin row bound
-    // is a guaranteed lower bound on every eigenvalue, so the
-    // smaller of the two is returned: it can never exceed the
-    // true smallest eigenvalue. the bound is used only when
-    // positive - a non-positive bound carries no information
-    // (frames with large off-diagonals) and would poison the
-    // sqrt in rotationalDtCrit
+    // conservative Ieff. use Gershgorin row bound as a guaranteed lower
+    // bound on the smallest eigenvalue.
+    // Note (MI): Foam::eigenValues clips near-degenerate roots of the
+    // characteristic cubic to the double root => problematic here
+    // Note (MI): even with Foam::eigenValues, the problem is small...
     static scalar minEigenvalue(const symmTensor& I)
     {
         const vector ev(eigenValues(I));
