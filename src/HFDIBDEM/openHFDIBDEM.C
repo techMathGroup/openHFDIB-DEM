@@ -2239,6 +2239,10 @@ void openHFDIBDEM::removeBodyContacts(label bodyId)
     }
 
     verletList_.removeBodyFromVList(immersedBodies_[bodyId]);
+
+    InfoH << iB_Info << "-- body " << bodyId
+        << " switched off: purged " << keys.size()
+        << " contact pair(s), Verlet entry removed" << endl;
 }
 //---------------------------------------------------------------------------//
 // function to either add or remove bodies from the simulation
