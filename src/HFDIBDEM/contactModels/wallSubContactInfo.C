@@ -257,13 +257,12 @@ vector wallSubContactInfo::getFt
         *wallCntvar.contactNormal_);
     // scale projected Ft to have same magnitude as FtLast
     vector FtLastS(mag(wallCntvar.FtPrev_) * (FtLastP/(mag(FtLastP)+SMALL)));
+    
     // compute relative tangential velocity
-    // vector cVeliNorm = wallCntvar.Veli_
-        // - ((wallCntvar.Veli_ & wallCntvar.contactNormal_)
-        // *wallCntvar.contactNormal_);
-    vector cVeliNorm = wallCntvar.Veli_*(wallCntvar.Veli_&wallCntvar.contactNormal_);
+    vector Vn((wallCntvar.Veli_ & wallCntvar.contactNormal_)
+        *wallCntvar.contactNormal_);
+    vector Vt(wallCntvar.Veli_ - Vn);
 
-    vector Vt(wallCntvar.Veli_-(cVeliNorm - vector::zero));
     // compute tangential force
     if(contactModelInfo::getUseMindlinRotationalModel())
     {

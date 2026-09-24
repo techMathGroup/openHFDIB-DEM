@@ -115,10 +115,10 @@ vector prtSubContactInfo::getFt(scalar deltaT, scalar FtCeil)
 
     // compute relative tangential velocity
     vector relVeli(cVeli_ - tVeli_);
-    vector veliNomr((relVeli)*(relVeli & prtCntVars_.contactNormal_));
-    vector Vt(relVeli-veliNomr);
+    vector Vn((relVeli & prtCntVars_.contactNormal_)
+        *prtCntVars_.contactNormal_);
+    vector Vt(relVeli - Vn);
     // compute tangential force
-        //NewDefinition
     if(contactModelInfo::getUseMindlinRotationalModel())
     {
         scalar tangTune(demTimeStepInfo::tangTune_);                    //read empirical mambo-jambo from demTimeStepInfo

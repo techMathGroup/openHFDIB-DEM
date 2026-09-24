@@ -87,7 +87,7 @@ class wallSubContactInfo
 
     wallContactVars wallCntvar_;
 
-    scalar reduceM_;    // Reduced mass
+    scalar reduceM_ = 0;    // Reduced mass
 
     forces outForce_; // Out variable for force
 
@@ -137,6 +137,11 @@ class wallSubContactInfo
     wallContactVars& getWallCntVars()
     {
         return wallCntvar_;
+    }
+
+    scalar& getReduceM()
+    {
+        return reduceM_;
     }
 
     void clearWallCntVars();
