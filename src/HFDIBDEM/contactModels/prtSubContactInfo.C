@@ -132,7 +132,7 @@ vector prtSubContactInfo::getFt(scalar deltaT, scalar FtCeil)
         {
             deltaFt *= FtCeil/(mag(deltaFt) + SMALL);
         }
-        FtPrev_ = - FtLastS - deltaFt;
+        FtPrev_ = FtLastS - deltaFt;
     }
 
     if(contactModelInfo::getUseChenRotationalModel())
@@ -144,7 +144,7 @@ vector prtSubContactInfo::getFt(scalar deltaT, scalar FtCeil)
         {
             Ftdi *= FtCeil/(mag(Ftdi) + SMALL);
         }
-        FtPrev_ = - FtLastS- Ftdi;
+        FtPrev_ = FtLastS - Ftdi;
     }
 
     // coulomb cap feeds back into the stored state: the spring

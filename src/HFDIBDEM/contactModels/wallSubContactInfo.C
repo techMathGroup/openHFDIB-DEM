@@ -275,12 +275,12 @@ vector wallSubContactInfo::getFt
         {
             deltaFt *= FtCeil/(mag(deltaFt) + SMALL);
         }
-        wallCntvar.FtPrev_ = - FtLastS - deltaFt;
+        wallCntvar.FtPrev_ = FtLastS - deltaFt;
     }
 
     if(contactModelInfo::getUseChenRotationalModel())
     {
-   
+
         vector Ftdi(meanCntPar.reduceBeta_*sqrt(meanCntPar.aG_*reduceM_*wallCntvar.Lc_)*Vt);
         Ftdi += meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT;
         // same one-ceiling bound on the increment as above
@@ -288,7 +288,7 @@ vector wallSubContactInfo::getFt
         {
             Ftdi *= FtCeil/(mag(Ftdi) + SMALL);
         }
-        wallCntvar.FtPrev_ = - FtLastS - Ftdi;
+        wallCntvar.FtPrev_ = FtLastS - Ftdi;
     }
 
     // coulomb cap feeds back into the stored state: the spring
