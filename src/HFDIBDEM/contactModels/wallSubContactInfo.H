@@ -144,6 +144,11 @@ class wallSubContactInfo
         return reduceM_;
     }
 
+    const boundBox& getBB() const
+    {
+        return BB_;
+    }
+
     void clearWallCntVars();
 
     scalar getMu(wallContactVars& wallCntvar)

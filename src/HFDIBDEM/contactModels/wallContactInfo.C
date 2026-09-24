@@ -25,6 +25,11 @@ License
 InNamespace
     Foam
 
+Notes:
+    Note (MI): there are sum sub-contact implementations present but
+    they are dubious and not properly tested
+    |-> testing is on To Do list as of 20260924
+
 Contributors
     Federico Municchi (2016),
     Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
@@ -646,6 +651,117 @@ boundBox wallContactInfo::correctSMBBforWall
 void wallContactInfo::clearOldContact()
 {
     subCList_.clear();
+}
+//---------------------------------------------------------------------------//
+void wallContactInfo::saveWallFtHistory()
+{
+    wallFtHistory_.clear();
+    for(auto sC : subCList_)
+    {
+        const List<string>& patches(sC->getContactPatches());
+        if (patches.size() == 0)
+        {
+            continue;
+        }
+
+        // key on the sorted patch set so a sub-contact that
+        // spans the same patches continues its history even if
+        // the list order changed between sub-steps
+        // Note (MI): anything sub-contact related is dubious
+        List<string> sortedPatches(patches);
+        Foam::sort(sortedPatches);
+        string key;
+        forAll(sortedPatches, sP)
+        {
+            key += sortedPatches[sP];
+            if (sP < sortedPatches.size() - 1)
+            {
+                key += ",";
+            }
+        }
+
+        vector FtPrev(sC->getWallCntVars().FtPrev_);
+        if (wallFtHistory_.found(key))
+        {
+            // several sub-contacts share a patch set (body
+            // regions); sum the springs as one lumped history
+            // Note (MI): anything sub-contact related is dubious
+            wallFtHistory_[key] += FtPrev;
+        }
+        else
+        {
+            wallFtHistory_.insert(key, FtPrev);
+        }
+    }
+}
+//---------------------------------------------------------------------------//
+void wallContactInfo::restoreWallFtHistory()
+{
+    if (wallFtHistory_.size() == 0 || subCList_.size() == 0)
+    {
+        return;
+    }
+
+    // count sub-contacts per key so a lumped history splits back
+    // over the same number of springs it was summed from
+    // Note (MI): anything sub-contact related is dubious
+    HashTable<label, string, Hash<string>> nPerKey;
+    for(auto sC : subCList_)
+    {
+        const List<string>& patches(sC->getContactPatches());
+        if (patches.size() == 0)
+        {
+            continue;
+        }
+
+        List<string> sortedPatches(patches);
+        Foam::sort(sortedPatches);
+        string key;
+        forAll(sortedPatches, sP)
+        {
+            key += sortedPatches[sP];
+            if (sP < sortedPatches.size() - 1)
+            {
+                key += ",";
+            }
+        }
+
+        if (nPerKey.found(key))
+        {
+            nPerKey[key] += 1;
+        }
+        else
+        {
+            nPerKey.insert(key, 1);
+        }
+    }
+
+    for(auto sC : subCList_)
+    {
+        const List<string>& patches(sC->getContactPatches());
+        if (patches.size() == 0)
+        {
+            continue;
+        }
+
+        List<string> sortedPatches(patches);
+        Foam::sort(sortedPatches);
+        string key;
+        forAll(sortedPatches, sP)
+        {
+            key += sortedPatches[sP];
+            if (sP < sortedPatches.size() - 1)
+            {
+                key += ",";
+            }
+        }
+
+        if (wallFtHistory_.found(key))
+        {
+            sC->getWallCntVars().FtPrev_
+                = wallFtHistory_[key]/nPerKey[key];
+        }
+    }
 }
 //---------------------------------------------------------------------------//
 void wallContactInfo::setNewSubContact(

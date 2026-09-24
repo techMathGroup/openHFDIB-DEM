@@ -1206,6 +1206,12 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                         wallContactIBTable.insert(bodyId,wallContactIB.size()-1);
                         // cIb.getWallCntInfo().registerSubContactList(wallContactList);
                     }
+                    else
+                    {
+                        // the tangential-spring history belongs to
+                        // the resolved contact only
+                        cIb.getWallCntInfo().clearWallFtHistory();
+                    }
                 }
             }
         }
@@ -1233,6 +1239,10 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     cIb.getWallCntInfo().findContactAreas();
                 }
 
+                // continue the tangential spring that persist from the 
+                // previous sub-step
+                cIb.getWallCntInfo().restoreWallFtHistory();
+
                 DynamicList<wallSubContactInfo*> wallContactList;
                 cIb.getWallCntInfo().registerSubContactList(wallContactList);
                 List<bool> wallcRList(wallContactList.size(),false);
@@ -1250,6 +1260,10 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     wallContactResolvedList[assignProc] += resolved;
                     wallcRList[sC] = resolved;
                 }
+
+                // harvest the tangential spring state before
+                // clearOldContact destroys the sub-contacts
+                cIb.getWallCntInfo().saveWallFtHistory();
             }
 
             reduce(wallContactResolvedList,sumOp<List<bool>>());

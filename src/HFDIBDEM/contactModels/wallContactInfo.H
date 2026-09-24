@@ -84,6 +84,11 @@ class wallContactInfo
 
     std::vector<std::shared_ptr<wallSubContactInfo>> subCList_;
 
+    // tangential-force history of the last DEM sub-step, keyed by
+    // the sorted contact-patch set of each sub-contact. mirrors
+    // the prt-side persistence
+    HashTable<vector, string, Hash<string>> wallFtHistory_;
+
     scalar reduceM_;    // Reduced mass
 
     forces outForce_; // Out variable for force
@@ -196,7 +201,25 @@ class wallContactInfo
         string wallName
     );
 
+    // clear the old contact information
     void clearOldContact();
+    
+    // harvest the tangential-force state of the current
+    // sub-contact list into wallFtHistory_
+    // Note (MI): anything sub-contact related is dubious
+    void saveWallFtHistory();
+
+    // drop the history: the contact resolved and a future
+    // contact must start from a zero spring
+    void clearWallFtHistory()
+    {
+        wallFtHistory_.clear();
+    }
+
+    // seed the fresh sub-contacts with the harvested history
+    // before the sub-step force evaluation
+    // Note (MI): anything sub-contact related is dubious
+    void restoreWallFtHistory();
 
     void setNewSubContact(
         const List<Tuple2<point,boundBox>>& contactBBData,
