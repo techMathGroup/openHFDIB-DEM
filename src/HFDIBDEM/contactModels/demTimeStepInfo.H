@@ -219,11 +219,45 @@ class demTimeStepInfo
 
     // smallest principal moment of inertia: the rotation-invariant
     // conservative Ieff.
+    // Foam::eigenValues clips near-degenerate roots of the
+    // characteristic cubic to the double root (verified:
+    // diag(a,a,a) + c on (x,z) returns a instead of a-c for c
+    // below ~1e-3*a) - exactly the two-equal-principal-moment
+    // shapes (spheres, cylinders, discs) - and the smallest
+    // eigenvalue then comes back too large, the unconservative
+    // direction for the stability step. the Gershgorin row bound
+    // is a guaranteed lower bound on every eigenvalue, so the
+    // smaller of the two is returned: it can never exceed the
+    // true smallest eigenvalue. the bound is used only when
+    // positive - a non-positive bound carries no information
+    // (frames with large off-diagonals) and would poison the
+    // sqrt in rotationalDtCrit
     static scalar minEigenvalue(const symmTensor& I)
     {
         const vector ev(eigenValues(I));
+        const scalar evMin(min(min(ev.x(), ev.y()), ev.z()));
 
-        return min(min(ev.x(), ev.y()), ev.z());
+        // gershgorin: every eigenvalue lies within
+        // [T_ii - sum|T_ij|, T_ii + sum|T_ij|] of some diagonal
+        const scalar gershMin
+        (
+            min
+            (
+                min
+                (
+                    I.xx() - mag(I.xy()) - mag(I.xz()),
+                    I.yy() - mag(I.xy()) - mag(I.yz())
+                ),
+                I.zz() - mag(I.xz()) - mag(I.yz())
+            )
+        );
+
+        if (gershMin > SMALL*mag(evMin))
+        {
+            return min(evMin, gershMin);
+        }
+
+        return evMin;
     }
 
     // rotational stability step of a tangential contact: the
