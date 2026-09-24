@@ -887,14 +887,21 @@ void immersedBody::rotateCachedInertia
 
     // drift recovery: w = inv(I_rotated) & L_ applies the torque-free
     // precession exactly (the gyroscopic term of the space-frame
-    // euler equation, in conservative form). |L| and the rotational
-    // energy are conserved identically in torque-free flight. the
-    // precession is not step-limited: for strongly anisotropic fast
-    // spinners a per-body bound dt <= C/lambda with
-    // lambda ~ omega*(I1-I3)/I1 could be added if free-flight
-    // accuracy ever matters - see rotation_dynamics_strategy.md (D2)
+    // euler equation, in conservative form).
     if (mag(geomModel_->getI()) > 0)
     {
+        // Note (MI): repopulate L_ if stale, that is, for bodies whose
+        // angular state is never torque-integrated (prescribed rotation,
+        // or free bodies without updateTorque).
+        if
+        (
+            bodyOperation_ != 1
+            && !(bodyOperation_ == 5 && updateTorque_)
+        )
+        {
+            L_ = geomModel_->getI() & (Axis_*omega_);
+        }
+
         splitOmega(inv(geomModel_->getI()) & L_);
     }
 }
