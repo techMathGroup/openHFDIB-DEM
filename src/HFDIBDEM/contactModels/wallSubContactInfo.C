@@ -195,13 +195,8 @@ void wallSubContactInfo::evalVariables(
     ibContactVars& cVars
 )
 {
-    reduceM_ =
-    (
-        ibCClass.getGeomModel().getM0()
-        *ibCClass.getGeomModel().getM0()
-        /(ibCClass.getGeomModel().getM0()
-        +ibCClass.getGeomModel().getM0())
-    );
+    // wall is infinitely massive: reduceM_ = body mass
+    reduceM_ = ibCClass.getGeomModel().getM0();
 
     wallCntvar.lVec_ = getLVec(wallCntvar,ibCClass);
     // wallCntvar.lVec_ = wallCntvar.contactCenter_ - ibCClass.getGeomModel().getCoM();
