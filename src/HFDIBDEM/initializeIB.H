@@ -1,16 +1,9 @@
-// for 2D case, remove unused directions from the rotation axis
 if (mesh_.nGeometricD() < 3)
 {
     const vector validDirs = (mesh_.geometricD() + Vector<label>::one)/2;
     Axis_ -= validDirs;
 }
 Axis_ /= mag(Axis_);
-
-// format bodyIdStr_ for better outputs
-while (bodyIdStr_.size() < 4)
-{
-    bodyIdStr_ = " " + bodyIdStr_;
-}
 
 // read the body operation name from immersedDict_
 if (immersedDict_.found("staticBody"))
@@ -143,31 +136,10 @@ if (immersedDict_.found("refineBuffers"))
 {
     refineBuffers_ = readLabel(immersedDict_.lookup("refineBuffers"));
 }
-Info << "refineBuffers_: " << refineBuffers_ << endl;
 if (immersedDict_.found("timesToSetStatic"))
 {
     timesToSetStatic_ = readLabel(immersedDict_.lookup("timesToSetStatic"));
 }
-
-// body creation strategy: connectivity (default) | legacy
-word bodyCreation("connectivity");
-if (immersedDict_.found("bodyCreation"))
-{
-    bodyCreation = word(immersedDict_.lookup("bodyCreation"));
-    if (bodyCreation != "connectivity" && bodyCreation != "legacy")
-    {
-        InfoH << iB_Info << "Unknown bodyCreation: " << bodyCreation
-            << ", using connectivity" << endl;
-        bodyCreation = "connectivity";
-    }
-}
-geomModel_->setBodyCreation(bodyCreation);
-
-// Note (MI): caused by the connectivity-based body creation;
-// make sure the CoM is valid from construction (stlBased bodies keep
-// CoM_ = (0,0,0) until calculateGeometricalProperties, which runs AFTER
-// the first createImmersedBody -> seed resolution would query a wrong CoM)
-geomModel_->setCoM();
 
 // set up body geometry
 geomModel_->setIntSpan(intSpan_);
@@ -178,27 +150,13 @@ geomModel_->setRefineBuffers(refineBuffers_);
 
 string material = word(immersedDict_.lookup("material"));
 
-interpolationInfo* intpInfoPtr(nullptr);
 if(ibIntp.valid())
 {
     intpInfo_.reset(ibIntp().createIntpInfo(                            //OF.com: set -> reset
         mesh_,
         geomModel_
     ));
-    intpInfoPtr = &intpInfo_();
 }
-
-// fluid-solid coupling model (IB for now, see fluidSolidCoupling).
-// constructed always - it owns the coupling state; the IB physics
-// fatals on a missing interpolation scheme (ibCoupling::updateCoupling)
-couplingModel_ = fluidSolidCoupling::New
-(
-    immersedDict_,
-    mesh_,
-    geomModel_,
-    intpInfoPtr,
-    bodyIdStr_
-);
 
 ibContactClass_.reset(new ibContactClass(
     geomModel_,

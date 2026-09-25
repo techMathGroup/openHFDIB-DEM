@@ -10,25 +10,24 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "geomModel.H"
 
@@ -38,7 +37,8 @@ using namespace Foam;
 geomModel::geomModel
 (
     const  fvMesh&   mesh,
-    const contactType cType
+    const contactType cType,
+    scalar  thrSurf
 )
 :
 contactType_(cType),
@@ -46,6 +46,7 @@ mesh_(mesh),
 ibPartialVolume_(Pstream::nProcs(), 0),
 owner_(0),
 cellToStartInCreateIB_(0),
+thrSurf_(thrSurf),
 intSpan_(2.0),
 sdBasedLambda_(false),
 curMeshBounds_(mesh_.points(),false),
@@ -56,10 +57,7 @@ CoM_(vector::zero),
 I_(symmTensor::zero),
 bBox_(std::make_shared<boundBox>()),
 dC_(0.0),
-rhoS_("rho",dimensionSet(1,-3,0,0,0,0,0),1.0),
-surfSeed_(-1),
-nCellsPrev_(-1),
-bodyCreation_("connectivity")
+rhoS_("rho",dimensionSet(1,-3,0,0,0,0,0),1.0)
 {
     surfCells_.setSize(Pstream::nProcs());
     intCells_.setSize(Pstream::nProcs());
@@ -68,25 +66,6 @@ bodyCreation_("connectivity")
 }
 geomModel::~geomModel()
 {
-}
-//---------------------------------------------------------------------------//
-// dispatch between connectivity-based and legacy body creation
-void geomModel::createImmersedBody
-(
-    volScalarField& body,
-    Field<label>& octreeField,
-    List<labelList>& cellPoints
-)
-{
-    if (bodyCreation_ != "legacy"
-        && createImmersedBodyConnectivity(body, octreeField, cellPoints))
-    {
-        bodyFieldValid_ = true;
-        return;
-    }
-
-    createImmersedBodyLegacy(body, octreeField, cellPoints);
-    bodyFieldValid_ = true;
 }
 //---------------------------------------------------------------------------//
 void geomModel::calculateGeometricalProperties
@@ -106,7 +85,16 @@ void geomModel::calculateGeometricalProperties
     //Get CellCount At Each SubDomain
     nCells_ = intCells_[Pstream::myProcNo()].size() + surfCells_[Pstream::myProcNo()].size();
 
-    reduceGeometricalProperties();
+    // collect from processors
+    reduce(M_, sumOp<scalar>());
+    //reduce(tmpCom,  sumOp<vector>());
+    reduce(I_,  sumOp<symmTensor>());
+    //collect cellCount actros processors
+    reduce(nCells_, sumOp<label>());
+    /*if(M_ > 0)
+    {
+        CoM_ = tmpCom / M_;
+    }*/
 }
 //---------------------------------------------------------------------------//
 void geomModel::calculateGeometricalPropertiesParallel
@@ -126,20 +114,6 @@ void geomModel::calculateGeometricalPropertiesParallel
     //Get CellCount At Each SubDomain
     nCells_ = intCells_[Pstream::myProcNo()].size() + surfCells_[Pstream::myProcNo()].size();
 
-}
-//---------------------------------------------------------------------------//
-void geomModel::reduceGeometricalProperties()
-{
-    // collect from processors
-    reduce(M_, sumOp<scalar>());
-    reduce(I_,  sumOp<symmTensor>());
-    reduce(nCells_, sumOp<label>());
-
-    // Note (MI): helper function to allow for future simplification
-    //            of calls to calculateGeometricalPropertiesParallel
-    //            and calculateGeometricalProperties
-    //            -> these two now differ only by a call to 
-    //               reduceGeometricalProperties
 }
 //---------------------------------------------------------------------------//
 void geomModel::addToMAndI
@@ -197,7 +171,6 @@ void geomModel::resetBody(volScalarField& body)
     surfCells_[Pstream::myProcNo()].clear();
     intCells_[Pstream::myProcNo()].clear();
     haloCells_[Pstream::myProcNo()].clear();
-    bodyFieldValid_ = false;
     }
 //---------------------------------------------------------------------------//
 bool geomModel::isBBoxInMesh()
@@ -434,9 +407,9 @@ void geomModel::correctSurfCells
             }
         }
 
-        if (cBody > SMALL)
+        if (cBody > thrSurf_)
         {
-            if (cBody > (1.0-SMALL))
+            if (cBody > (1.0-thrSurf_))
             {
                 intCells_[Pstream::myProcNo()].append(cCell);
             }
@@ -573,7 +546,7 @@ void geomModel::findHaloCells
         }
     }
 
-    // send faces to other procs
+    // send faces to other procs 
     PstreamBuffers pBufs(Pstream::commsTypes::nonBlocking);
     for (label proci = 0; proci < Pstream::nProcs(); proci++)
     {

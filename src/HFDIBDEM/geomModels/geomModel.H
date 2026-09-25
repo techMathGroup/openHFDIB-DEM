@@ -10,19 +10,19 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Description
@@ -32,9 +32,8 @@ SourceFiles
     geomModel.C
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef geomModel_H
@@ -49,7 +48,6 @@ Contributors
 #include "triangleFuncs.H"
 
 #include "processorPolyPatch.H"
-#include "meshSearch.H"
 
 #include "contactType.H"
 #include "subVolume.H"
@@ -113,6 +111,7 @@ namespace Foam
         label owner_;
 
         label cellToStartInCreateIB_;
+        scalar  thrSurf_;
 
         scalar  intSpan_;
         bool    sdBasedLambda_;
@@ -145,40 +144,7 @@ namespace Foam
         //body density
         dimensionedScalar rhoS_;
 
-        label   refineBuffers_;
-
-        // cached seed for the connectivity-based creation (first surf cell
-        // of the last successful creation); -1 = invalid
-        label surfSeed_;
-
-        // total cell count of the last successful connectivity-based
-        // creation; -1 = no baseline (count audit disabled)
-        label nCellsPrev_;
-
-        // creation mode: "connectivity" (default) | "legacy"
-        word bodyCreation_;
-
-        // validity of the body field + cell lists: true after a
-        // creation, false after any point mutation or resetBody.
-        // lets createBodies skip the reset+re-create pair for static
-        // bodies on an unchanged mesh (recreateBodies re-arms it
-        // after topology changes)
-        bool bodyFieldValid_{false};
-
-        // cached cell-search engine for the connectivity creation;
-        // the meshSearch construction builds a full cell octree
-        // (~O(nCells) per build), so it must NOT be rebuilt on every
-        // createImmersedBody call - invalidated by resetSeeds()
-        autoPtr<meshSearch> cellSearchEng_;
-
-        // mark encoding for the connectivity-based creation (octreeField_)
-        static constexpr label MARK_NONE        = 0;
-        static constexpr label MARK_SURF        = 1;                    // partial coverage
-        static constexpr label MARK_SHELL_INT   = 2;                    // int, face-adjacent to surf
-        static constexpr label MARK_FILLED_INT  = 3;                    // int, filled by connectivity
-        static constexpr label MARK_OUTSIDE     = 4;                    // classified, no coverage
-        static constexpr label MASK_CLASS       = 7;                    // low 3 bits: class
-        static constexpr label MARK_CENTER_IN   = 8;                    // bit: center inside
+        label   refineBuffers_; 
 
         public:
 
@@ -186,7 +152,8 @@ namespace Foam
         geomModel
         (
             const  fvMesh&   mesh,
-            const contactType cType
+            const contactType cType,
+            scalar  thrSurf = 1
         );
 
         // Destructors -------------------------------------------------
@@ -197,19 +164,10 @@ namespace Foam
             volScalarField& body,
             Field<label>& octreeField,
             List<labelList>& cellPoints
-        );
-
-        // legacy: per-model flood-fill implementations, renamed from
-        // createImmersedBody; called by the dispatcher above on fallback
-        virtual void createImmersedBodyLegacy
-        (
-            volScalarField& body,
-            Field<label>& octreeField,
-            List<labelList>& cellPoints
         )
         {
             InfoH << iB_Info << "1-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
         }
 
         virtual std::shared_ptr<geomModel> getCopy() = 0;
@@ -282,20 +240,20 @@ namespace Foam
         )
         {
             InfoH << iB_Info << "2-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
             return vector::zero;
         }
 
         virtual void bodyMovePoints(vector translVec)
         {
             InfoH << iB_Info << "3-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
         }
 
         virtual void bodyScalePoints(scalar scaleFac)
         {
             InfoH << iB_Info << "4-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
         }
 
         virtual void bodyRotatePoints
@@ -305,26 +263,26 @@ namespace Foam
         )
         {
             InfoH << iB_Info << "5-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
         }
 
         virtual void resetBody()
         {
             InfoH << iB_Info << "6-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
         }
 
         virtual vector getCoM()
         {
             InfoH << iB_Info << "7-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
             return vector::zero;
         }
 
         virtual boundBox getBounds()
         {
             InfoH << iB_Info << "8-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
             boundBox bound;
             return bound;
         }
@@ -332,33 +290,33 @@ namespace Foam
         virtual void synchronPos(label owner = -1)
         {
             InfoH << iB_Info << "9-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
         }
 
         virtual void writeBodyInfo(label bodyId, IOdictionary& dict, word path)
         {
             InfoH << iB_Info << "10-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
         }
 
         virtual boolList pointInside(pointField pointI)
         {
             InfoH << iB_Info << "11-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
             return {false};
         }
 
         virtual bool pointInside(point pointI)
         {
             InfoH << iB_Info << "12-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
             return false;
         }
 
         virtual volumeType getVolumeType(subVolume& sv, bool cIb)
         {
             InfoH << iB_Info << "13-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
             return volumeType::UNKNOWN;
         }
 
@@ -376,7 +334,7 @@ namespace Foam
         )
         {
             InfoH << iB_Info << "14-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
         }
 
         virtual bool limitFinalSubVolume
@@ -387,14 +345,14 @@ namespace Foam
         )
         {
             InfoH << iB_Info << "15-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
             return false;
         }
 
         virtual void setCoM()
         {
             InfoH << iB_Info << "16-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
         }
 
         constexpr contactType getcType()
@@ -439,7 +397,6 @@ namespace Foam
             volScalarField& body
         );
 
-        virtual void reduceGeometricalProperties();
 
 
         //evaluate center of mass and inertia tensor
@@ -502,31 +459,6 @@ namespace Foam
             I_ = I;
         }
 
-        // rotate the cached world-frame inertia by a finite rotation
-        // (angle about axis, rodrigues formula). the similarity
-        // transform keeps I_ symmetric and preserves its spectrum;
-        // symm() absorbs round-off of the tensor product. runs
-        // identically on all ranks - the angle/axis pair is uniform
-        // across ranks and no communication is needed
-        void rotateI(const scalar angle, const vector& axis)
-        {
-            if (mag(angle) < SMALL) return;
-
-            const tensor rotMatrix
-            (
-                Foam::cos(angle)*tensor::I
-              + Foam::sin(angle)*tensor
-                (
-                    0.0,      -axis.z(),  axis.y(),
-                    axis.z(),  0.0,       -axis.x(),
-                   -axis.y(),  axis.x(),   0.0
-                )
-              + (1.0 - Foam::cos(angle))*(axis*axis)
-            );
-
-            I_ = symm(rotMatrix & I_ & rotMatrix.T());
-        }
-
         virtual void resetBody(volScalarField& body);
 
         virtual bool isCluster() const
@@ -563,47 +495,6 @@ namespace Foam
             volScalarField& body
         );
 
-        // ---------- shared connectivity-based creation ----------
-
-        // returns false -> caller falls back to legacy
-        bool createImmersedBodyConnectivity
-        (
-            volScalarField& body,
-            Field<label>& octreeField,
-            List<labelList>& cellPoints
-        );
-
-        // phase 0: resolve a seed cell (cached surf seed, then findCell)
-        label resolveSeed
-        (
-            const pointField& cp,
-            List<labelList>& cellPoints
-        );
-
-        // phase 0: march from a fully-covered seed to a partial (ring) cell
-        label marchToRing(label seed, const pointField& cp);
-
-        // vertex-based lambda with shared-vertex cache
-        // (extracted from correctSurfCells); centerInside reports the
-        // pointInside test on the cell centre (sdBasedLambda sign)
-        scalar evaluateLambda
-        (
-            label cCell,
-            List<labelList>& cellPoints,
-            HashTable<bool, label, Hash<label>>& verticesStatus,
-            bool& centerInside
-        );
-
-        // one cell step along dir (getFaceInDir pattern from lineIntInfo)
-        label walkOneCell(label cCell, const vector& dir);
-
-        // shared processor-face exchange (will also serve legacy code later)
-        void exchangeFaceLabels
-        (
-            List<DynamicLabelList>& facesToSend,                        // cleared by the call
-            List<DynamicLabelList>& facesRecv
-        );
-
         virtual List<std::shared_ptr<boundBox>> getBBoxes();
 
         virtual pointField getBodyPoints()
@@ -617,7 +508,7 @@ namespace Foam
         virtual  void setBodyPosition(pointField pos)
         {
             InfoH << iB_Info << "22-- geomModelMessage-- "
-                << "notImplemented"<<endl;
+                << "notIplemented"<<endl;
         }
 
         void setRefineBuffers(label refineBuffers)
@@ -628,19 +519,6 @@ namespace Foam
         label getRefineBuffers()
         {
             return refineBuffers_;
-        }
-
-        void setBodyCreation(word bodyCreation) { bodyCreation_ = bodyCreation; }
-
-        // see bodyFieldValid_ above
-        bool bodyFieldValid() const { return bodyFieldValid_; }
-        void setBodyFieldValid(bool valid) { bodyFieldValid_ = valid; }
-
-        void resetSeeds()
-        {
-            surfSeed_ = -1;
-            nCellsPrev_ = -1;
-            cellSearchEng_.clear();                                    //OF.com: reset
         }
 
     };

@@ -10,35 +10,30 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
-    Foam
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
 
-Class
-    bbMatrix
+InNamspace
+    contactModel
 
 Description
-    Lattice of uniform sub-volumes covering a bounding box;
-    index <-> sub-volume-centre mapping for the virtual mesh.
+    methods to solve particle-particle contact
 
 SourceFiles
-    bbMatrix.C
+    virtualMesh.C
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef bbMatrix_H
@@ -139,11 +134,6 @@ class bbMatrix
     scalar getSubVolumeV()
     {
         return subVolumeV_;
-    }
-
-    vector getMatrixSize() const
-    {
-        return matrixSize_;
     }
 
     scalar getCharCellSize()

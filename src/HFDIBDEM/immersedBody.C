@@ -9,18 +9,15 @@
       |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
-
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
-InNamespace
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+InNamspace
     Foam
 Description
     class for immersed bodies representation.
@@ -28,8 +25,7 @@ SourceFiles
     immersedBodies.C
 Contributors
     Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*)
 \*---------------------------------------------------------------------------*/
 #include "immersedBody.H"
 #include "polyMesh.H"
@@ -89,15 +85,15 @@ Axis_(vector::one),
 AxisOld_(vector::one),
 omega_(0.0),
 omegaOld_(0.0),
-L_(vector::zero),
 Vel_(vector::zero),
 VelOld_(vector::zero),
 a_(vector::zero),
 alpha_(vector::zero),
 totalAngle_(vector::zero),
 CoNum_(0.0),
+//~ rhoF_(dimensionedScalar(transportProperties_.lookup("rho"))),
+rhoF_(1.0),
 bodyId_(bodyId),
-bodyIdStr_(Foam::name(bodyId_)),
 updateTorque_(false),
 bodyOperation_(0),
 octreeField_(mesh_.nCells(), 0),
@@ -108,7 +104,7 @@ sdBasedLambda_(false),
 overlayLambda_("add"),
 intSpan_(2.0),
 charCellSize_(1e3),
-refineBuffers_(recomputeM0 > 0 ? recomputeM0 + 1 : -1),
+refineBuffers_(0),
 recomputeM0_(recomputeM0),
 timesToSetStatic_(-1),
 staticContactPost_(vector::zero)
@@ -116,7 +112,7 @@ staticContactPost_(vector::zero)
     #include "initializeIB.H"
 
     InfoH << iB_Info << "Finished body initialization" << endl;
-    InfoH << basic_Info << "New bodyID: " << bodyIdStr_ << " name: "
+    InfoH << basic_Info << "New bodyID: " << bodyId_ << " name: "
         << bodyName_ << " rhoS: " << geomModel_->getRhoS()
         << " dC: " << getDC() << endl;
 }
@@ -144,62 +140,26 @@ void immersedBody::createImmersedBody
         syncCreateImmersedBody(body, refineF);
     }
 
-    computeCharCellSize();                                              //used in intpInfo_->setIntpInfo()
-    // Note (MI): in theory, it should be enough to compute body
-    //            characteristic cell size only once - after the first
-    //            creation on a sufficiently refined mesh
-    // => we should look into this in future
-    // Note (MI): computeCharCellSize() has gMax in it - is it efficient?
-    intpInfo_->setCharCellSize(charCellSize_);                          //set characteristic cell size to find interpolation points
-
     intpInfo_->setIntpInfo();
 }
 //---------------------------------------------------------------------------//
-void immersedBody::syncCreateImmersedBody                               //Note (MI): the name does not reflect the content
-(
-    volScalarField& body,
-    volScalarField& refineF
-)
-{
-    syncImmersedBodyGeometry(body, refineF);
-    // Note (MI): during simplification, calculateGeometricalProperties
-    //            was replaced by calculateGeometricalPropertiesParallel
-    //            and this replacement WAS NOT tested (a problem might
-    //            appear for clusterBodies)
-    // Note (MI): unlike the createBodies path, the callers of
-    //            this function (init/add/restart) run
-    //            computeBodyCharPars right after -> M_ must be
-    //            reduced here, otherwise M0_ is set from a
-    //            rank-local mass (0 on ranks without body cells)
-    //            and checkIfInDomain divides by zero
-    geomModel_->reduceGeometricalProperties();
-    syncImmersedBodyRefinement(body, refineF);
-}
-//---------------------------------------------------------------------------//
-void immersedBody::syncImmersedBodyGeometry
+void immersedBody::syncCreateImmersedBody
 (
     volScalarField& body,
     volScalarField& refineF
 )
 {
     geomModel_->setOwner();
-    InfoH << iB_Info << "body " << bodyIdStr_
+    InfoH << iB_Info << "body: " << bodyId_
         << " owner: " << geomModel_->getOwner() << endl;
 
     InfoH << iB_Info << "Computing geometrical properties" << endl;
-    geomModel_->calculateGeometricalPropertiesParallel(body);
-}
-//---------------------------------------------------------------------------//
-void immersedBody::syncImmersedBodyRefinement
-(
-    volScalarField& body,
-    volScalarField& refineF
-)
-{
-    // update body courant number
-    // computeBodyCoNumber();
+    geomModel_->calculateGeometricalProperties(body);
 
-    InfoH << iB_Info << "-- body " << bodyIdStr_
+    // update body courant number
+    computeBodyCoNumber();
+
+    InfoH << iB_Info << "-- body: " << bodyId_
         << " current center of mass position: " << geomModel_->getCoM() << endl;
 
     const List<DynamicLabelList>& surfCells = geomModel_->getSurfaceCellList();
@@ -213,59 +173,15 @@ void immersedBody::syncImmersedBodyRefinement
         zeroList
     );
 
-}
-//---------------------------------------------------------------------------//
-void immersedBody::computeCharCellSize()
-{
-    const List<DynamicLabelList>& surfCells = geomModel_->getSurfaceCellList();
-
-    // NOTE (MI): mesh_.nGeometricD() lazily runs calcDirections which
-    // performs collective communication (returnReduceOr + reduce on
-    // empty/wedge patch statistics) - it must be called by all ranks
-    // uniformly; keeping it inside the surfCells loop below triggered
-    // the collective only on ranks with a non-empty surf list and
-    // mismatched the collective sequence on refined (topologically
-    // changed, cache-invalidated) meshes -> MPI_ERR_TRUNCATE
-    const label nGeometricDMesh = mesh_.nGeometricD();
-
     scalarList charCellSizeL(Pstream::nProcs(),1e4);
     forAll (surfCells[Pstream::myProcNo()],sCellI)
     {
         label cellI = surfCells[Pstream::myProcNo()][sCellI];
-
-        scalar cellMeasure = mesh_.V()[cellI];
-        label nGeometricD = nGeometricDMesh;                            //reset per cell
-
-        if (!case3D)
-        {
-            scalar emptyThickness = 1.0;
-            forAll(emptyDir,dirI)                                       //this is based on settings from HFDIBDEMDict, not actual mesh
-            {                                                           //plus: adaptively refined meshes can be treated as 2D
-                if (emptyDir[dirI])                                     //minus: forces user to check both mesh and HFDIBDEMDict
-                {
-                    emptyThickness *= mesh_.bounds().span()[dirI];
-                    if (refineBuffers_ > 1)
-                    {
-                        emptyThickness /= (refineBuffers_ - 1);
-                    }
-                    // the mesh already discounts a genuinely empty direction
-                    // (empty patches) in nGeometricD: decrement only for
-                    // dict-declared empty directions the mesh itself does not
-                    // report as empty (pseudo-2D/thick meshes)
-                    if (mesh_.geometricD()[dirI] != -1)
-                    {
-                        nGeometricD--;
-                    }
-                }
-            }     
-            cellMeasure /= emptyThickness;
-        }
-
         charCellSizeL[Pstream::myProcNo()] =
             min
             (
                 charCellSizeL[Pstream::myProcNo()],
-                Foam::pow(cellMeasure,1.0/nGeometricD)
+                Foam::pow(mesh_.V()[cellI],0.3333)
             );
     }
     forAll(charCellSizeL,indl)
@@ -276,9 +192,70 @@ void immersedBody::computeCharCellSize()
         }
     }
 
-    charCellSize_ = gMax(charCellSizeL);                                //I want to be sure to always go to another cells
-    InfoH << iB_Info << "-- body " << bodyIdStr_
-        << " characteristic cell size: " << charCellSize_ << endl;
+    charCellSize_ = gMax(charCellSizeL);
+    InfoH << iB_Info << "Body characteristic cell size: "
+        << charCellSize_ << endl;
+}
+//---------------------------------------------------------------------------//
+void immersedBody::syncImmersedBodyParralell1
+(
+    volScalarField& body,
+    volScalarField& refineF
+)
+{
+    geomModel_->setOwner();
+    InfoH << iB_Info << "body: " << bodyId_
+        << " owner: " << geomModel_->getOwner() << endl;
+
+    InfoH << iB_Info << "Computing geometrical properties" << endl;
+    geomModel_->calculateGeometricalPropertiesParallel(body);
+}
+//---------------------------------------------------------------------------//
+void immersedBody::syncImmersedBodyParralell2
+(
+    volScalarField& body,
+    volScalarField& refineF
+)
+{
+    // update body courant number
+    // computeBodyCoNumber();
+
+    InfoH << iB_Info << "-- body: " << bodyId_
+        << " current center of mass position: " << geomModel_->getCoM() << endl;
+
+    const List<DynamicLabelList>& surfCells = geomModel_->getSurfaceCellList();
+    DynamicLabelList zeroList(surfCells[Pstream::myProcNo()].size(), 0);
+
+    constructRefineField
+    (
+        body,
+        refineF,
+        surfCells[Pstream::myProcNo()],
+        zeroList
+    );
+
+    scalarList charCellSizeL(Pstream::nProcs(),1e4);
+    forAll (surfCells[Pstream::myProcNo()],sCellI)
+    {
+        label cellI = surfCells[Pstream::myProcNo()][sCellI];
+        charCellSizeL[Pstream::myProcNo()] =
+            min
+            (
+                charCellSizeL[Pstream::myProcNo()],
+                Foam::pow(mesh_.V()[cellI],0.3333)
+            );
+    }
+    forAll(charCellSizeL,indl)
+    {
+        if(charCellSizeL[indl] > 5e3)
+        {
+            charCellSizeL[indl] = -1.0;
+        }
+    }
+
+    charCellSize_ = gMax(charCellSizeL);
+    InfoH << iB_Info << "Body characteristic cell size: "
+        << charCellSize_ << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::constructRefineField
@@ -474,8 +451,23 @@ void immersedBody::constructRefineField
 //---------------------------------------------------------------------------//
 void immersedBody::postPimpleUpdateImmersedBody
 (
-    const volScalarField& body,
-    const volVectorField& f,
+    volScalarField& body,
+    volVectorField& fPress,
+    volVectorField& fVisc,
+    const bool applyAddedMass
+)
+{
+    if(!solverInfo::getOnlyDEM())
+    {
+        updateCoupling(body, fPress, fVisc, applyAddedMass);
+    }
+    resetPostPimpleState();
+}
+//---------------------------------------------------------------------------//
+void immersedBody::postPimpleUpdateImmersedBody
+(
+    volScalarField& body,
+    volVectorField& f,
     const bool kinematicForce,
     const bool applyAddedMass
 )
@@ -487,71 +479,203 @@ void immersedBody::postPimpleUpdateImmersedBody
     resetPostPimpleState();
 }
 //---------------------------------------------------------------------------//
-void immersedBody::postPimpleUpdateImmersedBody
-(
-    const volScalarField& body,
-    const volVectorField& f,
-    const volScalarField& rho,
-    const bool kinematicForce,
-    const bool applyAddedMass
-)
-{
-    if(!solverInfo::getOnlyDEM())
-    {
-        updateCoupling(body, f, rho, kinematicForce, applyAddedMass);
-    }
-    resetPostPimpleState();
-}
-//---------------------------------------------------------------------------//
 void immersedBody::resetPostPimpleState()
 {
     Vel_ = VelOld_;
     Axis_ = AxisOld_;
     omega_ = omegaOld_;
-    couplingModel_->resetPostPimpleState();
+    FCouplingOld_ = FCoupling_;
+}
+//---------------------------------------------------------------------------//
+void immersedBody::updateCoupling
+(
+    volScalarField& body,
+    volVectorField& fPress,
+    volVectorField& fVisc,
+    const bool applyAddedMass
+)
+{
+    vector FV(vector::zero);
+    vector TA(vector::zero);
+    vector FAdded(vector::zero);
+    
+    // calcualate viscous force and torque
+    List<DynamicLabelList> intLists;
+    List<DynamicLabelList> surfLists;
+    List<DynamicLabelList> haloLists;
+    DynamicVectorList refCoMList;
+
+    geomModel_->getReferencedLists(
+        intLists,
+        surfLists,
+        haloLists,
+        refCoMList
+    );
+
+    forAll (intLists, i)
+    {
+        DynamicLabelList& intListI = intLists[i];
+        forAll (intListI, intCell)
+        {
+            label cellI = intListI[intCell];
+
+            vector fCellPress = fPress[cellI];
+
+            FV -= (fCellPress)*mesh_.V()[cellI];
+            FAdded -= (fPress.prevIter()[cellI] - fPress[cellI])
+                *mesh_.V()[cellI];
+            TA -= ((mesh_.C()[cellI] - refCoMList[i])^fCellPress)
+                *mesh_.V()[cellI];
+        }
+    }
+
+    const List<point>& ibPoints = intpInfo_->getIbPoints();             //get surface points
+    forAll (surfLists, i)
+    {
+        DynamicLabelList& surfListI = surfLists[i];
+        forAll (surfListI, surfCell)
+        {
+            label cellI = surfListI[surfCell];
+
+            vector fCellVisc = body[cellI]*fVisc[cellI];
+            vector fCellPress = body[cellI]*fPress[cellI];
+
+            FV -= (fCellVisc + fCellPress)*mesh_.V()[cellI];
+            TA -= ((ibPoints[i] - refCoMList[i])^(fCellVisc + fCellPress))
+                *mesh_.V()[cellI];
+            FAdded -= body[cellI]
+                *((fVisc.prevIter()[cellI] - fVisc[cellI])
+                + (fPress.prevIter()[cellI] - fPress[cellI]))
+                *mesh_.V()[cellI];
+        }
+    }
+    
+    reduce(FV, sumOp<vector>());
+    reduce(TA, sumOp<vector>());
+    reduce(FAdded, sumOp<vector>());
+
+    FV *= rhoF_.value();
+    TA *= rhoF_.value();
+    FAdded *= rhoF_.value();
+
+    FAdded = FCouplingOld_.F - FV;
+    
+    FCoupling_ = couplingHistCoef_*forces(FV, TA) + (1.0-couplingHistCoef_)*FCouplingOld_;
+
+    applyAddedMassScaling(FV, FAdded, applyAddedMass);
+
+    couplingHistCoef_ = max(couplingHistCoef_*0.95, 0.5);
+    
+    InfoH << iB_Info << "-- body: " << bodyId_ << ": COUPLING COEF =  " << couplingHistCoef_ << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateCoupling                                       //full interface
 (
-    const volScalarField& body,
-    const volVectorField& f,
+    volScalarField& body,
+    volVectorField& f,
     const bool kinematicForce,
     const bool applyAddedMass
 )
 {
-    fluidContext fCtx
-    {
-        &body,
-        &f,
-        nullptr,
-        fluidSituation::singlePhase,
-        kinematicForce,
-        applyAddedMass
-    };
+    vector FV(vector::zero);
+    vector TA(vector::zero);
+    vector FAdded(vector::zero);
 
-    couplingModel_->updateCoupling(fCtx, a_);
+
+    List<DynamicLabelList> intLists;
+    List<DynamicLabelList> surfLists;
+    List<DynamicLabelList> haloLists;
+    DynamicVectorList refCoMList;
+
+    geomModel_->getReferencedLists(
+        intLists,
+        surfLists,
+        haloLists,
+        refCoMList
+    );
+
+    forAll (intLists, i)
+    {
+        DynamicLabelList& intListI = intLists[i];
+        forAll (intListI, intCell)
+        {
+            label cellI = intListI[intCell];
+
+            FV -=  f[cellI]*mesh_.V()[cellI];
+            TA -=  ((mesh_.C()[cellI] - refCoMList[i])^f[cellI])
+                *mesh_.V()[cellI];
+            FAdded -= (f.prevIter()[cellI] - f[cellI])*mesh_.V()[cellI];
+        }
+    }
+
+    const List<point>& ibPoints = intpInfo_->getIbPoints();             //get surface points
+    forAll (surfLists, i)
+    {
+        DynamicLabelList& surfListI = surfLists[i];
+        forAll (surfListI, surfCell)
+        {
+            label cellI = surfListI[surfCell];
+
+            scalar fScale = 1.0*body[cellI]+0.5;
+
+            FV -=  fScale*f[cellI]*mesh_.V()[cellI];
+            TA -=  ((ibPoints[surfCell] - refCoMList[i])^(fScale*f[cellI])
+                *mesh_.V()[cellI]);
+            FAdded -= (f.prevIter()[cellI] - f[cellI])*mesh_.V()[cellI];//under construction
+        }
+    }
+
+    reduce(FV, sumOp<vector>());
+    reduce(TA, sumOp<vector>());
+    reduce(FAdded, sumOp<vector>());
+
+    if (kinematicForce)
+    {
+        FV *= rhoF_.value();
+        TA *= rhoF_.value();
+        FAdded *= rhoF_.value();
+    }
+
+    // scalar rhoS = geomModel_->getRhoS().value();
+    // FV /= rhoS;
+    // TA /= rhoS;
+    // FAdded /= rhoS;
+    // FV *= rhoF_.value();
+    // TA *= rhoF_.value();
+    // FAdded *= rhoF_.value();
+
+    FCoupling_ = couplingHistCoef_*forces(FV, TA) + (1.0-couplingHistCoef_)*FCouplingOld_;
+
+    applyAddedMassScaling(FV, FAdded, applyAddedMass);
+
+    couplingHistCoef_ = max(couplingHistCoef_*0.95, 0.5);
+    
+    InfoH << iB_Info << "-- body: " << bodyId_ << ": COUPLING COEF =  " << couplingHistCoef_ << endl;
 }
 //---------------------------------------------------------------------------//
-void immersedBody::updateCoupling                                       //full interface
+void immersedBody::applyAddedMassScaling
 (
-    const volScalarField& body,
-    const volVectorField& f,
-    const volScalarField& rho,
-    const bool kinematicForce,
+    const vector& FV,
+    const vector& FAdded,
     const bool applyAddedMass
 )
 {
-    fluidContext fCtx
+    if (!applyAddedMass)
     {
-        &body,
-        &f,
-        &rho,
-        fluidSituation::voF,
-        kinematicForce,
-        applyAddedMass
-    };
+        return;
+    }
 
-    couplingModel_->updateCoupling(fCtx, a_);
+    const scalar m0 = geomModel_->getM0();
+    const scalar massSign = ((FV & FAdded) < 0.0) ? 1.0 : -1.0;
+    scalar massAdded = min(1.0*m0, mag(FAdded)/(mag(a_) + SMALL));
+    massAdded *= massSign;
+    InfoH << iB_Info << "-- body: " << bodyId_ << " massAdded: " << massAdded
+        << " m0: " << m0 << endl;
+    InfoH << iB_Info << "-- body: " << bodyId_ << " orig coupling force: " << FCoupling_.F << " orig coupling torque: " << FCoupling_.T << endl;
+    const scalar scale = (m0 + massAdded)/m0;
+    FCoupling_.F *= scale;
+    FCoupling_.T *= scale;
+    InfoH << iB_Info << "-- body: " << bodyId_ << " scld coupling force: " << FCoupling_.F << " scld coupling torque: " << FCoupling_.T << endl;
 }
 //---------------------------------------------------------------------------//
 void immersedBody::updateLocalFluidDensity
@@ -664,24 +788,20 @@ void immersedBody::updateMovementComp
     scalar omega
 )
 {
-    // coupling state lives in the coupling model
-    const dimensionedScalar& rhoF(couplingModel_->getRhoF());
-    const forces& FCoupling(couplingModel_->getFCoupling());
-
     auto updateTranslation = [&]()
     {
 
         const uniformDimensionedVectorField& g =
             mesh_.lookupObject<uniformDimensionedVectorField>("g");
-
+            
         vector FG(vector::zero);
         if(!solverInfo::getOnlyDEM())
-            FG = geomModel_->getM0()*(1.0-rhoF.value()
+            FG = geomModel_->getM0()*(1.0-rhoF_.value()
             /geomModel_->getRhoS().value())*g.value();
         else
             FG = geomModel_->getM0()*g.value();
 
-        vector F(FCoupling.F);
+        vector F(FCoupling_.F);
         F += FContact_.F;
         F += FG;
 
@@ -694,16 +814,16 @@ void immersedBody::updateMovementComp
         {
             // compute current acceleration (assume constant over timeStep)
 
-            InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" mass            : " << geomModel_->getM0() << endl;
-            InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" acting force    : " << F << endl;
-            InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" coupling force  : " << FCoupling.F << endl;
-            InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" grav/buyo force : " << FG << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" ParticelMass    : " << geomModel_->getM0() << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" Acting Force    : " << F << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" Coupling Force  : " << FCoupling_.F << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" G-B Force       : " << FG << endl;
             
             a_  = F/(geomModel_->getM0());
             
             // update body linear velocity
             Vel_ = Vel + deltaT*a_;
-            InfoH << iB_Info <<"-- body "<< bodyIdStr_ <<" accelaration    : " << a_ << endl;
+            InfoH << iB_Info <<"-- body "<< bodyId_ <<" accelaration  : " << a_ << endl;
         }
     };
 
@@ -711,32 +831,41 @@ void immersedBody::updateMovementComp
     {
         if(mag(geomModel_->getI()) > 0)
         {
-            vector T(FCoupling.T);
+            vector T(FCoupling_.T);
             T += FContact_.T;
 
-            const symmTensor& I(geomModel_->getI());
+            // update body angular acceleration
+            alpha_ = inv(geomModel_->getI()) & T;
+            // update body angular velocity
+            vector Omega(Axis*omega + deltaT*alpha_);
+            // split Omega into Axis_ and omega_
+            omega_ = mag(Omega);
 
-            // kick: integrate the angular momentum, not omega. the
-            // gyroscopic term omega ^ (I & omega) is implied by the
-            // post-rotation recovery w = inv(I_rotated) & L_ in
-            // rotateCachedInertia - the conservative kick-drift
-            // form of the space-frame euler equation. this exact
-            // form requires I to co-rotate every sub-step (rotateI)
-            // update body angular acceleration (for output/contact
-            // consumers reading alpha_)
-            L_ = (I & (Axis*omega)) + deltaT*T;
-            alpha_ = inv(I) & T;
-
-            // provisional member update with the current I: equals
-            // the explicit euler step for the torque part, so
-            // omega_/Axis_ read valid state right after the kick
-            splitOmega(inv(I) & L_);
+            if (omega_ < SMALL)
+            {
+                Axis_ = vector::one;
+                if (!case3D)
+                {
+                    const vector validDirs = (geometricD + vector::one)/2;
+                    Axis_ -= validDirs;
+                }
+            }
+            else
+            {
+                Axis_ =  Omega/(omega_+SMALL);
+                if (!case3D)
+                {// in 2D, I need to keep only the part of the rotation axis
+                    const vector validDirs = (geometricD + vector::one)/2;
+                    Axis_ = cmptMultiply(vector::one-validDirs,Axis_);
+                }
+            }
+            Axis_ /= mag(Axis_);
         }
     };
 
     auto updateRotationFixedAxis = [&]()
     {
-        vector T(FCoupling.T);
+        vector T(FCoupling_.T);
         T += FContact_.T;
 
         // update body angular velocity
@@ -751,7 +880,7 @@ void immersedBody::updateMovementComp
 
     auto updatePositionByTable = [&]()
     {
-        vector F(FCoupling.F);
+        vector F(FCoupling_.F);
         F *= 0.0; // no force
 
         scalar time = mesh_.time().value();
@@ -869,81 +998,18 @@ void immersedBody::moveImmersedBody
     //     << totRotMatrix_ << endl;
 }
 //---------------------------------------------------------------------------//
-// rotate cached inertia with the sub-step rotation
-void immersedBody::rotateCachedInertia
-(
-    scalar deltaT
-)
-{
-    // static bodies rotate neither. operations 2/3/6 have a prescribed
-    // rotation (omega_/Axis_ from dict, never torque-integrated) which
-    // moveImmersedBody does apply - the cached I_ must follow it like
-    // for free bodies
-    if (bodyOperation_ == 0) return;
-
-    if (mag(deltaT + 1.0) < SMALL) deltaT = mesh_.time().deltaT().value();
-
-    geomModel_->rotateI(omega_*deltaT, Axis_);
-
-    // drift recovery: w = inv(I_rotated) & L_ applies the torque-free
-    // precession exactly (the gyroscopic term of the space-frame
-    // euler equation, in conservative form).
-    if (mag(geomModel_->getI()) > 0)
-    {
-        // Note (MI): repopulate L_ if stale, that is, for bodies whose
-        // angular state is never torque-integrated (prescribed rotation,
-        // or free bodies without updateTorque).
-        if
-        (
-            bodyOperation_ != 1
-            && !(bodyOperation_ == 5 && updateTorque_)
-        )
-        {
-            L_ = geomModel_->getI() & (Axis_*omega_);
-        }
-
-        splitOmega(inv(geomModel_->getI()) & L_);
-    }
-}
-//---------------------------------------------------------------------------//
-// split an angular velocity vector into the omega_/Axis_ pair
-void immersedBody::splitOmega(const vector& w)
-{
-    omega_ = mag(w);
-
-    if (omega_ < SMALL)
-    {
-        Axis_ = vector::one;
-        if (!case3D)
-        {
-            const vector validDirs = (geometricD + vector::one)/2;
-            Axis_ -= validDirs;
-        }
-    }
-    else
-    {
-        Axis_ = w/(omega_+SMALL);
-        if (!case3D)
-        {// in 2D, I need to keep only the part of the rotation axis
-            const vector validDirs = (geometricD + vector::one)/2;
-            Axis_ = cmptMultiply(vector::one-validDirs,Axis_);
-        }
-    }
-    Axis_ /= mag(Axis_);
-}
-//---------------------------------------------------------------------------//
 void immersedBody::printBodyInfo()
 {
     InfoH << iB_Info;
-    InfoH << "-- body " << bodyIdStr_ << " CoM                  : "
+    InfoH << "-- body " << bodyId_ << " CoM                  : "
         << geomModel_->getCoM() << endl;
-    InfoH << "-- body " << bodyIdStr_ << " linear velocity      : "
+    InfoH << "-- body " << bodyId_ << " linear velocity      : "
         << Vel_ << endl;
-    InfoH << "-- body " << bodyIdStr_ << " angluar velocity     : "
+    InfoH << "-- body " << bodyId_ << " angluar velocity     : "
         << omega_ << endl;
-    InfoH << "-- body " << bodyIdStr_ << " axis of rotation     : "
+    InfoH << "-- body " << bodyId_ << " axis of rotation     : "
         << Axis_ << endl;
-    InfoH << "-- body " << bodyIdStr_ << " total rotation matrix: "
+    InfoH << "-- body " << bodyId_ << " total rotation matrix: "
         << totRotMatrix_ << endl;
 }
 //---------------------------------------------------------------------------//
@@ -1039,9 +1105,13 @@ vectorField immersedBody::getUatIbPoints()
     vectorField ibPointsVal(ibPoints.size());
     forAll(ibPoints, pointI)
     {
-        vector planarVec =  geomModel_->getLVec(ibPoints[pointI])
+        // vector planarVec =  geomModel_->getLVec(ibPoints[pointI])
+        //                     - Axis_*(
+        //                     (geomModel_->getLVec(ibPoints[pointI]))&Axis_);
+
+        vector planarVec =  ibPoints[pointI] - geomModel_->getCoM()
                             - Axis_*(
-                            (geomModel_->getLVec(ibPoints[pointI]))&Axis_);
+                            (ibPoints[pointI]-geomModel_->getCoM())&Axis_);
 
         vector VSvalue = (-(planarVec^Axis_)*omega_ + Vel_);
         ibPointsVal[pointI] = VSvalue;
@@ -1128,109 +1198,24 @@ void immersedBody::computeBodyCoNumber()
         meanCoNum_ /= auxCntr;
     }
 
-    InfoH << iB_Info << "-- body " << bodyIdStr_
+    InfoH << iB_Info << "-- body " << bodyId_
         << " Courant Number mean: " << meanCoNum_
         << " max: " << CoNum_ << endl;
 
 }
-scalar immersedBody::computeBodyLinCoNumber()
-{
-    scalar VelMag(mag(Vel_));
-    scalar safetyFactor(1.2);
 
-    return safetyFactor*VelMag*mesh_.time().deltaT().value()/charCellSize_;
-}
 //---------------------------------------------------------------------------//
-scalar immersedBody::computeSweepDistance
-(
-    scalar deltaT,
-    scalar safetyTrans,
-    scalar safetyRot
-)
+// print out body linear and angular momentum
+void immersedBody::printMomentum()
 {
-    // coupling state lives in the coupling model
-    const dimensionedScalar& rhoF(couplingModel_->getRhoF());
-    const forces& FCoupling(couplingModel_->getFCoupling());
+    vector L(geomModel_->getI()&(Axis_*omega_));
+    vector p(geomModel_->getM()*Vel_);
 
-    //--- prescribed bodies (rotation/translation from dict or tables):
-    //    their velocity is not the integrated Vel_ - evaluate the actual
-    //    motion the integrator will apply during this step.
-    scalar sTrans(0);
-
-    if (bodyOperation_ == 6)
-    {
-        // position from an interpolation table: bound the step displacement
-        // directly from the table entries at the step edges
-        dictionary functionDict = immersedDict_.subDict("prescribedPosTableBody");
-        dictionary posIntTableDict = functionDict.subDict("posIntTableDict");
-        interpolationTable<vector> posIntTable = interpolationTable<vector>(posIntTableDict);
-
-        const scalar t(mesh_.time().value());
-        vector posNew = posIntTable(t + deltaT);
-        vector posOld = posIntTable(t);
-        sTrans = mag(posNew - posOld);
-    }
-    else if (bodyOperation_ == 1 or bodyOperation_ == 3 or bodyOperation_ == 4)
-    {
-        // prescribed translation (operations 1/3/4): Vel_ is never
-        // integrated, the translation is exactly |Vel_|*deltaT
-        sTrans = mag(Vel_)*deltaT;
-    }
-    else if (bodyOperation_ == 5 or bodyOperation_ == 2)
-    {
-        //--- free translation (operation 5: free body; operation 2:
-        //    prescribed rotation with force-integrated translation):
-        //    explicit-Euler trajectory with the acceleration assembled in
-        //    updateMovementComp. For a contact-free body FCoupling_ is
-        //    frozen over the CFD step, gravity is constant and FContact_
-        //    is zero (such bodies are hard-flagged as potential before
-        //    this is used), hence a is constant and
-        //    |dx| <= (|Vel| + |a|*deltaT)*deltaT.
-        vector FG(vector::zero);
-        const uniformDimensionedVectorField& g =
-            mesh_.lookupObject<uniformDimensionedVectorField>("g");
-
-        if(!solverInfo::getOnlyDEM())
-        {
-            FG = geomModel_->getM0()*(1.0-rhoF.value()
-            /geomModel_->getRhoS().value())*g.value();
-        }
-        else
-        {
-            FG = geomModel_->getM0()*g.value();
-        }
-
-        vector a(vector::zero);
-        if(geomModel_->getM0() > SMALL)
-        {
-            a = (FCoupling.F + FG)/geomModel_->getM0();
-        }
-
-        sTrans = (mag(Vel_) + mag(a)*deltaT)*deltaT;
-    }
-
-    //--- rotation: a material point at distance r from the CoM is displaced
-    //    by at most r*omega*deltaT; r is bounded by the bbox half-diagonal
-    //    measured from the CoM (body is always inside its bounding box).
-    //    The rotation contribution is scaled by a larger safety factor
-    //    than the translation one  - rotations are just more problematic
-    boundBox bb(geomModel_->getBounds());
-    pointField bbPoints(bb.points());
-    vector CoM(geomModel_->getCoM());
-
-    scalar rMax(0);
-    forAll(bbPoints, bP)
-    {
-        rMax = max(rMax, mag(bbPoints[bP] - CoM));
-    }
-
-    scalar sRot(omega_*rMax*deltaT);
-
-    //--- safety margin on top of the numerical scales involved
-    //    (charCellSize covers bbox/rounding slack of the body geometry)
-    scalar eps(0.5*virtualMeshLevel::getCharCellSize());
-
-    return safetyTrans*sTrans + safetyRot*sRot + eps;
+    InfoH << iB_Info;
+    InfoH << "-- body " << bodyId_ << "  linear momentum:" << p
+         << " magnitude: " << mag(p) <<endl;
+    InfoH << "-- body " << bodyId_ << " angular momentum:" << L
+         << " magnitude: " << mag(L) <<endl;
 }
 //---------------------------------------------------------------------------//
 // print out body statistics
@@ -1239,17 +1224,17 @@ void immersedBody::printStats()
     vector L(geomModel_->getI()&(Axis_*omega_));
     vector p(geomModel_->getM()*Vel_);
 
-    InfoH << iB_Info << "-- body " << bodyIdStr_ << "  linear momentum:" << p
+    InfoH << iB_Info << "-- body " << bodyId_ << "  linear momentum:" << p
         << " magnitude: " << mag(p) <<endl;
-    InfoH << "-- body " << bodyIdStr_ << " angular momentum:" << L
+    InfoH << "-- body " << bodyId_ << " angular momentum:" << L
         << " magnitude: " << mag(L) <<endl;
-    InfoH << basic_Info << "-- body " << bodyIdStr_ << " CoM :"
+    InfoH << basic_Info << "-- body " << bodyId_ << " CoM :"
         << geomModel_->getCoM() << endl;
-    InfoH << basic_Info << "-- body " << bodyIdStr_ << "  linear velocity:"
+    InfoH << basic_Info << "-- body " << bodyId_ << "  linear velocity:"
         << Vel_ << " magnitude: " << mag(Vel_) <<endl;
-    InfoH << "-- body " << bodyIdStr_ << " angular velocity:" << omega_
+    InfoH << "-- body " << bodyId_ << " angular velocity:" << omega_
         << " magnitude: " << mag(omega_) <<endl;
-    InfoH << "-- body " << bodyIdStr_ << "    rotation axis:" << Axis_
+    InfoH << "-- body " << bodyId_ << "    rotation axis:" << Axis_
         << " magnitude: " << mag(Axis_) <<endl;
 }
 //---------------------------------------------------------------------------//
@@ -1325,9 +1310,21 @@ void immersedBody::initSyncWithFlow(const volVectorField& U)
     omegaOld_   = omega_;
     AxisOld_    = Axis_;
     // print data:
-    InfoH << basic_Info << "-- body " << bodyIdStr_
+    InfoH << basic_Info << "-- body " << bodyId_
         << "initial movement variables:" << endl;
     printStats();
+}
+//---------------------------------------------------------------------------//
+void immersedBody::pimpleUpdate
+(
+    volScalarField& body,
+    volVectorField& fPress,
+    volVectorField& fVisc,
+    const bool applyAddedMass
+)
+{
+    updateCoupling(body, fPress, fVisc, applyAddedMass);
+    updateMovement(VelOld_, AxisOld_, omegaOld_);
 }
 //---------------------------------------------------------------------------//
 void immersedBody::pimpleUpdate
@@ -1350,8 +1347,8 @@ void immersedBody::checkIfInDomain(volScalarField& body)
         geomModel_->resetBody(body);
     }
 
-    InfoH << iB_Info << "-- body " << bodyIdStr_ << " current M/M0: "
-        << geomModel_->getM()/(geomModel_->getM0()+SMALL) << endl;
+    InfoH << iB_Info << "-- body " << bodyId_ << " current M/M0: "
+        << geomModel_->getM()/geomModel_->getM0() << endl;
     // if only 1% of the initial particle mass remains in the domain, switch it off
     if (geomModel_->getM()/(geomModel_->getM0()+SMALL) < 1e-2 && case3D)
     {
@@ -1362,7 +1359,7 @@ void immersedBody::checkIfInDomain(volScalarField& body)
     {
         switchActiveOff(body);
         geomModel_->resetBody(body);
-        InfoH << iB_Info << "-- body " << bodyIdStr_ << " switched off" << endl;
+        InfoH << iB_Info << "-- body " << bodyId_ << " switched off" << endl;
     }
 }
 //---------------------------------------------------------------------------//
@@ -1372,7 +1369,7 @@ void immersedBody::setRestartSim(vector vel, scalar angVel, vector axisRot, bool
     omega_ = angVel;
     Axis_ = axisRot;
     ibContactClass_->setTimeStepsInContWStatic(timesInContact);
-    InfoH << iB_Info << "-- body " << bodyIdStr_
+    InfoH << iB_Info << "-- body " << bodyId_
         << " timeStepsInContWStatic_: "
         << ibContactClass_->getTimeStepsInContWStatic() << endl;
     if(setStatic)
@@ -1380,7 +1377,7 @@ void immersedBody::setRestartSim(vector vel, scalar angVel, vector axisRot, bool
         bodyOperation_ = 0;
         omega_ = 0;
         Vel_ *= 0;
-        InfoH << basic_Info << "-- body " << bodyIdStr_ << " set as Static" << endl;
+        InfoH << basic_Info << "-- body " << bodyId_ << " set as Static" << endl;
     }
 }
 //---------------------------------------------------------------------------//
@@ -1398,7 +1395,7 @@ void immersedBody::checkBodyOp()
     if(ibContactClass_->checkInContactWithStatic())
     {
         ibContactClass_->setTimeStepsInContWStatic(ibContactClass_->getTimeStepsInContWStatic() + 1);
-        InfoH << iB_Info << "-- body " << bodyIdStr_
+        InfoH << iB_Info << "-- body " << bodyId_
             << " timeStepsInContWStatic_: "
             << ibContactClass_->getTimeStepsInContWStatic() << endl;
 
@@ -1420,10 +1417,65 @@ void immersedBody::checkBodyOp()
             bodyOperation_ = 0;
             omega_ = 0;
             Vel_ *= 0;
-            InfoH << basic_Info << "-- body " << bodyIdStr_ << " set as Static" << endl;
+            InfoH << basic_Info << "-- body " << bodyId_ << " set as Static" << endl;
         }
     }
 
     ibContactClass_->inContactWithStatic(false);
 }
 
+//---------------------------------------------------------------------------//
+void immersedBody::updateRhoF
+(
+    const scalar rho
+)
+{    
+    rhoF_ = rho;
+}
+void immersedBody::updateRhoF                                           //variant for VOF
+(
+    const volScalarField& rho,
+    const volScalarField& body
+)
+{
+    scalar fluidMass(0);
+    scalar fluidVol(0);
+
+    List<DynamicLabelList> relevantLists;
+    geomModel_->getReferencedHaloCellList(relevantLists);
+    DynamicVectorList refCoMList;
+    geomModel_->getReferencedCoMList(refCoMList);
+    
+    // Note (MI): in this case, we do not want to take into account the
+    //            fluid composition inside the particle (frozen alpha field)
+    // - we calculate the density of the surrounding fluid only from
+    //   HALO cells
+    // - weighting of the cell is done based on the fluid volume fraction
+    
+    // compute the weighted average of density        
+    forAll (relevantLists, i)
+    {
+        DynamicLabelList& relevantListI = relevantLists[i];
+        forAll (relevantListI, rCell)
+        {
+            label cellI = relevantListI[rCell];
+
+            fluidMass += rho[cellI]*mesh_.V()[cellI]*(1.0 - body[cellI]);
+            fluidVol  += mesh_.V()[cellI]*(1.0 - body[cellI]);
+        }
+    }
+    
+    reduce(fluidMass, sumOp<scalar>());
+    reduce(fluidVol, sumOp<scalar>());
+    
+    
+    if (fluidVol > SMALL)
+    {
+        rhoF_ = fluidMass/fluidVol;
+    }
+    else
+    {
+        rhoF_ = 1.0;
+    }
+    InfoH << iB_Info << "-- body: " << bodyId_ << ": rhoF = " << rhoF_ << endl;
+}

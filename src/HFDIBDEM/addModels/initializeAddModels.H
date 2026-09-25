@@ -1,5 +1,7 @@
     // Note: if you want to add a new addModel, do it here
 
+    scalar thrSurf(readScalar(HFDIBDEMDict_.lookup("surfaceThreshold")));
+
     forAll (bodyNames_,nameI)
     {
         word bodyName(bodyNames_[nameI]);
@@ -31,13 +33,13 @@
         {
             word stlPath("constant/triSurface/"+bodyName+".stl");
             bodyGeomModel = std::unique_ptr<convexBody>(
-                new convexBody(mesh_,stlPath));
+                new convexBody(mesh_,stlPath,thrSurf));
         }
         else if(bodyGeom == "nonConvex")
         {
             word stlPath("constant/triSurface/"+bodyName+".stl");
             bodyGeomModel = std::unique_ptr<nonConvexBody>(
-                new nonConvexBody(mesh_,stlPath));
+                new nonConvexBody(mesh_,stlPath,thrSurf));
         }
         else if(bodyGeom == "sphere")
         {
@@ -46,7 +48,7 @@
             scalar radius = readScalar(HFDIBDEMDict_.subDict(bodyName).subDict("sphere").lookup("radius"));
 
             bodyGeomModel = std::unique_ptr<sphereBody>(
-                new sphereBody(mesh_,startPosition,radius));
+                new sphereBody(mesh_,startPosition,radius,thrSurf));
         }
         else
         {
@@ -55,33 +57,7 @@
                 << " not supported, using bodyGeom nonConvex" << endl;
             bodyGeom = "nonConvex";
             bodyGeomModel = std::unique_ptr<nonConvexBody>(
-                new nonConvexBody(mesh_,stlPath));
-        }
-
-        // propagate the per-body creation mode to the master
-        // geomModel: getCopy() carries it over to every added body,
-        // but without this the dict entry would be silently ignored
-        // (constructor default is "connectivity")
-        {
-            word bodyCreation("connectivity");
-            if (HFDIBDEMDict_.subDict(bodyName).found("bodyCreation"))
-            {
-                bodyCreation = word
-                    (HFDIBDEMDict_.subDict(bodyName)
-                        .lookup("bodyCreation"));
-                if
-                (
-                    bodyCreation != "connectivity"
-                    && bodyCreation != "legacy"
-                )
-                {
-                    InfoH << iB_Info << "Unknown bodyCreation: "
-                        << bodyCreation
-                        << ", using connectivity" << endl;
-                    bodyCreation = "connectivity";
-                }
-            }
-            bodyGeomModel->setBodyCreation(bodyCreation);
+                new nonConvexBody(mesh_,stlPath,thrSurf));
         }
 
         InfoH << addModel_Info << "-- addModelMessage-- "
@@ -114,7 +90,8 @@
                     startTime0,
                     std::move(bodyGeomModel),
                     cellPoints_,
-                    bodyGeom
+                    bodyGeom,
+                    thrSurf
                 )
             );
         }

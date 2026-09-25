@@ -10,25 +10,24 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "verletList.H"
 
@@ -299,249 +298,6 @@ void verletList::update(PtrList<immersedBody>& ibs)
                 }
             }
         }
-    }
-}
-//---------------------------------------------------------------------------//
-void verletList::computePotentialBodies
-(
-    PtrList<immersedBody>& ibs,
-    const HashTable<scalar,label,Hash<label>>& sweepDist,
-    const HashSet<label,Hash<label>>& hardFlags,
-    HashSet<label,Hash<label>>& potentialBodies
-)
-{
-    potentialBodies.clear();
-
-    // per-coordinate overlap of sweep-inflated intervals; a pair is a
-    // potential contact if it overlaps in every non-empty coordinate
-    cPairHasSet overlapCnt[3];
-
-    for (label coord = 0; coord < 3; ++coord)
-    {
-        if (coord == emptyDim) continue;
-
-        // build displaced interval endpoints (copies - the live Verlet
-        // points alias the shared bboxes and must not be touched)
-        struct sweptPoint
-        {
-            label bodyId;
-            scalar pos;
-            bool isMin;
-        };
-        std::vector<sweptPoint> swept;
-        swept.reserve(2*verletBoxes_.size());
-
-        for (const auto& vBox : verletBoxes_)
-        {
-            const label bId(vBox->getBodyId());
-
-            if (!ibs[bId].getIsActive()) continue;
-
-            scalar s(0);
-            if (hardFlags.found(bId))
-            {
-                s = GREAT;
-            }
-            else if (sweepDist.found(bId))
-            {
-                s = sweepDist[bId];
-            }
-
-            swept.push_back({bId, vBox->getBBox()->min()[coord] - s, true});
-            swept.push_back({bId, vBox->getBBox()->max()[coord] + s, false});
-        }
-
-        std::sort(swept.begin(), swept.end(),
-            [](const sweptPoint& a, const sweptPoint& b)
-            {
-                return a.pos < b.pos;
-            });
-
-        // sweep: an opened (min not yet closed) body overlaps every later
-        // min before its own max is reached
-        std::unordered_set<label> opened;
-        for (const sweptPoint& p : swept)
-        {
-            if (p.isMin)
-            {
-                for (const label oId : opened)
-                {
-                    if (oId == p.bodyId) continue;
-
-                    overlapCnt[coord].insert(
-                        cPair(min(oId, p.bodyId), max(oId, p.bodyId)));
-                }
-                opened.insert(p.bodyId);
-            }
-            else
-            {
-                opened.erase(p.bodyId);
-            }
-        }
-    }
-
-    // intersect the coordinate sets. NOTE: every non-empty dimension
-    // participates - an empty overlap set in an active coordinate means
-    // no pair overlaps in that coordinate and empties the result. Only
-    // the empty (2D) dimension is excluded. The first active coordinate
-    // seeds the candidates (unconditionally, even if it is empty).
-    cPairHasSet candidates;
-    bool seeded(false);
-    for (label coord = 0; coord < 3; ++coord)
-    {
-        if (coord == emptyDim) continue;
-
-        if (!seeded)
-        {
-            candidates = overlapCnt[coord];
-            seeded = true;
-        }
-        else
-        {
-            cPairHasSet intersected;
-            for (const cPair& pair : overlapCnt[coord])
-            {
-                if (candidates.find(pair) != candidates.end())
-                {
-                    intersected.insert(pair);
-                }
-            }
-            candidates = std::move(intersected);
-        }
-    }
-
-    for (const cPair& pair : candidates)
-    {
-        if (!ibs[pair.first].getIsActive() || !ibs[pair.second].getIsActive())
-        {
-            continue;
-        }
-
-        bool cStatic(ibs[pair.first].getbodyOperation() == 0);
-        bool tStatic(ibs[pair.second].getbodyOperation() == 0);
-
-        if (cStatic && tStatic) continue;
-
-        // report both pair members (static ones included - the
-        // caller filters static bodies out of the movement sets)
-        potentialBodies.insert(pair.first);
-        potentialBodies.insert(pair.second);
-    }
-}
-//---------------------------------------------------------------------------//
-void verletList::computeInflatedPairs
-(
-    PtrList<immersedBody>& ibs,
-    const HashTable<scalar,label,Hash<label>>& sweepDist,
-    const HashSet<label,Hash<label>>& hardFlags,
-    cPairHasSet& inflatedPairs
-)
-{
-    inflatedPairs.clear();
-
-    // same sweep-and-prune as computePotentialBodies, but the output is
-    // the pair list itself and hard-flagged bodies are excluded from
-    // the sweep: their GREAT-inflated intervals would pair them with
-    // every body and pin the DEM time step
-    cPairHasSet overlapCnt[3];
-
-    for (label coord = 0; coord < 3; ++coord)
-    {
-        if (coord == emptyDim) continue;
-
-        struct sweptPoint
-        {
-            label bodyId;
-            scalar pos;
-            bool isMin;
-        };
-        std::vector<sweptPoint> swept;
-        swept.reserve(2*verletBoxes_.size());
-
-        for (const auto& vBox : verletBoxes_)
-        {
-            const label bId(vBox->getBodyId());
-
-            if (!ibs[bId].getIsActive()) continue;
-            if (hardFlags.found(bId)) continue;
-
-            scalar s(0);
-            if (sweepDist.found(bId))
-            {
-                s = sweepDist[bId];
-            }
-
-            swept.push_back({bId, vBox->getBBox()->min()[coord] - s, true});
-            swept.push_back({bId, vBox->getBBox()->max()[coord] + s, false});
-        }
-
-        std::sort(swept.begin(), swept.end(),
-            [](const sweptPoint& a, const sweptPoint& b)
-            {
-                return a.pos < b.pos;
-            });
-
-        std::unordered_set<label> opened;
-        for (const sweptPoint& p : swept)
-        {
-            if (p.isMin)
-            {
-                for (const label oId : opened)
-                {
-                    if (oId == p.bodyId) continue;
-
-                    overlapCnt[coord].insert(
-                        cPair(min(oId, p.bodyId), max(oId, p.bodyId)));
-                }
-                opened.insert(p.bodyId);
-            }
-            else
-            {
-                opened.erase(p.bodyId);
-            }
-        }
-    }
-
-    // intersect the coordinate sets (same logic as
-    // computePotentialBodies)
-    cPairHasSet candidates;
-    bool seeded(false);
-    for (label coord = 0; coord < 3; ++coord)
-    {
-        if (coord == emptyDim) continue;
-
-        if (!seeded)
-        {
-            candidates = overlapCnt[coord];
-            seeded = true;
-        }
-        else
-        {
-            cPairHasSet intersected;
-            for (const cPair& pair : overlapCnt[coord])
-            {
-                if (candidates.find(pair) != candidates.end())
-                {
-                    intersected.insert(pair);
-                }
-            }
-            candidates = std::move(intersected);
-        }
-    }
-
-    for (const cPair& pair : candidates)
-    {
-        if (!ibs[pair.first].getIsActive() || !ibs[pair.second].getIsActive())
-        {
-            continue;
-        }
-
-        bool cStatic(ibs[pair.first].getbodyOperation() == 0);
-        bool tStatic(ibs[pair.second].getbodyOperation() == 0);
-
-        if (cStatic && tStatic) continue;
-
-        inflatedPairs.insert(pair);
     }
 }
 //---------------------------------------------------------------------------//

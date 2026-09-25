@@ -10,19 +10,19 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Description
@@ -32,9 +32,8 @@ SourceFiles
     verletList.C
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef verletList_H
@@ -125,38 +124,6 @@ class verletList
     // sort the list
     // solve potential intersections
     void update(PtrList<immersedBody>& ibs);
-
-    // Conservative contact-potential test (adaptiveStepDEM): fills
-    // potentialBodies with the bodies (both pair members, static ones
-    // included) of every pair whose bounding boxes, each inflated by the
-    // per-body sweep distance sweepDist[i], overlap in every non-empty
-    // coordinate. Callers use it to sort bodies into the sub-cycled /
-    // single-stepped sets.
-    // Note (MI): bodies listed in hardFlags are always sub-cycled
-    // Note (MI): the test never mutates the live Verlet list
-    //            (displaced intervals are built as copies)
-    void computePotentialBodies
-    (
-        PtrList<immersedBody>& ibs,
-        const HashTable<scalar,label,Hash<label>>& sweepDist,
-        const HashSet<label,Hash<label>>& hardFlags,
-        HashSet<label,Hash<label>>& potentialBodies
-    );
-
-    // Pair-level companion of computePotentialBodies (adaptive DEM
-    // time-step sizing): fills inflatedPairs with every pair whose
-    // bounding boxes, each inflated by the per-body sweep distance,
-    // overlap in every non-empty coordinate. Pairs with a hard-flagged
-    // member are skipped (they are inflated by GREAT and would pair
-    // with every body in the case); pairs of two static bodies are
-    // skipped. The callers' set classification is not affected.
-    void computeInflatedPairs
-    (
-        PtrList<immersedBody>& ibs,
-        const HashTable<scalar,label,Hash<label>>& sweepDist,
-        const HashSet<label,Hash<label>>& hardFlags,
-        cPairHasSet& inflatedPairs
-    );
 
     cPairHasSet::iterator begin()
     {

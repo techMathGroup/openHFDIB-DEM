@@ -1,6 +1,5 @@
 for (label level=0;level<maxRefinementLevel+1;level++)
 {
-
     mesh.update();
 
     if (mesh.changing())
@@ -23,9 +22,8 @@ for (label level=0;level<maxRefinementLevel+1;level++)
         {
             #include "meshCourantNo.H"
         }
-
-        Info << "Recreating immersed bodies after mesh update" << endl;
-        lambda *= 0.0;
+//zlobi nula bez tecky
+        lambda *= 0.;
         HFDIBDEM.recreateBodies(lambda,refineF);
     }
 }

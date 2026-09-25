@@ -10,19 +10,19 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Description
@@ -32,9 +32,8 @@ SourceFiles
     sphereBody.C
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef sphereBody_H
@@ -75,13 +74,15 @@ namespace Foam
         (
             const  fvMesh&   mesh,
             vector startPos,
-            scalar radius
+            scalar radius,
+            scalar  thrSurf = 1
         )
         :
         shapeBased
         (
             mesh,
-            sphere
+            sphere,
+            thrSurf
         ),
         position_(startPos),
         radius_(radius),
@@ -103,7 +104,7 @@ namespace Foam
 
         // Public methods ----------------------------------------------
 
-        void createImmersedBodyLegacy
+        void createImmersedBody
         (
             volScalarField& body,
             Field<label>& octreeField,
@@ -118,16 +119,14 @@ namespace Foam
         std::shared_ptr<geomModel> getCopy() final override
         {
             std::shared_ptr<sphereBody> sphereBodyModel =
-                std::make_shared<sphereBody>(mesh_,position_,radius_);
+                std::make_shared<sphereBody>(mesh_,position_,radius_,thrSurf_);
 
             sphereBodyModel->initVars(intSpan_,sdBasedLambda_);
             sphereBodyModel->setRhoS(rhoS_);
             sphereBodyModel->setM0(M0_);
-            sphereBodyModel->setBodyCreation(bodyCreation_);
             sphereBodyModel->getSurfaceCellList() = surfCells_;
             sphereBodyModel->getHaloCellList() = haloCells_;
             sphereBodyModel->getInternalCellList() = intCells_;
-            sphereBodyModel->getSurfToHaloLabels() = surfToHaloLabels_;
 
             return sphereBodyModel;
         }
@@ -238,14 +237,7 @@ namespace Foam
         void setBodyPosition(pointField pos) final override
         {
             assert(pos.size() == 1 && "Only one point is allowed for sphere body");
-            // the DEM broadcast calls this each subcycle; skip the
-            // no-op case so static bodies keep their valid flag
-            if (pos[0] == position_)
-            {
-                return;
-            }
             position_ = pos[0];
-            bodyFieldValid_ = false;                                    // points moved: cell lists and the body field are stale
         }
 
         pointField getBodyPoints() final override

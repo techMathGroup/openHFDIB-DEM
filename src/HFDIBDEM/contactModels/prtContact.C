@@ -10,25 +10,24 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "prtContact.H"
 
@@ -343,13 +342,7 @@ void getPrtContactVars_ArbShape(
     vector normalVector = vector::zero;
     scalar contactArea(0);
 
-    // emptyScale restores the full extruded extent of the contact patch
-    // along the (pseudo-2D) empty direction if the virtual mesh was
-    // clipped there; it is 1 otherwise. The edge points span only the
-    // clipped layer, so the swept-hull area is the 2D footprint and must
-    // be scaled the same way as the volume (cf. the plane area formula in
-    // wallContact.C).
-    intersectedVolume = virtMesh.evaluateContact()*vmInfo->getEmptyScale();
+    intersectedVolume = virtMesh.evaluateContact();
 
     if(virtMesh.getEdgeSVPoints().size() <= 4)
     {
@@ -365,7 +358,7 @@ void getPrtContactVars_ArbShape(
                 ||
                 tClass.getGeomModel().getcType() == nonConvex
             );
-        contactArea = surfaceAndNormal.first()*vmInfo->getEmptyScale();
+        contactArea = surfaceAndNormal.first();
         normalVector = surfaceAndNormal.second();
         contactCenter = virtMesh.getContactCenter();
     }
@@ -669,11 +662,14 @@ bool solvePrtContact(
     F += FNd;
     InfoH << parallelDEM_Info << "-- Particle-particle " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact FN " << F << endl;
 
-    // the coulomb ceiling caps the applied force and the stored
-    // tangential state inside getFt
-    vector Ft = subCInfo.getFt(deltaT, cInfo.getMu()*mag(F));
+    vector Ft = subCInfo.getFt(deltaT);
     InfoH << parallelDEM_Info << "-- Particle-particle " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact Ft " << Ft << endl;
 
+    if (mag(Ft) > cInfo.getMu() * mag(F))
+    {
+        Ft *= cInfo.getMu() * mag(F) / mag(Ft);
+    }
+    InfoH << parallelDEM_Info << "-- Particle-particle " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact Ft clamped " << Ft << endl;
     F += Ft;
 
     vector FA = subCInfo.getFA();

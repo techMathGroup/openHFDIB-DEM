@@ -10,19 +10,19 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Description
@@ -32,9 +32,8 @@ SourceFiles
     prtSubContactInfo.C
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef prtSubContactInfo_H
@@ -50,7 +49,6 @@ Contributors
 #include "virtualMesh.H"
 #include "physicalProperties.H"
 #include "forces.H"
-#include "demTimeStepInfo.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -130,12 +128,12 @@ class prtSubContactInfo
         ibContactVars& tVars
     );
 
-    vector& getcLVec()
+    vector getcLVec()
     {
         return cLVec_;
     }
 
-    vector& gettLVec()
+    vector gettLVec()
     {
         return tLVec_;
     }
@@ -146,34 +144,14 @@ class prtSubContactInfo
 
     vector getFNd();
 
-    // tangential state of the previous sub-step
-    vector& getFtPrev()
-    {
-        return FtPrev_;
-    }
-
-    vector& getCVeli()
-    {
-        return cVeli_;
-    }
-
-    vector& getTVeli()
-    {
-        return tVeli_;
-    }
-
-    // tangential force of the current sub-step; the coulomb
-    // ceiling FtCeil (= mu*mag(FN) of this sub-contact) caps the
-    // APPLIED force and the stored state FtPrev_ alike, so the
-    // spring stops stretching at the sliding limit
-    vector getFt(scalar deltaT, scalar FtCeil = GREAT);
+    vector getFt(scalar deltaT);
 
     Tuple2<forces,forces>& getOutForce()
     {
         return outForce_;
     }
 
-    void setVMInfo(boundBox& bBox, scalar subVolumeV, scalar emptyScale = 1);
+    void setVMInfo(boundBox& bBox, scalar subVolumeV);
 
     void setVMInfo(const virtualMeshInfo& vmInfo);
 
@@ -203,67 +181,6 @@ class prtSubContactInfo
     scalar& getLc()
     {
         return Lc_;
-    }
-
-    // stability step of this contact from the cached contact state
-    // (the contact class of the adaptive DEM time-step estimator).
-    // the governing stiffness is taken from the implemented force
-    // laws with the tangential branch scaled by tangentialFactor
-    // (1 = full conservatism). damping sits inside the stepDEM
-    // safety factor.
-    scalar getPairDtCrit(scalar tangentialFactor = 1.0)
-    {
-        return demTimeStepInfo::pairDtCrit
-        (
-            demTimeStepInfo::effK
-            (
-                physicalProperties_.aY_,
-                prtCntVars_.contactVolume_,
-                physicalProperties_.aG_,
-                prtCntVars_.contactArea_,
-                Lc_,
-                tangentialFactor
-            ),
-            physicalProperties_.reduceM_
-        );
-    }
-
-    // rotational stability step: the tangential force on the cached
-    // lever arms (cLVec_ for body c, tLVec_ for body t - the full
-    // length is the conservative rPerp)
-    scalar getPairDtCritRot
-    (
-        const scalar IeffC,
-        const scalar IeffT,
-        scalar tangentialFactor = 1.0,
-        scalar rotationalFactor = 1.0
-    )
-    {
-        const scalar kT
-        (
-            rotationalFactor*tangentialFactor
-                *demTimeStepInfo::contactKT
-                (
-                    physicalProperties_.aG_,
-                    prtCntVars_.contactArea_,
-                    Lc_
-                )
-        );
-
-        scalar dtPair(getPairDtCrit(tangentialFactor));
-
-        dtPair = min
-        (
-            dtPair,
-            demTimeStepInfo::rotationalDtCrit(kT, mag(cLVec_), IeffC)
-        );
-        dtPair = min
-        (
-            dtPair,
-            demTimeStepInfo::rotationalDtCrit(kT, mag(tLVec_), IeffT)
-        );
-
-        return dtPair;
     }
 
     void syncData();

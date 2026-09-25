@@ -10,25 +10,24 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "prtSubContactInfo.H"
 #include "contactModelInfo.H"
@@ -102,7 +101,7 @@ vector prtSubContactInfo::getFNd()
 
 }
 //---------------------------------------------------------------------------//
-vector prtSubContactInfo::getFt(scalar deltaT, scalar FtCeil)
+vector prtSubContactInfo::getFt(scalar deltaT)
 {
     // compute relative tangential velocity
     vector FtLastP(FtPrev_ - (FtPrev_ & prtCntVars_.contactNormal_)
@@ -115,65 +114,40 @@ vector prtSubContactInfo::getFt(scalar deltaT, scalar FtCeil)
 
     // compute relative tangential velocity
     vector relVeli(cVeli_ - tVeli_);
-    vector Vn((relVeli & prtCntVars_.contactNormal_)
-        *prtCntVars_.contactNormal_);
-    vector Vt(relVeli - Vn);
+    vector veliNomr((relVeli)*(relVeli & prtCntVars_.contactNormal_));
+    vector Vt(relVeli-veliNomr);
     // compute tangential force
+        //NewDefinition
     if(contactModelInfo::getUseMindlinRotationalModel())
     {
-        scalar tangTune(demTimeStepInfo::tangTune_);                    //read empirical mambo-jambo from demTimeStepInfo
-        scalar kT = tangTune*8*physicalProperties_.aG_*(prtCntVars_.contactArea_/(Lc_+SMALL));
+        
+        scalar kT = 200*8*physicalProperties_.aG_*(prtCntVars_.contactArea_/(Lc_+SMALL));
         vector deltaFt(kT*Vt*deltaT + 2*physicalProperties_.reduceBeta_*sqrt(kT*physicalProperties_.reduceM_)*Vt);
-        // the spring can stretch by at most one ceiling per
-        // sub-step: a fresh contact (or a slip reversal) builds
-        // the tangential force up to the coulomb limit, never
-        // across it within a single step
-        if (mag(deltaFt) > FtCeil)
-        {
-            deltaFt *= FtCeil/(mag(deltaFt) + SMALL);
-        }
-        FtPrev_ = FtLastS - deltaFt;
+        FtPrev_ = - FtLastS - deltaFt;
     }
 
     if(contactModelInfo::getUseChenRotationalModel())
     {
+        
         vector Ftdi(- physicalProperties_.reduceBeta_*sqrt(physicalProperties_.aG_*physicalProperties_.reduceM_*Lc_)*Vt);
         Ftdi += physicalProperties_.aG_*Lc_*Vt*deltaT;
-        // same one-ceiling bound on the increment as above
-        if (mag(Ftdi) > FtCeil)
-        {
-            Ftdi *= FtCeil/(mag(Ftdi) + SMALL);
-        }
-        FtPrev_ = FtLastS - Ftdi;
+        FtPrev_ = - FtLastS- Ftdi;
     }
 
-    // coulomb cap feeds back into the stored state: the spring
-    // stops stretching at the sliding ceiling, so the applied
-    // force and the state can never disagree
-    if (mag(FtPrev_) > FtCeil)
-    {
-        FtPrev_ *= FtCeil/(mag(FtPrev_) + SMALL);
-    }
-
+    
     return FtPrev_;
 }
 //---------------------------------------------------------------------------//
-void prtSubContactInfo::setVMInfo
-(
-    boundBox& bBox,
-    scalar subVolumeV,
-    scalar emptyScale
-)
+void prtSubContactInfo::setVMInfo(boundBox& bBox, scalar subVolumeV)
 {
     if (!vmInfo_)
     {
-        vmInfo_ = std::make_shared<virtualMeshInfo>(bBox, subVolumeV, emptyScale);
+        vmInfo_ = std::make_shared<virtualMeshInfo>(bBox, subVolumeV);
         return;
     }
 
     vmInfo_->sV = subVolume(bBox);
     vmInfo_->subVolumeV = subVolumeV;
-    vmInfo_->emptyScale = emptyScale;
 }
 //---------------------------------------------------------------------------//
 void prtSubContactInfo::setVMInfo(const virtualMeshInfo& vmInfo)
@@ -186,7 +160,6 @@ void prtSubContactInfo::setVMInfo(const virtualMeshInfo& vmInfo)
 
     vmInfo_->sV = vmInfo.sV;
     vmInfo_->subVolumeV = vmInfo.subVolumeV;
-    vmInfo_->emptyScale = vmInfo.emptyScale;
     // vmInfo_->startingPoint = std::move(vmInfo.startingPoint);
     vmInfo_->startingPoint.reset(new point(*vmInfo.startingPoint));
 }

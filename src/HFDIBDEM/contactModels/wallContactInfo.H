@@ -10,19 +10,19 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Description
@@ -32,9 +32,8 @@ SourceFiles
     wallContactInfo.C
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef wallContactInfo_H
@@ -83,11 +82,6 @@ class wallContactInfo
     HashTable<physicalProperties,string,Hash<string>> wallMeanPars_;
 
     std::vector<std::shared_ptr<wallSubContactInfo>> subCList_;
-
-    // tangential-force history of the last DEM sub-step, keyed by
-    // the sorted contact-patch set of each sub-contact. mirrors
-    // the prt-side persistence
-    HashTable<vector, string, Hash<string>> wallFtHistory_;
 
     scalar reduceM_;    // Reduced mass
 
@@ -201,25 +195,7 @@ class wallContactInfo
         string wallName
     );
 
-    // clear the old contact information
     void clearOldContact();
-    
-    // harvest the tangential-force state of the current
-    // sub-contact list into wallFtHistory_
-    // Note (MI): anything sub-contact related is dubious
-    void saveWallFtHistory();
-
-    // drop the history: the contact resolved and a future
-    // contact must start from a zero spring
-    void clearWallFtHistory()
-    {
-        wallFtHistory_.clear();
-    }
-
-    // seed the fresh sub-contacts with the harvested history
-    // before the sub-step force evaluation
-    // Note (MI): anything sub-contact related is dubious
-    void restoreWallFtHistory();
 
     void setNewSubContact(
         const List<Tuple2<point,boundBox>>& contactBBData,

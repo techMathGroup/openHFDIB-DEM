@@ -10,31 +10,29 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "prtContactInfo.H"
 
 #include "interAdhesion.H"
 #include "virtualMeshLevel.H"
-#include "virtualMeshTools.H"
 #include "contactModelInfo.H"
 
 using namespace Foam;
@@ -196,47 +194,8 @@ void prtContactInfo::getContacts_ArbShape
     scalar subVolumeLength = charCellSize/virtualMeshLevel::getLevelOfDivision();
     scalar subVolumeV = pow(subVolumeLength,3);
 
-    // match the sub-contact BEFORE clipping the box: contact-history
-    // matching tests whether the previous starting point lies inside the
-    // bounding box, which the clipped slab could fail
     newContactList_.emplace_back(matchSubContact(subCbBox, physicalProperties_, contactPair_));
-
-    // Pseudo-2D: clip the pair bounding box to a single sub-volume layer
-    // in the empty direction (no-op in 3D). Clipping reuses (and clamps)
-    // the matched sub-contact's starting point so the tangential-force
-    // history survives; a fresh sub-contact starts from the box midpoint.
-    scalar emptyScale(1);
-    if (newContactList_.back()->getVMInfo())
-    {
-        std::shared_ptr<virtualMeshInfo>& vmInfo
-            = newContactList_.back()->getVMInfo();
-
-        point sPoint(vmInfo->getStartingPoint());
-        emptyScale = clipEmptyDirection(subCbBox, sPoint);
-        vmInfo->startingPoint.reset(new point(sPoint));
-    }
-    else
-    {
-        point sPoint(subCbBox.midpoint());
-        emptyScale = clipEmptyDirection(subCbBox, sPoint);
-    }
-
-    // overflow guard: must run AFTER the empty-direction clipping so it
-    // bounds the box the octree will actually traverse (mirrors the
-    // body-wall contact setup). The octree refines until sV.volume() <
-    // subVolumeV, so leaves can be as small as subVolumeV/8 (children
-    // are 1/8 of a split node), and counting internal nodes adds at most
-    // ~14%; hence 8*volume/subVolumeV is a safe upper bound on visited
-    // sub-volumes and the guard never rejects a mesh a complete scan
-    // could finish
-    checkVMLeafCount
-    (
-        8*subCbBox.volume()/subVolumeV,
-        subCbBox,
-        "particle-contact"
-    );
-
-    newContactList_.back()->setVMInfo(subCbBox, subVolumeV, emptyScale);
+    newContactList_.back()->setVMInfo(subCbBox, subVolumeV);
     return;
 }
 //---------------------------------------------------------------------------//
@@ -294,18 +253,6 @@ void prtContactInfo::syncContactList()
                 reduce(vmInfoToSync.sV.min(), sumOp<vector>());
                 reduce(vmInfoToSync.sV.max(), sumOp<vector>());
                 reduce(vmInfoToSync.subVolumeV, sumOp<scalar>());
-
-                // emptyScale must be reduced with the same zero-init
-                // pattern as the starting point below: on ranks other
-                // than the owning one the default-constructed vmInfoToSync
-                // carries 1, which a plain sumOp would add to the result
-                scalar emptyScaleToReduce(0);
-                if (procI == Pstream::myProcNo())
-                {
-                    emptyScaleToReduce = vmInfoToSync.getEmptyScale();
-                }
-                reduce(emptyScaleToReduce, sumOp<scalar>());
-                vmInfoToSync.emptyScale = emptyScaleToReduce;
 
                 point startPointToReduce = vmInfoToSync.getStartingPoint();
                 if (procI != Pstream::myProcNo())

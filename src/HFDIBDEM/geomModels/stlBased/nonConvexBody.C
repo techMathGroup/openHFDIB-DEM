@@ -10,25 +10,24 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "nonConvexBody.H"
 
@@ -75,7 +74,7 @@ labelList nonConvexBody::getBBoxCellsByOctTree
 }
 //---------------------------------------------------------------------------//
 // create immersed body for convex body
-void nonConvexBody::createImmersedBodyLegacy
+void nonConvexBody::createImmersedBody
 (
     volScalarField& body,
     Field<label>& octreeField,
@@ -115,26 +114,14 @@ void nonConvexBody::createImmersedBodyLegacy
 
     bool isInsideBB(false);
     labelList nextToCheck(1,0);
-    label iterCount(0);
-    // rank-local nCells() would make the safety bound another rank-local
-    // termination clause — share the largest bound across ranks instead
-    // (>= every rank's own cell count, so no rank's walk gets truncated)
-    label iterMax(mesh_.nCells());
+    label iterCount(0);label iterMax(mesh_.nCells());
     reduce(iterMax, maxOp<label>());
-
+    // exit condition must be identical on all ranks: the loop contains
+    // collectives (finishedSends, reduce), so the rank-local isInsideBB
+    // must not control it
     label nextSize = nextToCheck.size();
     reduce(nextSize, maxOp<label>());
-    // NOTE: isInsideBB is rank-local, but the loop termination must be
-    // global: the loop body (processor-face exchange via PstreamBuffers)
-    // and the tail (reduce) are collectives, so all ranks must evaluate
-    // this condition the same number of times. A rank-local flag here
-    // lets ranks exit at different iterations and the collectives cross
-    // (deadlock on decompositions where the body bbox spans only some
-    // of the ranks). The reduce is hoisted out of the condition because
-    // "or" short-circuits: ranks with a non-empty frontier would skip
-    // the collective while empty-frontier ranks enter it.
-    bool anyInsideBB(returnReduceOr(isInsideBB));
-    while ((nextSize > 0 or not anyInsideBB) && iterCount < iterMax)
+    while (nextSize > 0 && iterCount < iterMax)
     {
         iterCount++;
         DynamicLabelList auxToCheck;
@@ -271,10 +258,9 @@ void nonConvexBody::createImmersedBodyLegacy
         // next iteration
         nextToCheck = auxToCheck;
 
-        // check if all processors finished
+        // check if all processors finished 
         nextSize = nextToCheck.size();
         reduce(nextSize, maxOp<label>());
-        anyInsideBB = returnReduceOr(isInsideBB);
     }
 
     // get cell centers inside the body bounding box
@@ -314,14 +300,14 @@ void nonConvexBody::createImmersedBodyLegacy
         {
             cBody+=0.5;
         }
-        if (cBody > SMALL)
+        if (cBody > thrSurf_)
         {
-            if (cBody > (1.0-SMALL))
+            if (cBody > (1.0-thrSurf_))
             {
                 intCells_[Pstream::myProcNo()].append(cellI);
                 cellToStartInCreateIB_ = cellI;
             }
-            else if (cBody  <= (1.0-SMALL))
+            else if (cBody  <= (1.0-thrSurf_))
             {
                 surfCells_[Pstream::myProcNo()].append(cellI);
                 if (sdBasedLambda_)

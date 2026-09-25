@@ -10,19 +10,19 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Description
@@ -32,9 +32,8 @@ SourceFiles
     nonConvexBody.C
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef nonConvexBody_H
@@ -64,14 +63,16 @@ namespace Foam
         nonConvexBody
         (
             const  fvMesh&   mesh,
-            word      stlPath
+            word      stlPath,
+            scalar  thrSurf = 1
         )
         :
         stlBased
         (
             mesh,
             nonConvex,
-            stlPath
+            stlPath,
+            thrSurf
         ){}
 
         // Destructors -------------------------------------------------
@@ -83,7 +84,7 @@ namespace Foam
 
         // Public methods ----------------------------------------------
 
-        void createImmersedBodyLegacy
+        void createImmersedBody
         (
             volScalarField& body,
             Field<label>& octreeField,
@@ -103,16 +104,14 @@ namespace Foam
         std::shared_ptr<geomModel> getCopy() final override
         {
             std::shared_ptr<nonConvexBody> nonConvexBodyModel =
-                std::make_shared<nonConvexBody>(mesh_,stlPath_);
+                std::make_shared<nonConvexBody>(mesh_,stlPath_,thrSurf_);
 
-            nonConvexBodyModel->initVars(bodySurfMesh_.points(), intSpan_, sdBasedLambda_);
+            nonConvexBodyModel->initVars(bodySurfMesh_.points(), thrSurf_, intSpan_, sdBasedLambda_);
             nonConvexBodyModel->setRhoS(rhoS_);
             nonConvexBodyModel->setM0(M0_);
-            nonConvexBodyModel->setBodyCreation(bodyCreation_);
             nonConvexBodyModel->getSurfaceCellList() = surfCells_;
             nonConvexBodyModel->getHaloCellList() = haloCells_;
             nonConvexBodyModel->getInternalCellList() = intCells_;
-            nonConvexBodyModel->getSurfToHaloLabels() = surfToHaloLabels_;
 
             return nonConvexBodyModel;
         }

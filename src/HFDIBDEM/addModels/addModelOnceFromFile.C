@@ -10,25 +10,24 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "addModelOnceFromFile.H"
 
@@ -50,7 +49,8 @@ addModelOnceFromFile::addModelOnceFromFile
     const bool startTime0,
     std::unique_ptr<geomModel> bodyGeomModel,
     List<labelList>& cellPoints,
-    word& bodyGeom
+    word& bodyGeom,
+    scalar thrSurf
 )
 :
 addModel(mesh, std::move(bodyGeomModel), cellPoints),
@@ -60,7 +60,8 @@ coeffsDict_(addModelDict_.subDict(addMode_+"Coeffs")),
 bodyAdded_(false),
 fileName_("constant/" + (word(coeffsDict_.lookup("fileName")))),
 ifStream_(fileName_.toAbsolute()),
-bodyGeom_(bodyGeom)
+bodyGeom_(bodyGeom),
+thrSurf_(thrSurf)
 {
     if(!ifStream_.opened())
     {
@@ -93,13 +94,13 @@ void addModelOnceFromFile::addSTL(string& line)
     {
         word stlPath("constant/triSurface/" + line);
         geomModel_ = std::unique_ptr<convexBody>
-            (new convexBody(mesh_, stlPath));
+            (new convexBody(mesh_, stlPath, thrSurf_));
     }
     else
     {
         word stlPath("constant/triSurface/" + line);
         geomModel_ = std::unique_ptr<nonConvexBody>
-            (new nonConvexBody(mesh_, stlPath));
+            (new nonConvexBody(mesh_, stlPath, thrSurf_));
     }
 }
 //---------------------------------------------------------------------------//

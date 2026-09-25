@@ -9,23 +9,19 @@
       |_|                                        and D iscrete E lement M ethod
 -------------------------------------------------------------------------------
 License
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
-
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
-InNamespace
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+InNamspace
     Foam
 Contributors
     Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef immersedBody_H
@@ -55,8 +51,6 @@ Contributors
 #include "interpolationInfo.H"
 #include "ibInterpolation.H"
 
-#include "fluidSolidCoupling.H"
-
 #include "virtualMesh.H"
 namespace Foam
 {
@@ -74,28 +68,25 @@ namespace Foam
         typedef DynamicList<point> DynamicPointList;
 
         // name of the body
-        word bodyName_;
+        word    bodyName_;
 
         // is the particle active in the simulation
-        bool isActive_;
+        bool    isActive_;
 
         // body set-up
-        dictionary& immersedDict_;
+        dictionary&             immersedDict_;
 
         // mesh reference
-        const fvMesh& mesh_;
+        const  fvMesh&   mesh_;
 
         // fluid properties
-        dictionary& transportProperties_;
+        dictionary&             transportProperties_;
 
         // body geometry
         std::shared_ptr<geomModel> geomModel_;
 
         // Interpolation Info
         autoPtr<interpolationInfo> intpInfo_;
-
-        // fluid-solid coupling model
-        autoPtr<fluidSolidCoupling> couplingModel_;
 
         // contact models
         autoPtr<ibContactClass> ibContactClass_;
@@ -115,12 +106,6 @@ namespace Foam
         scalar omega_;
         scalar omegaOld_;
 
-        // angular momentum accumulator of the kick-drift rotation
-        // update - the fundamental rotation state between sub-steps.
-        // omega_/Axis_ are derived, recovered from L_ after each
-        // inertia rotation (rotateCachedInertia)
-        vector L_;
-
         // linear velocity
         vector Vel_;
         vector VelOld_;
@@ -133,6 +118,11 @@ namespace Foam
         // total Rodrigues angle of the body
         vector totalAngle_;
 
+        // forces acting on the particle due to the fluid
+        forces FCoupling_;
+        forces FCouplingOld_;
+        scalar couplingHistCoef_;
+
         // forces acting on the particle due to the contact
         forces FContact_;
 
@@ -142,17 +132,17 @@ namespace Foam
         // mean body Courant number based on its linear velocity
         scalar meanCoNum_;
 
-        // integer to identify current body
-        label bodyId_;
+        // fluid density
+        dimensionedScalar rhoF_;
 
-        // word with bodyId string for better outputs
-        word bodyIdStr_;
+        // integer to identify current body
+        label   bodyId_;
 
         // auxiliary switch - do I want to update the torques?
-        bool updateTorque_;
+        bool    updateTorque_;
 
         // operation to perform
-        int bodyOperation_;
+        int     bodyOperation_;
 
         // update immersed body info
         // void  updateImmersedBody
@@ -163,23 +153,29 @@ namespace Foam
 
         void updateCoupling
         (
-            const volScalarField& body,
-            const volVectorField& f,
-            const bool kinematicForce,
+            volScalarField& body,
+            volVectorField& fPress,
+            volVectorField& fVisc,
             const bool applyAddedMass
         );
 
         void updateCoupling
         (
-            const volScalarField& body,
-            const volVectorField& f,
-            const volScalarField& rho,
+            volScalarField& body,
+            volVectorField& f,
             const bool kinematicForce,
             const bool applyAddedMass
         );
 
 
         void resetPostPimpleState();
+
+        void applyAddedMassScaling
+        (
+            const vector& FV,
+            const vector& FAdded,
+            const bool applyAddedMass
+        );
 
         // auxiliary octree variables
         Field<label> octreeField_;
@@ -189,18 +185,18 @@ namespace Foam
         bool    startSynced_;
 
         // auxiliary variables
-        tensor totRotMatrix_;
-        bool sdBasedLambda_;
-        word overlayLambda_;
+        tensor  totRotMatrix_;
+        bool    sdBasedLambda_;
+        word    overlayLambda_;
         // bool    isInCollision_ = false;
-        scalar intSpan_;
-        scalar charCellSize_;                                           //characteristic cell size over surface
-        label refineBuffers_;                                           //number of refine buffers around body
-        label recomputeM0_;                                             //how many times rocompute M0_ because of refinement
-        label timesToSetStatic_;
-        vector staticContactPost_;
-
+        scalar  intSpan_;
+        scalar  charCellSize_;                                          //characteristic cell size over surface
+        label   refineBuffers_;                                         //number of refine buffers around body
+        label   recomputeM0_;                                           //how many times rocompute M0_ because of refinement
+        label   timesToSetStatic_;
+        vector  staticContactPost_;
         protected:
+
 
         public:
 
@@ -229,21 +225,7 @@ namespace Foam
         (
             scalar deltaT = -1.0
         );
-
-        // rotate the cached world-frame inertia by the current
-        // sub-step rotation (omega_*deltaT about Axis_). must run on
-        // all ranks - unlike moveImmersedBody it is not guarded by a
-        // rank-0 test, so I_ stays rank-uniform without communication
-        void rotateCachedInertia
-        (
-            scalar deltaT = -1.0
-        );
-
-        // split an angular velocity vector into the omega_/Axis_
-        // (magnitude, unit axis) pair. shared by the torque kick and
-        // the post-rotation recovery of the kick-drift update
-        void splitOmega(const vector& w);
-
+        
         void printBodyInfo();
         
         //update body movement based on acting forces
@@ -280,19 +262,17 @@ namespace Foam
             volScalarField& refineF
         );
 
-        void syncImmersedBodyGeometry
+        void syncImmersedBodyParralell1
         (
             volScalarField& body,
             volScalarField& refineF
         );
 
-        void syncImmersedBodyRefinement
+        void syncImmersedBodyParralell2
         (
             volScalarField& body,
             volScalarField& refineF
         );
-
-        void computeCharCellSize();
 
         void constructRefineField
         (
@@ -304,12 +284,7 @@ namespace Foam
         
         void resetCouplingHistory()
         {
-            couplingModel_->resetCouplingHistory();
-        }
-
-        fluidSolidCoupling& getCouplingModel()
-        {
-            return couplingModel_();
+            couplingHistCoef_ = 1.0;
         }
 
         // getters
@@ -327,21 +302,6 @@ namespace Foam
             }
         }
 
-        // re-populate the interpolation info after clearIntpInfo
-        // without re-creating the body: the coupling solvers clear
-        // the intp info every step and rely on the per-step
-        // createImmersedBody call to rebuild it - the static-body
-        // re-creation skip must preserve that (surfCells and
-        // charCellSize_ are unchanged for a skipped static body)
-        void refreshIntpInfo()
-        {
-            if(intpInfo_.valid())
-            {
-                intpInfo_->setCharCellSize(charCellSize_);
-                intpInfo_->setIntpInfo();
-            }
-        }
-
         const bool& checkWallContact() const
         {
             return ibContactClass_->checkWallContact();
@@ -350,11 +310,6 @@ namespace Foam
         const label& getBodyId() const
         {
             return bodyId_;
-        }
-
-        const word& getBodyIdStr() const
-        {
-            return bodyIdStr_;
         }
 
         const vector& getVel()  const
@@ -371,31 +326,6 @@ namespace Foam
         {
             return Axis_;
         }
-
-        const forces& getFContact() const
-        {
-            return FContact_;
-        }
-
-        const forces& getFCoupling() const
-        {
-            return couplingModel_->getFCoupling();
-        }
-
-        const scalar& getCharCellSize() const
-        {
-            return charCellSize_;
-        }
-
-        // conservative upper bound on the displacement of any body point
-        // during the coming time step deltaT (adaptiveStepDEM). safetyTrans
-        // and safetyRot are dict-tunable factors.
-        scalar computeSweepDistance
-        (
-            scalar deltaT,
-            scalar safetyTrans,
-            scalar safetyRot
-        );
 
         const scalar& getCoNum()   const
         {
@@ -469,17 +399,16 @@ namespace Foam
 
         void postPimpleUpdateImmersedBody
         (
-            const volScalarField& body,
-            const volVectorField& f,
-            const bool kinematicForce,
+            volScalarField& body,
+            volVectorField& fPress,
+            volVectorField& fVisc,
             const bool applyAddedMass
         );
 
         void postPimpleUpdateImmersedBody
         (
-            const volScalarField& body,
-            const volVectorField& f,
-            const volScalarField& rho,
+            volScalarField& body,
+            volVectorField& f,
             const bool kinematicForce,
             const bool applyAddedMass
         );
@@ -488,7 +417,8 @@ namespace Foam
         // the body linear velocity)
         void computeBodyCoNumber();
 
-        scalar computeBodyLinCoNumber();
+        // print out body linear and angular momentum for control
+        void printMomentum();
 
         // print out body statistics for control
         void printStats();
@@ -517,6 +447,14 @@ namespace Foam
         }
 
         void initSyncWithFlow(const volVectorField& U);
+
+        void pimpleUpdate
+        (
+            volScalarField& body,
+            volVectorField& fPress,
+            volVectorField& fVisc,
+            const bool applyAddedMass
+        );
 
         void pimpleUpdate
         (
@@ -552,7 +490,7 @@ namespace Foam
 
         void checkIfInDomain(volScalarField& body);
 
-        const label& getRecomputeM0() const
+        const label& getrecomputeM0() const
         {
             return recomputeM0_;
         }
@@ -612,7 +550,6 @@ namespace Foam
             dict.add("static",bodyOperation_ == 0);
             dict.add("timeStepsInContWStatic", ibContactClass_
                 ->getTimeStepsInContWStatic());
-            couplingModel_->writeCouplingInfo(dict);
             geomModel_->writeBodyInfo(bodyId_,dict, path);
         }
 
@@ -625,15 +562,8 @@ namespace Foam
         }
         
         // function to update the average fluid density on the body
-        void updateRhoF(const scalar rho)
-        {
-            couplingModel_->updateRhoF(rho);
-        }
-
-        void updateRhoF(const volScalarField& rho, const volScalarField& body)
-        {
-            couplingModel_->updateRhoF(rho, body);
-        }
+        void updateRhoF(const scalar rho);
+        void updateRhoF(const volScalarField& rho, const volScalarField& body);
 
         void writeIbInfo()
         {

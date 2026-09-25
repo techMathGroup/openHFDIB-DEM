@@ -10,117 +10,29 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
-Description
-    Algorithmic details of the particle-particle virtual mesh.
-
-    Contact detection (detectFirstContactPoint)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Depth-first descent of the octree rooted at the pair bounding box:
-
-      - classify node against both bodies (ensureVolumeType; the
-        per-body result is cached in the node's ibSubVolumeInfo, so
-        the shared tree is classified once per body and per node);
-
-      - prune:  OUTSIDE either body           -> no contact below;
-      - accept: INSIDE both bodies            -> contact;
-      - refine: MIXED (either body)           -> recurse into 8 octants.
-
-    At leaf resolution (node volume < subVolumeV) the MIXED case is
-    resolved by limitFinalSubVolume(): the leaf contributes contact
-    iff the geometry-restricted bounding boxes of the two bodies
-    overlap. Before recursing, the octant containing the previous
-    starting point is rotated to the front of the child list, which
-    warm-starts the descent towards the expected contact location.
-
-    Contact evaluation (evaluateContact / inspectSubVolume)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Same traversal, accumulating three quantities:
-
-      - contactVolume:   sum over leaves of the volume of the
-                         cross-section boundBox of the two
-                         geometry-restricted leaf boxes
-                         (INSIDE x INSIDE leaves contribute their full
-                         node volume);
-      - contactCenter:   volume-weighted mean of the leaf contributions;
-      - edge points:     midpoints of leaves that remain MIXED for both
-                         bodies (directly, or whose children produced
-                         edge points -- the flag propagates upwards).
-
-    Normal and area from the edge points (get3DcontactNormalAndSurface)
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-      - normal:  eigenvector of the smallest eigenvalue of the
-                 edge-point covariance matrix (closed-form weighted
-                 cross-product form); falls back to the analytic
-                 surface normal at the contact centre obtained from
-                 tGeomModel_.getClosestPointAndNormal();
-      - area:    points are projected onto the best-fit plane, swept
-                 in 4 x 15 angular sectors around the contact centre,
-                 the outermost point per sector is kept and the
-                 resulting convex polygon is closed; the area is the
-                 sum of the triangle fan (centre, sector_i,
-                 sector_i+1);
-      - non-convex bodies: edge sub-volumes are first grouped into
-                 connected subContacts (findsubContacts merges
-                 face-adjacent leaves, canCombineSubContacts), the
-                 normal/area evaluation runs per cluster and the
-                 results are volume-weighted averages.
-
-    Pseudo-2D and overflow handling
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    The pair bounding box arrives already clipped to a single
-    sub-volume layer in the empty direction (see prtContactInfo::
-    getContacts_ArbShape), and the evaluated volume/area are rescaled
-    by vMeshInfo_.emptyScale at the caller. Within this class the
-    traversal is unchanged -- the octree is simply shallower in the
-    empty direction.
-
-    The visit cap (iterMax_, see virtualMesh.H) counts every node
-    entered by detectFirstVolumeInContact and inspectSubVolume. Past
-    the cap the traversal stops: detection reports no contact, the
-    evaluation returns a truncated volume (both warn once). Because
-    the cap is derived from the tree geometry alone (8*rootVolume/
-    subVolumeV, min maxSubVolumes), a complete scan of an admissible
-    tree never reaches it.
-
-    Sketch of the shared classification states
-    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-                         +------------------+
-                         |   root subVol   |
-                         +--------+---------+
-                                  | classify vs body c / body t
-                     +------------+------------+------------+
-                     |            |            |            |
-                  OUTSIDE      INSIDE       MIXED      (leaf res.)
-                  (prune)     (contact)    (refine)    limitFinal
-                                                      SubVolume -> leaf
-                                                      bbox overlap
-
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "virtualMesh.H"
 
 #include "subVolume.H"
 #include "virtualMeshLevel.H"
-#include "virtualMeshTools.H"
 
 using namespace Foam;
 
@@ -155,39 +67,11 @@ virtualMesh::virtualMesh
 :
 cGeomModel_(cGeomModel),
 tGeomModel_(tGeomModel),
-vMeshInfo_(vMeshInfo),
-iterCount_(0),
-iterMax_
-(
-    maxVSIter
-    (
-        8.0*vMeshInfo.sV.volume()
-       /max(vMeshInfo.subVolumeV, VSMALL)
-    )
-),
-truncated_(false)
+vMeshInfo_(vMeshInfo)
 {}
 
 virtualMesh::~virtualMesh()
 {}
-//---------------------------------------------------------------------------//
-void virtualMesh::warnTruncated(const word& where)
-{
-    truncated_ = true;
-
-    WarningInFunction
-        << "virtualMesh::" << where << ": octree visit cap " << iterMax_
-        << " reached — "
-        << (where == "inspectSubVolume"
-            ? "the contact volume is truncated and the reported contact "
-               "force may be underestimated"
-            : "no contact is reported this check")
-        << ". Virtual mesh bBox: " << vMeshInfo_.sV
-        << ", subVolumeV: " << vMeshInfo_.subVolumeV
-        << ". Consider lowering virtualMesh level, increasing virtualMesh "
-        << "charCellSize, or raising maxSubVolumes."
-        << endl;
-}
 //---------------------------------------------------------------------------//
 bool virtualMesh::detectFirstContactPoint()
 {
@@ -201,15 +85,6 @@ bool virtualMesh::detectFirstContactPoint()
 //---------------------------------------------------------------------------//
 bool virtualMesh::detectFirstVolumeInContact(subVolume& sV, bool& startPointFound)
 {
-    if (++iterCount_ > iterMax_ && !truncated_)
-    {
-        warnTruncated("detectFirstVolumeInContact");
-    }
-    if (iterCount_ > iterMax_)
-    {
-        return false;
-    }
-
     ibSubVolumeInfo& cInfo = sV.cVolumeInfo();
     ibSubVolumeInfo& tInfo = sV.tVolumeInfo();
 
@@ -343,15 +218,6 @@ void virtualMesh::inspectSubVolume(
     DynamicPointList& edgePoints
 )
 {
-    if (++iterCount_ > iterMax_ && !truncated_)
-    {
-        warnTruncated("inspectSubVolume");
-    }
-    if (iterCount_ > iterMax_)
-    {
-        return;
-    }
-
     ibSubVolumeInfo& cInfo = sV.cVolumeInfo();
     ibSubVolumeInfo& tInfo = sV.tVolumeInfo();
 

@@ -10,25 +10,24 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "addModelDistribution.H"
 #include "meshSearch.H"
@@ -78,6 +77,7 @@ timeBetweenUsage_(0),
 partPerAdd_(0),
 fieldValue_(0),
 addedOnTimeLevel_(0),
+partPerAddTemp_(0),
 
 zoneName_(),
 minBound_(vector::zero),
@@ -85,10 +85,16 @@ maxBound_(vector::zero),
 
 bodyAdditionAttemptCounter_(0),
 
+succesfulladition_(false),
+restartPartCountTemp_(false),
+reapeatedAddition_(false),
+firstTimeRunning_(true),
 cellZoneActive_(false),
 boundBoxActive_(false),
+octreeField_(mesh_.nCells(), 0),
 timeBased_(false),
 fieldBased_(false),
+fieldCurrentValue_(0),
 allActiveCellsInMesh_(true),
 randGen_(clock::getTime())
 {
@@ -189,6 +195,8 @@ void addModelDistribution::init()
         InfoH << addModel_Info << "-- addModelMessage-- "
              << "addition zone completely immersed in mesh -> OK" << endl;
     }
+
+    partPerAddTemp_ = partPerAdd_;
 }
 
 //---------------------------------------------------------------------------//
@@ -295,6 +303,7 @@ std::shared_ptr<geomModel> addModelDistribution::addBody
 				useNTimes_--;
 				InfoH << addModel_Info << "-- addModelMessage-- "
                     << " useNTimes: " << useNTimes_<<  endl;
+				reapeatedAddition_ = false;
 			}
 		}
 
@@ -333,11 +342,12 @@ void addModelDistribution::updateCellZoneBoundBox()
         reduce(cellZoneBounds.min(), minOp<vector>());
         reduce(cellZoneBounds.max(), maxOp<vector>());
 
-        // the reduce() above leaves all processors with identical global
-        // bounds, so the members can be updated everywhere
-        minBound_ = cellZoneBounds.min();
-        maxBound_ = cellZoneBounds.max();
-        cellZoneBounds_ = boundBox(minBound_,maxBound_);
+        if (Pstream::myProcNo() == 0)
+        {
+            minBound_ = cellZoneBounds_.min();
+            maxBound_ = cellZoneBounds_.max();
+            cellZoneBounds_ = boundBox(minBound_,maxBound_);
+        }
 }
 //---------------------------------------------------------------------------//
 void addModelDistribution::initializeBoundBox()
@@ -521,10 +531,7 @@ Tuple2<label, scalar> addModelDistribution::returnScaleFactor()
             break;
         }
     }
-    // interpolate the sampled scale between the neighbouring size bins;
-    // clamp the lower bin so that bin 0 does not read particleSize_[-1]
-    label lowerBin(max(missingPart - 1, 0));
-    scalar factor(particleSize_[lowerBin] + (particleSize_[missingPart] - particleSize_[lowerBin]) * randGen_.sample01<scalar>());
+    scalar factor(particleSize_[missingPart - 1] + (particleSize_[missingPart] - particleSize_[missingPart - 1]) * randGen_.sample01<scalar>());
     factor *= convertToMeters_/stlBaseSize_;
 
     Tuple2<label, scalar> returnValue(missingPart, factor);

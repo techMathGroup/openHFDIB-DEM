@@ -10,25 +10,24 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "stlBased.H"
 
@@ -39,10 +38,11 @@ stlBased::stlBased
 (
     const  fvMesh&   mesh,
     const contactType cType,
-    word      stlPath
+    word      stlPath,
+    scalar  thrSurf
 )
 :
-geomModel(mesh,cType),
+geomModel(mesh,cType,thrSurf),
 bodySurfMesh_
 (
     IOobject
@@ -117,7 +117,6 @@ void stlBased::bodyMovePoints
     bodySurfMesh_.movePoints(bodyPoints);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
-    bodyFieldValid_ = false;                                            // points moved: cell lists and the body field are stale
 }
 //---------------------------------------------------------------------------//
 void stlBased::bodyScalePoints
@@ -143,7 +142,6 @@ void stlBased::bodyScalePoints
     bodySurfMesh_.movePoints(bodyPoints);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
-    bodyFieldValid_ = false;                                            // points moved/scaled/rotated/synced
 }
 //---------------------------------------------------------------------------//
 void stlBased::bodyRotatePoints
@@ -177,7 +175,6 @@ void stlBased::bodyRotatePoints
     bodySurfMesh_.movePoints(bodyPoints);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
-    bodyFieldValid_ = false;                                            // points moved/scaled/rotated/synced
 }
 //---------------------------------------------------------------------------//
 void stlBased::synchronPos(label owner)
@@ -204,7 +201,6 @@ void stlBased::synchronPos(label owner)
     bodySurfMesh_.movePoints(bodyPoints);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
-    bodyFieldValid_ = false;                                            // points moved/scaled/rotated/synced
 }
 //---------------------------------------------------------------------------//
 void stlBased::getClosestPointAndNormal
@@ -556,17 +552,8 @@ void stlBased::intersectBb
 //---------------------------------------------------------------------------//
 void stlBased::setBodyPosition(pointField pos)
 {
-    // the DEM broadcast calls this for every body each subcycle with
-    // the points gathered from rank 0; for static bodies
-    // skip the rebuild
-    if (pos == bodySurfMesh_.points())
-    {
-        return;
-    }
-
     bodySurfMesh_.movePoints(pos);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
-    bodyFieldValid_ = false;                                            // points moved: cell lists and the body field are stale
 }
 //---------------------------------------------------------------------------//

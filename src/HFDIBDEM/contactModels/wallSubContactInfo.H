@@ -10,19 +10,19 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Description
@@ -32,9 +32,8 @@ SourceFiles
     wallSubContactInfo.C
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef wallSubContactInfo_H
@@ -50,7 +49,6 @@ Contributors
 #include "materialInfo.H"
 #include "physicalProperties.H"
 #include "forces.H"
-#include "demTimeStepInfo.H"
 #include "spectatorMesh.H"
 #include "virtualMeshWall.H"
 
@@ -87,7 +85,7 @@ class wallSubContactInfo
 
     wallContactVars wallCntvar_;
 
-    scalar reduceM_ = 0;    // Reduced mass
+    scalar reduceM_;    // Reduced mass
 
     forces outForce_; // Out variable for force
 
@@ -139,16 +137,6 @@ class wallSubContactInfo
         return wallCntvar_;
     }
 
-    scalar& getReduceM()
-    {
-        return reduceM_;
-    }
-
-    const boundBox& getBB() const
-    {
-        return BB_;
-    }
-
     void clearWallCntVars();
 
     scalar getMu(wallContactVars& wallCntvar)
@@ -181,75 +169,7 @@ class wallSubContactInfo
 
     vector getFNd(wallContactVars& wallCntvar);
 
-    // tangential force of the current sub-step; the coulomb
-    // ceiling FtCeil (= mu*mag(FN) of this sub-contact) caps the
-    // APPLIED force and the stored state FtPrev_ alike, so the
-    // spring stops stretching at the sliding limit
-    vector getFt
-    (
-        wallContactVars& wallCntvar,
-        scalar deltaT,
-        scalar FtCeil = GREAT
-    );
-
-    // stability step of this wall contact from the cached contact
-    // state (the contact class of the adaptive DEM time-step
-    // estimator). the wall mass is infinite, so the reduced mass
-    // is the full body mass M0 - same value reduceM_ now carries
-    // for the force laws. tangentialFactor scales the tangential
-    // branch (1 = full conservatism); damping sits inside the
-    // stepDEM safety factor.
-    scalar getPairDtCrit
-    (
-        wallContactVars& wallCntvar,
-        ibContactVars& cVars,
-        scalar tangentialFactor = 1.0
-    )
-    {
-        return demTimeStepInfo::pairDtCrit
-        (
-            demTimeStepInfo::effK
-            (
-                wallCntvar.getMeanCntPar().aY_,
-                wallCntvar.contactVolume_,
-                wallCntvar.getMeanCntPar().aG_,
-                wallCntvar.contactArea_,
-                wallCntvar.Lc_,
-                tangentialFactor
-            ),
-            cVars.M0_
-        );
-    }
-
-    // rotational stability step: the tangential
-    // force on the cached lever arm lVec_ acts on the body's
-    // lambda_min inertia (the wall contributes no rotational mode).
-    scalar getPairDtCritRot
-    (
-        wallContactVars& wallCntvar,
-        ibContactVars& cVars,
-        scalar IeffC,
-        scalar tangentialFactor = 1.0,
-        scalar rotationalFactor = 1.0
-    )
-    {
-        const scalar kT
-        (
-            rotationalFactor*tangentialFactor
-                *demTimeStepInfo::contactKT
-                (
-                    wallCntvar.getMeanCntPar().aG_,
-                    wallCntvar.contactArea_,
-                    wallCntvar.Lc_
-                )
-        );
-
-        return min
-        (
-            getPairDtCrit(wallCntvar, cVars, tangentialFactor),
-            demTimeStepInfo::rotationalDtCrit(kT, mag(wallCntvar.lVec_), IeffC)
-        );
-    }
+    vector getFt(wallContactVars& wallCntvar, scalar deltaT);
 
     forces& getOutForce()
     {

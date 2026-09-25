@@ -103,6 +103,32 @@ volScalarField surface
 
 #include "createPhi.H"
 
+volScalarField normMagVort
+(
+    IOobject
+    (
+        "normMagVort",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+    mesh,
+    dimensionedScalar("zero", dimless, 0.0)
+);
+
+volScalarField refineCombined
+(
+    IOobject
+    (
+        "refineCombined",
+        runTime.timeName(),
+        mesh,
+        IOobject::READ_IF_PRESENT,
+        IOobject::AUTO_WRITE
+    ),
+    max(normMagVort, refineF)
+);
 
 label pRefCell = 0;
 scalar pRefValue = 0.0;

@@ -1,5 +1,4 @@
 geomModels/geomModel.C
-geomModels/createBodyConnectivity.C
 geomModels/stlBased/stlBased.C
 geomModels/stlBased/convexBody.C
 geomModels/stlBased/nonConvexBody.C
@@ -12,7 +11,6 @@ virtualMesh/subContact.C
 virtualMesh/subVolume.C
 virtualMesh/virtualMesh.C
 virtualMesh/spectatorMesh.C
-virtualMesh/virtualMeshTools.C
 virtualMesh/virtualMeshWall.C
 contactModels/materialInfo.C
 contactModels/wallContactVars.C
@@ -37,8 +35,6 @@ ibInterpolation/lineInt/lineIntInfo.C
 ibInterpolation/lineInt/lineInt.C
 ibInterpolation/leastSquaresInt/leastSquaresIntInfo.C
 ibInterpolation/leastSquaresInt/leastSquaresInt.C
-fluidSolidCoupling/fluidSolidCoupling.C
-fluidSolidCoupling/ibCoupling.C
 immersedBody.C
 openHFDIBDEM.C
 LIB = $(FOAM_USER_LIBBIN)/libHFDIBDEM

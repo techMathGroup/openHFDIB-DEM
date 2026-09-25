@@ -10,32 +10,31 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "wallSubContactInfo.H"
 
 #include "interAdhesion.H"
 #include "wallMatInfo.H"
 
-#include "virtualMeshTools.H"
+#include "virtualMeshLevel.H"
 #include "wallPlaneInfo.H"
 #include "contactModelInfo.H"
 using namespace Foam;
@@ -59,15 +58,6 @@ bodyId_(bodyId)
 {
     forAll(contactBBData,cBD)
     {
-        scalar emptyScale
-        (
-            clipEmptyDirection
-            (
-                contactBBData[cBD].second(),
-                contactBBData[cBD].first()
-            )
-        );
-
         vector subVolumeNVector = vector(
             floor((contactBBData[cBD].second().span()[0]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision()),
             floor((contactBBData[cBD].second().span()[1]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision()),
@@ -87,8 +77,7 @@ bodyId_(bodyId)
             }
             // Pout <<" Corrected subVolumeNVector "<< subVolumeNVector << endl;
         }
-
-        checkVMSize(subVolumeNVector, contactBBData[cBD].second(), "body-contact");
+     
 
         autoPtr<virtualMeshWallInfo> vmWInfo(
             new virtualMeshWallInfo(
@@ -96,30 +85,14 @@ bodyId_(bodyId)
                 contactBBData[cBD].first(),
                 subVolumeNVector,
                 virtualMeshLevel::getCharCellSize(),
-                pow(virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision(),3),
-                emptyScale
-            )
+                pow(virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision(),3)
+            )  
         );
         vmWInfoList_.append(std::move(vmWInfo));
     }
 
     forAll(planeBBData,pBD)
     {
-        const scalar svEdge
-        (
-            virtualMeshLevel::getCharCellSize()
-           /virtualMeshLevel::getLevelOfDivision()
-        );
-
-        scalar emptyScale
-        (
-            clipEmptyDirection
-            (
-                planeBBData[pBD].second(),
-                planeBBData[pBD].first()
-            )
-        );
-
         vector subVolumeNVector = vector(
             ceil((planeBBData[pBD].second().span()[0]/virtualMeshLevel::getCharCellSize()))*virtualMeshLevel::getLevelOfDivision(),
             ceil((planeBBData[pBD].second().span()[1]/virtualMeshLevel::getCharCellSize()))*virtualMeshLevel::getLevelOfDivision(),
@@ -128,36 +101,13 @@ bodyId_(bodyId)
 
         for(int i=0;i<3;i++)
         {
-            // Original single-layer fix for the degenerate (wall-normal)
-            // direction of the projected plane box
             if(subVolumeNVector[i] == planeBBData[pBD].second().minDim())
-            {
+            {                
                 subVolumeNVector[i] = 1;
-                planeBBData[pBD].second().min()[i] -= svEdge*0.5;
-                planeBBData[pBD].second().max()[i] += svEdge*0.5;
-            }
-            // Pseudo-2D: collapse a clipped empty-direction slab (exactly
-            // one sub-volume edge) to a single layer instead of
-            // levelOfDivision layers
-            else if
-            (
-                !case3D
-             && i == emptyDim
-             && planeBBData[pBD].second().span()[i] <= 1.5*svEdge
-            )
-            {
-                subVolumeNVector[i] = 1;
-                scalar mid = 0.5*
-                (
-                    planeBBData[pBD].second().min()[i]
-                   +planeBBData[pBD].second().max()[i]
-                );
-                planeBBData[pBD].second().min()[i] = mid - 0.5*svEdge;
-                planeBBData[pBD].second().max()[i] = mid + 0.5*svEdge;
-            }
+                planeBBData[pBD].second().min()[i] -=virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision()*0.5;
+                planeBBData[pBD].second().max()[i] +=virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision()*0.5;
+            }  
         }
-
-        checkVMSize(subVolumeNVector, planeBBData[pBD].second(), "plane-contact");
 
         autoPtr<virtualMeshWallInfo> vmWInfo(
             new virtualMeshWallInfo(
@@ -165,8 +115,7 @@ bodyId_(bodyId)
                 planeBBData[pBD].first(),
                 subVolumeNVector,
                 virtualMeshLevel::getCharCellSize(),
-                pow(virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision(),3),
-                emptyScale
+                pow(virtualMeshLevel::getCharCellSize()/virtualMeshLevel::getLevelOfDivision(),3)
             )
         );
         vmPlaneInfoList_.append(std::move(vmWInfo));
@@ -195,8 +144,13 @@ void wallSubContactInfo::evalVariables(
     ibContactVars& cVars
 )
 {
-    // wall is infinitely massive: reduceM_ = body mass
-    reduceM_ = ibCClass.getGeomModel().getM0();
+    reduceM_ =
+    (
+        ibCClass.getGeomModel().getM0()
+        *ibCClass.getGeomModel().getM0()
+        /(ibCClass.getGeomModel().getM0()
+        +ibCClass.getGeomModel().getM0())
+    );
 
     wallCntvar.lVec_ = getLVec(wallCntvar,ibCClass);
     // wallCntvar.lVec_ = wallCntvar.contactCenter_ - ibCClass.getGeomModel().getCoM();
@@ -238,12 +192,7 @@ vector wallSubContactInfo::getFNd(wallContactVars& wallCntvar)
 
 }
 //---------------------------------------------------------------------------//
-vector wallSubContactInfo::getFt
-(
-    wallContactVars& wallCntvar,
-    scalar deltaT,
-    scalar FtCeil
-)
+vector wallSubContactInfo::getFt(wallContactVars& wallCntvar, scalar deltaT)
 {
     physicalProperties& meanCntPar(wallCntvar.getMeanCntPar());
     // project last Ft into a new direction
@@ -252,46 +201,28 @@ vector wallSubContactInfo::getFt
         *wallCntvar.contactNormal_);
     // scale projected Ft to have same magnitude as FtLast
     vector FtLastS(mag(wallCntvar.FtPrev_) * (FtLastP/(mag(FtLastP)+SMALL)));
-    
     // compute relative tangential velocity
-    vector Vn((wallCntvar.Veli_ & wallCntvar.contactNormal_)
-        *wallCntvar.contactNormal_);
-    vector Vt(wallCntvar.Veli_ - Vn);
+    // vector cVeliNorm = wallCntvar.Veli_
+        // - ((wallCntvar.Veli_ & wallCntvar.contactNormal_)
+        // *wallCntvar.contactNormal_);
+    vector cVeliNorm = wallCntvar.Veli_*(wallCntvar.Veli_&wallCntvar.contactNormal_);
 
+    vector Vt(wallCntvar.Veli_-(cVeliNorm - vector::zero));
     // compute tangential force
     if(contactModelInfo::getUseMindlinRotationalModel())
     {
-        scalar tangTune(demTimeStepInfo::tangTune_);                    //read empirical mambo-jambo from demTimeStepInfo
-        scalar kT = tangTune*8*meanCntPar.aG_*(wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL));
+        
+        scalar kT = 200*8*meanCntPar.aG_*(wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL));
         vector deltaFt(kT*Vt*deltaT + 2*meanCntPar.reduceBeta_*sqrt(kT*reduceM_)*Vt);
-        // the spring can stretch by at most one ceiling per
-        // sub-step
-        if (mag(deltaFt) > FtCeil)
-        {
-            deltaFt *= FtCeil/(mag(deltaFt) + SMALL);
-        }
-        wallCntvar.FtPrev_ = FtLastS - deltaFt;
+        wallCntvar.FtPrev_ = - FtLastS - deltaFt;
     }
 
     if(contactModelInfo::getUseChenRotationalModel())
     {
-
+   
         vector Ftdi(meanCntPar.reduceBeta_*sqrt(meanCntPar.aG_*reduceM_*wallCntvar.Lc_)*Vt);
         Ftdi += meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT;
-        // same one-ceiling bound on the increment as above
-        if (mag(Ftdi) > FtCeil)
-        {
-            Ftdi *= FtCeil/(mag(Ftdi) + SMALL);
-        }
-        wallCntvar.FtPrev_ = FtLastS - Ftdi;
-    }
-
-    // coulomb cap feeds back into the stored state: the spring
-    // stops stretching at the sliding ceiling, so the applied
-    // force and the state can never disagree
-    if (mag(wallCntvar.FtPrev_) > FtCeil)
-    {
-        wallCntvar.FtPrev_ *= FtCeil/(mag(wallCntvar.FtPrev_) + SMALL);
+        wallCntvar.FtPrev_ = - FtLastS - Ftdi;
     }
 
     return wallCntvar.FtPrev_;

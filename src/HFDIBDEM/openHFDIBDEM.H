@@ -10,24 +10,24 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Description
-    implementation of the HFDIB method (Municchi and Radl, 2018) in OpenFOAM
-    extended by connection with (level-set) DEM (Isoz and Sourek, 2022)
+    implementation of the HFDIB method (Municchi and Radl, 2016) in OpenFOAM
+    extended by connection with (level-set) DEM (Isoz and Sourek, 2020)
 
 
 SourceFiles
@@ -35,8 +35,7 @@ SourceFiles
 
 Contributors
     Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*)
 \*---------------------------------------------------------------------------*/
 
 #ifndef openHFDIBDEM_H
@@ -113,60 +112,6 @@ namespace Foam
     // DEM step
     scalar stepDEM_;
 
-    // switch for the adaptive DEM time step (contact-potential test)
-    bool adaptiveDEM_;
-
-    // safety factors for the conservative sweep distance used when
-    // sorting bodies into the sub-cycled / single-stepped sets:
-    //  - translation: bounds |Vel|*dt (+ |a|*dt^2 for free bodies) with
-    //    a margin for the force state drifting over the CFD step
-    //  - rotation: bounds omega*rMax*dt with a larger margin - rotation
-    //    moves contact points tangentially, which the tight-bbox tests
-    //    of the live Verlet list only catch after the fact
-    scalar sweepSafetyTrans_;
-    scalar sweepSafetyRot_;
-
-    // switch for the deltaTDEM estimator inside adaptiveStepDEM
-    // (false restores the legacy stepDEM fraction of the CFD step)
-    bool useDEMdtEstimator_;
-
-    // pre-contact area estimate model: conservative uses areaCoeff*h^2,
-    // velocityAware caps it by the hertz peak contact area
-    // pi*R*deltaMax(v)
-    bool dtEstimatorVelocityAware_;
-
-    // c_A multiplier on h^2 in the pre-contact area estimate
-    scalar dtAreaCoeff_;
-
-    // multiplier on the tangential stiffness when sizing the step
-    // (1 = full conservatism; the implemented tangential law carries
-    // an empirical 200x tuning factor that makes it govern)
-    scalar dtTangentialFactor_;
-
-    // multiplier on the tangential stiffness of the rotational bound
-    // only (escape hatch if the rotational estimate is too tight)
-    scalar dtRotationalFactor_;
-
-    // floor on the estimated deltaTDEM (0 = off). binding means the
-    // estimated stability bound is being exceeded - warned in the log
-    scalar dtMinDEMdt_;
-
-    // cap on the DEM subcycle count (0 = unlimited). binding means the
-    // estimated stability bound is being exceeded - warned in the log
-    label dtMaxDEMSubCycles_;
-
-    // report the used/hertz/rayleigh step line every N CFD steps
-    label dtReportInterval_;
-
-    // per-CFD-step DEM step estimate (stepDEM_ * min pair stability
-    // step); GREAT when no pair constrains
-    scalar deltaTDEM_;
-
-    // hertz contact-duration and rayleigh surface-wave steps of the
-    // same pair set (diagnostics only, never used for sizing)
-    scalar dtDiagHertz_;
-    scalar dtDiagRayleigh_;
-
     // how many times rocompute M0_ because of mesh refinement
     label recomputeM0_;
 
@@ -180,10 +125,6 @@ namespace Foam
     bool recordSimulation_;
     bool recordFirstTimeStep_ = false;
     word recordOutDir_;
-
-    // counters, reset once per time step, tracking addRemoveBodies activity
-    label nBodiesAddedLastStep_ = 0;
-    label nBodiesRemovedLastStep_ = 0;
 
     public:
 
@@ -212,16 +153,6 @@ namespace Foam
     );
 
     void createBodies
-    (
-        volScalarField& body,
-        volScalarField& refineF
-    );
-    void recreateBodies
-    (
-        volScalarField& body,
-        volScalarField& refineF
-    );
-    void createBodiesComputeDynamicsVars
     (
         volScalarField& body,
         volScalarField& refineF
@@ -258,26 +189,43 @@ namespace Foam
     );
     void postUpdateBodies
     (
-        const volScalarField& body,
-        const volVectorField& f
+        volScalarField& body,
+        volVectorField& fPress,
+        volVectorField& fVisc
     );
     void postUpdateBodies
     (
-        const volScalarField& body,
-        const volVectorField& f,
+        volScalarField& body,
+        volVectorField& fPress,
+        volVectorField& fVisc,
+        const bool applyAddedMass
+    );
+    void postUpdateBodies
+    (
+        volScalarField& body,
+        volVectorField& f
+    );
+    void postUpdateBodies
+    (
+        volScalarField& body,
+        volVectorField& f,
         const bool kinematicForce,
         const bool applyAddedMass
     );
 
-    void postUpdateBodies
+    void updateFSCoupling
     (
-        const volScalarField& body,
-        const volVectorField& f,
-        const volScalarField& rho,
-        const bool kinematicForce,
+        volScalarField& body,
+        volVectorField& fPress,
+        volVectorField& fVisc
+    );
+    void updateFSCoupling
+    (
+        volScalarField& body,
+        volVectorField& fPress,
+        volVectorField& fVisc,
         const bool applyAddedMass
     );
-
     void updateFSCoupling
     (
         volScalarField& body,
@@ -291,55 +239,9 @@ namespace Foam
         const bool applyAddedMass
     );
 
+    void recreateBodies(volScalarField& body,volScalarField& refineF);
     // void for DEM inner-loops
     void updateDEM(volScalarField& body,volScalarField& refineF);
-
-    // adaptiveStepDEM: sort bodies into the sub-cycled set A (contact
-    // potential with another body or a wall during the coming CFD time
-    // step) and the single-stepped set B (no potential). Both sets
-    // exclude static bodies and are rank-uniform (reduced over all
-    // processors). hardFlags/sweepDist report the internal
-    // classification for the DEM dt estimator.
-    void computeAdaptiveSets
-    (
-        HashSet<label,Hash<label>>& subCycle,
-        HashSet<label,Hash<label>>& singleStep,
-        HashSet<label,Hash<label>>& hardFlags,
-        HashTable<scalar,label,Hash<label>>& sweepDist
-    );
-
-    // compute the system DEM step from two pair classes: contact
-    // (ongoing contact, cached contact state) and pre-contact
-    // (sweep-inflated pairs, estimated geometry). hertz/rayleigh
-    // steps are diagnostics only. the min and its governing pair are
-    // reduced across ranks
-    void computeDEMdtEstimate
-    (
-        const HashSet<label,Hash<label>>& subCycle,
-        const HashSet<label,Hash<label>>& hardFlags,
-        const HashTable<scalar,label,Hash<label>>& sweepDist
-    );
-
-    // upper bound on the contact-point speed magnitude of a body
-    // (|Vel| + |omega|*rMax), used for the pre-contact approach speed
-    scalar pairApproachSpeed(immersedBody& ib) const;
-
-    // upper bound on the lever arm of any contact point of the body
-    // (bbox corner distance from the CoM); static bodies
-    // (bodyOperation_ == 0) return 0 - they are not integrated
-    // rotationally
-    scalar bodyRMax(immersedBody& ib) const;
-
-    // smallest principal moment of inertia (lambda_min of I); GREAT
-    // for static bodies so their rotational bound never governs
-    scalar bodyIeff(immersedBody& ib) const;
-
-    // drop all contact bookkeeping of  body bodyId: the
-    // prtcInfoTable_ entries of every pair containing it (the
-    // Verlet-driven erase paths no longer see the body) and its
-    // Verlet-list entry.
-    // Note (MI): used in clean-up of switched-off bodies
-    void removeBodyContacts(label bodyId);
 
     prtContactInfo& getPrtcInfo(Tuple2<label,label> cPair);
 
@@ -376,26 +278,12 @@ namespace Foam
         recordFirstTimeStep_ = setUp;
     }
 
-    // number of bodies added by addRemoveBodies during the last time step
-    label nBodiesAddedLastStep() const
-    {
-        return nBodiesAddedLastStep_;
-    }
-
-    // number of bodies switched off (left the domain) during the last time step
-    label nBodiesRemovedLastStep() const
-    {
-        return nBodiesRemovedLastStep_;
-    }
-
     void writeFirtsTimeBodiesInfo();
 
     void setSolverInfo();
     
     void updateBodiesRhoF(const scalar rho);
     void updateBodiesRhoF(const volScalarField& rho, const volScalarField& body);
-
-    scalar computeBodiesLinCourantNo();
  };
 }
 

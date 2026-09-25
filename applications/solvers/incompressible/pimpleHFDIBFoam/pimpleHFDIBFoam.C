@@ -32,24 +32,6 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-
-/*---------------------------------------------------------------------------*\
-    Note
-
-    This file has been modified and extended as part of openHFDIB-DEM.
-
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
-
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
-\*---------------------------------------------------------------------------*/
 #include "fvCFD.H"
 #include "dynamicFvMesh.H"
 
@@ -97,7 +79,11 @@ int main(int argc, char *argv[])
     Info << "\nInitializing HFDIBDEM\n" << endl;
     openHFDIBDEM  HFDIBDEM(mesh);
     HFDIBDEM.initialize(lambda,U,refineF,maxRefinementLevel,runTime.timeName());
-    // #include "initialMeshRefinement.H"
+    //#include "initialMeshRefinement.H"
+    if (runTime.timeIndex() == 0)
+    {
+          #include "initialMeshRefinement.H"
+    }
 
     if(HFDIBDEM.getRecordFirstTime())
     {
@@ -110,8 +96,6 @@ int main(int argc, char *argv[])
     scalar CFDTime_(0.0);
     scalar DEMTime_(0.0);
     scalar suplTime_(0.0);
-
-    bool doInitialMeshRefinement(runTime.timeIndex() == 0);
 
     while (runTime.run())
     {
@@ -132,14 +116,7 @@ int main(int argc, char *argv[])
         Info<< "Time = " << runTime.timeName() << nl << endl;
 
         clockTime createBodiesTime; // OS time efficiency testing
-        Info << "Creating immersed bodies" << endl;
         HFDIBDEM.createBodies(lambda,refineF);
-        if (doInitialMeshRefinement)
-        {
-            Info << "Running initial mesh refinement for maxRefinementLevel: " << maxRefinementLevel << endl;
-            #include "meshRefinementLoop.H"
-            doInitialMeshRefinement = false;
-        }
         HFDIBDEM.updateBodiesRhoF(rho.value());
         suplTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
 
@@ -186,8 +163,8 @@ int main(int argc, char *argv[])
                         #include "meshCourantNo.H"
                     }
 
-                    Info << "Recreating immersed bodies after mesh update" << endl;
                     lambda *= 0.0;
+
                     HFDIBDEM.recreateBodies(lambda,refineF);
                     HFDIBDEM.updateSurface(thrSurf,lambda,surface);
                     volVectorField gradLambda(fvc::grad(lambda));                    
@@ -239,26 +216,21 @@ int main(int argc, char *argv[])
         // }
         
         // HFDIBDEM.postUpdateBodies(lambda,gradLambda,fDragPress,fDragVisc);
-        // HFDIBDEM.postUpdateBodies(lambda,f);
-
-        // HFDIBDEM.updateFSCoupling(lambda, f, true, false);
-        HFDIBDEM.postUpdateBodies(lambda, f, true, false);
-
+        // kinematicForce=true: scale coupling force by rhoF (f is kinematic)
+        HFDIBDEM.postUpdateBodies(lambda,f,true,false);
+	Info << "post updated body HFDIBDEM" << endl;
         suplTime_ += postUpdateBodiesTime.timeIncrement();
-
 
         clockTime addRemoveTime;
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
+        Info << "add removed bodies HFDIBDEM" << endl;
         HFDIBDEM.updateBodiesRhoF(rho.value());
-        if (HFDIBDEM.nBodiesAddedLastStep() > 0 || HFDIBDEM.nBodiesRemovedLastStep() > 0)
-        {
-            Info << "Running add/remove bodies-invoked mesh refinement for maxRefinementLevel: " << maxRefinementLevel << endl;
-            #include "meshRefinementLoop.H"
-        }
+        Info << "update bodies rhoF HFDIBDEM" << endl;
         suplTime_ += addRemoveTime.timeIncrement();
 
         clockTime updateDEMTime;
         HFDIBDEM.updateDEM(lambda,refineF);
+        Info << "updated DEM HFDIBDEM" << endl;
         DEMTime_ += updateDEMTime.timeIncrement();
         Info << "updated HFDIBDEM" << endl;
 

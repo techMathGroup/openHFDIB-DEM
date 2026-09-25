@@ -10,25 +10,24 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "lineInt.H"
 
@@ -76,7 +75,7 @@ void lineInt::correctVelocity
     List<point>& ibPoints = intpInfo.getIbPoints();
     List<List<intPoint>>& intPoints = intpInfo.getIntPoints();
 
-    getCurVelocity(intPoints);
+    getCurVelocity(intPoints, mesh);
     List<label> intOrder = getIntOrder(intPoints);
 
     forAll(intPoints, ibp)
@@ -144,7 +143,8 @@ void lineInt::correctVelocity
 //---------------------------------------------------------------------------//
 void lineInt::getCurVelocity
 (
-    List<List<intPoint>>& intPoints
+    List<List<intPoint>>& intPoints,
+    const Foam::fvMesh& mesh
 )
 {
     List<DynamicPointList> intPointToSync(Pstream::nProcs());
@@ -159,6 +159,13 @@ void lineInt::getCurVelocity
 
             if(curIPoint.iProc_ == Pstream::myProcNo())
             {
+                // Guard against stale cell indices after topology change
+    		if (curIPoint.iCell_ < 0 || curIPoint.iCell_ >= mesh.nCells())
+    		{
+        		curIPoint.iProc_ = -1;
+        		curIPoint.iVel_ = vector::zero;
+        		continue;
+    		}
                 curIPoint.iVel_ =  interpV_->interpolate(
                     curIPoint.iPoint_,
                     curIPoint.iCell_
@@ -223,6 +230,12 @@ void lineInt::getCurVelocity
     {
         forAll(intPRecv[proci], pi)
         {
+            if (intCRecv[proci][pi] < 0 ||
+        	intCRecv[proci][pi] >= mesh.nCells())
+    	    {
+        	intVelRtrn[proci].append(vector::zero);
+        	continue;
+    	    }
             intVelRtrn[proci].append(
                 interpV_->interpolate(
                     intPRecv[proci][pi],

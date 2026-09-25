@@ -10,25 +10,24 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "lineIntInfo.H"
 
@@ -50,19 +49,16 @@ lineIntInfo::~lineIntInfo()
 //---------------------------------------------------------------------------//
 void lineIntInfo::setIntpInfo()
 {
-    // Info << "!! --> entry check !!" << endl;
     const DynamicLabelList& cSurfCells = getSurfCells();
 
     resetIntpInfo(cSurfCells.size());
-    setIbCellLabels(cSurfCells);
     List<point>& ibPoints = getIbPoints();
     List<vector>& ibNormals = getIbNormals();
     List<List<intPoint>>& intPoints = getIntPoints();
-    const scalar& intDist = charCellSize_;                              //use IB characteristic cell size - const in method
 
     // prepare lists of points to solve
-    List<DynamicList<point>> ibPointsToSolve(Pstream::nProcs());        //Note (LK): include this as a part of the intPoint struct?
-    List<DynamicList<vector>> ibNormalsToSolve(Pstream::nProcs());      //Note (LK): include this as a part of the intPoint struct?
+    List<DynamicList<point>> ibPointsToSolve(Pstream::nProcs()); // include this as a part of the intPoint struct?
+    List<DynamicList<vector>> ibNormalsToSolve(Pstream::nProcs()); // include this as a part of the intPoint struct?
     List<DynamicList<intPoint>> intPointsToSolve(Pstream::nProcs());
 
     // create temporary unit surface normals
@@ -70,24 +66,25 @@ void lineIntInfo::setIntpInfo()
     {
         // get surface cell label
         label scell = cSurfCells[cellI];
+        scalar intDist = Foam::pow(mesh_.V()[scell],0.333);
 
-        geomModel_->getClosestPointAndNormal(                           //finds surface point and normal
+        geomModel_->getClosestPointAndNormal(
             mesh_.C()[scell],
             intDist*2*vector::one,
-            ibPoints[cellI],                                            //stores surface point
+            ibPoints[cellI],
             ibNormals[cellI]
         );
 
         intPoints[cellI].setSize(ORDER+1);
         intPoint cIntPoint
         (
-            ibPoints[cellI],                                            //1st is surface point
-            scell,                                                      //mesh cell label for surface cell
-            Pstream::myProcNo(),                                        //processor with current point
-            Pstream::myProcNo(),                                        //processor with originating surface cell
-            cellI                                                       //local surface cell label (in cSurfCells list)
+            ibPoints[cellI],
+            scell,
+            Pstream::myProcNo(),
+            Pstream::myProcNo(),
+            cellI
         );
-        intPoints[cellI][0] = cIntPoint;                                //save as the first interpolation point
+        intPoints[cellI][0] = cIntPoint;
 
         // save for looping lists
         ibPointsToSolve[Pstream::myProcNo()].append(ibPoints[cellI]);
@@ -96,11 +93,7 @@ void lineIntInfo::setIntpInfo()
     }
 
     // go by orders
-    // Info << "!! --> finding int points check !!" << endl;
-    // intPointI - counter, after the loop, index of interpolation point
-    // .. 0 -> surface point, then interpolation points up to ORDER
-    // Note (MI): rethink the comments (to do MI + LK)
-    for(label intPointI = 0; intPointI < ORDER; ++intPointI)
+    for(label i = 0; i < ORDER; ++i)
     {
         // lists to send
         List<DynamicList<point>> ibPointsToSend(Pstream::nProcs());
@@ -111,19 +104,17 @@ void lineIntInfo::setIntpInfo()
         List<DynamicList<point>> ibPointsToCont(Pstream::nProcs());
         List<DynamicList<vector>> ibNormalsToCont(Pstream::nProcs());
         List<DynamicList<intPoint>> intPointsToCont(Pstream::nProcs());
-        
 
         // loop over processors
-        // Note (MI): rethink indexing variables - iInfo vs proci vs cellI
         for (label proci = 0; proci < Pstream::nProcs(); proci++)
         {
-            // Info << "!!   |-> loop over intPointsToSolve !!" << endl;
             // loop over interpolation points
             forAll(intPointsToSolve[proci], iInfo)
             {
                 // latest interpolation point
                 intPoint cIntPoint = intPointsToSolve[proci][iInfo];
                 point cPoint = cIntPoint.iPoint_;
+                scalar intDist = Foam::pow(mesh_.V()[cIntPoint.iCell_],0.333);
 
                 do {
                     cPoint += ibNormalsToSolve[proci][iInfo]*intDist;
@@ -179,7 +170,7 @@ void lineIntInfo::setIntpInfo()
             intPointsToSend[proci].clear();
         }
 
-        // finished solving of received points
+        // finished solving of recieved points
         for (label proci = 0; proci < Pstream::nProcs(); proci++)
         {
             forAll(intPointsRecv[proci], iInfo)
@@ -241,7 +232,7 @@ void lineIntInfo::setIntpInfo()
                 label oLabel = intPointsSolved[proci][iInfo].oLabel_;
 
                 // save int point
-                intPoints[oLabel][intPointI+1] = intPointsSolved[proci][iInfo];
+                intPoints[oLabel][i+1] = intPointsSolved[proci][iInfo];
             }
         }
 

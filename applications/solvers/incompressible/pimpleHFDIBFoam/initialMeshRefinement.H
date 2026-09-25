@@ -4,16 +4,6 @@ for (label level=0;level<maxRefinementLevel+1;level++)
 
     if (mesh.changing())
     {
-        // Do not apply previous time-step mesh compression flux
-        // if the mesh topology changed
-        if (mesh.topoChanging())
-        {
-            talphaPhi1Corr0.clear();
-        }
-
-        gh = (g & mesh.C()) - ghRef;
-        ghf = (g & mesh.Cf()) - ghRef;
-
         MRF.update();
 
         if (correctPhi)
@@ -26,17 +16,14 @@ for (label level=0;level<maxRefinementLevel+1;level++)
 
             // Make the flux relative to the mesh motion
             fvc::makeRelative(phi, U);
-
-            mixture.correct();
         }
 
         if (checkMeshCourantNo)
         {
             #include "meshCourantNo.H"
         }
-
-        Info << "Recreating immersed bodies after mesh update" << endl;
-        lambda *= 0.0;
+//zlobi nula bez tecky
+        lambda *= 0.;
         HFDIBDEM.recreateBodies(lambda,refineF);
     }
 }

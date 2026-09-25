@@ -29,24 +29,6 @@ Description
 
 \*---------------------------------------------------------------------------*/
 
-
-/*---------------------------------------------------------------------------*\
-    Note
-
-    This file has been modified and extended as part of openHFDIB-DEM.
-
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
-
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
-\*---------------------------------------------------------------------------*/
 #include "fvCFD.H"
 #include "dynamicFvMesh.H"
 #include "openHFDIBDEM.H"
@@ -82,6 +64,7 @@ int main(int argc, char *argv[])
     openHFDIBDEM  HFDIBDEM(mesh);
     HFDIBDEM.initialize(lambda,U,refineF,maxRefinementLevel,runTime.timeName());
     HFDIBDEM.setSolverInfo();
+    #include "initialMeshRefinement.H"
 
     Info<< "\nStarting time loop\n" << endl;
     // OS time efficiency testing
@@ -102,16 +85,11 @@ int main(int argc, char *argv[])
         HFDIBDEM.writeFirtsTimeBodiesInfo();
     }
 
-    scalar DEMTime_(0.0);
-
-    bool doInitialMeshRefinement(runTime.timeIndex() == 0);
-
     while (runTime.run())
     {
 
         #include "readDyMControls.H"
-        CoNum = HFDIBDEM.computeBodiesLinCourantNo();
-        Info<< "bodies linear Courant Number max: " << CoNum << endl;
+        #include "CourantNo.H"
         #include "setDeltaT.H"
 
         runTime++;
@@ -120,53 +98,40 @@ int main(int argc, char *argv[])
 
         clockTime createBodiesTime; // OS time efficiency testing
         HFDIBDEM.createBodies(lambda,refineF);
-        if (doInitialMeshRefinement)
-        {
-            Info << "Running initial mesh refinement for maxRefinementLevel: " << maxRefinementLevel << endl;
-            #include "meshRefinementLoop.H"
-            doInitialMeshRefinement = false;
-        }
-        createBodiesTime_ += createBodiesTime.timeIncrement();          // OS time efficiency testing
+        createBodiesTime_ += createBodiesTime.timeIncrement(); // OS time efficiency testing
 
         // clockTime preUpdateBodiesTime; // OS time efficiency testing
         HFDIBDEM.preUpdateBodies(lambda);
-        // preUpdateTime_ += preUpdateBodiesTime.timeIncrement();       // OS time efficiency testing
+        // preUpdateTime_ += preUpdateBodiesTime.timeIncrement(); // OS time efficiency testing
 
         // clockTime meshUpdateTime; // OS time efficiency testing
         mesh.update();
-        // meshUpdateTime_ += meshUpdateTime.timeIncrement();           // OS time efficiency testing
+        // meshUpdateTime_ += meshUpdateTime.timeIncrement(); // OS time efficiency testing
 
         // clockTime meshChangingTime; // OS time efficiency testing
         if (mesh.changing())
         {
-            lambda *= 0.0;
+            lambda *= 0.;
             HFDIBDEM.recreateBodies(lambda,refineF);
         }
-        // meshChangingTime_ += meshChangingTime.timeIncrement();       // OS time efficiency testing
+        // meshChangingTime_ += meshChangingTime.timeIncrement(); // OS time efficiency testing
 
         Info << "updating HFDIBDEM" << endl;
 
         // clockTime postUpdateBodiesTime;
         volVectorField gradLambda(fvc::grad(lambda));
-        HFDIBDEM.postUpdateBodies(lambda,f,false,false);                //MI: here, we should clean up interfaces
+        HFDIBDEM.postUpdateBodies(lambda,f,f);                          //MI: here, we should clean up interfaces
         // postUpdateTime_ += postUpdateBodiesTime.timeIncrement();
 
         // clockTime addRemoveTime;
         HFDIBDEM.addRemoveBodies(lambda,U,refineF);
-        if (HFDIBDEM.nBodiesAddedLastStep() > 0 || HFDIBDEM.nBodiesRemovedLastStep() > 0)
-        {
-            Info << "Running add/remove bodies-invoked mesh refinement for maxRefinementLevel: " << maxRefinementLevel << endl;
-            #include "meshRefinementLoop.H"
-        }
         // addRemoveTime_ += addRemoveTime.timeIncrement();
 
         // clockTime updateDEMTime;
-        // HFDIBDEM.updateDEM(lambda,refineF);
-        clockTime updateDEMTime;
         HFDIBDEM.updateDEM(lambda,refineF);
-        DEMTime_ += updateDEMTime.timeIncrement();
-        Info << "updated HFDIBDEM" << endl;
         // updateDEMTime_ += updateDEMTime.timeIncrement();
+
+        Info << "updated HFDIBDEM" << endl;
 
         runTime.write();
 
@@ -180,8 +145,7 @@ int main(int argc, char *argv[])
         Info<< "ExecutionTime = " << runTime.elapsedCpuTime() << " s"
             << "  ClockTime = " << runTime.elapsedClockTime() << " s"
             << nl << endl;
-        Info << " createBodiesTime         = " << createBodiesTime_    << " s \n" << // endl;
-                " DEMTime_                 = " << DEMTime_             << " s \n" << endl;
+        Info << "createBodiesTime    = " << createBodiesTime_    << " s " << endl;
 
     // Info<< "preUpdateTime       = " << preUpdateTime_       << " s \n"
     //     << "createBodiesTime    = " << createBodiesTime_    << " s \n"

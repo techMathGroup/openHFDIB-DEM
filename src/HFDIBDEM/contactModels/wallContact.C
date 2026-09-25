@@ -10,25 +10,24 @@
 -------------------------------------------------------------------------------
 License
 
-    openHFDIB-DEM is free software: you can redistribute it and/or modify it
-    under the terms of the GNU General Public License (Version 3) as published
-    by the Free Software Foundation.
+    openHFDIB-DEM is licensed under the GNU LESSER GENERAL PUBLIC LICENSE (LGPL).
 
-    openHFDIB-DEM is distributed in the hope that it will be useful, but
-    WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-    or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
-    for more details.
+    Everyone is permitted to copy and distribute verbatim copies of this license
+    document, but changing it is not allowed.
 
-    You should have received a copy of the GNU General Public License
-    along with openHFDIB-DEM. If not, see <http://www.gnu.org/licenses/>.
+    This version of the GNU Lesser General Public License incorporates the terms
+    and conditions of version 3 of the GNU General Public License, supplemented
+    by the additional permissions listed below.
 
-InNamespace
+    You should have received a copy of the GNU Lesser General Public License
+    along with openHFDIB. If not, see <http://www.gnu.org/licenses/lgpl.html>.
+
+InNamspace
     Foam
 
 Contributors
-    Federico Municchi (2016),
-    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-2025),
-    Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
+    Martin Isoz (2019-*), Martin Kotouč Šourek (2019-*),
+    Ondřej Studeník (2020-*)
 \*---------------------------------------------------------------------------*/
 #include "wallContact.H"
 #include "wallMatInfo.H"
@@ -290,11 +289,7 @@ void getWallContactVars_ArbShape(
 
         if(virtMeshWall.detectFirstContactPoint())
         {
-            // emptyScale restores the full extruded volume of a contact
-            // patch whose virtual mesh was clipped to one layer in the
-            // empty direction (pseudo-2D); it is 1 otherwise
-            intersectVolume +=
-                virtMeshWall.evaluateContact()*vmWInfo->getEmptyScale();
+            intersectVolume += virtMeshWall.evaluateContact();
             contactCenters().append(virtMeshWall.getContactCenter());
         }
     }
@@ -322,10 +317,7 @@ void getWallContactVars_ArbShape(
 
             if(virtMeshPlane->detectFirstFaceContactPoint())
             {
-                // count of wetted plane faces x face area; emptyScale
-                // restores the full patch extent along the (pseudo-2D)
-                // empty direction if this plane VM was clipped there
-                scalar contactAreaLoc = (virtMeshPlane->evaluateContact()*vmWInfo->getEmptyScale()/vmWInfo->getSVVolume())*(pow(vmWInfo->getSVVolume(),2.0/3));
+                scalar contactAreaLoc = (virtMeshPlane->evaluateContact()/vmWInfo->getSVVolume())*(pow(vmWInfo->getSVVolume(),2.0/3));
                 contactAreas().append(contactAreaLoc);
                 contactPlaneCenters().append(virtMeshPlane->getContactCenter());
             }
@@ -550,10 +542,14 @@ bool solveWallContact
     F += FNd;
     InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FN " << F << endl;
 
-    // the coulomb ceiling inside getFt() -> FtCeil = sCI.getMu(wallCntVar)*mag(F)
-    vector Ft = sCI.getFt(wallCntVar, deltaT, sCI.getMu(wallCntVar)*mag(F));
+    vector Ft = sCI.getFt(wallCntVar, deltaT);
     InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact Ft " << Ft << endl;
 
+    if (mag(Ft) > sCI.getMu(wallCntVar) * mag(F))
+    {
+        Ft *= sCI.getMu(wallCntVar) * mag(F) / mag(Ft);
+    }
+    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact Ft clamped" << Ft << endl;
     F += Ft;
 
     vector FA = sCI.getFA(wallCntVar);
