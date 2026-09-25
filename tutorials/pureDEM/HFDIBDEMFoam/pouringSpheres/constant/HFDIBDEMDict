@@ -21,7 +21,21 @@ interpolationSchemes
   U cell;
 }
 surfaceThreshold    1e-4;
+
+// DEM settings
 stepDEM     		0.01;
+
+// adaptive DEM stepping option (sub-cycling of contacting bodies)
+// adaptiveStepDEM true;
+// adaptiveStepDEMDict
+// {
+//     DEMdtEstimator  velocityAware; // or conservative
+//     sweepSafetyTrans 1.5;
+//     sweepSafetyRot   3.0;
+//     minDEMdt         0;
+//     maxDEMSubCycles  0; // 0 = unlimited
+// }
+
 geometricD 		    (1 1 1);
 recordSimulation 	true;
 recordFirstTimeStep false;

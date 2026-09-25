@@ -1,6 +1,5 @@
 #!/bin/bash
-
-source /opt/openfoam8/etc/bashrc
+# run from a terminal with the OpenFOAM (v2412) environment sourced
 
 . $WM_PROJECT_DIR/bin/tools/RunFunctions
 

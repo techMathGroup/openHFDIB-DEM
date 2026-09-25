@@ -27,9 +27,21 @@ interpolationSchemes
 surfaceThreshold                1e-6;
 nDragForceSmoothingIterations   0;
 nDirectForcingIterations        10;
+immersedUTolerance              1e-6;
 
 // DEM settings
 stepDEM     1;
+
+// adaptive DEM stepping option (sub-cycling of contacting bodies)
+// adaptiveStepDEM true;
+// adaptiveStepDEMDict
+// {
+//     DEMdtEstimator  velocityAware; // or conservative
+//     sweepSafetyTrans 1.5;
+//     sweepSafetyRot   3.0;
+//     minDEMdt         0;
+//     maxDEMSubCycles  0; // 0 = unlimited
+// }
 
 // simulation auxiliary settings
 geometricD (1 1 1);
