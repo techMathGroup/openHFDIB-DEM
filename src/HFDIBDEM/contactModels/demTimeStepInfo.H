@@ -267,6 +267,25 @@ class demTimeStepInfo
 
         return 2.0*Foam::sqrt(Ieff/kEff);
     }
+
+    // stability step for a body approaching an analytic wall plane
+    // (the infinite-mass partner of the pair tiers)
+    static scalar wallDtCrit
+    (
+        const scalar d,
+        const scalar vN,
+        const scalar dtStable
+    )
+    {
+        scalar dt(dtStable);
+
+        if (vN > SMALL && d > SMALL)
+        {
+            dt = max(dt, d/vN);
+        }
+
+        return dt;
+    }
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -1780,9 +1780,9 @@ void openHFDIBDEM::computeDEMdtEstimate
     dtDiagRayleigh_ = GREAT;
 
     // governing pair bookkeeping for the log (argmin with the
-    // reduce); govIsContact: 0 = contact, 1 = pre-contact, -1 = none;
-    // govIsRot: 1 = the rotational bound of the governing pair
-    // governs, 0 otherwise
+    // reduce); 
+    // govIsContact: 0 = contact, 1 = pre-contact, 2 = wall, -1 = none
+    // govIsRot: 1 = the rotational bound governs, 0 otherwise, -1 wall
     label govC(-1);
     label govT(-1);
     label govIsContact(-1);
@@ -2031,6 +2031,213 @@ void openHFDIBDEM::computeDEMdtEstimate
             if (dtH < dtDiagHertz_) dtDiagHertz_ = dtH;
         }
 
+        //--- for analytic walls - no contact object, no verlet partner
+        //    => contact class pair cannot see this by default
+        {
+            const HashTable<List<vector>,string,Hash<string>>& wallPlanes
+            (
+                wallPlaneInfo::getWallPlaneInfo()
+            );
+            const HashTable<materialInfo,string,Hash<string>>& wallMats
+            (
+                wallMatInfo::getWallMatInfo()
+            );
+
+            if (wallPlanes.size() > 0)
+            {
+                const stringList wallNames(wallPlanes.toc());
+
+                const labelList subList(subCycle.toc());
+                forAll(subList, sI)
+                {
+                    immersedBody& cIb(immersedBodies_[subList[sI]]);
+
+                    if (!cIb.getIsActive()) continue;
+                    if (cIb.getbodyOperation() == 0) continue;          // wall bodies do not integrate
+
+                    // wall gap: distance of the closest surface
+                    // point to the plane (positive while apart).
+                    // the sweep distance is not what we want here -
+                    // compute the geometric gap directly
+                    const bool isSphere
+                    (
+                        cIb.getGeomModel().getcType() == sphere
+                    );
+                    const vector CoM(cIb.getGeomModel().getCoM());
+
+                    forAll(wallNames, wI)
+                    {
+                        const List<vector>& planeInfo
+                        (
+                            wallPlanes[wallNames[wI]]
+                        );
+                        const vector& n(planeInfo[0]);
+                        const vector& p0(planeInfo[1]);
+
+                        scalar gap;
+                        if (isSphere)
+                        {
+                            // signed distance of the outboard sphere
+                            // point, same form as the sweep test in
+                            // computeAdaptiveSets: the CoM sits on
+                            // the fluid side (negative), so the
+                            // surface gap is that distance plus the
+                            // radius; 0 when touching
+                            gap = ((CoM - p0) & n)
+                                + cIb.getGeomModel().getDC()/2.0;
+                        }
+                        else
+                        {
+                            pointField bbPoints
+                            (
+                                cIb.getGeomModel().getBounds().points()
+                            );
+                            scalar dOut(-GREAT);
+                            forAll(bbPoints, bP)
+                            {
+                                dOut = max
+                                (
+                                    dOut,
+                                    ((bbPoints[bP] - p0) & n)
+                                );
+                            }
+                            // the closest surface point is the most
+                            // outboard one; its signed distance is
+                            // dOut (negative on the fluid side)
+                            gap = -dOut;
+                        }
+
+                        const scalar s
+                        (
+                            sweepDist.found(subList[sI])
+                                ? sweepDist[subList[sI]]
+                                : 0.0
+                        );
+
+                        if (gap < -s) continue;                         // cannot reach this CFD step
+
+                        // exact body-wall materials
+                        const materialInfo& cMat
+                        (
+                            cIb.getibContactClass().getMatInfo()
+                        );
+                        const materialInfo& wMat
+                        (
+                            wallMats[wallNames[wI]]
+                        );
+                        const scalar aY
+                        (
+                            1.0/((1.0 - sqr(cMat.getNu()))/cMat.getY()
+                                + (1.0 - sqr(wMat.getNu()))/wMat.getY())
+                        );
+                        const scalar aG
+                        (
+                            1.0/(2.0*(2.0 - cMat.getNu())
+                                *(1.0 + cMat.getNu())/cMat.getY()
+                                + 2.0*(2.0 - wMat.getNu())
+                                *(1.0 + wMat.getNu())/wMat.getY())
+                        );
+
+                        // wall partner is infinitely massive: the
+                        // reduced mass is the body mass
+                        const scalar M0(cIb.getGeomModel().getM0());
+
+                        const scalar h(cIb.getCharCellSize());
+
+                        const scalar R
+                        (
+                            demTimeStepInfo::equivRadius
+                            (
+                                M0/max
+                                (
+                                    cIb.getGeomModel().getRhoS().value(),
+                                    SMALL
+                                )
+                            )
+                        );
+
+                        // approach-speed upper bound (same terms
+                        // as the pair tier)
+                        const scalar vN(pairApproachSpeed(cIb));
+
+                        // a body at rest on the wall (vN = 0) has no
+                        // hertz cap: deltaMax(0) = 0 would zero the
+                        // area estimate and un-bound the step exactly
+                        // where gravity presses the body into the
+                        // wall. fall back to the geometric estimate
+                        const scalar aEst
+                        (
+                            demTimeStepInfo::aEst
+                            (
+                                h,
+                                R,
+                                M0,
+                                aY,
+                                vN,
+                                dtAreaCoeff_,
+                                dtEstimatorVelocityAware_ && vN > SMALL
+                            )
+                        );
+
+                        // first-touch assumptions identical to the
+                        // pre-contact pair tier
+                        const scalar dtStable
+                        (
+                            min
+                            (
+                                demTimeStepInfo::pairDtCrit
+                                (
+                                    demTimeStepInfo::effK
+                                    (
+                                        aY,
+                                        aEst*h,
+                                        aG,
+                                        aEst,
+                                        h,
+                                        dtTangentialFactor_
+                                    ),
+                                    M0
+                                ),
+                                demTimeStepInfo::rotationalDtCrit
+                                (
+                                    dtRotationalFactor_
+                                        *dtTangentialFactor_
+                                        *demTimeStepInfo::contactKT
+                                        (
+                                            aG,
+                                            aEst,
+                                            h
+                                        ),
+                                    bodyRMax(cIb),
+                                    bodyIeff(cIb)
+                                )
+                            )
+                        );
+
+                        // gap can be negative (already touching):
+                        // the stability step alone applies then
+                        const scalar dtWall
+                        (
+                            demTimeStepInfo::wallDtCrit
+                            (
+                                max(gap, 0.0),
+                                vN,
+                                dtStable
+                            )
+                        );
+
+                        if (dtWall < deltaTDEM_)
+                        {
+                            deltaTDEM_ = dtWall;
+                            govC = subList[sI];
+                            govIsContact = 2;
+                            govIsRot = dtStable < dtWall;
+                        }
+                    }
+                }
+            }
+        }
+
         // rayleigh diagnostic: min over sub-cycled bodies
         {
             const labelList subList(subCycle.toc());
@@ -2160,9 +2367,12 @@ void openHFDIBDEM::computeDEMdtEstimate
         if (govIsContact >= 0)
         {
             InfoH << DEM_Info << " deltaTDEM estimate: " << deltaTDEM_
-                << " (pair " << govC << "-" << govT
+                << " ("
+                << (govIsContact == 2 ? "wall body " : "pair ")
+                << govC << "-" << govT
                 << ", "
-                << (govIsContact == 0 ? "contact" : "pre-contact")
+                << (govIsContact == 0 ? "contact"
+                    : (govIsContact == 2 ? "wall" : "pre-contact"))
                 << (govIsRot == 1 ? ", rotational" : "")
                 << ")"
                 << "; Hertz-based stepDEM: " << dtDiagHertz_
