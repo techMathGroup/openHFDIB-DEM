@@ -100,3 +100,4 @@ tests/
 tools/
 old_codes/
 reports/
+.DS_Store
