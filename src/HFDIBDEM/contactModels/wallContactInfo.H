@@ -209,11 +209,43 @@ class wallContactInfo
     // Note (MI): anything sub-contact related is dubious
     void saveWallFtHistory();
 
+    // cached stability step of the last sub-step's wall
+    // contacts, computed from the live contact state before
+    // clearOldContact destroys it. consumed by the in-contact
+    // wall tier of the DEM dt estimator
+    // Note (MI): this is caused by the fact that the sub-contacts no
+    //            longer exist when the estimator runs
+    scalar wallDtCrit_ = GREAT;
+    label wallDtCritRot_ = 0;
+
     // drop the history: the contact resolved and a future
     // contact must start from a zero spring
     void clearWallFtHistory()
     {
         wallFtHistory_.clear();
+        wallDtCrit_ = GREAT;
+        wallDtCritRot_ = 0;
+    }
+
+    // harvest the stability step of the current sub-contact
+    // list into wallDtCrit_ (minimum over sub-contacts; each
+    // call overwrites, so the cache always carries the latest
+    // sub-step state)
+    void saveWallDtCrit
+    (
+        const scalar IeffC,
+        const scalar tangentialFactor,
+        const scalar rotationalFactor
+    );
+
+    scalar getWallDtCrit() const
+    {
+        return wallDtCrit_;
+    }
+
+    label getWallDtCritIsRot() const
+    {
+        return wallDtCritRot_;
     }
 
     // seed the fresh sub-contacts with the harvested history

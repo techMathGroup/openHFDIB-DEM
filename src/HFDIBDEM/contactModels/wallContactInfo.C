@@ -695,6 +695,50 @@ void wallContactInfo::saveWallFtHistory()
     }
 }
 //---------------------------------------------------------------------------//
+void wallContactInfo::saveWallDtCrit
+(
+    const scalar IeffC,
+    const scalar tangentialFactor,
+    const scalar rotationalFactor
+)
+{
+    // the cache always carries the latest sub-step state: reset
+    // before scanning, so a softening contact cannot keep a
+    // stale minimum
+    wallDtCrit_ = GREAT;
+    wallDtCritRot_ = 0;
+
+    for(auto sC : subCList_)
+    {
+        wallContactVars& wallCntvar(sC->getWallCntVars());
+
+        if (mag(wallCntvar.contactVolume_) < SMALL)
+        {
+            continue;
+        }
+
+        const scalar dtPair
+        (
+            sC->getPairDtCritRot
+            (
+                wallCntvar,
+                getcVars(),
+                IeffC,
+                tangentialFactor,
+                rotationalFactor
+            )
+        );
+
+        if (dtPair < wallDtCrit_)
+        {
+            wallDtCrit_ = dtPair;
+            wallDtCritRot_ =
+                (dtPair < sC->getPairDtCrit(wallCntvar, getcVars(), tangentialFactor))
+                ? 1 : 0;
+        }
+    }
+}
+//---------------------------------------------------------------------------//
 void wallContactInfo::restoreWallFtHistory()
 {
     if (wallFtHistory_.size() == 0 || subCList_.size() == 0)

@@ -1382,6 +1382,14 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                 // harvest the tangential spring state before
                 // clearOldContact destroys the sub-contacts
                 cIb.getWallCntInfo().saveWallFtHistory();
+
+                // harvest the stability step from the same live
+                // contact state 
+                cIb.getWallCntInfo().saveWallDtCrit(
+                    bodyIeff(cIb),
+                    dtTangentialFactor_,
+                    dtRotationalFactor_
+                );
             }
 
             reduce(wallContactResolvedList,sumOp<List<bool>>());
@@ -1899,7 +1907,8 @@ void openHFDIBDEM::computeDEMdtEstimate
 
     // governing pair bookkeeping for the log (argmin with the
     // reduce); 
-    // govIsContact: 0 = contact, 1 = pre-contact, 2 = wall, -1 = none
+    // govIsContact: 0 = contact, 1 = pre-contact, 2 = wall (pre-contact),
+    //               3 = wall (in contact), -1 = none
     // govIsRot: 1 = the rotational bound governs, 0 otherwise, -1 wall
     label govC(-1);
     label govT(-1);
@@ -2356,6 +2365,34 @@ void openHFDIBDEM::computeDEMdtEstimate
             }
         }
 
+        // --- in-contact analytic-wall tier needs to use cached
+        //    stability steps from the previous sub-step (real contact
+        //    instead of pre-contact estimate)
+        // Note (MI): stlBased collisionPatches are intentionally 
+        //            omitted here - they are treated as ordinary bodies
+        //            => they enter standard Verlet lists
+        {
+            const labelList subList(subCycle.toc());
+            forAll(subList, sI)
+            {
+                immersedBody& cIb(immersedBodies_[subList[sI]]);
+
+                if (!cIb.getIsActive()) continue;
+                if (cIb.getbodyOperation() == 0) continue;
+
+                const scalar dtPair(cIb.getWallCntInfo().getWallDtCrit());
+
+                if (dtPair < deltaTDEM_)
+                {
+                    deltaTDEM_ = dtPair;
+                    govC = subList[sI];
+                    govT = -1;
+                    govIsContact = 3;
+                    govIsRot = cIb.getWallCntInfo().getWallDtCritIsRot();
+                }
+            }
+        }
+
         // rayleigh diagnostic: min over sub-cycled bodies
         {
             const labelList subList(subCycle.toc());
@@ -2486,11 +2523,13 @@ void openHFDIBDEM::computeDEMdtEstimate
         {
             InfoH << DEM_Info << " deltaTDEM estimate: " << deltaTDEM_
                 << " ("
-                << (govIsContact == 2 ? "wall body " : "pair ")
+                << (govIsContact == 2 || govIsContact == 3
+                    ? "wall body " : "pair ")
                 << govC << "-" << govT
                 << ", "
                 << (govIsContact == 0 ? "contact"
-                    : (govIsContact == 2 ? "wall" : "pre-contact"))
+                    : (govIsContact == 2 ? "wall"
+                        : (govIsContact == 3 ? "wall contact" : "pre-contact")))
                 << (govIsRot == 1 ? ", rotational" : "")
                 << ")"
                 << "; Hertz-based stepDEM: " << dtDiagHertz_
