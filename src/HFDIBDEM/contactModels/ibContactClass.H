@@ -75,6 +75,9 @@ class ibContactClass
 
     bool inContactWithStatic_;
 
+    // body is a stlBased collision patch materialized as a wall
+    bool isSTLWall_;
+
     label timeStepsInContWStatic_;
 
     const materialInfo& matInfo_;
@@ -85,7 +88,8 @@ class ibContactClass
     ibContactClass
     (
         std::shared_ptr<geomModel>& geomModel,
-        const string& material
+        const string& material,
+        bool isSTLWall = false
     );
 
     ibContactClass
@@ -104,6 +108,11 @@ class ibContactClass
     std::shared_ptr<geomModel> getGeomModelPtr()
     {
         return geomModel_;
+    }
+
+    const bool& getIsSTLWall() const
+    {
+        return isSTLWall_;
     }
 
     const bool& checkWallContact() const

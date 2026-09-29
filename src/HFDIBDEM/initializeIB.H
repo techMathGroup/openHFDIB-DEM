@@ -221,7 +221,8 @@ couplingModel_ = fluidSolidCoupling::New
 
 ibContactClass_.reset(new ibContactClass(
     geomModel_,
-    material
+    material,
+    isSTLWall_
 ));
 
 ibCntVars_.reset(new ibContactVars

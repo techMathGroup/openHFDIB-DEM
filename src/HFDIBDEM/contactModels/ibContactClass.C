@@ -40,12 +40,14 @@ using namespace Foam;
 ibContactClass::ibContactClass
 (
     std::shared_ptr<geomModel>& geomModel,
-    const string& material
+    const string& material,
+    bool isSTLWall
 )
 :
 geomModel_(geomModel),
 isInWallContact_(false),
 inContactWithStatic_(false),
+isSTLWall_(isSTLWall),
 timeStepsInContWStatic_(0),
 matInfo_(materialProperties::getMatProps()[material])
 {
@@ -56,6 +58,7 @@ ibContactClass::ibContactClass(const ibContactClass& other)
 geomModel_(other.geomModel_),
 isInWallContact_(other.isInWallContact_),
 inContactWithStatic_(other.inContactWithStatic_),
+isSTLWall_(other.isSTLWall_),
 timeStepsInContWStatic_(other.timeStepsInContWStatic_),
 matInfo_(other.matInfo_)
 {
