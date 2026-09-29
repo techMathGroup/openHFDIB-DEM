@@ -561,6 +561,9 @@ void openHFDIBDEM::initialize
         }
     }
 
+    // materialize stlBased collisionPatches as static wall bodie
+    createSTLWallBodies();
+
     #include "initializeAddModels.H"
 
     forAll (addModels_,modelI)
@@ -2801,6 +2804,136 @@ void openHFDIBDEM::restartSimulation
         immersedBodies_[addIBPos].getCouplingModel().readCouplingInfo(bodyDict);
 
         verletList_.addBodyToVList(immersedBodies_[addIBPos]);
+    }
+}
+//---------------------------------------------------------------------------//
+void openHFDIBDEM::createSTLWallBodies()
+{
+    const HashTable<List<word>,string,Hash<string>>& wallSTLs
+    (
+        wallSTLInfo::getWallSTLInfo()
+    );
+
+    if (wallSTLs.size() == 0)
+    {
+        return;
+    }
+
+    const stringList wallNames(wallSTLs.toc());
+
+    // wall body names are prefixed so they never collide with
+    // bodyNames_ entries; addModels_ and the record/restart
+    // machinery iterate bodyNames_ only and never see them
+    forAll(wallNames, wI)
+    {
+        const List<word>& stlInfo(wallSTLs[wallNames[wI]]);
+        const word& stlName(stlInfo[0]);
+        const word& stlMaterial(stlInfo[1]);
+        const word& stlBodyGeom(stlInfo[2]);
+
+        word wallBodyName("stlWall_" + wallNames[wI]);
+        word stlPath("constant/triSurface/" + stlName + ".stl");
+
+        // wall body ids must not collide with restarted bodies:
+        // wall bodies are appended after restartSimulation has run
+        // and are never recorded, but verify explicitly rather
+        // than rely on ordering luck
+        label newIBSize(immersedBodies_.size()+1);
+        label addIBPos(newIBSize - 1);
+        forAll(immersedBodies_, ib)
+        {
+            if (immersedBodies_[ib].getBodyId() == addIBPos)
+            {
+                FatalErrorInFunction
+                    << "stlBased wall body id " << addIBPos
+                    << " collides with an existing body id"
+                    << exit(FatalError);
+            }
+        }
+
+        // synthetic body dict: the immersedBody constructor reads
+        // rho (dimensioned) and material unconditionally, and the
+        // staticBody keyword selects the static operation
+        if (!HFDIBDEMDict_.found(wallBodyName))
+        {
+            dictionary wallBodyDict;
+            wallBodyDict.add("staticBody",true);
+            wallBodyDict.add
+            (
+                "rho",
+                dimensionedScalar
+                (
+                    "rho",
+                    dimensionSet(1,-3,0,0,0,0,0),
+                    1.0
+                )
+            );
+            wallBodyDict.add("material",stlMaterial);
+            wallBodyDict.add("isSTLWall",true);
+
+            HFDIBDEMDict_.add(wallBodyName,wallBodyDict);
+        }
+        else
+        {
+            FatalIOErrorInFunction(HFDIBDEMDict_)
+                << "body name " << wallBodyName
+                << " reserved for a stlBased collision patch"
+                << exit(FatalIOError);
+        }
+
+        // build the geomModel directly from the STL file -
+        // addModels are bypassed entirely
+        std::shared_ptr<geomModel> bodyGeomModel;
+        if (stlBodyGeom == "convex")
+        {
+            bodyGeomModel = std::make_shared<convexBody>(mesh_,stlPath);
+        }
+        else
+        {
+            bodyGeomModel = std::make_shared<nonConvexBody>(mesh_,stlPath);
+        }
+
+        immersedBodies_.setSize(newIBSize);
+        immersedBodies_.set
+        (
+            addIBPos,
+            new immersedBody
+            (
+                wallBodyName,
+                mesh_,
+                HFDIBDEMDict_,
+                transportProperties_,
+                addIBPos,
+                0,                                          // recomputeM0: never recompute a wall
+                bodyGeomModel,
+                ibInterp_,
+                cellPoints_
+            )
+        );
+
+        // the wall is infinitely massive: reduceM collapses to
+        // the particle mass in pair contacts (standard DEM wall
+        // convention). M is left at 0 - read only by paths the
+        // wall body never enters
+        immersedBodies_[addIBPos].getGeomModel().setM0(VGREAT);
+
+        if (immersedBodies_[addIBPos].getGeomModel().getM0() < VGREAT/2.0)
+        {
+            FatalErrorInFunction
+                << "stlBased wall body " << wallBodyName
+                << ": M0 not set to VGREAT"
+                << exit(FatalError);
+        }
+
+        // wall bodies carry no lambda projection and no surface
+        // cells, so their geometry-dependent contact parameters
+        // need no re-computation. register with the verlet list:
+        // bounds come from the STL points alone
+        verletList_.addBodyToVList(immersedBodies_[addIBPos]);
+
+        InfoH << basic_Info << "Created stlBased wall body "
+            << wallBodyName << " from " << stlPath
+            << " (bodyId " << addIBPos << ")" << endl;
     }
 }
 //---------------------------------------------------------------------------//

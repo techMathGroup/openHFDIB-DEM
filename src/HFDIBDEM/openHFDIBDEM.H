@@ -364,6 +364,9 @@ namespace Foam
         word runTime
     );
 
+    // materialize stlBased collisionPatches as static wall bodies
+    void createSTLWallBodies();
+
     void preCalculateCellPoints();
 
     bool getRecordFirstTime()
