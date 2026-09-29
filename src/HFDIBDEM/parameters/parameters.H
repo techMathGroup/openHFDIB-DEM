@@ -43,6 +43,7 @@ Contributors
 #include "interAdhesion.H"
 #include "wallMatInfo.H"
 #include "wallPlaneInfo.H"
+#include "wallSTLInfo.H"
 #include "virtualMeshLevel.H"
 #include "cyclicPlaneInfo.H"
 #include "contactModelInfo.H"
@@ -66,6 +67,9 @@ HashTable<materialInfo,string,Hash<string>> wallMatInfo::wallMatInfo_ =
 
 HashTable<List<vector>,string,Hash<string>> wallPlaneInfo::wallPlaneInfo_ =
     HashTable<List<vector>,string,Hash<string>>();
+
+HashTable<List<word>,string,Hash<string>> wallSTLInfo::wallSTLInfo_ =
+    HashTable<List<word>,string,Hash<string>>();
 
 HashTable<List<vector>,string,Hash<string>> cyclicPlaneInfo::cyclicPlaneInfo_ =
     HashTable<List<vector>,string,Hash<string>>();

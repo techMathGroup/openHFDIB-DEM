@@ -282,19 +282,106 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
     forAll(patchNames, patchI)
     {
         word patchMaterial = word(patchDic.subDict(patchNames[patchI]).lookup("material"));
-        vector patchNVec   = vector(patchDic.subDict(patchNames[patchI]).lookup("nVec"));
-        vector planePoint  = vector(patchDic.subDict(patchNames[patchI]).lookup("planePoint"));
 
-        wallPlaneInfo::wallPlaneInfo_insert(
-            patchNames[patchI],
-            patchNVec,
-            planePoint
-        );
+        // patch type: plane (default) or stlBased; anything else
+        // is a fatal input error
+        word patchType("plane");
+        if (patchDic.subDict(patchNames[patchI]).found("type"))
+        {
+            patchType = word(patchDic.subDict(patchNames[patchI]).lookup("type"));
+        }
 
-        wallMatInfo::wallMatInfo_insert(
-            patchNames[patchI],
-            materialProperties::getMatProps()[patchMaterial]
-        );
+        if (patchType == "plane")
+        {
+            vector patchNVec  = vector(patchDic.subDict(patchNames[patchI]).lookup("nVec"));
+            vector planePoint = vector(patchDic.subDict(patchNames[patchI]).lookup("planePoint"));
+
+            wallPlaneInfo::wallPlaneInfo_insert(
+                patchNames[patchI],
+                patchNVec,
+                planePoint
+            );
+
+            wallMatInfo::wallMatInfo_insert(
+                patchNames[patchI],
+                materialProperties::getMatProps()[patchMaterial]
+            );
+        }
+        else if (patchType == "stlBased")
+        {
+            if (!patchDic.subDict(patchNames[patchI]).found("stlName"))
+            {
+                FatalIOErrorInFunction(demDic)
+                    << "collisionPatch " << patchNames[patchI]
+                    << ": type stlBased requires a stlName entry"
+                    << exit(FatalIOError);
+            }
+
+            word stlName = word(patchDic.subDict(patchNames[patchI]).lookup("stlName"));
+            word stlPath("constant/triSurface/" + stlName + ".stl");
+
+            if (!isFile(stlPath))
+            {
+                FatalIOErrorInFunction(demDic)
+                    << "collisionPatch " << patchNames[patchI]
+                    << ": stlName " << stlName
+                    << " - file " << stlPath << " not found"
+                    << exit(FatalIOError);
+            }
+
+            word bodyGeom("nonConvex");
+            if (patchDic.subDict(patchNames[patchI]).found("bodyGeom"))
+            {
+                bodyGeom = word(patchDic.subDict(patchNames[patchI]).lookup("bodyGeom"));
+                if (bodyGeom != "convex" && bodyGeom != "nonConvex")
+                {
+                    FatalIOErrorInFunction(demDic)
+                        << "collisionPatch " << patchNames[patchI]
+                        << ": bodyGeom " << bodyGeom
+                        << " not supported, valid entries: convex, nonConvex"
+                        << exit(FatalIOError);
+                }
+            }
+
+            // read + validate bodyCreation here for interface
+            // consistency; it has no effect for wall bodies
+            // (no body-field creation)
+            if (patchDic.subDict(patchNames[patchI]).found("bodyCreation"))
+            {
+                word bodyCreation
+                (
+                    word(patchDic.subDict(patchNames[patchI]).lookup("bodyCreation"))
+                );
+                if (bodyCreation != "connectivity" && bodyCreation != "legacy")
+                {
+                    FatalIOErrorInFunction(demDic)
+                        << "collisionPatch " << patchNames[patchI]
+                        << ": bodyCreation " << bodyCreation
+                        << " not supported, valid entries:"
+                        << " connectivity, legacy"
+                        << exit(FatalIOError);
+                }
+            }
+
+            wallSTLInfo::wallSTLInfo_insert(
+                patchNames[patchI],
+                stlName,
+                patchMaterial,
+                bodyGeom
+            );
+
+            Info << " -- collisionPatch " << patchNames[patchI]
+                << " is stlBased (stlName " << stlName
+                << ", bodyGeom " << bodyGeom << ")" << endl;
+        }
+        else
+        {
+            FatalIOErrorInFunction(demDic)
+                << "collisionPatch " << patchNames[patchI]
+                << ": type " << patchType
+                << " not supported, valid entries: plane, stlBased"
+                << exit(FatalIOError);
+        }
     }
 
     if(demDic.found("cyclicPatches"))
