@@ -334,6 +334,15 @@ namespace Foam
     // for static bodies so their rotational bound never governs
     scalar bodyIeff(immersedBody& ib) const;
 
+    // number of immersed bodies that are not stlBased walls -
+    // walls are permanent domain features, not solids, and must
+    // not occupy the nSolidsInDomain budget
+    // Note (MI): introduced with stlBased collisionPatches to exclude
+    //            walls from the nSolidsInDomain budget
+    // Note (MI): stlBased collisionPatches are based on staticBody,
+    //            which created the need to do this
+    label nNonWallBodies() const;
+
     // drop all contact bookkeeping of  body bodyId: the
     // prtcInfoTable_ entries of every pair containing it (the
     // Verlet-driven erase paths no longer see the body) and its

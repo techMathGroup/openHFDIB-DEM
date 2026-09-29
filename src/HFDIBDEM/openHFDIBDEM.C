@@ -578,7 +578,7 @@ void openHFDIBDEM::initialize
         //            bodies is below the threshold (if set)
         // Note (MI): the second condition is required to avoid skipping
         //            addition of all the bodies on first time step
-        while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions and (solverInfo::getNSolidsThreshold() < 0 or immersedBodies_.size() < solverInfo::getNSolidsThreshold()))
+        while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions and (solverInfo::getNSolidsThreshold() < 0 or nNonWallBodies() < solverInfo::getNSolidsThreshold()))
         {
             InfoH << addModel_Info << "addModel invoked action, trying to add new body" << endl;
             std::shared_ptr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));
@@ -616,7 +616,7 @@ void openHFDIBDEM::initialize
                 }
                 verletList_.addBodyToVList(immersedBodies_[addIBPos]);
                 InfoH << addModel_Info << "Body based on: " << bodyName << " successfully added" << endl;
-                InfoH << addModel_Info << "Current count of solids within the domain : " << immersedBodies_.size() << endl;
+                InfoH << addModel_Info << "Current count of solids within the domain : " << nNonWallBodies() << endl;
                 cAddition = 0;
             }
             else
@@ -651,7 +651,13 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            if (skipStaticRecreation
+            if (immersedBodies_[bodyId].getisSTLWall())
+            {
+                // stlBased wall bodies carry no body field and no
+                // interpolation points - there is nothing to re-create
+                recreateBody[bodyId] = false;
+            }
+            else if (skipStaticRecreation
                 && immersedBodies_[bodyId].getbodyOperation() == 0)
             {
                 recreateBody[bodyId] = !immersedBodies_[bodyId]
@@ -698,7 +704,8 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
 
     forAll (immersedBodies_,bodyId)
     {
-        if (immersedBodies_[bodyId].getIsActive())
+        if (immersedBodies_[bodyId].getIsActive()
+            && !immersedBodies_[bodyId].getisSTLWall())
         {
             immersedBodies_[bodyId].checkIfInDomain(body);
             if (!immersedBodies_[bodyId].getIsActive())
@@ -729,7 +736,8 @@ void openHFDIBDEM::recreateBodies
     }
     forAll (immersedBodies_,bodyId)
     {
-        if (immersedBodies_[bodyId].getIsActive())
+        if (immersedBodies_[bodyId].getIsActive()
+            && !immersedBodies_[bodyId].getisSTLWall())
         {
             immersedBodies_[bodyId].recreateBodyField(body,refineF);
         }
@@ -741,6 +749,13 @@ void openHFDIBDEM::recreateBodies
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
+            if (immersedBodies_[bodyId].getisSTLWall())
+            {
+                // wall bodies are permanent domain features -
+                // never removed, never recompute M0
+                continue;
+            }
+
             immersedBodies_[bodyId].checkIfInDomain(body);
             if (!immersedBodies_[bodyId].getIsActive())
             {
@@ -772,7 +787,8 @@ void openHFDIBDEM::createBodiesComputeDynamicsVars(
 
     forAll (immersedBodies_,bodyId)
     {
-        if (immersedBodies_[bodyId].getIsActive())
+        if (immersedBodies_[bodyId].getIsActive()
+            && !immersedBodies_[bodyId].getisSTLWall())
         {
             immersedBodies_[bodyId].syncImmersedBodyGeometry(body,refineF);
             if (immersedBodies_[bodyId].getGeomModel().isCluster())
@@ -801,7 +817,8 @@ void openHFDIBDEM::createBodiesComputeDynamicsVars(
     label bodyIndex(0);
     forAll (immersedBodies_,bodyId)
     {
-        if (immersedBodies_[bodyId].getIsActive())
+        if (immersedBodies_[bodyId].getIsActive()
+            && !immersedBodies_[bodyId].getisSTLWall())
         {
             if (immersedBodies_[bodyId].getGeomModel().isCluster())
             {
@@ -1021,7 +1038,8 @@ void openHFDIBDEM::writeBodiesInfo()
     DynamicLabelList activeIB;
     forAll (immersedBodies_,bodyId)
     {
-        if (immersedBodies_[bodyId].getIsActive())
+        if (immersedBodies_[bodyId].getIsActive()
+            && !immersedBodies_[bodyId].getisSTLWall())
         {
             activeIB.append(bodyId);
         }
@@ -1061,6 +1079,10 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
     {
         forAll (immersedBodies_,bodyId)
         {
+            // stlBased walls are permanent domain features - never
+            // candidates for cyclic re-clustering
+            if (immersedBodies_[bodyId].getisSTLWall()) continue;
+
             if (!immersedBodies_[bodyId].getGeomModel().isCluster())
             {
                 vector transVec = vector::zero;
@@ -2519,6 +2541,21 @@ scalar openHFDIBDEM::bodyIeff(immersedBody& ib) const
     return demTimeStepInfo::minEigenvalue(ib.getGeomModel().getI());
 }
 //---------------------------------------------------------------------------//
+label openHFDIBDEM::nNonWallBodies() const
+{
+    // walls are permanent domain features, not solids - they must
+    // not occupy the nSolidsInDomain budget
+    label nBodies(0);
+    forAll (immersedBodies_,bodyId)
+    {
+        if (!immersedBodies_[bodyId].getisSTLWall())
+        {
+            nBodies++;
+        }
+    }
+    return nBodies;
+}
+//---------------------------------------------------------------------------//
 prtContactInfo& openHFDIBDEM::getPrtcInfo(Tuple2<label,label> cPair)
 {
     if(!prtcInfoTable_.found(cPair))
@@ -2578,7 +2615,19 @@ void openHFDIBDEM::addRemoveBodies
 
         // Note (MI): add solid body only if the number of immersed 
         //            bodies is below the threshold (if set)
-        while (addModels_[modelI].shouldAddBody(body) and cAddition < maxAdditions and (solverInfo::getNSolidsThreshold() < 0 or immersedBodies_.size() < solverInfo::getNSolidsThreshold()))
+        // Note (MI): with nNonWallBodies() added because of the
+        //            stlBased collisionPatches, this conditions is a bit
+        //            all over the place - could we simplify it?
+        while
+        (
+            addModels_[modelI].shouldAddBody(body)
+            and cAddition < maxAdditions
+            and
+            (
+                solverInfo::getNSolidsThreshold() < 0
+                or nNonWallBodies() < solverInfo::getNSolidsThreshold()
+            )
+        )
         {
             InfoH << addModel_Info << "addModel invoked action, trying to add new body" << endl;
             std::shared_ptr<geomModel> bodyGeomModel(addModels_[modelI].addBody(body, immersedBodies_));
@@ -2971,7 +3020,8 @@ void openHFDIBDEM::writeFirtsTimeBodiesInfo()
     DynamicLabelList activeIB;
     forAll (immersedBodies_,bodyId)
     {
-        if (immersedBodies_[bodyId].getIsActive())
+        if (immersedBodies_[bodyId].getIsActive()
+            && !immersedBodies_[bodyId].getisSTLWall())
         {
             activeIB.append(bodyId);
         }
