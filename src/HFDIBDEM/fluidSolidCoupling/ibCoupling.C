@@ -35,6 +35,13 @@ Note (MI, 20260922):
     - the remaining difference comes from uncertainty about
       physics modeling
 
+To Do (MI, 20260929):
+    - put together single-phase and VOF tests with clear physics 
+      expectations (this might be a problem, I am not even sure about
+      surrogate for particle-settling in single-phase)
+    - unify the single-phase and VOF implementations as much as possible
+    
+
 SourceFiles
     ibCoupling.C
 
