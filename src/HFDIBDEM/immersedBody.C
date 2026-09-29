@@ -525,6 +525,10 @@ void immersedBody::updateCoupling                                       //full i
     const bool applyAddedMass
 )
 {
+    // Note (MI): do I want to keep isSTLWall_ or replace by
+    //            isSTLCollisionPatch_?
+    if (isSTLWall_) return;                                             // only relevant for DEM
+
     fluidContext fCtx
     {
         &body,
@@ -547,6 +551,8 @@ void immersedBody::updateCoupling                                       //full i
     const bool applyAddedMass
 )
 {
+    if (isSTLWall_) return;                                             // only relevant for DEM
+
     fluidContext fCtx
     {
         &body,

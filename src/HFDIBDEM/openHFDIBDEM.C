@@ -1006,7 +1006,13 @@ void openHFDIBDEM::interpolateIB
     // loop over all the immersed bodies
     forAll (immersedBodies_,bodyId)
     {
-        if (immersedBodies_[bodyId].getIsActive())
+        // stlBased collisionPatches impose no field values and carry
+        // no interpolation points - the flow does not see them
+        if
+        (
+            immersedBodies_[bodyId].getIsActive()
+            && !immersedBodies_[bodyId].getisSTLWall()
+        )
         {
             // update imposed field according to body
             immersedBodies_[bodyId].updateVectorField(Vs, V.name(),body);
