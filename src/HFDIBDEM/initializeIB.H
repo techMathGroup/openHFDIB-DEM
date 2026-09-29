@@ -108,6 +108,17 @@ else
     InfoH << iB_Info << "Did not find updateTorque, using updateTorque: " << updateTorque_ << endl;
 }
 
+// stlBased collision patch materialized as a static body
+if (immersedDict_.found("isSTLWall"))
+{
+    isSTLWall_ = readBool(immersedDict_.lookup("isSTLWall"));
+    if (isSTLWall_)
+    {
+        InfoH << iB_Info << bodyName_
+            << " is a stlBased collision patch body." << endl;
+    }
+}
+
 // do I want the IB to start as in sync with the flow?
 if (immersedDict_.found("startSynced"))
 {
@@ -179,7 +190,15 @@ geomModel_->setRefineBuffers(refineBuffers_);
 string material = word(immersedDict_.lookup("material"));
 
 interpolationInfo* intpInfoPtr(nullptr);
-if(ibIntp.valid())
+// stlBased wall bodies never construct interpolation points: they
+// carry no lambda projection and must not interact with the flow
+// Note (MI): these are bounding surfaces for DEM, not for the flow
+//            - if constraint on the flow should be enforced, proper flow
+//              boundary condition is to be defined
+// Note (MI): in the future, there should be an option to extract 
+//            a collision patch directly from the flow mesh boundary
+//            => this would be the final general wall implementation
+if(ibIntp.valid() && !isSTLWall_)
 {
     intpInfo_.reset(ibIntp().createIntpInfo(                            //OF.com: set -> reset
         mesh_,

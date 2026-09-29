@@ -151,6 +151,11 @@ namespace Foam
         // auxiliary switch - do I want to update the torques?
         bool updateTorque_;
 
+        // stlBased collision patch materialized as a static body;
+        // such bodies carry no lambda projection, no interpolation
+        // points and never interact with the flow
+        bool isSTLWall_;
+
         // operation to perform
         int bodyOperation_;
 
@@ -514,6 +519,11 @@ namespace Foam
         const bool& getStartSynced() const
         {
             return startSynced_;
+        }
+
+        const bool& getisSTLWall() const
+        {
+            return isSTLWall_;
         }
 
         void initSyncWithFlow(const volVectorField& U);

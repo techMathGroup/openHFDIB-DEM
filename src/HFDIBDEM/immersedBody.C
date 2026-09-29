@@ -99,6 +99,7 @@ CoNum_(0.0),
 bodyId_(bodyId),
 bodyIdStr_(Foam::name(bodyId_)),
 updateTorque_(false),
+isSTLWall_(false),
 bodyOperation_(0),
 octreeField_(mesh_.nCells(), 0),
 cellToStartInCreateIB_(0),
@@ -150,9 +151,14 @@ void immersedBody::createImmersedBody
     //            creation on a sufficiently refined mesh
     // => we should look into this in future
     // Note (MI): computeCharCellSize() has gMax in it - is it efficient?
-    intpInfo_->setCharCellSize(charCellSize_);                          //set characteristic cell size to find interpolation points
+    // Note (MI): interpolation points exist only when an interpolation
+    // scheme was set AND the body is not a stlBased wall
+    if (intpInfo_.valid())
+    {
+        intpInfo_->setCharCellSize(charCellSize_);                      //set characteristic cell size to find interpolation points
 
-    intpInfo_->setIntpInfo();
+        intpInfo_->setIntpInfo();
+    }
 }
 //---------------------------------------------------------------------------//
 void immersedBody::syncCreateImmersedBody                               //Note (MI): the name does not reflect the content
@@ -1035,6 +1041,12 @@ void immersedBody::updateVectorField
 // reset body field for this immersed object
 vectorField immersedBody::getUatIbPoints()
 {
+    // no interpolation points without an interpolation scheme
+    if (!intpInfo_.valid())
+    {
+        return vectorField(0);
+    }
+
     const List<point>& ibPoints = intpInfo_->getIbPoints();
     vectorField ibPointsVal(ibPoints.size());
     forAll(ibPoints, pointI)
