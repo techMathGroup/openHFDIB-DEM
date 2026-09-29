@@ -147,7 +147,7 @@ int main(int argc, char *argv[])
         Info << "updating HFDIBDEM" << endl;
 
         // clockTime postUpdateBodiesTime;
-        volVectorField gradLambda(fvc::grad(lambda));
+        // volVectorField gradLambda(fvc::grad(lambda));
         HFDIBDEM.postUpdateBodies(lambda,f,false,false);                //MI: here, we should clean up interfaces
         // postUpdateTime_ += postUpdateBodiesTime.timeIncrement();
 
