@@ -521,7 +521,7 @@ namespace Foam
             return startSynced_;
         }
 
-        const bool& getisSTLWall() const
+        const bool& getIsSTLWall() const
         {
             return isSTLWall_;
         }

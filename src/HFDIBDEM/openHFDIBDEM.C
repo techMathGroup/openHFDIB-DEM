@@ -651,7 +651,7 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            if (immersedBodies_[bodyId].getisSTLWall())
+            if (immersedBodies_[bodyId].getIsSTLWall())
             {
                 // stlBased wall bodies carry no body field and no
                 // interpolation points - there is nothing to re-create
@@ -705,7 +705,7 @@ void openHFDIBDEM::createBodies(volScalarField& body,volScalarField& refineF)
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive()
-            && !immersedBodies_[bodyId].getisSTLWall())
+            && !immersedBodies_[bodyId].getIsSTLWall())
         {
             immersedBodies_[bodyId].checkIfInDomain(body);
             if (!immersedBodies_[bodyId].getIsActive())
@@ -737,7 +737,7 @@ void openHFDIBDEM::recreateBodies
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive()
-            && !immersedBodies_[bodyId].getisSTLWall())
+            && !immersedBodies_[bodyId].getIsSTLWall())
         {
             immersedBodies_[bodyId].recreateBodyField(body,refineF);
         }
@@ -749,7 +749,7 @@ void openHFDIBDEM::recreateBodies
     {
         if (immersedBodies_[bodyId].getIsActive())
         {
-            if (immersedBodies_[bodyId].getisSTLWall())
+            if (immersedBodies_[bodyId].getIsSTLWall())
             {
                 // wall bodies are permanent domain features -
                 // never removed, never recompute M0
@@ -788,7 +788,7 @@ void openHFDIBDEM::createBodiesComputeDynamicsVars(
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive()
-            && !immersedBodies_[bodyId].getisSTLWall())
+            && !immersedBodies_[bodyId].getIsSTLWall())
         {
             immersedBodies_[bodyId].syncImmersedBodyGeometry(body,refineF);
             if (immersedBodies_[bodyId].getGeomModel().isCluster())
@@ -818,7 +818,7 @@ void openHFDIBDEM::createBodiesComputeDynamicsVars(
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive()
-            && !immersedBodies_[bodyId].getisSTLWall())
+            && !immersedBodies_[bodyId].getIsSTLWall())
         {
             if (immersedBodies_[bodyId].getGeomModel().isCluster())
             {
@@ -1011,7 +1011,7 @@ void openHFDIBDEM::interpolateIB
         if
         (
             immersedBodies_[bodyId].getIsActive()
-            && !immersedBodies_[bodyId].getisSTLWall()
+            && !immersedBodies_[bodyId].getIsSTLWall()
         )
         {
             // update imposed field according to body
@@ -1045,7 +1045,7 @@ void openHFDIBDEM::writeBodiesInfo()
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive()
-            && !immersedBodies_[bodyId].getisSTLWall())
+            && !immersedBodies_[bodyId].getIsSTLWall())
         {
             activeIB.append(bodyId);
         }
@@ -1087,7 +1087,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         {
             // stlBased walls are permanent domain features - never
             // candidates for cyclic re-clustering
-            if (immersedBodies_[bodyId].getisSTLWall()) continue;
+            if (immersedBodies_[bodyId].getIsSTLWall()) continue;
 
             if (!immersedBodies_[bodyId].getGeomModel().isCluster())
             {
@@ -2554,7 +2554,7 @@ label openHFDIBDEM::nNonWallBodies() const
     label nBodies(0);
     forAll (immersedBodies_,bodyId)
     {
-        if (!immersedBodies_[bodyId].getisSTLWall())
+        if (!immersedBodies_[bodyId].getIsSTLWall())
         {
             nBodies++;
         }
@@ -3027,7 +3027,7 @@ void openHFDIBDEM::writeFirtsTimeBodiesInfo()
     forAll (immersedBodies_,bodyId)
     {
         if (immersedBodies_[bodyId].getIsActive()
-            && !immersedBodies_[bodyId].getisSTLWall())
+            && !immersedBodies_[bodyId].getIsSTLWall())
         {
             activeIB.append(bodyId);
         }
