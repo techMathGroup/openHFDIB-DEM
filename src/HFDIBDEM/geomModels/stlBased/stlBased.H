@@ -41,6 +41,7 @@ Contributors
 #define stlBased_H
 
 #include "geomModel.H"
+#include "momentOfInertia.H"                                            //reqiured for computeVolumeCoM
 
 namespace Foam
 {
@@ -122,19 +123,13 @@ namespace Foam
             );
 
             bodySurfMesh_.movePoints(tmpSurf.points());
+            triSurf_.reset(new triSurface(bodySurfMesh_));
+            computeVolumeCoM(triSurf_());
         }
 
         vector getCoM() final override
         {
-            pointField bSMeshPts = bodySurfMesh_.points();
-            // get its center of mass
-            vector CoM(vector::zero);
-            forAll(bSMeshPts,point)
-            {
-                CoM += bSMeshPts[point];
-            }
-            CoM/= bSMeshPts.size();
-            return CoM;
+            return CoM_;
         }
 
         boundBox getBounds() final override
@@ -189,17 +184,48 @@ namespace Foam
             historyPoints_ = surfPoints;
             intSpan_ = intSpan;
             sdBasedLambda_ = sdBasedLambda;
+            computeVolumeCoM(triSurf_());
+        }
+
+        // volume centroid of a closed surface (divergence theorem)
+        // Note (MI): based on standard OpenFOAM function
+        void computeVolumeCoM(const triSurface& surf)
+        {
+            scalar m(0);
+            tensor J(tensor::zero);
+            momentOfInertia::massPropertiesSolid
+            (
+                surf,
+                1.0,
+                m,
+                CoM_,
+                J
+            );
+
+            if (m < SMALL)                                              // fallback for singular cases
+            {
+                WarningInFunction
+                    << "stl surface " << stlPath_
+                    << " yields non-positive volume (" << m
+                    << "): open or inside-out. Falling back to the"
+                    << " vertex average - rotation bookkeeping may"
+                    << " be inaccurate" << endl;
+                const pointField& bSMeshPts = bodySurfMesh_.points();
+                CoM_    = vector::zero;
+                forAll(bSMeshPts,point)
+                {
+                    CoM_ += bSMeshPts[point];
+                }
+                CoM_/= bSMeshPts.size();
+                // Note (MI): these kinds of loops can be replaced with
+                // CoM_ = sum(bSMeshPts)/bSMeshPts.size();
+                // -- and this happens on multiple occasions in the codebase
+            }
         }
 
         void setCoM() final override
         {
-            pointField bSMeshPts = bodySurfMesh_.points();
-            CoM_    = vector::zero;
-            forAll(bSMeshPts,point)
-            {
-                CoM_ += bSMeshPts[point];
-            }
-            CoM_/= bSMeshPts.size();
+            computeVolumeCoM(triSurf_());
         }
 
         pointField getBodyPoints() final override

@@ -58,6 +58,7 @@ stlPath_(stlPath)
     historyPoints_ = bodySurfMesh_.points();
     triSurf_.reset(new triSurface(bodySurfMesh_));                      //OF.com: set -> reset
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
+    computeVolumeCoM(triSurf_());
 }
 //---------------------------------------------------------------------------//
 vector stlBased::addModelReturnRandomPosition
@@ -70,15 +71,10 @@ vector stlBased::addModelReturnRandomPosition
     vector ranVec(vector::zero);
 
     //meshSearch searchEng(mesh_);
-    pointField bSMeshPts = bodySurfMesh_.points();
+    const pointField& bSMeshPts = bodySurfMesh_.points();
 
     // get its center of mass
-    vector CoM(vector::zero);
-    forAll(bSMeshPts,point)
-    {
-        CoM += bSMeshPts[point];
-    }
-    CoM/= bSMeshPts.size();
+    vector CoM(getCoM());
 
     const vector validDirs = (geometricD + vector::one)/2;
     vector dirCorr(cmptMultiply((vector::one - validDirs),CoM));
@@ -100,7 +96,7 @@ vector stlBased::addModelReturnRandomPosition
         ranVec[i] = ranNum;
     }
 
-    ranVec = cmptMultiply(validDirs,ranVec);                            //translate only with respect to valid directions
+    ranVec = cmptMultiply(validDirs,ranVec);                            // translate only with respect to valid directions
     ranVec += dirCorr;
 
     return ranVec;
@@ -118,6 +114,8 @@ void stlBased::bodyMovePoints
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
     bodyFieldValid_ = false;                                            // points moved: cell lists and the body field are stale
+
+    CoM_ += translVec;
 }
 //---------------------------------------------------------------------------//
 void stlBased::bodyScalePoints
@@ -127,13 +125,8 @@ void stlBased::bodyScalePoints
 {
     pointField bodyPoints(bodySurfMesh_.points());
 
-    // get its center of mass
-    vector CoM(vector::zero);
-    forAll(bodyPoints,point)
-    {
-        CoM += bodyPoints[point];
-    }
-    CoM/= bodyPoints.size();
+    // scale about the center of mass so that CoM_ stays valid
+    vector CoM(getCoM());
 
     bodyPoints -= CoM;
     bodySurfMesh_.movePoints(bodyPoints);
@@ -153,13 +146,8 @@ void stlBased::bodyRotatePoints
 )
 {
     pointField bodyPoints(bodySurfMesh_.points());
-    // get its center of mass
-    vector CoM(vector::zero);
-    forAll(bodyPoints,point)
-    {
-        CoM += bodyPoints[point];
-    }
-    CoM/= bodyPoints.size();
+    // rotate about the tracked center of mass
+    vector CoM(getCoM());
 
     tensor rotMatrix(Foam::cos(rotAngle)*tensor::I);
 
@@ -205,6 +193,9 @@ void stlBased::synchronPos(label owner)
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
     bodyFieldValid_ = false;                                            // points moved/scaled/rotated/synced
+
+    // re-track the centroid
+    computeVolumeCoM(triSurf_());                                       // points were replaced wholesale
 }
 //---------------------------------------------------------------------------//
 void stlBased::getClosestPointAndNormal
@@ -568,5 +559,8 @@ void stlBased::setBodyPosition(pointField pos)
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
     bodyFieldValid_ = false;                                            // points moved: cell lists and the body field are stale
+
+    // re-track the centroid
+    computeVolumeCoM(triSurf_());                                       // points were replaced wholesale
 }
 //---------------------------------------------------------------------------//
