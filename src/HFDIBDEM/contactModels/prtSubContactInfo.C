@@ -150,9 +150,27 @@ vector prtSubContactInfo::getFt(scalar deltaT, scalar FtCeil)
     // coulomb cap feeds back into the stored state: the spring
     // stops stretching at the sliding ceiling, so the applied
     // force and the state can never disagree
+    // Note (MI): this code is included twice in the code base,
+    //            once in prtSubContactInfo and once in wallSubContactInfo
+    //            could it be refactored to avoid code duplication?
     if (mag(FtPrev_) > FtCeil)
     {
-        FtPrev_ *= FtCeil/(mag(FtPrev_) + SMALL);
+        if (mag(Vt) > contactModelInfo::vSlipMin_)
+        {
+            // sliding: kinetic friction opposes the slip. the
+            // state is redirected with the applied force; on
+            // re-stick the spring re-forms from the sliding
+            // direction
+            FtPrev_ = -FtCeil*Vt/(mag(Vt) + SMALL);
+        }
+        else
+        {
+            // below vSlipMin_ the slip direction is assumed noise-
+            // dominated: keep the spring direction (the cap
+            // firing from a shrinking ceiling must not scramble
+            // the state)
+            FtPrev_ *= FtCeil/(mag(FtPrev_) + SMALL);
+        }
     }
 
     return FtPrev_;
