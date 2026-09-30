@@ -118,34 +118,31 @@ vector prtSubContactInfo::getFt(scalar deltaT, scalar FtCeil)
     vector Vn((relVeli & prtCntVars_.contactNormal_)
         *prtCntVars_.contactNormal_);
     vector Vt(relVeli - Vn);
+    
     // compute tangential force
-    if(contactModelInfo::getUseMindlinRotationalModel())
+    vector deltaFt(vector::zero);
+    if (contactModelInfo::getUseMindlinRotationalModel())
     {
         scalar tangTune(demTimeStepInfo::tangTune_);                    //read empirical mambo-jambo from demTimeStepInfo
-        scalar kT = tangTune*8*physicalProperties_.aG_*(prtCntVars_.contactArea_/(Lc_+SMALL));
-        vector deltaFt(kT*Vt*deltaT + 2*physicalProperties_.reduceBeta_*sqrt(kT*physicalProperties_.reduceM_)*Vt);
-        // the spring can stretch by at most one ceiling per
-        // sub-step: a fresh contact (or a slip reversal) builds
-        // the tangential force up to the coulomb limit, never
-        // across it within a single step
-        if (mag(deltaFt) > FtCeil)
-        {
-            deltaFt *= FtCeil/(mag(deltaFt) + SMALL);
-        }
-        FtPrev_ = FtLastS - deltaFt;
+        scalar kT = tangTune*8.0*physicalProperties_.aG_*(prtCntVars_.contactArea_/(Lc_+SMALL));
+        deltaFt = kT*Vt*deltaT + 2.0*physicalProperties_.reduceBeta_*sqrt(kT*physicalProperties_.reduceM_)*Vt;
     }
-
-    if(contactModelInfo::getUseChenRotationalModel())
+    else if(contactModelInfo::getUseChenRotationalModel())
     {
-        vector Ftdi(- physicalProperties_.reduceBeta_*sqrt(physicalProperties_.aG_*physicalProperties_.reduceM_*Lc_)*Vt);
-        Ftdi += physicalProperties_.aG_*Lc_*Vt*deltaT;
-        // same one-ceiling bound on the increment as above
-        if (mag(Ftdi) > FtCeil)
-        {
-            Ftdi *= FtCeil/(mag(Ftdi) + SMALL);
-        }
-        FtPrev_ = FtLastS - Ftdi;
+        deltaFt = physicalProperties_.reduceBeta_*sqrt(physicalProperties_.aG_*physicalProperties_.reduceM_*Lc_)*Vt;
+        deltaFt += physicalProperties_.aG_*Lc_*Vt*deltaT;
     }
+    // the spring can stretch by at most one ceiling per
+    // sub-step: a fresh contact (or a slip reversal) builds
+    // the tangential force up to the coulomb limit, never
+    // across it within a single step
+    // Note (MI): if rotation contact model is none or a wrong name it
+    //            defaults to Mindlin through the dict-reader
+    if (mag(deltaFt) > FtCeil)
+    {
+        deltaFt *= FtCeil/(mag(deltaFt) + SMALL);
+    }
+    FtPrev_ = FtLastS - deltaFt;
 
     // coulomb cap feeds back into the stored state: the spring
     // stops stretching at the sliding ceiling, so the applied

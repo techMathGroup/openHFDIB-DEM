@@ -259,32 +259,29 @@ vector wallSubContactInfo::getFt
     vector Vt(wallCntvar.Veli_ - Vn);
 
     // compute tangential force
-    if(contactModelInfo::getUseMindlinRotationalModel())
+    vector deltaFt(vector::zero);
+    if (contactModelInfo::getUseMindlinRotationalModel())
     {
         scalar tangTune(demTimeStepInfo::tangTune_);                    //read empirical mambo-jambo from demTimeStepInfo
-        scalar kT = tangTune*8*meanCntPar.aG_*(wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL));
-        vector deltaFt(kT*Vt*deltaT + 2*meanCntPar.reduceBeta_*sqrt(kT*reduceM_)*Vt);
-        // the spring can stretch by at most one ceiling per
-        // sub-step
-        if (mag(deltaFt) > FtCeil)
-        {
-            deltaFt *= FtCeil/(mag(deltaFt) + SMALL);
-        }
-        wallCntvar.FtPrev_ = FtLastS - deltaFt;
+        scalar kT = tangTune*8.0*meanCntPar.aG_*(wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL));
+        deltaFt = kT*Vt*deltaT + 2.0*meanCntPar.reduceBeta_*sqrt(kT*reduceM_)*Vt;
     }
-
-    if(contactModelInfo::getUseChenRotationalModel())
+    else if(contactModelInfo::getUseChenRotationalModel())
     {
-
-        vector Ftdi(meanCntPar.reduceBeta_*sqrt(meanCntPar.aG_*reduceM_*wallCntvar.Lc_)*Vt);
-        Ftdi += meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT;
-        // same one-ceiling bound on the increment as above
-        if (mag(Ftdi) > FtCeil)
-        {
-            Ftdi *= FtCeil/(mag(Ftdi) + SMALL);
-        }
-        wallCntvar.FtPrev_ = FtLastS - Ftdi;
+        deltaFt = meanCntPar.reduceBeta_*sqrt(meanCntPar.aG_*reduceM_*wallCntvar.Lc_)*Vt;
+        deltaFt += meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT;
     }
+    // the spring can stretch by at most one ceiling per
+    // sub-step: a fresh contact (or a slip reversal) builds
+    // the tangential force up to the coulomb limit, never
+    // across it within a single step
+    // Note (MI): if rotation contact model is none or a wrong name it
+    //            defaults to Mindlin through the dict-reader
+    if (mag(deltaFt) > FtCeil)
+    {
+        deltaFt *= FtCeil/(mag(deltaFt) + SMALL);
+    }
+    wallCntvar.FtPrev_ = FtLastS - deltaFt;
 
     // coulomb cap feeds back into the stored state: the spring
     // stops stretching at the sliding ceiling, so the applied
