@@ -54,7 +54,22 @@ void subContact::addSubVolume(std::shared_ptr<subVolume> sV)
     tmp<pointField> points = boundBox_.points();
     points->append(sV->points());
     boundBox_ = boundBox(points,false);
-    volume_ += sV->volume();
+
+    // exact leaf evaluation: a leaf evaluated by planePolyClip carries
+    // its clipped volume in the cache; 
+    // Note (MI): this is used instead of the full node volume (legacy
+    //            clamp approach) => no over-counting of MIXED rim leaves. 
+    // Note (MI): the legacy clamp approach uses the full node volume 
+    //            for MIXED rim leaves and keeps the cache unset (-1) 
+    //            => over-counting of MIXED rim leaves.
+    const scalar leafVolume
+    (
+        sV->cVolumeInfo().clippedVolume_ > -0.5
+        ? sV->cVolumeInfo().clippedVolume_
+        : sV->volume()
+    );
+
+    volume_ += leafVolume;
 }
 //---------------------------------------------------------------------------//
 bool subContact::canCombine(subVolume& sV)
