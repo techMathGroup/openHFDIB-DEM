@@ -32,6 +32,9 @@ Contributors
 \*---------------------------------------------------------------------------*/
 #include "stlBased.H"
 
+#include <fstream>                                                      //std::ofstream cover visualization
+#include <iomanip>                                                      //std::setprecision cover visualization
+
 using namespace Foam;
 
 //---------------------------------------------------------------------------//
@@ -771,7 +774,13 @@ void stlBased::coverSplit
     coverSplit(rightSet, stallCoeff, nLeaves, maxBoxes, leaves);
 }
 //---------------------------------------------------------------------------//
-bool stlBased::computeStaticCover(label maxBoxes, scalar stallCoeff)
+bool stlBased::computeStaticCover
+(
+    label maxBoxes,
+    scalar stallCoeff,
+    bool writeCover,
+    word bodyName
+)
 {
     if (coverActive_)
     {
@@ -850,6 +859,18 @@ bool stlBased::computeStaticCover(label maxBoxes, scalar stallCoeff)
         << " (ratio " << coverVol/max(getBounds().mag(), SMALL)
         << ")" << endl;
 
+    if (writeCover)
+    {
+        writeCoverVtk
+        (
+            bodyName,
+            coverBoxes_,
+            coverPartition_,
+            triSurf_(),
+            getBounds()
+        );
+    }
+
     return true;
 }
 //---------------------------------------------------------------------------//
@@ -878,6 +899,229 @@ void stlBased::refreshCoverBounds()
         // reallocate (in-place mutation contract)
         coverBoxes_[leafI]->min() = minP;
         coverBoxes_[leafI]->max() = maxP;
+    }
+}
+//---------------------------------------------------------------------------//
+void stlBased::writeCoverVtk
+(
+    const word& bodyName,
+    const List<std::shared_ptr<boundBox>>& boxes,
+    const labelListList& partition,
+    const triSurface& surf,
+    const boundBox& fullAABB
+) const
+{
+    // master rank only: the deterministic build guarantees every
+    // rank holds the identical partition, no gather is needed
+    if (!Pstream::master())
+    {
+        return;
+    }
+
+    fileName coverDir
+    (
+        mesh_.time().rootPath() + "/"
+        + mesh_.time().globalCaseName()
+        + "/bodiesInfo/" + mesh_.time().timeName()
+        + "/coverFiles"
+    );
+
+    if (!isDir(coverDir))
+    {
+        mkDir(coverDir);
+    }
+
+    const label nBoxes(boxes.size());
+    const scalar fullVol(max(fullAABB.mag(), SMALL));
+
+    // ---- one hexahedron per cover box ----------------
+    {
+        std::ofstream boxFile
+        (
+            (coverDir + "/" + bodyName + "_boxes.vtk").c_str(),
+            std::ofstream::trunc
+        );
+
+        if (!boxFile.is_open())
+        {
+            FatalErrorInFunction
+                << "cannot open cover file "
+                << coverDir + "/" + bodyName + "_boxes.vtk"
+                << " for writing"
+                << abort(FatalError);
+        }
+
+        boxFile << std::setprecision(16);
+
+        boxFile << "# vtk DataFile Version 3.0\n"
+            << "cover boxes for " << bodyName << "\n"
+            << "ASCII\n"
+            << "DATASET UNSTRUCTURED_GRID\n"
+            << "POINTS " << 8*nBoxes << " double\n";
+
+        // 8 points per cell, contiguous layout, VTK hexahedron
+        // order (counterclockwise quads)
+        for (label boxI = 0; boxI < nBoxes; ++boxI)
+        {
+            const point& minP(boxes[boxI]->min());
+            const point& maxP(boxes[boxI]->max());
+
+            boxFile << minP.x() << " " << minP.y() << " " << minP.z() << "\n";
+            boxFile << maxP.x() << " " << minP.y() << " " << minP.z() << "\n";
+            boxFile << maxP.x() << " " << maxP.y() << " " << minP.z() << "\n";
+            boxFile << minP.x() << " " << maxP.y() << " " << minP.z() << "\n";
+            boxFile << minP.x() << " " << minP.y() << " " << maxP.z() << "\n";
+            boxFile << maxP.x() << " " << minP.y() << " " << maxP.z() << "\n";
+            boxFile << maxP.x() << " " << maxP.y() << " " << maxP.z() << "\n";
+            boxFile << minP.x() << " " << maxP.y() << " " << maxP.z() << "\n";
+        }
+
+        boxFile << "CELLS " << nBoxes << " " << 9*nBoxes << "\n";
+
+        for (label boxI = 0; boxI < nBoxes; ++boxI)
+        {
+            boxFile << " 8";
+
+            for (label ptI = 0; ptI < 8; ++ptI)
+            {
+                boxFile << " " << 8*boxI + ptI;
+            }
+
+            boxFile << "\n";
+        }
+
+        boxFile << "CELL_TYPES " << nBoxes << "\n";
+
+        for (label boxI = 0; boxI < nBoxes; ++boxI)
+        {
+            boxFile << "12\n";
+        }
+
+        boxFile << "CELL_DATA " << nBoxes << "\n";
+
+        boxFile << "SCALARS boxIndex int 1\n"
+            << "LOOKUP_TABLE default\n";
+
+        for (label boxI = 0; boxI < nBoxes; ++boxI)
+        {
+            boxFile << boxI << "\n";
+        }
+
+        boxFile << "SCALARS nTriangles int 1\n"
+            << "LOOKUP_TABLE default\n";
+
+        for (label boxI = 0; boxI < nBoxes; ++boxI)
+        {
+            boxFile << partition[boxI].size() << "\n";
+        }
+
+        boxFile << "SCALARS boxVolume double 1\n"
+            << "LOOKUP_TABLE default\n";
+
+        for (label boxI = 0; boxI < nBoxes; ++boxI)
+        {
+            boxFile << boxes[boxI]->mag() << "\n";
+        }
+
+        boxFile << "SCALARS volumeRatio double 1\n"
+            << "LOOKUP_TABLE default\n";
+
+        for (label boxI = 0; boxI < nBoxes; ++boxI)
+        {
+            boxFile << boxes[boxI]->mag()/fullVol << "\n";
+        }
+    }
+
+    // ---- surface triangles colored by partition ------
+    {
+        // reverse map triangle -> box; the build-time self-check
+        // guarantees every triangle feeds exactly one box, a
+        // surviving -1 is a partition bug
+        const label nTris(surf.size());
+        labelList triBox(nTris, -1);
+
+        forAll(partition, boxI)
+        {
+            forAll(partition[boxI], i)
+            {
+                triBox[partition[boxI][i]] = boxI;
+            }
+        }
+
+        forAll(triBox, triI)
+        {
+            if (triBox[triI] < 0)
+            {
+                WarningInFunction
+                    << "triangle " << triI << " of " << bodyName
+                    << " lies in no cover box"
+                    << endl;
+            }
+        }
+
+        const pointField& points(surf.points());
+
+        std::ofstream partFile
+        (
+            (coverDir + "/" + bodyName + "_partition.vtk").c_str(),
+            std::ofstream::trunc
+        );
+
+        if (!partFile.is_open())
+        {
+            FatalErrorInFunction
+                << "cannot open cover file "
+                << coverDir + "/" + bodyName + "_partition.vtk"
+                << " for writing"
+                << abort(FatalError);
+        }
+
+        partFile << std::setprecision(16);
+
+        partFile << "# vtk DataFile Version 3.0\n"
+            << "cover partition for " << bodyName << "\n"
+            << "ASCII\n"
+            << "DATASET UNSTRUCTURED_GRID\n"
+            << "POINTS " << points.size() << " double\n";
+
+        forAll(points, ptI)
+        {
+            partFile << points[ptI].x() << " "
+                << points[ptI].y() << " "
+                << points[ptI].z() << "\n";
+        }
+
+        partFile << "CELLS " << nTris << " " << 4*nTris << "\n";
+
+        for (label triI = 0; triI < nTris; ++triI)
+        {
+            const typename triSurface::FaceType& f = surf[triI];
+
+            partFile << " 3";
+
+            for (auto ind : f)
+            {
+                partFile << " " << ind;
+            }
+
+            partFile << "\n";
+        }
+
+        partFile << "CELL_TYPES " << nTris << "\n";
+
+        for (label triI = 0; triI < nTris; ++triI)
+        {
+            partFile << "5\n";
+        }
+
+        partFile << "CELL_DATA " << nTris << "\n"
+            << "SCALARS boxIndex int 1\n"
+            << "LOOKUP_TABLE default\n";
+
+        forAll(triBox, triI)
+        {
+            partFile << triBox[triI] << "\n";
+        }
     }
 }
 //---------------------------------------------------------------------------//

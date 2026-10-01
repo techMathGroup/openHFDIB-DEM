@@ -98,6 +98,21 @@ namespace Foam
         // refresh mechanism for every motion class
         void refreshCoverBounds();
 
+        // ascii legacy-vtk cover writer (debug machinery)
+        // writes:
+        // <bodyName>_boxes.vtk (hexahedron per box) and
+        // <bodyName>_partition.vtk (triangles colored by box);
+        // Note (MI): after the createCover project is finished and
+        //            debugged, this function can be removed
+        void writeCoverVtk
+        (
+            const word& bodyName,
+            const List<std::shared_ptr<boundBox>>& boxes,
+            const labelListList& partition,
+            const triSurface& surf,
+            const boundBox& fullAABB
+        ) const;
+
         void getIntersectionPoints
         (
             const label index,
@@ -178,8 +193,16 @@ namespace Foam
         List<std::shared_ptr<boundBox>> getBBoxes() final override;
 
         // build the cover partition + boxes once; returns true on
-        // success, false leaves the legacy single-AABB behavior
-        bool computeStaticCover(label maxBoxes, scalar stallCoeff);
+        // success, false leaves the legacy single-AABB behavior;
+        // writeCover (default off) writes the vtk visualization,
+        // bodyName is used for the output file names
+        bool computeStaticCover
+        (
+            label maxBoxes,
+            scalar stallCoeff,
+            bool writeCover = false,
+            word bodyName = word::null
+        );
 
         void synchronPos(label owner = -1) final override;
 
