@@ -391,6 +391,25 @@ namespace Foam
             return false;
         }
 
+        // tangent plane of the body surface crossing a MIXED leaf:
+        // {p, n} with n the unit inward normal (pointing into the body
+        // material) and p any point on the plane. 
+        // - used by the exact planePolyClip to give MIXED leaves partial volume
+        // - returns falls when the body cannot provide a local plane
+        //   (caller falls back to limitFinalSubVolume)
+        virtual bool getLeafSubVolumePlane
+        (
+            subVolume& sv,
+            bool cIb,
+            point& p,
+            vector& n
+        )
+        {
+            InfoH << iB_Info << "19-- geomModelMessage-- "
+                << "notImplemented"<<endl;
+            return false;
+        }
+
         virtual void setCoM()
         {
             InfoH << iB_Info << "16-- geomModelMessage-- "

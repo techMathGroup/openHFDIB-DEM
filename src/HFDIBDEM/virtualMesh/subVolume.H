@@ -55,7 +55,9 @@ struct ibSubVolumeInfo
 {
     ibSubVolumeInfo():
         volumeType_(volumeType::UNKNOWN)
-    {}
+    {
+        resetClip();
+    }
 
     explicit ibSubVolumeInfo(volumeType vType)
     :
@@ -77,10 +79,22 @@ struct ibSubVolumeInfo
                 volumeType_ = volumeType::UNKNOWN;
                 break;
         }
+
+        resetClip();
     }
 
     volumeType volumeType_;
     autoPtr<labelList> shapesIn_;
+
+    // exact leaf evaluation (planePolyClip)
+    scalar clippedVolume_;
+    vector clippedCentroid_;
+
+    void resetClip()
+    {
+        clippedVolume_ = -1;
+        clippedCentroid_ = vector::zero;
+    }
     
     // --- copy ctor (deep copy of shapesIn_) ---
     ibSubVolumeInfo(const ibSubVolumeInfo& other)
@@ -91,7 +105,9 @@ struct ibSubVolumeInfo
             other.shapesIn_.valid()
             ? autoPtr<labelList>(new labelList(*other.shapesIn_))
             : autoPtr<labelList>()
-        )
+        ),
+        clippedVolume_(other.clippedVolume_),
+        clippedCentroid_(other.clippedCentroid_)
     {}
 
     // --- copy assignment (deep copy of shapesIn_) ---
@@ -109,6 +125,9 @@ struct ibSubVolumeInfo
                 shapesIn_.reset(new labelList(*other.shapesIn_));
             }
             // else shapesIn_ remains empty (invalid)
+
+            clippedVolume_ = other.clippedVolume_;
+            clippedCentroid_ = other.clippedCentroid_;
         }
         return *this;
     }

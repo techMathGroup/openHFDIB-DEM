@@ -430,9 +430,14 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         dictionary vMDic = HFDIBDEMDict_.subDict("virtualMesh");
         virtualMeshLevel::setVirtualMeshLevel(readScalar(vMDic.lookup("level")),readScalar(vMDic.lookup("charCellSize")));
         virtualMeshLevel::setMaxSubVolumes(vMDic.lookupOrDefault<scalar>("maxSubVolumes",virtualMeshLevel::getMaxSubVolumes()));
+        virtualMeshLevel::setExactSubVolume
+        (
+            vMDic.lookupOrDefault<bool>("exactSubVolume", false)
+        );
         Info <<" -- VirtMesh Decomposition Level is set to        : "<< virtualMeshLevel::getVirtualMeshLevel() << endl;
         Info <<" -- VirtMesh charCellSize for boundary is set to  : "<< virtualMeshLevel::getCharCellSize() << endl;
         Info <<" -- VirtMesh max number of subVolumes is set to   : "<< virtualMeshLevel::getMaxSubVolumes() << endl;
+        Info <<" -- VirtMesh exact sub-volume evaluation is        : "<< virtualMeshLevel::getExactSubVolume() << endl;
 
     }
     else
@@ -441,7 +446,6 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         Info <<" -- VirtMesh Decomposition Level is set to        : "<< virtualMeshLevel::getVirtualMeshLevel() << endl;
         Info <<" -- VirtMesh charCellSize for boundary is set to  : "<< virtualMeshLevel::getCharCellSize() << endl;
         Info <<" -- VirtMesh max number of subVolumes is set to   : "<< virtualMeshLevel::getMaxSubVolumes() << endl;
-
     }
 
     recordOutDir_ = mesh_.time().rootPath() + "/" + mesh_.time().globalCaseName() + "/bodiesInfo";

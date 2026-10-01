@@ -176,6 +176,14 @@ namespace Foam
             boundBox& limBBox
         ) final override;
 
+        bool getLeafSubVolumePlane
+        (
+            subVolume& sv,
+            bool cIb,
+            point& p,
+            vector& n
+        ) final override;
+
         void initVars(pointField surfPoints, scalar intSpan, bool sdBasedLambda)
         {
             bodySurfMesh_.movePoints(surfPoints);

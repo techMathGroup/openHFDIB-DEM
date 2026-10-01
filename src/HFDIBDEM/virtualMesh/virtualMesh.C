@@ -121,6 +121,7 @@ Contributors
 #include "subVolume.H"
 #include "virtualMeshLevel.H"
 #include "virtualMeshTools.H"
+#include "planePolyClip.H"
 
 using namespace Foam;
 
@@ -141,6 +142,75 @@ volumeType ensureVolumeType
     }
 
     return info.volumeType_;
+}
+
+// exact leaf evaluation
+bool evaluateLeafExact
+(
+    subVolume& sV,
+    geomModel& cGeom,
+    geomModel& tGeom,
+    const volumeType cType,
+    const volumeType tType
+)
+{
+    ibSubVolumeInfo& cInfo = sV.cVolumeInfo();
+    ibSubVolumeInfo& tInfo = sV.tVolumeInfo();
+
+    if (cInfo.clippedVolume_ > -0.5)
+    {
+        // already evaluated (possibly on the detect pass)
+        return true;
+    }
+
+    const boundBox leaf(sV.min(), sV.max());
+
+    // inward half-spaces of the MIXED bodies
+    point cP(vector::zero);
+    vector cN(vector::zero);
+    point tP(vector::zero);
+    vector tN(vector::zero);
+
+    const bool cHasPlane
+    (
+        cType == volumeType::MIXED
+        && cGeom.getLeafSubVolumePlane(sV, true, cP, cN)
+    );
+    const bool tHasPlane
+    (
+        tType == volumeType::MIXED
+        && tGeom.getLeafSubVolumePlane(sV, false, tP, tN)
+    );
+
+    if (cType == volumeType::MIXED && !cHasPlane)
+    {
+        return false;
+    }
+    if (tType == volumeType::MIXED && !tHasPlane)
+    {
+        return false;
+    }
+
+    planePolyClip::halfSpace hs1(cP, cN);
+    planePolyClip::halfSpace hs2(tP, tN);
+
+    // at least one body is MIXED here, so at least one plane exists
+    planePolyClip::volumeAndCentroid
+    (
+        leaf,
+        cHasPlane ? hs1 : hs2,
+        cHasPlane && tHasPlane,
+        cHasPlane ? hs1 : hs2,
+        cInfo.clippedVolume_,
+        cInfo.clippedCentroid_
+    );
+
+    // cache on both records so either accessor sees it (tInfo
+    // mirrors cInfo for the leaf-level result)
+    tInfo.clippedVolume_ = cInfo.clippedVolume_;
+    tInfo.clippedCentroid_ = cInfo.clippedCentroid_;
+
+    return true;
 }
 
 }
@@ -215,19 +285,48 @@ bool virtualMesh::detectFirstVolumeInContact(subVolume& sV, bool& startPointFoun
 
     if (sV.volume() < vMeshInfo_.subVolumeV)
     {
-        ensureVolumeType(sV, cGeomModel_, true);
-        ensureVolumeType(sV, tGeomModel_, false);
+        const volumeType cType
+        (
+            ensureVolumeType(sV, cGeomModel_, true)
+        );
+        const volumeType tType
+        (
+            ensureVolumeType(sV, tGeomModel_, false)
+        );
 
-        if (cInfo.volumeType_ == volumeType::OUTSIDE
-            || tInfo.volumeType_ == volumeType::OUTSIDE)
+        if (cType == volumeType::OUTSIDE || tType == volumeType::OUTSIDE)
         {
             return false;
+        }
+
+        if (cType == volumeType::INSIDE && tType == volumeType::INSIDE)
+        {
+            return true;
+        }
+
+        // exact leaf evaluation: contact exists iff the clipped leaf
+        // volume is positive - identical criterion to the evaluation
+        // pass, so the detect/evaluate leaf sets cannot diverge
+        if
+        (
+            virtualMeshLevel::getExactSubVolume()
+            && evaluateLeafExact
+            (
+                sV,
+                cGeomModel_,
+                tGeomModel_,
+                cType,
+                tType
+            )
+        )
+        {
+            return sV.cVolumeInfo().clippedVolume_ > VSMALL;
         }
 
         boundBox cBBox = boundBox(sV.min(), sV.max());
         boundBox tBBox = boundBox(sV.min(), sV.max());
 
-        if (cInfo.volumeType_ == volumeType::MIXED)          //OF.com: mixed, inside, outside -> MIXED, INSIDE, OUTSIDE
+        if (cInfo.volumeType_ == volumeType::MIXED)                     //O F.com: mixed, inside, outside -> MIXED, INSIDE, OUTSIDE
         {
             if (!cGeomModel_.limitFinalSubVolume(sV,true,cBBox))
             {
@@ -357,8 +456,58 @@ void virtualMesh::inspectSubVolume(
 
     if (sV.volume() < vMeshInfo_.subVolumeV)
     {
-        ensureVolumeType(sV, cGeomModel_, true);
-        ensureVolumeType(sV, tGeomModel_, false);
+        const volumeType cType
+        (
+            ensureVolumeType(sV, cGeomModel_, true)
+        );
+        const volumeType tType
+        (
+            ensureVolumeType(sV, tGeomModel_, false)
+        );
+
+        if (cType == volumeType::OUTSIDE || tType == volumeType::OUTSIDE)
+        {
+            return;
+        }
+
+        // exact leaf evaluation (approach B): both bodies keep
+        // partial-volume credit via planePolyClip. INSIDE/INSIDE
+        // leaves take the full volume below
+        if
+        (
+            virtualMeshLevel::getExactSubVolume()
+            && (cType == volumeType::MIXED || tType == volumeType::MIXED)
+            && evaluateLeafExact
+            (
+                sV,
+                cGeomModel_,
+                tGeomModel_,
+                cType,
+                tType
+            )
+        )
+        {
+            if
+            (
+                cType != volumeType::INSIDE
+                && tType != volumeType::INSIDE
+            )
+            {
+                // rim leaf: MIXED for both bodies
+                edgePoints.append(sV.midpoint());
+                sV.setAsEdge();
+            }
+
+            const scalar clippedV(sV.cVolumeInfo().clippedVolume_);
+            if (clippedV > VSMALL)
+            {
+                contactVolume += clippedV;
+                contactCenter +=
+                    (sV.cVolumeInfo().clippedCentroid_*clippedV);
+            }
+            return;
+        }
+        // exactSubVolume off or no plane available: legacy clamp below
 
         boundBox cBBox = boundBox(sV.min(), sV.max());
         boundBox tBBox = boundBox(sV.min(), sV.max());

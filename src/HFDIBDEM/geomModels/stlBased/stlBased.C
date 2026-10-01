@@ -410,6 +410,104 @@ bool stlBased::limitFinalSubVolume
     // return true;
 }
 //---------------------------------------------------------------------------//
+bool stlBased::getLeafSubVolumePlane
+(
+    subVolume& sv,
+    bool cIb,
+    point& p,
+    vector& n
+)
+{
+    // dominant-plane rule: the facet with the largest in-box
+    // triangle-box overlap area approximates the surface crossing the
+    // subVolume (aka leaf);
+    // Note (MI): shapesIn_ must be filled - getVolumeType was called on
+    //             this leaf before
+    const auto& info = sv.getVolumeInfo(cIb);
+
+    if (!info.shapesIn_.valid() || info.shapesIn_->size() == 0)
+    {
+        return false;
+    }
+
+    const labelList& shapesIn(info.shapesIn_());
+    const pointField& surfPts(triSurf_->points());
+
+    label bestFacet(-1);
+    scalar bestArea(0);
+
+    forAll(shapesIn, i)
+    {
+        const label facetI(shapesIn[i]);
+        const triPointRef tri
+        (
+            surfPts[(*triSurf_)[facetI][0]],
+            surfPts[(*triSurf_)[facetI][1]],
+            surfPts[(*triSurf_)[facetI][2]]
+        );
+
+        // overlap weight: triangle-bbox vs leaf-box overlap volume;
+        const boundBox triBBox
+        (
+            min(min(tri.a(), tri.b()), tri.c()),
+            max(max(tri.a(), tri.b()), tri.c())
+        );
+        const boundBox overlap
+        (
+            max(sv.min(), triBBox.min()),
+            min(sv.max(), triBBox.max())
+        );
+
+        if (overlap.valid() && overlap.volume() > bestArea)
+        {
+            bestArea = overlap.volume();                                //largest dominates
+            bestFacet = facetI;
+        }
+    }
+
+    if (bestFacet == -1)
+    {
+        return false;
+    }
+
+    const vector areaN
+    (
+        (*triSurf_)[bestFacet].areaNormal(surfPts)
+    );
+    const scalar aNmag(mag(areaN));
+
+    if (aNmag < VSMALL)
+    {
+        return false;
+    }
+
+    // outward facet normal; inward orientation is resolved with a
+    // single pointInside probe offset into the leaf from the plane,
+    // so the stl file orientation is not trusted
+    // Note (MI): the cost of this "not trusted" should be checked
+    //            -> if this becomes a bottleneck, just trust the user
+    //           (stl orientation)
+    vector nOut(areaN/aNmag);
+
+    p = (*triSurf_)[bestFacet].centre(surfPts);
+    const vector offset(nOut*(sv.mag()/8.0 + VSMALL));
+
+    // probe the two sides of the plane: whichever lands inside the
+    // body tells the inward direction
+    const bool posInside(pointInside(p + offset));
+    const bool negInside(pointInside(p - offset));
+
+    if (posInside == negInside)
+    {
+        // both or neither inside => no reliable plane
+        return false;
+    }
+
+    n = posInside ? -nOut : nOut;
+
+    return true;
+}
+//---------------------------------------------------------------------------//
 void stlBased::getIntersectionPoints
 (
     const label index,

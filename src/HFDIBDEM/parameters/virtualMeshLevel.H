@@ -87,6 +87,20 @@ class virtualMeshLevel
     static scalar levelOfDivision_;
     static scalar charCellSize_;
 
+    // exact per-leaf partial-volume for MIXED leaves: the leaf (subVolume) 
+    // box is clipped by the tangent-plane half-spaces of the MIXED
+    // bodies (planePolyClip) into O(h_sub^2) with continuous 
+    // dV/d(configuration).
+    static bool exactSubVolume_;
+    static bool getExactSubVolume()
+    {
+        return exactSubVolume_;
+    }
+    static void setExactSubVolume(const bool exactSubVolume)
+    {
+        exactSubVolume_ = exactSubVolume;
+    }
+
     // Upper bound on the number of sub-volumes a single wall virtual mesh
     // may span. Exceeding it triggers a FatalError at virtual-mesh creation
     // (see wallSubContactInfo), and bounds the flood-fill iteration caps
