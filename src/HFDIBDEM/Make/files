@@ -12,6 +12,7 @@ virtualMesh/subContact.C
 virtualMesh/subVolume.C
 virtualMesh/virtualMesh.C
 virtualMesh/spectatorMesh.C
+virtualMesh/planePolyClip.C
 virtualMesh/virtualMeshTools.C
 virtualMesh/virtualMeshWall.C
 contactModels/materialInfo.C
