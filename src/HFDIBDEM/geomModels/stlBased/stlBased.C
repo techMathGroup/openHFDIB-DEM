@@ -53,7 +53,8 @@ bodySurfMesh_
         IOobject::NO_WRITE
     )
 ),
-stlPath_(stlPath)
+stlPath_(stlPath),
+coverActive_(false)
 {
     historyPoints_ = bodySurfMesh_.points();
     triSurf_.reset(new triSurface(bodySurfMesh_));                      //OF.com: set -> reset
@@ -660,5 +661,261 @@ void stlBased::setBodyPosition(pointField pos)
 
     // re-track the centroid
     computeVolumeCoM(triSurf_());                                       // points were replaced wholesale
+}
+//---------------------------------------------------------------------------//
+boundBox stlBased::triSetBBox(const labelList& tris) const
+{
+    const pointField& points = triSurf_->points();
+
+    point minP = point::max;
+    point maxP = point::min;
+
+    forAll(tris, i)
+    {
+        const typename triSurface::FaceType& f = (*triSurf_)[tris[i]];
+
+        for (auto ind : f)
+        {
+            minP = min(minP, points[ind]);
+            maxP = max(maxP, points[ind]);
+        }
+    }
+
+    return boundBox(minP, maxP);
+}
+//---------------------------------------------------------------------------//
+void stlBased::coverSplit
+(
+    const labelList& tris,
+    scalar stallCoeff,
+    label& nLeaves,
+    label maxBoxes,
+    List<labelList>& leaves
+) const
+{
+    const boundBox parentBBox(triSetBBox(tris));
+
+    const vector span(parentBBox.max() - parentBBox.min());
+    const vector validDirs((geometricD + vector::one)/2);
+    const vector spanDirs(cmptMultiply(span, validDirs));
+
+    label splitDir(-1);
+    scalar widest(0);
+    for (label dir = 0; dir < 3; ++dir)
+    {
+        if (spanDirs[dir] > widest)
+        {
+            widest = spanDirs[dir];
+            splitDir = dir;
+        }
+    }
+
+    // cannot split further in a non-degenerate direction
+    if (splitDir == -1)
+    {
+        leaves[nLeaves++] = tris;
+        return;
+    }
+
+    // split at the median triangle centroid along the widest axis;
+    // ties are broken by the triangle INDEX (sortedOrder is stable
+    // w.r.t. it), never by float comparison of equal centroids, so
+    // every rank builds the identical partition
+    const pointField& points = triSurf_->points();
+    scalarField centroidCoord(tris.size());
+
+    forAll(tris, i)
+    {
+        centroidCoord[i] =
+            (*triSurf_)[tris[i]].centre(points)[splitDir];
+    }
+
+    labelList order(sortedOrder(centroidCoord));
+
+    labelList leftSet(order.size()/2);
+    labelList rightSet(order.size() - order.size()/2);
+
+    forAll(order, i)
+    {
+        if (i < order.size()/2)
+        {
+            leftSet[i] = tris[order[i]];
+        }
+        else
+        {
+            rightSet[i - order.size()/2] = tris[order[i]];
+        }
+    }
+
+    // stall criterion: if the children barely reduce the bound, the
+    // geometry fills this box - stop splitting here. The box cap is
+    // checked against the leaf budget including both prospective
+    // children so nLeaves never exceeds maxBoxes
+    const scalar parentVol(parentBBox.mag());
+    const scalar childrenVol
+    (
+        triSetBBox(leftSet).mag() + triSetBBox(rightSet).mag()
+    );
+
+    if
+    (
+        childrenVol > stallCoeff*parentVol
+        || nLeaves + 2 > maxBoxes
+    )
+    {
+        leaves[nLeaves++] = tris;
+        return;
+    }
+
+    coverSplit(leftSet, stallCoeff, nLeaves, maxBoxes, leaves);
+    coverSplit(rightSet, stallCoeff, nLeaves, maxBoxes, leaves);
+}
+//---------------------------------------------------------------------------//
+bool stlBased::computeStaticCover(label maxBoxes, scalar stallCoeff)
+{
+    if (coverActive_)
+    {
+        return true;
+    }
+
+    const label nTris(triSurf_->size());
+
+    if (nTris < 1)
+    {
+        return false;
+    }
+
+    labelList allTris(nTris);
+    forAll(allTris, i)
+    {
+        allTris[i] = i;
+    }
+
+    List<labelList> leaves(maxBoxes);
+    label nLeaves(0);
+
+    coverSplit(allTris, stallCoeff, nLeaves, maxBoxes, leaves);
+
+    coverPartition_.setSize(nLeaves);
+    coverBoxes_.setSize(nLeaves);
+
+    for (label leafI = 0; leafI < nLeaves; ++leafI)
+    {
+        coverPartition_[leafI] = leaves[leafI];
+        coverBoxes_[leafI] = std::make_shared<boundBox>
+        (
+            triSetBBox(leaves[leafI])
+        );
+    }
+
+    // build-time self-check: every surface point of every triangle
+    // must lie inside its own leaf box (hence inside the union)
+    for (label leafI = 0; leafI < nLeaves; ++leafI)
+    {
+        const boundBox& bBox(*coverBoxes_[leafI]);
+        const pointField& points = triSurf_->points();
+
+        forAll(coverPartition_[leafI], i)
+        {
+            const typename triSurface::FaceType& f =
+                (*triSurf_)[coverPartition_[leafI][i]];
+
+            for (auto ind : f)
+            {
+                if (!bBox.contains(points[ind]))
+                {
+                    FatalErrorInFunction
+                        << "cover self-check failed: point "
+                        << points[ind] << " of triangle "
+                        << coverPartition_[leafI][i]
+                        << " outside its cover box " << bBox
+                        << abort(FatalError);
+                }
+            }
+        }
+    }
+
+    coverActive_ = true;
+
+    // cover statistics: total box volume vs the full AABB
+    scalar coverVol(0);
+    for (label leafI = 0; leafI < nLeaves; ++leafI)
+    {
+        coverVol += coverBoxes_[leafI]->mag();
+    }
+
+    InfoH << basic_Info << "cover built for " << stlPath_
+        << ": " << nLeaves << " boxes, total volume " << coverVol
+        << " vs AABB volume " << getBounds().mag()
+        << " (ratio " << coverVol/max(getBounds().mag(), SMALL)
+        << ")" << endl;
+
+    return true;
+}
+//---------------------------------------------------------------------------//
+void stlBased::refreshCoverBounds()
+{
+    const pointField& points = triSurf_->points();
+
+    forAll(coverPartition_, leafI)
+    {
+        point minP = point::max;
+        point maxP = point::min;
+
+        forAll(coverPartition_[leafI], i)
+        {
+            const typename triSurface::FaceType& f =
+                (*triSurf_)[coverPartition_[leafI][i]];
+
+            for (auto ind : f)
+            {
+                minP = min(minP, points[ind]);
+                maxP = max(maxP, points[ind]);
+            }
+        }
+
+        // write through the aliased boxes in place - never
+        // reallocate (in-place mutation contract)
+        coverBoxes_[leafI]->min() = minP;
+        coverBoxes_[leafI]->max() = maxP;
+    }
+}
+//---------------------------------------------------------------------------//
+List<std::shared_ptr<boundBox>> stlBased::getBBoxes()
+{
+    if (!coverActive_)
+    {
+        return geomModel::getBBoxes();
+    }
+
+    // aliasing-contract watch: the same boundBox objects must be
+    // returned every call - verletPoints hold references into them
+    if (coverBoxWatch_.size() != coverBoxes_.size())
+    {
+        coverBoxWatch_.setSize(coverBoxes_.size());
+        forAll(coverBoxes_, boxI)
+        {
+            coverBoxWatch_[boxI] = coverBoxes_[boxI].get();
+        }
+    }
+    else
+    {
+        forAll(coverBoxes_, boxI)
+        {
+            if (coverBoxWatch_[boxI] != coverBoxes_[boxI].get())
+            {
+                FatalErrorInFunction
+                    << "cover boxes of " << stlPath_
+                    << " were reallocated after verlet registration"
+                    << " (in-place mutation contract violated - live"
+                    << " verletPoints alias these boxes)"
+                    << abort(FatalError);
+            }
+        }
+    }
+
+    refreshCoverBounds();
+
+    return coverBoxes_;
 }
 //---------------------------------------------------------------------------//

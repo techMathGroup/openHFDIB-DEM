@@ -64,6 +64,40 @@ namespace Foam
 
         pointField historyPoints_;
 
+        // tight multi-box cover (broad-phase bound): k-d median
+        // partition of the surface triangles, built once per body
+        // Note (MI): the shared boundBox objects in coverBoxes_ are
+        // handed to verlet registration and are aliased by live
+        // verletPoints - they must NEVER be reset, reallocated or
+        // resized afterwards, only mutated in place through
+        // min()/max() (in-place mutation contract, verletPoint.H)
+        List<std::shared_ptr<boundBox>> coverBoxes_;
+        labelListList coverPartition_;
+        bool coverActive_;
+
+        // watch list of raw box pointers from the previous
+        // getBBoxes() call - catches aliasing-contract violation
+        List<const boundBox*> coverBoxWatch_;
+
+        // AABB of a subset of triangles (indices into triSurf_)
+        boundBox triSetBBox(const labelList& tris) const;
+
+        // recursive median split of a triangle set along its widest
+        // axis, stopped by the stall criterion or the box cap
+        void coverSplit
+        (
+            const labelList& tris,
+            scalar stallCoeff,
+            label& nLeaves,
+            label maxBoxes,
+            List<labelList>& leaves
+        ) const;
+
+        // re-derive cover box bounds from the partition and the
+        // current (synchronized) surface points - the single
+        // refresh mechanism for every motion class
+        void refreshCoverBounds();
+
         void getIntersectionPoints
         (
             const label index,
@@ -137,6 +171,15 @@ namespace Foam
             boundBox bounds(bodySurfMesh_.points(), false);
             return bounds;
         }
+
+        // multi-box broad-phase bound; refreshes box bounds from
+        // the partition + current points on every call (the
+        // verletList::update side-effect refresh path)
+        List<std::shared_ptr<boundBox>> getBBoxes() final override;
+
+        // build the cover partition + boxes once; returns true on
+        // success, false leaves the legacy single-AABB behavior
+        bool computeStaticCover(label maxBoxes, scalar stallCoeff);
 
         void synchronPos(label owner = -1) final override;
 
