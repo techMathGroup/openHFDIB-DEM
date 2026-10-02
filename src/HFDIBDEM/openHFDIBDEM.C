@@ -432,7 +432,7 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
         virtualMeshLevel::setMaxSubVolumes(vMDic.lookupOrDefault<scalar>("maxSubVolumes",virtualMeshLevel::getMaxSubVolumes()));
         virtualMeshLevel::setExactSubVolume
         (
-            vMDic.lookupOrDefault<bool>("exactSubVolume", false)
+            vMDic.lookupOrDefault<bool>("exactSubVolume", true)
         );
         Info <<" -- VirtMesh Decomposition Level is set to        : "<< virtualMeshLevel::getVirtualMeshLevel() << endl;
         Info <<" -- VirtMesh charCellSize for boundary is set to  : "<< virtualMeshLevel::getCharCellSize() << endl;
@@ -618,6 +618,7 @@ void openHFDIBDEM::initialize
                 {
                     immersedBodies_[addIBPos].initSyncWithFlow(U);
                 }
+                immersedBodies_[addIBPos].buildCoverIfRequested();
                 verletList_.addBodyToVList(immersedBodies_[addIBPos]);
                 InfoH << addModel_Info << "Body based on: " << bodyName << " successfully added" << endl;
                 InfoH << addModel_Info << "Current count of solids within the domain : " << nNonWallBodies() << endl;
@@ -2718,6 +2719,7 @@ void openHFDIBDEM::addRemoveBodies
                 {
                     nBody.initSyncWithFlow(U);
                 }
+                nBody.buildCoverIfRequested();
                 verletList_.addBodyToVList(nBody);
 
                 InfoH << addModel_Info
@@ -2901,6 +2903,7 @@ void openHFDIBDEM::restartSimulation
         //  constructor defaults)
         immersedBodies_[addIBPos].getCouplingModel().readCouplingInfo(bodyDict);
 
+        immersedBodies_[addIBPos].buildCoverIfRequested();
         verletList_.addBodyToVList(immersedBodies_[addIBPos]);
     }
 }
@@ -3027,6 +3030,7 @@ void openHFDIBDEM::createSTLWallBodies()
         // cells, so their geometry-dependent contact parameters
         // need no re-computation. register with the verlet list:
         // bounds come from the STL points alone
+        immersedBodies_[addIBPos].buildCoverIfRequested();
         verletList_.addBodyToVList(immersedBodies_[addIBPos]);
 
         InfoH << basic_Info << "Created stlBased wall body "
