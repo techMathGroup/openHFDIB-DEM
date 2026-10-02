@@ -687,6 +687,24 @@ boundBox stlBased::triSetBBox(const labelList& tris) const
     return boundBox(minP, maxP);
 }
 //---------------------------------------------------------------------------//
+scalar stlBased::coverBoxVol(const boundBox& bBox) const
+{
+    // direction-masked volume: geometricD is +1 in active, -1 in
+    // empty directions, so the empty component becomes 1
+    vector span(bBox.span());
+    const vector validDirs((geometricD + vector::one)/2);
+
+    for (label dir = 0; dir < 3; ++dir)
+    {
+        if (validDirs[dir] < 0.5)
+        {
+            span[dir] = 1.0;
+        }
+    }
+
+    return cmptProduct(span);
+}
+//---------------------------------------------------------------------------//
 void stlBased::coverSplit
 (
     const labelList& tris,
@@ -754,10 +772,10 @@ void stlBased::coverSplit
     // geometry fills this box - stop splitting here. The box cap is
     // checked against the leaf budget including both prospective
     // children so nLeaves never exceeds maxBoxes
-    const scalar parentVol(parentBBox.mag());
+    const scalar parentVol(coverBoxVol(parentBBox));
     const scalar childrenVol
     (
-        triSetBBox(leftSet).mag() + triSetBBox(rightSet).mag()
+        coverBoxVol(triSetBBox(leftSet)) + coverBoxVol(triSetBBox(rightSet))
     );
 
     if
@@ -850,13 +868,13 @@ bool stlBased::computeStaticCover
     scalar coverVol(0);
     for (label leafI = 0; leafI < nLeaves; ++leafI)
     {
-        coverVol += coverBoxes_[leafI]->mag();
+        coverVol += coverBoxVol(*coverBoxes_[leafI]);
     }
 
     InfoH << basic_Info << "cover built for " << stlPath_
         << ": " << nLeaves << " boxes, total volume " << coverVol
-        << " vs AABB volume " << getBounds().mag()
-        << " (ratio " << coverVol/max(getBounds().mag(), SMALL)
+        << " vs AABB volume " << coverBoxVol(getBounds())
+        << " (ratio " << coverVol/max(coverBoxVol(getBounds()), SMALL)
         << ")" << endl;
 
     if (writeCover)
@@ -932,7 +950,7 @@ void stlBased::writeCoverVtk
     }
 
     const label nBoxes(boxes.size());
-    const scalar fullVol(max(fullAABB.mag(), SMALL));
+    const scalar fullVol(max(coverBoxVol(fullAABB), SMALL));
 
     // ---- one hexahedron per cover box ----------------
     {
@@ -1020,7 +1038,7 @@ void stlBased::writeCoverVtk
 
         for (label boxI = 0; boxI < nBoxes; ++boxI)
         {
-            boxFile << boxes[boxI]->mag() << "\n";
+            boxFile << coverBoxVol(*boxes[boxI]) << "\n";
         }
 
         boxFile << "SCALARS volumeRatio double 1\n"
@@ -1028,7 +1046,7 @@ void stlBased::writeCoverVtk
 
         for (label boxI = 0; boxI < nBoxes; ++boxI)
         {
-            boxFile << boxes[boxI]->mag()/fullVol << "\n";
+            boxFile << coverBoxVol(*boxes[boxI])/fullVol << "\n";
         }
     }
 

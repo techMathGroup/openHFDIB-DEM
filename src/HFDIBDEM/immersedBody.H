@@ -205,6 +205,14 @@ namespace Foam
         label timesToSetStatic_;
         vector staticContactPost_;
 
+        // tight-cover (broad-phase bound) request and parameters
+        // from the body sub-dict (computeCover/computeCoverDict)
+        bool computeCover_;
+        word coverComputeOn_;
+        label coverMaxBoxes_;
+        scalar coverStallCoeff_;
+        bool coverWrite_;
+
         protected:
 
         public:
@@ -577,6 +585,11 @@ namespace Foam
         }
 
         void checkBodyOp();
+
+        // build the tight cover on the body geomModel if the dict
+        // requested it and the body is static at the call; used
+        // immediately before verlet registration
+        void buildCoverIfRequested();
 
         void setRestartSim
         (

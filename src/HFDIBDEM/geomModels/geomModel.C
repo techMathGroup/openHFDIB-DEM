@@ -660,3 +660,16 @@ List<std::shared_ptr<boundBox>> geomModel::getBBoxes()
     return retList;
 }
 //---------------------------------------------------------------------------//
+bool geomModel::computeStaticCover
+(
+    label maxBoxes,
+    scalar stallCoeff,
+    bool writeCover,
+    word bodyName
+)
+{
+    // covers exist only for stlBased bodies; everything else
+    // keeps the legacy single-AABB behavior
+    return false;
+}
+//---------------------------------------------------------------------------//

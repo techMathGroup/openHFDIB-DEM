@@ -82,6 +82,10 @@ namespace Foam
         // AABB of a subset of triangles (indices into triSurf_)
         boundBox triSetBBox(const labelList& tris) const;
 
+        // box volume with empty (2D) directions masked to 1;
+        // boundBox::mag() is the diagonal, NOT the volume
+        scalar coverBoxVol(const boundBox& bBox) const;
+
         // recursive median split of a triangle set along its widest
         // axis, stopped by the stall criterion or the box cap
         void coverSplit
@@ -202,7 +206,7 @@ namespace Foam
             scalar stallCoeff,
             bool writeCover = false,
             word bodyName = word::null
-        );
+        ) final override;
 
         void synchronPos(label owner = -1) final override;
 

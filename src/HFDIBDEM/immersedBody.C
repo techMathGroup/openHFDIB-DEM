@@ -112,7 +112,12 @@ charCellSize_(1e3),
 refineBuffers_(recomputeM0 > 0 ? recomputeM0 + 1 : -1),
 recomputeM0_(recomputeM0),
 timesToSetStatic_(-1),
-staticContactPost_(vector::zero)
+staticContactPost_(vector::zero),
+computeCover_(false),
+coverComputeOn_("init"),
+coverMaxBoxes_(64),
+coverStallCoeff_(0.75),
+coverWrite_(false)
 {
     #include "initializeIB.H"
 
@@ -1381,6 +1386,44 @@ void immersedBody::checkIfInDomain(volScalarField& body)
         switchActiveOff(body);
         geomModel_->resetBody(body);
         InfoH << iB_Info << "-- body " << bodyIdStr_ << " switched off" << endl;
+    }
+}
+//---------------------------------------------------------------------------//
+void immersedBody::buildCoverIfRequested()
+{
+    if (!computeCover_)
+    {
+        return;
+    }
+
+    if (bodyOperation_ != 0)
+    {
+        // moving body: covers not implemented yet - legacy AABB used
+        if (coverComputeOn_ == "init")
+        {
+            InfoH << iB_Info << bodyName_ << ": cover deferred -"
+                << " moving-body covers may be implemented later,"
+                << " legacy AABB used" << endl;
+        }
+        return;
+    }
+
+    // static at this moment: build for computeOn init, and for
+    // setStatic too - a dict-declared static body flips nowhere,
+    // so for it setStatic is equivalent to init (documented)
+    const bool coverBuilt(geomModel_->computeStaticCover
+    (
+        coverMaxBoxes_,
+        coverStallCoeff_,
+        coverWrite_,
+        bodyName_
+    ));
+
+    if (!coverBuilt)
+    {
+        InfoH << iB_Info << bodyName_ << ": computeCover requested"
+            << " but the geomModel does not support it - keeping"
+            << " the legacy AABB" << endl;
     }
 }
 //---------------------------------------------------------------------------//

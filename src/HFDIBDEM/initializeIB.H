@@ -160,6 +160,50 @@ if (immersedDict_.found("timesToSetStatic"))
     timesToSetStatic_ = readLabel(immersedDict_.lookup("timesToSetStatic"));
 }
 
+// tight multi-box cover (broad-phase bound); opt-in, only
+// stlBased bodies support it (others ignore the request)
+if (immersedDict_.found("computeCover"))
+{
+    computeCover_ = readBool(immersedDict_.lookup("computeCover"));
+
+    if (immersedDict_.found("computeCoverDict"))
+    {
+        dictionary coverDict
+        (
+            immersedDict_.subDict("computeCoverDict")
+        );
+
+        if (coverDict.found("computeOn"))
+        {
+            coverComputeOn_ = word(coverDict.lookup("computeOn"));
+
+            if
+            (
+                coverComputeOn_ != "init"
+                && coverComputeOn_ != "setStatic"
+            )
+            {
+                InfoH << iB_Info << "Unknown computeOn: "
+                    << coverComputeOn_ << ", using init" << endl;
+                coverComputeOn_ = "init";
+            }
+        }
+
+        if (coverDict.found("maxBoxes"))
+        {
+            coverMaxBoxes_ = readLabel(coverDict.lookup("maxBoxes"));
+        }
+        if (coverDict.found("stallCoeff"))
+        {
+            coverStallCoeff_ = readScalar(coverDict.lookup("stallCoeff"));
+        }
+        if (coverDict.found("writeCover"))
+        {
+            coverWrite_ = readBool(coverDict.lookup("writeCover"));
+        }
+    }
+}
+
 // body creation strategy: connectivity (default) | legacy
 word bodyCreation("connectivity");
 if (immersedDict_.found("bodyCreation"))

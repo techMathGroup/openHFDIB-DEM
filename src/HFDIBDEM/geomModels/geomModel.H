@@ -625,6 +625,16 @@ namespace Foam
 
         virtual List<std::shared_ptr<boundBox>> getBBoxes();
 
+        // build the tight multi-box cover only for stlBased bodies,
+        // others return false and keep the legacy single-AABB getBBoxes
+        virtual bool computeStaticCover
+        (
+            label maxBoxes,
+            scalar stallCoeff,
+            bool writeCover,
+            word bodyName
+        );
+
         virtual pointField getBodyPoints()
         {
             InfoH << iB_Info << "18-- geomModelMessage-- "
