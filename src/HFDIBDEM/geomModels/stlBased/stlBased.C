@@ -769,6 +769,15 @@ void stlBased::coverSplit
         return;
     }
 
+    // a set of one triangle cannot be halved into two non-empty
+    // children - it is a leaf (an empty child would produce an
+    // inverted boundBox and overflow in the volume computation)
+    if (tris.size() < 2)
+    {
+        leaves[nLeaves++] = tris;
+        return;
+    }
+
     // split at the median triangle centroid along the widest axis;
     // ties are broken by the triangle INDEX (sortedOrder is stable
     // w.r.t. it), never by float comparison of equal centroids, so
