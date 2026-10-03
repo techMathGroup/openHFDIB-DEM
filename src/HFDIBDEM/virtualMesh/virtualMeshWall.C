@@ -71,6 +71,19 @@ Description
     sub-volumes spread the frontier, the flood is confined to the
     connected patch containing the seed.
 
+    Exact second pass (virtualMesh dict entry exactSubVolume, set
+    wall planes only): after the flood every face neighbour of an
+    inside sub-volume is classified, so the contact band (inside
+    sub-volumes with an outside or missing face neighbour) is read
+    off directly. Band leaves are clipped by the dominant body
+    surface plane (geomModel::getBoxSurfacePlane) and the fluid
+    side of every wall half-space (planePolyClip, exact); interior
+    leaves keep their full sub-volume; the contact centre becomes
+    volume-weighted. Fallbacks: a band leaf without a reliable body
+    plane keeps its full sub-volume; a clipped-to-zero total falls
+    back to the legacy count. Plane virtual meshes (wall-contact
+    area evaluation) carry no wall planes and stay legacy.
+
     Overflow cap (maxVSIter, from virtualMeshTools)
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     iterMax = min(nLatticeSubVolumes, maxSubVolumes), computed in
@@ -295,6 +308,8 @@ scalar virtualMeshWall::evaluateContact()
     nextToCheck->append(bbMatrix_.getSVIndexForPoint_Wall(vMeshWallInfo_.getStartingPoint()));
     label iterCount(0);
 
+    DynamicVectorList insideLeaves;
+
     const label iterMax(maxVSIter(bbMatrix_.getMatrixSize()));
 
     while (nextToCheck().size() > 0)
@@ -315,6 +330,7 @@ scalar virtualMeshWall::evaluateContact()
             {
                 volumeCount++;
                 contactCenter_ += cSubVolume.center;
+                insideLeaves.append(nextToCheck()[sV]);
                 checkAndAppendFace(nextToCheck()[sV], auxToCheck());
             }
         }
@@ -344,7 +360,138 @@ scalar virtualMeshWall::evaluateContact()
         contactCenter_ /= volumeCount;
     }
 
+    // exact second pass: the flood has classified every face neighbour
+    // of every inside leaf, so the contact band (inside leaves with an
+    // outside or missing face neighbour) can be read off directly.
+    // band leaves are clipped by the body surface plane and every wall
+    // half-space; interior leaves keep their full sub-volume. plane
+    // virtual meshes carry no wall planes and stay on the legacy count
+    if (    volumeCount > 0
+        &&  virtualMeshLevel::getExactSubVolume()
+        &&  wallPlanes_.size() > 0)
+    {
+        scalar exactVolume(0);
+        vector exactCenter(vector::zero);
+
+        forAll(insideLeaves,lI)
+        {
+            subVolumeProperties& cSubVolume = bbMatrix_[insideLeaves[lI]];
+
+            bool isOnBand(false);
+            vector svI(insideLeaves[lI]);
+            List<vector> nbrSVI(bbMatrix_.faceNeighbourSubVolumes(svI));
+
+            if (nbrSVI.size() < 6)
+            {
+                // missing face neighbour (out of matrix): the seam is
+                // interior to the contact, treat it as outside
+                isOnBand = true;
+            }
+            else
+            {
+                forAll(nbrSVI,nSV)
+                {
+                    if (!bbMatrix_[nbrSVI[nSV]].isCBody)
+                    {
+                        isOnBand = true;
+                        break;
+                    }
+                }
+            }
+
+            if (isOnBand)
+            {
+                evaluateContactLeafExact(cSubVolume);
+                exactVolume += cSubVolume.clippedVolume_;
+                exactCenter +=
+                    cSubVolume.clippedVolume_*cSubVolume.clippedCentroid_;
+            }
+            else
+            {
+                exactVolume += bbMatrix_.getSubVolumeV();
+                exactCenter += bbMatrix_.getSubVolumeV()*cSubVolume.center;
+            }
+        }
+
+        if (exactVolume > VSMALL)
+        {
+            contactCenter_ = exactCenter/exactVolume;
+
+            return exactVolume;
+        }
+
+        // detected-but-clipped-to-zero: the flood counted inside
+        // leaves but every band clip removed its region, so a plane
+        // estimate failed on the band rather than the contact being
+        // empty. fall back to the legacy count (contactCenter_
+        // already carries the unweighted mean)
+        // Note (MI): see how often this fires, maybe, we shall
+        //            debug levels and write this only for debug levels > 1
+        WarningInFunction
+            << "virtualMeshWall::evaluateContact: the flood found "
+            << volumeCount << " inside sub-volumes but the exact band "
+            << "clips summed to zero -- falling back to the legacy "
+            << "sub-volume count. "
+            << "Virtual mesh bBox: " << bbMatrix_.getBBox()
+            << ", matrixSize: " << bbMatrix_.getMatrixSize()
+            << ", startingPoint: " << vMeshWallInfo_.getStartingPoint()
+            << endl;
+    }
+
     return volumeCount*bbMatrix_.getSubVolumeV();
+}
+//---------------------------------------------------------------------------//
+void virtualMeshWall::evaluateContactLeafExact
+(
+    subVolumeProperties& subVolume
+)
+{
+    if (subVolume.clippedVolume_ > -0.5)
+    {
+        // already evaluated (a previous evaluateContact this check)
+        return;
+    }
+
+    subVolume.clippedVolume_ = 0;
+    subVolume.clippedCentroid_ = vector::zero;
+
+    // leaf box: uniform lattice, edge charCellSize/levelOfDivision in
+    // every direction, centred on the sub-volume centre
+    const scalar svEdge
+    (
+        bbMatrix_.getCharCellSize()
+       /virtualMeshLevel::getLevelOfDivision()
+    );
+    const boundBox leaf
+    (
+        subVolume.center - 0.5*svEdge*vector::one,
+        subVolume.center + 0.5*svEdge*vector::one
+    );
+
+    point bP(vector::zero);
+    vector bN(vector::zero);
+
+    if (cGeomModel_.getBoxSurfacePlane(leaf, bP, bN))
+    {
+        // kept material = body side of the surface plane and the
+        // fluid side of every wall half-space
+        List<planePolyClip::halfSpace> planes(wallPlanes_);
+        planes.append(planePolyClip::halfSpace(bP, bN));
+
+        planePolyClip::volumeAndCentroid
+        (
+            leaf,
+            planes,
+            subVolume.clippedVolume_,
+            subVolume.clippedCentroid_
+        );
+    }
+    else
+    {
+        // no reliable body plane in this leaf: full sub-volume
+        subVolume.clippedVolume_ = bbMatrix_.getSubVolumeV();
+        subVolume.clippedCentroid_ = subVolume.center;
+    }
 }
 //---------------------------------------------------------------------------//
 void virtualMeshWall::checkSubVolume(subVolumeProperties& subVolume)

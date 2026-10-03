@@ -71,6 +71,18 @@ void planePolyClip::volumeCentroidAndFace
 }
 
 
+void planePolyClip::volumeAndCentroid
+(
+    const boundBox& box,
+    const List<halfSpace>& planes,
+    scalar& volume,
+    vector& centroid
+)
+{
+    clipAndIntegrateList(box, planes, volume, centroid);
+}
+
+
 void planePolyClip::clipAndIntegrate
 (
     const boundBox& box,
@@ -285,6 +297,171 @@ void planePolyClip::clipAndIntegrate
 
             // signed volume x 6 of tet (anchor, a, b, c); positive when
             // (a, b, c) winds outward seen from the anchor
+            const scalar vt
+            (
+                (1.0/6.0)*((a - anchor) & ((b - anchor) ^ (c - anchor)))
+            );
+            v += vt;
+            m += vt*(0.25*(anchor + a + b + c));
+        }
+    }
+
+    if (v > VSMALL)
+    {
+        volume = v;
+        centroid = m/v;
+    }
+    else
+    {
+        volume = 0;
+        centroid = vector::zero;
+    }
+}
+
+
+void planePolyClip::clipAndIntegrateList
+(
+    const boundBox& box,
+    const List<halfSpace>& planes,
+    scalar& volume,
+    vector& centroid
+)
+{
+    volume = 0;
+    centroid = vector::zero;
+
+    // same machinery as clipAndIntegrate, without the hs1 face
+    // capture: clip the box face soup by every half-space in
+    // sequence, then integrate the surviving soup
+    static const label faceCorners[6][4] =
+    {
+        {0, 3, 2, 1},   // zmin, outward -z
+        {4, 5, 6, 7},   // zmax, outward +z
+        {0, 1, 5, 4},   // ymin, outward -y
+        {2, 3, 7, 6},   // ymax, outward +y
+        {1, 2, 6, 5},   // xmax, outward +x
+        {0, 4, 7, 3}    // xmin, outward -x
+    };
+
+    const scalar tol(SMALL);
+    const pointField corners(box.points());
+
+    DynamicList<DynamicList<point>> faces;
+    for (const auto& fc : faceCorners)
+    {
+        DynamicList<point> poly;
+        for (label i = 0; i < 4; ++i)
+        {
+            poly.append(corners[fc[i]]);
+        }
+        faces.append(poly);
+    }
+
+    forAll(planes, plI)
+    {
+        const halfSpace& hs(planes[plI]);
+
+        DynamicList<DynamicList<point>> newFaces;
+        DynamicList<point> closing;
+
+        for (const auto& poly : faces)
+        {
+            DynamicList<point> kept;
+
+            const label n(poly.size());
+            for (label i = 0; i < n; ++i)
+            {
+                const point& a(poly[i]);
+                const point& b(poly[(i + 1) % n]);
+
+                const scalar da((a - hs.p) & hs.n);
+                const scalar db((b - hs.p) & hs.n);
+
+                const bool aIn(da >= -tol);
+                const bool bIn(db >= -tol);
+
+                if (aIn)
+                {
+                    kept.append(a);
+                }
+
+                if (aIn != bIn)
+                {
+                    const scalar t(da/(da - db));
+                    const point x(a + t*(b - a));
+                    kept.append(x);
+                    closing.append(x);
+                }
+            }
+
+            if (kept.size() >= 3)
+            {
+                newFaces.append(kept);
+            }
+        }
+
+        if (newFaces.size() == 0)
+        {
+            // everything cut away
+            return;
+        }
+
+        if (closing.size() >= 3)
+        {
+            // order the closing ring by angle around its centroid
+            // and wind it outward (see clipAndIntegrate)
+            vector c(vector::zero);
+            forAll(closing, i)
+            {
+                c += closing[i];
+            }
+            c /= scalar(closing.size());
+
+            vector e1(mag(hs.n.x()) > 0.5 ? vector(0, 1, 0) : vector(1, 0, 0));
+            e1 = e1 - (e1 & hs.n)*hs.n;
+            e1 /= mag(e1) + VSMALL;
+            const vector e2(hs.n ^ e1);
+
+            SortableList<scalar> angle(closing.size());
+            forAll(closing, i)
+            {
+                const vector r(closing[i] - c);
+                angle[i] = Foam::atan2(r & e2, r & e1);
+            }
+            angle.sort();
+
+            DynamicList<point> closingFace;
+            for (label k = closing.size() - 1; k >= 0; --k)
+            {
+                closingFace.append(closing[angle.indices()[k]]);
+            }
+
+            newFaces.append(closingFace);
+        }
+
+        faces = newFaces;
+    }
+
+    if (faces.size() == 0)
+    {
+        return;
+    }
+
+    // integrate: signed tetrahedra from an anchor inside the region
+    scalar v(0);
+    vector m(vector::zero);
+
+    const point anchor(box.midpoint());
+
+    for (const auto& poly : faces)
+    {
+        const label n(poly.size());
+        for (label i = 1; i < n - 1; ++i)
+        {
+            const point& a(poly[0]);
+            const point& b(poly[i]);
+            const point& c(poly[i + 1]);
+
             const scalar vt
             (
                 (1.0/6.0)*((a - anchor) & ((b - anchor) ^ (c - anchor)))

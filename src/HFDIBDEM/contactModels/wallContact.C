@@ -261,8 +261,10 @@ void getWallContactVars_ArbShape(
     scalar contactArea(0);
     vector contactNormal(vector::zero);
 
-    autoPtr<DynamicVectorList> contactCenters(
-        new DynamicVectorList);
+    // volume-weighted contact centre: sum of (centre * weight) over
+    // every contact virtual mesh and internal box, divided by the
+    // intersect volume
+    vector contactCenterSum(vector::zero);
 
     autoPtr<DynamicVectorList> contactPlaneCenters(
         new DynamicVectorList);
@@ -274,6 +276,18 @@ void getWallContactVars_ArbShape(
     label vMPlaneInfoSize  = sCW.getVMPlaneSize();
     const List<Tuple2<point,boundBox>>& sCInternalInfo = sCW.getInternalElements();
     const List<string>& contactPatches = sCW.getContactPatches();
+
+    // wall half-spaces of this sub-contact, in the planePolyClip
+    // convention
+    List<planePolyClip::halfSpace> wallPlanes;
+    forAll(contactPatches,cP)
+    {
+        List<vector> planeInfo = wallPlaneInfo::getWallPlaneInfo()[contactPatches[cP]];
+        wallPlanes.append
+        (
+            planePolyClip::halfSpace(planeInfo[1], planeInfo[0])
+        );
+    }
 
     for(label i = 0; i< vMContactInfoSize; i++)
     {
@@ -288,21 +302,27 @@ void getWallContactVars_ArbShape(
             wallCntInfo.getcClass().getGeomModel()
         );
 
+        virtMeshWall.setWallPlanes(wallPlanes);
+
         if(virtMeshWall.detectFirstContactPoint())
         {
             // emptyScale restores the full extruded volume of a contact
             // patch whose virtual mesh was clipped to one layer in the
             // empty direction (pseudo-2D); it is 1 otherwise
-            intersectVolume +=
-                virtMeshWall.evaluateContact()*vmWInfo->getEmptyScale();
-            contactCenters().append(virtMeshWall.getContactCenter());
+            const scalar vmVolume
+            (
+                virtMeshWall.evaluateContact()*vmWInfo->getEmptyScale()
+            );
+            intersectVolume += vmVolume;
+            contactCenterSum += vmVolume*virtMeshWall.getContactCenter();
         }
     }
 
     forAll(sCInternalInfo,sCII)
     {
         intersectVolume += sCInternalInfo[sCII].second().volume();
-        contactCenters().append(sCInternalInfo[sCII].first());
+        contactCenterSum += sCInternalInfo[sCII].second().volume()
+           *sCInternalInfo[sCII].first();
     }
 
     if(intersectVolume>0)
@@ -336,12 +356,9 @@ void getWallContactVars_ArbShape(
             }
         }
 
-        forAll(contactCenters(),cC)
-        {
-            contactCenter += contactCenters()[cC];
-        }
-        // Pout << "contactCenter " << contactCenter.size() << endl;
-        contactCenter /= contactCenters().size();
+        // volume-weighted mean over every contribution above
+        // (legacy: unweighted mean of the per-VM centres)
+        contactCenter = contactCenterSum/intersectVolume;
         // Pout << "Survived #0 " << endl;
         // Pout << "contactAreas() " << contactAreas() << endl;
         forAll(contactAreas(),cA)

@@ -96,6 +96,7 @@ Contributors
 #include "bbMatrix.H"
 #include "clockTime.H"
 #include "subVolumeProperties.H"
+#include "planePolyClip.H"
 // #include ""
 
 
@@ -207,6 +208,23 @@ class virtualMeshWall
 
     bbMatrix bbMatrix_;
 
+    // wall half-spaces of this sub-contact, in the planePolyClip
+    // convention (kept/fluid side): a point x is kept when
+    // (x - p) & n >= 0 for every entry. empty on plane virtual
+    // meshes (legacy evaluation there); set by the contact model
+    // from wallPlaneInfo before evaluateContact
+    List<planePolyClip::halfSpace> wallPlanes_;
+
+    // exact leaf evaluation for the wall path: clip the leaf box by
+    // the dominant body-surface plane and every wall half-space,
+    // cache in clippedVolume_/clippedCentroid_. called only for 
+    // contact-band leaves; a leaf without a reliable body plane falls
+    // back to its full sub-volume (legacy-equal)
+    void evaluateContactLeafExact
+    (
+        subVolumeProperties& subVolume
+    );
+
     // Append a neighbour sub-volume to the next flood-fill layer only if it
     // has not been visited yet (toCheck == true). Without this guard the
     // floods re-queue already-processed sub-volumes and their frontiers grow
@@ -255,6 +273,14 @@ class virtualMeshWall
     vector& getContactCenter()
     {
         return contactCenter_;
+    }
+
+    void setWallPlanes
+    (
+        const List<planePolyClip::halfSpace>& wallPlanes
+    )
+    {
+        wallPlanes_ = wallPlanes;
     }
 
 };

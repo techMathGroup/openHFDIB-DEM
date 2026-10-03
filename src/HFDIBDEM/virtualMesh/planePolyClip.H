@@ -26,9 +26,9 @@ Class
     Foam::planePolyClip
 
 Description
-    exact partial-volume credit for one virtualMesh leaf (subVolume): 
-    clips an axis-aligned box by up to two half-spaces and integrates
-    the volume and centroid of the kept region.
+    exact partial-volume credit for one virtualMesh leaf (subVolume):
+    clips an axis-aligned box by any number of half-spaces and
+    integrates the volume and centroid of the kept region.
 
     - usable for MIXED subvolumes
     - build using Sutherland-Hodgman polygon clipping
@@ -68,6 +68,13 @@ struct planePolyClip
         point p;
         vector n;
 
+        // default: needed for List<halfSpace> (UList machinery)
+        halfSpace()
+        :
+        p(vector::zero),
+        n(vector(0, 0, 1))
+        {}
+
         halfSpace(const point& p, const vector& n)
         :
         p(p),
@@ -85,6 +92,18 @@ struct planePolyClip
         const halfSpace& hs1,
         const bool hasSecond,
         const halfSpace& hs2,
+        scalar& volume,
+        vector& centroid
+    );
+
+    // list variant: clip box by all the half-spaces (empty list keeps
+    // the whole box) and integrate the kept region. used when more
+    // than two half-spaces meet in one leaf (e.g. a body corner
+    // touching a two-wall corner)
+    static void volumeAndCentroid
+    (
+        const boundBox& box,
+        const List<halfSpace>& planes,
         scalar& volume,
         vector& centroid
     );
@@ -119,6 +138,15 @@ struct planePolyClip
         scalar& volume,
         vector& centroid,
         DynamicList<point>* faceOut
+    );
+
+    // shared clip + integration core for the list variant
+    static void clipAndIntegrateList
+    (
+        const boundBox& box,
+        const List<halfSpace>& planes,
+        scalar& volume,
+        vector& centroid
     );
 };
 
