@@ -125,6 +125,15 @@ struct planePolyClip
         DynamicList<point>& facePolygon
     );
 
+    // magnitude of the area vector of a planar polygon, fanned
+    // from the polygon centroid (duplicate points and winding
+    // order do not matter). returns 0 for fewer than three
+    // vertices; use on the face polygons of volumeCentroidAndFace
+    static scalar polygonArea
+    (
+        const DynamicList<point>& poly
+    );
+
     private:
 
     // shared clip + integration core; faceOut (null when no face is

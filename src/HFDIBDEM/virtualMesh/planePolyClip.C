@@ -71,6 +71,37 @@ void planePolyClip::volumeCentroidAndFace
 }
 
 
+scalar planePolyClip::polygonArea
+(
+    const DynamicList<point>& poly
+)
+{
+    if (poly.size() < 3)
+    {
+        return 0;
+    }
+
+    // shoelace area: fan the triangles from the polygon centroid
+    // (well-conditioned) and take the magnitude of the area vector
+    vector c(vector::zero);
+    forAll(poly, i)
+    {
+        c += poly[i];
+    }
+    c /= scalar(poly.size());
+
+    vector areaVec(vector::zero);
+    const label n(poly.size());
+    for (label i = 0; i < n; ++i)
+    {
+        const point& a(poly[i]);
+        const point& b(poly[(i + 1) % n]);
+        areaVec += 0.5*((a - c) ^ (b - c));
+    }
+    return mag(areaVec);
+}
+
+
 void planePolyClip::volumeAndCentroid
 (
     const boundBox& box,

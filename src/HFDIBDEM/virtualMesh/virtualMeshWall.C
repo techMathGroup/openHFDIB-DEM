@@ -84,6 +84,18 @@ Description
     back to the legacy count. Plane virtual meshes (wall-contact
     area evaluation) carry no wall planes and stay legacy.
 
+    Wetted-area evaluation (evaluateContactAreaExact, plane
+    virtual meshes): per band leaf of the preceding
+    evaluateContact flood, the polygon where the kept material
+    (body side of the surface plane, behind the wall) meets the
+    wall plane is the wetted footprint of that leaf; its polygon
+    area is the exact contribution. Interior leaves and leaves
+    without a reliable body plane keep their full face area; a
+    band leaf whose kept region does not reach the wall plane
+    wets nothing. Semantics: the area is the planar cross-section
+    of the contact patch on the wall (the sphere analytic path
+    measures pi*contactRad^2 likewise), not the curved cap.
+
     Overflow cap (maxVSIter, from virtualMeshTools)
     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     iterMax = min(nLatticeSubVolumes, maxSubVolumes), computed in
@@ -308,7 +320,7 @@ scalar virtualMeshWall::evaluateContact()
     nextToCheck->append(bbMatrix_.getSVIndexForPoint_Wall(vMeshWallInfo_.getStartingPoint()));
     label iterCount(0);
 
-    DynamicVectorList insideLeaves;
+    insideLeaves_.clear();
 
     const label iterMax(maxVSIter(bbMatrix_.getMatrixSize()));
 
@@ -330,7 +342,7 @@ scalar virtualMeshWall::evaluateContact()
             {
                 volumeCount++;
                 contactCenter_ += cSubVolume.center;
-                insideLeaves.append(nextToCheck()[sV]);
+                insideLeaves_.append(nextToCheck()[sV]);
                 checkAndAppendFace(nextToCheck()[sV], auxToCheck());
             }
         }
@@ -352,6 +364,10 @@ scalar virtualMeshWall::evaluateContact()
                 << ". Consider lowering virtualMesh level, increasing "
                 << "virtualMesh charCellSize, or raising maxSubVolumes."
                 << endl;
+            // the inside-leaf set is incomplete: keep the exact area
+            // pass from walking a partial band (it refuses on the
+            // empty set and the caller keeps its legacy area)
+            insideLeaves_.clear();
             break;
         }
     }
@@ -373,33 +389,12 @@ scalar virtualMeshWall::evaluateContact()
         scalar exactVolume(0);
         vector exactCenter(vector::zero);
 
-        forAll(insideLeaves,lI)
+        forAll(insideLeaves_,lI)
         {
-            subVolumeProperties& cSubVolume = bbMatrix_[insideLeaves[lI]];
+            subVolumeProperties& cSubVolume = bbMatrix_[insideLeaves_[lI]];
+            vector svI(insideLeaves_[lI]);
 
-            bool isOnBand(false);
-            vector svI(insideLeaves[lI]);
-            List<vector> nbrSVI(bbMatrix_.faceNeighbourSubVolumes(svI));
-
-            if (nbrSVI.size() < 6)
-            {
-                // missing face neighbour (out of matrix): the seam is
-                // interior to the contact, treat it as outside
-                isOnBand = true;
-            }
-            else
-            {
-                forAll(nbrSVI,nSV)
-                {
-                    if (!bbMatrix_[nbrSVI[nSV]].isCBody)
-                    {
-                        isOnBand = true;
-                        break;
-                    }
-                }
-            }
-
-            if (isOnBand)
+            if (isOnContactBand(svI))
             {
                 evaluateContactLeafExact(cSubVolume);
                 exactVolume += cSubVolume.clippedVolume_;
@@ -455,18 +450,7 @@ void virtualMeshWall::evaluateContactLeafExact
     subVolume.clippedVolume_ = 0;
     subVolume.clippedCentroid_ = vector::zero;
 
-    // leaf box: uniform lattice, edge charCellSize/levelOfDivision in
-    // every direction, centred on the sub-volume centre
-    const scalar svEdge
-    (
-        bbMatrix_.getCharCellSize()
-       /virtualMeshLevel::getLevelOfDivision()
-    );
-    const boundBox leaf
-    (
-        subVolume.center - 0.5*svEdge*vector::one,
-        subVolume.center + 0.5*svEdge*vector::one
-    );
+    const boundBox leaf(leafBox(subVolume));
 
     point bP(vector::zero);
     vector bN(vector::zero);
@@ -492,6 +476,160 @@ void virtualMeshWall::evaluateContactLeafExact
         subVolume.clippedVolume_ = bbMatrix_.getSubVolumeV();
         subVolume.clippedCentroid_ = subVolume.center;
     }
+}
+//---------------------------------------------------------------------------//
+bool virtualMeshWall::isOnContactBand
+(
+    vector& svI
+)
+{
+    List<vector> nbrSVI(bbMatrix_.faceNeighbourSubVolumes(svI));
+
+    if (nbrSVI.size() < 6)
+    {
+        // missing face neighbour (out of matrix): the seam is
+        // interior to the contact, treat it as outside
+        return true;
+    }
+
+    forAll(nbrSVI,nSV)
+    {
+        if (!bbMatrix_[nbrSVI[nSV]].isCBody)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+//---------------------------------------------------------------------------//
+boundBox virtualMeshWall::leafBox
+(
+    const subVolumeProperties& subVolume
+)
+{
+    // uniform lattice: edge charCellSize/levelOfDivision in every
+    // direction, centred on the sub-volume centre
+    const scalar svEdge
+    (
+        bbMatrix_.getCharCellSize()
+       /virtualMeshLevel::getLevelOfDivision()
+    );
+
+    return boundBox
+    (
+        subVolume.center - 0.5*svEdge*vector::one,
+        subVolume.center + 0.5*svEdge*vector::one
+    );
+}
+//---------------------------------------------------------------------------//
+scalar virtualMeshWall::evaluateContactAreaExact
+(
+    const planePolyClip::halfSpace& wallPlane
+)
+{
+    // exact wetted area on the wall plane, from the inside leaves
+    // of the preceding evaluateContact flood (persisted in
+    // insideLeaves_): per band leaf, the polygon where the kept
+    // material (body side of the surface plane, behind the wall)
+    // meets the wall plane is the wetted footprint of that leaf
+    if (    !virtualMeshLevel::getExactSubVolume()
+        ||  insideLeaves_.size() == 0)
+    {
+        return -1;
+    }
+
+    scalar exactArea(0);
+    label nBandNoPolygon(0);
+
+    const scalar svEdge
+    (
+        bbMatrix_.getCharCellSize()
+       /virtualMeshLevel::getLevelOfDivision()
+    );
+    const scalar leafFaceArea(svEdge*svEdge);
+
+    forAll(insideLeaves_,lI)
+    {
+        subVolumeProperties& cSubVolume = bbMatrix_[insideLeaves_[lI]];
+        vector svI(insideLeaves_[lI]);
+
+        if (!isOnContactBand(svI))
+        {
+            // interior leaf: full footprint in the wall plane
+            exactArea += leafFaceArea;
+            continue;
+        }
+
+        const boundBox leaf(leafBox(cSubVolume));
+
+        point bP(vector::zero);
+        vector bN(vector::zero);
+
+        if (cGeomModel_.getBoxSurfacePlane(leaf, bP, bN))
+        {
+            // kept material = body side of the surface plane and
+            // behind the wall; the hs1 closing face is the wetted
+            // footprint of this leaf in the wall plane
+            scalar V(0);
+            vector C(vector::zero);
+            DynamicList<point> face;
+
+            planePolyClip::volumeCentroidAndFace
+            (
+                leaf,
+                wallPlane,
+                true,
+                planePolyClip::halfSpace(bP, bN),
+                V, C, face
+            );
+
+            if (face.size() >= 3)
+            {
+                exactArea += planePolyClip::polygonArea(face);
+            }
+            else if (V > VSMALL)
+            {
+                // kept region fully behind the wall plane (the
+                // plane does not cut the leaf): full face area
+                exactArea += leafFaceArea;
+            }
+            else
+            {
+                // no kept material behind the wall in this leaf
+                nBandNoPolygon++;
+            }
+        }
+        else
+        {
+            // no reliable body plane in this leaf: full face area
+            exactArea += leafFaceArea;
+        }
+    }
+
+    if (exactArea < VSMALL)
+    {
+        // detected-but-clipped-to-zero: same rationale as the
+        // volume pass -- the flood found inside leaves but no
+        // leaf wets the wall plane, which a plane estimate failed
+        // rather than a genuinely dry patch. keep the legacy
+        // count-based area
+        WarningInFunction
+            << "virtualMeshWall::evaluateContactAreaExact: the flood "
+            << "found " << insideLeaves_.size() << " inside sub-volumes "
+            << "but the band footprints summed to zero ("
+            << nBandNoPolygon
+            << " band leaves without a wall-plane polygon) -- "
+            << "keeping the legacy count-based area. "
+            << "Virtual mesh bBox: " << bbMatrix_.getBBox()
+            << ", matrixSize: " << bbMatrix_.getMatrixSize()
+            << ", startingPoint: " << vMeshWallInfo_.getStartingPoint()
+            << endl;
+
+        return -1;
+    }
+
+    return exactArea;
 }
 //---------------------------------------------------------------------------//
 void virtualMeshWall::checkSubVolume(subVolumeProperties& subVolume)

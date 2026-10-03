@@ -215,6 +215,11 @@ class virtualMeshWall
     // from wallPlaneInfo before evaluateContact
     List<planePolyClip::halfSpace> wallPlanes_;
 
+    // inside leaves of the last evaluateContact flood (indices);
+    // reused by evaluateContactAreaExact so the area pass does not
+    // re-flood the patch. empty until evaluateContact runs
+    DynamicVectorList insideLeaves_;
+
     // exact leaf evaluation for the wall path: clip the leaf box by
     // the dominant body-surface plane and every wall half-space,
     // cache in clippedVolume_/clippedCentroid_. called only for 
@@ -223,6 +228,21 @@ class virtualMeshWall
     void evaluateContactLeafExact
     (
         subVolumeProperties& subVolume
+    );
+
+    // contact band: an inside leaf with an outside or missing face
+    // neighbour; a missing neighbour (out of matrix) counts as
+    // outside because box seams are interior to the contact
+    bool isOnContactBand
+    (
+        vector& svI
+    );
+
+    // leaf box of the uniform wall lattice: edge
+    // charCellSize/levelOfDivision, centred on the sub-volume
+    boundBox leafBox
+    (
+        const subVolumeProperties& subVolume
     );
 
     // Append a neighbour sub-volume to the next flood-fill layer only if it
@@ -282,6 +302,23 @@ class virtualMeshWall
     {
         wallPlanes_ = wallPlanes;
     }
+
+    // exact wetted area of the contact patch on the wall plane.
+    // wallPlane must keep the BEHIND-WALL side (the penetrating
+    // body material): per band leaf, the polygon where the kept
+    // region (body side of the surface plane, behind the wall)
+    // meets the wall plane is the wetted footprint of that leaf.
+    // interior leaves keep their full sub-volume face area; a
+    // band leaf whose kept region does not reach the wall plane
+    // wets nothing. requires a preceding evaluateContact on this
+    // instance (its flood feeds the band walk); returns -1 when
+    // the exact evaluation does not apply (guard off, no
+    // evaluateContact flood available, or flood truncated), so
+    // the caller keeps its legacy count-based area
+    scalar evaluateContactAreaExact
+    (
+        const planePolyClip::halfSpace& wallPlane
+    );
 
 };
 

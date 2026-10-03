@@ -345,8 +345,48 @@ void getWallContactVars_ArbShape(
                 // count of wetted plane faces x face area; emptyScale
                 // restores the full patch extent along the (pseudo-2D)
                 // empty direction if this plane VM was clipped there
-                scalar contactAreaLoc = (virtMeshPlane->evaluateContact()*vmWInfo->getEmptyScale()/vmWInfo->getSVVolume())*(pow(vmWInfo->getSVVolume(),2.0/3));
-                contactAreas().append(contactAreaLoc);
+                scalar vmVolume
+                (
+                    virtMeshPlane->evaluateContact()
+                   *vmWInfo->getEmptyScale()
+                );
+
+                // exact wetted area: the wall-face polygon of each
+                // band leaf of the flood above (needs the wall plane
+                // of the patch this plane VM measures). returns -1
+                // when the exact evaluation does not apply
+                scalar exactArea(-1);
+                if (i < contactPatches.size())
+                {
+                    List<vector> planeInfo = wallPlaneInfo::getWallPlaneInfo()[contactPatches[i]];
+                    // the penetrating body material is behind the
+                    // wall: keep the behind-wall side of the patch
+                    // plane (stored normal points into the fluid)
+                    exactArea = virtMeshPlane->evaluateContactAreaExact
+                    (
+                        planePolyClip::halfSpace
+                        (
+                            planeInfo[1],
+                           -planeInfo[0]
+                        )
+                    );
+                }
+
+                if (exactArea > -0.5)
+                {
+                    contactAreas().append
+                    (
+                        exactArea*vmWInfo->getEmptyScale()
+                    );
+                }
+                else
+                {
+                    contactAreas().append
+                    (
+                        (vmVolume/vmWInfo->getSVVolume())
+                       *(pow(vmWInfo->getSVVolume(),2.0/3.0))
+                    );
+                }
                 contactPlaneCenters().append(virtMeshPlane->getContactCenter());
             }
             else
