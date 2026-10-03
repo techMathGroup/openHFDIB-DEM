@@ -43,8 +43,51 @@ void planePolyClip::volumeAndCentroid
     vector& centroid
 )
 {
+    clipAndIntegrate(box, hs1, hasSecond, hs2, volume, centroid, nullptr);
+}
+
+
+void planePolyClip::volumeCentroidAndFace
+(
+    const boundBox& box,
+    const halfSpace& hs1,
+    const bool hasSecond,
+    const halfSpace& hs2,
+    scalar& volume,
+    vector& centroid,
+    DynamicList<point>& facePolygon
+)
+{
+    clipAndIntegrate
+    (
+        box,
+        hs1,
+        hasSecond,
+        hs2,
+        volume,
+        centroid,
+        &facePolygon
+    );
+}
+
+
+void planePolyClip::clipAndIntegrate
+(
+    const boundBox& box,
+    const halfSpace& hs1,
+    const bool hasSecond,
+    const halfSpace& hs2,
+    scalar& volume,
+    vector& centroid,
+    DynamicList<point>* faceOut
+)
+{
     volume = 0;
     centroid = vector::zero;
+    if (faceOut)
+    {
+        faceOut->clear();
+    }
 
     // Note (MI): subvolumes are always hexes
 
@@ -150,7 +193,7 @@ void planePolyClip::volumeAndCentroid
             }
             c /= scalar(closing.size());
 
-            vector e1(hs.n.x() > 0.5 ? vector(0, 1, 0) : vector(1, 0, 0));
+            vector e1(mag(hs.n.x()) > 0.5 ? vector(0, 1, 0) : vector(1, 0, 0));
             e1 = e1 - (e1 & hs.n)*hs.n;
             e1 /= mag(e1) + VSMALL;
             const vector e2(hs.n ^ e1);
@@ -175,9 +218,45 @@ void planePolyClip::volumeAndCentroid
             // by two faces appears twice in the ring) are harmless:
             // they create zero-area triangles in the fan
             newFaces.append(closingFace);
+
+            if (pass == 0 && faceOut)
+            {
+                // the requested face polygon: the kept region meets
+                // the hs1 plane along this ring; later half-spaces
+                // may clip it further (handled below the loop)
+                faceOut->transfer(closingFace);
+            }
         }
 
         faces = newFaces;
+
+        if (faceOut && faceOut->size() > 0 && pass == 0 && hasSecond)
+        {
+            // hs2 may cut the hs1 face polygon: re-clip the captured
+            // ring by the remaining half-space (kept side, same rule
+            // as the face soup)
+            DynamicList<point> keptFace;
+            const label n(faceOut->size());
+            for (label i = 0; i < n; ++i)
+            {
+                const point& a((*faceOut)[i]);
+                const point& b((*faceOut)[(i + 1) % n]);
+
+                const scalar da((a - hs2.p) & hs2.n);
+                const scalar db((b - hs2.p) & hs2.n);
+
+                if (da >= -tol)
+                {
+                    keptFace.append(a);
+                }
+                if ((da >= -tol) != (db >= -tol))
+                {
+                    const scalar t(da/(da - db));
+                    keptFace.append(a + t*(b - a));
+                }
+            }
+            faceOut->transfer(keptFace);
+        }
     }
 
     if (faces.size() == 0)

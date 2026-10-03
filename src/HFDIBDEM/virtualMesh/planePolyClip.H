@@ -88,6 +88,38 @@ struct planePolyClip
         scalar& volume,
         vector& centroid
     );
+
+    // as volumeAndCentroid, plus the polygon in which the kept
+    // region meets the plane of hs1 (the closing face of the first
+    // clip). the polygon is empty when hs1 does not cut the box or
+    // the region does not survive the clip. callers that need the
+    // face in a specific plane (e.g. the wetted wall face of a
+    // contact leaf) must pass that half-space as hs1
+    static void volumeCentroidAndFace
+    (
+        const boundBox& box,
+        const halfSpace& hs1,
+        const bool hasSecond,
+        const halfSpace& hs2,
+        scalar& volume,
+        vector& centroid,
+        DynamicList<point>& facePolygon
+    );
+
+    private:
+
+    // shared clip + integration core; faceOut (null when no face is
+    // requested) receives the closing polygon of the hs1 clip
+    static void clipAndIntegrate
+    (
+        const boundBox& box,
+        const halfSpace& hs1,
+        const bool hasSecond,
+        const halfSpace& hs2,
+        scalar& volume,
+        vector& centroid,
+        DynamicList<point>* faceOut
+    );
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

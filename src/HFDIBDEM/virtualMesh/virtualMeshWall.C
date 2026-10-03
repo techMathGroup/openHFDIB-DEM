@@ -361,7 +361,8 @@ void virtualMeshWall::resetSubVolume(subVolumeProperties& subVolume)
     subVolume.toCheck = true;
     subVolume.isCBody = false;
     subVolume.isTBody = false;
-    subVolume.isOnEdge = false;   
+    subVolume.isOnEdge = false;
+    subVolume.resetClip();
 }
 //---------------------------------------------------------------------------//
 label virtualMeshWall::getInternalSV()

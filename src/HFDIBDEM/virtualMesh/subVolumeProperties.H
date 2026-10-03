@@ -30,7 +30,8 @@ Class
 
 Description
     Classification flags of a single virtual-mesh sub-volume
-    (contacting/target body containment, edge status).
+    (contacting/target body containment, edge status), plus the
+    exact-clip cache of the wall virtual-mesh path.
 
 SourceFiles
     subVolume.C
@@ -57,7 +58,9 @@ class subVolumeProperties
 
     subVolumeProperties(point center):
     center(center)
-    {}
+    {
+        resetClip();
+    }
 
     // const point center;
     const point center;
@@ -65,6 +68,18 @@ class subVolumeProperties
     bool isTBody=false;
     bool toCheck=true;
     bool isOnEdge=false;
+
+    // exact-clip cache (wall path): -1 = unevaluated, 0 = evaluated
+    // empty; guard with > -0.5 as on the prt path (subVolume.H);
+    // reset by resetSubVolume so a re-checked leaf re-evaluates
+    scalar clippedVolume_ = -1;
+    vector clippedCentroid_ = vector::zero;
+
+    void resetClip()
+    {
+        clippedVolume_ = -1;
+        clippedCentroid_ = vector::zero;
+    }
 
     // point pointInMesh;
     // autoPtr<point> pointInMesh;
