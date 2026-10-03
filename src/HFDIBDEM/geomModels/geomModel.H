@@ -410,6 +410,24 @@ namespace Foam
             return false;
         }
 
+        // tangent plane of the body surface crossing an axis-aligned
+        // box: {p, n} with n the unit inward normal (pointing into
+        // the body material) and p any point on the plane.
+        // - wall-path counterpart of getLeafSubVolumePlane: decoupled
+        //   from subVolume (the wall virtual-mesh lattice has no
+        //   octree parent chain, so shapesIn_ is not precomputed)
+        // - returns false when the body cannot provide a local plane;
+        //   the base stays silent (called once per band leaf)
+        virtual bool getBoxSurfacePlane
+        (
+            const boundBox& leaf,
+            point& p,
+            vector& n
+        )
+        {
+            return false;
+        }
+
         virtual void setCoM()
         {
             InfoH << iB_Info << "16-- geomModelMessage-- "

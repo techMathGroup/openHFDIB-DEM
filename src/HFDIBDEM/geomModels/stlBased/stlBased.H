@@ -254,6 +254,29 @@ namespace Foam
             vector& n
         ) final override;
 
+        bool getBoxSurfacePlane
+        (
+            const boundBox& leaf,
+            point& p,
+            vector& n
+        ) final override;
+
+        private:
+
+        // shared dominant-facet tangent-plane helper: picks the facet
+        // with the largest triangle-bbox/leaf-box overlap from
+        // shapesIn and resolves the inward orientation with
+        // pointInside probes either side of the plane
+        bool getShapesSurfacePlane
+        (
+            const labelList& shapesIn,
+            const boundBox& leaf,
+            point& p,
+            vector& n
+        );
+
+        public:
+
         void initVars(pointField surfPoints, scalar intSpan, bool sdBasedLambda)
         {
             bodySurfMesh_.movePoints(surfPoints);

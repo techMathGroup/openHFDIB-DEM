@@ -422,9 +422,6 @@ bool stlBased::getLeafSubVolumePlane
     vector& n
 )
 {
-    // dominant-plane rule: the facet with the largest in-box
-    // triangle-box overlap area approximates the surface crossing the
-    // subVolume (aka leaf);
     // Note (MI): shapesIn_ must be filled - getVolumeType was called on
     //             this leaf before
     const auto& info = sv.getVolumeInfo(cIb);
@@ -434,7 +431,41 @@ bool stlBased::getLeafSubVolumePlane
         return false;
     }
 
-    const labelList& shapesIn(info.shapesIn_());
+    return getShapesSurfacePlane(info.shapesIn_(), sv, p, n);
+}
+//---------------------------------------------------------------------------//
+bool stlBased::getBoxSurfacePlane
+(
+    const boundBox& leaf,
+    point& p,
+    vector& n
+)
+{
+    // wall-path variant: no octree parent chain, so search the
+    // facets overlapping the leaf box directly
+    const indexedOctree<treeDataTriSurface>& tree = triSurfSearch_->tree();
+
+    const labelList shapesIn(tree.findBox(treeBoundBox(leaf)));
+
+    if (shapesIn.size() == 0)                                           //internal finds nothing -> returns full leaf volume
+    {
+        return false;
+    }
+
+    return getShapesSurfacePlane(shapesIn, leaf, p, n);
+}
+//---------------------------------------------------------------------------//
+bool stlBased::getShapesSurfacePlane
+(
+    const labelList& shapesIn,
+    const boundBox& leaf,
+    point& p,
+    vector& n
+)
+{
+    // dominant-plane rule: the facet with the largest in-box
+    // triangle-box overlap area approximates the surface crossing the
+    // leaf
     const pointField& surfPts(triSurf_->points());
 
     label bestFacet(-1);
@@ -458,8 +489,8 @@ bool stlBased::getLeafSubVolumePlane
         );
         const boundBox overlap
         (
-            max(sv.min(), triBBox.min()),
-            min(sv.max(), triBBox.max())
+            max(leaf.min(), triBBox.min()),
+            min(leaf.max(), triBBox.max())
         );
 
         if (overlap.valid() && overlap.volume() > bestArea)
@@ -494,7 +525,7 @@ bool stlBased::getLeafSubVolumePlane
     vector nOut(areaN/aNmag);
 
     p = (*triSurf_)[bestFacet].centre(surfPts);
-    const vector offset(nOut*(sv.mag()/8.0 + VSMALL));
+    const vector offset(nOut*(leaf.avgDim()/8.0 + VSMALL));
 
     // probe the two sides of the plane: whichever lands inside the
     // body tells the inward direction
