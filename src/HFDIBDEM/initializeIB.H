@@ -210,8 +210,8 @@ if (immersedDict_.found("computeCover"))
             )
             {
                 InfoH << iB_Info << "Unknown coverAlgorithm: "
-                    << coverAlgorithm_ << ", using kdTree" << endl;
-                coverAlgorithm_ = "kdTree";
+                    << coverAlgorithm_ << ", using spatial" << endl;
+                coverAlgorithm_ = "spatial";
             }
         }
 

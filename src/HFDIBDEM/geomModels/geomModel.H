@@ -651,7 +651,7 @@ namespace Foam
             scalar stallCoeff,
             bool writeCover = false,
             word bodyName = word::null,
-            word coverAlgorithm = "kdTree",
+            word coverAlgorithm = "spatial",
             word axisRule = "cyclic",
             bool prune = true
         );

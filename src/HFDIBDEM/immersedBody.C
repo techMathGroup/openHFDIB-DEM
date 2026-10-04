@@ -118,7 +118,7 @@ coverComputeOn_("init"),
 coverMaxBoxes_(64),
 coverStallCoeff_(0.75),
 coverWrite_(false),
-coverAlgorithm_("kdTree"),
+coverAlgorithm_("spatial"),
 coverAxisRule_("cyclic"),
 coverPrune_(true)
 {
