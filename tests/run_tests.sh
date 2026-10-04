@@ -4,6 +4,9 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
+# pure-Python unit tests (no OpenFOAM env needed)
+python3 -m unittest discover -s tests/unit -p "test_*.py" -v
+
 python3 -m unittest discover -s tests/virtualMesh -p "test_*.py" -v
 
 # solver-level regression tests (need OpenFOAM env: blockMesh, decomposePar,
