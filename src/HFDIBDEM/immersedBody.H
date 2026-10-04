@@ -212,6 +212,9 @@ namespace Foam
         label coverMaxBoxes_;
         scalar coverStallCoeff_;
         bool coverWrite_;
+        word coverAlgorithm_;
+        word coverAxisRule_;
+        bool coverPrune_;
 
         protected:
 

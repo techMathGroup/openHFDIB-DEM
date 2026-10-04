@@ -193,13 +193,89 @@ if (immersedDict_.found("computeCover"))
         {
             coverMaxBoxes_ = readLabel(coverDict.lookup("maxBoxes"));
         }
-        if (coverDict.found("stallCoeff"))
-        {
-            coverStallCoeff_ = readScalar(coverDict.lookup("stallCoeff"));
-        }
         if (coverDict.found("writeCover"))
         {
             coverWrite_ = readBool(coverDict.lookup("writeCover"));
+        }
+
+        // computeCover alrgorithm selector
+        if (coverDict.found("coverAlgorithm"))
+        {
+            coverAlgorithm_ = word(coverDict.lookup("coverAlgorithm"));
+
+            if
+            (
+                coverAlgorithm_ != "kdTree"
+                && coverAlgorithm_ != "spatial"
+            )
+            {
+                InfoH << iB_Info << "Unknown coverAlgorithm: "
+                    << coverAlgorithm_ << ", using kdTree" << endl;
+                coverAlgorithm_ = "kdTree";
+            }
+            else if (coverAlgorithm_ == "spatial")
+            {
+                InfoH << iB_Info << "coverAlgorithm spatial is"
+                    << " not implemented yet - using kdTree"
+                    << " until it lands" << endl;
+            }
+        }
+
+        if (coverAlgorithm_ == "kdTree" && coverDict.found("kdTreeCoeffs"))
+        {
+            dictionary kdTreeCoeffs
+            (
+                coverDict.subDict("kdTreeCoeffs")
+            );
+
+            if (kdTreeCoeffs.found("stallCoeff"))
+            {
+                coverStallCoeff_ =
+                    readScalar(kdTreeCoeffs.lookup("stallCoeff"));
+            }
+        }
+
+        if (coverAlgorithm_ == "spatial" && coverDict.found("spatialCoeffs"))
+        {
+            dictionary spatialCoeffs
+            (
+                coverDict.subDict("spatialCoeffs")
+            );
+
+            if (spatialCoeffs.found("axisRule"))
+            {
+                coverAxisRule_ = word(spatialCoeffs.lookup("axisRule"));
+
+                if
+                (
+                    coverAxisRule_ != "cyclic"
+                    && coverAxisRule_ != "bestvol"
+                    && coverAxisRule_ != "widest"
+                )
+                {
+                    InfoH << iB_Info << "Unknown axisRule: "
+                        << coverAxisRule_ << ", using cyclic" << endl;
+                    coverAxisRule_ = "cyclic";
+                }
+            }
+
+            if (spatialCoeffs.found("prune"))
+            {
+                coverPrune_ = readBool(spatialCoeffs.lookup("prune"));
+            }
+        }
+
+        // back-compat: stallCoeff at the computeCoverDict level
+        // (pre-selector layout); kdTree only, deprecated
+        if
+        (
+            coverAlgorithm_ == "kdTree"
+            && coverDict.found("stallCoeff")
+        )
+        {
+            InfoH << iB_Info << "stallCoeff in computeCoverDict"
+                << " is deprecated, use kdTreeCoeffs" << endl;
+            coverStallCoeff_ = readScalar(coverDict.lookup("stallCoeff"));
         }
     }
 }

@@ -117,7 +117,10 @@ computeCover_(false),
 coverComputeOn_("init"),
 coverMaxBoxes_(64),
 coverStallCoeff_(0.75),
-coverWrite_(false)
+coverWrite_(false),
+coverAlgorithm_("kdTree"),
+coverAxisRule_("cyclic"),
+coverPrune_(true)
 {
     #include "initializeIB.H"
 
