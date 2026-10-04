@@ -250,11 +250,13 @@ void verletList::initialSorting()
             }
             else
             {
-                label curIb = (*iter)->getBodyId();
+                // close only this box - a body with several boxes
+                // (cover) stays open while any of them is
+                auto curBox = (*iter)->getParentBox();
                 openedIb.remove_if(
-                    [&curIb](std::shared_ptr<verletPoint>& vPoint)
+                    [&curBox](std::shared_ptr<verletPoint>& vPoint)
                     {
-                        return vPoint->getBodyId() == curIb;
+                        return vPoint->getParentBox() == curBox;
                     }
                 );
             }
@@ -354,28 +356,34 @@ void verletList::computePotentialBodies
         std::sort(swept.begin(), swept.end(),
             [](const sweptPoint& a, const sweptPoint& b)
             {
-                return a.pos < b.pos;
+                // mins first on ties: a box maxing exactly where
+                // another mins (split-plane endpoints of cover
+                // boxes) must not close the body in between
+                return std::make_pair(a.pos, !a.isMin)
+                    < std::make_pair(b.pos, !b.isMin);
             });
 
-        // sweep: an opened (min not yet closed) body overlaps every later
-        // min before its own max is reached
-        std::unordered_set<label> opened;
+        // sweep: a body with an open box (any of them - a body
+        // with several overlapping cover boxes is open for the
+        // union of their intervals) overlaps every later-opened
+        // body; track the count of open boxes per body
+        std::unordered_map<label, label> openCount;
         for (const sweptPoint& p : swept)
         {
             if (p.isMin)
             {
-                for (const label oId : opened)
+                for (const auto& o : openCount)
                 {
-                    if (oId == p.bodyId) continue;
+                    if (o.first == p.bodyId || o.second == 0) continue;
 
                     overlapCnt[coord].insert(
-                        cPair(min(oId, p.bodyId), max(oId, p.bodyId)));
+                        cPair(min(o.first, p.bodyId), max(o.first, p.bodyId)));
                 }
-                opened.insert(p.bodyId);
+                ++openCount[p.bodyId];
             }
             else
             {
-                opened.erase(p.bodyId);
+                --openCount[p.bodyId];
             }
         }
     }
@@ -478,26 +486,31 @@ void verletList::computeInflatedPairs
         std::sort(swept.begin(), swept.end(),
             [](const sweptPoint& a, const sweptPoint& b)
             {
-                return a.pos < b.pos;
+                // mins first on ties: same split-plane endpoint
+                // argument as computePotentialBodies
+                return std::make_pair(a.pos, !a.isMin)
+                    < std::make_pair(b.pos, !b.isMin);
             });
 
-        std::unordered_set<label> opened;
+        // same counting sweep as computePotentialBodies: a
+        // multi-box body is open for the union of its intervals
+        std::unordered_map<label, label> openCount;
         for (const sweptPoint& p : swept)
         {
             if (p.isMin)
             {
-                for (const label oId : opened)
+                for (const auto& o : openCount)
                 {
-                    if (oId == p.bodyId) continue;
+                    if (o.first == p.bodyId || o.second == 0) continue;
 
                     overlapCnt[coord].insert(
-                        cPair(min(oId, p.bodyId), max(oId, p.bodyId)));
+                        cPair(min(o.first, p.bodyId), max(o.first, p.bodyId)));
                 }
-                opened.insert(p.bodyId);
+                ++openCount[p.bodyId];
             }
             else
             {
-                opened.erase(p.bodyId);
+                --openCount[p.bodyId];
             }
         }
     }
