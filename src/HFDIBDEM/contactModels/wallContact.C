@@ -361,13 +361,15 @@ void getWallContactVars_ArbShape(
                     List<vector> planeInfo = wallPlaneInfo::getWallPlaneInfo()[contactPatches[i]];
                     // the penetrating body material is behind the
                     // wall: keep the behind-wall side of the patch
-                    // plane (stored normal points into the fluid)
+                    // plane (stored normal points out of the
+                    // fluid, into the wall, so it is the kept-side
+                    // normal of planePolyClip as-is)
                     exactArea = virtMeshPlane->evaluateContactAreaExact
                     (
                         planePolyClip::halfSpace
                         (
                             planeInfo[1],
-                           -planeInfo[0]
+                            planeInfo[0]
                         )
                     );
                 }
