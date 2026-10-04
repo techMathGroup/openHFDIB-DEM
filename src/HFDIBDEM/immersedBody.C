@@ -1419,7 +1419,10 @@ void immersedBody::buildCoverIfRequested()
         coverMaxBoxes_,
         coverStallCoeff_,
         coverWrite_,
-        bodyName_
+        bodyName_,
+        coverAlgorithm_,
+        coverAxisRule_,
+        coverPrune_
     ));
 
     if (!coverBuilt)

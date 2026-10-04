@@ -649,8 +649,11 @@ namespace Foam
         (
             label maxBoxes,
             scalar stallCoeff,
-            bool writeCover,
-            word bodyName
+            bool writeCover = false,
+            word bodyName = word::null,
+            word coverAlgorithm = "kdTree",
+            word axisRule = "cyclic",
+            bool prune = true
         );
 
         virtual pointField getBodyPoints()

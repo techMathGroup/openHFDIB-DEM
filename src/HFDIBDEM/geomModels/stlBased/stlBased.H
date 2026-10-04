@@ -99,6 +99,34 @@ namespace Foam
             List<labelList>& leaves
         ) const;
 
+        // spatial-halving cover (coverAlgorithm spatial): the node
+        // box is halved at the midpoint of the split axis; a
+        // triangle straddling the plane is duplicated into every
+        // half it touches, and each child box is the triangle-set
+        // bbox intersected with the parent half-space chain
+        // (cumulative clamping - Stich et al. 2009, doi:
+        // 10.1145/1572769.1572771). 
+        // axis rule:
+        // cyclic (depth-modulo valid axes), split stops on an
+        // empty half (criterion a). prune collapses a subtree whose
+        // leaf-box union does not improve on the node box
+        void spatialSplit
+        (
+            const labelList& tris,
+            const boundBox& clampBox,
+            label& nLeaves,
+            label budget,
+            label depth,
+            bool prune,
+            List<labelList>& leaves,
+            List<boundBox>& leafBoxes
+        ) const;
+
+        // exact union volume of a set of boxes (sweep along x,
+        // interval-union of yz cross-sections per slab); the
+        // volume criterion of the spatial prune
+        scalar boxUnionVol(const List<boundBox>& boxes) const;
+
         // re-derive cover box bounds from the partition and the
         // current (synchronized) surface points - the single
         // refresh mechanism for every motion class
@@ -201,13 +229,19 @@ namespace Foam
         // build the cover partition + boxes once; returns true on
         // success, false leaves the legacy single-AABB behavior;
         // writeCover (default off) writes the vtk visualization,
-        // bodyName is used for the output file names
+        // bodyName is used for the output file names;
+        // coverAlgorithm: kdTree (median split, stallCoeff) or
+        // spatial (halving + duplication + clamping, axisRule,
+        // prune); the params of the other algorithm are ignored
         bool computeStaticCover
         (
             label maxBoxes,
             scalar stallCoeff,
             bool writeCover = false,
-            word bodyName = word::null
+            word bodyName = word::null,
+            word coverAlgorithm = "kdTree",
+            word axisRule = "cyclic",
+            bool prune = true
         ) final override;
 
         void synchronPos(label owner = -1) final override;

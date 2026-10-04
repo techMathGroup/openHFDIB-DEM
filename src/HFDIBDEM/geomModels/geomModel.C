@@ -665,7 +665,10 @@ bool geomModel::computeStaticCover
     label maxBoxes,
     scalar stallCoeff,
     bool writeCover,
-    word bodyName
+    word bodyName,
+    word coverAlgorithm,
+    word axisRule,
+    bool prune
 )
 {
     // covers exist only for stlBased bodies; everything else

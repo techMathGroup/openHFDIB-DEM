@@ -213,12 +213,6 @@ if (immersedDict_.found("computeCover"))
                     << coverAlgorithm_ << ", using kdTree" << endl;
                 coverAlgorithm_ = "kdTree";
             }
-            else if (coverAlgorithm_ == "spatial")
-            {
-                InfoH << iB_Info << "coverAlgorithm spatial is"
-                    << " not implemented yet - using kdTree"
-                    << " until it lands" << endl;
-            }
         }
 
         if (coverAlgorithm_ == "kdTree" && coverDict.found("kdTreeCoeffs"))

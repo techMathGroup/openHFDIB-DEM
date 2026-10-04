@@ -849,12 +849,306 @@ void stlBased::coverSplit
     );
 }
 //---------------------------------------------------------------------------//
+scalar stlBased::boxUnionVol(const List<boundBox>& boxes) const
+{
+    // sweep along x over all box x-boundaries; inside each slab
+    // take the exact union area of the yz rectangles
+    if (boxes.size() == 0)
+    {
+        return 0.0;
+    }
+
+    scalarField xs(2*boxes.size());
+    forAll(boxes, bI)
+    {
+        xs[2*bI] = boxes[bI].min().x();
+        xs[2*bI + 1] = boxes[bI].max().x();
+    }
+    sort(xs);
+
+    scalar totalVol(0);
+
+    for (label i = 0; i < xs.size() - 1; ++i)
+    {
+        if (xs[i + 1] - xs[i] <= VSMALL)
+        {
+            continue;
+        }
+
+        // yz rectangles of every box spanning this slab
+        List<boundBox> rects;
+        forAll(boxes, bI)
+        {
+            if
+            (
+                boxes[bI].min().x() <= xs[i]
+             && boxes[bI].max().x() >= xs[i + 1]
+            )
+            {
+                rects.append
+                (
+                    boundBox
+                    (
+                        point(boxes[bI].min().y(), boxes[bI].min().z(), 0),
+                        point(boxes[bI].max().y(), boxes[bI].max().z(), 0)
+                    )
+                );
+            }
+        }
+
+        if (rects.size() == 0)
+        {
+            continue;
+        }
+
+        // exact union area of 2-d rectangles: sweep along y,
+        // merge z intervals per y slab
+        scalarField ys(2*rects.size());
+        forAll(rects, rI)
+        {
+            ys[2*rI] = rects[rI].min().x();
+            ys[2*rI + 1] = rects[rI].max().x();
+        }
+        sort(ys);
+
+        scalar area(0);
+
+        for (label j = 0; j < ys.size() - 1; ++j)
+        {
+            if (ys[j + 1] - ys[j] <= VSMALL)
+            {
+                continue;
+            }
+
+            // z intervals of every rectangle spanning this
+            // y slab, merged in sorted order
+            List<Tuple2<scalar,scalar>> zInts;
+            forAll(rects, rI)
+            {
+                if
+                (
+                    rects[rI].min().x() <= ys[j]
+                 && rects[rI].max().x() >= ys[j + 1]
+                )
+                {
+                    zInts.append
+                    (
+                        Tuple2<scalar,scalar>
+                        (
+                            rects[rI].min().y(),
+                            rects[rI].max().y()
+                        )
+                    );
+                }
+            }
+
+            if (zInts.size() == 0)
+            {
+                continue;
+            }
+
+            sort(zInts);
+            scalar zLo(zInts[0].first());
+            scalar zHi(zInts[0].second());
+            scalar merged(0);
+
+            for (label k = 1; k < zInts.size(); ++k)
+            {
+                if (zInts[k].first() <= zHi)
+                {
+                    zHi = max(zHi, zInts[k].second());
+                }
+                else
+                {
+                    merged += zHi - zLo;
+                    zLo = zInts[k].first();
+                    zHi = zInts[k].second();
+                }
+            }
+            merged += zHi - zLo;
+
+            area += (ys[j + 1] - ys[j])*merged;
+        }
+
+        totalVol += (xs[i + 1] - xs[i])*area;
+    }
+
+    return totalVol;
+}
+//---------------------------------------------------------------------------//
+void stlBased::spatialSplit
+(
+    const labelList& tris,
+    const boundBox& clampBox,
+    label& nLeaves,
+    label budget,
+    label depth,
+    bool prune,
+    List<labelList>& leaves,
+    List<boundBox>& leafBoxes
+) const
+{
+    // effective node box: triangle-set bbox clamped by the
+    // half-space chain of all ancestors (cumulative clamping)
+    const boundBox triBox(triSetBBox(tris));
+    const boundBox nodeBox
+    (
+        max(triBox.min(), clampBox.min()),
+        min(triBox.max(), clampBox.max())
+    );
+
+    const vector span(nodeBox.span());
+    const vector validDirs((geometricD + vector::one)/2);
+
+    if (budget < 2)
+    {
+        leaves[nLeaves] = tris;
+        leafBoxes[nLeaves] = nodeBox;
+        ++nLeaves;
+        return;
+    }
+
+    // valid split axes (non-empty, non-degenerate span)
+    labelList axes;
+    for (label dir = 0; dir < 3; ++dir)
+    {
+        if (validDirs[dir] > 0.5 && span[dir] > 0)
+        {
+            axes.append(dir);
+        }
+    }
+
+    if (axes.size() == 0)
+    {
+        leaves[nLeaves] = tris;
+        leafBoxes[nLeaves] = nodeBox;
+        ++nLeaves;
+        return;
+    }
+
+    // cyclic rule: rotate through the valid axes by depth so the
+    // thin axis gets its turn regardless of local aspect ratio
+    const label splitDir(axes[depth % axes.size()]);
+    const scalar mid(0.5*(nodeBox.min()[splitDir]
+        + nodeBox.max()[splitDir]));
+
+    // classify: a triangle touches a half when its bbox overlaps
+    // the half-interval along the split axis; straddlers are
+    // duplicated into both halves
+    const pointField& points = triSurf_->points();
+
+    labelList leftTris(tris.size());
+    labelList rightTris(tris.size());
+    label nLeft(0);
+    label nRight(0);
+
+    forAll(tris, i)
+    {
+        const typename triSurface::FaceType& f = (*triSurf_)[tris[i]];
+        scalar tMin(GREAT);
+        scalar tMax(-GREAT);
+
+        for (auto ind : f)
+        {
+            tMin = min(tMin, points[ind][splitDir]);
+            tMax = max(tMax, points[ind][splitDir]);
+        }
+
+        if (tMax <= mid)
+        {
+            leftTris[nLeft++] = tris[i];
+        }
+        else if (tMin >= mid)
+        {
+            rightTris[nRight++] = tris[i];
+        }
+        else
+        {
+            leftTris[nLeft++] = tris[i];
+            rightTris[nRight++] = tris[i];
+        }
+    }
+
+    leftTris.setSize(nLeft);
+    rightTris.setSize(nRight);
+
+    if (nLeft == 0 || nRight == 0)
+    {
+        // criterion (a): empty half - the body fills only one
+        // side; splitting cannot tighten anything here
+        leaves[nLeaves] = tris;
+        leafBoxes[nLeaves] = nodeBox;
+        ++nLeaves;
+        return;
+    }
+
+    // child clamp boxes: the node box cut at the split plane
+    boundBox leftClamp(nodeBox);
+    boundBox rightClamp(nodeBox);
+    leftClamp.max()[splitDir] = mid;
+    rightClamp.min()[splitDir] = mid;
+
+    const label nLeavesBefore(nLeaves);
+    spatialSplit
+    (
+        leftTris,
+        leftClamp,
+        nLeaves,
+        (budget + 1)/2,
+        depth + 1,
+        prune,
+        leaves,
+        leafBoxes
+    );
+    spatialSplit
+    (
+        rightTris,
+        rightClamp,
+        nLeaves,
+        budget - (nLeaves - nLeavesBefore),
+        depth + 1,
+        prune,
+        leaves,
+        leafBoxes
+    );
+
+    if (prune)
+    {
+        // bottom-up prune: if the subtree's leaf-box union does
+        // not improve on this node's own box, collapse it - the
+        // boxes only tile the node box without tightening
+        List<boundBox> subBoxes
+        (
+            leafBoxes.slice
+            (
+                nLeavesBefore,
+                nLeaves - nLeavesBefore
+            )
+        );
+
+        if
+        (
+            boxUnionVol(subBoxes)
+         >= coverBoxVol(nodeBox)*(1.0 - SMALL)
+        )
+        {
+            // roll the subtree back to a single leaf
+            leaves[nLeavesBefore] = tris;
+            leafBoxes[nLeavesBefore] = nodeBox;
+            nLeaves = nLeavesBefore + 1;
+        }
+    }
+}
+//---------------------------------------------------------------------------//
 bool stlBased::computeStaticCover
 (
     label maxBoxes,
     scalar stallCoeff,
     bool writeCover,
-    word bodyName
+    word bodyName,
+    word coverAlgorithm,
+    word axisRule,
+    bool prune
 )
 {
     if (coverActive_)
@@ -878,42 +1172,115 @@ bool stlBased::computeStaticCover
     List<labelList> leaves(maxBoxes);
     label nLeaves(0);
 
-    coverSplit(allTris, stallCoeff, nLeaves, maxBoxes, leaves);
-
-    coverPartition_.setSize(nLeaves);
-    coverBoxes_.setSize(nLeaves);
-
-    for (label leafI = 0; leafI < nLeaves; ++leafI)
+    if (coverAlgorithm == "spatial")
     {
-        coverPartition_[leafI] = leaves[leafI];
-        coverBoxes_[leafI] = std::make_shared<boundBox>
+        // spatial-halving tree with clamped leaf boxes; the
+        // leaves/leafBoxes arrays are exactly maxBoxes long (the
+        // budget bounds the emitted leaves), and prune can only
+        // shrink nLeaves further
+        List<boundBox> leafBoxes(maxBoxes);
+        spatialSplit
         (
-            triSetBBox(leaves[leafI])
+            allTris,
+            getBounds(),
+            nLeaves,
+            maxBoxes,
+            0,
+            prune,
+            leaves,
+            leafBoxes
         );
+
+        coverPartition_.setSize(nLeaves);
+        coverBoxes_.setSize(nLeaves);
+
+        for (label leafI = 0; leafI < nLeaves; ++leafI)
+        {
+            coverPartition_[leafI] = leaves[leafI];
+            coverBoxes_[leafI] = std::make_shared<boundBox>
+            (
+                leafBoxes[leafI]
+            );
+        }
+    }
+    else
+    {
+        coverSplit(allTris, stallCoeff, nLeaves, maxBoxes, leaves);
+
+        coverPartition_.setSize(nLeaves);
+        coverBoxes_.setSize(nLeaves);
+
+        for (label leafI = 0; leafI < nLeaves; ++leafI)
+        {
+            coverPartition_[leafI] = leaves[leafI];
+            coverBoxes_[leafI] = std::make_shared<boundBox>
+            (
+                triSetBBox(leaves[leafI])
+            );
+        }
     }
 
-    // build-time self-check: every surface point of every triangle
-    // must lie inside its own leaf box (hence inside the union)
-    for (label leafI = 0; leafI < nLeaves; ++leafI)
+    // build-time self-check: every surface point must lie inside
+    // the union of the cover boxes. kdTree: a point of a triangle
+    // lies in its own leaf box. spatial: with duplication a
+    // straddling triangle's point can fall in the sibling's
+    // clamped box, so the check tests the union membership (the
+    // actual broad-phase invariant)
+    if (coverAlgorithm == "spatial")
     {
-        const boundBox& bBox(*coverBoxes_[leafI]);
         const pointField& points = triSurf_->points();
 
-        forAll(coverPartition_[leafI], i)
+        forAll(allTris, tI)
         {
             const typename triSurface::FaceType& f =
-                (*triSurf_)[coverPartition_[leafI][i]];
+                (*triSurf_)[tI];
 
             for (auto ind : f)
             {
-                if (!bBox.contains(points[ind]))
+                bool inside(false);
+                for (label leafI = 0; leafI < nLeaves; ++leafI)
+                {
+                    if (coverBoxes_[leafI]->contains(points[ind]))
+                    {
+                        inside = true;
+                        break;
+                    }
+                }
+
+                if (!inside)
                 {
                     FatalErrorInFunction
                         << "cover self-check failed: point "
-                        << points[ind] << " of triangle "
-                        << coverPartition_[leafI][i]
-                        << " outside its cover box " << bBox
+                        << points[ind] << " of triangle " << tI
+                        << " outside the cover box union"
                         << abort(FatalError);
+                }
+            }
+        }
+    }
+    else
+    {
+        for (label leafI = 0; leafI < nLeaves; ++leafI)
+        {
+            const boundBox& bBox(*coverBoxes_[leafI]);
+            const pointField& points = triSurf_->points();
+
+            forAll(coverPartition_[leafI], i)
+            {
+                const typename triSurface::FaceType& f =
+                    (*triSurf_)[coverPartition_[leafI][i]];
+
+                for (auto ind : f)
+                {
+                    if (!bBox.contains(points[ind]))
+                    {
+                        FatalErrorInFunction
+                            << "cover self-check failed: point "
+                            << points[ind] << " of triangle "
+                            << coverPartition_[leafI][i]
+                            << " outside its cover box " << bBox
+                            << abort(FatalError);
+                    }
                 }
             }
         }
