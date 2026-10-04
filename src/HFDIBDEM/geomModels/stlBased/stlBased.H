@@ -87,13 +87,15 @@ namespace Foam
         scalar coverBoxVol(const boundBox& bBox) const;
 
         // recursive median split of a triangle set along its widest
-        // axis, stopped by the stall criterion or the box cap
+        // axis, stopped by the stall criterion or the box cap; the
+        // budget bounds the leaves this subtree may emit, so the
+        // cap is honored by construction
         void coverSplit
         (
             const labelList& tris,
             scalar stallCoeff,
             label& nLeaves,
-            label maxBoxes,
+            label budget,
             List<labelList>& leaves
         ) const;
 

@@ -741,7 +741,7 @@ void stlBased::coverSplit
     const labelList& tris,
     scalar stallCoeff,
     label& nLeaves,
-    label maxBoxes,
+    label budget,
     List<labelList>& leaves
 ) const
 {
@@ -778,6 +778,15 @@ void stlBased::coverSplit
         return;
     }
 
+    // budget exhausted: this subtree must emit exactly one box
+    // (the budget is decremented by the emitted leaves, so the
+    // write below is always in bounds)
+    if (budget < 2)
+    {
+        leaves[nLeaves++] = tris;
+        return;
+    }
+
     // split at the median triangle centroid along the widest axis;
     // ties are broken by the triangle INDEX (sortedOrder is stable
     // w.r.t. it), never by float comparison of equal centroids, so
@@ -809,27 +818,35 @@ void stlBased::coverSplit
     }
 
     // stall criterion: if the children barely reduce the bound, the
-    // geometry fills this box - stop splitting here. The box cap is
-    // checked against the leaf budget including both prospective
-    // children so nLeaves never exceeds maxBoxes
+    // geometry fills this box - stop splitting here
     const scalar parentVol(coverBoxVol(parentBBox));
     const scalar childrenVol
     (
         coverBoxVol(triSetBBox(leftSet)) + coverBoxVol(triSetBBox(rightSet))
     );
 
-    if
-    (
-        childrenVol > stallCoeff*parentVol
-        || nLeaves + 2 > maxBoxes
-    )
+    if (childrenVol > stallCoeff*parentVol)
     {
         leaves[nLeaves++] = tris;
         return;
     }
 
-    coverSplit(leftSet, stallCoeff, nLeaves, maxBoxes, leaves);
-    coverSplit(rightSet, stallCoeff, nLeaves, maxBoxes, leaves);
+    // hand half the budget to the left subtree, the remainder to
+    // the right: both always get at least one slot, and the total
+    // emitted can never exceed the parent budget (integer split,
+    // deterministic across ranks)
+    const label leftBudget((budget + 1)/2);
+    const label nLeavesBefore(nLeaves);
+
+    coverSplit(leftSet, stallCoeff, nLeaves, leftBudget, leaves);
+    coverSplit
+    (
+        rightSet,
+        stallCoeff,
+        nLeaves,
+        budget - (nLeaves - nLeavesBefore),
+        leaves
+    );
 }
 //---------------------------------------------------------------------------//
 bool stlBased::computeStaticCover
