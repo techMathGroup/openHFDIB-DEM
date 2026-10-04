@@ -370,6 +370,32 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
                 bodyGeom
             );
 
+            // cover request: forward the keywords verbatim - the
+            // synthetic wall body dict gets them and the regular
+            // immersedBody parsing does the validation/defaults
+            if (patchDic.subDict(patchNames[patchI]).found("computeCover"))
+            {
+                dictionary coverRequest;
+                coverRequest.add(
+                    "computeCover",
+                    readBool(patchDic.subDict(patchNames[patchI])
+                        .lookup("computeCover"))
+                );
+                if (patchDic.subDict(patchNames[patchI])
+                    .found("computeCoverDict"))
+                {
+                    coverRequest.add(
+                        "computeCoverDict",
+                        patchDic.subDict(patchNames[patchI])
+                            .subDict("computeCoverDict")
+                    );
+                }
+                wallSTLInfo::wallSTLInfo_insertCover(
+                    patchNames[patchI],
+                    coverRequest
+                );
+            }
+
             Info << " -- collisionPatch " << patchNames[patchI]
                 << " is stlBased (stlName " << stlName
                 << ", bodyGeom " << bodyGeom << ")" << endl;
@@ -2922,6 +2948,12 @@ void openHFDIBDEM::createSTLWallBodies()
 
     const stringList wallNames(wallSTLs.toc());
 
+    // per-patch cover requests, parsed at collisionPatch time
+    const HashTable<dictionary,string,Hash<string>>& wallSTLCovers
+    (
+        wallSTLInfo::getWallSTLCoverInfo()
+    );
+
     // wall body names are prefixed so they never collide with
     // bodyNames_ entries; addModels_ and the record/restart
     // machinery iterate bodyNames_ only and never see them
@@ -2971,6 +3003,27 @@ void openHFDIBDEM::createSTLWallBodies()
             );
             wallBodyDict.add("material",stlMaterial);
             wallBodyDict.add("isSTLWall",true);
+
+            // forward the cover request, if the patch made one -
+            // defaults and validation happen in initializeIB
+            if (wallSTLCovers.found(wallNames[wI]))
+            {
+                const dictionary& coverRequest
+                (
+                    wallSTLCovers[wallNames[wI]]
+                );
+                wallBodyDict.add(
+                    "computeCover",
+                    readBool(coverRequest.lookup("computeCover"))
+                );
+                if (coverRequest.found("computeCoverDict"))
+                {
+                    wallBodyDict.add(
+                        "computeCoverDict",
+                        coverRequest.subDict("computeCoverDict")
+                    );
+                }
+            }
 
             HFDIBDEMDict_.add(wallBodyName,wallBodyDict);
         }

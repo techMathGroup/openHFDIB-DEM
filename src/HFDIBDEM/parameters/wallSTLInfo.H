@@ -42,6 +42,7 @@ Contributors
 #include "word.H"
 #include "HashTable.H"
 #include "string.H"
+#include "dictionary.H"
 
 namespace Foam
 {
@@ -72,8 +73,28 @@ class wallSTLInfo
             wallSTLInfo_.insert(wallPatch,stlInfo);
         };
 
+        //- cover request per stlBased patch; the dict is stored
+        //- verbatim and parsed later by the immersedBody machinery
+        static const HashTable<dictionary,string,Hash<string>>&
+        getWallSTLCoverInfo()
+        {
+            return wallSTLInfoCover_;
+        }
+
+        static void wallSTLInfo_insertCover
+        (
+            const string& wallPatch,
+            const dictionary& coverDict
+        )
+        {
+            wallSTLInfoCover_.insert(wallPatch,coverDict);
+        };
+
         //- Hash table for storing stlBased collision patch info
         static HashTable<List<word>,string,Hash<string>> wallSTLInfo_;
+
+        //- Hash table for storing stlBased cover requests
+        static HashTable<dictionary,string,Hash<string>> wallSTLInfoCover_;
 
 };
 

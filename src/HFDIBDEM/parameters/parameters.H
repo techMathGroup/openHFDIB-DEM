@@ -71,6 +71,9 @@ HashTable<List<vector>,string,Hash<string>> wallPlaneInfo::wallPlaneInfo_ =
 HashTable<List<word>,string,Hash<string>> wallSTLInfo::wallSTLInfo_ =
     HashTable<List<word>,string,Hash<string>>();
 
+HashTable<dictionary,string,Hash<string>> wallSTLInfo::wallSTLInfoCover_ =
+    HashTable<dictionary,string,Hash<string>>();
+
 HashTable<List<vector>,string,Hash<string>> cyclicPlaneInfo::cyclicPlaneInfo_ =
     HashTable<List<vector>,string,Hash<string>>();
 
