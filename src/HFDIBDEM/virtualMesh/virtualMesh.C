@@ -200,7 +200,7 @@ bool evaluateLeafExact
         leaf,
         cHasPlane ? hs1 : hs2,
         cHasPlane && tHasPlane,
-        cHasPlane ? hs1 : hs2,
+        hs2,
         cInfo.clippedVolume_,
         cInfo.clippedCentroid_
     );
