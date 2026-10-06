@@ -487,18 +487,42 @@ bool virtualMeshWall::isOnContactBand
     vector& svI
 )
 {
-    List<vector> nbrSVI(bbMatrix_.faceNeighbourSubVolumes(svI));
+    // inlined face-neighbour scan of the lattice (no neighbour-list
+    // allocation); the bounds check PRECEDES any bbMatrix_[]
+    // indexing - the operator lazily creates sub-volumes and a
+    // negative/out-of-range component would be undefined
+    const label i(svI[0]);
+    const label j(svI[1]);
+    const label k(svI[2]);
 
-    if (nbrSVI.size() < 6)
-    {
-        // missing face neighbour (out of matrix): the seam is
-        // interior to the contact, treat it as outside
-        return true;
-    }
+    const vector mSize(bbMatrix_.getMatrixSize());
 
-    forAll(nbrSVI,nSV)
+    for (label dir = 0; dir < 6; dir++)
     {
-        if (!bbMatrix_[nbrSVI[nSV]].isCBody)
+        label nI(i);
+        label nJ(j);
+        label nK(k);
+
+        if (dir == 0)      { nI--; }
+        else if (dir == 1) { nI++; }
+        else if (dir == 2) { nJ--; }
+        else if (dir == 3) { nJ++; }
+        else if (dir == 4) { nK--; }
+        else                { nK++; }
+
+        if 
+        (    
+            nI < 0 || nI >= label(mSize[0])
+            || nJ < 0 || nJ >= label(mSize[1])
+            || nK < 0 || nK >= label(mSize[2])
+        )
+        {
+            // missing face neighbour (out of matrix): the seam is
+            // interior to the contact, treat it as outside
+            return true;
+        }
+
+        if (!bbMatrix_[vector(nI,nJ,nK)].isCBody)
         {
             return true;
         }
