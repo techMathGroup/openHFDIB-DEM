@@ -42,6 +42,7 @@ Contributors
 
 #include "geomModel.H"
 #include "momentOfInertia.H"                                            //reqiured for computeVolumeCoM
+#include "facetBinning.H"
 
 namespace Foam
 {
@@ -61,6 +62,21 @@ namespace Foam
         word                stlPath_;
         autoPtr<triSurface> triSurf_;
         autoPtr<triSurfaceSearch> triSurfSearch_;
+
+        // uniform-grid broad phase over triSurf_ facets, serving
+        // the wall exact path (getBoxSurfacePlane). built lazily
+        // on first query, rebuilt whenever surfaceVersion_ moves;
+        // invalid (degenerate surface) keeps tree.findBox
+        mutable autoPtr<facetBinning> facetBinning_;
+
+        // bumped by EVERY mutation that resets triSurfSearch_
+        // (setBodyPosition, initVars, synchronPos, bodyMovePoints,
+        // bodyRotatePoints, bodyScalePoints); the binning rebuilds
+        // on a mismatch at query time
+        mutable label surfaceVersion_;
+
+        // reference version of the current binning; -1 = none
+        mutable label binningVersion_;
 
         pointField historyPoints_;
 
@@ -311,6 +327,19 @@ namespace Foam
             vector& n
         );
 
+        // facets overlapping queryBox: the binning broad phase
+        // when its build is current and valid, tree.findBox
+        // otherwise. candidate set is identical (vmFacetBinning
+        // cross-validation); only the order differs (sorted vs
+        // hash), neutralized by the order-independent tie-break
+        labelList boxOverlappingFacets(const boundBox& queryBox) const;
+
+        // bump after every mutation that resets triSurfSearch_
+        void touchSurface()
+        {
+            surfaceVersion_++;
+        }
+
         public:
 
         void initVars(pointField surfPoints, scalar intSpan, bool sdBasedLambda)
@@ -318,6 +347,7 @@ namespace Foam
             bodySurfMesh_.movePoints(surfPoints);
             triSurf_.reset(new triSurface(bodySurfMesh_));
             triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
+            touchSurface();
             historyPoints_ = surfPoints;
             intSpan_ = intSpan;
             sdBasedLambda_ = sdBasedLambda;

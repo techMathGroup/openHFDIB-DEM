@@ -57,6 +57,8 @@ bodySurfMesh_
     )
 ),
 stlPath_(stlPath),
+surfaceVersion_(0),
+binningVersion_(-1),
 coverActive_(false)
 {
     historyPoints_ = bodySurfMesh_.points();
@@ -117,6 +119,7 @@ void stlBased::bodyMovePoints
     bodySurfMesh_.movePoints(bodyPoints);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
+    touchSurface();
     bodyFieldValid_ = false;                                            // points moved: cell lists and the body field are stale
 
     CoM_ += translVec;
@@ -140,6 +143,7 @@ void stlBased::bodyScalePoints
     bodySurfMesh_.movePoints(bodyPoints);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
+    touchSurface();
     bodyFieldValid_ = false;                                            // points moved/scaled/rotated/synced
 }
 //---------------------------------------------------------------------------//
@@ -169,6 +173,7 @@ void stlBased::bodyRotatePoints
     bodySurfMesh_.movePoints(bodyPoints);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
+    touchSurface();
     bodyFieldValid_ = false;                                            // points moved/scaled/rotated/synced
 }
 //---------------------------------------------------------------------------//
@@ -196,6 +201,7 @@ void stlBased::synchronPos(label owner)
     bodySurfMesh_.movePoints(bodyPoints);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
+    touchSurface();
     bodyFieldValid_ = false;                                            // points moved/scaled/rotated/synced
 
     // re-track the centroid
@@ -434,6 +440,29 @@ bool stlBased::getLeafSubVolumePlane
     return getShapesSurfacePlane(info.shapesIn_(), sv, p, n);
 }
 //---------------------------------------------------------------------------//
+labelList stlBased::boxOverlappingFacets(const boundBox& queryBox) const
+{
+    // lazy build/rebuild: the binning follows the surface version
+    // so a moved/rotated/scaled body never queries a stale grid
+    if (!facetBinning_.valid() || binningVersion_ != surfaceVersion_)
+    {
+        facetBinning_.reset(new facetBinning(triSurf_()));
+        binningVersion_ = surfaceVersion_;
+    }
+
+    if (facetBinning_->valid())
+    {
+        return facetBinning_->facetsNear
+        (
+            queryBox,
+            triSurfSearch_->tree().shapes()
+        );
+    }
+
+    // degenerate surface for the binning: the octree walk
+    return triSurfSearch_->tree().findBox(treeBoundBox(queryBox));
+}
+//---------------------------------------------------------------------------//
 bool stlBased::getBoxSurfacePlane
 (
     const boundBox& leaf,
@@ -443,9 +472,7 @@ bool stlBased::getBoxSurfacePlane
 {
     // wall-path variant: no octree parent chain, so search the
     // facets overlapping the leaf box directly
-    const indexedOctree<treeDataTriSurface>& tree = triSurfSearch_->tree();
-
-    const labelList shapesIn(tree.findBox(treeBoundBox(leaf)));
+    const labelList shapesIn(boxOverlappingFacets(leaf));
 
     if (shapesIn.size() == 0)                                           //internal finds nothing -> returns full leaf volume
     {
@@ -708,6 +735,7 @@ void stlBased::setBodyPosition(pointField pos)
     bodySurfMesh_.movePoints(pos);
     triSurf_.reset(new triSurface(bodySurfMesh_));
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
+    touchSurface();
     bodyFieldValid_ = false;                                            // points moved: cell lists and the body field are stale
 
     // re-track the centroid
