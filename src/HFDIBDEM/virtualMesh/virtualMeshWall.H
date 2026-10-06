@@ -220,6 +220,12 @@ class virtualMeshWall
     // re-flood the patch. empty until evaluateContact runs
     DynamicVectorList insideLeaves_;
 
+    // scratch clip-plane list of the exact band pass: holds a copy
+    // of wallPlanes_ taken at the start of that pass plus one slot
+    // for the body half-space of the current leaf (last slot,
+    // written by index). never carried across passes or contacts
+    List<planePolyClip::halfSpace> clipPlanes_;
+
     // exact leaf evaluation for the wall path: clip the leaf box by
     // the dominant body-surface plane and every wall half-space,
     // cache in clippedVolume_/clippedCentroid_. called only for 

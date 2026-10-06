@@ -389,6 +389,11 @@ scalar virtualMeshWall::evaluateContact()
         scalar exactVolume(0);
         vector exactCenter(vector::zero);
 
+        // scratch for the band clips: wall planes plus the body
+        // half-space slot (last, written per leaf by index)
+        clipPlanes_ = wallPlanes_;
+        clipPlanes_.append(planePolyClip::halfSpace());
+
         forAll(insideLeaves_,lI)
         {
             subVolumeProperties& cSubVolume = bbMatrix_[insideLeaves_[lI]];
@@ -459,13 +464,12 @@ void virtualMeshWall::evaluateContactLeafExact
     {
         // kept material = body side of the surface plane and the
         // fluid side of every wall half-space
-        List<planePolyClip::halfSpace> planes(wallPlanes_);
-        planes.append(planePolyClip::halfSpace(bP, bN));
+        clipPlanes_[clipPlanes_.size()-1] = planePolyClip::halfSpace(bP, bN);
 
         planePolyClip::volumeAndCentroid
         (
             leaf,
-            planes,
+            clipPlanes_,
             subVolume.clippedVolume_,
             subVolume.clippedCentroid_
         );
