@@ -498,6 +498,21 @@ bool stlBased::getShapesSurfacePlane
             bestArea = overlap.volume();                                //largest dominates
             bestFacet = facetI;
         }
+        else if
+        (
+            overlap.valid()
+         && bestFacet > -1
+         && overlap.volume() == bestArea
+         && facetI < bestFacet
+        )
+        {
+            // bit-identical overlap ties are the norm on flat
+            // faces of axis-aligned or lattice-rotated bodies
+            // (every diagonal-split face pair shares one bbox);
+            // the smallest facet index keeps the pick independent
+            // of the candidate order the caller happens to use
+            bestFacet = facetI;
+        }
     }
 
     if (bestFacet == -1)
