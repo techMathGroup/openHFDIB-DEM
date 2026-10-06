@@ -1,6 +1,7 @@
 geomModels/geomModel.C
 geomModels/createBodyConnectivity.C
 geomModels/stlBased/stlBased.C
+geomModels/stlBased/facetBinning.C
 geomModels/stlBased/convexBody.C
 geomModels/stlBased/nonConvexBody.C
 geomModels/shapeBased/shapeBased.C
