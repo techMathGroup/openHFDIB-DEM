@@ -553,7 +553,9 @@ bool stlBased::getShapesSurfacePlane
         return false;
     }
 
-    n = posInside ? -nOut : nOut;
+    // n must point into the body: the planePolyClip half-spaces keep
+    // the (x - p) & n >= 0 side, which is the body interior here
+    n = posInside ? nOut : -nOut;
 
     return true;
 }
