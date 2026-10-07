@@ -334,6 +334,14 @@ namespace Foam
         // hash), neutralized by the order-independent tie-break
         labelList boxOverlappingFacets(const boundBox& queryBox) const;
 
+        // non-empty candidate set:
+        // (the binning is a superset gather pruned by the platform
+        // predicate, so non-empty == a facet truly crosses the box)
+        virtual bool boxIntersectsSurface(const boundBox& leaf) const
+        {
+            return boxOverlappingFacets(leaf).size() > 0;
+        }
+
         // bump after every mutation that resets triSurfSearch_
         void touchSurface()
         {

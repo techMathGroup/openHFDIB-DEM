@@ -428,6 +428,20 @@ namespace Foam
             return false;
         }
 
+        // does any surface facet cross the box? the count-all leaf
+        // classification of the wall virtual mesh: a watertight
+        // surface cannot cross a leaf without a facet intersection,
+        // so a straddling leaf is never dropped from the contact.
+        // false in the base (analytic shapes keep their centroid
+        // test as the only gate)
+        virtual bool boxIntersectsSurface
+        (
+            const boundBox& leaf
+        ) const
+        {
+            return false;
+        }
+
         virtual void setCoM()
         {
             InfoH << iB_Info << "16-- geomModelMessage-- "

@@ -251,6 +251,15 @@ class virtualMeshWall
         const subVolumeProperties& subVolume
     );
 
+    // does the leaf box reach the kept side of every wall
+    // half-space? a box entirely on the fluid side of some plane
+    // carries no contact material - the guard that keeps the
+    // count-all flood inside body INTERSECT wall-region
+    bool intersectsWallRegion
+    (
+        const subVolumeProperties& subVolume
+    );
+
     // leaf ownership: the ceil lattice rule lets a matrix bleed
     // past its export box into the neighbouring element; the SM
     // export boxes tile the contact region without overlap, so a

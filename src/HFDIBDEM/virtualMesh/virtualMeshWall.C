@@ -700,9 +700,57 @@ void virtualMeshWall::checkSubVolume(subVolumeProperties& subVolume)
 {
     if (subVolume.toCheck)
     {
-        subVolume.isCBody = cGeomModel_.pointInside(subVolume.center);
+        // count-all classification: a leaf is contact material
+        // when its centroid is inside OR any facet crosses the leaf
+        // box. the centroid test alone drops outside-centroid rim
+        // leaves (a one-sided O(sv) under-estimate); the facet test
+        // never drops a straddling leaf of a watertight surface,
+        // matching the prt-prt MIXED-leaf counting.
+        // the wall-region guard keeps the flood inside the contact:
+        // without it the facet clause lets the flood climb the body
+        // surface shell into body volume above the wall plane
+        subVolume.isCBody =
+        (
+            intersectsWallRegion(subVolume)
+            &&
+            (
+                cGeomModel_.pointInside(subVolume.center)
+             || cGeomModel_.boxIntersectsSurface(leafBox(subVolume))
+            )
+        );
         subVolume.toCheck = false;
     }
+}
+//---------------------------------------------------------------------------//
+bool virtualMeshWall::intersectsWallRegion
+(
+    const subVolumeProperties& subVolume
+)
+{
+    // a box entirely on the fluid side of some wall half-space
+    // carries no contact material: the corner with the largest
+    // dot(c - p, n) decides (n points into the kept side)
+    const boundBox leaf(leafBox(subVolume));
+
+    forAll(wallPlanes_, wP)
+    {
+        point corner(vector::zero);
+
+        for (label i = 0; i < 3; i++)
+        {
+            corner[i] =
+                wallPlanes_[wP].n[i] > 0
+              ? leaf.max()[i]
+              : leaf.min()[i];
+        }
+
+        if (((corner - wallPlanes_[wP].p) & wallPlanes_[wP].n) < 0)
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 //---------------------------------------------------------------------------//
 void virtualMeshWall::resetSubVolume(subVolumeProperties& subVolume)
