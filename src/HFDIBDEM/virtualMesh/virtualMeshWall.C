@@ -416,8 +416,27 @@ scalar virtualMeshWall::evaluateContact()
             }
             else
             {
-                exactVolume += bbMatrix_.getSubVolumeV();
-                exactCenter += bbMatrix_.getSubVolumeV()*cSubVolume.center;
+                // interior leaf: clip by the wall half-spaces only.
+                // unlike prt-prt (where a non-band leaf is interior
+                // to the overlap), the wall region body AND
+                // wall-half-space cuts the top leaf layer of a flat
+                // contact: the wall planes are analytic, so this
+                // clip is exact
+                const boundBox leaf(leafBox(cSubVolume));
+
+                scalar leafV(0);
+                vector leafC(vector::zero);
+
+                planePolyClip::volumeAndCentroid
+                (
+                    leaf,
+                    wallPlanes_,
+                    leafV,
+                    leafC
+                );
+
+                exactVolume += leafV;
+                exactCenter += leafV*leafC;
             }
         }
 
@@ -495,48 +514,15 @@ bool virtualMeshWall::isOnContactBand
     vector& svI
 )
 {
-    // inlined face-neighbour scan of the lattice (no neighbour-list
-    // allocation); the bounds check PRECEDES any bbMatrix_[]
-    // indexing - the operator lazily creates sub-volumes and a
-    // negative/out-of-range component would be undefined
-    const label i(svI[0]);
-    const label j(svI[1]);
-    const label k(svI[2]);
-
-    const vector mSize(bbMatrix_.getMatrixSize());
-
-    for (label dir = 0; dir < 6; dir++)
-    {
-        label nI(i);
-        label nJ(j);
-        label nK(k);
-
-        if (dir == 0)      { nI--; }
-        else if (dir == 1) { nI++; }
-        else if (dir == 2) { nJ--; }
-        else if (dir == 3) { nJ++; }
-        else if (dir == 4) { nK--; }
-        else                { nK++; }
-
-        if 
-        (    
-            nI < 0 || nI >= label(mSize[0])
-            || nJ < 0 || nJ >= label(mSize[1])
-            || nK < 0 || nK >= label(mSize[2])
-        )
-        {
-            // missing face neighbour (out of matrix): the seam is
-            // interior to the contact, treat it as outside
-            return true;
-        }
-
-        if (!bbMatrix_[vector(nI,nJ,nK)].isCBody)
-        {
-            return true;
-        }
-    }
-
-    return false;
+    // band = any facet crosses the leaf box (the second-order rule):
+    // a watertight surface cannot cross a leaf without a facet
+    // intersection, so no straddling leaf is ever left un-clipped.
+    // replaces the inside-with-outside-face-neighbour rule, which
+    // missed inside-centroid rim leaves whose neighbours were all
+    // counted (first-order) - now that the classification counts all
+    // straddling leaves, the old neighbour scan
+    // would band nearly the whole contact
+    return cGeomModel_.boxIntersectsSurface(leafBox(bbMatrix_[svI]));
 }
 //---------------------------------------------------------------------------//
 boundBox virtualMeshWall::leafBox
