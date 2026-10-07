@@ -68,10 +68,12 @@ bodyId_(bodyId)
             )
         );
 
+        // ceil -> full overlap but a possibility of bleeding to the next
+        //         SM-originating sub-volume. => reason to implement ownsLeaf
         vector subVolumeNVector = vector(
-            floor((contactBBData[cBD].second().span()[0]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision()),
-            floor((contactBBData[cBD].second().span()[1]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision()),
-            floor((contactBBData[cBD].second().span()[2]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision())
+            ceil((contactBBData[cBD].second().span()[0]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision()),
+            ceil((contactBBData[cBD].second().span()[1]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision()),
+            ceil((contactBBData[cBD].second().span()[2]/virtualMeshLevel::getCharCellSize())*virtualMeshLevel::getLevelOfDivision())
         );
         if(cmptMin(subVolumeNVector)<SMALL)
         {

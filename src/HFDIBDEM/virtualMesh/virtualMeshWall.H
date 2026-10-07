@@ -251,6 +251,17 @@ class virtualMeshWall
         const subVolumeProperties& subVolume
     );
 
+    // leaf ownership: the ceil lattice rule lets a matrix bleed
+    // past its export box into the neighbouring element; the SM
+    // export boxes tile the contact region without overlap, so a
+    // leaf whose centre lies in this VM's box counts here and
+    // nowhere else. the flood still traverses non-owned leaves
+    // (no seam gaps); only counting is gated
+    bool ownsLeaf
+    (
+        const vector& svI
+    );
+
     // Append a neighbour sub-volume to the next flood-fill layer only if it
     // has not been visited yet (toCheck == true). Without this guard the
     // floods re-queue already-processed sub-volumes and their frontiers grow

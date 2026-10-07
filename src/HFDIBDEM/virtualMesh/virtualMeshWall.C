@@ -340,10 +340,18 @@ scalar virtualMeshWall::evaluateContact()
             checkSubVolume(cSubVolume);
             if (cSubVolume.isCBody)
             {
+                // traverse regardless of ownership so the flood
+                // crosses box seams; count only owned leaves
+                checkAndAppendFace(nextToCheck()[sV], auxToCheck());
+
+                if (!ownsLeaf(nextToCheck()[sV]))
+                {
+                    continue;
+                }
+
                 volumeCount++;
                 contactCenter_ += cSubVolume.center;
                 insideLeaves_.append(nextToCheck()[sV]);
-                checkAndAppendFace(nextToCheck()[sV], auxToCheck());
             }
         }
         autoPtr<DynamicVectorList> helpPtr(nextToCheck.ptr());
@@ -658,6 +666,34 @@ scalar virtualMeshWall::evaluateContactAreaExact
     }
 
     return exactArea;
+}
+//---------------------------------------------------------------------------//
+bool virtualMeshWall::ownsLeaf(const vector& svI)
+{
+    // centre of the leaf: bBox_.min() + (2*idx + 1)*svEdge/2
+    const boundBox& bBox(bbMatrix_.getBBox());
+    const scalar svEdge
+    (
+        virtualMeshLevel::getCharCellSize()
+       /virtualMeshLevel::getLevelOfDivision()
+    );
+
+    for (label i = 0; i < 3; i++)
+    {
+        const scalar c
+        (
+            bBox.min()[i] + (2*svI[i] + 1)*svEdge*0.5
+        );
+
+        // half-open [min, max): every centre lands in exactly one
+        // of the tiling export boxes
+        if (c < bBox.min()[i] || c >= bBox.max()[i])
+        {
+            return false;
+        }
+    }
+
+    return true;
 }
 //---------------------------------------------------------------------------//
 void virtualMeshWall::checkSubVolume(subVolumeProperties& subVolume)
