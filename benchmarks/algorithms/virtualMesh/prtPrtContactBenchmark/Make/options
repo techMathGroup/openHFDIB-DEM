@@ -1,0 +1,16 @@
+EXE_INC = \
+    -I$(LIB_SRC)/dynamicMesh/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/mesh/blockMesh/lnInclude \
+    -I$(MPI_ARCH_PATH)/include \
+    -I/home/isozm/Documents/10_IT_CAS/2021_openHFDIBDEM/02_github/openHFDIB-DEM/src/HFDIBDEM/lnInclude
+
+EXE_LIBS = \
+    -ldynamicFvMesh \
+    -ldynamicMesh \
+    -lmeshTools \
+    -lblockMesh \
+    -lfiniteVolume \
+    -L$(FOAM_USER_LIBBIN) \
+    -lHFDIBDEM
