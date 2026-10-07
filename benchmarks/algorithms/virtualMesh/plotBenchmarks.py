@@ -99,12 +99,12 @@ def plotSummary(csvPaths, outDir, benchName):
     for arm, ax in zip(("exact", "legacy"), axes):
         for p in csvPaths:
             config, cols, rows = readCsv(p)
+            if config.find("tilted") > -1: continue
             sv = col(rows, "svEdge", cols)
             e = [abs(x) for x in
                  col(rows, f"eV_{arm}", cols)]
             ax.loglog(sv, e, "o-",
-                      label=config.split(", d/R")[0].split("d/R")[-1]
-                      .strip(" ="))
+                      label=config.split(" d/R = ")[-1])
         ax.set_xlabel("svEdge")
         ax.set_ylabel(f"|eV| ({arm})")
         ax.grid(True, which="both", alpha=0.3)

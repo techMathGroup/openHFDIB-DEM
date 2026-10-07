@@ -99,6 +99,7 @@ def writePlotFiles(legs, logPath):
                         " the faceted reference\n")
                 f.write("level svEdge "
                         "V_exact eV_exact A_exact eA_exact "
+                        "svEdge "
                         "V_legacy eV_legacy A_legacy eA_legacy\n")
                 for level in sorted(rows):
                     parts = [str(level)]

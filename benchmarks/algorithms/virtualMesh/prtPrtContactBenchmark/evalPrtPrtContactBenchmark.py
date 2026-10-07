@@ -81,7 +81,9 @@ def writePlotFiles(series, logPath):
             f.write("# V measured; eV relative error vs the "
                     "faceted lens reference\n")
             f.write("level svEdge "
-                    "V_exact eV_exact V_legacy eV_legacy\n")
+                    "V_exact eV_exact "
+                    "svEdge "
+                    "V_legacy eV_legacy\n")
             for level in sorted(rows):
                 parts = [str(level)]
                 arm = rows[level]
