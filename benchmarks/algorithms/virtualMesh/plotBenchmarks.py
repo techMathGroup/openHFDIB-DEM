@@ -22,7 +22,8 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt     # noqa: E402
 
-BENCHMARKS = ["wallContactBenchmark", "prtPrtContactBenchmark"]
+BENCHMARKS = ["wallContactBenchmark", "prtPrtContactBenchmark",
+              "prtWallContactBenchmark"]
 
 # order-guide slopes on the log-log error plot: err ~ svEdge^p
 GUIDE_SLOPES = [1, 2]
