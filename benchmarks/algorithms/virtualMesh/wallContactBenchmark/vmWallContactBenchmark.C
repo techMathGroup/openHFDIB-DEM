@@ -53,6 +53,16 @@ Description
     expected first order by design. The tilted-wall leg is
     reported but not gated (known open issue).
 
+    Each evaluation additionally prints the split of the
+    measured contact volume into the vm-flood term and the
+    internal-box term (both re-derived per the production
+    loops of getWallContactVars_ArbShape) on a line of its own:
+    the tilted-wall bias is level-independent, pointing at the
+    charCellSize-scale scaffolding, and this split separates
+    the two candidate sources. The evaluator script ignores
+    lines it does not parse, so the plotting output is
+    unchanged.
+
     Run from the case directory of this benchmark (needs
     constant/triSurface/sphere.stl and a blockMesh-generated mesh).
 
@@ -71,6 +81,7 @@ Contributors
 #include "interAdhesion.H"
 #include "outputHFDIBDEM.H"
 #include "wallSubContactInfo.H"
+#include "virtualMeshWall.H"
 #include "triSurface.H"
 #include <memory>
 
@@ -443,6 +454,86 @@ int main(int argc, char *argv[])
                     continue;
                 }
 
+                // volume split BEFORE the production call: the
+                // production loop of getWallContactVars_ArbShape
+                // copies the info autoPtrs by value
+                // (autoPtr<virtualMeshWallInfo> vmWInfo = ...)
+                // and the v2412 autoPtr copy ctor is a move in
+                // disguise, so after the production call the
+                // list entries are empty. the split uses a
+                // reference and never steals; it re-derives the
+                // two volume terms (vm flood vs internal boxes)
+                // to attribute the tilted-wall bias
+                scalar splitVmFlood(0);
+                scalar splitInternalBox(0);
+                {
+                    wallSubContactInfo& sC(*subContacts[0]);
+
+                    // wall half-spaces of the sub-contact, as the
+                    // production call builds them (wallContact.C)
+                    List<planePolyClip::halfSpace> wallPlanes;
+                    forAll(sC.getContactPatches(), cP)
+                    {
+                        List<vector> planeInfo
+                        (
+                            wallPlaneInfo::getWallPlaneInfo()
+                            [sC.getContactPatches()[cP]]
+                        );
+                        wallPlanes.append
+                        (
+                            planePolyClip::halfSpace
+                            (
+                                planeInfo[1],
+                                planeInfo[0]
+                            )
+                        );
+                    }
+
+                    // the vm-flood term: every contact VM of the
+                    // sub-contact re-flooded (same lattices and
+                    // wall planes as the production call)
+                    for
+                    (
+                        label vmI = 0;
+                        vmI < sC.getVMContactSize();
+                        vmI++
+                    )
+                    {
+                        autoPtr<virtualMeshWallInfo>& vmWInfo
+                        (
+                            sC.getVMContactInfo(vmI)
+                        );
+                        if (!vmWInfo.valid())
+                        {
+                            continue;
+                        }
+
+                        virtualMeshWall virtMeshWall
+                        (
+                            vmWInfo(),
+                            wallCntInfo.getcClass().getGeomModel()
+                        );
+
+                        virtMeshWall.setWallPlanes(wallPlanes);
+
+                        if (virtMeshWall.detectFirstContactPoint())
+                        {
+                            splitVmFlood +=
+                                virtMeshWall.evaluateContact()
+                               *vmWInfo->getEmptyScale();
+                        }
+                    }
+
+                    // the internal-box term: full reboxed
+                    // volumes, exactly as the production sum
+                    forAll(sC.getInternalElements(), sCII)
+                    {
+                        splitInternalBox +=
+                            sC.getInternalElements()[sCII]
+                            .second().volume();
+                    }
+                }
+
                 // geometric evaluation only: getWallContactVars
                 // fills wallCntVars (no force integration needed)
                 contactModel::getWallContactVars
@@ -457,6 +548,15 @@ int main(int argc, char *argv[])
                 (
                     subContacts[0]->getWallCntVars()
                 );
+
+                Info << "    split level " << level << " "
+                     << (exact ? "exact" : "legacy")
+                     << ": vmFlood " << splitVmFlood
+                     << " internalBox " << splitInternalBox
+                     << " sum " << splitVmFlood + splitInternalBox
+                     << " (production V "
+                     << vars.contactVolume_ << ")"
+                     << endl;
 
                 Info << "  level " << level << " "
                      << (exact ? "exact" : "legacy")
