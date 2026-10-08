@@ -224,7 +224,7 @@ int main(int argc, char *argv[])
 
     // analytic radius of the test sphere (the STL was generated
     // with exactly this radius)
-    const scalar R(0.0075);
+    const scalar R(1.0);
 
     // center-to-plane distance d of the sweep (the plate top face
     // plays the wall of wallContactBenchmark)
@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
     // virtualMesh levels of the sweep: svEdge halves each step
     const FixedList<label,3> levelList({3, 4, 5});
 
-    const scalar charCellSize(0.001);
+    const scalar charCellSize(2.0/15.0);
     const scalar maxSubVolumes(1000000000);
 
     // leg orientations: leg 0 is the lattice-aligned plate; leg 1

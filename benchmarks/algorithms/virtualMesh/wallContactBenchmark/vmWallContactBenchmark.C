@@ -223,7 +223,7 @@ int main(int argc, char *argv[])
 
     // analytic radius of the test sphere (the STL was generated
     // with exactly this radius)
-    const scalar R(0.0075);
+    const scalar R(1.0);
 
     // center-to-wall distance d of the sweep: near touching to
     // half immersed in the wall - the deep end keeps the cap
@@ -233,7 +233,7 @@ int main(int argc, char *argv[])
     // virtualMesh levels of the sweep: svEdge halves each step
     const FixedList<label,3> levelList({3, 4, 5});
 
-    const scalar charCellSize(0.0005);
+    const scalar charCellSize(1.0/15.0);
     const scalar maxSubVolumes(1000000000);
 
     // wall: y = 0, fluid above. the stored normal points OUT of

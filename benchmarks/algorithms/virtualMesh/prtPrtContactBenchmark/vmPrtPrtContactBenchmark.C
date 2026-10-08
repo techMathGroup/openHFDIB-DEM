@@ -143,7 +143,7 @@ int main(int argc, char *argv[])
 
     // analytic radius of the test sphere (the STL was generated with
     // exactly this radius, centered at the origin)
-    const scalar R(0.0075);
+    const scalar R(1.0);
 
     // center distance sweep: near touching to half overlap
     const FixedList<scalar,4> dList({1.9*R, 1.6*R, 1.3*R, 1.0*R});
@@ -151,7 +151,7 @@ int main(int argc, char *argv[])
     // virtualMesh levels of the sweep
     const FixedList<label,4> levelList({2, 3, 4, 5});
 
-    const scalar charCellSize(0.001);
+    const scalar charCellSize(2.0/15.0);
     const scalar maxSubVolumes(1000000000);
 
     virtualMeshLevel::setMaxSubVolumes(maxSubVolumes);

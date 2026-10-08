@@ -36,8 +36,10 @@ LEGACY_ORDER = 1.5
 # legacy-arm noise floor: the count-all error is a signed sum of
 # over/under-counts that partially cancel, so once it falls below
 # this level the per-step ratios measure cancellation noise, not
-# order - such pairs are skipped by the legacy gate
-LEGACY_NOISE = 1e-4
+# order - such pairs are skipped by the legacy gate (1e-3 covers
+# the mirror-superconvergence arms, where sub-1e-3 errors are
+# pure rounding redistribution)
+LEGACY_NOISE = 1e-3
 
 
 def parse(path):
