@@ -576,14 +576,39 @@ scalar virtualMeshWall::evaluateContactAreaExact
         subVolumeProperties& cSubVolume = bbMatrix_[insideLeaves_[lI]];
         vector svI(insideLeaves_[lI]);
 
+        const boundBox leaf(leafBox(cSubVolume));
+
+        // footprint of this leaf in the wall plane: the box
+        // cross-section at the plane (empty when the plane does
+        // not cut the leaf). a plane point lies in exactly one
+        // leaf of the lattice, so the per-leaf cross-sections
+        // tile the wetted footprint exactly once - the flat
+        // a^2 of the aligned slab is the special case where
+        // every leaf straddles the plane at mid-height
+        scalar xV(0);
+        vector xC(vector::zero);
+        DynamicList<point> xFace;
+
         if (!isOnContactBand(svI))
         {
-            // interior leaf: full footprint in the wall plane
-            exactArea += leafFaceArea;
+            // interior leaf: body fills the box, footprint is
+            // the full cross-section (0 for the deeper layers
+            // of the tilted-wall staircase)
+            planePolyClip::volumeCentroidAndFace
+            (
+                leaf,
+                wallPlane,
+                false,
+                planePolyClip::halfSpace(),
+                xV, xC, xFace
+            );
+
+            if (xFace.size() >= 3)
+            {
+                exactArea += planePolyClip::polygonArea(xFace);
+            }
             continue;
         }
-
-        const boundBox leaf(leafBox(cSubVolume));
 
         point bP(vector::zero);
         vector bN(vector::zero);
@@ -610,22 +635,31 @@ scalar virtualMeshWall::evaluateContactAreaExact
             {
                 exactArea += planePolyClip::polygonArea(face);
             }
-            else if (V > VSMALL)
-            {
-                // kept region fully behind the wall plane (the
-                // plane does not cut the leaf): full face area
-                exactArea += leafFaceArea;
-            }
-            else
+            else if (V <= VSMALL)
             {
                 // no kept material behind the wall in this leaf
                 nBandNoPolygon++;
             }
+            // kept region fully behind the wall plane (the plane
+            // does not cut it): no footprint - contributes 0
         }
         else
         {
-            // no reliable body plane in this leaf: full face area
-            exactArea += leafFaceArea;
+            // no reliable body plane in this leaf: full box
+            // cross-section, like an interior leaf
+            planePolyClip::volumeCentroidAndFace
+            (
+                leaf,
+                wallPlane,
+                false,
+                planePolyClip::halfSpace(),
+                xV, xC, xFace
+            );
+
+            if (xFace.size() >= 3)
+            {
+                exactArea += planePolyClip::polygonArea(xFace);
+            }
         }
     }
 
