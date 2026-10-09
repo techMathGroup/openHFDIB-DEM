@@ -625,6 +625,15 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(bool nonConvex)
 
         for (subContact& sC : sCS)
         {
+            // a sub-contact without overlap volume above the
+            // noise floor carries only quantization noise: no
+            // area, no normal contribution (keeps area>0 imply
+            // totalVolume>relSMALL by construction)
+            if (sC.getVolume() < relSMALL)
+            {
+                continue;
+            }
+
             DynamicPointList edgeSubContactPoints = sC.getEdgePoints();
             if(edgeSubContactPoints.size() < 1)
             {
