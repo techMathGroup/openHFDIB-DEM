@@ -368,6 +368,23 @@ void getPrtContactVars_ArbShape(
         contactArea = surfaceAndNormal.first()*vmInfo->getEmptyScale();
         normalVector = surfaceAndNormal.second();
         contactCenter = virtMesh.getContactCenter();
+
+        // hull area degenerated (collinear edge points, flat-face
+        // touch): estimate the area from the contact shape the way
+        // the wall side does - n leaves of volume svVol carry
+        // roughly n*svVol^(2/3), with V = n*svVol this is V^(2/3)
+        // scaled by the leaf volume
+        const scalar relASMALL
+        (
+            SMALL*pow(vmInfo->subVolumeV, 2.0/3.0)
+        );
+
+        if (contactArea < relASMALL)
+        {
+            contactArea = intersectedVolume
+                /pow(vmInfo->subVolumeV, 1.0/3.0)
+               *vmInfo->getEmptyScale();
+        }
     }
 
 
