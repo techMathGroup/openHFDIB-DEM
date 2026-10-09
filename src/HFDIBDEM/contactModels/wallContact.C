@@ -35,6 +35,7 @@ Contributors
 
 #include "virtualMeshLevel.H"
 #include "wallPlaneInfo.H"
+#include "planePolyClip.H"
 
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
@@ -48,6 +49,44 @@ namespace contactModel
 {
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+namespace
+{
+
+// is the box entirely on the kept side of every wall half-space?
+// the minimum-dot corner decides: if even the corner closest to
+// the plane (in the kept direction) is kept, so is the whole box
+// and its full volume needs no clip. (note the difference from
+// virtualMeshWall::intersectsWallRegion, whose largest-dot
+// corner tests entirely-on-the-FLUID-side - the opposite
+// question)
+bool boxBehindWalls
+(
+    const boundBox& box,
+    const List<planePolyClip::halfSpace>& wallPlanes
+)
+{
+    forAll(wallPlanes, wP)
+    {
+        point corner(vector::zero);
+
+        for (label i = 0; i < 3; i++)
+        {
+            corner[i] =
+                wallPlanes[wP].n[i] > 0
+              ? box.min()[i]
+              : box.max()[i];
+        }
+
+        if (((corner - wallPlanes[wP].p) & wallPlanes[wP].n) < 0)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+}// End namespace Foam::contactModel::<anonymous>
 //---------------------------------------------------------------------------//
 bool detectWallContact(
     const fvMesh&   mesh,
@@ -291,7 +330,14 @@ void getWallContactVars_ArbShape(
 
     for(label i = 0; i< vMContactInfoSize; i++)
     {
-        autoPtr<virtualMeshWallInfo> vmWInfo = sCW.getVMContactInfo(i);
+        // peek by reference: the v2412 autoPtr copy constructor
+        // steals the pointer, so a by-value copy would empty the
+        // list entry and break any later evaluation of this
+        // sub-contact
+        autoPtr<virtualMeshWallInfo>& vmWInfo
+        (
+            sCW.getVMContactInfo(i)
+        );
         if (!vmWInfo.valid())
         {
             continue;
@@ -320,16 +366,48 @@ void getWallContactVars_ArbShape(
 
     forAll(sCInternalInfo,sCII)
     {
-        intersectVolume += sCInternalInfo[sCII].second().volume();
-        contactCenterSum += sCInternalInfo[sCII].second().volume()
-           *sCInternalInfo[sCII].first();
+        const boundBox& iBox(sCInternalInfo[sCII].second());
+
+        // exact arm: a box straddling a wall plane carries
+        // material above the wall that is not penetrating - the
+        // world-axis-aligned rebox of a projected element
+        // straddles on tilted walls. clip it to the kept side of
+        // every wall half-space; the full-volume box (aligned
+        // walls, interior boxes) takes the fast path unchanged
+        if (    virtualMeshLevel::getExactSubVolume()
+            && !boxBehindWalls(iBox, wallPlanes))
+        {
+            scalar clipV(0);
+            vector clipC(vector::zero);
+
+            planePolyClip::volumeAndCentroid
+            (
+                iBox,
+                wallPlanes,
+                clipV,
+                clipC
+            );
+
+            intersectVolume += clipV;
+            contactCenterSum += clipV*clipC;
+        }
+        else
+        {
+            intersectVolume += iBox.volume();
+            contactCenterSum += iBox.volume()
+               *sCInternalInfo[sCII].first();
+        }
     }
 
     if(intersectVolume>0)
     {
         for(label i = 0; i< vMPlaneInfoSize; i++)
         {
-            autoPtr<virtualMeshWallInfo> vmWInfo = sCW.getVMPlaneInfo(i);
+            // peek by reference (see the vmWInfoList_ loop above)
+            autoPtr<virtualMeshWallInfo>& vmWInfo
+            (
+                sCW.getVMPlaneInfo(i)
+            );
             if (!vmWInfo.valid())
             {
                 continue;

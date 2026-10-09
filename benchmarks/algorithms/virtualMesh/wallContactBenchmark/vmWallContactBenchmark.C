@@ -320,12 +320,15 @@ int main(int argc, char *argv[])
     {
         // rotate the wall registry entry and the sphere placement
         // by the same 30-degree tilt about z: the tilted leg sees
-        // diagonal wall half-spaces in every band leaf
-        wallPlaneInfo::wallPlaneInfo_insert
+        // diagonal wall half-spaces in every band leaf.
+        // wallPlaneInfo_insert uses HashTable::insert, which does
+        // NOT overwrite an existing key - the aligned leg entered
+        // "bot" first, so re-set the entry through the table
+        // directly
+        wallPlaneInfo::wallPlaneInfo_.set
         (
             wallName,
-            wallOrientations[wI],
-            wallP
+            List<vector>{{wallOrientations[wI], wallP}}
         );
 
         Info << nl
