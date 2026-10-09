@@ -636,8 +636,19 @@ void getWallContactVars_Sphere(
         wallCntVars.contactVolume_ += wallCntVarsList[i].contactVolume_;
     }
 
-    wallCntVars.contactCenter_ /= wallCntVars.contactVolume_;
-    wallCntVars.contactNormal_ /= wallCntVars.contactVolume_;
+    if (wallCntVars.contactVolume_ > SMALL)
+    {
+        wallCntVars.contactCenter_ /= wallCntVars.contactVolume_;
+        wallCntVars.contactNormal_ /= wallCntVars.contactVolume_;
+    }
+    else
+    {
+        // zero total cap volume (grazing sphere on wall): fall
+        // back to the unweighted means over the patch list
+        wallCntVars.contactCenter_ /= wallCntVarsList.size();
+        wallCntVars.contactNormal_ /=
+            mag(wallCntVars.contactNormal_) + VSMALL;
+    }
 
     wallCntVars.setMeanCntPars_Plane
     (
