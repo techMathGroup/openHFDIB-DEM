@@ -497,7 +497,27 @@ void getWallContactVars_ArbShape(
             contactNormal -= wallPlaneInfo::getWallPlaneInfo()[contactPatches[cP]][0]*contactAreas()[cP];
         }
         // Pout << "contactNormal " << mag(contactNormal) << endl;
-        contactNormal /=mag(contactNormal);
+        if (mag(contactNormal) > SMALL)
+        {
+            contactNormal /= mag(contactNormal);
+        }
+        else
+        {
+            // cancelled per-patch sum (e.g. a body squeezed between
+            // opposing parallel walls): take the into-fluid normal
+            // of the largest-area patch - the same direction the
+            // weighted sum would converge to as one patch wins
+            label maxA(0);
+            forAll(contactPatches,cP)
+            {
+                if (contactAreas()[cP] > contactAreas()[maxA])
+                {
+                    maxA = cP;
+                }
+            }
+            contactNormal = -wallPlaneInfo::getWallPlaneInfo()
+                [contactPatches[maxA]][0];
+        }
         // Pout << "contactNormal " << contactNormal << endl;
         wallCntInfo.getcClass().setWallContact(true);
         wallCntInfo.getcClass().inContactWithStatic(true);

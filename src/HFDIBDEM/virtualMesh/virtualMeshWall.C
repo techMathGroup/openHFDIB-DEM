@@ -736,6 +736,24 @@ bool virtualMeshWall::intersectsWallRegion
         }
     }
 
+    forAll(floodBounds_, bP)
+    {
+        point corner(vector::zero);
+
+        for (label i = 0; i < 3; i++)
+        {
+            corner[i] =
+                floodBounds_[bP].n[i] > 0
+              ? leaf.max()[i]
+              : leaf.min()[i];
+        }
+
+        if (((corner - floodBounds_[bP].p) & floodBounds_[bP].n) < 0)
+        {
+            return false;
+        }
+    }
+
     return true;
 }
 //---------------------------------------------------------------------------//
