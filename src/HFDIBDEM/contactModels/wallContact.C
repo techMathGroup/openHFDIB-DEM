@@ -418,6 +418,49 @@ void getWallContactVars_ArbShape(
                 wallCntInfo.getcClass().getGeomModel()
             ));
 
+            // the plane lattice is world-axis-aligned, so on a
+            // tilted wall its box has no thin direction and the
+            // flood would fill the whole contact zone: bound it to
+            // the one-leaf-thick slab around the patch plane (on
+            // an aligned wall the flat box bounds the flood
+            // already and the guard never rejects)
+            if (i < contactPatches.size())
+            {
+                List<vector> planeInfo = wallPlaneInfo::getWallPlaneInfo()[contactPatches[i]];
+
+                const vector& planeN(planeInfo[0]);
+                const point& planeP(planeInfo[1]);
+                // half a sub-volume edge along the wall normal:
+                // the slab the plane VM would occupy if its box
+                // were lattice-aligned with the plane
+                const scalar halfDiag
+                (
+                    0.5*Foam::pow
+                    (
+                        vmWInfo->getSVVolume(),
+                        1.0/3.0
+                    )
+                );
+
+                // the band |s| <= h needs the inward-facing pair:
+                // -n at p + h*n keeps s <= h, +n at p - h*n keeps
+                // s >= -h (s = signed distance along planeN)
+                List<planePolyClip::halfSpace> slabBounds
+                ({
+                    planePolyClip::halfSpace
+                    (
+                        planeP + planeN*halfDiag,
+                        -planeN
+                    ),
+                    planePolyClip::halfSpace
+                    (
+                        planeP - planeN*halfDiag,
+                        planeN
+                    )
+                });
+                virtMeshPlane->setFloodBounds(slabBounds);
+            }
+
             if(virtMeshPlane->detectFirstFaceContactPoint())
             {
                 // count of wetted plane faces x face area; emptyScale

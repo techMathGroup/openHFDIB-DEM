@@ -714,8 +714,9 @@ bool virtualMeshWall::intersectsWallRegion
 )
 {
     // a box entirely on the fluid side of some wall half-space
-    // carries no contact material: the corner with the largest
-    // dot(c - p, n) decides (n points into the kept side)
+    // (or outside a plane-VM slab bound) carries no contact
+    // material: the corner with the largest dot(c - p, n)
+    // decides (n points into the kept side)
     const boundBox leaf(leafBox(subVolume));
 
     forAll(wallPlanes_, wP)

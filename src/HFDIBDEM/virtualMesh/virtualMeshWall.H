@@ -215,6 +215,10 @@ class virtualMeshWall
     // from wallPlaneInfo before evaluateContact
     List<planePolyClip::halfSpace> wallPlanes_;
 
+    // slab bounds of a plane virtual mesh (see setFloodBounds);
+    // empty on body-contact virtual meshes
+    List<planePolyClip::halfSpace> floodBounds_;
+
     // inside leaves of the last evaluateContact flood (indices);
     // reused by evaluateContactAreaExact so the area pass does not
     // re-flood the patch. empty until evaluateContact runs
@@ -327,6 +331,21 @@ class virtualMeshWall
     )
     {
         wallPlanes_ = wallPlanes;
+    }
+
+    // slab bound of a plane virtual mesh: the patch plane pushed
+    // to both sides by half a sub-volume edge. the world-aligned
+    // plane lattice has no thin direction on a tilted wall, so
+    // the flood needs this analytic bound to stay in the one-
+    // leaf-thick slab around the wall plane. unlike wallPlanes_,
+    // this never gates the exact volume pass (plane VMs keep
+    // the legacy count)
+    void setFloodBounds
+    (
+        const List<planePolyClip::halfSpace>& floodBounds
+    )
+    {
+        floodBounds_ = floodBounds;
     }
 
     // exact wetted area of the contact patch on the wall plane.
