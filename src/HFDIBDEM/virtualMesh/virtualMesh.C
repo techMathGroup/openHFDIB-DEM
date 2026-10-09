@@ -615,6 +615,14 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(bool nonConvex)
 
         scalar totalVolume = 0;
 
+        // mesh-relative noise floor: contacts whose total volume
+        // sits below one-millionth of a leaf carry no overlap
+        // material, only quantization noise
+        const scalar relSMALL
+        (
+            SMALL*vMeshInfo_.subVolumeV
+        );
+
         for (subContact& sC : sCS)
         {
             DynamicPointList edgeSubContactPoints = sC.getEdgePoints();
@@ -634,10 +642,21 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(bool nonConvex)
             }
         }
 
-        if (contactNormalAndSurface.first() > 0)
+        if
+        (
+            contactNormalAndSurface.first() > 0
+            && totalVolume > relSMALL
+        )
         {
             contactNormalAndSurface.second()
                 /= totalVolume;
+        }
+        else if (contactNormalAndSurface.first() > 0)
+        {
+            // sub-leaf-scale grazing contact: fall back to the
+            // accumulated (unweighted) direction sum
+            contactNormalAndSurface.second()
+                /= mag(contactNormalAndSurface.second()) + VSMALL;
         }
 
         return contactNormalAndSurface;
