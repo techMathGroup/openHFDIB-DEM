@@ -243,8 +243,39 @@ void wallContactInfo::findContactAreas()
                 Tuple2<point,boundBox> sMExport;
                 forAll(contactPatches_,wP)
                 {
-                    boundBox sMEBB = correctSMBBforWall(SM_().getElementBB(possibleSMContact[SC][item]),contactPatches_[wP]);
-                    if(sMEBB.minDim() != 0)
+                    // exact arm: the wall half-spaces clip the raw
+                    // element box analytically downstream (internal
+                    // boxes and VM leaves), so the world-aligned
+                    // projection rebox is skipped - on tilted walls
+                    // the rebox hull spreads each element laterally
+                    // by up to ccs*|n_t|, injecting outside-body
+                    // and seam volume the wall clip cannot remove.
+                    // legacy arm keeps the rebox
+                    boundBox sMEBB;
+                    bool keepElement(false);
+                    if (virtualMeshLevel::getExactSubVolume())
+                    {
+                        sMEBB = SM_().getElementBB(
+                            possibleSMContact[SC][item]);
+                        // an element with no corner strictly behind
+                        // the wall carries no contact material: the
+                        // rebox collapses it to minDim 0 today, the
+                        // raw box must be dropped here instead. a
+                        // corner exactly on the plane does not
+                        // count - it projects onto itself and
+                        // leaves the reboxed element flat
+                        keepElement = boxPenetratesWall(
+                            sMEBB, contactPatches_[wP]);
+                    }
+                    else
+                    {
+                        sMEBB = correctSMBBforWall(
+                            SM_().getElementBB(
+                                possibleSMContact[SC][item]),
+                            contactPatches_[wP]);
+                        keepElement = sMEBB.minDim() != 0;
+                    }
+                    if(keepElement)
                     {
                         sMExport.first() = SM_()[possibleSMContact[SC][item]].initPoint;
                         sMExport.second() = sMEBB;
@@ -646,6 +677,34 @@ boundBox wallContactInfo::correctSMBBforWall
         }
     }
     return boundBox(newBB,false);
+}
+//---------------------------------------------------------------------------//
+bool wallContactInfo::boxPenetratesWall
+(
+    const boundBox& bB,
+    const string& wallName
+)
+{
+    // true when some corner is strictly behind the plane: the kept
+    // side of a half-space is convex, so a box reaches behind the
+    // wall iff a corner does. an on-plane corner does not count -
+    // the legacy rebox of such an element collapses flat (minDim
+    // 0) and drops it, and its raw box carries no behind-wall
+    // material for the exact-arm clip
+    const vector& normalVector =
+        wallPlaneInfo::getWallPlaneInfo()[wallName][0];
+    const vector& centerPoint =
+        wallPlaneInfo::getWallPlaneInfo()[wallName][1];
+
+    const pointField bBPoints(bB.points());
+    forAll(bBPoints,bBP)
+    {
+        if(((bBPoints[bBP] - centerPoint) & normalVector) > 0)
+        {
+            return true;
+        }
+    }
+    return false;
 }
 //---------------------------------------------------------------------------//
 void wallContactInfo::clearOldContact()

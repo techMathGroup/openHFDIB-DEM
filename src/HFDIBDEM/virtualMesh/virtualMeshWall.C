@@ -447,6 +447,19 @@ scalar virtualMeshWall::evaluateContact()
             return exactVolume;
         }
 
+        // detected-but-clipped-to-zero with wall planes present:
+        // the flood found body material but none of it is on the
+        // wall side of any plane, so this lattice contributes no
+        // contact volume - return 0 (the band classification and
+        // the plane estimates are reliable, the contact is empty).
+        // without wall planes (the old shell-VM use) a zero sum
+        // still points at a failed plane estimate rather than an
+        // empty contact, so the legacy count remains the fallback
+        if (wallPlanes_.size() > 0)
+        {
+            return 0;
+        }
+
         // detected-but-clipped-to-zero: the flood counted inside
         // leaves but every band clip removed its region, so a plane
         // estimate failed on the band rather than the contact being

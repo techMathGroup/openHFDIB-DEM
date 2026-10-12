@@ -201,6 +201,15 @@ class wallContactInfo
         string wallName
     );
 
+    // true when some corner of bB is strictly behind the wall
+    // plane - the exact arm keeps only such elements (the legacy
+    // rebox drops the rest) and clips their raw boxes downstream
+    bool boxPenetratesWall
+    (
+        const boundBox& bB,
+        const string& wallName
+    );
+
     // clear the old contact information
     void clearOldContact();
     
