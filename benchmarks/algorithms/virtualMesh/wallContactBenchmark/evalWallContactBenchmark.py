@@ -34,7 +34,12 @@ LOG_RE = re.compile(
     r"A (\S+) \(err vs faceted (\S+)\)"
 )
 LEG_RE = re.compile(r"=== tilted-wall leg")
+SWEEP_RE = re.compile(r"=== ccs-sweep tilted-wall leg")
 OFFORIGIN_RE = re.compile(r"=== off-origin aligned-wall leg")
+SCAN_RE = re.compile(
+    r"missed scan: idealBodyVol (\S+) coveredVol (\S+) "
+    r"missedVol (\S+) covered/missed elements (\d+)/(\d+)"
+)
 D_RE = re.compile(r"--- center distance d = (\S+) \(d/R = ([\d.]+)\)")
 
 # order gates: error ratio across one level refinement
@@ -51,12 +56,15 @@ LEGACY_NOISE = 1e-4
 def parse(path):
     # per leg -> d -> arm -> level -> (svEdge, V, eV, A, eA)
     legs = []
+    scans = []
     legName = "aligned"
     cur = None
     fails = 0
     with open(path) as f:
         for line in f:
-            if LEG_RE.search(line):
+            if SWEEP_RE.search(line):
+                legName = "sweep"
+            elif LEG_RE.search(line):
                 legName = "tilted"
             elif OFFORIGIN_RE.search(line):
                 legName = "offorigin"
@@ -66,6 +74,16 @@ def parse(path):
                 if not legs or legs[-1][0] != legName:
                     legs.append((legName, {}))
                 legs[-1][1][m.group(2)] = cur
+                continue
+            m = SCAN_RE.search(line)
+            if m:
+                scans.append((legName, {
+                    "ideal": float(m.group(1)),
+                    "covered": float(m.group(2)),
+                    "missed": float(m.group(3)),
+                    "nCovered": int(m.group(4)),
+                    "nMissed": int(m.group(5)),
+                }))
                 continue
             if "[FAIL]" in line:
                 fails += 1
@@ -86,7 +104,7 @@ def parse(path):
                     V, float(m.group(5)),
                     A, float(m.group(7)),
                 )
-    return legs, fails
+    return legs, scans, fails
 
 
 def writePlotFiles(legs, logPath):
@@ -168,7 +186,7 @@ def main():
         print("usage: evalWallContactBenchmark.py <log>")
         sys.exit(2)
     logPath = Path(sys.argv[1])
-    legs, fails = parse(logPath)
+    legs, scans, fails = parse(logPath)
     problems = []
 
     nPlots = writePlotFiles(legs, logPath)
@@ -181,8 +199,10 @@ def main():
         # the same flat ccs floor as the tilted leg - report the
         # order, do not gate it. the leg is gated where it matters:
         # a detected contact with zero V or A (the plane-box ULP
-        # regression) fails unconditionally
-        gated = legName not in ("tilted", "offorigin")
+        # regression) fails unconditionally. the ccs-sweep leg is
+        # the matched-svEdge probe of the ccs-order of that floor -
+        # report only, the gating policy is decided from its output
+        gated = legName not in ("tilted", "offorigin", "sweep")
         print(f"=== {legName} wall leg"
               + ("" if gated
                  else " (order NOT gated - ccs-scale floor)"))
@@ -204,6 +224,57 @@ def main():
                               + " (not gated)")
     if fails:
         problems.append(f"{fails} contact-detection failure(s)")
+
+    # the ccs-order comparison: exact-arm V error of the tilted
+    # leg vs the sweep leg at matched svEdge. a first-order ccs
+    # floor halves from ccs to ccs/2; an svEdge-order term stays.
+    # report only - this is the phase-2 decision input
+    def exactErrs(legName):
+        for name, dSeries in legs:
+            if name != legName:
+                continue
+            out = {}
+            for dKey, arms in dSeries.items():
+                arm = arms.get("exact", {})
+                # svEdge -> error
+                out[dKey] = {v[0]: v[2] for v in arm.values()}
+            return out
+        return {}
+    tiltErrs = exactErrs("tilted")
+    sweepErrs = exactErrs("sweep")
+    if tiltErrs and sweepErrs:
+        print("=== ccs-order (tilted vs sweep, matched svEdge,"
+              " exact arm)")
+        for dKey in sorted(tiltErrs):
+            if dKey not in sweepErrs:
+                continue
+            pairs = []
+            for sv in sorted(tiltErrs[dKey]):
+                if sv in sweepErrs[dKey]:
+                    pairs.append((sv, tiltErrs[dKey][sv],
+                                   sweepErrs[dKey][sv]))
+            for sv, eT, eS in pairs:
+                note = ""
+                if abs(eS) > 1e-13:
+                    note = f"  ratio {eT/eS:.2f}"
+                print(f"  d/R {dKey} svEdge {sv:.3e}"
+                      f"  err(ccs) {eT:+.3e}"
+                      f"  err(ccs/2) {eS:+.3e}{note}")
+            if not pairs:
+                print(f"  d/R {dKey}: no matched svEdge pair")
+
+    # the missed-element scans: the attribution table (report
+    # only). the aligned-leg scan is the self-check of the scan
+    # replica - its missedVol must be ~0
+    if scans:
+        print("=== missed-element scans (ideal/covered/missed"
+              " volumes, element counts)")
+        for legName, s in scans:
+            print(f"  {legName:9s} ideal {s['ideal']:.6e}"
+                  f"  covered {s['covered']:.6e}"
+                  f"  missed {s['missed']:.3e}"
+                  f"  elements {s['nCovered']}/{s['nMissed']}"
+                  f" (covered/missed)")
 
     if problems:
         print("\nvmWallContactBenchmark: FAIL")

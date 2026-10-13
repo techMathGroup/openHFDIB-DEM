@@ -63,6 +63,27 @@ Description
     lines it does not parse, so the plotting output is
     unchanged.
 
+    The ccs-sweep leg repeats the tilted wall at
+    charCellSize/2 with the levels shifted one down: both
+    legs then share the svEdge range (matched svEdge), and the
+    error comparison at matched svEdge isolates the pure
+    charCellSize dependence of the tilted-wall error from the
+    svEdge-order virtual-mesh machinery (a first-order-in-ccs
+    floor halves when ccs halves; an svEdge-order term stays).
+
+    The exact arm additionally prints a missed-element scan
+    (first level of each leg only, the SM keep-set is
+    level-independent): the SM lattice is re-derived locally
+    (the floor/ceil bbox snap and ceil matrix sizing of
+    constructSM) and every element with behind-wall body
+    material is matched against the sub-contact boxes. This
+    attributes the residual tilted-wall volume error to either
+    the detection gate (elements the possibleSMContact flood
+    never visited, missedBody > 0) or the SM-scale box
+    quantization (missedBody == 0 with a flat idealBodyVol
+    error) - the two candidate mechanisms of the phase-2
+    decision.
+
     Run from the case directory of this benchmark (needs
     constant/triSurface/sphere.stl and a blockMesh-generated mesh).
 
@@ -89,6 +110,183 @@ Contributors
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 using namespace Foam;
+
+//- re-derive the SM lattice exactly as wallContactInfo::
+// constructSM does (floor/ceil bbox snap at ccs, ceil matrix
+// sizing, vertex centers at bBox.min + i*ccs) and scan every
+// element with behind-wall body material against the sub-contact
+// boxes. the raw element boxes of the exact arm (post a1b563e)
+// are min-corner-identified, so covered elements are matched
+// exactly. prints the missed-element attribution the phase-2
+// decision needs: idealBodyVol (the behind-wall body material
+// of the SM slab, wall-clipped), coveredVol (the part the
+// contact carries), missedVol, and the element-count split
+void missedElementScan
+(
+    geomModel& geom,
+    const List<planePolyClip::halfSpace>& wallPlanes,
+    wallSubContactInfo& sC,
+    const scalar charCellSize,
+    const vector& wallN,
+    const point& wallP
+)
+{
+    // the SM lattice of constructSM: body bbox snapped to the
+    // ccs grid (floor at min, ceil at max), ceil matrix sizing
+    const boundBox bodyBB(geom.getBounds());
+    point minP(bodyBB.min());
+    point maxP(bodyBB.max());
+    for (int i = 0; i < 3; i++)
+    {
+        minP[i] = std::floor(minP[i]/charCellSize)*charCellSize;
+        maxP[i] = std::ceil(maxP[i]/charCellSize)*charCellSize;
+    }
+    const vector nCells
+    (
+        std::ceil((maxP.x() - minP.x())/charCellSize),
+        std::ceil((maxP.y() - minP.y())/charCellSize),
+        std::ceil((maxP.z() - minP.z())/charCellSize)
+    );
+
+    // the element boxes the contact actually carries: the raw
+    // SM element boxes of the export and internal lists
+    List<boundBox> carried;
+    forAll(sC.getInternalElements(), iI)
+    {
+        carried.append(sC.getInternalElements()[iI].second());
+    }
+    for (label vmI = 0; vmI < sC.getVMContactSize(); vmI++)
+    {
+        autoPtr<virtualMeshWallInfo>& vmWInfo
+        (
+            sC.getVMContactInfo(vmI)
+        );
+        if (vmWInfo.valid())
+        {
+            carried.append(boundBox(vmWInfo->getbBox()));
+        }
+    }
+
+    scalar idealBodyVol(0);
+    scalar coveredVol(0);
+    label nMissed(0);
+    label nCovered(0);
+
+    // the scan: every element with a corner strictly behind the
+    // wall and body material (a vertex or the centroid inside,
+    // or a facet crossing the box - the count-all rule of the
+    // VM leaf classification)
+    for (label i = 0; i < nCells.x(); i++)
+    {
+        for (label j = 0; j < nCells.y(); j++)
+        {
+            for (label k = 0; k < nCells.z(); k++)
+            {
+                const point eMin
+                (
+                    minP
+                  + vector(i, j, k)*charCellSize
+                );
+                const boundBox element
+                (
+                    eMin,
+                    eMin + vector::one*charCellSize
+                );
+
+                // some corner strictly behind the wall (the
+                // keep-set of boxPenetratesWall)
+                bool penetrates(false);
+                {
+                    const pointField cPts(element.points());
+                    forAll(cPts, cP)
+                    {
+                        if (((cPts[cP] - wallP) & wallN) > 0)
+                        {
+                            penetrates = true;
+                            break;
+                        }
+                    }
+                }
+                if (!penetrates)
+                {
+                    continue;
+                }
+
+                // body material in the element: centroid or
+                // vertex inside, or a facet crossing the box
+                bool hasBody(geom.pointInside(element.midpoint()));
+                if (!hasBody)
+                {
+                    const pointField ePts(element.points());
+                    forAll(ePts, eP)
+                    {
+                        if (geom.pointInside(ePts[eP]))
+                        {
+                            hasBody = true;
+                            break;
+                        }
+                    }
+                }
+                if (!hasBody)
+                {
+                    hasBody = geom.boxIntersectsSurface(element);
+                }
+                if (!hasBody)
+                {
+                    continue;
+                }
+
+                // the ideal behind-wall body volume of this
+                // element: the box clipped by the wall planes.
+                // the body part inside is bounded by this clip
+                // from above, so idealBodyVol is an upper bound
+                // of the true behind-wall body material
+                scalar eV(0);
+                vector eC(vector::zero);
+                planePolyClip::volumeAndCentroid
+                (
+                    element,
+                    wallPlanes,
+                    eV,
+                    eC
+                );
+                idealBodyVol += eV;
+
+                // covered: the min corner falls in some carried
+                // box (the raw element boxes of the exact arm
+                // are the element boxes themselves)
+                bool isCovered(false);
+                forAll(carried, cI)
+                {
+                    if
+                    (
+                        mag(carried[cI].min() - eMin)
+                      < 0.5*SMALL*charCellSize
+                    )
+                    {
+                        isCovered = true;
+                        break;
+                    }
+                }
+                if (isCovered)
+                {
+                    nCovered++;
+                    coveredVol += eV;
+                }
+                else
+                {
+                    nMissed++;
+                }
+            }
+        }
+    }
+
+    Info << "    missed scan: idealBodyVol " << idealBodyVol
+         << " coveredVol " << coveredVol
+         << " missedVol " << idealBodyVol - coveredVol
+         << " covered/missed elements " << nCovered
+         << "/" << nMissed << endl;
+}
 
 //- exact faceted references of the STL cap below the wall plane:
 // the body is the STL polyhedron shifted to center (0, d, 0); the
@@ -242,10 +440,18 @@ int main(int argc, char *argv[])
     const FixedList<scalar,3> dList({0.95*R, 0.75*R, 0.5*R});
 
     // virtualMesh levels of the sweep: svEdge halves each step
-    const FixedList<label,3> levelList({3, 4, 5});
+    const FixedList<label,3> levelListBase({3, 4, 5});
 
     const scalar charCellSize(1.0/15.0);
     const scalar maxSubVolumes(1000000000);
+
+    // virtualMesh levels of the ccs-sweep leg: shifted one down
+    // from levelList so the svEdge range matches the 1/15 legs
+    // (svEdge = ccs/2^level; halving ccs and lowering the level
+    // by one keeps svEdge) - the matched-svEdge comparison of
+    // the sweep leg and the tilted leg isolates the pure
+    // charCellSize dependence of the tilted-wall error
+    const FixedList<label,3> sweepLevelList({2, 3, 4});
 
     // wall: y = 0, fluid above. the stored normal points OUT of
     // the fluid, into the wall (the convention of every plane
@@ -274,35 +480,6 @@ int main(int argc, char *argv[])
 
     virtualMeshLevel::setMaxSubVolumes(maxSubVolumes);
 
-    // wall orientations of the study: the aligned leg is the
-    // original y-normal wall; the tilted leg (30 degrees about z)
-    // exercises the exact path on a wall NOT aligned with the
-    // lattice or any body facet - the sphere cap against the
-    // tilted plane has the same analytic reference (the geometry
-    // is rotation-invariant), but the band leaves, the wall
-    // half-space diagonal cuts and the probe pairs all differ;
-    // the off-origin leg repeats the aligned wall shifted along
-    // its normal - the plane-box projection then carries 1-ULP
-    // noise in the wall-normal span (the origin wall projects
-    // exactly), which must not break the plane-VM lattice
-    const FixedList<vector,3> wallOrientations
-    ({
-        vector(0, -1, 0),
-        vector(0.5, -Foam::sqrt(3.0)/2.0, 0),
-        vector(0, -1, 0)
-    });
-
-    // plane points of the legs: the tilted leg rotates about the
-    // origin, so it shares wallP; the off-origin leg sits at
-    // y = 1/30 (inside the mesh, below every sphere placement,
-    // noisy for every SM grid line of this ccs)
-    const FixedList<point,3> wallPoints
-    ({
-        wallP,
-        wallP,
-        point(0, 1.0/30.0, 0)
-    });
-
     // body: the icosphere STL, centered at the origin of the STL
     // coordinates; positioned by shifting the surface points
     autoPtr<nonConvexBody> sphereBody
@@ -327,11 +504,53 @@ int main(int argc, char *argv[])
          << endl;
 
     // wall-orientation sweep: leg 0 is the lattice-aligned wall,
-    // leg 1 the 30-degree tilt (same cap references - the analytic
-    // and faceted cap of a sphere cut by a plane are invariant to
-    // a shared rotation of sphere and plane)
-    forAll(wallOrientations, wI)
+    // leg 1 the 30-degree tilt, leg 2 the off-origin aligned wall,
+    // leg 3 the ccs-sweep (30-degree tilt at ccs/2, levels shifted
+    // one down - matched svEdge) (same cap references - the
+    // analytic and faceted cap of a sphere cut by a plane are
+    // invariant to a shared rotation of sphere and plane)
+    const FixedList<vector,4> wallOrientations
+    ({
+        vector(0, -1, 0),
+        vector(0.5, -Foam::sqrt(3.0)/2.0, 0),
+        vector(0, -1, 0),
+        vector(0.5, -Foam::sqrt(3.0)/2.0, 0)
+    });
+
+    // plane points of the legs: the tilted legs rotate about the
+    // origin, so they share wallP; the off-origin leg sits at
+    // y = 1/30 (inside the mesh, below every sphere placement,
+    // noisy for every SM grid line of this ccs)
+    const FixedList<point,4> wallPoints
+    ({
+        wallP,
+        wallP,
+        point(0, 1.0/30.0, 0),
+        wallP
+    });
+
+    // charCellSize of the legs: every leg but the sweep runs at
+    // the base ccs; the sweep halves it (levels compensate, so
+    // the svEdge range matches)
+    const FixedList<scalar,4> legCcs
+    ({
+        charCellSize,
+        charCellSize,
+        charCellSize,
+        0.5*charCellSize
+    });
+
+    for (label wI = 0; wI < wallOrientations.size(); wI++)
     {
+    // the level list of this leg (matched svEdge for the sweep)
+    const FixedList<label,3>& levelList
+    (
+        wI == 3 ? sweepLevelList : levelListBase
+    );
+
+    // the ccs of this leg
+    const scalar ccs(legCcs[wI]);
+
     if (wI > 0)
     {
         // re-set the wall registry entry for this leg (leg 0
@@ -342,7 +561,9 @@ int main(int argc, char *argv[])
         // diagonal wall half-spaces in every band leaf.
         // leg 2 shifts the aligned wall along its normal to
         // y = 1/30: an off-origin flat wall, the projected plane
-        // box carries 1-ULP noise in its normal span
+        // box carries 1-ULP noise in its normal span.
+        // leg 3 repeats the tilted wall at ccs/2 with the levels
+        // shifted one down (matched svEdge - the ccs-order probe)
         wallPlaneInfo::wallPlaneInfo_.set
         (
             wallName,
@@ -353,13 +574,19 @@ int main(int argc, char *argv[])
              << "=== "
              << (wI == 1
                  ? "tilted-wall leg (30 degrees about z)"
-                 : "off-origin aligned-wall leg (y = 1/30)")
+                 : wI == 2
+                 ? "off-origin aligned-wall leg (y = 1/30)"
+                 : "ccs-sweep tilted-wall leg (30 degrees, "
+                   "ccs/2, matched svEdge)")
              << " ===" << endl;
     }
 
     forAll(dList, dI)
     {
         const scalar d(dList[dI]);
+        // the sweep leg keeps the sphere placement of the tilted
+        // leg: the wall and sphere rotate together, the ccs is
+        // the only change (the level shift compensates svEdge)
         const scalar xH(R - d);
         const scalar VrefAna
         (
@@ -384,7 +611,7 @@ int main(int argc, char *argv[])
              << " (faceting " << ArefF/ArefAna - 1 << ")" << endl;
 
         // place the sphere: STL center to (0, d, 0) on the aligned
-        // leg; the tilted leg rotates sphere and wall together
+        // leg; the tilted legs rotate sphere and wall together
         // (rotation about z through the origin), so the cap
         // geometry relative to the plane is identical; the
         // off-origin leg shifts sphere and wall together, so the
@@ -401,7 +628,7 @@ int main(int argc, char *argv[])
             {
                 pos[pI] += shift;
             }
-            if (wI == 1)
+            if (wI == 1 || wI == 3)
             {
                 const scalar a(30.0*constant::mathematical::pi/180.0);
                 const tensor rot
@@ -421,10 +648,10 @@ int main(int argc, char *argv[])
         forAll(levelList, lI)
         {
             const label level(levelList[lI]);
-            virtualMeshLevel::setVirtualMeshLevel(level, charCellSize);
+            virtualMeshLevel::setVirtualMeshLevel(level, ccs);
             const scalar svEdge
             (
-                charCellSize/virtualMeshLevel::getLevelOfDivision()
+                ccs/virtualMeshLevel::getLevelOfDivision()
             );
 
             for (label exactArm = 0; exactArm <= 1; exactArm++)
@@ -563,6 +790,27 @@ int main(int argc, char *argv[])
                         splitInternalBox +=
                             sC.getInternalElements()[sCII]
                             .second().volume();
+                    }
+
+                    // the missed-element scan: first level of the
+                    // leg only (the SM keep-set is level-
+                    // independent) and the exact arm only (the
+                    // carried boxes are the raw element boxes
+                    // post a1b563e). run on the tilted and the
+                    // sweep legs (the decision inputs) and on the
+                    // aligned leg (the scan self-check: detection
+                    // is clean there, so missedVol must be ~0)
+                    if (exact && lI == 0 && wI != 2)
+                    {
+                        missedElementScan
+                        (
+                            wallCntInfo.getcClass().getGeomModel(),
+                            wallPlanes,
+                            sC,
+                            ccs,
+                            wallOrientations[wI],
+                            wallPoints[wI]
+                        );
                     }
                 }
 
