@@ -130,9 +130,13 @@ bodyId_(bodyId)
 
         for(int i=0;i<3;i++)
         {
-            // Original single-layer fix for the degenerate (wall-normal)
-            // direction of the projected plane box
-            if(subVolumeNVector[i] == planeBBData[pBD].second().minDim())
+            // single-layer fix for the degenerate (wall-normal)
+            // direction of the projected plane box: contactPlaneBBox
+            // projects every corner onto the wall plane, so the
+            // normal-direction span is geometrically 0.  any physically
+            // real extent is far above SMALL, so the tolerance is
+            // safe
+            if(planeBBData[pBD].second().span()[i] < SMALL)
             {
                 subVolumeNVector[i] = 1;
                 planeBBData[pBD].second().min()[i] -= svEdge*0.5;

@@ -280,11 +280,27 @@ int main(int argc, char *argv[])
     // lattice or any body facet - the sphere cap against the
     // tilted plane has the same analytic reference (the geometry
     // is rotation-invariant), but the band leaves, the wall
-    // half-space diagonal cuts and the probe pairs all differ
-    const FixedList<vector,2> wallOrientations
+    // half-space diagonal cuts and the probe pairs all differ;
+    // the off-origin leg repeats the aligned wall shifted along
+    // its normal - the plane-box projection then carries 1-ULP
+    // noise in the wall-normal span (the origin wall projects
+    // exactly), which must not break the plane-VM lattice
+    const FixedList<vector,3> wallOrientations
     ({
         vector(0, -1, 0),
-        vector(0.5, -Foam::sqrt(3.0)/2.0, 0)
+        vector(0.5, -Foam::sqrt(3.0)/2.0, 0),
+        vector(0, -1, 0)
+    });
+
+    // plane points of the legs: the tilted leg rotates about the
+    // origin, so it shares wallP; the off-origin leg sits at
+    // y = 1/30 (inside the mesh, below every sphere placement,
+    // noisy for every SM grid line of this ccs)
+    const FixedList<point,3> wallPoints
+    ({
+        wallP,
+        wallP,
+        point(0, 1.0/30.0, 0)
     });
 
     // body: the icosphere STL, centered at the origin of the STL
@@ -318,21 +334,27 @@ int main(int argc, char *argv[])
     {
     if (wI > 0)
     {
-        // rotate the wall registry entry and the sphere placement
-        // by the same 30-degree tilt about z: the tilted leg sees
+        // re-set the wall registry entry for this leg (leg 0
+        // entered it at the origin through wallPlaneInfo_insert;
+        // the HashTable insert would not overwrite).
+        // leg 1 rotates the wall and the sphere placement by the
+        // same 30-degree tilt about z: the tilted leg sees
         // diagonal wall half-spaces in every band leaf.
-        // wallPlaneInfo_insert uses HashTable::insert, which does
-        // NOT overwrite an existing key - the aligned leg entered
-        // "bot" first, so re-set the entry through the table
-        // directly
+        // leg 2 shifts the aligned wall along its normal to
+        // y = 1/30: an off-origin flat wall, the projected plane
+        // box carries 1-ULP noise in its normal span
         wallPlaneInfo::wallPlaneInfo_.set
         (
             wallName,
-            List<vector>{{wallOrientations[wI], wallP}}
+            List<vector>{{wallOrientations[wI], wallPoints[wI]}}
         );
 
         Info << nl
-             << "=== tilted-wall leg (30 degrees about z) ===" << endl;
+             << "=== "
+             << (wI == 1
+                 ? "tilted-wall leg (30 degrees about z)"
+                 : "off-origin aligned-wall leg (y = 1/30)")
+             << " ===" << endl;
     }
 
     forAll(dList, dI)
@@ -364,15 +386,22 @@ int main(int argc, char *argv[])
         // place the sphere: STL center to (0, d, 0) on the aligned
         // leg; the tilted leg rotates sphere and wall together
         // (rotation about z through the origin), so the cap
-        // geometry relative to the plane is identical
+        // geometry relative to the plane is identical; the
+        // off-origin leg shifts sphere and wall together, so the
+        // cap geometry relative to the plane is identical too
         {
             pointField pos(sphereBody->getBodyPoints());
-            const vector shift(vector(0, d, 0) - sphereBody->getCoM());
+            const vector shift
+            (
+                vector(0, d, 0)
+              + vector(0, 1.0/30.0, 0)*(wI == 2 ? 1 : 0)
+              - sphereBody->getCoM()
+            );
             forAll(pos, pI)
             {
                 pos[pI] += shift;
             }
-            if (wI > 0)
+            if (wI == 1)
             {
                 const scalar a(30.0*constant::mathematical::pi/180.0);
                 const tensor rot

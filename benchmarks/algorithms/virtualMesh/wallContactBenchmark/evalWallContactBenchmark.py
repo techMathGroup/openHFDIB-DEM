@@ -10,9 +10,11 @@ the error ratio between consecutive levels:
 
 exact arm: every ratio must be >= 2 (second order: svEdge halves
 per level, error must quarter). legacy arm: every ratio must be
->= 1.5 (first order: error must halve). the tilted-wall leg is
-reported but never gated (known open issue). contact-detection
-failures in the log FAIL unconditionally.
+>= 1.5 (first order: error must halve). the tilted-wall and
+off-origin legs are reported but never order-gated (known ccs-
+scale floor); a detected contact with zero volume or area fails
+unconditionally (the plane-VM lattice regression). contact-
+detection failures in the log FAIL unconditionally.
 
 plottable output: one CSV per tested geometric configuration
 (leg, d) into <logDir>/plots/, with the dependence of the
@@ -32,6 +34,7 @@ LOG_RE = re.compile(
     r"A (\S+) \(err vs faceted (\S+)\)"
 )
 LEG_RE = re.compile(r"=== tilted-wall leg")
+OFFORIGIN_RE = re.compile(r"=== off-origin aligned-wall leg")
 D_RE = re.compile(r"--- center distance d = (\S+) \(d/R = ([\d.]+)\)")
 
 # order gates: error ratio across one level refinement
@@ -55,6 +58,8 @@ def parse(path):
         for line in f:
             if LEG_RE.search(line):
                 legName = "tilted"
+            elif OFFORIGIN_RE.search(line):
+                legName = "offorigin"
             m = D_RE.search(line)
             if m:
                 cur = {}
@@ -69,10 +74,17 @@ def parse(path):
                 level, arm = int(m.group(1)), m.group(2)
                 if arm not in ("exact", "legacy"):
                     continue
+                V = float(m.group(4))
+                A = float(m.group(6))
+                if V <= 0.0 or A <= 0.0:
+                    # a detected contact with zero volume or area:
+                    # the plane VM lost every leaf (e.g. the plane
+                    # box ULP regression) - fail unconditionally
+                    fails += 1
                 cur.setdefault(arm, {})[level] = (
                     float(m.group(3)),
-                    float(m.group(4)), float(m.group(5)),
-                    float(m.group(6)), float(m.group(7)),
+                    V, float(m.group(5)),
+                    A, float(m.group(7)),
                 )
     return legs, fails
 
@@ -164,9 +176,16 @@ def main():
           f"{logPath.parent/'plots'}")
 
     for legName, dSeries in legs:
-        gated = legName != "tilted"
+        # the off-origin wall sits mid-cell of the SM grid (every
+        # grid line is a multiple of ccs), so its volume carries
+        # the same flat ccs floor as the tilted leg - report the
+        # order, do not gate it. the leg is gated where it matters:
+        # a detected contact with zero V or A (the plane-box ULP
+        # regression) fails unconditionally
+        gated = legName not in ("tilted", "offorigin")
         print(f"=== {legName} wall leg"
-              + ("" if gated else " (NOT gated - known issue)"))
+              + ("" if gated
+                 else " (order NOT gated - ccs-scale floor)"))
         for dKey, arms in dSeries.items():
             print(f"  d/R = {dKey}")
             for arm in ("exact", "legacy"):
@@ -176,9 +195,11 @@ def main():
                              {l: v[2] for l, v in arms[arm].items()},
                              problems)
                     else:
+                        # not order-gated: print the errors (the
+                        # ccs-scale floor series)
                         print(f"    {arm:6s} errors: "
                               + " ".join(
-                                  f"{arms[arm][l][1]:+.3e}"
+                                  f"{arms[arm][l][2]:+.3e}"
                                   for l in sorted(arms[arm]))
                               + " (not gated)")
     if fails:
