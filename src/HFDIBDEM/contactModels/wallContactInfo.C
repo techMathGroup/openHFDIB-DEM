@@ -445,9 +445,33 @@ List<DynamicList<vector>> wallContactInfo::detectPossibleSMContact
                             }
                         }
                     }
-                    if((isInBody && !isInMesh)|| SM_()[nextToCheck()[cE]].stlFound)
+                    if
+                    (
+                        (isInBody && !isInMesh)
+                     || SM_()[nextToCheck()[cE]].stlFound
+                    )
                     {
-                        subContactElements().append(nextToCheck()[cE]);
+                        // for tilted analytical wall, it may happen that
+                        // an element satisfies both rules (body
+                        // + mesh straddling AND stl seed) and would be
+                        // appended twice
+                        // this gate is to remove this double count
+                        //
+                        // Note (MI): this is still not a perfect
+                        //            solution but after three days of
+                        //            work, it seems that this is the
+                        //            best we can do for now without truly
+                        //            rotating the spectatorMesh frame
+                        if
+                        (
+                            !checkedOctreeFaces.found
+                            (
+                                nextToCheck()[cE]
+                            )
+                        )
+                        {
+                            subContactElements().append(nextToCheck()[cE]);
+                        }
                         checkedOctreeFaces.insert(nextToCheck()[cE]);
                         auxToCheck().append(SM_().faceNeighbourElements(nextToCheck()[cE]));
                         if(allInBody)

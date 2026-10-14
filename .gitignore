@@ -97,6 +97,7 @@ doc/Doxygen/DTAGS
 # local analysis and helper folders
 analyses/
 tests/
+tests_local/
 tools/
 old_codes/
 reports/
