@@ -305,8 +305,12 @@ void getWallContactVars_ArbShape(
     // intersect volume
     vector contactCenterSum(vector::zero);
 
-    autoPtr<DynamicVectorList> contactPlaneCenters(
-        new DynamicVectorList);
+    // dead since the area-weighted normal rewrite: accumulated
+    // but never consumed. kept commented for one commit to
+    // make the removal revertible, delete after that lands
+    // Note (MI): anything sub-contact related is dubious
+    //~ autoPtr<DynamicVectorList> contactPlaneCenters(
+    //~     new DynamicVectorList);
 
     autoPtr<DynamicScalarList> contactAreas(
         new DynamicScalarList);
@@ -327,6 +331,27 @@ void getWallContactVars_ArbShape(
             planePolyClip::halfSpace(planeInfo[1], planeInfo[0])
         );
     }
+
+    // a sub-contact spanning several wall patches clips its
+    // volume by the intersection of every wall half-space; when
+    // the actual wall touches are disjoint or merely grazing,
+    // the clip returns round-off slivers (monkeysInABox: corner
+    // contacts below 1e-24 with an empty band up to 1e-16)
+    // that pass the VSMALL and ==0 gates while the plane-VM
+    // area and the amplified contact center generate real
+    // forces. gate on the wall-lattice-relative noise floor,
+    // mirroring the prt-side family (prtContact.C:374); the
+    // measured empty band above the gate makes the rejection
+    // lossless at case scales
+    const scalar relSMALL
+    (
+        SMALL*pow
+        (
+            virtualMeshLevel::getCharCellSize()
+           /virtualMeshLevel::getLevelOfDivision(),
+            3.0
+        )
+    );
 
     for(label i = 0; i< vMContactInfoSize; i++)
     {
@@ -399,7 +424,7 @@ void getWallContactVars_ArbShape(
         }
     }
 
-    if(intersectVolume>0)
+    if(intersectVolume > relSMALL)
     {
         for(label i = 0; i< vMPlaneInfoSize; i++)
         {
@@ -510,12 +535,12 @@ void getWallContactVars_ArbShape(
                        *(pow(vmWInfo->getSVVolume(),2.0/3.0))
                     );
                 }
-                contactPlaneCenters().append(virtMeshPlane->getContactCenter());
+                //~ contactPlaneCenters().append(virtMeshPlane->getContactCenter());
             }
             else
             {
                 contactAreas().append((intersectVolume/vmWInfo->getSVVolume())*(pow(vmWInfo->getSVVolume(),2.0/3)));
-                contactPlaneCenters().append(virtMeshPlane->getContactCenter());
+                //~ contactPlaneCenters().append(virtMeshPlane->getContactCenter());
             }
         }
 
