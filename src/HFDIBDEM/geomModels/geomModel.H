@@ -477,7 +477,10 @@ namespace Foam
 
         void setOverlayLambda(word overlayLambda){overlayLambda_ = overlayLambda;}
 
-        void resetHashTable(){cachedNeighbours_.clear();}
+        void resetHashTables(){
+            cachedNeighbours_.clear();
+            procNeighbours_.clear();
+        }
 
         virtual void setRhoS(dimensionedScalar rhoS){rhoS_ = rhoS;}
         dimensionedScalar getRhoS(){return rhoS_;}

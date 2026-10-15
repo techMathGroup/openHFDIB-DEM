@@ -3103,7 +3103,7 @@ void openHFDIBDEM::preCalculateCellPoints()
 
     forAll (immersedBodies_,bodyId)
     {
-        immersedBodies_[bodyId].getGeomModel().resetHashTable();
+        immersedBodies_[bodyId].getGeomModel().resetHashTables();
         // mesh changed -> cached seeds and count baselines are invalid
         immersedBodies_[bodyId].getGeomModel().resetSeeds();
     }
