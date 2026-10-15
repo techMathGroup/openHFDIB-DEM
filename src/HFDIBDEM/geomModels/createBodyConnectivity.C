@@ -138,10 +138,13 @@ label geomModel::resolveSeed
 }
 //---------------------------------------------------------------------------//
 // phase 0: march from a fully-covered seed to a partial (ring) cell
-label geomModel::marchToRing(label seed, const pointField& cp)
+label geomModel::marchToRing(
+    label seed, 
+    const pointField& cp, 
+    const Vector<label>& geomDirs
+)
 {
     // march toward the bbox minimum;
-    const Vector<label> geomDirs(mesh_.geometricD());
     const vector validDirs
     (
         (geomDirs.x() == -1 ? 0.0 : 1.0),
@@ -333,7 +336,10 @@ bool geomModel::createImmersedBodyConnectivity
 
     // ================= phase 0: seed =================
     label seed = resolveSeed(cp, cellPoints);                           // -1 on ranks without the body
-
+    
+    // NOTE MK: Prepare geomDirs for all ranks (uses reduce lazily).
+    const Vector<label> geomDirs = mesh_.geometricD();
+    
     label ringSeed(-1);
     if (seed != -1)
     {
@@ -349,7 +355,7 @@ bool geomModel::createImmersedBodyConnectivity
         }
         else if (seedLambda >= 1.0 - SMALL)
         {
-            ringSeed = marchToRing(seed, cp);
+            ringSeed = marchToRing(seed, cp, geomDirs);
         }
         // seedLambda <= SMALL: stale seed or degenerate overlap
     }

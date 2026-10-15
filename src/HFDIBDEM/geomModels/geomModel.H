@@ -632,7 +632,7 @@ namespace Foam
         );
 
         // phase 0: march from a fully-covered seed to a partial (ring) cell
-        label marchToRing(label seed, const pointField& cp);
+        label marchToRing(label seed, const pointField& cp, const Vector<label>& geomDirs);
 
         // vertex-based lambda with shared-vertex cache
         // (extracted from correctSurfCells); centerInside reports the
