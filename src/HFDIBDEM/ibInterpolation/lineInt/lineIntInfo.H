@@ -83,13 +83,13 @@ namespace Foam
         (
             const intPoint& retPoint,
             const label prevFace
-        );
+        ) const;
 
         bool pointInCell
         (
-            point pToCheck,
-            label cToCheck
-        );
+            const point& pToCheck,
+            const label cToCheck
+        ) const;
 
         // Syncing functions
         void sendAndRecvIntPoints
