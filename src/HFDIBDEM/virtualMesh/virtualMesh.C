@@ -607,6 +607,8 @@ void virtualMesh::inspectSubVolume(
 //---------------------------------------------------------------------------//
 Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(bool nonConvex)
 {
+    contactPolygons_.clear();
+
     if (nonConvex)
     {
         std::vector<subContact> sCS = findsubContacts(vMeshInfo_.sV);
@@ -868,6 +870,16 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList
             vector BC(commCellsInSections[0] - contactCenter_);
             vector crossPr(AC ^ BC);
             area += mag(crossPr)/2;
+        }
+        if (commCellsInSections.size() > 2)
+        {
+            pointField fan(commCellsInSections.size() + 1);
+            fan[0] = contactCenter_;
+            forAll(commCellsInSections, i)
+            {
+                fan[i + 1] = commCellsInSections[i];
+            }
+            contactPolygons_.append(fan);
         }
     }
 

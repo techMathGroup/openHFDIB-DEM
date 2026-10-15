@@ -39,6 +39,9 @@ Contributors
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
+#include "DynamicList.H"
+#include "pointField.H"
+
 namespace Foam
 {
 
@@ -52,6 +55,11 @@ struct prtContactVars
     scalar contactVolume_ = 0.0f;
     vector contactNormal_ = vector::zero;
     scalar contactArea_ = 0.0f;
+
+    // contact plane footprint(s): every pointField is a triangle fan,
+    // element 0 is the fan centre and the remaining points follow
+    // the contact patch boundary. Empty when no footprint is available
+    DynamicList<pointField> contactPolygons_;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

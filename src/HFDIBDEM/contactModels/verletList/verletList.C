@@ -131,6 +131,10 @@ void verletList::addCPairToCntNList(
     {
         return;
     }
+    if(isPairIgnored(cPair.first, cPair.second))
+    {
+        return;
+    }
     if(posCntList_.find(cPair) == posCntList_.end() &&
         (cntNeighList_[0].find(cPair) != cntNeighList_[0].end() || emptyDim == 0) &&
         (cntNeighList_[1].find(cPair) != cntNeighList_[1].end() || emptyDim == 1) &&
@@ -430,6 +434,8 @@ void verletList::computePotentialBodies
 
         if (cStatic && tStatic) continue;
 
+        if (isPairIgnored(pair.first, pair.second)) continue;
+
         // report both pair members (static ones included - the
         // caller filters static bodies out of the movement sets)
         potentialBodies.insert(pair.first);
@@ -554,7 +560,23 @@ void verletList::computeInflatedPairs
 
         if (cStatic && tStatic) continue;
 
+        if (isPairIgnored(pair.first, pair.second)) continue;
+
         inflatedPairs.insert(pair);
     }
+}
+//---------------------------------------------------------------------------//
+void verletList::ignorePair(label a, label b)
+{
+    const cPair pair(min(a, b), max(a, b));
+    ignoredPairs_.insert(pair);
+    posCntList_.erase(pair);
+}
+//---------------------------------------------------------------------------//
+bool verletList::isPairIgnored(label a, label b) const
+{
+    return
+        !ignoredPairs_.empty()
+     && ignoredPairs_.count(cPair(min(a, b), max(a, b))) > 0;
 }
 //---------------------------------------------------------------------------//

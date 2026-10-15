@@ -198,6 +198,9 @@ class virtualMesh
     point contactCenter_;
     DynamicPointList edgeSubVolumesPoints_;
 
+    // contact footprint fans (see prtContactVars::contactPolygons_)
+    DynamicList<pointField> contactPolygons_;
+
     // Truncation-only visit cap (mirrors maxVSIter in virtualMeshWall):
     // a complete scan of this octree visits at most
     // 8*rootVolume/subVolumeV sub-volumes (leaves can be as small as
@@ -248,6 +251,11 @@ class virtualMesh
     DynamicPointList& getEdgeSVPoints()
     {
         return edgeSubVolumesPoints_;
+    }
+
+    const DynamicList<pointField>& getContactPolygons() const
+    {
+        return contactPolygons_;
     }
 
     point& getContactCenter()

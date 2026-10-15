@@ -67,6 +67,7 @@ Contributors
 #include "lineInt.H"
 
 #include "verletList.H"
+#include "demObserver.H"
 
 //OS Time efficiency Testing
 #include "clockTime.H"
@@ -109,6 +110,9 @@ namespace Foam
 
     HashTable<autoPtr<prtContactInfo>,Tuple2<label, label>,Hash<Tuple2<label, label>>>
         prtcInfoTable_;
+
+    // optional observer of the DEM sub-stepping (not owned)
+    demObserver* demObserver_ = nullptr;
 
     // DEM step
     scalar stepDEM_;
@@ -408,6 +412,30 @@ namespace Foam
     void updateBodiesRhoF(const volScalarField& rho, const volScalarField& body);
 
     scalar computeBodiesLinCourantNo();
+
+    // register an observer of the DEM sub-stepping (nullptr to remove)
+    void setDEMObserver(demObserver* observer)
+    {
+        demObserver_ = observer;
+    }
+
+    // access to the immersed bodies
+    PtrList<immersedBody>& getImmersedBodies()
+    {
+        return immersedBodies_;
+    }
+
+    // permanently ignore the contact between two bodies (no contact
+    // detection, no contact forces, no influence on adaptive DEM stepping)
+    void ignoreContactBetween(label bodyA, label bodyB)
+    {
+        verletList_.ignorePair(bodyA, bodyB);
+    }
+
+    bool isContactIgnored(label bodyA, label bodyB) const
+    {
+        return verletList_.isPairIgnored(bodyA, bodyB);
+    }
  };
 }
 

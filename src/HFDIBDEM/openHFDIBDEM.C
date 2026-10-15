@@ -1546,6 +1546,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     sCI->setResolvedContact(resolved);
 
                     contactResolved[assignProc] += resolved;
+
+                    if (resolved && demObserver_)
+                    {
+                        demObserver_->prtContactSolved(*sCI, deltaTime*step);
+                    }
                 }
             }
         }
@@ -1656,6 +1661,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
                     continue;
                 }
             }
+        }
+
+        if (demObserver_)
+        {
+            demObserver_->demSubStepContactsSolved(deltaTime*step);
         }
 
         forAll (immersedBodies_,ib)

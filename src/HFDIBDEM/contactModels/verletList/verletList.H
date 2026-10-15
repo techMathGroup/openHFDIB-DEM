@@ -48,6 +48,7 @@ Contributors
 
 #include <list>
 #include <map>
+#include <set>
 #include <unordered_map>
 #include <unordered_set>
 
@@ -92,6 +93,10 @@ class verletList
     // Pair is added to this list when it is present in all 3 cntNeighList_.
     cPairHasSet posCntList_;
 
+    // pairs whose mutual contact is permanently ignored (never enter
+    // posCntList_); stored as (min, max)
+    std::set<cPair> ignoredPairs_;
+
     void swapVerletPoints(
         std::shared_ptr<verletPoint> a,
         std::shared_ptr<verletPoint> b,
@@ -112,6 +117,11 @@ class verletList
 
     // Destructors -------------------------------------------------
     ~verletList();
+
+    // Permanently exclude the pair from contact detection
+    void ignorePair(label a, label b);
+
+    bool isPairIgnored(label a, label b) const;
 
     // Add new body to be tracked by Verlet list
     void addBodyToVList(immersedBody& ib);
