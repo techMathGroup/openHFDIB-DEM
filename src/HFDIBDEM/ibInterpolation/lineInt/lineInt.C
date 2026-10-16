@@ -74,6 +74,7 @@ void lineInt::correctVelocity
     const DynamicLabelList& cSurfCells = intpInfo.getSurfCells();
 
     List<point>& ibPoints = intpInfo.getIbPoints();
+    List<vector>& ibNormals = intpInfo.getIbNormals();
     List<List<intPoint>>& intPoints = intpInfo.getIntPoints();
 
     getCurVelocity(intPoints);
@@ -85,6 +86,10 @@ void lineInt::correctVelocity
 
         switch(intOrder[ibp])
         {
+            // Note on positions of interpolations points:
+            // 0: surface point (always valid)
+            // 1: first marched point
+            // 2: second marched point
             case 0:
             {
                 Ui[cellI] = ibPointsVal[ibp];
@@ -93,15 +98,14 @@ void lineInt::correctVelocity
 
             case 1:
             {
-                //~ vector VP1 = intPoints[ibp][0].iVel_ - ibPointsVal[ibp];
-                vector VP1 = intPoints[ibp][1].iVel_ - ibPointsVal[ibp]; // first int point is surface point
+                vector VP1 = intPoints[ibp][1].iVel_ - ibPointsVal[ibp];
 
                 // distance between interpolation points
-                //~ scalar deltaR = mag(intPoints[ibp][0].iPoint_ - ibPoints[ibp]);
-                scalar deltaR = mag(intPoints[ibp][1].iPoint_ - ibPoints[ibp]); // first int point is surface point
+                scalar deltaR = mag(intPoints[ibp][1].iPoint_ - ibPoints[ibp]);
 
-                // cell center to surface distance
-                scalar ds = mag(mesh.C()[cellI] - ibPoints[ibp]);
+                // signed cell center to surface distance along the
+                // outward normal (negative for centers inside the body)
+                scalar ds = (mesh.C()[cellI] - ibPoints[ibp]) & ibNormals[ibp];
 
                 vector linCoeff = VP1/(deltaR+SMALL);
 
@@ -111,21 +115,17 @@ void lineInt::correctVelocity
 
             case 2:
             {
-                //~ vector VP1 =  intPoints[ibp][0].iVel_ - ibPointsVal[ibp];
-                //~ vector VP2 =  intPoints[ibp][1].iVel_ - ibPointsVal[ibp];
-                vector VP1 =  intPoints[ibp][1].iVel_ - ibPointsVal[ibp]; // first int point is surface point
-                vector VP2 =  intPoints[ibp][2].iVel_ - ibPointsVal[ibp]; // first int point is surface point
+                vector VP1 =  intPoints[ibp][1].iVel_ - ibPointsVal[ibp];
+                vector VP2 =  intPoints[ibp][2].iVel_ - ibPointsVal[ibp];
 
                 // distance between interpolation points
-                //~ scalar deltaR1 = mag(intPoints[ibp][0].iPoint_ - ibPoints[ibp]);
-                //~ scalar deltaR2 = mag(intPoints[ibp][1].iPoint_
-                //~         - intPoints[ibp][0].iPoint_);
-                scalar deltaR1 = mag(intPoints[ibp][1].iPoint_ - ibPoints[ibp]); // first int point is surface point
-                scalar deltaR2 = mag(intPoints[ibp][2].iPoint_ // first int point is surface point
-                        - intPoints[ibp][1].iPoint_); // first int point is surface point
+                scalar deltaR1 = mag(intPoints[ibp][1].iPoint_ - ibPoints[ibp]);
+                scalar deltaR2 = mag(intPoints[ibp][2].iPoint_
+                        - intPoints[ibp][1].iPoint_);
 
-                // cell center to surface distance
-                scalar ds = mag(mesh.C()[cellI] - ibPoints[ibp]);
+                // signed cell center to surface distance along the
+                // outward normal (negative for centers inside the body)
+                scalar ds = (mesh.C()[cellI] - ibPoints[ibp]) & ibNormals[ibp];
 
                 vector quadCoeff = (VP2 - VP1)*deltaR1 - VP1*deltaR2;
                 quadCoeff       /= (deltaR1*deltaR2*(deltaR1 + deltaR2)+SMALL);
@@ -278,7 +278,9 @@ List<label> lineInt::getIntOrder
 
     forAll(intPoints, ibp)
     {
-        forAll(intPoints[ibp], ip)
+        // index 0 is the surface point and is always valid - only
+        // marched points decide the interpolation order
+        for (label ip = 1; ip < intPoints[ibp].size(); ip++)
         {
             if(intPoints[ibp][ip].iProc_ != -1)
             {
