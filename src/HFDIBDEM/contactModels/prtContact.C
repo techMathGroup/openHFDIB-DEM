@@ -33,6 +33,7 @@ Contributors
 #include "prtContact.H"
 
 #include "virtualMeshLevel.H"
+#include "pspPairControl.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -351,6 +352,83 @@ void getPrtContactVars_ArbShape(
     // wallContact.C).
     intersectedVolume = virtMesh.evaluateContact()*vmInfo->getEmptyScale();
 
+    // psp: embedded pass-through state. For a monitored pair with a
+    // frozen entry normal, when one body is fully inside the other
+    // the contact hull degenerates - there is no rim between the two
+    // surfaces (edge points <= 4) although the octree still measures
+    // the intersection volume from the INSIDE&&INSIDE leaves. The
+    // standard evaluation would drop the contact here. Keep it alive
+    // instead and synthesise the contact variables: the normal is the
+    // frozen entry normal (pointing from the target towards the
+    // penetrator, i.e. -e), the volume is the measured intersection
+    // volume and the area follows from the contained body's extent
+    // along the penetration direction.
+    pspPairControl::forcedNormal pspFn;
+    const bool pspEmbedded
+    (
+        pspPairControl::getForcedNormal
+        (
+            subCInfo.getCPair().first(),
+            subCInfo.getCPair().second(),
+            pspFn
+        )
+        && intersectedVolume > 0
+        && virtMesh.getEdgeSVPoints().size() <= 4
+        && (
+            cClass.getGeomModel().getBounds().contains
+            (
+                tClass.getGeomModel().getBounds()
+            )
+            || tClass.getGeomModel().getBounds().contains
+            (
+                cClass.getGeomModel().getBounds()
+            )
+        )
+    );
+
+    if (pspEmbedded)
+    {
+        const boundBox& cBBox(cClass.getGeomModel().getBounds());
+        const boundBox& tBBox(tClass.getGeomModel().getBounds());
+
+        // contained body: the one inside the other's bounding box
+        const bool cInT(tBBox.contains(cBBox));
+        const boundBox& contained(cInT ? cBBox : tBBox);
+
+        // cross-section estimate: intersection volume over the extent
+        // of the contained body along the penetration direction
+        const scalar pspProj
+        (
+            mag(pspFn.e_ & contained.span())
+        );
+        const scalar pspArea
+        (
+            pspProj > SMALL
+          ? intersectedVolume/(pspProj*vmInfo->getEmptyScale())
+          : intersectedVolume
+            /pow(vmInfo->subVolumeV, 1.0/3.0)
+        );
+
+        subCInfo.getprtCntVars().contactCenter_ =
+            0.5*(cClass.getGeomModel().getCoM()
+          + tClass.getGeomModel().getCoM());
+        subCInfo.getprtCntVars().contactVolume_ = intersectedVolume;
+        // -e points from the target towards the penetrator and always
+        // decelerates the relative approach, whichever pair member is c
+        subCInfo.getprtCntVars().contactNormal_ = -pspFn.e_;
+        subCInfo.getprtCntVars().contactArea_ = pspArea;
+        subCInfo.getprtCntVars().contactPolygons_.clear();
+        subCInfo.getprtCntVars().synthesized_ = true;
+
+        InfoH << parallelDEM_Info << "-- Detected Particle-particle contact [embedded]: -- body "
+                << subCInfo.getCPair().first() << " & -- body "
+                << subCInfo.getCPair().second() << endl;
+        InfoH << parallelDEM_Info << "-- Particle-particle " << subCInfo.getCPair().first()
+                << "-" << subCInfo.getCPair().second() << " contact volume "
+                << intersectedVolume << " contact area " << pspArea << endl;
+        return;
+    }
+
     if(virtMesh.getEdgeSVPoints().size() <= 4)
     {
         intersectedVolume = 0;
@@ -395,6 +473,7 @@ void getPrtContactVars_ArbShape(
         subCInfo.getprtCntVars().contactNormal_ = normalVector;
         subCInfo.getprtCntVars().contactArea_ = contactArea;
         subCInfo.getprtCntVars().contactPolygons_ = virtMesh.getContactPolygons();
+        subCInfo.getprtCntVars().synthesized_ = false;
     }
     else
     {
@@ -403,6 +482,7 @@ void getPrtContactVars_ArbShape(
         subCInfo.getprtCntVars().contactVolume_ = 0;
         subCInfo.getprtCntVars().contactNormal_ = vector::zero;
         subCInfo.getprtCntVars().contactArea_ = 0;
+        subCInfo.getprtCntVars().synthesized_ = false;
     }
 }
 //---------------------------------------------------------------------------//

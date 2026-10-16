@@ -73,6 +73,27 @@ void prtSubContactInfo::evalVariables(
     Vn_ = -(cVeli_ - tVeli_) & prtCntVars_.contactNormal_;
     Lc_ = (contactModelInfo::getLcCoeff())*mag(cLVec_)*mag(tLVec_)/(mag(cLVec_) + mag(tLVec_));
 
+    // psp: geometric floor on Lc. As a thin body buries itself in the
+    // target, the contact center converges onto its CoM and the raw
+    // harmonic Lc collapses to ~0, so FNe = aY*VC/Lc diverges although
+    // VC grows only marginally. Floor Lc by the smaller body's
+    // half-thickness (smallest bounding-box extent) so deep-penetration
+    // stiffness stays bounded: force then tracks the overlap volume.
+    {
+        const boundBox cBBox(cIb.getGeomModel().getBounds());
+        const boundBox tBBox(tIb.getGeomModel().getBounds());
+        const vector cSpan(cBBox.span());
+        const vector tSpan(tBBox.span());
+        const scalar cMinSpan(min(min(cSpan.x(), cSpan.y()), cSpan.z()));
+        const scalar tMinSpan(min(min(tSpan.x(), tSpan.y()), tSpan.z()));
+        const scalar LcFloor(contactModelInfo::getLcCoeff()*min(cMinSpan, tMinSpan));
+
+        if (Lc_ < LcFloor)
+        {
+            Lc_ = LcFloor;
+        }
+    }
+
     physicalProperties_.curAdhN_ = min
     (
         physicalProperties_.maxAdhN_,

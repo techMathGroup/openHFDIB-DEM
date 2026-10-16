@@ -1599,6 +1599,17 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         reduce(tBodyOutForceList,sumOp<List<vector>>());
         reduce(tBodyOutTorqueList,sumOp<List<vector>>());
 
+        // psp: pre-force observer hook. The contact forces of this
+        // sub-step are computed and reduced but not yet applied. A pair
+        // ignored here (verletList_.ignorePair erases it from
+        // posCntList_, which the application loop below iterates)
+        // receives no force in this sub-step and is excluded from all
+        // following sub-steps.
+        if (demObserver_)
+        {
+            demObserver_->demSubStepContactsPreForce(deltaTime*step);
+        }
+
         label nvListIter(0);
 
         for (auto it = verletList_.begin(); it != verletList_.end(); ++it)

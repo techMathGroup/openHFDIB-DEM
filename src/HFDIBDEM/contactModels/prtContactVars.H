@@ -56,6 +56,11 @@ struct prtContactVars
     vector contactNormal_ = vector::zero;
     scalar contactArea_ = 0.0f;
 
+    // psp: true when this contact was synthesised from the frozen entry
+    // normal of an embedded pass-through pair rather than evaluated from
+    // the geometric contact hull
+    bool synthesized_ = false;
+
     // contact plane footprint(s): every pointField is a triangle fan,
     // element 0 is the fan centre and the remaining points follow
     // the contact patch boundary. Empty when no footprint is available

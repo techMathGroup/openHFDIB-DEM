@@ -64,6 +64,15 @@ class demObserver
     )
     {}
 
+    // Called on all ranks once per DEM sub-step, after the contacts of
+    // the sub-step were solved (and their out-forces reduced) but
+    // BEFORE the forces are applied to the bodies (collective calls
+    // are allowed). Ignoring a body pair here removes its contact
+    // from the current sub-step (no force is applied) and from all
+    // following sub-steps.
+    virtual void demSubStepContactsPreForce(const scalar deltaTDEM)
+    {}
+
     // Called on all ranks once per DEM sub-step, after the contact forces
     // were applied and before the closing half-step velocity update
     // (collective calls are allowed). Ignoring a body pair here removes
