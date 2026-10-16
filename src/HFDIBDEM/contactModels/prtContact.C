@@ -425,7 +425,10 @@ void getPrtContactVars_ArbShape(
                 << subCInfo.getCPair().second() << endl;
         InfoH << parallelDEM_Info << "-- Particle-particle " << subCInfo.getCPair().first()
                 << "-" << subCInfo.getCPair().second() << " contact volume "
-                << intersectedVolume << " contact area " << pspArea << endl;
+                << intersectedVolume << endl;
+        InfoH << parallelDEM_Info << "-- Particle-particle " << subCInfo.getCPair().first()
+                << "-" << subCInfo.getCPair().second() << " contact area "
+                << pspArea << endl;
         return;
     }
 
