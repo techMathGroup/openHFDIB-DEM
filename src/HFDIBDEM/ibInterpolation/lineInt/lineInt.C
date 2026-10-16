@@ -117,7 +117,6 @@ void lineInt::correctVelocity
                         ibPointsVal[ibp], 
                         intPoints[ibp][1].iVel_
                     );
-                    Ui[cellI] = linVal;      
                 }
                 Ui[cellI] = linVal;
                 break;
