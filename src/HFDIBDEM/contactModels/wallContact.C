@@ -37,6 +37,10 @@ Contributors
 #include "wallPlaneInfo.H"
 #include "planePolyClip.H"
 
+#include <chrono>
+#include <cstdlib>
+#include <sstream>
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -84,6 +88,326 @@ bool boxBehindWalls
     }
 
     return true;
+}
+
+// volume and first moment of the penetrating body material inside
+// the intersection of the given wall half-spaces (a single-patch
+// subset measures the patch-local penetration, the full set the
+// wedge). the body-side virtual meshes are re-evaluated with their
+// wall planes replaced by the subset: their flood seed (the only
+// mutable state of virtualMeshWallInfo, advanced by
+// detectFirstContactPoint) is saved and restored so the persisted
+// seed of the full-set evaluation - run first - keeps evolving
+// exactly as before this function exists
+void evalSubsetVolume
+(
+    wallContactInfo& wallCntInfo,
+    wallSubContactInfo& sCW,
+    const List<planePolyClip::halfSpace>& planes,
+    scalar& V,
+    vector& M
+)
+{
+    V = 0;
+    M = vector::zero;
+
+    const label nVM = sCW.getVMContactSize();
+    for (label i = 0; i < nVM; i++)
+    {
+        // peek by reference (see the vmWInfoList_ loop in
+        // getWallContactVars_ArbShape)
+        autoPtr<virtualMeshWallInfo>& vmWInfo
+        (
+            sCW.getVMContactInfo(i)
+        );
+        if (!vmWInfo.valid())
+        {
+            continue;
+        }
+
+        const point seed(vmWInfo->getStartingPoint());
+
+        virtualMeshWall vm
+        (
+            vmWInfo(),
+            wallCntInfo.getcClass().getGeomModel()
+        );
+        vm.setWallPlanes(planes);
+
+        if (vm.detectFirstContactPoint())
+        {
+            const scalar vv
+            (
+                vm.evaluateContact()*vmWInfo->getEmptyScale()
+            );
+            V += vv;
+            M += vv*vm.getContactCenter();
+        }
+
+        vmWInfo->setStartingPoint(seed);
+    }
+
+    // internal boxes mirror the main evaluation: exact clip of
+    // straddlers, full volume behind every plane of the subset
+    const List<Tuple2<point,boundBox>>& internal
+    (
+        sCW.getInternalElements()
+    );
+    forAll(internal, sCII)
+    {
+        const boundBox& iBox(internal[sCII].second());
+
+        if (    virtualMeshLevel::getExactSubVolume()
+            && !boxBehindWalls(iBox, planes))
+        {
+            scalar cV(0);
+            vector cC(vector::zero);
+
+            planePolyClip::volumeAndCentroid
+            (
+                iBox,
+                planes,
+                cV,
+                cC
+            );
+
+            V += cV;
+            M += cV*cC;
+        }
+        else
+        {
+            V += iBox.volume();
+            M += iBox.volume()*internal[sCII].first();
+        }
+    }
+}
+
+// per-patch attribution of a multi-patch sub-contact by
+// inclusion-exclusion: V_union = sum over nonempty subsets S of
+// (-1)^(|S|+1) V_S, each subset volume shared equally between
+// its patches (weight 1/|S| per signed term), which gives
+// sum_p V_p_eff = V_union identically. submodularity of the
+// subset volumes keeps V_p_eff >= 0 up to round-off (a small
+// negative remainder is clamped and counted).
+// patches with V_p <= relSMALL are dropped before enumeration:
+// V_S <= V_p for every p in S, so no surviving subset can
+// contain a dropped patch (R4). monotonicity violations
+// (V_S > V_(S\q) beyond round-off, unreachable in exact
+// arithmetic) are clamped to the parent minimum and counted.
+// behaviour-neutral: results are only logged (env
+// HFDIB_WALL_SPLIT_DIAG), consumed by the C3 force path
+void splitWallSubContact
+(
+    wallContactInfo& wallCntInfo,
+    wallSubContactInfo& sCW,
+    const List<planePolyClip::halfSpace>& wallPlanes,
+    const List<string>& contactPatches,
+    const DynamicScalarList& contactAreas,
+    const scalar intersectVolume,
+    const scalar relSMALL
+)
+{
+    const label n(contactPatches.size());
+
+    // the inclusion-exclusion sum is over 2^n subsets: beyond a
+    // handful of patches the enumeration (and the log line)
+    // stops paying for itself
+    if (n < 2 || n > 6)
+    {
+        return;
+    }
+
+    const auto t0(std::chrono::steady_clock::now());
+
+    auto subsetPlanes = [&](label mask)
+    {
+        List<planePolyClip::halfSpace> pl;
+        for (label p = 0; p < n; p++)
+        {
+            if (mask & (1 << p))
+            {
+                pl.append(wallPlanes[p]);
+            }
+        }
+        return pl;
+    };
+
+    // subset volumes and first moments, indexed by bitmask; the
+    // full set first so the restored flood seed it leaves behind
+    // is the one the main evaluation would persist
+    List<scalar> Vs(1 << n, 0.0);
+    List<vector> Ms(1 << n, vector::zero);
+    evalSubsetVolume
+    (
+        wallCntInfo, sCW, wallPlanes, Vs[(1 << n) - 1], Ms[(1 << n) - 1]
+    );
+
+    // R4 prefilter: single-patch volumes, survivors only
+    // continue to the enumeration
+    List<scalar> Vp(n, 0.0);
+    List<vector> Mp(n, vector::zero);
+    label survMask(0);
+    for (label p = 0; p < n; p++)
+    {
+        evalSubsetVolume
+        (
+            wallCntInfo, sCW, subsetPlanes(1 << p), Vp[p], Mp[p]
+        );
+        if (Vp[p] > relSMALL)
+        {
+            survMask |= (1 << p);
+        }
+    }
+
+    label clamps(0);
+    for (label mask = 1; mask < (1 << n); mask++)
+    {
+        if ((mask & survMask) != mask)
+        {
+            continue;
+        }
+
+        label cnt(0);
+        for (label p = 0; p < n; p++)
+        {
+            if (mask & (1 << p))
+            {
+                cnt++;
+            }
+        }
+
+        if (cnt == 1)
+        {
+            // reuse the prefilter evaluation of this patch
+            for (label p = 0; p < n; p++)
+            {
+                if (mask & (1 << p))
+                {
+                    Vs[mask] = Vp[p];
+                    Ms[mask] = Mp[p];
+                }
+            }
+            continue;
+        }
+
+        evalSubsetVolume
+        (
+            wallCntInfo, sCW, subsetPlanes(mask), Vs[mask], Ms[mask]
+        );
+
+        // monotonicity safeguard: V_S <= V_(S minus q)
+        scalar vmin(GREAT);
+        for (label q = 0; q < n; q++)
+        {
+            if (mask & (1 << q))
+            {
+                vmin = min(vmin, Vs[mask & ~(1 << q)]);
+            }
+        }
+        if (Vs[mask] > vmin*(1 + 1e-9) + VSMALL)
+        {
+            Ms[mask] *= vmin/(Vs[mask] + VSMALL);
+            Vs[mask] = vmin;
+            clamps++;
+        }
+    }
+
+    // inclusion-exclusion attribution
+    List<scalar> Veff(n, 0.0);
+    List<vector> Meff(n, vector::zero);
+    scalar Vunion(0);
+    for (label mask = 1; mask < (1 << n); mask++)
+    {
+        label cnt(0);
+        for (label p = 0; p < n; p++)
+        {
+            if (mask & (1 << p))
+            {
+                cnt++;
+            }
+        }
+        const scalar sgn(cnt % 2 ? 1.0 : -1.0);
+
+        Vunion += sgn*Vs[mask];
+        for (label p = 0; p < n; p++)
+        {
+            if (mask & (1 << p))
+            {
+                Veff[p] += sgn*Vs[mask]/cnt;
+                Meff[p] += sgn*Ms[mask]/cnt;
+            }
+        }
+    }
+    label negs(0);
+    for (label p = 0; p < n; p++)
+    {
+        if (Veff[p] < 0)
+        {
+            Veff[p] = 0;
+            negs++;
+        }
+    }
+
+    // per-patch contact centres from the clamped volumes
+    List<vector> Ceff(n, vector::zero);
+    for (label p = 0; p < n; p++)
+    {
+        if (Veff[p] > 0)
+        {
+            Ceff[p] = Meff[p]/Veff[p];
+        }
+    }
+
+    // the sub-volume edge length carries V to an equivalent
+    // penetration depth, for the area/volume ratio column
+    const scalar edge
+    (
+        virtualMeshLevel::getCharCellSize()
+       /virtualMeshLevel::getLevelOfDivision()
+    );
+
+    const scalar us
+    (
+        std::chrono::duration<double, std::micro>
+        (
+            std::chrono::steady_clock::now() - t0
+        ).count()
+    );
+
+    std::ostringstream os;
+    os << "wallSplit body " << sCW.getBodyId() << " n " << n
+       << " Vmain " << intersectVolume << " Vall "
+       << Vs[(1 << n) - 1] << " Vunion " << Vunion;
+    os << " patches";
+    for (label p = 0; p < n; p++)
+    {
+        os << " " << contactPatches[p];
+    }
+    os << " Vp";
+    for (label p = 0; p < n; p++)
+    {
+        os << " " << Vp[p];
+    }
+    os << " Veff";
+    for (label p = 0; p < n; p++)
+    {
+        os << " " << Veff[p];
+    }
+    os << " Ap";
+    for (label p = 0; p < n; p++)
+    {
+        os << " " << (p < contactAreas.size()
+                        ? contactAreas[p] : -1.0);
+    }
+    os << " ratio";
+    for (label p = 0; p < n; p++)
+    {
+        os << " " << (Veff[p] > 0 && p < contactAreas.size()
+                        ? contactAreas[p]/(Veff[p]/edge) : -1.0);
+    }
+    os << " clamps " << clamps << " negs " << negs
+       << " surv " << survMask << " us " << us;
+    Info << os.str().c_str() << endl;
 }
 
 }// End namespace Foam::contactModel::<anonymous>
@@ -532,6 +856,29 @@ void getWallContactVars_ArbShape(
             {
                 contactAreas().append((intersectVolume/vmWInfo->getSVVolume())*(pow(vmWInfo->getSVVolume(),2.0/3)));
                 //~ contactPlaneCenters().append(virtMeshPlane->getContactCenter());
+            }
+        }
+
+        // per-patch attribution of multi-patch sub-contacts:
+        // diagnostics only (env HFDIB_WALL_SPLIT_DIAG), the
+        // results do not feed the force model yet
+        {
+            static const bool splitDiag
+            (
+                std::getenv("HFDIB_WALL_SPLIT_DIAG") != nullptr
+            );
+            if (splitDiag && contactPatches.size() > 1)
+            {
+                splitWallSubContact
+                (
+                    wallCntInfo,
+                    sCW,
+                    wallPlanes,
+                    contactPatches,
+                    contactAreas(),
+                    intersectVolume,
+                    relSMALL
+                );
             }
         }
 
