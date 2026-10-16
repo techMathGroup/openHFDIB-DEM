@@ -81,6 +81,13 @@ namespace Foam
             List<List<intPoint>>& intPoints
         );
 
+        void limitVelocity
+        (
+            vector& velVal,
+            const vector& surfVel,
+            const vector& u1
+        );
+
         public:
 
         // Constructors ------------------------------------------------

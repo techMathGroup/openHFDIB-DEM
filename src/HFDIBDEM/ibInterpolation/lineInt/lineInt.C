@@ -109,7 +109,17 @@ void lineInt::correctVelocity
 
                 vector linCoeff = VP1/(deltaR+SMALL);
 
-                Ui[cellI] = linCoeff*ds + ibPointsVal[ibp];
+                vector linVal = linCoeff*ds + ibPointsVal[ibp];
+                if (ds < 0)
+                {
+                    limitVelocity(
+                        linVal, 
+                        ibPointsVal[ibp], 
+                        intPoints[ibp][1].iVel_
+                    );
+                    Ui[cellI] = linVal;      
+                }
+                Ui[cellI] = linVal;
                 break;
             }
 
@@ -135,7 +145,18 @@ void lineInt::correctVelocity
                 linCoeff        += VP1*Foam::pow(deltaR2,2.0);
                 linCoeff        /= (deltaR1*deltaR2*(deltaR1 + deltaR2)+SMALL);
 
-                Ui[cellI] = quadCoeff*ds*ds + linCoeff*ds + ibPointsVal[ibp];
+                vector quadVal = quadCoeff*ds*ds + linCoeff*ds
+                    + ibPointsVal[ibp];
+
+                if (ds < 0)
+                {
+                    limitVelocity(
+                        quadVal, 
+                        ibPointsVal[ibp], 
+                        intPoints[ibp][1].iVel_
+                    );
+                }
+                Ui[cellI] = quadVal;
                 break;
             }
         }
@@ -290,5 +311,30 @@ List<label> lineInt::getIntOrder
     }
 
     return intOrderToRtn;
+}
+//---------------------------------------------------------------------------//
+void lineInt::limitVelocity
+(
+    vector& velVal,
+    const vector& surfVel,
+    const vector& u1
+)
+{
+    // cell center inside the body: clamp the extrapolated velocities
+    // to the hull of the interpolation node velocities
+    // Note (MI): here, we loose accuracy, but remove instability after
+    //            using the correct (signed) ds
+    // Note (MI): the accuracy loss is formal. in fact, compared to
+    //            the original implementation, with wrong ds, this may
+    //            be more accurate
+    for (direction cmpt = 0; cmpt < 3; cmpt++)
+    {
+        const scalar lo = min
+            (surfVel[cmpt], u1[cmpt]);
+        const scalar hi = max
+            (surfVel[cmpt], u1[cmpt]);
+    
+        velVal[cmpt] = min(max(velVal[cmpt], lo), hi);
+    }
 }
 //---------------------------------------------------------------------------//
