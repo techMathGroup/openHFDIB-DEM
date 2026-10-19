@@ -793,6 +793,46 @@ void wallContactInfo::saveWallDtCrit
 
     for(auto sC : subCList_)
     {
+        // the split path evaluates the per-patch variables (the
+        // aggregate keeps only the union volume for the logs):
+        // scan every patch's own spring, the merged object
+        // carries no lever arm there
+        List<wallContactVars>& patchVars(sC->getPatchCntVars());
+
+        if (patchVars.size() > 0)
+        {
+            forAll(patchVars, p)
+            {
+                wallContactVars& pv(patchVars[p]);
+
+                if (mag(pv.contactVolume_) < SMALL)
+                {
+                    continue;
+                }
+
+                const scalar dtPair
+                (
+                    sC->getPairDtCritRot
+                    (
+                        pv,
+                        getcVars(),
+                        IeffC,
+                        tangentialFactor,
+                        rotationalFactor
+                    )
+                );
+
+                if (dtPair < wallDtCrit_)
+                {
+                    wallDtCrit_ = dtPair;
+                    wallDtCritRot_ =
+                        (dtPair < sC->getPairDtCrit(pv, getcVars(), tangentialFactor))
+                        ? 1 : 0;
+                }
+            }
+            continue;
+        }
+
         wallContactVars& wallCntvar(sC->getWallCntVars());
 
         if (mag(wallCntvar.contactVolume_) < SMALL)

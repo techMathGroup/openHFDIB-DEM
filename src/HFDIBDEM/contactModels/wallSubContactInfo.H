@@ -87,6 +87,11 @@ class wallSubContactInfo
 
     wallContactVars wallCntvar_;
 
+    // per-patch contact variables of the inclusion-exclusion
+    // split of a multi-patch sub-contact (empty on the unsplit
+    // path); index-aligned with contactPatches_
+    List<wallContactVars> patchVars_;
+
     scalar reduceM_ = 0;    // Reduced mass
 
     forces outForce_; // Out variable for force
@@ -139,6 +144,13 @@ class wallSubContactInfo
         return wallCntvar_;
     }
 
+    // per-patch split of a multi-patch sub-contact; empty on the
+    // unsplit path and on single-patch sub-contacts
+    List<wallContactVars>& getPatchCntVars()
+    {
+        return patchVars_;
+    }
+
     scalar& getReduceM()
     {
         return reduceM_;
@@ -148,8 +160,6 @@ class wallSubContactInfo
     {
         return BB_;
     }
-
-    void clearWallCntVars();
 
     scalar getMu(wallContactVars& wallCntvar)
     {
