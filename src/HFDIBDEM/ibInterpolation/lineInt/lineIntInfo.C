@@ -222,7 +222,14 @@ void lineIntInfo::setIntpInfo()
 
                 vector dir = cIntPoint.iPoint_ - ibPointsRecv[proci][iInfo];
                 dir /= mag(dir);
+                // Note (MI): this dir seems unused - bug or feature?
+                // Note (MI): is normalization by mag(dir) robust?
+                //            |-> can cIntPoint.iPoint_ coincide with 
+                //                ibPointsRecv[proci][iInfo]?
                 correctIntPoint(ibPointsRecv[proci][iInfo], cIntPoint);
+                // Note (MI): correctIntPoint computes its own dir
+                // Note (MI): as well as getClosestPoint, which is used 
+                //            in correctIntPoint
 
                 intPointsRecv[proci][iInfo] = cIntPoint;
             }
@@ -308,6 +315,9 @@ void lineIntInfo::correctIntPoint
         {
             const face faceI = mesh_.faces()[cellFaces[fi]];
             vector dir = closestPoint - cPoint.iPoint_;
+            // Note (MI): there is no normalization here
+            // Question (MI): could normalization by mag(dir) help with
+            //                faceI.ray() robustness?
 
             pointHit pHit = faceI.ray(
                 cPoint.iPoint_,
@@ -338,6 +348,8 @@ vector lineIntInfo::getClosestPoint
 {
     vector dir = cPoint.iPoint_ - ibPoint;
     dir /= mag(dir);
+    // Note (MI): is normalization by mag(dir) robust?
+    //            |-> can cPoint.iPoint_ coincide with ibPoint?
 
     vector dirToC = mesh_.C()[cPoint.iCell_] - ibPoint;
 
@@ -414,6 +426,7 @@ label lineIntInfo::getFaceInDir
 {
     label faceToReturn = -1;
     vector dir = retPoint.iPoint_ - mesh_.C()[retPoint.iCell_];
+    // Note (MI): no normalization here
 
     const labelList& cellFaces(mesh_.cells()[retPoint.iCell_]);
     scalar dotProd(-GREAT);
@@ -437,6 +450,8 @@ label lineIntInfo::getFaceInDir
                 outNorm = patchSf[patchFaceI];
             }
 
+            // Note (MI): but outNorm is not normalized either
+            //            |-> could this lead to numerical issues?
             outNorm = (mesh_.faceOwner()[fI] == retPoint.iCell_)
                 ? outNorm : -outNorm;
 
