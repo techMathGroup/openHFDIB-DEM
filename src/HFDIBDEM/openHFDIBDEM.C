@@ -1350,7 +1350,40 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
         bodiesPositionList[Pstream::myProcNo()].clear();
 
+        // psp: snapshot the potential-contact pairs before the sweep. Pairs
+        // the sweep drops (bounding boxes separated) ended their episode by
+        // body-body repulsion; the erase sites inside the sub-step loop
+        // cannot see them because the sweep removes the pair before contact
+        // detection gets a chance to fail. Ending the episode here also
+        // resets the per-pair tracking state, so a later re-contact of the
+        // same pair starts a fresh episode. Pairs removed by ignorePair
+        // (application switch-off) are erased during the sub-steps and are
+        // absent from both snapshots - their ending is logged by the
+        // application itself
+        std::set<std::pair<label,label>> pspPairsBefore;
+        for (auto pspIter = verletList_.begin(); pspIter != verletList_.end(); pspIter++)
+        {
+            pspPairsBefore.insert(*pspIter);
+        }
+
         verletList_.update(immersedBodies_);
+
+        if (!pspPairsBefore.empty())
+        {
+            std::set<std::pair<label,label>> pspPairsAfter;
+            for (auto pspIter = verletList_.begin(); pspIter != verletList_.end(); pspIter++)
+            {
+                pspPairsAfter.insert(*pspIter);
+            }
+
+            for (const auto& pspPair : pspPairsBefore)
+            {
+                if (pspPairsAfter.find(pspPair) == pspPairsAfter.end())
+                {
+                    pspEpisodeEnded(mesh_, pspPair.first, pspPair.second);
+                }
+            }
+        }
 
         DynamicLabelList wallContactIB;
         wallContactIBTable.clear();
