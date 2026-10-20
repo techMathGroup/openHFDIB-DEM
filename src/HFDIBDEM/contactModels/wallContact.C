@@ -966,6 +966,14 @@ void getWallContactVars_ArbShape(
                         p1,
                         wallCntInfo.getWallMeanPars()
                     );
+
+                    // continue the tangential spring staged by
+                    // wallContactInfo::restoreWallFtHistory
+                    if (sCW.getPatchFtPrev().found(contactPatches[p]))
+                    {
+                        pv.FtPrev_ = sCW.getPatchFtPrev()
+                            [contactPatches[p]];
+                    }
                 }
 
                 patchVars.append(pv);
@@ -1179,13 +1187,10 @@ bool solveWallContact
 
     // per-patch force path (multi-patch sub-contacts with a
     // valid attribution): every patch carries its own lever
-    // arm, penetration and material, so the elastic, damping
-    // and adhesive forces are evaluated per patch and summed
-    // with their own moment arms. friction needs a per-patch
-    // tangential history, so mu > 0 falls back to the merged
-    // path below
-    if (patchVars.size() > 0
-        && sCI.getMu(wallCntVar) < SMALL)
+    // arm, penetration and material, so the elastic, damping,
+    // tangential and adhesive forces are evaluated per patch
+    // and summed with their own moment arms
+    if (patchVars.size() > 0)
     {
         if (mag(wallCntVar.contactVolume_) < SMALL)
         {
@@ -1239,10 +1244,25 @@ bool solveWallContact
                 InfoH << parallelDEM_Info << "FNd was Clipped to "<< FNd << endl;
             }
             F += FNd;
+
+            // the coulomb ceiling inside getFt():
+            // FtCeil = mu*mag(FNe + FNd of this patch)
+            vector Ft
+            (
+                sCI.getFt
+                (
+                    pv,
+                    deltaT,
+                    sCI.getMu(pv)*mag(F)
+                )
+            );
+            F += Ft;
             F -= sCI.getFA(pv);
 
             InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId()
                 <<" split patch "<< sCI.getContactPatches()[p] << " FN " << F << endl;
+            InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId()
+                <<" split patch "<< sCI.getContactPatches()[p] << " Ft " << Ft << endl;
 
             Fsum += F;
             Tsum += pv.lVec_ ^ F;
@@ -1254,7 +1274,7 @@ bool solveWallContact
     }
 
     // the aggregate variables feed the merged path (single-patch
-    // sub-contacts, unsplit runs and the mu > 0 fallback)
+    // sub-contacts and unsplit runs)
     sCI.evalVariables(wallCntVar,wallCntInfo.getcClass(),wallCntInfo.getcVars());
 
     if(wallCntVar.contactVolume_ == 0)

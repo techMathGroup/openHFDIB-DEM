@@ -741,6 +741,30 @@ void wallContactInfo::saveWallFtHistory()
     wallFtHistory_.clear();
     for(auto sC : subCList_)
     {
+        // the split path carries one tangential spring per
+        // patch: persist each keyed by its own patch name,
+        // lumping sub-contacts that share the patch (the same
+        // lumping the merged path applies per patch set)
+        List<wallContactVars>& patchVars(sC->getPatchCntVars());
+
+        if (patchVars.size() > 0)
+        {
+            const List<string>& patches(sC->getContactPatches());
+            forAll(patchVars, p)
+            {
+                vector FtPrev(patchVars[p].FtPrev_);
+                if (wallFtHistory_.found(patches[p]))
+                {
+                    wallFtHistory_[patches[p]] += FtPrev;
+                }
+                else
+                {
+                    wallFtHistory_.insert(patches[p], FtPrev);
+                }
+            }
+            continue;
+        }
+
         const List<string>& patches(sC->getContactPatches());
         if (patches.size() == 0)
         {
@@ -873,6 +897,7 @@ void wallContactInfo::restoreWallFtHistory()
     // over the same number of springs it was summed from
     // Note (MI): anything sub-contact related is dubious
     HashTable<label, string, Hash<string>> nPerKey;
+    HashTable<label, string, Hash<string>> nPerPatch;
     for(auto sC : subCList_)
     {
         const List<string>& patches(sC->getContactPatches());
@@ -901,6 +926,21 @@ void wallContactInfo::restoreWallFtHistory()
         {
             nPerKey.insert(key, 1);
         }
+
+        // the per-patch springs lump per patch name, so the
+        // restore divides by the number of sub-contacts that
+        // carry the patch
+        forAll(patches, p)
+        {
+            if (nPerPatch.found(patches[p]))
+            {
+                nPerPatch[patches[p]] += 1;
+            }
+            else
+            {
+                nPerPatch.insert(patches[p], 1);
+            }
+        }
     }
 
     for(auto sC : subCList_)
@@ -927,6 +967,21 @@ void wallContactInfo::restoreWallFtHistory()
         {
             sC->getWallCntVars().FtPrev_
                 = wallFtHistory_[key]/nPerKey[key];
+        }
+
+        // stage the per-patch springs on the sub-contact: the
+        // patch variables themselves are only built inside
+        // solveWallContact, after this restore
+        forAll(patches, p)
+        {
+            if (wallFtHistory_.found(patches[p]))
+            {
+                sC->getPatchFtPrev().insert
+                (
+                    patches[p],
+                    wallFtHistory_[patches[p]]/nPerPatch[patches[p]]
+                );
+            }
         }
     }
 }

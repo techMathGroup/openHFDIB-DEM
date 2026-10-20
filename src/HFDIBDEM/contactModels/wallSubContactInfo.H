@@ -92,6 +92,13 @@ class wallSubContactInfo
     // path); index-aligned with contactPatches_
     List<wallContactVars> patchVars_;
 
+    // per-patch tangential springs restored (by patch name)
+    // before the patch variables are built; consumed by the
+    // patchVars fill, which happens inside solveWallContact
+    // (wallContactInfo::restoreWallFtHistory runs earlier in
+    // the sub-step)
+    HashTable<vector, string, Hash<string>> patchFtPrev_;
+
     scalar reduceM_ = 0;    // Reduced mass
 
     forces outForce_; // Out variable for force
@@ -149,6 +156,12 @@ class wallSubContactInfo
     List<wallContactVars>& getPatchCntVars()
     {
         return patchVars_;
+    }
+
+    // staged per-patch springs from the tangential history
+    HashTable<vector, string, Hash<string>>& getPatchFtPrev()
+    {
+        return patchFtPrev_;
     }
 
     scalar& getReduceM()
