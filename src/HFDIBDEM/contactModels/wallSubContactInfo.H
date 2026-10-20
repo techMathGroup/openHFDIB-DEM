@@ -87,9 +87,10 @@ class wallSubContactInfo
 
     wallContactVars wallCntvar_;
 
-    // per-patch contact variables of the inclusion-exclusion
-    // split of a multi-patch sub-contact (empty on the unsplit
-    // path); index-aligned with contactPatches_
+    // per-patch contact variables (the inclusion-exclusion
+    // attribution of a multi-patch sub-contact, or the aggregate
+    // as one entry otherwise); index-aligned with
+    // contactPatches_
     List<wallContactVars> patchVars_;
 
     // per-patch tangential springs restored (by patch name)
@@ -156,8 +157,8 @@ class wallSubContactInfo
         return wallCntvar_;
     }
 
-    // per-patch split of a multi-patch sub-contact; empty on the
-    // unsplit path and on single-patch sub-contacts
+    // per-patch force variables of every sub-contact; empty when
+    // the volume gate rejected the sub-contact this sub-step
     List<wallContactVars>& getPatchCntVars()
     {
         return patchVars_;

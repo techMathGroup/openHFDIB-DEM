@@ -640,12 +640,6 @@ void getWallContactVars_ArbShape(
     // intersect volume
     vector contactCenterSum(vector::zero);
 
-    // dead since the area-weighted normal rewrite: accumulated
-    // but never consumed. kept commented to make the removal 
-    // revertible, delete when definitely sure of useleness
-    //~ autoPtr<DynamicVectorList> contactPlaneCenters(
-    //~     new DynamicVectorList);
-
     autoPtr<DynamicScalarList> contactAreas(
         new DynamicScalarList);
 
@@ -874,12 +868,10 @@ void getWallContactVars_ArbShape(
                        *(pow(vmWInfo->getSVVolume(),2.0/3.0))
                     );
                 }
-                //~ contactPlaneCenters().append(virtMeshPlane->getContactCenter());
             }
             else
             {
                 contactAreas().append((intersectVolume/vmWInfo->getSVVolume())*(pow(vmWInfo->getSVVolume(),2.0/3)));
-                //~ contactPlaneCenters().append(virtMeshPlane->getContactCenter());
             }
         }
 
@@ -972,8 +964,6 @@ void getWallContactVars_ArbShape(
         // volume-weighted mean over every contribution above
         // (legacy: unweighted mean of the per-VM centres)
         contactCenter = contactCenterSum/intersectVolume;
-        // Pout << "Survived #0 " << endl;
-        // Pout << "contactAreas() " << contactAreas() << endl;
         forAll(contactAreas(),cA)
         {
             contactArea += contactAreas()[cA];
@@ -983,13 +973,10 @@ void getWallContactVars_ArbShape(
         {
             return;
         }
-        // Pout << "contactArea " << contactArea << endl;
-        // Pout << "Survived #0.5 " << endl;
         forAll(contactPatches,cP)
         {
             contactNormal -= wallPlaneInfo::getWallPlaneInfo()[contactPatches[cP]][0]*contactAreas()[cP];
         }
-        // Pout << "contactNormal " << mag(contactNormal) << endl;
         if (mag(contactNormal) > SMALL)
         {
             contactNormal /= mag(contactNormal);
@@ -1011,24 +998,19 @@ void getWallContactVars_ArbShape(
             contactNormal = -wallPlaneInfo::getWallPlaneInfo()
                 [contactPatches[maxA]][0];
         }
-        // Pout << "contactNormal " << contactNormal << endl;
         wallCntInfo.getcClass().setWallContact(true);
         wallCntInfo.getcClass().inContactWithStatic(true);
-        // Pout << "Survived #1 " << endl;
         wallContactVars& wallCntVars = sCW.getWallCntVars();
-        // Pout << "Survived #2 " << endl;
         wallCntVars.contactCenter_ = contactCenter;
         wallCntVars.contactArea_   = contactArea;
         wallCntVars.contactVolume_ = intersectVolume;
         wallCntVars.contactNormal_ = contactNormal;
-        // Pout << "Survived #3 " << endl;
         wallCntVars.setMeanCntPars_Plane
         (
             contactAreas(),
             contactPatches,
             wallCntInfo.getWallMeanPars()
         );
-        // Pout << "Survived #4 " << endl;
 
         // per-patch list of the paths without an attribution:
         // single-patch sub-contacts and sub-contacts above the
@@ -1243,35 +1225,17 @@ void getWallContactVars_Cluster(
     wallSubContactInfo& sWC
 )
 {
-    // any cluster works here: only the member list is needed, a
-    // plain clusterBody carries no periodic machinery
-    clusterBody& cCluster = dynamic_cast<clusterBody&>(wallCntInfo.getcClass().getGeomModel());
-
     // the sub-contact was created by one member of the cluster:
-    // evaluate exactly that member. With touching members the
-    // bbox scan below let every overlapping member rewrite the
-    // same sub-contact, so the last member won
+    // evaluate exactly that member. Detection is the only
+    // producer of cluster sub-contacts and it tags every one,
+    // so the creator is always set (with touching members the
+    // pre-tagging bbox scan let every overlapping member
+    // rewrite the same sub-contact, so the last member won)
     std::shared_ptr<geomModel> creator(sWC.getCreatorModel());
 
     if (creator != nullptr)
     {
         evalClusterMember(mesh, wallCntInfo, creator, deltaT, sWC);
-
-        return;
-    }
-
-    // untagged sub-contact: no detection path should end here,
-    // the scan is the safety net until the tagging is verified
-    std::vector<std::shared_ptr<geomModel>> cBodies = cCluster.getClusterBodies();
-
-    for(std::shared_ptr<geomModel>& cgModel : cBodies)
-    {
-        if(!sWC.getsWCBB().overlaps(cgModel->getBounds()))
-        {
-            continue;
-        }
-
-        evalClusterMember(mesh, wallCntInfo, cgModel, deltaT, sWC);
     }
 }
 //---------------------------------------------------------------------------//

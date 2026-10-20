@@ -251,73 +251,19 @@ vector wallSubContactInfo::getFt
     scalar FtCeil
 )
 {
-    physicalProperties& meanCntPar(wallCntvar.getMeanCntPar());
-    // project last Ft into a new direction
-    vector FtLastP(wallCntvar.FtPrev_
-        - (wallCntvar.FtPrev_ & wallCntvar.contactNormal_)
-        *wallCntvar.contactNormal_);
-    // scale projected Ft to have same magnitude as FtLast
-    vector FtLastS(mag(wallCntvar.FtPrev_) * (FtLastP/(mag(FtLastP)+SMALL)));
-    
-    // compute relative tangential velocity
-    vector Vn((wallCntvar.Veli_ & wallCntvar.contactNormal_)
-        *wallCntvar.contactNormal_);
-    vector Vt(wallCntvar.Veli_ - Vn);
-
-    // compute tangential force
-    vector deltaFt(vector::zero);
-    if (contactModelInfo::getUseMindlinRotationalModel())
-    {
-        scalar tangTune(demTimeStepInfo::tangTune_);                    //read empirical mambo-jambo from demTimeStepInfo
-        scalar kT = tangTune*8.0*meanCntPar.aG_*(wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL));
-        deltaFt = kT*Vt*deltaT + 2.0*meanCntPar.reduceBeta_*sqrt(kT*reduceM_)*Vt;
-    }
-    else if(contactModelInfo::getUseChenRotationalModel())
-    {
-        deltaFt = meanCntPar.reduceBeta_*sqrt(meanCntPar.aG_*reduceM_*wallCntvar.Lc_)*Vt;
-        deltaFt += meanCntPar.aG_*wallCntvar.Lc_*Vt*deltaT;
-    }
-    // the spring can stretch by at most one ceiling per
-    // sub-step: a fresh contact (or a slip reversal) builds
-    // the tangential force up to the coulomb limit, never
-    // across it within a single step
-    // Note (MI): if rotation contact model is none or a wrong name it
-    //            defaults to Mindlin through the dict-reader
-    if (mag(deltaFt) > FtCeil)
-    {
-        deltaFt *= FtCeil/(mag(deltaFt) + SMALL);
-    }
-    wallCntvar.FtPrev_ = FtLastS - deltaFt;
-
-    // coulomb cap feeds back into the stored state: the spring
-    // stops stretching at the sliding ceiling, so the applied
-    // force and the state can never disagree
-    // Note (MI): this code is included twice in the code base,
-    //            once in prtSubContactInfo and once in wallSubContactInfo
-    //            could it be refactored to avoid code duplication?
-    if (mag(wallCntvar.FtPrev_) > FtCeil)
-    {
-        if (mag(Vt) > contactModelInfo::vSlipMin_)
-        {
-            // sliding: kinetic friction opposes the slip. the
-            // state is redirected with the applied force; on
-            // re-stick the spring re-forms from the sliding
-            // direction
-            wallCntvar.FtPrev_ = -FtCeil
-                *Vt/(mag(Vt) + SMALL);
-        }
-        else
-        {
-            // below vSlipMin_ the slip direction is assumed noise-
-            // dominated: keep the spring direction (the cap
-            // firing from a shrinking ceiling must not scramble
-            // the state)
-            wallCntvar.FtPrev_ *=
-                FtCeil/(mag(wallCntvar.FtPrev_) + SMALL);
-        }
-    }
-
-    return wallCntvar.FtPrev_;
+    return contactModelInfo::tangentialSpringForce
+    (
+        wallCntvar.FtPrev_,
+        wallCntvar.Veli_,
+        wallCntvar.contactNormal_,
+        wallCntvar.contactArea_,
+        wallCntvar.Lc_,
+        wallCntvar.getMeanCntPar().aG_,
+        wallCntvar.getMeanCntPar().reduceBeta_,
+        reduceM_,
+        deltaT,
+        FtCeil
+    );
 }
 //---------------------------------------------------------------------------//
 void wallSubContactInfo::syncData()

@@ -26,7 +26,8 @@ InNamespace
     contactModel
 
 Description
-    Static class for storing virtual mesh level
+    Static class for storing contact model parameters and the
+    shared tangential force law
 
 Contributors
     Federico Municchi (2016),
@@ -36,6 +37,9 @@ Contributors
 
 #ifndef contactModelInfo_H
 #define contactModelInfo_H
+
+#include "vector.H"
+#include "demTimeStepInfo.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -50,6 +54,89 @@ namespace Foam
 class contactModelInfo
 {
     public:
+
+    // shared tangential force law of the wall and particle
+    // contact paths: the rotational model (mindlin/chen; an
+    // unknown dict name defaults to mindlin through the
+    // dict-reader) builds the spring increment, the coulomb
+    // ceiling caps the applied force and the stored state
+    // alike. FtPrev is the spring state, updated in place and
+    // returned as the applied force; the call sites differ
+    // only in where the inputs live
+    static vector tangentialSpringForce
+    (
+        vector& FtPrev,
+        const vector& relVeli,
+        const vector& contactNormal,
+        const scalar contactArea,
+        const scalar Lc,
+        const scalar aG,
+        const scalar reduceBeta,
+        const scalar reduceM,
+        const scalar deltaT,
+        const scalar FtCeil
+    )
+    {
+        // project last Ft into a new direction
+        vector FtLastP(FtPrev - (FtPrev & contactNormal)*contactNormal);
+        // scale projected Ft to have same magnitude as FtLast
+        vector FtLastS(mag(FtPrev)*(FtLastP/(mag(FtLastP)+SMALL)));
+
+        // relative tangential velocity
+        vector Vn((relVeli & contactNormal)*contactNormal);
+        vector Vt(relVeli - Vn);
+
+        // compute tangential force
+        vector deltaFt(vector::zero);
+        if (getUseMindlinRotationalModel())
+        {
+            // empirical tuning factor, see demTimeStepInfo
+            scalar tangTune(demTimeStepInfo::tangTune_);
+            scalar kT = tangTune*8.0*aG*(contactArea/(Lc+SMALL));
+            deltaFt = kT*Vt*deltaT
+                + 2.0*reduceBeta*sqrt(kT*reduceM)*Vt;
+        }
+        else if (getUseChenRotationalModel())
+        {
+            deltaFt = reduceBeta*sqrt(aG*reduceM*Lc)*Vt;
+            deltaFt += aG*Lc*Vt*deltaT;
+        }
+
+        // the spring can stretch by at most one ceiling per
+        // sub-step: a fresh contact (or a slip reversal) builds
+        // the tangential force up to the coulomb limit, never
+        // across it within a single step
+        if (mag(deltaFt) > FtCeil)
+        {
+            deltaFt *= FtCeil/(mag(deltaFt) + SMALL);
+        }
+        FtPrev = FtLastS - deltaFt;
+
+        // coulomb cap feeds back into the stored state: the
+        // spring stops stretching at the sliding ceiling, so
+        // the applied force and the state can never disagree
+        if (mag(FtPrev) > FtCeil)
+        {
+            if (mag(Vt) > vSlipMin_)
+            {
+                // sliding: kinetic friction opposes the slip;
+                // the state is redirected with the applied
+                // force, on re-stick the spring re-forms from
+                // the sliding direction
+                FtPrev = -FtCeil*Vt/(mag(Vt) + SMALL);
+            }
+            else
+            {
+                // below vSlipMin_ the slip direction is assumed
+                // noise-dominated: keep the spring direction
+                // (the cap firing from a shrinking ceiling must
+                // not scramble the state)
+                FtPrev *= FtCeil/(mag(FtPrev) + SMALL);
+            }
+        }
+
+        return FtPrev;
+    }
 
     static void setLcCoeff(scalar LcCoeff)
     {
