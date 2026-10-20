@@ -755,20 +755,10 @@ void getWallContactVars_ArbShape(
     // opens the contact even when the wedge (the intersection
     // over all patches) is still empty, so a body touching one
     // wall that just reached a second one does not wait for
-    // corner material. the split is the default; HFDIB_WALL_SPLIT
-    // =0 reverts to the merged-wedge path, HFDIB_WALL_SPLIT_DIAG
-    // additionally logs the attribution
-    static const bool wallSplit
-    (
-        std::getenv("HFDIB_WALL_SPLIT") == nullptr
-     || std::getenv("HFDIB_WALL_SPLIT")[0] != '0'
-    );
-    static const bool splitDiag
-    (
-        std::getenv("HFDIB_WALL_SPLIT_DIAG") != nullptr
-    );
+    // corner material. HFDIB_WALL_SPLIT_DIAG additionally logs
+    // the attribution
     wallSplitResult split;
-    if (contactPatches.size() > 1 && (wallSplit || splitDiag))
+    if (contactPatches.size() > 1)
     {
         split = splitWallSubContact
         (
@@ -779,7 +769,7 @@ void getWallContactVars_ArbShape(
             relSMALL
         );
     }
-    const bool splitActive(wallSplit && split.valid);
+    const bool splitActive(split.valid);
 
     if(intersectVolume > relSMALL || splitActive)
     {
@@ -1049,20 +1039,6 @@ void getWallContactVars_ArbShape(
         // Pout << "Survived #4 " << endl;
     }
 }
-// //---------------------------------------------------------------------------//
-// env gate of the per-patch wall-contact path (see
-// getWallContactVars_ArbShape): unset or any value but "0"
-// keeps the split the default
-// Note (MI): to be removed in the (close) future
-static bool wallSplitOn()
-{
-    static const bool on
-    (
-        std::getenv("HFDIB_WALL_SPLIT") == nullptr
-     || std::getenv("HFDIB_WALL_SPLIT")[0] != '0'
-    );
-    return on;
-}
 //---------------------------------------------------------------------------//
 void getWallContactVars_Sphere(
     const fvMesh&   mesh,
@@ -1143,7 +1119,7 @@ void getWallContactVars_Sphere(
     // are already one entry per patch, so they fill the patch
     // list directly (no inclusion-exclusion needed); a single
     // patch keeps the merged aggregate below
-    if (wallSplitOn() && contactPatches.size() > 1)
+    if (contactPatches.size() > 1)
     {
         List<wallContactVars>& patchVars(sCW.getPatchCntVars());
         patchVars.clear();
@@ -1368,8 +1344,9 @@ bool solveWallContact
         return true;
     }
 
-    // the aggregate variables feed the merged path (single-patch
-    // sub-contacts and unsplit runs)
+    // the aggregate variables feed the single-contact path
+    // (single-patch sub-contacts and sub-contacts above the
+    // split patch cap)
     sCI.evalVariables(wallCntVar,wallCntInfo.getcClass(),wallCntInfo.getcVars());
 
     if(wallCntVar.contactVolume_ == 0)
