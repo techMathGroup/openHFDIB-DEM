@@ -45,12 +45,37 @@ Contributors
 #include "defineExternVars.H"
 #include "parameters.H"
 #include "demTimeStepInfo.H"
+#include "pspPairControl.H"
 
 #define ORDER 2
 
 using namespace Foam;
 using namespace contactModel;
 
+//---------------------------------------------------------------------------//
+// psp: report why a contact episode of a body pair ended (distinguishes a
+// full immersion, handled by the embedded-contact synthesis inside the
+// contact model, from the standard body-body repulsion) and reset the
+// episode state
+static void pspEpisodeEnded(const fvMesh& mesh, label cInd, label tInd)
+{
+    switch (pspPairControl::endContactEpisode(cInd, tInd))
+    {
+        case pspPairControl::endRepulsion:
+            InfoH << parallelDEM_Info << "pspHFDIBDEM: contact between body "
+                << cInd << " and body " << tInd << " ended at time "
+                << mesh.time().value() << " (body-body repulsion)" << endl;
+            break;
+        case pspPairControl::endWhileEmbedded:
+            InfoH << parallelDEM_Info << "pspHFDIBDEM: contact between body "
+                << cInd << " and body " << tInd << " ended at time "
+                << mesh.time().value()
+                << " (lost while body still embedded)" << endl;
+            break;
+        default:
+            break;
+    }
+}
 //---------------------------------------------------------------------------//
 openHFDIBDEM::openHFDIBDEM(const Foam::fvMesh& mesh)
 :
@@ -1622,6 +1647,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             {
                 if(prtcInfoTable_.found(cPair))
                 {
+                    // psp: the geometric contact of the pair was lost -
+                    // report why the contact episode ended (full immersion
+                    // vs standard body-body repulsion) and reset the
+                    // episode state
+                    pspEpisodeEnded(mesh_, cInd, tInd);
                     prtcInfoTable_.erase(cPair);
                     continue;
                 }
@@ -1668,6 +1698,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
             {
                 if(prtcInfoTable_.found(cPair))
                 {
+                    // psp: the geometric contact of the pair was lost -
+                    // report why the contact episode ended (full immersion
+                    // vs standard body-body repulsion) and reset the
+                    // episode state
+                    pspEpisodeEnded(mesh_, cInd, tInd);
                     prtcInfoTable_.erase(cPair);
                     continue;
                 }

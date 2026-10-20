@@ -352,84 +352,221 @@ void getPrtContactVars_ArbShape(
     // wallContact.C).
     intersectedVolume = virtMesh.evaluateContact()*vmInfo->getEmptyScale();
 
-    // psp: embedded pass-through state. For a monitored pair with a
-    // frozen entry normal, when one body is fully inside the other
-    // the contact hull degenerates - there is no rim between the two
-    // surfaces (edge points <= 4) although the octree still measures
-    // the intersection volume from the INSIDE&&INSIDE leaves. The
-    // standard evaluation would drop the contact here. Keep it alive
-    // instead and synthesise the contact variables: the normal is the
-    // frozen entry normal (pointing from the target towards the
-    // penetrator, i.e. -e), the volume is the measured intersection
-    // volume and the area follows from the contained body's extent
-    // along the penetration direction.
-    pspPairControl::forcedNormal pspFn;
+    const label cId(subCInfo.getCPair().first());
+    const label tId(subCInfo.getCPair().second());
+
+    // psp automatic pass-through state of the pair (episode state is
+    // tracked for every body pair; STL-wall pair contacts are excluded)
+    const bool pspEligible
+    (
+        !cClass.getIsSTLWall() && !tClass.getIsSTLWall()
+    );
+    pspPairControl::forcedNormal pspRec;
+    const bool hasPspRec
+    (
+        pspEligible && pspPairControl::getRecord(cId, tId, pspRec)
+    );
+
+    // a pair whose penetrator crossed the backside of the other body is
+    // permanently force-free (the standard exit-face detection would
+    // otherwise repel the penetrator out through the back face)
+    if (hasPspRec && pspRec.passedThrough_)
+    {
+        subCInfo.getprtCntVars().contactPolygons_.clear();
+        subCInfo.getprtCntVars().contactCenter_ = vector::zero;
+        subCInfo.getprtCntVars().contactVolume_ = 0;
+        subCInfo.getprtCntVars().contactNormal_ = vector::zero;
+        subCInfo.getprtCntVars().contactArea_ = 0;
+        subCInfo.getprtCntVars().synthesized_ = false;
+        return;
+    }
+
+    const boundBox& cBBox(cClass.getGeomModel().getBounds());
+    const boundBox& tBBox(tClass.getGeomModel().getBounds());
+    const vector cCoM(cClass.getGeomModel().getCoM());
+    const vector tCoM(tClass.getGeomModel().getCoM());
+
+    // containment: one bounding box fully inside the other
+    const bool cInT(tBBox.contains(cBBox));
+    const bool tInC(cBBox.contains(tBBox));
+
+    // psp: embedded pass-through state. When one body is fully inside
+    // the other the contact hull degenerates - there is no rim between
+    // the two surfaces (edge points <= 4) although the octree still
+    // measures the intersection volume from the INSIDE&&INSIDE leaves.
+    // The standard evaluation would drop the contact here. Keep it
+    // alive instead and synthesise the contact variables: the normal is
+    // the frozen entry normal, the volume is the measured intersection
+    // volume grown linearly by the (signed) penetration displacement
+    // since the embed onset times the maximum registered contact area
+    // of the episode, and the area follows from the contained body's
+    // extent along the penetration direction. The signed displacement
+    // makes the embedded contact spring-like: the force grows while the
+    // body buries itself and relaxes again on rebound.
     const bool pspEmbedded
     (
-        pspPairControl::getForcedNormal
-        (
-            subCInfo.getCPair().first(),
-            subCInfo.getCPair().second(),
-            pspFn
-        )
+        pspEligible
         && intersectedVolume > 0
         && virtMesh.getEdgeSVPoints().size() <= 4
-        && (
-            cClass.getGeomModel().getBounds().contains
-            (
-                tClass.getGeomModel().getBounds()
-            )
-            || tClass.getGeomModel().getBounds().contains
-            (
-                cClass.getGeomModel().getBounds()
-            )
-        )
+        && (cInT || tInC)
     );
 
     if (pspEmbedded)
     {
-        const boundBox& cBBox(cClass.getGeomModel().getBounds());
-        const boundBox& tBBox(tClass.getGeomModel().getBounds());
-
-        // contained body: the one inside the other's bounding box
-        const bool cInT(tBBox.contains(cBBox));
+        // the contained body is the penetrator
+        const label pen(cInT ? cId : tId);
+        const vector& penCoM(cInT ? cCoM : tCoM);
+        const vector& tarCoM(cInT ? tCoM : cCoM);
         const boundBox& contained(cInT ? cBBox : tBBox);
 
-        // cross-section estimate: intersection volume over the extent
+        pspPairControl::forcedNormal& pspR
+        (
+            pspPairControl::record(cId, tId)
+        );
+
+        if (!pspR.embedded_)
+        {
+            // embed onset (or re-embed after a rebound): freeze the
+            // entry direction and the relative-CoM datum. An entry
+            // direction registered by an application is kept.
+            if (pspR.penetrator_ == -1 || !pspR.appControlled_)
+            {
+                if (mag(pspR.lastNormal_) > SMALL)
+                {
+                    // lastNormal_ points from the pair's second member
+                    // towards its first member; e_ points from the
+                    // penetrator towards the target
+                    pspR.e_ = (pen == cId)
+                      ? -pspR.lastNormal_
+                      : pspR.lastNormal_;
+                }
+                else
+                {
+                    // contact first seen already embedded (the entry was
+                    // swallowed by the detection gap): fall back to the
+                    // CoM axis of the pair
+                    pspR.e_ = tarCoM - penCoM;
+                }
+                pspR.e_ /= mag(pspR.e_) + VSMALL;
+            }
+            pspR.penetrator_ = pen;
+            pspR.relCoM0_ = penCoM - tarCoM;
+            pspR.sMax_ = 0;
+            pspR.embedded_ = true;
+            pspR.episodeActive_ = true;
+
+            InfoH << parallelDEM_Info << "pspHFDIBDEM: body " << pen
+                    << " fully immersed in body "
+                    << (pen == cId ? tId : cId)
+                    << " at time " << mesh.time().value()
+                    << " (geometric contact ended: full immersion, "
+                       "embedded contact continues)" << endl;
+        }
+
+        // signed penetration since the embed onset: positive while the
+        // penetrator keeps burying itself, negative on rebound
+        const vector pspPenRelCoM
+        (
+            pspR.penetrator_ == cId ? cCoM - tCoM : tCoM - cCoM
+        );
+        const scalar pspS((pspPenRelCoM - pspR.relCoM0_) & pspR.e_);
+        pspR.sMax_ = max(pspR.sMax_, pspS);
+
+        // extrapolated overlap volume: measured contained volume
+        // increased linearly by (displacement x max registered contact
+        // area during the contact)
+        const scalar pspVC
+        (
+            max(intersectedVolume + pspS*pspR.maxArea_, 0)
+        );
+
+        // cross-section estimate: overlap volume over the extent
         // of the contained body along the penetration direction
         const scalar pspProj
         (
-            mag(pspFn.e_ & contained.span())
+            mag(pspR.e_ & contained.span())
         );
         const scalar pspArea
         (
             pspProj > SMALL
-          ? intersectedVolume/(pspProj*vmInfo->getEmptyScale())
-          : intersectedVolume
-            /pow(vmInfo->subVolumeV, 1.0/3.0)
+          ? pspVC/(pspProj*vmInfo->getEmptyScale())
+          : pspVC/pow(vmInfo->subVolumeV, 1.0/3.0)
         );
 
-        subCInfo.getprtCntVars().contactCenter_ =
-            0.5*(cClass.getGeomModel().getCoM()
-          + tClass.getGeomModel().getCoM());
-        subCInfo.getprtCntVars().contactVolume_ = intersectedVolume;
-        // -e points from the target towards the penetrator and always
-        // decelerates the relative approach, whichever pair member is c
-        subCInfo.getprtCntVars().contactNormal_ = -pspFn.e_;
+        subCInfo.getprtCntVars().contactCenter_ = 0.5*(cCoM + tCoM);
+        subCInfo.getprtCntVars().contactVolume_ = pspVC;
+        // the normal force on the penetrator acts along -e_ (the entry
+        // direction points into the target) and always decelerates the
+        // relative approach, whichever pair member is c
+        subCInfo.getprtCntVars().contactNormal_ =
+            (pspR.penetrator_ == cId) ? -pspR.e_ : pspR.e_;
         subCInfo.getprtCntVars().contactArea_ = pspArea;
         subCInfo.getprtCntVars().contactPolygons_.clear();
         subCInfo.getprtCntVars().synthesized_ = true;
 
         InfoH << parallelDEM_Info << "-- Detected Particle-particle contact [embedded]: -- body "
-                << subCInfo.getCPair().first() << " & -- body "
-                << subCInfo.getCPair().second() << endl;
-        InfoH << parallelDEM_Info << "-- Particle-particle " << subCInfo.getCPair().first()
-                << "-" << subCInfo.getCPair().second() << " contact volume "
-                << intersectedVolume << endl;
-        InfoH << parallelDEM_Info << "-- Particle-particle " << subCInfo.getCPair().first()
-                << "-" << subCInfo.getCPair().second() << " contact area "
+                << cId << " & -- body "
+                << tId << endl;
+        InfoH << parallelDEM_Info << "-- Particle-particle " << cId
+                << "-" << tId << " contact volume "
+                << pspVC << endl;
+        InfoH << parallelDEM_Info << "-- Particle-particle " << cId
+                << "-" << tId << " contact area "
                 << pspArea << endl;
         return;
+    }
+
+    // psp: the embedded phase just ended (the penetrator is no longer
+    // fully contained). Distinguish how: still at (or beyond) the
+    // deepest registered point means the leading edge crossed the
+    // backside - switch the contact force off permanently, unless an
+    // application controls the pair and runs its own pass-through
+    // trigger; a clearly shallower depth means a rebound - the standard
+    // contact takes over again
+    if (hasPspRec && pspRec.embedded_)
+    {
+        pspPairControl::forcedNormal& pspR
+        (
+            pspPairControl::record(cId, tId)
+        );
+
+        const vector pspPenRelCoM
+        (
+            pspR.penetrator_ == cId ? cCoM - tCoM : tCoM - cCoM
+        );
+        const scalar pspS((pspPenRelCoM - pspR.relCoM0_) & pspR.e_);
+
+        if (pspS >= pspR.sMax_ - SMALL && !pspR.appControlled_)
+        {
+            // backside crossed with the movement direction unchanged
+            pspR.passedThrough_ = true;
+            pspR.embedded_ = false;
+
+            InfoH << parallelDEM_Info << "pspHFDIBDEM: body "
+                    << pspR.penetrator_ << " penetrated the backside of body "
+                    << (pspR.penetrator_ == cId ? tId : cId)
+                    << " at time " << mesh.time().value()
+                    << " (contact force off)" << endl;
+
+            subCInfo.getprtCntVars().contactPolygons_.clear();
+            subCInfo.getprtCntVars().contactCenter_ = vector::zero;
+            subCInfo.getprtCntVars().contactVolume_ = 0;
+            subCInfo.getprtCntVars().contactNormal_ = vector::zero;
+            subCInfo.getprtCntVars().contactArea_ = 0;
+            subCInfo.getprtCntVars().synthesized_ = false;
+            return;
+        }
+
+        if (pspS < pspR.sMax_ - SMALL)
+        {
+            InfoH << parallelDEM_Info << "pspHFDIBDEM: body "
+                    << pspR.penetrator_ << " rebounded inside body "
+                    << (pspR.penetrator_ == cId ? tId : cId)
+                    << " at time " << mesh.time().value()
+                    << " (embedded contact ended by rebound: standard "
+                       "contact resumed)" << endl;
+        }
+        pspR.embedded_ = false;
     }
 
     if(virtMesh.getEdgeSVPoints().size() <= 4)
@@ -477,6 +614,31 @@ void getPrtContactVars_ArbShape(
         subCInfo.getprtCntVars().contactArea_ = contactArea;
         subCInfo.getprtCntVars().contactPolygons_ = virtMesh.getContactPolygons();
         subCInfo.getprtCntVars().synthesized_ = false;
+
+        // psp: track the contact episode of the pair for the automatic
+        // pass-through support - the maximum registered contact area (the
+        // overlap-volume extrapolation factor of the embedded contact)
+        // and the last standard contact normal (the entry-direction
+        // fallback at the embed onset)
+        if (pspEligible)
+        {
+            pspPairControl::forcedNormal& pspR
+            (
+                pspPairControl::record(cId, tId)
+            );
+
+            if (!pspR.episodeActive_)
+            {
+                pspR.episodeActive_ = true;
+                pspR.maxArea_ = 0;
+            }
+
+            if (!pspR.embedded_)
+            {
+                pspR.maxArea_ = max(pspR.maxArea_, contactArea);
+                pspR.lastNormal_ = normalVector;
+            }
+        }
     }
     else
     {
