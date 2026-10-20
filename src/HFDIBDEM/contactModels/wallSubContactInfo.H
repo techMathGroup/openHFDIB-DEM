@@ -99,6 +99,11 @@ class wallSubContactInfo
     // the sub-step)
     HashTable<vector, string, Hash<string>> patchFtPrev_;
 
+    // creating member of a cluster sub-contact (null on plain
+    // bodies); set at detection so the evaluation runs the
+    // member exclusively
+    std::shared_ptr<geomModel> creatorModel_ = nullptr;
+
     scalar reduceM_ = 0;    // Reduced mass
 
     forces outForce_; // Out variable for force
@@ -162,6 +167,18 @@ class wallSubContactInfo
     HashTable<vector, string, Hash<string>>& getPatchFtPrev()
     {
         return patchFtPrev_;
+    }
+
+    // creating member of a cluster sub-contact (null on plain
+    // bodies); the cluster evaluation runs this member only
+    std::shared_ptr<geomModel>& getCreatorModel()
+    {
+        return creatorModel_;
+    }
+
+    void setCreatorModel(std::shared_ptr<geomModel> creator)
+    {
+        creatorModel_ = std::move(creator);
     }
 
     scalar& getReduceM()

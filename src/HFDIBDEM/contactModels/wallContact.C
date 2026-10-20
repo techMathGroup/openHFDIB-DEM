@@ -523,7 +523,7 @@ bool detectWallContact_Cluster(
 {
     wallCntInfo.getContactPatches().clear();
 
-    periodicBody& cCluster = dynamic_cast<periodicBody&>(ibClass.getGeomModel());
+    clusterBody& cCluster = dynamic_cast<clusterBody&>(ibClass.getGeomModel());
     std::vector<std::shared_ptr<geomModel>> cBodies = cCluster.getClusterBodies();
 
     for(std::shared_ptr<geomModel>& cgModel : cBodies)
@@ -554,6 +554,13 @@ bool detectWallContact_Cluster(
             tmpWallCntI
         ))
         {
+            // tag the member's sub-contacts before the splice:
+            // the evaluation then runs the creating member only
+            for (auto& sC : tmpWallCntI.getWallSCList())
+            {
+                sC->setCreatorModel(cgModel);
+            }
+
             wallCntInfo.getWallSCList().insert(
                 std::end(wallCntInfo.getWallSCList()),
                 std::begin(tmpWallCntI.getWallSCList()),
@@ -1181,6 +1188,37 @@ void getWallContactVars_Sphere(
     }
 }
 //---------------------------------------------------------------------------//
+// evaluate one cluster member through the sub-contact; the
+// patches stay the parent union so a member sees the same cap
+// list as before the creator tagging
+static void evalClusterMember(
+    const fvMesh&   mesh,
+    wallContactInfo& wallCntInfo,
+    std::shared_ptr<geomModel>& cgModel,
+    const scalar deltaT,
+    wallSubContactInfo& sWC
+)
+{
+    ibContactClass cIbClassI(
+        cgModel,
+        wallCntInfo.getcClass().getMatInfo().getMaterial()
+    );
+
+    wallContactInfo cWallCntI(
+        cIbClassI,
+        wallCntInfo.getcVars()
+    );
+
+    cWallCntI.getContactPatches() = wallCntInfo.getContactPatches();
+
+    getWallContactVars(
+        mesh,
+        cWallCntI,
+        deltaT,
+        sWC
+    );
+}
+//---------------------------------------------------------------------------//
 void getWallContactVars_Cluster(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo,
@@ -1188,7 +1226,25 @@ void getWallContactVars_Cluster(
     wallSubContactInfo& sWC
 )
 {
-    periodicBody& cCluster = dynamic_cast<periodicBody&>(wallCntInfo.getcClass().getGeomModel());
+    // any cluster works here: only the member list is needed, a
+    // plain clusterBody carries no periodic machinery
+    clusterBody& cCluster = dynamic_cast<clusterBody&>(wallCntInfo.getcClass().getGeomModel());
+
+    // the sub-contact was created by one member of the cluster:
+    // evaluate exactly that member. With touching members the
+    // bbox scan below let every overlapping member rewrite the
+    // same sub-contact, so the last member won
+    std::shared_ptr<geomModel> creator(sWC.getCreatorModel());
+
+    if (creator != nullptr)
+    {
+        evalClusterMember(mesh, wallCntInfo, creator, deltaT, sWC);
+
+        return;
+    }
+
+    // untagged sub-contact: no detection path should end here,
+    // the scan is the safety net until the tagging is verified
     std::vector<std::shared_ptr<geomModel>> cBodies = cCluster.getClusterBodies();
 
     for(std::shared_ptr<geomModel>& cgModel : cBodies)
@@ -1198,24 +1254,7 @@ void getWallContactVars_Cluster(
             continue;
         }
 
-        ibContactClass cIbClassI(
-            cgModel,
-            wallCntInfo.getcClass().getMatInfo().getMaterial()
-        );
-
-        wallContactInfo cWallCntI(
-            cIbClassI,
-            wallCntInfo.getcVars()
-        );
-
-        cWallCntI.getContactPatches() = wallCntInfo.getContactPatches();
-
-        getWallContactVars(
-            mesh,
-            cWallCntI,
-            deltaT,
-            sWC
-        );
+        evalClusterMember(mesh, wallCntInfo, cgModel, deltaT, sWC);
     }
 }
 //---------------------------------------------------------------------------//
