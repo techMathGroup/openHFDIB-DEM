@@ -320,6 +320,58 @@ bool detectPrtPrtContact_Cluster
     return false;
 }
 //---------------------------------------------------------------------------//
+// synthesise the footprint of a contact patch as a polygon fan: a disc of
+// radius r around the given centre (or in the pseudo-2D case a rectangle
+// chord x emptyLength), in the plane perpendicular to the contact normal
+// carried by vars
+static void setContactFootprint
+(
+    prtContactVars& vars,
+    const point& centre,
+    const scalar r,
+    const scalar emptyLength
+)
+{
+    vars.contactPolygons_.clear();
+
+    const vector n(vars.contactNormal_);
+    if (mag(n) < SMALL || r <= 0) return;
+
+    vector e1(1, 0, 0);
+    if (mag(e1 & n) > 0.9) e1 = vector(0, 1, 0);
+    vector u(n ^ e1);
+    u /= mag(u);
+    vector v(n ^ u);
+
+    if (case3D)
+    {
+        const label nPts(24);
+        pointField fan(nPts + 1);
+        fan[0] = centre;
+        for (label i = 0; i < nPts; i++)
+        {
+            const scalar a(2*Foam::constant::mathematical::pi*i/nPts);
+            fan[i + 1] = centre + r*(cos(a)*u + sin(a)*v);
+        }
+        vars.contactPolygons_.append(fan);
+    }
+    else
+    {
+        vector eDir(vector::zero);
+        eDir[emptyDim] = 1;
+        vector t(n ^ eDir);
+        t /= mag(t) + VSMALL;
+
+        pointField fan(5);
+        fan[0] = centre;
+        fan[1] = centre + r*t + 0.5*emptyLength*eDir;
+        fan[2] = centre - r*t + 0.5*emptyLength*eDir;
+        fan[3] = centre - r*t - 0.5*emptyLength*eDir;
+        fan[4] = centre + r*t - 0.5*emptyLength*eDir;
+        vars.contactPolygons_.append(fan);
+    }
+}
+//---------------------------------------------------------------------------//
 void getPrtContactVars_ArbShape(
     const fvMesh&   mesh,
     ibContactClass& cClass,
@@ -501,7 +553,39 @@ void getPrtContactVars_ArbShape(
         subCInfo.getprtCntVars().contactNormal_ =
             (pspR.penetrator_ == cId) ? -pspR.e_ : pspR.e_;
         subCInfo.getprtCntVars().contactArea_ = pspArea;
-        subCInfo.getprtCntVars().contactPolygons_.clear();
+
+        // psp: synthesize the footprint of the embedded contact: the
+        // contained body's cross-section perpendicular to the entry
+        // direction (the area the synthesis assigns to the contact),
+        // placed at the penetrator's leading face - the current
+        // penetration depth. The application contact-pressure logger
+        // projects these polygons onto the mesh, so without them the
+        // pCont field would stay empty while a body is submerged
+        {
+            const scalar penSpanE(mag(pspR.e_ & contained.span()));
+            const point leadingFace(penCoM + pspR.e_*0.5*penSpanE);
+
+            scalar r(0);
+            scalar emptyLength(0);
+            if (case3D)
+            {
+                r = sqrt(pspArea/Foam::constant::mathematical::pi);
+            }
+            else
+            {
+                emptyLength = contained.span()[emptyDim];
+                r = 0.5*pspArea/max(emptyLength, VSMALL);
+            }
+
+            setContactFootprint
+            (
+                subCInfo.getprtCntVars(),
+                leadingFace,
+                r,
+                emptyLength
+            );
+        }
+
         subCInfo.getprtCntVars().synthesized_ = true;
 
         InfoH << parallelDEM_Info << "-- Detected Particle-particle contact [embedded]: -- body "
@@ -652,8 +736,7 @@ void getPrtContactVars_ArbShape(
 }
 //---------------------------------------------------------------------------//
 // sphere contacts carry no hull: synthesise the footprint of the contact
-// patch (a disc of radius r around the contact centre, or in the
-// pseudo-2D case a rectangle chord x emptyLength)
+// patch around the contact centre
 static void setSphereFootprint
 (
     prtContactVars& vars,
@@ -661,44 +744,7 @@ static void setSphereFootprint
     const scalar emptyLength
 )
 {
-    vars.contactPolygons_.clear();
-
-    const vector n(vars.contactNormal_);
-    if (mag(n) < SMALL || r <= 0) return;
-
-    vector e1(1, 0, 0);
-    if (mag(e1 & n) > 0.9) e1 = vector(0, 1, 0);
-    vector u(n ^ e1);
-    u /= mag(u);
-    vector v(n ^ u);
-
-    if (case3D)
-    {
-        const label nPts(24);
-        pointField fan(nPts + 1);
-        fan[0] = vars.contactCenter_;
-        for (label i = 0; i < nPts; i++)
-        {
-            const scalar a(2*Foam::constant::mathematical::pi*i/nPts);
-            fan[i + 1] = vars.contactCenter_ + r*(cos(a)*u + sin(a)*v);
-        }
-        vars.contactPolygons_.append(fan);
-    }
-    else
-    {
-        vector eDir(vector::zero);
-        eDir[emptyDim] = 1;
-        vector t(n ^ eDir);
-        t /= mag(t) + VSMALL;
-
-        pointField fan(5);
-        fan[0] = vars.contactCenter_;
-        fan[1] = vars.contactCenter_ + r*t + 0.5*emptyLength*eDir;
-        fan[2] = vars.contactCenter_ - r*t + 0.5*emptyLength*eDir;
-        fan[3] = vars.contactCenter_ - r*t - 0.5*emptyLength*eDir;
-        fan[4] = vars.contactCenter_ + r*t - 0.5*emptyLength*eDir;
-        vars.contactPolygons_.append(fan);
-    }
+    setContactFootprint(vars, vars.contactCenter_, r, emptyLength);
 }
 //---------------------------------------------------------------------------//
 void getPrtContactVars_Sphere
