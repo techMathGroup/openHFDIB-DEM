@@ -40,7 +40,6 @@ Contributors
 #include "dictionary.H"
 #include "IDLList.H"
 #include "fvCFD.H"
-#include "geomModel.H"
 
 #include <memory>
 

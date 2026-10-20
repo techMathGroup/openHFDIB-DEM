@@ -26,9 +26,11 @@ InNamespace
     Foam
 
 Notes:
-    Note (MI): there are sum sub-contact implementations present but
-    they are dubious and not properly tested
-    |-> testing is on To Do list as of 20260924
+    Note (MI): a refactoring campaign was ran in September and October
+               to improve the multi-contact handling in wallContact
+               (splitting sub-contacts, per-patch tangential springs, etc.).
+               |-> hopefully, the new code survives user-based testing
+                   (it survived the developer's tests...)
 
 Contributors
     Federico Municchi (2016),
@@ -100,15 +102,8 @@ ibContactVars_(cVars)
             cntPatches[patchI],
             physicalProperties(aY, aG, aMu, maxAdhN, 0, 0, reduceBeta)
         );
-        // Info << "reduceBeta " <<reduceBeta <<endl;
-        // Info << "sqrt(5) "<< sqrt(5) <<endl;
     }
 
-    // forAll(cntPatches, patchI)
-    // {
-    //     physicalProperties& cMeanCntPars(wallMeanPars_[cntPatches[patchI]]);
-    //     Info << "Info reduceBeta WallMeanPar" << cntPatches[patchI] << " : "<< cMeanCntPars.reduceBeta_ <<endl;
-    // }
     reduceM_ = 0;
 }
 
@@ -207,8 +202,6 @@ void wallContactInfo::findContactAreas()
     autoPtr<DynamicVectorList> contactSTLPoints(
         new DynamicVectorList);
 
-    // InfoH << DEM_Info <<" -- SM bbBoxIsInContact " << endl;
-    // InfoH << DEM_Info <<" -- SM contactPatches_.size() "<< contactPatches_.size() << endl;
     pointField bodyPoints = ibContactClass_.getGeomModel().getBodyPoints();
     forAll(bodyPoints,bP)
     {
@@ -221,7 +214,6 @@ void wallContactInfo::findContactAreas()
 
         }
     }
-    // InfoH << DEM_Info <<" -- SM contactSTLPoints.size() " << contactSTLPoints().size() << endl;
 
     if(contactSTLPoints().size() > SMALL)
     {
@@ -312,15 +304,14 @@ void wallContactInfo::findContactAreas()
                         isPathechInSC[wP]+= true;
                     }
                 }
-                // InfoH << DEM_Info << "-- SM sCBBox "<< sCBBox << endl;
+                
                 if(isPathechInSC[wP])
                 {
 
                     cBbox = boundBox(overallContactPoints,false);
                     boundBox planeBox = contactPlaneBBox(constructVMBox(cBbox,contactPatches_[wP]),contactPatches_[wP]);
-                    // InfoH << DEM_Info << "-- SM cBbox "<< cBbox << endl;
                     contactPatches.append(contactPatches_[wP]);
-                    // InfoH << DEM_Info << "-- SM planeBox #1 "<< planeBox << endl;
+
                     forAll(contactPatches_,wP2)
                     {
                         if(wP != wP2)
@@ -336,7 +327,6 @@ void wallContactInfo::findContactAreas()
                             if(isPathechInSC[wP2])
                             {
                                 pointField bbPoints = planeBox.points();
-                                // InfoH << DEM_Info << "-- SM planeBox #2 "<< planeBox << endl;
                                 pointField newBBPoints;
                                 forAll(bbPoints,bBP)
                                 {
@@ -354,16 +344,12 @@ void wallContactInfo::findContactAreas()
 
                         }
                     }
-                    // InfoH << DEM_Info << "-- SM PlaneBox #2"<< planeBox << endl;
+
                     Tuple2<point,boundBox> sMPlane(planeBox.midpoint(),planeBox);
                     sMPlaneList.append(sMPlane);
                 }
 
             }
-            // InfoH << DEM_Info <<" -- SM planeBoxList.size() : " << sMPlaneList.size() << endl;
-            // InfoH << DEM_Info <<" -- SM sMExportList.size() : " << sMExportList.size() << endl;
-            // InfoH << DEM_Info <<" -- SM sMInternal.size()   : " << sMInternal.size() << endl;
-            // InfoH << DEM_Info <<" -- SM emptyCells.size()   : " << emptyCells << endl;
             setNewSubContact(sMExportList,sMPlaneList,contactPatches,sMInternal,cBbox);
         }
     }
@@ -383,8 +369,6 @@ List<DynamicList<vector>> wallContactInfo::detectPossibleSMContact
     autoPtr<DynamicVectorList> contactElements(
         new DynamicVectorList);
 
-    // InfoH << DEM_Info <<"  -- ConstructSM - Is Allive : #1.1 " << endl;
-
     forAll(contactPoints,cP)
     {
         vector elementIndex(SM_().getSMCentroidIndex(contactPoints[cP]));
@@ -399,7 +383,7 @@ List<DynamicList<vector>> wallContactInfo::detectPossibleSMContact
             contactElements().append(elementIndex);
         }
     }
-    // InfoH << DEM_Info <<"  -- ConstructSM - Is Allive : #1.2 " << endl;
+
     autoPtr<DynamicVectorList> nextToCheck(
         new DynamicVectorList);
 
@@ -410,7 +394,7 @@ List<DynamicList<vector>> wallContactInfo::detectPossibleSMContact
             new DynamicVectorList);
 
     label iterCount2(0);
-    // InfoH << DEM_Info <<"  -- ConstructSM - Is Allive : #1.3 " << endl;
+    
     while((contactElements().size() > SMALL) and iterCount2++ < iterMax)
     {
         label iterCount(0);
@@ -418,7 +402,7 @@ List<DynamicList<vector>> wallContactInfo::detectPossibleSMContact
         subContactElements().clear();
 
         nextToCheck().append(contactElements()[0]);
-        // nextToCheck().append(edgeFaceNeighbours(mesh,commonFaces[0]));
+        
         while ((nextToCheck().size() > 0) and iterCount++ < iterMax)
         {
             auxToCheck().clear();
@@ -481,10 +465,8 @@ List<DynamicList<vector>> wallContactInfo::detectPossibleSMContact
                     }
                 }
             }
-            autoPtr<DynamicVectorList> helpPtr(nextToCheck.ptr()); // deleted const ...
-//zlobi deprecated set(), use reset()
+            autoPtr<DynamicVectorList> helpPtr(nextToCheck.ptr()); 
             nextToCheck.reset(auxToCheck.ptr());
-            // auxToCheck = helpPtr;
             auxToCheck = std::move(helpPtr);
         }
         if(subContactElements().size() > 0)
@@ -494,13 +476,12 @@ List<DynamicList<vector>> wallContactInfo::detectPossibleSMContact
         DynamicVectorList& elems = contactElements();
         for (auto it = elems.begin(); it != elems.end();)
         {
-            label idx = it - elems.begin();  // pointer arithmetic = index
+            label idx = it - elems.begin();                             // pointer arithmetic = index
 
             if (checkedOctreeFaces.found(*it))
             {
-                // it = contactElements().remove(it);
-                elems.remove(idx);           // removes and shifts
-                it = elems.begin() + idx;    // refresh pointer
+                elems.remove(idx);                                      // removes and shifts
+                it = elems.begin() + idx;                               // refresh pointer
             }
             else
             {
@@ -535,7 +516,6 @@ boundBox wallContactInfo::constructVMBox
     string& wallName
 )
 {
-    // InfoH << DEM_Info << " --SM initialBB Box : " << baseContactAreaBB << endl;
     pointField bbPoints = baseContactAreaBB.points();
     pointField newBBPoints;
     forAll(bbPoints,bP)
@@ -558,17 +538,12 @@ vector wallContactInfo::getPlanePoint
     string wallName
 )
 {
-    //contactPlane Data
+    // -- get contact plane data
     const vector& normalVector = wallPlaneInfo::getWallPlaneInfo()[wallName][0];
     const vector& centerPoint = wallPlaneInfo::getWallPlaneInfo()[wallName][1];
-    //contactPlane Data
 
     scalar fracI = normalVector & (centerPoint - pointInDomain);
     scalar fracII = magSqr(normalVector);
-    // scalar fracI = normalVector[0]*(centerPoint[0]-pointInDomain[0])+
-    //                 normalVector[1]*(centerPoint[1]-pointInDomain[1])+
-    //                 normalVector[2]*(centerPoint[2]-pointInDomain[2]);
-    // scalar fracII = pow(normalVector[0],2) + pow(normalVector[1],2) + pow(normalVector[2],2);
 
     return pointInDomain + (fracI/fracII)*normalVector;
 }
@@ -589,7 +564,6 @@ void wallContactInfo::checkSMElement
         while(iC < contactPatches.size() and !SM_()[index].isMesh)
         {
 
-            //~ isMeshLocC *= isInsidePlane(centroidPoint,contactPatches[iC]);//OF.com issues warning
             isMeshLocC &= isInsidePlane(centroidPoint,contactPatches[iC]);
             iC++;
         }
@@ -608,7 +582,6 @@ void wallContactInfo::checkSMElement
                 bool isMeshLocV(true);
                 while(iC < contactPatches.size() and !SM_()(verticesLabels[vL]).isMesh)
                 {
-                    //~ isMeshLocV *= isInsidePlane(vertexPoint,contactPatches[iC]);
                     isMeshLocV &= isInsidePlane(vertexPoint,contactPatches[iC]);
                     iC ++;
                 }
@@ -633,11 +606,10 @@ void wallContactInfo::checkElement
     bool allInBodyLocal(true);
 
     inMeshLocal =  inMeshLocal || SM_()[index].isMesh;
-    //~ allInMeshLocal *= SM_()[index].isMesh;
     allInMeshLocal &= SM_()[index].isMesh;
     inBodyLocal =  inBodyLocal || SM_()[index].isCBody;
-    //~ allInBodyLocal *= SM_()[index].isCBody;
     allInBodyLocal &= SM_()[index].isCBody;
+
     if(SM_()[index].isCBody && !SM_()[index].initPointSet)
     {
         SM_()[index].initPoint = SM_()[index].center;
@@ -648,11 +620,10 @@ void wallContactInfo::checkElement
     forAll(verticesLabels, vL)
     {
         inMeshLocal =  inMeshLocal || SM_()(verticesLabels[vL]).isMesh;
-        //~ allInMeshLocal *= SM_()(verticesLabels[vL]).isMesh;
         allInMeshLocal &= SM_()(verticesLabels[vL]).isMesh;
         inBodyLocal =  inBodyLocal || SM_()(verticesLabels[vL]).isCBody;
-        //~ allInBodyLocal *= SM_()(verticesLabels[vL]).isCBody;
         allInBodyLocal &= SM_()(verticesLabels[vL]).isCBody;
+        
         if(SM_()(verticesLabels[vL]).isCBody && !SM_()[index].isCBody && !SM_()[index].initPointSet)
         {
             SM_()[index].initPoint = SM_()(verticesLabels[vL]).center;
@@ -741,39 +712,48 @@ void wallContactInfo::saveWallFtHistory()
     wallFtHistory_.clear();
     for(auto sC : subCList_)
     {
-        const List<string>& patches(sC->getContactPatches());
-        if (patches.size() == 0)
+        // the split path carries one tangential spring per
+        // patch: persist each keyed by its own patch name,
+        // lumping sub-contacts that share the patch (the same
+        // lumping the merged path applies per patch set)
+        List<wallContactVars>& patchVars(sC->getPatchCntVars());
+
+        if (patchVars.size() > 0)
         {
+            const List<string>& patches(sC->getContactPatches());
+            forAll(patchVars, p)
+            {
+                vector FtPrev(patchVars[p].FtPrev_);
+                if (wallFtHistory_.found(patches[p]))
+                {
+                    wallFtHistory_[patches[p]] += FtPrev;
+                }
+                else
+                {
+                    wallFtHistory_.insert(patches[p], FtPrev);
+                }
+            }
             continue;
         }
 
-        // key on the sorted patch set so a sub-contact that
-        // spans the same patches continues its history even if
-        // the list order changed between sub-steps
-        // Note (MI): anything sub-contact related is dubious
-        List<string> sortedPatches(patches);
-        Foam::sort(sortedPatches);
-        string key;
-        forAll(sortedPatches, sP)
+        // sub-contact below the volume gate (a graze) builds no
+        // patch variables: pass the staged springs through so
+        // the tangential history survives the graze frozen
+        const List<string>& patches(sC->getContactPatches());
+        forAll(patches, p)
         {
-            key += sortedPatches[sP];
-            if (sP < sortedPatches.size() - 1)
+            if (sC->getPatchFtPrev().found(patches[p]))
             {
-                key += ",";
+                vector FtPrev(sC->getPatchFtPrev()[patches[p]]);
+                if (wallFtHistory_.found(patches[p]))
+                {
+                    wallFtHistory_[patches[p]] += FtPrev;
+                }
+                else
+                {
+                    wallFtHistory_.insert(patches[p], FtPrev);
+                }
             }
-        }
-
-        vector FtPrev(sC->getWallCntVars().FtPrev_);
-        if (wallFtHistory_.found(key))
-        {
-            // several sub-contacts share a patch set (body
-            // regions); sum the springs as one lumped history
-            // Note (MI): anything sub-contact related is dubious
-            wallFtHistory_[key] += FtPrev;
-        }
-        else
-        {
-            wallFtHistory_.insert(key, FtPrev);
         }
     }
 }
@@ -793,31 +773,46 @@ void wallContactInfo::saveWallDtCrit
 
     for(auto sC : subCList_)
     {
-        wallContactVars& wallCntvar(sC->getWallCntVars());
+        // every sub-contact carries its per-patch variables (the
+        // aggregate keeps only the union volume for the logs):
+        // scan every patch's own spring, a placeholder carries
+        // no lever arm there
+        List<wallContactVars>& patchVars(sC->getPatchCntVars());
 
-        if (mag(wallCntvar.contactVolume_) < SMALL)
+        if (patchVars.size() == 0)
         {
             continue;
         }
 
-        const scalar dtPair
-        (
-            sC->getPairDtCritRot
-            (
-                wallCntvar,
-                getcVars(),
-                IeffC,
-                tangentialFactor,
-                rotationalFactor
-            )
-        );
-
-        if (dtPair < wallDtCrit_)
+        forAll(patchVars, p)
         {
-            wallDtCrit_ = dtPair;
-            wallDtCritRot_ =
-                (dtPair < sC->getPairDtCrit(wallCntvar, getcVars(), tangentialFactor))
-                ? 1 : 0;
+            wallContactVars& pv(patchVars[p]);
+
+            if (mag(pv.contactVolume_)
+                < virtualMeshLevel::getRelVolSmall())
+            {
+                continue;
+            }
+
+            const scalar dtPair
+            (
+                sC->getPairDtCritRot
+                (
+                    pv,
+                    getcVars(),
+                    IeffC,
+                    tangentialFactor,
+                    rotationalFactor
+                )
+            );
+
+            if (dtPair < wallDtCrit_)
+            {
+                wallDtCrit_ = dtPair;
+                wallDtCritRot_ =
+                    (dtPair < sC->getPairDtCrit(pv, getcVars(), tangentialFactor))
+                    ? 1 : 0;
+            }
         }
     }
 }
@@ -829,64 +824,41 @@ void wallContactInfo::restoreWallFtHistory()
         return;
     }
 
-    // count sub-contacts per key so a lumped history splits back
-    // over the same number of springs it was summed from
-    // Note (MI): anything sub-contact related is dubious
-    HashTable<label, string, Hash<string>> nPerKey;
+    // count sub-contacts per patch so a lumped history splits
+    // back over the same number of springs it was summed from
+    HashTable<label, string, Hash<string>> nPerPatch;
     for(auto sC : subCList_)
     {
         const List<string>& patches(sC->getContactPatches());
-        if (patches.size() == 0)
+        forAll(patches, p)
         {
-            continue;
-        }
-
-        List<string> sortedPatches(patches);
-        Foam::sort(sortedPatches);
-        string key;
-        forAll(sortedPatches, sP)
-        {
-            key += sortedPatches[sP];
-            if (sP < sortedPatches.size() - 1)
+            if (nPerPatch.found(patches[p]))
             {
-                key += ",";
+                nPerPatch[patches[p]] += 1;
             }
-        }
-
-        if (nPerKey.found(key))
-        {
-            nPerKey[key] += 1;
-        }
-        else
-        {
-            nPerKey.insert(key, 1);
+            else
+            {
+                nPerPatch.insert(patches[p], 1);
+            }
         }
     }
 
+    // stage the per-patch springs on the sub-contact: the
+    // patch variables themselves are only built inside
+    // solveWallContact, after this restore
     for(auto sC : subCList_)
     {
         const List<string>& patches(sC->getContactPatches());
-        if (patches.size() == 0)
+        forAll(patches, p)
         {
-            continue;
-        }
-
-        List<string> sortedPatches(patches);
-        Foam::sort(sortedPatches);
-        string key;
-        forAll(sortedPatches, sP)
-        {
-            key += sortedPatches[sP];
-            if (sP < sortedPatches.size() - 1)
+            if (wallFtHistory_.found(patches[p]))
             {
-                key += ",";
+                sC->getPatchFtPrev().insert
+                (
+                    patches[p],
+                    wallFtHistory_[patches[p]]/nPerPatch[patches[p]]
+                );
             }
-        }
-
-        if (wallFtHistory_.found(key))
-        {
-            sC->getWallCntVars().FtPrev_
-                = wallFtHistory_[key]/nPerKey[key];
         }
     }
 }

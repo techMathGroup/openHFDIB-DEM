@@ -477,7 +477,10 @@ namespace Foam
 
         void setOverlayLambda(word overlayLambda){overlayLambda_ = overlayLambda;}
 
-        void resetHashTable(){cachedNeighbours_.clear();}
+        void resetHashTables(){
+            cachedNeighbours_.clear();
+            procNeighbours_.clear();
+        }
 
         virtual void setRhoS(dimensionedScalar rhoS){rhoS_ = rhoS;}
         dimensionedScalar getRhoS(){return rhoS_;}
@@ -632,7 +635,7 @@ namespace Foam
         );
 
         // phase 0: march from a fully-covered seed to a partial (ring) cell
-        label marchToRing(label seed, const pointField& cp);
+        label marchToRing(label seed, const pointField& cp, const Vector<label>& geomDirs);
 
         // vertex-based lambda with shared-vertex cache
         // (extracted from correctSurfCells); centerInside reports the

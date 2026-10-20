@@ -215,7 +215,6 @@ class wallContactInfo
     
     // harvest the tangential-force state of the current
     // sub-contact list into wallFtHistory_
-    // Note (MI): anything sub-contact related is dubious
     void saveWallFtHistory();
 
     // cached stability step of the last sub-step's wall

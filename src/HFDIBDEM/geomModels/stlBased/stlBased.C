@@ -32,6 +32,8 @@ Contributors
 \*---------------------------------------------------------------------------*/
 #include "stlBased.H"
 
+#include "facetBoxOverlap.H"
+
 #include <fstream>                                                      //std::ofstream cover visualization
 #include <iomanip>                                                      //std::setprecision cover visualization
 
@@ -508,34 +510,30 @@ bool stlBased::getShapesSurfacePlane
             surfPts[(*triSurf_)[facetI][2]]
         );
 
-        // overlap weight: triangle-bbox vs leaf-box overlap volume;
-        const boundBox triBBox
+        // overlap weight: exact triangle area inside the leaf box
+        const scalar overlapArea
         (
-            min(min(tri.a(), tri.b()), tri.c()),
-            max(max(tri.a(), tri.b()), tri.c())
-        );
-        const boundBox overlap
-        (
-            max(leaf.min(), triBBox.min()),
-            min(leaf.max(), triBBox.max())
+            facetBoxOverlapArea
+            (
+                tri.a(), tri.b(), tri.c(), leaf.min(), leaf.max()
+            )
         );
 
-        if (overlap.valid() && overlap.volume() > bestArea)
+        if (overlapArea > bestArea)
         {
-            bestArea = overlap.volume();                                //largest dominates
+            bestArea = overlapArea;                                     //largest dominates
             bestFacet = facetI;
         }
         else if
         (
-            overlap.valid()
-         && bestFacet > -1
-         && overlap.volume() == bestArea
+            bestFacet > -1
+         && overlapArea == bestArea
          && facetI < bestFacet
         )
         {
             // bit-identical overlap ties are the norm on flat
             // faces of axis-aligned or lattice-rotated bodies
-            // (every diagonal-split face pair shares one bbox);
+            // (a diagonal-split face pair can clip to equal areas);
             // the smallest facet index keeps the pick independent
             // of the candidate order the caller happens to use
             bestFacet = facetI;

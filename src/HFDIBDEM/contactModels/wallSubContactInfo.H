@@ -87,6 +87,24 @@ class wallSubContactInfo
 
     wallContactVars wallCntvar_;
 
+    // per-patch contact variables (the inclusion-exclusion
+    // attribution of a multi-patch sub-contact, or the aggregate
+    // as one entry otherwise); index-aligned with
+    // contactPatches_
+    List<wallContactVars> patchVars_;
+
+    // per-patch tangential springs restored (by patch name)
+    // before the patch variables are built; consumed by the
+    // patchVars fill, which happens inside solveWallContact
+    // (wallContactInfo::restoreWallFtHistory runs earlier in
+    // the sub-step)
+    HashTable<vector, string, Hash<string>> patchFtPrev_;
+
+    // creating member of a cluster sub-contact (null on plain
+    // bodies); set at detection so the evaluation runs the
+    // member exclusively
+    std::shared_ptr<geomModel> creatorModel_ = nullptr;
+
     scalar reduceM_ = 0;    // Reduced mass
 
     forces outForce_; // Out variable for force
@@ -139,6 +157,31 @@ class wallSubContactInfo
         return wallCntvar_;
     }
 
+    // per-patch force variables of every sub-contact; empty when
+    // the volume gate rejected the sub-contact this sub-step
+    List<wallContactVars>& getPatchCntVars()
+    {
+        return patchVars_;
+    }
+
+    // staged per-patch springs from the tangential history
+    HashTable<vector, string, Hash<string>>& getPatchFtPrev()
+    {
+        return patchFtPrev_;
+    }
+
+    // creating member of a cluster sub-contact (null on plain
+    // bodies); the cluster evaluation runs this member only
+    std::shared_ptr<geomModel>& getCreatorModel()
+    {
+        return creatorModel_;
+    }
+
+    void setCreatorModel(std::shared_ptr<geomModel> creator)
+    {
+        creatorModel_ = std::move(creator);
+    }
+
     scalar& getReduceM()
     {
         return reduceM_;
@@ -148,8 +191,6 @@ class wallSubContactInfo
     {
         return BB_;
     }
-
-    void clearWallCntVars();
 
     scalar getMu(wallContactVars& wallCntvar)
     {

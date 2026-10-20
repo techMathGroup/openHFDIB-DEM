@@ -95,7 +95,7 @@ void getContacts_Cluster(
 
     if(cIsCluster)
     {
-        periodicBody& cCluster = dynamic_cast<periodicBody&>(prtcInfo.getcClass().getGeomModel());
+        clusterBody& cCluster = dynamic_cast<clusterBody&>(prtcInfo.getcClass().getGeomModel());
         cBodies = cCluster.getClusterBodies();
     }
     else
@@ -105,7 +105,7 @@ void getContacts_Cluster(
 
     if(prtcInfo.gettClass().getGeomModel().isCluster())
     {
-        periodicBody& tCluster = dynamic_cast<periodicBody&>(prtcInfo.gettClass().getGeomModel());
+        clusterBody& tCluster = dynamic_cast<clusterBody&>(prtcInfo.gettClass().getGeomModel());
 
         if (cIsCluster)
         {
@@ -262,7 +262,7 @@ bool detectPrtPrtContact_Cluster
 
     if(isCCluster)
     {
-        periodicBody& cCluster = dynamic_cast<periodicBody&>(cClass.getGeomModel());
+        clusterBody& cCluster = dynamic_cast<clusterBody&>(cClass.getGeomModel());
         cBodies = cCluster.getClusterBodies();
     }
     else
@@ -272,7 +272,7 @@ bool detectPrtPrtContact_Cluster
 
     if(tClass.getGeomModel().isCluster())
     {
-        periodicBody& tCluster = dynamic_cast<periodicBody&>(tClass.getGeomModel());
+        clusterBody& tCluster = dynamic_cast<clusterBody&>(tClass.getGeomModel());
         if (isCCluster)
         {
             tBodies.push_back(tCluster.getClusterBodies()[0]);
@@ -819,7 +819,7 @@ void getPrtContactVars_Cluster
 
     if(isCCluster)
     {
-        periodicBody& cCluster = dynamic_cast<periodicBody&>(cClass.getGeomModel());
+        clusterBody& cCluster = dynamic_cast<clusterBody&>(cClass.getGeomModel());
         cBodies = cCluster.getClusterBodies();
     }
     else
@@ -829,7 +829,7 @@ void getPrtContactVars_Cluster
 
     if(tClass.getGeomModel().isCluster())
     {
-        periodicBody& tCluster = dynamic_cast<periodicBody&>(tClass.getGeomModel());
+        clusterBody& tCluster = dynamic_cast<clusterBody&>(tClass.getGeomModel());
         if (isCCluster)
         {
             tBodies.push_back(tCluster.getClusterBodies()[0]);

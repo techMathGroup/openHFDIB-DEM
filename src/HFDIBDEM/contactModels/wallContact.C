@@ -37,6 +37,10 @@ Contributors
 #include "wallPlaneInfo.H"
 #include "planePolyClip.H"
 
+#include <chrono>
+#include <cstdlib>
+#include <sstream>
+
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -84,6 +88,330 @@ bool boxBehindWalls
     }
 
     return true;
+}
+
+// volume and first moment of the penetrating body material inside
+// the intersection of the given wall half-spaces (a single-patch
+// subset measures the patch-local penetration, the full set the
+// wedge). the body-side virtual meshes are re-evaluated with their
+// wall planes replaced by the subset: their flood seed (the only
+// mutable state of virtualMeshWallInfo, advanced by
+// detectFirstContactPoint) is saved and restored so the persisted
+// seed of the full-set evaluation - run first - keeps evolving
+// exactly as before this function exists
+void evalSubsetVolume
+(
+    wallContactInfo& wallCntInfo,
+    wallSubContactInfo& sCW,
+    const List<planePolyClip::halfSpace>& planes,
+    scalar& V,
+    vector& M
+)
+{
+    V = 0;
+    M = vector::zero;
+
+    const label nVM = sCW.getVMContactSize();
+    for (label i = 0; i < nVM; i++)
+    {
+        // peek by reference (see the vmWInfoList_ loop in
+        // getWallContactVars_ArbShape)
+        autoPtr<virtualMeshWallInfo>& vmWInfo
+        (
+            sCW.getVMContactInfo(i)
+        );
+        if (!vmWInfo.valid())
+        {
+            continue;
+        }
+
+        const point seed(vmWInfo->getStartingPoint());
+
+        virtualMeshWall vm
+        (
+            vmWInfo(),
+            wallCntInfo.getcClass().getGeomModel()
+        );
+        vm.setWallPlanes(planes);
+
+        if (vm.detectFirstContactPoint())
+        {
+            const scalar vv
+            (
+                vm.evaluateContact()*vmWInfo->getEmptyScale()
+            );
+            V += vv;
+            M += vv*vm.getContactCenter();
+        }
+
+        vmWInfo->setStartingPoint(seed);
+    }
+
+    // internal boxes mirror the main evaluation: exact clip of
+    // straddlers, full volume behind every plane of the subset
+    const List<Tuple2<point,boundBox>>& internal
+    (
+        sCW.getInternalElements()
+    );
+    forAll(internal, sCII)
+    {
+        const boundBox& iBox(internal[sCII].second());
+
+        if (    virtualMeshLevel::getExactSubVolume()
+            && !boxBehindWalls(iBox, planes))
+        {
+            scalar cV(0);
+            vector cC(vector::zero);
+
+            planePolyClip::volumeAndCentroid
+            (
+                iBox,
+                planes,
+                cV,
+                cC
+            );
+
+            V += cV;
+            M += cV*cC;
+        }
+        else
+        {
+            V += iBox.volume();
+            M += iBox.volume()*internal[sCII].first();
+        }
+    }
+}
+
+// per-patch attribution of a multi-patch sub-contact: effective
+// volume and centre per patch, index aligned with the patch
+// list of the sub-contact
+struct wallSplitResult
+{
+    bool valid = false;
+    List<scalar> Veff;
+    List<vector> Ceff;
+};
+
+// split a multi-patch sub-contact into per-patch penetrations
+// by inclusion-exclusion: V_union = sum over nonempty subsets S
+// of (-1)^(|S|+1) V_S, each subset volume shared equally between
+// its patches (weight 1/|S| per signed term), which gives
+// sum_p V_p_eff = V_union identically. patches with V_p below
+// relSMALL are dropped before the enumeration (V_S <= V_p for
+// every p in S, so no surviving subset contains a dropped
+// patch). the monotonicity and negative-remainder clamps are
+// round-off safeguards only: a firing counter is a diagnostic
+// signal, not normal flow. side-effect-free (see
+// evalSubsetVolume for the seed handling), so the caller may
+// consume the result in the force path or only log it
+// (HFDIB_WALL_SPLIT_DIAG)
+wallSplitResult splitWallSubContact
+(
+    wallContactInfo& wallCntInfo,
+    wallSubContactInfo& sCW,
+    const List<planePolyClip::halfSpace>& wallPlanes,
+    const List<string>& contactPatches,
+    const scalar relSMALL
+)
+{
+    wallSplitResult res;
+
+    const label n(contactPatches.size());
+
+    // the inclusion-exclusion sum is over 2^n subsets: beyond a
+    // handful of patches the enumeration (and the log line)
+    // stops paying for itself
+    if (n < 2 || n > 6)
+    {
+        return res;
+    }
+
+    // start of the attribution, for the HFDIB_WALL_SPLIT_DIAG timing
+    const auto t0(std::chrono::steady_clock::now());
+
+    auto subsetPlanes = [&](label mask)
+    {
+        List<planePolyClip::halfSpace> pl;
+        for (label p = 0; p < n; p++)
+        {
+            if (mask & (1 << p))
+            {
+                pl.append(wallPlanes[p]);
+            }
+        }
+        return pl;
+    };
+
+    // subset volumes and first moments, indexed by bitmask; the
+    // full set first so the restored flood seed it leaves behind
+    // is the one the main evaluation would persist
+    List<scalar> Vs(1 << n, 0.0);
+    List<vector> Ms(1 << n, vector::zero);
+    evalSubsetVolume
+    (
+        wallCntInfo, sCW, wallPlanes, Vs[(1 << n) - 1], Ms[(1 << n) - 1]
+    );
+
+    // single-patch volumes (the prefilter of the enumeration:
+    // a dropped patch is absent from every surviving subset)
+    List<scalar> Vp(n, 0.0);
+    List<vector> Mp(n, vector::zero);
+    label survMask(0);
+    for (label p = 0; p < n; p++)
+    {
+        evalSubsetVolume
+        (
+            wallCntInfo, sCW, subsetPlanes(1 << p), Vp[p], Mp[p]
+        );
+        if (Vp[p] > relSMALL)
+        {
+            survMask |= (1 << p);
+        }
+    }
+
+    label clamps(0);
+    for (label mask = 1; mask < (1 << n); mask++)
+    {
+        if ((mask & survMask) != mask)
+        {
+            continue;
+        }
+
+        label cnt(0);
+        for (label p = 0; p < n; p++)
+        {
+            if (mask & (1 << p))
+            {
+                cnt++;
+            }
+        }
+
+        if (cnt == 1)
+        {
+            // reuse the prefilter evaluation of this patch
+            for (label p = 0; p < n; p++)
+            {
+                if (mask & (1 << p))
+                {
+                    Vs[mask] = Vp[p];
+                    Ms[mask] = Mp[p];
+                }
+            }
+            continue;
+        }
+
+        evalSubsetVolume
+        (
+            wallCntInfo, sCW, subsetPlanes(mask), Vs[mask], Ms[mask]
+        );
+
+        // monotonicity safeguard: V_S <= V_(S minus q)
+        scalar vmin(GREAT);
+        for (label q = 0; q < n; q++)
+        {
+            if (mask & (1 << q))
+            {
+                vmin = min(vmin, Vs[mask & ~(1 << q)]);
+            }
+        }
+        if (Vs[mask] > vmin*(1 + 1e-9) + VSMALL)
+        {
+            Ms[mask] *= vmin/(Vs[mask] + VSMALL);
+            Vs[mask] = vmin;
+            clamps++;
+        }
+    }
+
+    // inclusion-exclusion attribution
+    List<scalar> Veff(n, 0.0);
+    List<vector> Meff(n, vector::zero);
+    scalar Vunion(0);
+    for (label mask = 1; mask < (1 << n); mask++)
+    {
+        label cnt(0);
+        for (label p = 0; p < n; p++)
+        {
+            if (mask & (1 << p))
+            {
+                cnt++;
+            }
+        }
+        const scalar sgn(cnt % 2 ? 1.0 : -1.0);
+
+        Vunion += sgn*Vs[mask];
+        for (label p = 0; p < n; p++)
+        {
+            if (mask & (1 << p))
+            {
+                Veff[p] += sgn*Vs[mask]/cnt;
+                Meff[p] += sgn*Ms[mask]/cnt;
+            }
+        }
+    }
+    label negs(0);
+    for (label p = 0; p < n; p++)
+    {
+        if (Veff[p] < 0)
+        {
+            Veff[p] = 0;
+            negs++;
+        }
+    }
+
+    // per-patch contact centres from the clamped volumes
+    List<vector> Ceff(n, vector::zero);
+    for (label p = 0; p < n; p++)
+    {
+        if (Veff[p] > 0)
+        {
+            Ceff[p] = Meff[p]/Veff[p];
+        }
+    }
+
+    res.valid = true;
+    res.Veff = Veff;
+    res.Ceff = Ceff;
+
+    // diagnostic line (env HFDIB_WALL_SPLIT_DIAG)
+    static const bool splitDiag
+    (
+        std::getenv("HFDIB_WALL_SPLIT_DIAG") != nullptr
+    );
+    if (splitDiag)
+    {
+        const scalar us
+        (
+            std::chrono::duration<double, std::micro>
+            (
+                std::chrono::steady_clock::now() - t0
+            ).count()
+        );
+
+        std::ostringstream os;
+        os << "wallSplit body " << sCW.getBodyId() << " n " << n
+           << " Vwedge " << Vs[(1 << n) - 1] << " Vunion "
+           << Vunion;
+        os << " patches";
+        for (label p = 0; p < n; p++)
+        {
+            os << " " << contactPatches[p];
+        }
+        os << " Vp";
+        for (label p = 0; p < n; p++)
+        {
+            os << " " << Vp[p];
+        }
+        os << " Veff";
+        for (label p = 0; p < n; p++)
+        {
+            os << " " << Veff[p];
+        }
+        os << " clamps " << clamps << " negs " << negs
+           << " surv " << survMask << " us " << us;
+        Info << os.str().c_str() << endl;
+    }
+
+    return res;
 }
 
 }// End namespace Foam::contactModel::<anonymous>
@@ -195,7 +523,7 @@ bool detectWallContact_Cluster(
 {
     wallCntInfo.getContactPatches().clear();
 
-    periodicBody& cCluster = dynamic_cast<periodicBody&>(ibClass.getGeomModel());
+    clusterBody& cCluster = dynamic_cast<clusterBody&>(ibClass.getGeomModel());
     std::vector<std::shared_ptr<geomModel>> cBodies = cCluster.getClusterBodies();
 
     for(std::shared_ptr<geomModel>& cgModel : cBodies)
@@ -226,6 +554,13 @@ bool detectWallContact_Cluster(
             tmpWallCntI
         ))
         {
+            // tag the member's sub-contacts before the splice:
+            // the evaluation then runs the creating member only
+            for (auto& sC : tmpWallCntI.getWallSCList())
+            {
+                sC->setCreatorModel(cgModel);
+            }
+
             wallCntInfo.getWallSCList().insert(
                 std::end(wallCntInfo.getWallSCList()),
                 std::begin(tmpWallCntI.getWallSCList()),
@@ -305,12 +640,6 @@ void getWallContactVars_ArbShape(
     // intersect volume
     vector contactCenterSum(vector::zero);
 
-    // dead since the area-weighted normal rewrite: accumulated
-    // but never consumed. kept commented to make the removal 
-    // revertible, delete when definitely sure of useleness
-    //~ autoPtr<DynamicVectorList> contactPlaneCenters(
-    //~     new DynamicVectorList);
-
     autoPtr<DynamicScalarList> contactAreas(
         new DynamicScalarList);
 
@@ -334,15 +663,7 @@ void getWallContactVars_ArbShape(
     // mirror of the prt-side family (prtContact.C:374); the
     // measured empty band above the gate makes the rejection
     // lossless at case scales
-    const scalar relSMALL
-    (
-        SMALL*pow
-        (
-            virtualMeshLevel::getCharCellSize()
-           /virtualMeshLevel::getLevelOfDivision(),
-            3.0
-        )
-    );
+    const scalar relSMALL(virtualMeshLevel::getRelVolSmall());
 
     for(label i = 0; i< vMContactInfoSize; i++)
     {
@@ -415,7 +736,28 @@ void getWallContactVars_ArbShape(
         }
     }
 
-    if(intersectVolume > relSMALL)
+    // per-patch attribution of a multi-patch sub-contact,
+    // evaluated before the volume gate below: the union volume
+    // opens the contact even when the wedge (the intersection
+    // over all patches) is still empty, so a body touching one
+    // wall that just reached a second one does not wait for
+    // corner material. HFDIB_WALL_SPLIT_DIAG additionally logs
+    // the attribution
+    wallSplitResult split;
+    if (contactPatches.size() > 1)
+    {
+        split = splitWallSubContact
+        (
+            wallCntInfo,
+            sCW,
+            wallPlanes,
+            contactPatches,
+            relSMALL
+        );
+    }
+    const bool splitActive(split.valid);
+
+    if(intersectVolume > relSMALL || splitActive)
     {
         for(label i = 0; i< vMPlaneInfoSize; i++)
         {
@@ -526,20 +868,102 @@ void getWallContactVars_ArbShape(
                        *(pow(vmWInfo->getSVVolume(),2.0/3.0))
                     );
                 }
-                //~ contactPlaneCenters().append(virtMeshPlane->getContactCenter());
             }
             else
             {
                 contactAreas().append((intersectVolume/vmWInfo->getSVVolume())*(pow(vmWInfo->getSVVolume(),2.0/3)));
-                //~ contactPlaneCenters().append(virtMeshPlane->getContactCenter());
+            }
+        }
+
+        // the aggregate of the split path is the per-patch union,
+        // not the wedge: this opens the contact while the wedge
+        // is still empty and keeps the stored volume/centre
+        // consistent with the summed per-patch forces once the
+        // wedge fills. a patch without a penetration slab
+        // (Ap == 0) contributes nothing
+        if (splitActive)
+        {
+            intersectVolume = 0;
+            contactCenterSum = vector::zero;
+            forAll(contactAreas(), cA)
+            {
+                if (split.Veff[cA] > relSMALL
+                    && contactAreas()[cA] > 0)
+                {
+                    intersectVolume += split.Veff[cA];
+                    contactCenterSum += split.Ceff[cA]*split.Veff[cA];
+                }
+            }
+            if (intersectVolume <= relSMALL)
+            {
+                return;
+            }
+        }
+
+        // per-patch force variables of the split path, one
+        // wallContactVars per patch; the aggregate above keeps
+        // the union volume for the logs and the dt estimator
+        if (splitActive)
+        {
+            // one plane VM per patch (wallContactInfo::
+            // setNewSubContact appends one plane box per patch
+            // entry): the area list must align with the patch
+            // list
+            if (contactAreas().size() != contactPatches.size())
+            {
+                FatalErrorInFunction
+                    << "wall split: plane-VM/patch index mismatch: "
+                    << contactAreas().size() << " areas vs "
+                    << contactPatches.size() << " patches"
+                    << abort(FatalError);
+            }
+
+            List<wallContactVars>& patchVars(sCW.getPatchCntVars());
+            patchVars.clear();
+            forAll(contactPatches, p)
+            {
+                // placeholder for a skipped patch keeps the list
+                // index-aligned; its zero volume makes the force
+                // loop ignore it
+                wallContactVars pv;
+
+                // same gate as the aggregate above
+                if (split.Veff[p] > relSMALL
+                    && contactAreas()[p] > 0)
+                {
+                    pv.contactVolume_ = split.Veff[p];
+                    pv.contactCenter_ = split.Ceff[p];
+                    pv.contactArea_ = contactAreas()[p];
+                    pv.contactNormal_ =
+                        -wallPlaneInfo::getWallPlaneInfo()
+                            [contactPatches[p]][0];
+
+                    DynamicScalarList a1;
+                    a1.append(contactAreas()[p]);
+                    List<string> p1(1, contactPatches[p]);
+                    pv.setMeanCntPars_Plane
+                    (
+                        a1,
+                        p1,
+                        wallCntInfo.getWallMeanPars()
+                    );
+
+                    // continue the tangential spring staged by
+                    // wallContactInfo::restoreWallFtHistory
+                    if (sCW.getPatchFtPrev().found(contactPatches[p]))
+                    {
+                        pv.FtPrev_ = sCW.getPatchFtPrev()
+                            [contactPatches[p]];
+                    }
+                }
+
+                patchVars.append(pv);
             }
         }
 
         // volume-weighted mean over every contribution above
         // (legacy: unweighted mean of the per-VM centres)
         contactCenter = contactCenterSum/intersectVolume;
-        // Pout << "Survived #0 " << endl;
-        // Pout << "contactAreas() " << contactAreas() << endl;
         forAll(contactAreas(),cA)
         {
             contactArea += contactAreas()[cA];
@@ -549,13 +973,10 @@ void getWallContactVars_ArbShape(
         {
             return;
         }
-        // Pout << "contactArea " << contactArea << endl;
-        // Pout << "Survived #0.5 " << endl;
         forAll(contactPatches,cP)
         {
             contactNormal -= wallPlaneInfo::getWallPlaneInfo()[contactPatches[cP]][0]*contactAreas()[cP];
         }
-        // Pout << "contactNormal " << mag(contactNormal) << endl;
         if (mag(contactNormal) > SMALL)
         {
             contactNormal /= mag(contactNormal);
@@ -577,27 +998,66 @@ void getWallContactVars_ArbShape(
             contactNormal = -wallPlaneInfo::getWallPlaneInfo()
                 [contactPatches[maxA]][0];
         }
-        // Pout << "contactNormal " << contactNormal << endl;
         wallCntInfo.getcClass().setWallContact(true);
         wallCntInfo.getcClass().inContactWithStatic(true);
-        // Pout << "Survived #1 " << endl;
         wallContactVars& wallCntVars = sCW.getWallCntVars();
-        // Pout << "Survived #2 " << endl;
         wallCntVars.contactCenter_ = contactCenter;
         wallCntVars.contactArea_   = contactArea;
         wallCntVars.contactVolume_ = intersectVolume;
         wallCntVars.contactNormal_ = contactNormal;
-        // Pout << "Survived #3 " << endl;
         wallCntVars.setMeanCntPars_Plane
         (
             contactAreas(),
             contactPatches,
             wallCntInfo.getWallMeanPars()
         );
-        // Pout << "Survived #4 " << endl;
+
+        // per-patch list of the paths without an attribution:
+        // single-patch sub-contacts and sub-contacts above the
+        // split patch cap carry the aggregate evaluated above
+        // as one real entry, placeholders keep the list
+        // index-aligned. This routes every sub-contact through
+        // the per-patch force path in solveWallContact
+        if (!splitActive)
+        {
+            // alphabetically first patch: the deterministic home
+            // of the aggregate entry (a stable history key)
+            label keyP(0);
+            forAll(contactPatches, p)
+            {
+                if (contactPatches[p] < contactPatches[keyP])
+                {
+                    keyP = p;
+                }
+            }
+
+            List<wallContactVars>& patchVars(sCW.getPatchCntVars());
+            patchVars.clear();
+            forAll(contactPatches, p)
+            {
+                wallContactVars pv;
+
+                if (p == keyP)
+                {
+                    pv = wallCntVars;
+
+                    // continue the tangential spring staged by
+                    // wallContactInfo::restoreWallFtHistory
+                    // (the spring the merged path kept on the
+                    // sub-contact aggregate)
+                    if (sCW.getPatchFtPrev().found(contactPatches[keyP]))
+                    {
+                        pv.FtPrev_ = sCW.getPatchFtPrev()
+                            [contactPatches[keyP]];
+                    }
+                }
+
+                patchVars.append(pv);
+            }
+        }
     }
 }
-// //---------------------------------------------------------------------------//
+//---------------------------------------------------------------------------//
 void getWallContactVars_Sphere(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo,
@@ -673,11 +1133,89 @@ void getWallContactVars_Sphere(
         wallCntInfo.getWallMeanPars()
     );
 
+    // per-patch force path: the analytic per-patch variables
+    // are already one entry per patch, so they fill the patch
+    // list directly (no inclusion-exclusion needed); the
+    // aggregate above keeps only the union volume for the logs
+    // and the dt estimator
+    if (contactPatches.size() > 0)
+    {
+        const scalar relSMALL(virtualMeshLevel::getRelVolSmall());
+
+        List<wallContactVars>& patchVars(sCW.getPatchCntVars());
+        patchVars.clear();
+        forAll(contactPatches, p)
+        {
+            // placeholder for an empty cap keeps the list
+            // index-aligned; its zero volume makes the force
+            // loop ignore it
+            wallContactVars pv;
+
+            if (wallCntVarsList[p].contactVolume_ > relSMALL)
+            {
+                pv = wallCntVarsList[p];
+
+                DynamicScalarList a1;
+                a1.append(wallCntVarsList[p].contactArea_);
+                List<string> p1(1, contactPatches[p]);
+                pv.setMeanCntPars_Plane
+                (
+                    a1,
+                    p1,
+                    wallCntInfo.getWallMeanPars()
+                );
+            }
+
+            // continue the tangential spring staged by
+            // wallContactInfo::restoreWallFtHistory also on a
+            // placeholder: a cap below the volume gate keeps
+            // its spring frozen through the graze
+            if (sCW.getPatchFtPrev().found(contactPatches[p]))
+            {
+                pv.FtPrev_ = sCW.getPatchFtPrev()
+                    [contactPatches[p]];
+            }
+
+            patchVars.append(pv);
+        }
+    }
+
     if(wallCntVars.contactVolume_ > 0)
     {
         wallCntInfo.getcClass().setWallContact(true);
         wallCntInfo.getcClass().inContactWithStatic(true);
     }
+}
+//---------------------------------------------------------------------------//
+// evaluate one cluster member through the sub-contact; the
+// patches stay the parent union so a member sees the same cap
+// list as before the creator tagging
+static void evalClusterMember(
+    const fvMesh&   mesh,
+    wallContactInfo& wallCntInfo,
+    std::shared_ptr<geomModel>& cgModel,
+    const scalar deltaT,
+    wallSubContactInfo& sWC
+)
+{
+    ibContactClass cIbClassI(
+        cgModel,
+        wallCntInfo.getcClass().getMatInfo().getMaterial()
+    );
+
+    wallContactInfo cWallCntI(
+        cIbClassI,
+        wallCntInfo.getcVars()
+    );
+
+    cWallCntI.getContactPatches() = wallCntInfo.getContactPatches();
+
+    getWallContactVars(
+        mesh,
+        cWallCntI,
+        deltaT,
+        sWC
+    );
 }
 //---------------------------------------------------------------------------//
 void getWallContactVars_Cluster(
@@ -687,34 +1225,17 @@ void getWallContactVars_Cluster(
     wallSubContactInfo& sWC
 )
 {
-    periodicBody& cCluster = dynamic_cast<periodicBody&>(wallCntInfo.getcClass().getGeomModel());
-    std::vector<std::shared_ptr<geomModel>> cBodies = cCluster.getClusterBodies();
+    // the sub-contact was created by one member of the cluster:
+    // evaluate exactly that member. Detection is the only
+    // producer of cluster sub-contacts and it tags every one,
+    // so the creator is always set (with touching members the
+    // pre-tagging bbox scan let every overlapping member
+    // rewrite the same sub-contact, so the last member won)
+    std::shared_ptr<geomModel> creator(sWC.getCreatorModel());
 
-    for(std::shared_ptr<geomModel>& cgModel : cBodies)
+    if (creator != nullptr)
     {
-        if(!sWC.getsWCBB().overlaps(cgModel->getBounds()))
-        {
-            continue;
-        }
-
-        ibContactClass cIbClassI(
-            cgModel,
-            wallCntInfo.getcClass().getMatInfo().getMaterial()
-        );
-
-        wallContactInfo cWallCntI(
-            cIbClassI,
-            wallCntInfo.getcVars()
-        );
-
-        cWallCntI.getContactPatches() = wallCntInfo.getContactPatches();
-
-        getWallContactVars(
-            mesh,
-            cWallCntI,
-            deltaT,
-            sWC
-        );
+        evalClusterMember(mesh, wallCntInfo, creator, deltaT, sWC);
     }
 }
 //---------------------------------------------------------------------------//
@@ -733,14 +1254,26 @@ bool solveWallContact
         sCI
     );
 
-    vector outF = vector::zero;
-    vector cLVecOut = vector::zero;
-
     wallContactVars& wallCntVar = sCI.getWallCntVars();
 
-    sCI.evalVariables(wallCntVar,wallCntInfo.getcClass(),wallCntInfo.getcVars());
+    List<wallContactVars>& patchVars(sCI.getPatchCntVars());
 
-    if(wallCntVar.contactVolume_ == 0)
+    // every contact-carrying sub-contact enters the per-patch
+    // path: a multi-patch split for 2-6 patches, the single
+    // aggregate entry for single-patch and above-cap
+    // sub-contacts. Every patch carries its own lever arm,
+    // penetration and material, so the elastic, damping,
+    // tangential and adhesive forces are evaluated per patch
+    // and summed with their own moment arms
+    if (patchVars.size() == 0)
+    {
+        sCI.getOutForce().F = vector::zero;
+        sCI.getOutForce().T = vector::zero;
+        return false;
+    }
+
+    if (mag(wallCntVar.contactVolume_)
+        < virtualMeshLevel::getRelVolSmall())
     {
         sCI.getOutForce().F = vector::zero;
         sCI.getOutForce().T = vector::zero;
@@ -762,37 +1295,70 @@ bool solveWallContact
     InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact area "
         << wallCntVar.contactArea_ << endl;
 
-    vector F = sCI.getFNe(wallCntVar);
-    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FNe " << F << endl;
-
-    vector FNd = sCI.getFNd(wallCntVar);
-    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FNd " << FNd << endl;
-
-    if ((F & FNd) < 0 && mag(FNd) > mag(F))
+    forAll(patchVars, p)
     {
-        FNd *= mag(F) / mag(FNd);
-        InfoH << parallelDEM_Info << "FNd was Clipped to "<< FNd << endl;
+        sCI.evalVariables
+        (
+            patchVars[p],
+            wallCntInfo.getcClass(),
+            wallCntInfo.getcVars()
+        );
     }
 
-    F += FNd;
-    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FN " << F << endl;
+    vector Fsum(vector::zero);
+    vector Tsum(vector::zero);
+    forAll(patchVars, p)
+    {
+        wallContactVars& pv(patchVars[p]);
 
-    // the coulomb ceiling inside getFt() -> FtCeil = sCI.getMu(wallCntVar)*mag(F)
-    vector Ft = sCI.getFt(wallCntVar, deltaT, sCI.getMu(wallCntVar)*mag(F));
-    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact Ft " << Ft << endl;
+        if (pv.contactVolume_ == 0)
+        {
+            continue;
+        }
 
-    F += Ft;
+        vector F(sCI.getFNe(pv));
+        InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId()
+            <<" split patch "<< sCI.getContactPatches()[p] << " contact FNe " << F << endl;
 
-    vector FA = sCI.getFA(wallCntVar);
-    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FA " << FA << endl;
-    F -= FA;
+        vector FNd(sCI.getFNd(pv));
+        InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId()
+            <<" split patch "<< sCI.getContactPatches()[p] << " contact FNd " << FNd << endl;
 
-    outF += F;
+        if ((F & FNd) < 0 && mag(FNd) > mag(F))
+        {
+            FNd *= mag(F)/mag(FNd);
+            InfoH << parallelDEM_Info << "FNd was Clipped to "<< FNd << endl;
+        }
+        F += FNd;
+        InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId()
+            <<" split patch "<< sCI.getContactPatches()[p] << " contact FN " << F << endl;
 
-    cLVecOut += wallCntVar.lVec_;
+        // the coulomb ceiling inside getFt():
+        // FtCeil = mu*mag(FNe + FNd of this patch)
+        vector Ft
+        (
+            sCI.getFt
+            (
+                pv,
+                deltaT,
+                sCI.getMu(pv)*mag(F)
+            )
+        );
+        InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId()
+            <<" split patch "<< sCI.getContactPatches()[p] << " contact Ft " << Ft << endl;
+        F += Ft;
 
-    sCI.getOutForce().F = outF;
-    sCI.getOutForce().T = cLVecOut ^  outF;
+        vector FA(sCI.getFA(pv));
+        InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId()
+            <<" split patch "<< sCI.getContactPatches()[p] << " contact FA " << FA << endl;
+        F -= FA;
+
+        Fsum += F;
+        Tsum += pv.lVec_ ^ F;
+    }
+
+    sCI.getOutForce().F = Fsum;
+    sCI.getOutForce().T = Tsum;
     return true;
 }
 // //---------------------------------------------------------------------------//

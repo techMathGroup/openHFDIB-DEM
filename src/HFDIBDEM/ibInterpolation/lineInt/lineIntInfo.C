@@ -222,8 +222,16 @@ void lineIntInfo::setIntpInfo()
 
                 vector dir = cIntPoint.iPoint_ - ibPointsRecv[proci][iInfo];
                 dir /= mag(dir);
+                // Note (MI): this dir seems unused - bug or feature?
+                // Note (LK): all dirs should be parallel to surface normal, we can use one and pass it here
+                // Note (MI): is normalization by mag(dir) robust?
+                //            |-> can cIntPoint.iPoint_ coincide with 
+                //                ibPointsRecv[proci][iInfo]?
+                // Note (LK): will not coincide with non-zero intDist, and even then it would hang in pointInCell function line 130
                 correctIntPoint(ibPointsRecv[proci][iInfo], cIntPoint);
-
+                // Note (MI): correctIntPoint computes its own dir
+                // Note (MI): as well as getClosestPoint, which is used 
+                //            in correctIntPoint
                 intPointsRecv[proci][iInfo] = cIntPoint;
             }
         }
@@ -308,6 +316,12 @@ void lineIntInfo::correctIntPoint
         {
             const face faceI = mesh_.faces()[cellFaces[fi]];
             vector dir = closestPoint - cPoint.iPoint_;
+            // Note (MI): there is no normalization here
+            // Question (MI): could normalization by mag(dir) help with
+            //                faceI.ray() robustness?
+            // Note (LK): faceI.ray is defined in file src/OpenFOAM/meshes/meshShapes/face/faceIntersection.C
+            // its readme says that the direction vector does not have to be normalized
+            // but we can do it, it should not matter and it will be consistent
 
             pointHit pHit = faceI.ray(
                 cPoint.iPoint_,
@@ -338,6 +352,10 @@ vector lineIntInfo::getClosestPoint
 {
     vector dir = cPoint.iPoint_ - ibPoint;
     dir /= mag(dir);
+    // Note (MI): is normalization by mag(dir) robust?
+    // Note (LK): we can pass on surface normal itself
+    //            |-> can cPoint.iPoint_ coincide with ibPoint?
+    // Note (LK): will not coincide with non-zero intDist, and even then it would hang in pointInCell function line 130
 
     vector dirToC = mesh_.C()[cPoint.iCell_] - ibPoint;
 
@@ -410,10 +428,12 @@ label lineIntInfo::getFaceInDir
 (
     const intPoint& retPoint,
     const label prevFace
-)
+) const
 {
     label faceToReturn = -1;
     vector dir = retPoint.iPoint_ - mesh_.C()[retPoint.iCell_];
+    // Note (MI): no normalization here
+    // Note (LK): here, both should be normalized
 
     const labelList& cellFaces(mesh_.cells()[retPoint.iCell_]);
     scalar dotProd(-GREAT);
@@ -423,10 +443,28 @@ label lineIntInfo::getFaceInDir
         label fI = cellFaces[faceI];
         if(fI != prevFace)
         {
-            vector outNorm = (mesh_.faceOwner()[fI] == retPoint.iCell_)
-                ? mesh_.Sf()[fI] : (-1*mesh_.Sf()[fI]);
+            vector outNorm(vector::zero);
+
+            if (mesh_.isInternalFace(fI))
+            {
+                outNorm = mesh_.Sf()[fI];
+            }
+            else
+            {
+                label facePatchId(mesh_.boundaryMesh().whichPatch(fI));
+                label patchFaceI = mesh_.boundaryMesh()[facePatchId].whichFace(fI);
+                const vectorField& patchSf = mesh_.Sf().boundaryField()[facePatchId];
+                outNorm = patchSf[patchFaceI];
+            }
+
+            // Note (MI): but outNorm is not normalized either
+            //            |-> could this lead to numerical issues?
+            // Note (LK): yes, here both should be normalized
+            outNorm = (mesh_.faceOwner()[fI] == retPoint.iCell_)
+                ? outNorm : -outNorm;
 
             scalar auxDotProd(outNorm & dir);
+
             if (auxDotProd > dotProd)
             {
                 dotProd = auxDotProd;
@@ -440,24 +478,42 @@ label lineIntInfo::getFaceInDir
 //---------------------------------------------------------------------------//
 bool lineIntInfo::pointInCell
 (
-    point pToCheck,
-    label cToCheck
-)
+    const point& pToCheck,
+    const label cToCheck
+) const
 {
     const labelList& cellFaces(mesh_.cells()[cToCheck]);
     forAll(cellFaces, faceI)
     {
         label fI = cellFaces[faceI];
-        vector outNorm = mesh_.Sf()[fI];
-        outNorm = (mesh_.faceOwner()[fI] == cToCheck) ? outNorm : (-1*outNorm);
 
-        if (((pToCheck - mesh_.Cf()[fI]) & outNorm) > 0)
+        vector outNorm(vector::zero);
+        vector faceC(vector::zero);
+
+        if (mesh_.isInternalFace(fI))
+        {
+            outNorm = mesh_.Sf()[fI];
+            faceC = mesh_.Cf()[fI];
+        }
+        else
+        {
+            label facePatchId(mesh_.boundaryMesh().whichPatch(fI));
+            label patchFaceI = mesh_.boundaryMesh()[facePatchId].whichFace(fI);
+            const vectorField& patchSf = mesh_.Sf().boundaryField()[facePatchId];
+            const vectorField& patchCf = mesh_.Cf().boundaryField()[facePatchId];
+            outNorm = patchSf[patchFaceI];
+            faceC = patchCf[patchFaceI];
+        }
+
+        outNorm = (mesh_.faceOwner()[fI] == cToCheck) ? outNorm : -outNorm;   
+        if (((pToCheck - faceC) & outNorm) > 0)
         {
             return false;
-        }
+        }        
     }
     return true;
 }
+
 //---------------------------------------------------------------------------//
 void lineIntInfo::sendAndRecvIntPoints
 (

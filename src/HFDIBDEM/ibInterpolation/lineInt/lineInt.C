@@ -74,6 +74,7 @@ void lineInt::correctVelocity
     const DynamicLabelList& cSurfCells = intpInfo.getSurfCells();
 
     List<point>& ibPoints = intpInfo.getIbPoints();
+    List<vector>& ibNormals = intpInfo.getIbNormals();
     List<List<intPoint>>& intPoints = intpInfo.getIntPoints();
 
     getCurVelocity(intPoints);
@@ -85,6 +86,10 @@ void lineInt::correctVelocity
 
         switch(intOrder[ibp])
         {
+            // Note on positions of interpolations points:
+            // 0: surface point (always valid)
+            // 1: first marched point
+            // 2: second marched point
             case 0:
             {
                 Ui[cellI] = ibPointsVal[ibp];
@@ -93,39 +98,43 @@ void lineInt::correctVelocity
 
             case 1:
             {
-                //~ vector VP1 = intPoints[ibp][0].iVel_ - ibPointsVal[ibp];
-                vector VP1 = intPoints[ibp][1].iVel_ - ibPointsVal[ibp]; // first int point is surface point
+                vector VP1 = intPoints[ibp][1].iVel_ - ibPointsVal[ibp];
 
                 // distance between interpolation points
-                //~ scalar deltaR = mag(intPoints[ibp][0].iPoint_ - ibPoints[ibp]);
-                scalar deltaR = mag(intPoints[ibp][1].iPoint_ - ibPoints[ibp]); // first int point is surface point
+                scalar deltaR = mag(intPoints[ibp][1].iPoint_ - ibPoints[ibp]);
 
-                // cell center to surface distance
-                scalar ds = mag(mesh.C()[cellI] - ibPoints[ibp]);
+                // signed cell center to surface distance along the
+                // outward normal (negative for centers inside the body)
+                scalar ds = (mesh.C()[cellI] - ibPoints[ibp]) & ibNormals[ibp];
 
                 vector linCoeff = VP1/(deltaR+SMALL);
 
-                Ui[cellI] = linCoeff*ds + ibPointsVal[ibp];
+                vector linVal = linCoeff*ds + ibPointsVal[ibp];
+                if (ds < 0)
+                {
+                    limitVelocity(
+                        linVal, 
+                        ibPointsVal[ibp], 
+                        intPoints[ibp][1].iVel_
+                    );
+                }
+                Ui[cellI] = linVal;
                 break;
             }
 
             case 2:
             {
-                //~ vector VP1 =  intPoints[ibp][0].iVel_ - ibPointsVal[ibp];
-                //~ vector VP2 =  intPoints[ibp][1].iVel_ - ibPointsVal[ibp];
-                vector VP1 =  intPoints[ibp][1].iVel_ - ibPointsVal[ibp]; // first int point is surface point
-                vector VP2 =  intPoints[ibp][2].iVel_ - ibPointsVal[ibp]; // first int point is surface point
+                vector VP1 =  intPoints[ibp][1].iVel_ - ibPointsVal[ibp];
+                vector VP2 =  intPoints[ibp][2].iVel_ - ibPointsVal[ibp];
 
                 // distance between interpolation points
-                //~ scalar deltaR1 = mag(intPoints[ibp][0].iPoint_ - ibPoints[ibp]);
-                //~ scalar deltaR2 = mag(intPoints[ibp][1].iPoint_
-                //~         - intPoints[ibp][0].iPoint_);
-                scalar deltaR1 = mag(intPoints[ibp][1].iPoint_ - ibPoints[ibp]); // first int point is surface point
-                scalar deltaR2 = mag(intPoints[ibp][2].iPoint_ // first int point is surface point
-                        - intPoints[ibp][1].iPoint_); // first int point is surface point
+                scalar deltaR1 = mag(intPoints[ibp][1].iPoint_ - ibPoints[ibp]);
+                scalar deltaR2 = mag(intPoints[ibp][2].iPoint_
+                        - intPoints[ibp][1].iPoint_);
 
-                // cell center to surface distance
-                scalar ds = mag(mesh.C()[cellI] - ibPoints[ibp]);
+                // signed cell center to surface distance along the
+                // outward normal (negative for centers inside the body)
+                scalar ds = (mesh.C()[cellI] - ibPoints[ibp]) & ibNormals[ibp];
 
                 vector quadCoeff = (VP2 - VP1)*deltaR1 - VP1*deltaR2;
                 quadCoeff       /= (deltaR1*deltaR2*(deltaR1 + deltaR2)+SMALL);
@@ -135,7 +144,18 @@ void lineInt::correctVelocity
                 linCoeff        += VP1*Foam::pow(deltaR2,2.0);
                 linCoeff        /= (deltaR1*deltaR2*(deltaR1 + deltaR2)+SMALL);
 
-                Ui[cellI] = quadCoeff*ds*ds + linCoeff*ds + ibPointsVal[ibp];
+                vector quadVal = quadCoeff*ds*ds + linCoeff*ds
+                    + ibPointsVal[ibp];
+
+                if (ds < 0)
+                {
+                    limitVelocity(
+                        quadVal, 
+                        ibPointsVal[ibp], 
+                        intPoints[ibp][1].iVel_
+                    );
+                }
+                Ui[cellI] = quadVal;
                 break;
             }
         }
@@ -278,7 +298,9 @@ List<label> lineInt::getIntOrder
 
     forAll(intPoints, ibp)
     {
-        forAll(intPoints[ibp], ip)
+        // index 0 is the surface point and is always valid - only
+        // marched points decide the interpolation order
+        for (label ip = 1; ip < intPoints[ibp].size(); ip++)
         {
             if(intPoints[ibp][ip].iProc_ != -1)
             {
@@ -288,5 +310,30 @@ List<label> lineInt::getIntOrder
     }
 
     return intOrderToRtn;
+}
+//---------------------------------------------------------------------------//
+void lineInt::limitVelocity
+(
+    vector& velVal,
+    const vector& surfVel,
+    const vector& u1
+)
+{
+    // cell center inside the body: clamp the extrapolated velocities
+    // to the hull of the interpolation node velocities
+    // Note (MI): here, we loose accuracy, but remove instability after
+    //            using the correct (signed) ds
+    // Note (MI): the accuracy loss is formal. in fact, compared to
+    //            the original implementation, with wrong ds, this may
+    //            be more accurate
+    for (direction cmpt = 0; cmpt < 3; cmpt++)
+    {
+        const scalar lo = min
+            (surfVel[cmpt], u1[cmpt]);
+        const scalar hi = max
+            (surfVel[cmpt], u1[cmpt]);
+    
+        velVal[cmpt] = min(max(velVal[cmpt], lo), hi);
+    }
 }
 //---------------------------------------------------------------------------//
