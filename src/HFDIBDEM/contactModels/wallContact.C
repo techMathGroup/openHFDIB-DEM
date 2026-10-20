@@ -1043,6 +1043,20 @@ void getWallContactVars_ArbShape(
     }
 }
 // //---------------------------------------------------------------------------//
+// env gate of the per-patch wall-contact path (see
+// getWallContactVars_ArbShape): unset or any value but "0"
+// keeps the split the default
+// Note (MI): to be removed in the (close) future
+static bool wallSplitOn()
+{
+    static const bool on
+    (
+        std::getenv("HFDIB_WALL_SPLIT") == nullptr
+     || std::getenv("HFDIB_WALL_SPLIT")[0] != '0'
+    );
+    return on;
+}
+//---------------------------------------------------------------------------//
 void getWallContactVars_Sphere(
     const fvMesh&   mesh,
     wallContactInfo& wallCntInfo,
@@ -1117,6 +1131,48 @@ void getWallContactVars_Sphere(
         contactPatches,
         wallCntInfo.getWallMeanPars()
     );
+
+    // per-patch force path: the analytic per-patch variables
+    // are already one entry per patch, so they fill the patch
+    // list directly (no inclusion-exclusion needed); a single
+    // patch keeps the merged aggregate below
+    if (wallSplitOn() && contactPatches.size() > 1)
+    {
+        List<wallContactVars>& patchVars(sCW.getPatchCntVars());
+        patchVars.clear();
+        forAll(contactPatches, p)
+        {
+            // placeholder for an empty cap keeps the list
+            // index-aligned; its zero volume makes the force
+            // loop ignore it
+            wallContactVars pv;
+
+            if (wallCntVarsList[p].contactVolume_ > SMALL)
+            {
+                pv = wallCntVarsList[p];
+
+                DynamicScalarList a1;
+                a1.append(wallCntVarsList[p].contactArea_);
+                List<string> p1(1, contactPatches[p]);
+                pv.setMeanCntPars_Plane
+                (
+                    a1,
+                    p1,
+                    wallCntInfo.getWallMeanPars()
+                );
+
+                // continue the tangential spring staged by
+                // wallContactInfo::restoreWallFtHistory
+                if (sCW.getPatchFtPrev().found(contactPatches[p]))
+                {
+                    pv.FtPrev_ = sCW.getPatchFtPrev()
+                        [contactPatches[p]];
+                }
+            }
+
+            patchVars.append(pv);
+        }
+    }
 
     if(wallCntVars.contactVolume_ > 0)
     {
