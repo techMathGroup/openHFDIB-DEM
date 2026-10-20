@@ -73,6 +73,16 @@ class virtualMeshLevel
         return charCellSize_;
     }
 
+    // virtualMesh-relative round-off floor for volume-existence gates:
+    // SMALL times one virtual-mesh leaf volume. A contact volume
+    // below it is clip round-off, not penetration, at any
+    // absolute body scale (SMALL alone is dimensionful and would
+    // reject real micro-scale contacts)
+    static scalar getRelVolSmall()
+    {
+        return SMALL*pow(charCellSize_/levelOfDivision_, 3.0);
+    }
+
     static void setMaxSubVolumes(const scalar maxSubVolumes)
     {
         maxSubVolumes_ = maxSubVolumes;

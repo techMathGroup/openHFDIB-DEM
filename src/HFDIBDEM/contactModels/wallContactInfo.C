@@ -765,39 +765,24 @@ void wallContactInfo::saveWallFtHistory()
             continue;
         }
 
+        // sub-contact below the volume gate (a graze) builds no
+        // patch variables: pass the staged springs through so
+        // the tangential history survives the graze frozen
         const List<string>& patches(sC->getContactPatches());
-        if (patches.size() == 0)
+        forAll(patches, p)
         {
-            continue;
-        }
-
-        // key on the sorted patch set so a sub-contact that
-        // spans the same patches continues its history even if
-        // the list order changed between sub-steps
-        // Note (MI): anything sub-contact related is dubious
-        List<string> sortedPatches(patches);
-        Foam::sort(sortedPatches);
-        string key;
-        forAll(sortedPatches, sP)
-        {
-            key += sortedPatches[sP];
-            if (sP < sortedPatches.size() - 1)
+            if (sC->getPatchFtPrev().found(patches[p]))
             {
-                key += ",";
+                vector FtPrev(sC->getPatchFtPrev()[patches[p]]);
+                if (wallFtHistory_.found(patches[p]))
+                {
+                    wallFtHistory_[patches[p]] += FtPrev;
+                }
+                else
+                {
+                    wallFtHistory_.insert(patches[p], FtPrev);
+                }
             }
-        }
-
-        vector FtPrev(sC->getWallCntVars().FtPrev_);
-        if (wallFtHistory_.found(key))
-        {
-            // several sub-contacts share a patch set (body
-            // regions); sum the springs as one lumped history
-            // Note (MI): anything sub-contact related is dubious
-            wallFtHistory_[key] += FtPrev;
-        }
-        else
-        {
-            wallFtHistory_.insert(key, FtPrev);
         }
     }
 }
@@ -817,71 +802,46 @@ void wallContactInfo::saveWallDtCrit
 
     for(auto sC : subCList_)
     {
-        // the split path evaluates the per-patch variables (the
+        // every sub-contact carries its per-patch variables (the
         // aggregate keeps only the union volume for the logs):
-        // scan every patch's own spring, the merged object
-        // carries no lever arm there
+        // scan every patch's own spring, a placeholder carries
+        // no lever arm there
         List<wallContactVars>& patchVars(sC->getPatchCntVars());
 
-        if (patchVars.size() > 0)
+        if (patchVars.size() == 0)
         {
-            forAll(patchVars, p)
+            continue;
+        }
+
+        forAll(patchVars, p)
+        {
+            wallContactVars& pv(patchVars[p]);
+
+            if (mag(pv.contactVolume_)
+                < virtualMeshLevel::getRelVolSmall())
             {
-                wallContactVars& pv(patchVars[p]);
-
-                if (mag(pv.contactVolume_) < SMALL)
-                {
-                    continue;
-                }
-
-                const scalar dtPair
-                (
-                    sC->getPairDtCritRot
-                    (
-                        pv,
-                        getcVars(),
-                        IeffC,
-                        tangentialFactor,
-                        rotationalFactor
-                    )
-                );
-
-                if (dtPair < wallDtCrit_)
-                {
-                    wallDtCrit_ = dtPair;
-                    wallDtCritRot_ =
-                        (dtPair < sC->getPairDtCrit(pv, getcVars(), tangentialFactor))
-                        ? 1 : 0;
-                }
+                continue;
             }
-            continue;
-        }
 
-        wallContactVars& wallCntvar(sC->getWallCntVars());
-
-        if (mag(wallCntvar.contactVolume_) < SMALL)
-        {
-            continue;
-        }
-
-        const scalar dtPair
-        (
-            sC->getPairDtCritRot
+            const scalar dtPair
             (
-                wallCntvar,
-                getcVars(),
-                IeffC,
-                tangentialFactor,
-                rotationalFactor
-            )
-        );
+                sC->getPairDtCritRot
+                (
+                    pv,
+                    getcVars(),
+                    IeffC,
+                    tangentialFactor,
+                    rotationalFactor
+                )
+            );
 
-        if (dtPair < wallDtCrit_)
-        {
-            wallDtCrit_ = dtPair;
-            wallDtCritRot_ =
-                (dtPair < sC->getPairDtCrit(wallCntvar, getcVars(), tangentialFactor))
-                ? 1 : 0;
+            if (dtPair < wallDtCrit_)
+            {
+                wallDtCrit_ = dtPair;
+                wallDtCritRot_ =
+                    (dtPair < sC->getPairDtCrit(pv, getcVars(), tangentialFactor))
+                    ? 1 : 0;
+            }
         }
     }
 }
@@ -893,43 +853,12 @@ void wallContactInfo::restoreWallFtHistory()
         return;
     }
 
-    // count sub-contacts per key so a lumped history splits back
-    // over the same number of springs it was summed from
-    // Note (MI): anything sub-contact related is dubious
-    HashTable<label, string, Hash<string>> nPerKey;
+    // count sub-contacts per patch so a lumped history splits
+    // back over the same number of springs it was summed from
     HashTable<label, string, Hash<string>> nPerPatch;
     for(auto sC : subCList_)
     {
         const List<string>& patches(sC->getContactPatches());
-        if (patches.size() == 0)
-        {
-            continue;
-        }
-
-        List<string> sortedPatches(patches);
-        Foam::sort(sortedPatches);
-        string key;
-        forAll(sortedPatches, sP)
-        {
-            key += sortedPatches[sP];
-            if (sP < sortedPatches.size() - 1)
-            {
-                key += ",";
-            }
-        }
-
-        if (nPerKey.found(key))
-        {
-            nPerKey[key] += 1;
-        }
-        else
-        {
-            nPerKey.insert(key, 1);
-        }
-
-        // the per-patch springs lump per patch name, so the
-        // restore divides by the number of sub-contacts that
-        // carry the patch
         forAll(patches, p)
         {
             if (nPerPatch.found(patches[p]))
@@ -943,35 +872,12 @@ void wallContactInfo::restoreWallFtHistory()
         }
     }
 
+    // stage the per-patch springs on the sub-contact: the
+    // patch variables themselves are only built inside
+    // solveWallContact, after this restore
     for(auto sC : subCList_)
     {
         const List<string>& patches(sC->getContactPatches());
-        if (patches.size() == 0)
-        {
-            continue;
-        }
-
-        List<string> sortedPatches(patches);
-        Foam::sort(sortedPatches);
-        string key;
-        forAll(sortedPatches, sP)
-        {
-            key += sortedPatches[sP];
-            if (sP < sortedPatches.size() - 1)
-            {
-                key += ",";
-            }
-        }
-
-        if (wallFtHistory_.found(key))
-        {
-            sC->getWallCntVars().FtPrev_
-                = wallFtHistory_[key]/nPerKey[key];
-        }
-
-        // stage the per-patch springs on the sub-contact: the
-        // patch variables themselves are only built inside
-        // solveWallContact, after this restore
         forAll(patches, p)
         {
             if (wallFtHistory_.found(patches[p]))

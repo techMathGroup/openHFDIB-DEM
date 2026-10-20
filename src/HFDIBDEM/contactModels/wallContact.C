@@ -669,15 +669,7 @@ void getWallContactVars_ArbShape(
     // mirror of the prt-side family (prtContact.C:374); the
     // measured empty band above the gate makes the rejection
     // lossless at case scales
-    const scalar relSMALL
-    (
-        SMALL*pow
-        (
-            virtualMeshLevel::getCharCellSize()
-           /virtualMeshLevel::getLevelOfDivision(),
-            3.0
-        )
-    );
+    const scalar relSMALL(virtualMeshLevel::getRelVolSmall());
 
     for(label i = 0; i< vMContactInfoSize; i++)
     {
@@ -1037,6 +1029,50 @@ void getWallContactVars_ArbShape(
             wallCntInfo.getWallMeanPars()
         );
         // Pout << "Survived #4 " << endl;
+
+        // per-patch list of the paths without an attribution:
+        // single-patch sub-contacts and sub-contacts above the
+        // split patch cap carry the aggregate evaluated above
+        // as one real entry, placeholders keep the list
+        // index-aligned. This routes every sub-contact through
+        // the per-patch force path in solveWallContact
+        if (!splitActive)
+        {
+            // alphabetically first patch: the deterministic home
+            // of the aggregate entry (a stable history key)
+            label keyP(0);
+            forAll(contactPatches, p)
+            {
+                if (contactPatches[p] < contactPatches[keyP])
+                {
+                    keyP = p;
+                }
+            }
+
+            List<wallContactVars>& patchVars(sCW.getPatchCntVars());
+            patchVars.clear();
+            forAll(contactPatches, p)
+            {
+                wallContactVars pv;
+
+                if (p == keyP)
+                {
+                    pv = wallCntVars;
+
+                    // continue the tangential spring staged by
+                    // wallContactInfo::restoreWallFtHistory
+                    // (the spring the merged path kept on the
+                    // sub-contact aggregate)
+                    if (sCW.getPatchFtPrev().found(contactPatches[keyP]))
+                    {
+                        pv.FtPrev_ = sCW.getPatchFtPrev()
+                            [contactPatches[keyP]];
+                    }
+                }
+
+                patchVars.append(pv);
+            }
+        }
     }
 }
 //---------------------------------------------------------------------------//
@@ -1117,10 +1153,13 @@ void getWallContactVars_Sphere(
 
     // per-patch force path: the analytic per-patch variables
     // are already one entry per patch, so they fill the patch
-    // list directly (no inclusion-exclusion needed); a single
-    // patch keeps the merged aggregate below
-    if (contactPatches.size() > 1)
+    // list directly (no inclusion-exclusion needed); the
+    // aggregate above keeps only the union volume for the logs
+    // and the dt estimator
+    if (contactPatches.size() > 0)
     {
+        const scalar relSMALL(virtualMeshLevel::getRelVolSmall());
+
         List<wallContactVars>& patchVars(sCW.getPatchCntVars());
         patchVars.clear();
         forAll(contactPatches, p)
@@ -1130,7 +1169,7 @@ void getWallContactVars_Sphere(
             // loop ignore it
             wallContactVars pv;
 
-            if (wallCntVarsList[p].contactVolume_ > SMALL)
+            if (wallCntVarsList[p].contactVolume_ > relSMALL)
             {
                 pv = wallCntVarsList[p];
 
@@ -1143,14 +1182,16 @@ void getWallContactVars_Sphere(
                     p1,
                     wallCntInfo.getWallMeanPars()
                 );
+            }
 
-                // continue the tangential spring staged by
-                // wallContactInfo::restoreWallFtHistory
-                if (sCW.getPatchFtPrev().found(contactPatches[p]))
-                {
-                    pv.FtPrev_ = sCW.getPatchFtPrev()
-                        [contactPatches[p]];
-                }
+            // continue the tangential spring staged by
+            // wallContactInfo::restoreWallFtHistory also on a
+            // placeholder: a cap below the volume gate keeps
+            // its spring frozen through the graze
+            if (sCW.getPatchFtPrev().found(contactPatches[p]))
+            {
+                pv.FtPrev_ = sCW.getPatchFtPrev()
+                    [contactPatches[p]];
             }
 
             patchVars.append(pv);
@@ -1249,107 +1290,26 @@ bool solveWallContact
         sCI
     );
 
-    vector outF = vector::zero;
-    vector cLVecOut = vector::zero;
-
     wallContactVars& wallCntVar = sCI.getWallCntVars();
 
     List<wallContactVars>& patchVars(sCI.getPatchCntVars());
 
-    // per-patch force path (multi-patch sub-contacts with a
-    // valid attribution): every patch carries its own lever
-    // arm, penetration and material, so the elastic, damping,
+    // every contact-carrying sub-contact enters the per-patch
+    // path: a multi-patch split for 2-6 patches, the single
+    // aggregate entry for single-patch and above-cap
+    // sub-contacts. Every patch carries its own lever arm,
+    // penetration and material, so the elastic, damping,
     // tangential and adhesive forces are evaluated per patch
     // and summed with their own moment arms
-    if (patchVars.size() > 0)
+    if (patchVars.size() == 0)
     {
-        if (mag(wallCntVar.contactVolume_) < SMALL)
-        {
-            sCI.getOutForce().F = vector::zero;
-            sCI.getOutForce().T = vector::zero;
-            return false;
-        }
-
-        InfoH << parallelDEM_Info << "-- Detected Particle-wall contact: -- body "
-            << sCI.getBodyId() << endl;
-        InfoH << parallelDEM_Info << "-- body "<< sCI.getBodyId() <<"  linear velocity:"
-            << wallCntInfo.getcVars().Vel_ << " magnitude: " << mag(wallCntInfo.getcVars().Vel_) <<endl;
-        InfoH << parallelDEM_Info << "-- body "<< sCI.getBodyId() <<"  angular velocity:"
-            << wallCntInfo.getcVars().omega_ << " magnitude: " << mag(wallCntInfo.getcVars().omega_) <<endl;
-        InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact center "
-            << wallCntVar.contactCenter_ << endl;
-        InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact normal "
-            << wallCntVar.contactNormal_ << endl;
-        InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact volume "
-            << wallCntVar.contactVolume_ << endl;
-        InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact area "
-            << wallCntVar.contactArea_ << endl;
-
-        forAll(patchVars, p)
-        {
-            sCI.evalVariables
-            (
-                patchVars[p],
-                wallCntInfo.getcClass(),
-                wallCntInfo.getcVars()
-            );
-        }
-
-        vector Fsum(vector::zero);
-        vector Tsum(vector::zero);
-        forAll(patchVars, p)
-        {
-            wallContactVars& pv(patchVars[p]);
-
-            if (pv.contactVolume_ == 0)
-            {
-                continue;
-            }
-
-            vector F(sCI.getFNe(pv));
-
-            vector FNd(sCI.getFNd(pv));
-            if ((F & FNd) < 0 && mag(FNd) > mag(F))
-            {
-                FNd *= mag(F)/mag(FNd);
-                InfoH << parallelDEM_Info << "FNd was Clipped to "<< FNd << endl;
-            }
-            F += FNd;
-
-            // the coulomb ceiling inside getFt():
-            // FtCeil = mu*mag(FNe + FNd of this patch)
-            vector Ft
-            (
-                sCI.getFt
-                (
-                    pv,
-                    deltaT,
-                    sCI.getMu(pv)*mag(F)
-                )
-            );
-            F += Ft;
-            F -= sCI.getFA(pv);
-
-            InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId()
-                <<" split patch "<< sCI.getContactPatches()[p] << " FN " << F << endl;
-            InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId()
-                <<" split patch "<< sCI.getContactPatches()[p] << " Ft " << Ft << endl;
-
-            Fsum += F;
-            Tsum += pv.lVec_ ^ F;
-        }
-
-        sCI.getOutForce().F = Fsum;
-        sCI.getOutForce().T = Tsum;
-        return true;
+        sCI.getOutForce().F = vector::zero;
+        sCI.getOutForce().T = vector::zero;
+        return false;
     }
 
-    // the aggregate variables feed the single-contact path
-    // (single-patch sub-contacts and sub-contacts above the
-    // split patch cap)
-    sCI.evalVariables(wallCntVar,wallCntInfo.getcClass(),wallCntInfo.getcVars());
-
-    if(wallCntVar.contactVolume_ == 0)
+    if (mag(wallCntVar.contactVolume_)
+        < virtualMeshLevel::getRelVolSmall())
     {
         sCI.getOutForce().F = vector::zero;
         sCI.getOutForce().T = vector::zero;
@@ -1371,37 +1331,70 @@ bool solveWallContact
     InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact area "
         << wallCntVar.contactArea_ << endl;
 
-    vector F = sCI.getFNe(wallCntVar);
-    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FNe " << F << endl;
-
-    vector FNd = sCI.getFNd(wallCntVar);
-    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FNd " << FNd << endl;
-
-    if ((F & FNd) < 0 && mag(FNd) > mag(F))
+    forAll(patchVars, p)
     {
-        FNd *= mag(F) / mag(FNd);
-        InfoH << parallelDEM_Info << "FNd was Clipped to "<< FNd << endl;
+        sCI.evalVariables
+        (
+            patchVars[p],
+            wallCntInfo.getcClass(),
+            wallCntInfo.getcVars()
+        );
     }
 
-    F += FNd;
-    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FN " << F << endl;
+    vector Fsum(vector::zero);
+    vector Tsum(vector::zero);
+    forAll(patchVars, p)
+    {
+        wallContactVars& pv(patchVars[p]);
 
-    // the coulomb ceiling inside getFt() -> FtCeil = sCI.getMu(wallCntVar)*mag(F)
-    vector Ft = sCI.getFt(wallCntVar, deltaT, sCI.getMu(wallCntVar)*mag(F));
-    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact Ft " << Ft << endl;
+        if (pv.contactVolume_ == 0)
+        {
+            continue;
+        }
 
-    F += Ft;
+        vector F(sCI.getFNe(pv));
+        InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId()
+            <<" split patch "<< sCI.getContactPatches()[p] << " contact FNe " << F << endl;
 
-    vector FA = sCI.getFA(wallCntVar);
-    InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId() <<" contact FA " << FA << endl;
-    F -= FA;
+        vector FNd(sCI.getFNd(pv));
+        InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId()
+            <<" split patch "<< sCI.getContactPatches()[p] << " contact FNd " << FNd << endl;
 
-    outF += F;
+        if ((F & FNd) < 0 && mag(FNd) > mag(F))
+        {
+            FNd *= mag(F)/mag(FNd);
+            InfoH << parallelDEM_Info << "FNd was Clipped to "<< FNd << endl;
+        }
+        F += FNd;
+        InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId()
+            <<" split patch "<< sCI.getContactPatches()[p] << " contact FN " << F << endl;
 
-    cLVecOut += wallCntVar.lVec_;
+        // the coulomb ceiling inside getFt():
+        // FtCeil = mu*mag(FNe + FNd of this patch)
+        vector Ft
+        (
+            sCI.getFt
+            (
+                pv,
+                deltaT,
+                sCI.getMu(pv)*mag(F)
+            )
+        );
+        InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId()
+            <<" split patch "<< sCI.getContactPatches()[p] << " contact Ft " << Ft << endl;
+        F += Ft;
 
-    sCI.getOutForce().F = outF;
-    sCI.getOutForce().T = cLVecOut ^  outF;
+        vector FA(sCI.getFA(pv));
+        InfoH << parallelDEM_Info << "-- Particle-wall body "<< sCI.getBodyId()
+            <<" split patch "<< sCI.getContactPatches()[p] << " contact FA " << FA << endl;
+        F -= FA;
+
+        Fsum += F;
+        Tsum += pv.lVec_ ^ F;
+    }
+
+    sCI.getOutForce().F = Fsum;
+    sCI.getOutForce().T = Tsum;
     return true;
 }
 // //---------------------------------------------------------------------------//
