@@ -223,14 +223,15 @@ void lineIntInfo::setIntpInfo()
                 vector dir = cIntPoint.iPoint_ - ibPointsRecv[proci][iInfo];
                 dir /= mag(dir);
                 // Note (MI): this dir seems unused - bug or feature?
+                // Note (LK): all dirs should be parallel to surface normal, we can use one and pass it here
                 // Note (MI): is normalization by mag(dir) robust?
                 //            |-> can cIntPoint.iPoint_ coincide with 
                 //                ibPointsRecv[proci][iInfo]?
+                // Note (LK): will not coincide with non-zero intDist, and even then it would hang in pointInCell function line 130
                 correctIntPoint(ibPointsRecv[proci][iInfo], cIntPoint);
                 // Note (MI): correctIntPoint computes its own dir
                 // Note (MI): as well as getClosestPoint, which is used 
                 //            in correctIntPoint
-
                 intPointsRecv[proci][iInfo] = cIntPoint;
             }
         }
@@ -318,6 +319,9 @@ void lineIntInfo::correctIntPoint
             // Note (MI): there is no normalization here
             // Question (MI): could normalization by mag(dir) help with
             //                faceI.ray() robustness?
+            // Note (LK): faceI.ray is defined in file src/OpenFOAM/meshes/meshShapes/face/faceIntersection.C
+            // its readme says that the direction vector does not have to be normalized
+            // but we can do it, it should not matter and it will be consistent
 
             pointHit pHit = faceI.ray(
                 cPoint.iPoint_,
@@ -349,7 +353,9 @@ vector lineIntInfo::getClosestPoint
     vector dir = cPoint.iPoint_ - ibPoint;
     dir /= mag(dir);
     // Note (MI): is normalization by mag(dir) robust?
+    // Note (LK): we can pass on surface normal itself
     //            |-> can cPoint.iPoint_ coincide with ibPoint?
+    // Note (LK): will not coincide with non-zero intDist, and even then it would hang in pointInCell function line 130
 
     vector dirToC = mesh_.C()[cPoint.iCell_] - ibPoint;
 
@@ -427,6 +433,7 @@ label lineIntInfo::getFaceInDir
     label faceToReturn = -1;
     vector dir = retPoint.iPoint_ - mesh_.C()[retPoint.iCell_];
     // Note (MI): no normalization here
+    // Note (LK): here, both should be normalized
 
     const labelList& cellFaces(mesh_.cells()[retPoint.iCell_]);
     scalar dotProd(-GREAT);
@@ -452,6 +459,7 @@ label lineIntInfo::getFaceInDir
 
             // Note (MI): but outNorm is not normalized either
             //            |-> could this lead to numerical issues?
+            // Note (LK): yes, here both should be normalized
             outNorm = (mesh_.faceOwner()[fI] == retPoint.iCell_)
                 ? outNorm : -outNorm;
 
