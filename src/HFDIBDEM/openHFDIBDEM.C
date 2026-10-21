@@ -860,9 +860,19 @@ void openHFDIBDEM::createBodiesComputeDynamicsVars(
             }
             else
             {
-                particleMasses.append(immersedBodies_[bodyId].getGeomModel().getM());
-                particleCells.append(immersedBodies_[bodyId].getGeomModel().getNCells());
-                particleInertiaTensors.append(immersedBodies_[bodyId].getGeomModel().getI());
+                geomModel& gModel(immersedBodies_[bodyId].getGeomModel());
+                particleMasses.append(gModel.getM());
+                particleCells.append(gModel.getNCells());
+                // the geometric inertia is global (identical on every
+                // rank) - appending it would multiply it by nProcs in
+                // the reduction below; it is re-installed per rank from
+                // the cached STL integral after setI
+                particleInertiaTensors.append
+                (
+                    gModel.usesGeometricMass()
+                  ? symmTensor::zero
+                  : gModel.getI()
+                );
             }
         }
     }
@@ -891,9 +901,11 @@ void openHFDIBDEM::createBodiesComputeDynamicsVars(
             }
             else
             {
-                immersedBodies_[bodyId].getGeomModel().setM(particleMasses[bodyIndex]);
-                immersedBodies_[bodyId].getGeomModel().setNCells(particleCells[bodyIndex]);
-                immersedBodies_[bodyId].getGeomModel().setI(particleInertiaTensors[bodyIndex]);
+                geomModel& gModel(immersedBodies_[bodyId].getGeomModel());
+                gModel.setM(particleMasses[bodyIndex]);
+                gModel.setNCells(particleCells[bodyIndex]);
+                gModel.setI(particleInertiaTensors[bodyIndex]);
+                gModel.applyMassModel();                            // geometric model: restore I_ from the STL integral
                 bodyIndex++;
             }
 
@@ -2985,6 +2997,19 @@ void openHFDIBDEM::restartSimulation
                 }
             }
             bodyGeomModel->setBodyCreation(bodyCreation);
+        }
+
+        // propagate the per-body mass model to the restart-constructed
+        // geomModel (kept in sync with initializeIB.H)
+        {
+            word massModel("geometric");
+            if (HFDIBDEMDict_.subDict(bodyName).found("massModel"))
+            {
+                massModel = word
+                    (HFDIBDEMDict_.subDict(bodyName)
+                        .lookup("massModel"));
+            }
+            bodyGeomModel->setMassModel(massModel);
         }
 
         label newIBSize(immersedBodies_.size()+1);

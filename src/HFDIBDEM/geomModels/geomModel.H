@@ -130,6 +130,12 @@ namespace Foam
         scalar M0_;                                                     //initial mass (at addition)
         label nCells_;
 
+        // initial MESH mass (domain-exit baseline): M0_ holds the mass
+        // used by the dynamics (the geometric one for the default mass
+        // model), while the domain-exit test must stay relative to the
+        // mesh mass it was designed for
+        scalar Mmesh0_;
+
         //location of center of mass
         vector CoM_;
 
@@ -157,6 +163,22 @@ namespace Foam
 
         // creation mode: "connectivity" (default) | "legacy"
         word bodyCreation_;
+
+        // mass model: "geometric" (default for surface-based models:
+        // rigid-body mass and inertia from the STL volume, with the
+        // mesh mass only kept as the domain-exit baseline) | "mesh"
+        // (opt-out: cell-based mass and inertia - the historic
+        // behaviour). models without a closed surface (spheres,
+        // clusters) report no geometric properties and keep their own
+        // definitions
+        word massModel_;
+
+        // density-1 geometric mass properties, cached by the surface
+        // based models on every STL integral; Igeom_ is about CoM_ and
+        // lives in the current (world) frame
+        scalar Vgeom_;
+        symmTensor Igeom_;
+        bool geomValid_;
 
         // validity of the body field + cell lists: true after a
         // creation, false after any point mutation or resetBody.
@@ -448,6 +470,20 @@ namespace Foam
                 << "notImplemented"<<endl;
         }
 
+        // geometric (surface) mass properties: rigid-body mass and
+        // inertia about the CoM, density already applied, in the
+        // current (world) frame. Models without a closed surface
+        // (spheres, clusters) report no geometric properties and keep
+        // the mesh mass model.
+        virtual bool geometricMassProperties
+        (
+            scalar& m,
+            symmTensor& J
+        ) const
+        {
+            return false;
+        }
+
         constexpr contactType getcType()
         {return contactType_;}
 
@@ -513,6 +549,58 @@ namespace Foam
         void setM0(scalar M0)
         {
             M0_ = M0;
+        }
+
+        // mass model switch ("geometric" default / "mesh" opt-out)
+        void setMassModel(const word& massModel)
+        {
+            if (massModel != "geometric" && massModel != "mesh")
+            {
+                InfoH << iB_Info << "Unknown massModel: " << massModel
+                    << ", using geometric" << endl;
+                massModel_ = "geometric";
+                return;
+            }
+            massModel_ = massModel;
+        }
+
+        const word& getMassModel() const
+        {
+            return massModel_;
+        }
+
+        // the dynamics currently use the geometric mass/inertia
+        bool usesGeometricMass() const
+        {
+            return massModel_ == "geometric" && geomValid_;
+        }
+
+        // mesh-mass baseline of the domain-exit test (falls back to
+        // M0_ before the first mesh mass is registered)
+        scalar getMmesh0() const
+        {
+            return Mmesh0_ > SMALL ? Mmesh0_ : M0_;
+        }
+
+        // install the cached geometric mass/inertia into M0_/I_; no-op
+        // for the mesh model, for models without a surface, and when
+        // the STL integral was singular
+        void applyMassModel()
+        {
+            if (!usesGeometricMass())
+            {
+                return;
+            }
+
+            scalar m(0);
+            symmTensor J(symmTensor::zero);
+            if (!geometricMassProperties(m, J) || m <= SMALL)
+            {
+                return;
+            }
+
+            M0_ = m;
+            I_  = J;
         }
 
         scalar& getM()

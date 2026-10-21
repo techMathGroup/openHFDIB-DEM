@@ -52,6 +52,7 @@ curMeshBounds_(mesh_.points(),false),
 M_(0.0),
 M0_(0.0),
 nCells_(0),
+Mmesh0_(0.0),
 CoM_(vector::zero),
 I_(symmTensor::zero),
 bBox_(std::make_shared<boundBox>()),
@@ -59,7 +60,11 @@ dC_(0.0),
 rhoS_("rho",dimensionSet(1,-3,0,0,0,0,0),1.0),
 surfSeed_(-1),
 nCellsPrev_(-1),
-bodyCreation_("connectivity")
+bodyCreation_("connectivity"),
+massModel_("geometric"),
+Vgeom_(0.0),
+Igeom_(symmTensor::zero),
+geomValid_(false)
 {
     surfCells_.setSize(Pstream::nProcs());
     intCells_.setSize(Pstream::nProcs());
@@ -107,6 +112,11 @@ void geomModel::calculateGeometricalProperties
     nCells_ = intCells_[Pstream::myProcNo()].size() + surfCells_[Pstream::myProcNo()].size();
 
     reduceGeometricalProperties();
+
+    // the mesh accumulation above rebuilt I_ from the cells: restore
+    // the geometric mass/inertia (identical on all ranks, read from
+    // the cached STL integral - no communication needed)
+    applyMassModel();
 }
 //---------------------------------------------------------------------------//
 void geomModel::calculateGeometricalPropertiesParallel
@@ -126,14 +136,27 @@ void geomModel::calculateGeometricalPropertiesParallel
     //Get CellCount At Each SubDomain
     nCells_ = intCells_[Pstream::myProcNo()].size() + surfCells_[Pstream::myProcNo()].size();
 
+    // restore the geometric mass/inertia (NOT reduced - the cached STL
+    // integral is already global and identical on all ranks)
+    applyMassModel();
 }
 //---------------------------------------------------------------------------//
 void geomModel::reduceGeometricalProperties()
 {
     // collect from processors
     reduce(M_, sumOp<scalar>());
-    reduce(I_,  sumOp<symmTensor>());
+
+    // the geometric inertia is global (identical on every rank) -
+    // summing it would multiply it by nProcs
+    if (!usesGeometricMass())
+    {
+        reduce(I_,  sumOp<symmTensor>());
+    }
+
     reduce(nCells_, sumOp<label>());
+
+    // restore the geometric mass/inertia after the mesh accumulation
+    applyMassModel();
 
     // Note (MI): helper function to allow for future simplification
     //            of calls to calculateGeometricalPropertiesParallel
@@ -178,8 +201,13 @@ void geomModel::computeBodyCharPars()
         label cellI = surfCells_[Pstream::myProcNo()][sCellI];
         dC_ = max(dC_,mag(CoM_-mesh_.C()[cellI]));
     }
+    // the mesh mass is the baseline of the domain-exit test, even
+    // when the dynamics use the geometric mass
+    Mmesh0_ = M_;
     M0_ = M_;
     reduce(dC_, maxOp<scalar>());
+
+    applyMassModel();
 }
 //---------------------------------------------------------------------------//
 void geomModel::resetBody(volScalarField& body)

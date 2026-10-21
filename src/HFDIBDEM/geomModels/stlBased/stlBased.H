@@ -377,6 +377,12 @@ namespace Foam
                 J
             );
 
+            // cache the density-1 mass properties for the geometric
+            // mass model (the integral is already paid for the CoM)
+            Vgeom_   = max(m, scalar(0));
+            Igeom_   = symm(J);
+            geomValid_ = (m >= SMALL);
+
             if (m < SMALL)                                              // fallback for singular cases
             {
                 WarningInFunction
@@ -396,6 +402,25 @@ namespace Foam
                 // CoM_ = sum(bSMeshPts)/bSMeshPts.size();
                 // -- and this happens on multiple occasions in the codebase
             }
+        }
+
+        // geometric mass properties for the mass model: rho * volume,
+        // rho * inertia about the CoM, in the current (world) frame
+        bool geometricMassProperties
+        (
+            scalar& m,
+            symmTensor& J
+        ) const final override
+        {
+            if (!geomValid_)
+            {
+                return false;
+            }
+
+            m = rhoS_.value()*Vgeom_;
+            J = rhoS_.value()*Igeom_;
+
+            return true;
         }
 
         void setCoM() final override
