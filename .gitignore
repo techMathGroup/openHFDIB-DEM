@@ -28,6 +28,10 @@ lex.yy.c
 .ccls-cache
 .devcontainer
 
+# clangd
+compile_commands.json
+.cache/
+
 # Corefiles
 core
 

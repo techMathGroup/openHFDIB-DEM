@@ -15,8 +15,12 @@ CompileFlags:
 
 Diagnostics:
   # OpenFOAM code often has intentional broad includes
+  # (lnInclude style: symbols arrive transitively, so both checks
+  # only produce false positives here)
   UnusedIncludes: None
-  MissingIncludes: Strict
+  MissingIncludes: None
+  ClangTidy:
+    Remove: ["*"]
 
 Index:
   Background: Build
@@ -33,7 +37,3 @@ InlayHints:
   Enabled: true
   ParameterNames: true
   DeducedTypes: false
-
-ClangTidy:
-  Add: []
-  Remove: ["*"]
