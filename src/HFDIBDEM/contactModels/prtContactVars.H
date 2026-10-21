@@ -65,6 +65,19 @@ struct prtContactVars
     // element 0 is the fan centre and the remaining points follow
     // the contact patch boundary. Empty when no footprint is available
     DynamicList<pointField> contactPolygons_;
+
+    // surface-loading coefficients of the current sub-step (published by
+    // prtSubContactInfo::getFNSl for the application's shape and record
+    // writers; all zero for pairs on the standard law)
+    bool surfaceLoading_ = false;
+    scalar slPMean_ = 0;    // F/A [Pa]
+    scalar slPStr_ = 0;     // strength branch cap [Pa]
+    scalar slPEdge_ = 0;    // sample flow pressure for the edge cap [Pa]
+    scalar slPHug_ = 0;     // impedance-matched pressure [Pa]
+    scalar slBlendF_ = 0;   // shock fraction f [-]
+    scalar slZEff_ = 0;     // effective impedance [kg/m2/s]
+    scalar slW_ = 0;        // mean overlap depth [m]
+    scalar slVn_ = 0;       // relative normal velocity [m/s]
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

@@ -39,6 +39,8 @@ Contributors
 
 #include "fvCFD.H"
 
+#include "surfaceLoadingLaw.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -89,6 +91,12 @@ struct physicalProperties
     scalar curAdhN_ = 0;    // Current contact adhesive coef
     scalar reduceM_ = 0;    // Reduced Mass of the contact pair
     scalar reduceBeta_ = 0;  // Reduced damping coef of the contact pair
+
+    // Optional regime-aware surface-loading law for this pair. When
+    // slActive_ is false the standard aY*V/Lc + damping law applies and
+    // every existing case is bit-identical.
+    bool slActive_ = false;
+    surfaceLoadingLaw::pairParams sl_;
 };
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

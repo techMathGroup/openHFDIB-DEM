@@ -42,7 +42,8 @@ materialInfo::materialInfo
     scalar nu,
     scalar mu,
     scalar adhN,
-    scalar eps
+    scalar eps,
+    const materialDynamics& dyn
 )
 :
 material_(material),
@@ -50,8 +51,8 @@ Y_(Y),
 nu_(nu),
 mu_(mu),
 adhN_(adhN),
-eps_(eps)
-
+eps_(eps),
+dyn_(dyn)
 {
 }
 
@@ -62,7 +63,8 @@ Y_(mi.Y_),
 nu_(mi.nu_),
 mu_(mi.mu_),
 adhN_(mi.adhN_),
-eps_(mi.eps_)
+eps_(mi.eps_),
+dyn_(mi.dyn_)
 {
 }
 

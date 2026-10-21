@@ -46,6 +46,7 @@ Contributors
 #include "parameters.H"
 #include "demTimeStepInfo.H"
 #include "pspPairControl.H"
+#include "surfaceLoadingModel.H"
 
 #define ORDER 2
 
@@ -223,6 +224,57 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
             eps = min(eps, 1.0);
         }
 
+        // dynamic parameters of the surface-loading law; all optional so
+        // that every existing material entry parses unchanged
+        materialDynamics dyn;
+
+        dyn.rho = matIDic.lookupOrDefault<scalar>("rho", -1.0);
+        dyn.Yc = matIDic.lookupOrDefault<scalar>("Yc", -1.0);
+        dyn.capFactor = matIDic.lookupOrDefault<scalar>("capFactor", 2.7);
+
+        // Y and Yc are two very different moduli of the same material and
+        // sit next to each other in the dict, so a swapped or mistyped Yc
+        // would silently turn an elastic solve into a plastic one
+        {
+            const scalar Y(readScalar(matIDic.lookup("Y")));
+
+            if (dyn.Yc > 0.5*Y)
+            {
+                WarningInFunction
+                    << "material " << materialsNames[matI]
+                    << ": Yc " << dyn.Yc << " Pa exceeds 0.5*Y " << 0.5*Y
+                    << " Pa; check that Yc is the compressive flow stress,"
+                    << " not the elastic modulus" << endl;
+            }
+        }
+
+        if (matIDic.found("hugoniot"))
+        {
+            const dictionary& hDic(matIDic.subDict("hugoniot"));
+
+            dyn.hasHugoniot = true;
+            dyn.c0 = hDic.lookupOrDefault<scalar>("c0", 0.0);
+            dyn.s = hDic.lookupOrDefault<scalar>("s", 0.0);
+            dyn.c0High = hDic.lookupOrDefault<scalar>("c0High", 0.0);
+            dyn.sHigh = hDic.lookupOrDefault<scalar>("sHigh", 0.0);
+            dyn.uMelt = hDic.lookupOrDefault<scalar>("uMelt", 0.0);
+        }
+
+        // reserved for a future rate-dependent flow stress; only the
+        // placeholder is implemented, so anything else is a read error
+        const word rateModel
+        (
+            matIDic.lookupOrDefault<word>("rateModel", "none")
+        );
+
+        if (rateModel != "none")
+        {
+            FatalErrorInFunction
+                << "material " << materialsNames[matI]
+                << ": rateModel '" << rateModel
+                << "' is not implemented (only 'none')" << exit(FatalError);
+        }
+
         materialProperties::matProps_insert(
             materialsNames[matI],
             materialInfo(
@@ -232,10 +284,15 @@ recordSimulation_(readBool(HFDIBDEMDict_.lookup("recordSimulation")))
                 readScalar(matIDic.lookup("mu")),
                 readScalar(matIDic.lookup("adhN")),
                 // readScalar(matIDic.lookup("eps"))
-                eps
+                eps,
+                dyn
             )
         );
     }
+
+    // opt-in surface-loading pairs (demDic/surfaceLoading); no block means
+    // every contact keeps the standard law
+    surfaceLoadingModel::read(demDic);
 
     if(demDic.found("interfaceAdh"))
     {

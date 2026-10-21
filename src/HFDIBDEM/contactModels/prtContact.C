@@ -34,6 +34,7 @@ Contributors
 
 #include "virtualMeshLevel.H"
 #include "pspPairControl.H"
+#include "surfaceLoadingModel.H"
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
@@ -1107,20 +1108,57 @@ bool solvePrtContact(
     );
 
     // compute the normal force
-    vector F = subCInfo.getFNe();
-    InfoH << parallelDEM_Info << "-- " << cntType << " " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact FNe " << F << endl;
+    vector F;
 
-    vector FNd = subCInfo.getFNd();
-    InfoH << parallelDEM_Info << "-- " << cntType << " " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact FNd " << FNd << endl;
-
-    // clamp FNd if opposite direction to FNe
-    if ((F & FNd) < 0 && mag(FNd) > mag(F))
+    if (subCInfo.isSurfaceLoading())
     {
-        FNd *= mag(F) / mag(FNd);
-    }
+        // regime-aware surface-loading law: the spring, the radiation
+        // dashpot and the strength ceiling are assembled together, so
+        // there is no separate damping term to clamp
+        F = subCInfo.getFNSl();
 
-    F += FNd;
-    InfoH << parallelDEM_Info << "-- " << cntType << " " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact FN " << F << endl;
+        const prtContactVars& slVars(subCInfo.getprtCntVars());
+
+        if
+        (
+            surfaceLoadingModel::markReported
+            (
+                subCInfo.getCPair().first(),
+                subCInfo.getCPair().second()
+            )
+        )
+        {
+            Info<< "surface-loading " << subCInfo.getCPair().first()
+                << "-" << subCInfo.getCPair().second()
+                << ": v " << slVars.slVn_
+                << " p_H " << slVars.slPHug_
+                << " p_str " << slVars.slPStr_
+                << " f " << slVars.slBlendF_
+                << " Z " << slVars.slZEff_
+                << " A " << slVars.contactArea_
+                << " F " << slVars.slPMean_*slVars.contactArea_
+                << endl;
+        }
+
+        InfoH << parallelDEM_Info << "-- " << cntType << " " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact FN (surface loading) " << F << endl;
+    }
+    else
+    {
+        F = subCInfo.getFNe();
+        InfoH << parallelDEM_Info << "-- " << cntType << " " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact FNe " << F << endl;
+
+        vector FNd = subCInfo.getFNd();
+        InfoH << parallelDEM_Info << "-- " << cntType << " " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact FNd " << FNd << endl;
+
+        // clamp FNd if opposite direction to FNe
+        if ((F & FNd) < 0 && mag(FNd) > mag(F))
+        {
+            FNd *= mag(F) / mag(FNd);
+        }
+
+        F += FNd;
+        InfoH << parallelDEM_Info << "-- " << cntType << " " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact FN " << F << endl;
+    }
 
     // the coulomb ceiling caps the applied force and the stored
     // tangential state inside getFt

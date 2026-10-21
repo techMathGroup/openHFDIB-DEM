@@ -43,6 +43,8 @@ Contributors
 #include "dictionary.H"
 #include "fvCFD.H"
 
+#include "materialDynamics.H"
+
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
 
 namespace Foam
@@ -80,6 +82,11 @@ class materialInfo
         //coeffitient of restitution for normal force
         scalar eps_;
 
+        // dynamic parameters of the surface-loading law (density, flow
+        // stress, strength-cap factor, Hugoniot); defaults are inert so
+        // the standard contact law is unaffected
+        materialDynamics dyn_;
+
     public:
 
     // Constructors ------------------------------------------------
@@ -90,7 +97,8 @@ class materialInfo
         scalar nu,
         scalar mu,
         scalar adhN,
-        scalar eps
+        scalar eps,
+        const materialDynamics& dyn = materialDynamics()
     );
 
     materialInfo
@@ -129,6 +137,11 @@ class materialInfo
     const scalar& getEps()   const
     {
         return eps_;
+    }
+
+    const materialDynamics& getDyn()   const
+    {
+        return dyn_;
     }
 };
 

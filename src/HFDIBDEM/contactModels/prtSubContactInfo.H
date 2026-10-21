@@ -142,6 +142,16 @@ class prtSubContactInfo
 
     vector getFNe();
 
+    // Regime-aware surface-loading normal force (replaces getFNe+getFNd
+    // for pairs registered in surfaceLoadingModel). Publishes the
+    // coefficients of the sub-step into prtCntVars_ for the application.
+    vector getFNSl();
+
+    bool isSurfaceLoading() const
+    {
+        return physicalProperties_.slActive_;
+    }
+
     vector getFA();
 
     vector getFNd();
@@ -213,19 +223,52 @@ class prtSubContactInfo
     // safety factor.
     scalar getPairDtCrit(scalar tangentialFactor = 1.0)
     {
-        return demTimeStepInfo::pairDtCrit
+        scalar dtPair
         (
-            demTimeStepInfo::effK
+            demTimeStepInfo::pairDtCrit
             (
-                physicalProperties_.aY_,
-                prtCntVars_.contactVolume_,
-                physicalProperties_.aG_,
-                prtCntVars_.contactArea_,
-                Lc_,
-                tangentialFactor
-            ),
-            physicalProperties_.reduceM_
+                demTimeStepInfo::effK
+                (
+                    physicalProperties_.aY_,
+                    prtCntVars_.contactVolume_,
+                    physicalProperties_.aG_,
+                    prtCntVars_.contactArea_,
+                    Lc_,
+                    tangentialFactor
+                ),
+                physicalProperties_.reduceM_
+            )
         );
+
+        // Radiation dashpot of the shock branch: tau = m/(Z*A). The
+        // secant impedance only grows above the elastic one, so the
+        // elastic value gives a velocity-independent (conservative)
+        // bound. Only the blended law has a dashpot, so 'blend none'
+        // keeps the standard step exactly.
+        if
+        (
+            physicalProperties_.slActive_
+         && physicalProperties_.sl_.blendOn
+        )
+        {
+            const scalar zEl
+            (
+                surfaceLoadingLaw::elasticImpedance
+                (
+                    physicalProperties_.sl_.flyer,
+                    physicalProperties_.sl_.sample
+                )
+            );
+
+            dtPair = min
+            (
+                dtPair,
+                0.1*physicalProperties_.reduceM_
+               /(zEl*max(prtCntVars_.contactArea_, SMALL))
+            );
+        }
+
+        return dtPair;
     }
 
     // rotational stability step: the tangential force on the cached

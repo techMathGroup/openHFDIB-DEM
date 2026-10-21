@@ -108,6 +108,33 @@ vector prtSubContactInfo::getFNe()
         *prtCntVars_.contactNormal_;
 }
 //---------------------------------------------------------------------------//
+vector prtSubContactInfo::getFNSl()
+{
+    const surfaceLoadingLaw::result r
+    (
+        surfaceLoadingLaw::evaluate
+        (
+            physicalProperties_.sl_,
+            Vn_,
+            prtCntVars_.contactArea_,
+            prtCntVars_.contactVolume_,
+            Lc_
+        )
+    );
+
+    prtCntVars_.surfaceLoading_ = true;
+    prtCntVars_.slPMean_ = r.pMean;
+    prtCntVars_.slPStr_ = r.pStr;
+    prtCntVars_.slPEdge_ = r.pEdge;
+    prtCntVars_.slPHug_ = r.pHug;
+    prtCntVars_.slBlendF_ = r.blendF;
+    prtCntVars_.slZEff_ = r.zEff;
+    prtCntVars_.slW_ = r.w;
+    prtCntVars_.slVn_ = Vn_;
+
+    return r.F*prtCntVars_.contactNormal_;
+}
+//---------------------------------------------------------------------------//
 vector prtSubContactInfo::getFA()
 {
     return ((sqrt(8*Foam::constant::mathematical::pi*physicalProperties_.aY_

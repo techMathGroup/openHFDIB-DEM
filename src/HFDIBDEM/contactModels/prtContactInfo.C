@@ -31,6 +31,7 @@ Contributors
     Ondřej Studeník (2020-*), Lucie Kubíčková (2026-*)
 \*---------------------------------------------------------------------------*/
 #include "prtContactInfo.H"
+#include "surfaceLoadingModel.H"
 
 #include "interAdhesion.H"
 #include "virtualMeshLevel.H"
@@ -98,8 +99,71 @@ tContactVars_(tVars)
     (
        (-1)*sqrt(5.0)*log((0.5*(cMatInfo.getEps()+tMatInfo.getEps())))/
        (sqrt(sqr(log(0.5*(cMatInfo.getEps()+tMatInfo.getEps())))+
-       sqr(Foam::constant::mathematical::pi)))  
+       sqr(Foam::constant::mathematical::pi)))
     );
+
+    // opt-in surface-loading law: build the pair parameters once
+    if
+    (
+        surfaceLoadingModel::isActive
+        (
+            contactPair_.first(),
+            contactPair_.second()
+        )
+    )
+    {
+        const bool cIsFlyer
+        (
+            contactPair_.first()
+         == surfaceLoadingModel::flyerOf
+            (
+                contactPair_.first(),
+                contactPair_.second()
+            )
+        );
+
+        const materialInfo& fMat(cIsFlyer ? cMatInfo : tMatInfo);
+        const materialInfo& sMat(cIsFlyer ? tMatInfo : cMatInfo);
+
+        if (!fMat.getDyn().usable() || !sMat.getDyn().usable())
+        {
+            FatalErrorInFunction
+                << "surface-loading pair " << contactPair_.first()
+                << "-" << contactPair_.second() << ": material '"
+                << (fMat.getDyn().usable() ? sMat.getMaterial()
+                                           : fMat.getMaterial())
+                << "' needs rho, Yc and hugoniot{c0 s} in DEM/materials"
+                << exit(FatalError);
+        }
+
+        const surfaceLoadingModel::settings& s(surfaceLoadingModel::get());
+
+        physicalProperties_.slActive_ = true;
+        physicalProperties_.sl_.flyer = fMat.getDyn();
+        physicalProperties_.sl_.sample = sMat.getDyn();
+        physicalProperties_.sl_.aY = physicalProperties_.aY_;
+        physicalProperties_.sl_.reduceM = physicalProperties_.reduceM_;
+        physicalProperties_.sl_.reduceBeta = physicalProperties_.reduceBeta_;
+        physicalProperties_.sl_.blendOn = s.blendOn;
+        physicalProperties_.sl_.ratioLo = s.ratioLo;
+        physicalProperties_.sl_.ratioHi = s.ratioHi;
+        physicalProperties_.sl_.secant = s.secant;
+        physicalProperties_.sl_.halfSpace = s.halfSpace;
+        physicalProperties_.sl_.kappa = s.kappa;
+        physicalProperties_.sl_.capOn = s.capOn;
+
+        Info<< "surface-loading pair " << min(contactPair_.first(), contactPair_.second())
+            << "-" << max(contactPair_.first(), contactPair_.second())
+            << ": flyer " << fMat.getMaterial()
+            << " (rho " << fMat.getDyn().rho
+            << ", Yc " << fMat.getDyn().Yc
+            << ", cap " << fMat.getDyn().capFactor << ")"
+            << ", sample " << sMat.getMaterial()
+            << " (rho " << sMat.getDyn().rho
+            << ", Yc " << sMat.getDyn().Yc
+            << ", cap " << sMat.getDyn().capFactor << ")"
+            << endl;
+    }
 }
 
 prtContactInfo::~prtContactInfo()
