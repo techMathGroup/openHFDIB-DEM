@@ -516,6 +516,32 @@ void getPrtContactVars_ArbShape(
               ? pspR.lastCentre_
               : 0.5*(cCoM + tCoM);
 
+            // freeze the shape of the last real contact patch as well:
+            // keep its polygon set (the logger projects these onto the
+            // mesh) and translate it so that it sits at the frozen
+            // anchor - for a footprint taken from the same sub-step the
+            // shift is zero, it only moves a cached patch whose centre
+            // differs from the anchor
+            pspR.footprintPolygons_.clear();
+            if (pspR.lastPolygons_.size() && pspR.maxArea_ > SMALL)
+            {
+                const vector fpShift
+                (
+                    pspR.footprintCentre_ - pspR.lastCentre_
+                );
+
+                pspR.footprintPolygons_.setSize(pspR.lastPolygons_.size());
+                forAll(pspR.lastPolygons_, i)
+                {
+                    pointField& poly(pspR.footprintPolygons_[i]);
+                    poly = pspR.lastPolygons_[i];
+                    forAll(poly, j)
+                    {
+                        poly[j] += fpShift;
+                    }
+                }
+            }
+
             pspR.penetrator_ = pen;
             pspR.relCoM0_ = penCoM - tarCoM;
             pspR.sMax_ = 0;
@@ -580,14 +606,22 @@ void getPrtContactVars_ArbShape(
         // the whole time dependence of the embedded load
         subCInfo.getprtCntVars().contactArea_ = pspR.footprintArea_;
 
-        // psp: synthesize the footprint of the embedded contact: a disc
-        // (3D) / chord (2D) of the frozen static footprint area,
-        // perpendicular to the entry direction and anchored at the patch
-        // centre of the last geometric contact. The application
+        // psp: apply the static footprint of the embedded contact. Its
+        // polygons were frozen at the embed onset from the last real
+        // contact patch (same shape, orientation and anchor as the
+        // geometric contact, so the projected cell set does not change).
+        // Only without a cached patch (contact first seen already
+        // embedded) synthesize an equivalent-area disc (3D) / chord
+        // rectangle (2D) at the frozen anchor. The application
         // contact-pressure logger projects these polygons onto the mesh,
         // so without them the pCont field would stay empty while a body
-        // is submerged; with the frozen anchor the projected cell set
-        // does not move while the pressure rises and falls
+        // is submerged
+        if (pspR.footprintPolygons_.size())
+        {
+            subCInfo.getprtCntVars().contactPolygons_
+                = pspR.footprintPolygons_;
+        }
+        else
         {
             scalar r(0);
             scalar emptyLength(0);
@@ -753,6 +787,10 @@ void getPrtContactVars_ArbShape(
                 pspR.maxArea_ = max(pspR.maxArea_, contactArea);
                 pspR.lastNormal_ = normalVector;
                 pspR.lastCentre_ = contactCenter;
+                // psp: remember the shape of the last real contact patch
+                // (the static footprint of a following embed)
+                pspR.lastPolygons_
+                    = subCInfo.getprtCntVars().contactPolygons_;
             }
         }
     }

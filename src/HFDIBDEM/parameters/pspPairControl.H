@@ -45,9 +45,10 @@ Description
     contact area of the episode - the embedded contact thus acts as a
     spring that stiffens with depth and relaxes on rebound. The
     synthesised contact carries a STATIC footprint: its area (the max
-    geometric area of the episode) and its anchor (the patch centre of
-    the last geometric contact) are frozen at the embed onset, and the
-    reported contact area is the frozen one, so the derived pressure
+    geometric area of the episode), its shape (the polygon set of the
+    last geometric contact patch) and its anchor (the patch centre of
+    that contact) are frozen at the embed onset, and the reported
+    contact area is the frozen one, so the derived pressure
     p = F/A_frozen carries the whole time dependence of the embedded
     load - the equivalent of a laser-shock-peening style surface
     pressure load. When the penetrator reaches the backside of the
@@ -63,6 +64,8 @@ Contributors
 #define pspPairControl_H
 
 #include "vector.H"
+#include "DynamicList.H"
+#include "pointField.H"
 
 #include <map>
 #include <utility>
@@ -108,6 +111,14 @@ class pspPairControl
                                      // embedded contact (static footprint:
                                      // the pressure carries the time
                                      // dependence, p = F/A_frozen)
+            DynamicList<pointField> lastPolygons_; // polygon set of the
+                                     // last geometric contact (the
+                                     // footprint shape of a following
+                                     // embed)
+            DynamicList<pointField> footprintPolygons_; // frozen
+                                     // footprint polygons of the embedded
+                                     // contact (the last real patch,
+                                     // translated to footprintCentre_)
             bool episodeActive_ = false; // a contact episode is ongoing
             bool embedded_ = false;   // penetrator fully inside target now
             bool passedThrough_ = false; // backside crossed with unchanged
@@ -231,6 +242,8 @@ class pspPairControl
             r.lastCentre_ = vector::zero;
             r.footprintCentre_ = vector::zero;
             r.footprintArea_ = 0;
+            r.lastPolygons_.clear();
+            r.footprintPolygons_.clear();
             r.episodeActive_ = false;
             r.embedded_ = false;
             r.relCoM0_ = vector::zero;
