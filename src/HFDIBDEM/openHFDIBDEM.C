@@ -1271,6 +1271,11 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         {
             if (ibSingleStep(ib) && !firstIter) continue;
 
+            // a switched-off body is inert: it neither moves nor
+            // feeds the position exchange (the index pairing with
+            // the set loop below relies on the same skip predicate)
+            if (!immersedBodies_[ib].getIsActive()) continue;
+
             const scalar ibStep(ibSingleStep(ib) ? 1.0 : step);
 
             immersedBodies_[ib].updateMovement(deltaTime*ibStep*0.5);
@@ -1307,6 +1312,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         forAll (immersedBodies_,ib)
         {
             if (ibSingleStep(ib) && !firstIter) continue;
+            if (!immersedBodies_[ib].getIsActive()) continue;
 
             if(immersedBodies_[ib].getGeomModel().getcType() != cluster)
             {
@@ -1661,6 +1667,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
         forAll (immersedBodies_,ib)
         {
             if (ibSingleStep(ib) && !firstIter) continue;
+            if (!immersedBodies_[ib].getIsActive()) continue;
 
             const scalar ibStep(ibSingleStep(ib) ? 1.0 : step);
 

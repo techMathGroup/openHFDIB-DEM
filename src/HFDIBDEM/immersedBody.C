@@ -1288,6 +1288,10 @@ void immersedBody::switchActiveOff
     // turn of the particle
     isActive_ = false;
 
+    // the resolved contact that switched the body off must not keep
+    // acting on it: the DEM loop no longer resets inactive bodies
+    FContact_.clear();
+
     // rewrite the body field
     geomModel_->resetBody(body);
 }
