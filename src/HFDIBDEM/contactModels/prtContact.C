@@ -501,6 +501,21 @@ void getPrtContactVars_ArbShape(
                 }
                 pspR.e_ /= mag(pspR.e_) + VSMALL;
             }
+            // psp: freeze the static footprint of the embedded contact -
+            // the area of the last real contact patch (the max registered
+            // geometric area, the same factor the overlap-volume
+            // extrapolation uses), anchored at the patch centre of the
+            // last geometric contact, i.e. the entry point on the
+            // target's surface. The pressure carries the time dependence
+            // (p = F/A_frozen). Without a preceding geometric contact
+            // the anchor falls back to the CoM midpoint and the area to
+            // the first synthesized area (assigned below)
+            pspR.footprintArea_ = pspR.maxArea_;
+            pspR.footprintCentre_ =
+                pspR.maxArea_ > SMALL
+              ? pspR.lastCentre_
+              : 0.5*(cCoM + tCoM);
+
             pspR.penetrator_ = pen;
             pspR.relCoM0_ = penCoM - tarCoM;
             pspR.sMax_ = 0;
@@ -545,6 +560,14 @@ void getPrtContactVars_ArbShape(
           : pspVC/pow(vmInfo->subVolumeV, 1.0/3.0)
         );
 
+        // psp: fallback of the frozen static footprint for a contact
+        // first seen already embedded (no geometric patch was registered
+        // in this episode): use the first synthesised area
+        if (pspR.footprintArea_ <= SMALL)
+        {
+            pspR.footprintArea_ = pspArea;
+        }
+
         subCInfo.getprtCntVars().contactCenter_ = 0.5*(cCoM + tCoM);
         subCInfo.getprtCntVars().contactVolume_ = pspVC;
         // the normal force on the penetrator acts along -e_ (the entry
@@ -552,35 +575,40 @@ void getPrtContactVars_ArbShape(
         // relative approach, whichever pair member is c
         subCInfo.getprtCntVars().contactNormal_ =
             (pspR.penetrator_ == cId) ? -pspR.e_ : pspR.e_;
-        subCInfo.getprtCntVars().contactArea_ = pspArea;
+        // psp: static footprint - the reported contact area is the frozen
+        // footprint area, so the derived pressure p = F/A_frozen carries
+        // the whole time dependence of the embedded load
+        subCInfo.getprtCntVars().contactArea_ = pspR.footprintArea_;
 
-        // psp: synthesize the footprint of the embedded contact: the
-        // contained body's cross-section perpendicular to the entry
-        // direction (the area the synthesis assigns to the contact),
-        // placed at the penetrator's leading face - the current
-        // penetration depth. The application contact-pressure logger
-        // projects these polygons onto the mesh, so without them the
-        // pCont field would stay empty while a body is submerged
+        // psp: synthesize the footprint of the embedded contact: a disc
+        // (3D) / chord (2D) of the frozen static footprint area,
+        // perpendicular to the entry direction and anchored at the patch
+        // centre of the last geometric contact. The application
+        // contact-pressure logger projects these polygons onto the mesh,
+        // so without them the pCont field would stay empty while a body
+        // is submerged; with the frozen anchor the projected cell set
+        // does not move while the pressure rises and falls
         {
-            const scalar penSpanE(mag(pspR.e_ & contained.span()));
-            const point leadingFace(penCoM + pspR.e_*0.5*penSpanE);
-
             scalar r(0);
             scalar emptyLength(0);
             if (case3D)
             {
-                r = sqrt(pspArea/Foam::constant::mathematical::pi);
+                r = sqrt
+                (
+                    pspR.footprintArea_
+                   /Foam::constant::mathematical::pi
+                );
             }
             else
             {
                 emptyLength = contained.span()[emptyDim];
-                r = 0.5*pspArea/max(emptyLength, VSMALL);
+                r = 0.5*pspR.footprintArea_/max(emptyLength, VSMALL);
             }
 
             setContactFootprint
             (
                 subCInfo.getprtCntVars(),
-                leadingFace,
+                pspR.footprintCentre_,
                 r,
                 emptyLength
             );
@@ -597,6 +625,9 @@ void getPrtContactVars_ArbShape(
         InfoH << parallelDEM_Info << "-- Particle-particle " << cId
                 << "-" << tId << " contact area "
                 << pspArea << endl;
+        InfoH << parallelDEM_Info << "-- Particle-particle " << cId
+                << "-" << tId << " static footprint area "
+                << pspR.footprintArea_ << endl;
         return;
     }
 
@@ -721,6 +752,7 @@ void getPrtContactVars_ArbShape(
             {
                 pspR.maxArea_ = max(pspR.maxArea_, contactArea);
                 pspR.lastNormal_ = normalVector;
+                pspR.lastCentre_ = contactCenter;
             }
         }
     }

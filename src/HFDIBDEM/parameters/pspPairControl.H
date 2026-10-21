@@ -43,11 +43,17 @@ Description
     synthesised overlap volume linearly with the (signed) penetration
     displacement since the embed onset times the maximum registered
     contact area of the episode - the embedded contact thus acts as a
-    spring that stiffens with depth and relaxes on rebound. When the
-    penetrator reaches the backside of the containing body with the
-    movement direction unchanged, the pair is marked passedThrough and
-    its contact force is switched off permanently (no exit-face
-    repulsion).
+    spring that stiffens with depth and relaxes on rebound. The
+    synthesised contact carries a STATIC footprint: its area (the max
+    geometric area of the episode) and its anchor (the patch centre of
+    the last geometric contact) are frozen at the embed onset, and the
+    reported contact area is the frozen one, so the derived pressure
+    p = F/A_frozen carries the whole time dependence of the embedded
+    load - the equivalent of a laser-shock-peening style surface
+    pressure load. When the penetrator reaches the backside of the
+    containing body with the movement direction unchanged, the pair is
+    marked passedThrough and its contact force is switched off
+    permanently (no exit-face repulsion).
 
 Contributors
     Martin Isoz (2019-*)
@@ -93,6 +99,15 @@ class pspPairControl
                                         // member towards its first member)
             scalar maxArea_ = 0;      // max registered contact area of the
                                      // current contact episode
+            vector lastCentre_ = vector::zero; // last geometric contact
+                                     // patch centre (the static-footprint
+                                     // anchor of a following embed)
+            vector footprintCentre_ = vector::zero; // frozen footprint
+                                     // centre of the embedded contact
+            scalar footprintArea_ = 0; // frozen footprint area of the
+                                     // embedded contact (static footprint:
+                                     // the pressure carries the time
+                                     // dependence, p = F/A_frozen)
             bool episodeActive_ = false; // a contact episode is ongoing
             bool embedded_ = false;   // penetrator fully inside target now
             bool passedThrough_ = false; // backside crossed with unchanged
@@ -213,6 +228,9 @@ class pspPairControl
             // passedThrough_ flag
             r.lastNormal_ = vector::zero;
             r.maxArea_ = 0;
+            r.lastCentre_ = vector::zero;
+            r.footprintCentre_ = vector::zero;
+            r.footprintArea_ = 0;
             r.episodeActive_ = false;
             r.embedded_ = false;
             r.relCoM0_ = vector::zero;
