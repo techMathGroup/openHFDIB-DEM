@@ -74,6 +74,7 @@ f.storePrevIter();
 // HFDIBDEM.updateFSCoupling(lambda,f);
 HFDIBDEM.updateFSCoupling(lambda, f, true, false);
 HFDIBDEM.interpolateIB(U,Ui,lambda);
+Ui.correctBoundaryConditions();
 
 // f += 0.8*(Ui - U)/runTime.deltaT();
 // Note (MI): this continuous forcing term makes the particle movement

@@ -18,7 +18,7 @@ UEqn.relax();
 fvOptions.constrain(UEqn);
 
 const volVectorField gradP(fvc::grad(p));
-const volScalarField& UEqnA = UEqn.A();
+const volScalarField UEqnA(UEqn.A());
 const volScalarField maskedUEqnA(surface*UEqnA);
 const volVectorField maskedPressTerm(surface*gradP);
 
