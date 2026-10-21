@@ -61,8 +61,8 @@ void lineIntInfo::setIntpInfo()
     const scalar& intDist = charCellSize_;                              //use IB characteristic cell size - const in method
 
     // prepare lists of points to solve
-    List<DynamicList<point>> ibPointsToSolve(Pstream::nProcs());        //Note (LK): include this as a part of the intPoint struct?
-    List<DynamicList<vector>> ibNormalsToSolve(Pstream::nProcs());      //Note (LK): include this as a part of the intPoint struct?
+    List<DynamicList<point>> ibPointsToSolve(Pstream::nProcs());   //Note (LK): include this as a part of the intPoint struct?
+    List<DynamicList<vector>> ibNormalsToSolve(Pstream::nProcs()); //Note (LK): include this as a part of the intPoint struct?
     List<DynamicList<intPoint>> intPointsToSolve(Pstream::nProcs());
 
     // create temporary unit surface normals
@@ -74,18 +74,18 @@ void lineIntInfo::setIntpInfo()
         geomModel_->getClosestPointAndNormal(                           //finds surface point and normal
             mesh_.C()[scell],
             intDist*2*vector::one,
-            ibPoints[cellI],                                            //stores surface point
+            ibPoints[cellI],                              //stores surface point
             ibNormals[cellI]
         );
 
         intPoints[cellI].setSize(ORDER+1);
         intPoint cIntPoint
         (
-            ibPoints[cellI],                                            //1st is surface point
-            scell,                                                      //mesh cell label for surface cell
-            Pstream::myProcNo(),                                        //processor with current point
-            Pstream::myProcNo(),                                        //processor with originating surface cell
-            cellI                                                       //local surface cell label (in cSurfCells list)
+            ibPoints[cellI],                                     //1st is surface point
+            scell,                                                //mesh cell label for surface cell
+            Pstream::myProcNo(),                                  //processor with current point
+            Pstream::myProcNo(),                                  //processor with originating surface cell
+            cellI                                                //local surface cell label (in cSurfCells list)
         );
         intPoints[cellI][0] = cIntPoint;                                //save as the first interpolation point
 
@@ -96,7 +96,6 @@ void lineIntInfo::setIntpInfo()
     }
 
     // go by orders
-    // Info << "!! --> finding int points check !!" << endl;
     // intPointI - counter, after the loop, index of interpolation point
     // .. 0 -> surface point, then interpolation points up to ORDER
     // Note (MI): rethink the comments (to do MI + LK)
@@ -114,7 +113,6 @@ void lineIntInfo::setIntpInfo()
         
 
         // loop over processors
-        // Note (MI): rethink indexing variables - iInfo vs proci vs cellI
         for (label proci = 0; proci < Pstream::nProcs(); proci++)
         {
             // Info << "!!   |-> loop over intPointsToSolve !!" << endl;
@@ -220,14 +218,8 @@ void lineIntInfo::setIntpInfo()
                     intPointsRecv[proci][iInfo].oLabel_
                 );
 
-                vector dir = cIntPoint.iPoint_ - ibPointsRecv[proci][iInfo];
-                dir /= mag(dir);
-                // Note (MI): this dir seems unused - bug or feature?
-                // Note (LK): all dirs should be parallel to surface normal, we can use one and pass it here
-                // Note (MI): is normalization by mag(dir) robust?
-                //            |-> can cIntPoint.iPoint_ coincide with 
-                //                ibPointsRecv[proci][iInfo]?
-                // Note (LK): will not coincide with non-zero intDist, and even then it would hang in pointInCell function line 130
+                // vector dir = cIntPoint.iPoint_ - ibPointsRecv[proci][iInfo];
+                // dir /= mag(dir);
                 correctIntPoint(ibPointsRecv[proci][iInfo], cIntPoint);
                 // Note (MI): correctIntPoint computes its own dir
                 // Note (MI): as well as getClosestPoint, which is used 
@@ -316,12 +308,11 @@ void lineIntInfo::correctIntPoint
         {
             const face faceI = mesh_.faces()[cellFaces[fi]];
             vector dir = closestPoint - cPoint.iPoint_;
-            // Note (MI): there is no normalization here
-            // Question (MI): could normalization by mag(dir) help with
-            //                faceI.ray() robustness?
+            dir /= mag(dir);
             // Note (LK): faceI.ray is defined in file src/OpenFOAM/meshes/meshShapes/face/faceIntersection.C
             // its readme says that the direction vector does not have to be normalized
             // but we can do it, it should not matter and it will be consistent
+            // Note (MI): added dir normalization for consistency
 
             pointHit pHit = faceI.ray(
                 cPoint.iPoint_,
@@ -352,14 +343,11 @@ vector lineIntInfo::getClosestPoint
 {
     vector dir = cPoint.iPoint_ - ibPoint;
     dir /= mag(dir);
-    // Note (MI): is normalization by mag(dir) robust?
-    // Note (LK): we can pass on surface normal itself
-    //            |-> can cPoint.iPoint_ coincide with ibPoint?
-    // Note (LK): will not coincide with non-zero intDist, and even then it would hang in pointInCell function line 130
+
 
     vector dirToC = mesh_.C()[cPoint.iCell_] - ibPoint;
 
-    return ibPoint + dir*(dirToC&dir);
+    return ibPoint + dir*(dirToC & dir);
 }
 //---------------------------------------------------------------------------//
 intPoint lineIntInfo::findIntPoint
@@ -432,8 +420,7 @@ label lineIntInfo::getFaceInDir
 {
     label faceToReturn = -1;
     vector dir = retPoint.iPoint_ - mesh_.C()[retPoint.iCell_];
-    // Note (MI): no normalization here
-    // Note (LK): here, both should be normalized
+    dir /= mag(dir);
 
     const labelList& cellFaces(mesh_.cells()[retPoint.iCell_]);
     scalar dotProd(-GREAT);
@@ -457,11 +444,9 @@ label lineIntInfo::getFaceInDir
                 outNorm = patchSf[patchFaceI];
             }
 
-            // Note (MI): but outNorm is not normalized either
-            //            |-> could this lead to numerical issues?
-            // Note (LK): yes, here both should be normalized
             outNorm = (mesh_.faceOwner()[fI] == retPoint.iCell_)
                 ? outNorm : -outNorm;
+            outNorm /= mag(outNorm);
 
             scalar auxDotProd(outNorm & dir);
 
