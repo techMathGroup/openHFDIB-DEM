@@ -318,8 +318,6 @@ class virtualMeshWall
 
     void resetSubVolume(subVolumeProperties& subVolume);
 
-    label getInternalSV();
-
     vector& getContactCenter()
     {
         return contactCenter_;

@@ -67,7 +67,6 @@ class subVolumeProperties
     bool isCBody=false;
     bool isTBody=false;
     bool toCheck=true;
-    bool isOnEdge=false;
 
     // exact-clip cache (wall path): -1 = unevaluated, 0 = evaluated
     // empty; guard with > -0.5 as on the prt path (subVolume.H);

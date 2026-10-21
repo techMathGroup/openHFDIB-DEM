@@ -810,58 +810,6 @@ void virtualMeshWall::resetSubVolume(subVolumeProperties& subVolume)
     subVolume.toCheck = true;
     subVolume.isCBody = false;
     subVolume.isTBody = false;
-    subVolume.isOnEdge = false;
     subVolume.resetClip();
-}
-//---------------------------------------------------------------------------//
-label virtualMeshWall::getInternalSV()
-{
-    autoPtr<DynamicVectorList> nextToCheck(
-        new DynamicVectorList);
-    autoPtr<DynamicVectorList> auxToCheck(
-        new DynamicVectorList);
-
-    nextToCheck->append(bbMatrix_.getSVIndexForPoint(vMeshWallInfo_.getStartingPoint()));
-    label innerSVCount(0);
-    vectorHashSet octreeSvSet;
-    
-    while (nextToCheck->size() > 0)
-    {
-        auxToCheck().clear();
-        forAll (nextToCheck(),sV)
-        {   
-            if (!octreeSvSet.found(nextToCheck()[sV]))
-            {
-                octreeSvSet.insert(nextToCheck()[sV]);
-                subVolumeProperties& cSubVolume = bbMatrix_[nextToCheck()[sV]];
-                if (cSubVolume.isCBody)
-                {
-                    bool isNotOnEdge(true);
-                    List<vector> neighbourSubVolumes = bbMatrix_.faceNeighbourSubVolumes(nextToCheck()[sV]);
-                    neighbourSubVolumes.append(bbMatrix_.edgeNeighbourSubVolumes(nextToCheck()[sV]));
-                    neighbourSubVolumes.append(bbMatrix_.cornerNeighbourSubVolumes(nextToCheck()[sV]));
-                    forAll(neighbourSubVolumes,nSV)
-                    {
-                        //~ isNotOnEdge *= bbMatrix_[neighbourSubVolumes[nSV]].isCBody;//OF.com issues warning
-                        isNotOnEdge &= bbMatrix_[neighbourSubVolumes[nSV]].isCBody;
-                    }
-                    if(!isNotOnEdge)
-                    {
-                        cSubVolume.isOnEdge = true;
-                    }
-                    auxToCheck().append(bbMatrix_.faceNeighbourSubVolumes(nextToCheck()[sV]));
-                }
-                if(!cSubVolume.isOnEdge)
-                {
-                    innerSVCount++;
-                }
-            }
-        }
-
-        autoPtr<DynamicVectorList> helpPtr(nextToCheck.ptr());
-        nextToCheck.reset(auxToCheck.ptr());
-        auxToCheck = std::move(helpPtr);
-    }
-    return innerSVCount;
 }
 // ************************************************************************* //
