@@ -61,7 +61,7 @@ class contactModelInfo
     // (reducebeta_damping_consistency_20261021.md, Sec. 10-11)
     static scalar normalDashpotPrefactor()
     {
-        return sqrt(5.0);
+        return sqrt(3.0);
     }
 
     static scalar mindlinDashpotPrefactor()
