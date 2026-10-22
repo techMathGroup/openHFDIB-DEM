@@ -2801,7 +2801,18 @@ void openHFDIBDEM::restartSimulation
 )
 {
     word timePath(recordOutDir_+"/"+runTime);
-    fileNameList files(readDir(timePath));
+    // keep body dictionaries only: the recorded directory can also
+    // hold post-processing artifacts that would abort the restart
+    // as unreadable body info
+    fileNameList allFiles(readDir(timePath, fileName::FILE));
+    fileNameList files;
+    forAll(allFiles,f)
+    {
+        if (allFiles[f].hasExt("info"))
+        {
+            files.append(allFiles[f]);
+        }
+    }
 
     forAll(files,f)
     {
