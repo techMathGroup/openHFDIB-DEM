@@ -66,7 +66,7 @@ class contactModelInfo
 
     static scalar mindlinDashpotPrefactor()
     {
-        return 2.0*sqrt(5.0);
+        return sqrt(3.0);
     }
 
     static scalar chenDashpotPrefactor()
