@@ -222,6 +222,13 @@ inline double blendFactor
         return 1.0;
     }
 
+    // a separating contact has no shock: the impedance match is only
+    // defined for approach, and zEff*v < 0 would make log10 trap
+    if (!(pHug > 0.0))
+    {
+        return 0.0;
+    }
+
     return smoothstep
     (
         (std::log10(pHug/pStr) - std::log10(lo))
@@ -265,7 +272,8 @@ inline result evaluate
         ? (v > 0.0 ? impedanceMatch(p.flyer, p.sample, v)/v
                    : elasticImpedance(p.flyer, p.sample))
         : elasticImpedance(p.flyer, p.sample);
-    r.pHug = r.zEff*v;
+    // a separating contact carries no shock pressure
+    r.pHug = v > 0.0 ? r.zEff*v : 0.0;
 
     r.blendF = p.blendOn
         ? blendFactor(r.pHug, r.pStr, p.ratioLo, p.ratioHi)

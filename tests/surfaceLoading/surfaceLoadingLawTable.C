@@ -53,8 +53,11 @@ int main()
     std::printf("# aY %.17g A %.17g w %.17g Lc %.17g\n", p.aY, A, w, Lc);
     std::printf("# v F pMean pHug pStr pEdge f Z kEff\n");
 
+    // negative velocities are separating contacts: no shock may be
+    // blended in and no floating point exception may be raised
     const double vv[] =
     {
+        -50.0, -5.0,
         1.0, 20.0, 56.0, 77.0, 100.0, 300.0,
         1000.0, 1884.0, 2700.0, 4100.0, 4170.0, 4200.0, 4300.0
     };

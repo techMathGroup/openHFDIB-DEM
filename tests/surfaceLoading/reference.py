@@ -95,8 +95,12 @@ def evaluate(v, blend=True, cap=True, half_space=True):
 
     phug = impedance_match(FLYER, SAMPLE, v)
     z = phug / v if v > 0 else elastic_z(FLYER, SAMPLE)
-    f = smoothstep((math.log10(phug / pstr) - math.log10(LO))
-                   / (math.log10(HI) - math.log10(LO))) if blend else 0.0
+    # no shock on a separating contact (phug <= 0), and log10 would
+    # otherwise trap on the non-positive ratio
+    f = 0.0
+    if blend and phug > 0.0:
+        f = smoothstep((math.log10(phug / pstr) - math.log10(LO))
+                       / (math.log10(HI) - math.log10(LO)))
 
     pceil = (1.0 - f) * pstr + f * phug
     k = KAPPA * AY * math.sqrt(A)
