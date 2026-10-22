@@ -90,7 +90,6 @@ label  solverInfo::nSolidsThreshold_ = 1000;
 bool solverInfo::onlyDEM_ = false;
 bool contactModelInfo::useChenRotationalModel_ = false;
 bool contactModelInfo::useMindlinRotationalModel_ = false;
-bool contactModelInfo::increasedDamping_ = false;
 scalar contactModelInfo::vSlipMin_ = 1e-3;
 
 // * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //

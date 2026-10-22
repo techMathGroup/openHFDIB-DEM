@@ -178,11 +178,6 @@ class contactModelInfo
         }
     }
 
-    static void setIncreasedDamping(bool increasedDamping)
-    {
-        increasedDamping_ = increasedDamping;
-    }
-
     static scalar getLcCoeff()
     {
         return LcCoeff_;
@@ -198,11 +193,6 @@ class contactModelInfo
         return useMindlinRotationalModel_;
     }
 
-    static bool getIncreasedDamping()
-    {
-        return increasedDamping_;
-    }
-
     static void setVSlipMin(scalar vSlipMin)
     {
         vSlipMin_ = vSlipMin;
@@ -216,7 +206,6 @@ class contactModelInfo
     static scalar LcCoeff_;
     static bool useChenRotationalModel_;
     static bool useMindlinRotationalModel_;
-    static bool increasedDamping_;
 
     // slip-speed gate of the coulomb-cap direction redirect:
     // below it the slip direction is assumed noise-dominated
