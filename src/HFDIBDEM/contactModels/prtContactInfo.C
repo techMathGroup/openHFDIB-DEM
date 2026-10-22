@@ -125,7 +125,15 @@ tContactVars_(tVars)
         const materialInfo& fMat(cIsFlyer ? cMatInfo : tMatInfo);
         const materialInfo& sMat(cIsFlyer ? tMatInfo : cMatInfo);
 
-        if (!fMat.getDyn().usable() || !sMat.getDyn().usable())
+        // addModel builds a speculative contact class with the placeholder
+        // material "None" to test the overlap of a body being inserted; it
+        // never carries a force and has no dynamics to set up
+        const bool placeholder
+        (
+            fMat.getMaterial() == "None" || sMat.getMaterial() == "None"
+        );
+
+        if (!placeholder && (!fMat.getDyn().usable() || !sMat.getDyn().usable()))
         {
             FatalErrorInFunction
                 << "surface-loading pair " << contactPair_.first()
@@ -134,6 +142,11 @@ tContactVars_(tVars)
                                            : fMat.getMaterial())
                 << "' needs rho, Yc and hugoniot{c0 s} in DEM/materials"
                 << exit(FatalError);
+        }
+
+        if (placeholder)
+        {
+            return;
         }
 
         const surfaceLoadingModel::settings& s(surfaceLoadingModel::get());
