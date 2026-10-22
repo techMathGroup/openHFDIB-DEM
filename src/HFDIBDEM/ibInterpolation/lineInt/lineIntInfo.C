@@ -430,19 +430,7 @@ label lineIntInfo::getFaceInDir
         label fI = cellFaces[faceI];
         if(fI != prevFace)
         {
-            vector outNorm(vector::zero);
-
-            if (mesh_.isInternalFace(fI))
-            {
-                outNorm = mesh_.Sf()[fI];
-            }
-            else
-            {
-                label facePatchId(mesh_.boundaryMesh().whichPatch(fI));
-                label patchFaceI = mesh_.boundaryMesh()[facePatchId].whichFace(fI);
-                const vectorField& patchSf = mesh_.Sf().boundaryField()[facePatchId];
-                outNorm = patchSf[patchFaceI];
-            }
+            vector outNorm(mesh_.faceAreas()[fI]);
 
             outNorm = (mesh_.faceOwner()[fI] == retPoint.iCell_)
                 ? outNorm : -outNorm;
@@ -471,24 +459,8 @@ bool lineIntInfo::pointInCell
     forAll(cellFaces, faceI)
     {
         label fI = cellFaces[faceI];
-
-        vector outNorm(vector::zero);
-        vector faceC(vector::zero);
-
-        if (mesh_.isInternalFace(fI))
-        {
-            outNorm = mesh_.Sf()[fI];
-            faceC = mesh_.Cf()[fI];
-        }
-        else
-        {
-            label facePatchId(mesh_.boundaryMesh().whichPatch(fI));
-            label patchFaceI = mesh_.boundaryMesh()[facePatchId].whichFace(fI);
-            const vectorField& patchSf = mesh_.Sf().boundaryField()[facePatchId];
-            const vectorField& patchCf = mesh_.Cf().boundaryField()[facePatchId];
-            outNorm = patchSf[patchFaceI];
-            faceC = patchCf[patchFaceI];
-        }
+        vector outNorm(mesh_.faceAreas()[fI]);
+        vector faceC(mesh_.faceCentres()[fI]);
 
         outNorm = (mesh_.faceOwner()[fI] == cToCheck) ? outNorm : -outNorm;   
         if (((pToCheck - faceC) & outNorm) > 0)
