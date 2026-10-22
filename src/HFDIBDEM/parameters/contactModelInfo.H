@@ -71,7 +71,7 @@ class contactModelInfo
 
     static scalar chenDashpotPrefactor()
     {
-        return sqrt(5.0);
+        return 2.0;
     }
 
     // shared tangential force law of the wall and particle
