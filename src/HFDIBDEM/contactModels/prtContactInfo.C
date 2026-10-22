@@ -83,7 +83,7 @@ tContactVars_(tVars)
         + (1 - sqr(tMatInfo.getNu()))/tMatInfo.getY());
     physicalProperties_.aG_ = 1/(2*(2 - cMatInfo.getNu())*(1 + cMatInfo.getNu())/cMatInfo.getY()
         + 2*(2 - tMatInfo.getNu())*(1 + tMatInfo.getNu())/tMatInfo.getY());
-    physicalProperties_.aMu_ = (cMatInfo.getMu()+tMatInfo.getMu())/2;
+    physicalProperties_.aMu_ = 0.5*(cMatInfo.getMu()+tMatInfo.getMu());
     physicalProperties_.maxAdhN_ = cMatInfo.getAdhN() + tMatInfo.getAdhN() - 2*adhPot;
     physicalProperties_.curAdhN_ = 0;
     physicalProperties_.reduceM_ =
@@ -93,12 +93,13 @@ tContactVars_(tVars)
         /(cIbContactClass_.getGeomModel().getM0()
         +tIbContactClass_.getGeomModel().getM0())
     );
-    
-    physicalProperties_.reduceBeta_ =
+    // compute damping coefficient
+    const scalar averageRestitution = 0.5*(cMatInfo.getEps() + tMatInfo.getEps());
+    const scalar logRestitution = log(averageRestitution);
+    const scalar sqrPi = sqr(Foam::constant::mathematical::pi);
+    physicalProperties_.zetaE_ =
     (
-       (-1)*sqrt(5.0)*log((0.5*(cMatInfo.getEps()+tMatInfo.getEps())))/
-       (sqrt(sqr(log(0.5*(cMatInfo.getEps()+tMatInfo.getEps())))+
-       sqr(Foam::constant::mathematical::pi)))  
+        -logRestitution/sqrt(sqr(logRestitution) + sqrPi)
     );
 }
 

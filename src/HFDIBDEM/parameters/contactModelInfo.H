@@ -55,6 +55,25 @@ class contactModelInfo
 {
     public:
 
+    // dashpot prefactors of the dissipative branches: each
+    // dashpot reads pref*zeta(e)*sqrt(m*k_branch); the branch
+    // stiffnesses differ so the prefactors do too
+    // (reducebeta_damping_consistency_20261021.md, Sec. 10-11)
+    static scalar normalDashpotPrefactor()
+    {
+        return sqrt(5.0);
+    }
+
+    static scalar mindlinDashpotPrefactor()
+    {
+        return 2.0*sqrt(5.0);
+    }
+
+    static scalar chenDashpotPrefactor()
+    {
+        return sqrt(5.0);
+    }
+
     // shared tangential force law of the wall and particle
     // contact paths: the rotational model (mindlin/chen; an
     // unknown dict name defaults to mindlin through the
@@ -71,7 +90,7 @@ class contactModelInfo
         const scalar contactArea,
         const scalar Lc,
         const scalar aG,
-        const scalar reduceBeta,
+        const scalar zetaE,
         const scalar reduceM,
         const scalar deltaT,
         const scalar FtCeil
@@ -94,11 +113,13 @@ class contactModelInfo
             scalar tangTune(demTimeStepInfo::tangTune_);
             scalar kT = tangTune*8.0*aG*(contactArea/(Lc+SMALL));
             deltaFt = kT*Vt*deltaT
-                + 2.0*reduceBeta*sqrt(kT*reduceM)*Vt;
+                + mindlinDashpotPrefactor()*zetaE
+                *sqrt(kT*reduceM)*Vt;
         }
         else if (getUseChenRotationalModel())
         {
-            deltaFt = reduceBeta*sqrt(aG*reduceM*Lc)*Vt;
+            deltaFt = chenDashpotPrefactor()*zetaE
+                *sqrt(aG*reduceM*Lc)*Vt;
             deltaFt += aG*Lc*Vt*deltaT;
         }
 

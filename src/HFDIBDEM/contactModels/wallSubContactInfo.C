@@ -223,25 +223,38 @@ void wallSubContactInfo::evalVariables(
 //---------------------------------------------------------------------------//
 vector wallSubContactInfo::getFNe(wallContactVars& wallCntvar)
 {
-    return (wallCntvar.getMeanCntPar().aY_*wallCntvar.contactVolume_
-        /(wallCntvar.Lc_+SMALL))*wallCntvar.contactNormal_;
+    return
+    (
+        wallCntvar.getMeanCntPar().aY_*wallCntvar.contactVolume_
+        /(wallCntvar.Lc_+SMALL) //elastic force magnitude
+    )*wallCntvar.contactNormal_; //contact normal
 }
 //---------------------------------------------------------------------------//
 vector wallSubContactInfo::getFA(wallContactVars& wallCntvar)
 {
-    return ((sqrt(8*Foam::constant::mathematical::pi
-        *wallCntvar.getMeanCntPar().aY_
-        *wallCntvar.curAdhN_*wallCntvar.contactVolume_))
-        *wallCntvar.contactNormal_);
+    return
+    (
+        sqrt
+        (
+            8*Foam::constant::mathematical::pi*wallCntvar.getMeanCntPar().aY_
+            *wallCntvar.curAdhN_*wallCntvar.contactVolume_
+        ) //adhesive force magnitude
+    )*wallCntvar.contactNormal_; //contact normal
 }
 //---------------------------------------------------------------------------//
 vector wallSubContactInfo::getFNd(wallContactVars& wallCntvar)
 {
     physicalProperties& meanCntPar(wallCntvar.getMeanCntPar());
-    return ((meanCntPar.reduceBeta_*sqrt(meanCntPar.aY_
-            *reduceM_*wallCntvar.contactArea_/(wallCntvar.Lc_+SMALL))*
-            wallCntvar.Vn_)*wallCntvar.contactNormal_);
-
+    return
+    (
+        contactModelInfo::normalDashpotPrefactor()*meanCntPar.zetaE_ //damping
+        *sqrt
+        (
+            meanCntPar.aY_*reduceM_*wallCntvar.contactArea_
+            /(wallCntvar.Lc_+SMALL) //stiffness
+        )
+        *wallCntvar.Vn_ //relative velocity
+    )*wallCntvar.contactNormal_; //contact normal
 }
 //---------------------------------------------------------------------------//
 vector wallSubContactInfo::getFt
@@ -259,7 +272,7 @@ vector wallSubContactInfo::getFt
         wallCntvar.contactArea_,
         wallCntvar.Lc_,
         wallCntvar.getMeanCntPar().aG_,
-        wallCntvar.getMeanCntPar().reduceBeta_,
+        wallCntvar.getMeanCntPar().zetaE_,
         reduceM_,
         deltaT,
         FtCeil

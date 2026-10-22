@@ -63,9 +63,7 @@ void prtSubContactInfo::evalVariables(
 )
 {
     cLVec_ = cIb.getGeomModel().getLVec(prtCntVars_.contactCenter_);
-    // cLVec_ = prtCntVars_.contactCenter_ - cIb.getGeomModel().getCoM();
     tLVec_ = tIb.getGeomModel().getLVec(prtCntVars_.contactCenter_);
-    // tLVec_ = prtCntVars_.contactCenter_ - tIb.getGeomModel().getCoM();
 
     cVeli_ = getVeli(cVars, cLVec_);
     tVeli_ = getVeli(tVars, tLVec_);
@@ -83,23 +81,37 @@ void prtSubContactInfo::evalVariables(
 //---------------------------------------------------------------------------//
 vector prtSubContactInfo::getFNe()
 {
-    return (physicalProperties_.aY_*prtCntVars_.contactVolume_/(Lc_+SMALL))
-        *prtCntVars_.contactNormal_;
+    return
+    (
+        physicalProperties_.aY_*prtCntVars_.contactVolume_
+        /(Lc_+SMALL) //elastic force magnitude
+    )*prtCntVars_.contactNormal_; //contact normal
 }
 //---------------------------------------------------------------------------//
 vector prtSubContactInfo::getFA()
 {
-    return ((sqrt(8*Foam::constant::mathematical::pi*physicalProperties_.aY_
-        *physicalProperties_.curAdhN_*prtCntVars_.contactVolume_))
-        *prtCntVars_.contactNormal_);
+    return
+    (
+        sqrt
+        (
+            8*Foam::constant::mathematical::pi*physicalProperties_.aY_
+            *physicalProperties_.curAdhN_*prtCntVars_.contactVolume_
+        ) //adhesive force magnitude
+    )*prtCntVars_.contactNormal_; //contact normal
 }
 //---------------------------------------------------------------------------//
 vector prtSubContactInfo::getFNd()
 {
-    return (physicalProperties_.reduceBeta_*sqrt(physicalProperties_.aY_
-        *physicalProperties_.reduceM_*prtCntVars_.contactArea_/(Lc_+SMALL))*
-        Vn_)*prtCntVars_.contactNormal_;
-
+    return
+    (   
+        contactModelInfo::normalDashpotPrefactor()*physicalProperties_.zetaE_ //damping
+        *sqrt
+        (
+            physicalProperties_.aY_*physicalProperties_.reduceM_*prtCntVars_.contactArea_
+            /(Lc_+SMALL) //stiffness
+        )
+        *Vn_ //relative velocity
+    )*prtCntVars_.contactNormal_; //contact normal
 }
 //---------------------------------------------------------------------------//
 vector prtSubContactInfo::getFt(scalar deltaT, scalar FtCeil)
@@ -112,7 +124,7 @@ vector prtSubContactInfo::getFt(scalar deltaT, scalar FtCeil)
         prtCntVars_.contactArea_,
         Lc_,
         physicalProperties_.aG_,
-        physicalProperties_.reduceBeta_,
+        physicalProperties_.zetaE_,
         physicalProperties_.reduceM_,
         deltaT,
         FtCeil
