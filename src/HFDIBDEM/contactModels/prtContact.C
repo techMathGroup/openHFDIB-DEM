@@ -69,11 +69,6 @@ void getContacts(
     }
     else
     {
-        // if (Pstream::myProcNo() == 0)
-        // {
-            // scalar ranCellVol = mesh.V()[0];
-            // prtcInfo.getContacts_ArbShape(ranCellVol);
-        // }
         scalar ranCellVol = pow(virtualMeshLevel::getCharCellSize(),3);
         prtcInfo.getContacts_ArbShape(ranCellVol);        
     }
@@ -124,12 +119,14 @@ void getContacts_Cluster(
     {
         for(std::shared_ptr<geomModel>& tgModel : tBodies)
         {
-            ibContactClass cIbClassI(
+            ibContactClass cIbClassI
+            (
                 cgModel,
                 prtcInfo.getcClass().getMatInfo().getMaterial()
             );
 
-            ibContactClass tIbClassI(
+            ibContactClass tIbClassI
+            (
                 tgModel,
                 prtcInfo.gettClass().getMatInfo().getMaterial()
             );
@@ -146,7 +143,8 @@ void getContacts_Cluster(
 
             if (tmpPrtCntInfo.getPrtSCList().size() > 0)
             {
-                prtcInfo.getPrtSCList().insert(
+                prtcInfo.getPrtSCList().insert
+                (
                     prtcInfo.getPrtSCList().end(),
                     tmpPrtCntInfo.getPrtSCList().begin(),
                     tmpPrtCntInfo.getPrtSCList().end()
@@ -218,7 +216,8 @@ bool detectPrtPrtContact_ArbShape(
         return false;
     }
 
-    virtualMesh virtMesh(
+    virtualMesh virtMesh
+    (
         *vmInfo,
         cClass.getGeomModel(),
         tClass.getGeomModel()
@@ -305,12 +304,14 @@ bool detectPrtPrtContact_Cluster
                 subCInfo.getPhysicalProperties()
             );
 
-            if (detectPrtPrtContact(
-                mesh,
-                cIbClassI,
-                tIbClassI,
-                subCInfo
-            ))
+            if (detectPrtPrtContact
+                (
+                    mesh,
+                    cIbClassI,
+                    tIbClassI,
+                    subCInfo
+                )
+            )
             {
                 return true;
             }
@@ -332,7 +333,8 @@ void getPrtContactVars_ArbShape(
         return;
     }
 
-    virtualMesh virtMesh(
+    virtualMesh virtMesh
+    (
         *vmInfo,
         cClass.getGeomModel(),
         tClass.getGeomModel()
@@ -536,17 +538,20 @@ void getPrtContactVars_Cluster
     {
         for(std::shared_ptr<geomModel>& tgModel : tBodies)
         {
-            ibContactClass cIbClassI(
+            ibContactClass cIbClassI
+            (
                 cgModel,
                 cClass.getMatInfo().getMaterial()
             );
 
-            ibContactClass tIbClassI(
+            ibContactClass tIbClassI
+            (
                 tgModel,
                 tClass.getMatInfo().getMaterial()
             );
 
-            prtSubContactInfo tmpSubCInfoI(
+            prtSubContactInfo tmpSubCInfoI
+            (
                 subCInfo.getCPair(),
                 subCInfo.getPhysicalProperties()
             );
@@ -587,7 +592,8 @@ void getPrtContactVars
         tClass.getGeomModel().getcType() == sphere
     )
     {
-        getPrtContactVars_Sphere(
+        getPrtContactVars_Sphere
+        (
             mesh,
             cClass,
             tClass,
@@ -601,7 +607,8 @@ void getPrtContactVars
         tClass.getGeomModel().getcType() == cluster
     )
     {
-        getPrtContactVars_Cluster(
+        getPrtContactVars_Cluster
+        (
             mesh,
             cClass,
             tClass,
@@ -610,7 +617,8 @@ void getPrtContactVars
     }
     else
     {
-        getPrtContactVars_ArbShape(
+        getPrtContactVars_ArbShape
+        (
             mesh,
             cClass,
             tClass,
@@ -626,7 +634,8 @@ bool solvePrtContact(
     scalar deltaT
 )
 {
-    getPrtContactVars(
+    getPrtContactVars
+    (
         mesh,
         cInfo.getcClass(),
         cInfo.gettClass(),
@@ -671,7 +680,8 @@ bool solvePrtContact(
     InfoH << parallelDEM_Info << "-- " << cntType << " " <<subCInfo.getCPair().first() <<"-"<<subCInfo.getCPair().second() << " contact area "
             << subCInfo.getprtCntVars().contactArea_ << endl;
 
-    subCInfo.evalVariables(
+    subCInfo.evalVariables
+    (
         cInfo.getcClass(),
         cInfo.gettClass(),
         cInfo.getcVars(),

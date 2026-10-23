@@ -263,7 +263,8 @@ bool virtualMesh::detectFirstContactPoint()
 {
     bool startPointFound = false;
 
-    return detectFirstVolumeInContact(
+    return detectFirstVolumeInContact
+    (
         vMeshInfo_.getSubVolume(),
         startPointFound
     );
@@ -326,7 +327,7 @@ bool virtualMesh::detectFirstVolumeInContact(subVolume& sV, bool& startPointFoun
         boundBox cBBox = boundBox(sV.min(), sV.max());
         boundBox tBBox = boundBox(sV.min(), sV.max());
 
-        if (cInfo.volumeType_ == volumeType::MIXED)                     //O F.com: mixed, inside, outside -> MIXED, INSIDE, OUTSIDE
+        if (cInfo.volumeType_ == volumeType::MIXED)
         {
             if (!cGeomModel_.limitFinalSubVolume(sV,true,cBBox))
             {
@@ -361,21 +362,6 @@ bool virtualMesh::detectFirstVolumeInContact(subVolume& sV, bool& startPointFoun
     {
         return true;
     }
-
-    //~ List<subVolume>& sVs = sV.childSubVolumes();
-
-    //~ if (!startPointFound)
-    //~ {
-        //~ for (auto iter = sVs.begin(); iter != sVs.end(); ++iter)
-        //~ {
-            //~ if (iter->contains(vMeshInfo_.getStartingPoint()))
-            //~ {
-                //~ // Move this one to the front
-                //~ std::rotate(sVs.begin(), iter, sVs.end());
-                //~ break;
-            //~ }
-        //~ }
-    //~ }
     
     // Access the autoPtr list
     List<autoPtr<subVolume>>& sVsPtr = sV.childSubVolumes();
@@ -396,17 +382,9 @@ bool virtualMesh::detectFirstVolumeInContact(subVolume& sV, bool& startPointFoun
         }
     }
 
-    //~ forAll(sVs,i)
-    //~ {
-        //~ if (detectFirstVolumeInContact(sVs[i], startPointFound))
-        //~ {
-            //~ return true;
-        //~ }
-        //~ startPointFound = true;
-    //~ }
     forAll(sVsPtr, i)
     {
-        subVolume& sv = *(sVsPtr[i]);   // dereference autoPtr to get the actual object
+        subVolume& sv = *(sVsPtr[i]);                                   // dereference autoPtr to get the actual object
     
         if (detectFirstVolumeInContact(sv, startPointFound))
         {
@@ -581,13 +559,12 @@ void virtualMesh::inspectSubVolume(
         return;
     }
 
-    //~ List<subVolume>& sVs = sV.childSubVolumes();
     // Access the autoPtr list
     List<autoPtr<subVolume>>& sVsPtr = sV.childSubVolumes();
     DynamicPointList newEdgePoints;
     forAll(sVsPtr,i)
     {
-        subVolume& cSv = *(sVsPtr[i]);   // dereference autoPtr to get the actual object
+        subVolume& cSv = *(sVsPtr[i]);                                  // dereference autoPtr to get the actual object
         inspectSubVolume(cSv, contactVolume, contactCenter, newEdgePoints);
     }
 
@@ -678,8 +655,6 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(bool nonConvex)
 //---------------------------------------------------------------------------//
 Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList edgeSubVolumesPoints)
 {
-    //Note (??): This function is taken from prtContact and just adjusted
-    //           for higher accuracy
     scalar area(0.0);
     vector normalVec(vector::zero);
     scalar tDC(tGeomModel_.getDC());
@@ -801,12 +776,10 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList
         // loop over parts of plane to find and sort points
         DynamicVectorList commCellsInSections;
         for (label i = 0; i < 4; i++)
-        //~ for (label i = 0; i < 8; i++)
         {
             scalar uStep(helpList[i + 1] -  helpList[i]);
             scalar vStep(helpList[i + 2] -  helpList[i + 1]);
             DynamicPointList pointsInSection;
-            //~ for (scalar j = 0.0; j < 5.0; j += 1.0)
             for (scalar j = 0.0; j < 15.0; j += 1.0)
             {
                 plane uPlane(contactCenter_, u*(helpList[i] + uStep*j/15.0) + v*(helpList[i + 1] + vStep*j/15.0));
@@ -855,7 +828,6 @@ Tuple2<scalar,vector> virtualMesh::get3DcontactNormalAndSurface(DynamicPointList
         //-- calculate contact area
         for (label i = 0; i + 1 < commCellsInSections.size(); i++)
         {
-            //~ Info << commCellsInSections[i] << endl;
             vector AC(commCellsInSections[i] - contactCenter_);
             vector BC(commCellsInSections[i + 1] - contactCenter_);
             vector crossPr(AC ^ BC);
@@ -894,7 +866,6 @@ std::vector<subContact> virtualMesh::findsubContacts(subVolume& sV)
         
         List<autoPtr<subVolume>>& sVsPtr = sV.childSubVolumes();
         
-        //~ for (subVolume& child : sV.childSubVolumes())
         forAll (sVsPtr, i)
         {
             subVolume& child = *(sVsPtr[i]);
