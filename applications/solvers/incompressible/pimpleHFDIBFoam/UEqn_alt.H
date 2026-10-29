@@ -40,7 +40,9 @@ const volVectorField maskedPressTerm(surface*gradP);
 // Forcing update definition
 auto updateForcing = [&](const fvVectorMatrix& eqn)
 {
-    const volScalarField& UEqnA = eqn.A();
+    // const volScalarField& UEqnA = eqn.A();
+    tmp<volScalarField> tUEqnA = eqn.A();
+    const volScalarField& UEqnA = tUEqnA();
     const volScalarField maskedUEqnA(surface*UEqnA);
 
     f = Ui*maskedUEqnA;
