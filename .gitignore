@@ -100,9 +100,13 @@ doc/Doxygen/DTAGS
 
 # local analysis and helper folders
 analyses/
-tests/
+tests/*
+!tests/algorithms/
 tests_local/
 tools/
 old_codes/
 reports/
 pubs/
+
+# generated Python caches
+__pycache__/

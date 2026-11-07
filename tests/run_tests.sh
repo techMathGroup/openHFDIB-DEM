@@ -7,7 +7,7 @@ cd "$repo_root"
 # pure-Python unit tests (no OpenFOAM env needed)
 python3 -m unittest discover -s tests/unit -p "test_*.py" -v
 
-python3 -m unittest discover -s tests/virtualMesh -p "test_*.py" -v
+python3 -m unittest discover -s tests/algorithms/virtualMesh -p "test_*.py" -v
 
 # solver-level regression tests (need OpenFOAM env: blockMesh, decomposePar,
 # HFDIBDEMFoam, mpirun); skipped automatically if the tools are missing
@@ -17,3 +17,6 @@ python3 -m unittest discover -s tests/HFDIBDEMFoam -p "test_*.py" -v
 # interIsoHFDIBFoam, blockMesh, setFields, decomposePar, mpirun);
 # skips with a stale-binary reason if the solver predates libHFDIBDEM.so
 python3 -m unittest discover -s tests/fluidSolidCoupling -p "test_*.py" -v
+
+# lineInt serial/parallel handoff, containment, and production-field checks
+python3 -I tests/algorithms/lineInt/run_regression.py --strict

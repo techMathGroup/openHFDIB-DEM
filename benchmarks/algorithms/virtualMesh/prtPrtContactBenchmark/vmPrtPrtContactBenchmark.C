@@ -52,7 +52,7 @@ Description
     exact arm must halve-plus its error per level refinement (second
     order), the legacy arm is expected first order by design.
 
-    Cross-check: tests/virtualMesh/vmReplica.py run on the identical
+    Cross-check: tests/algorithms/virtualMesh/vmReplica.py run on the identical
     STL pair and settings must reproduce the exact-arm numbers.
 
 Contributors

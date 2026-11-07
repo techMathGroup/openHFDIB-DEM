@@ -1,0 +1,29 @@
+FoamFile
+{
+    version 2.0;
+    format ascii;
+    class dictionary;
+    object fvSolution;
+}
+
+solvers
+{
+    "(p|pFinal)"
+    {
+        solver GAMG;
+        tolerance 1e-8;
+        relTol 0;
+        smoother GaussSeidel;
+    }
+    "(U|UFinal)" { solver PBiCG; preconditioner DILU; tolerance 1e-10; relTol 0; }
+}
+PIMPLE
+{
+    momentumPredictor no;
+    nOuterCorrectors 1;
+    nCorrectors 1;
+    nNonOrthogonalCorrectors 0;
+    consistent yes;
+    pRefCell 0;
+    pRefValue 0;
+}

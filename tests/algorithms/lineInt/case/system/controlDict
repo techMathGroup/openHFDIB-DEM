@@ -1,0 +1,25 @@
+FoamFile
+{
+    version 2.0;
+    format ascii;
+    class dictionary;
+    object controlDict;
+}
+
+application pimpleHFDIBFoam;
+startFrom startTime;
+startTime 0;
+stopAt endTime;
+endTime 1e-6;
+deltaT 1e-6;
+writeControl timeStep;
+writeInterval 1;
+purgeWrite 0;
+writeFormat ascii;
+writePrecision 8;
+writeCompression off;
+timeFormat general;
+timePrecision 8;
+runTimeModifiable false;
+adjustTimeStep no;
+libs (libHFDIBDEM);
