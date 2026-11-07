@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
 
             ghf_gradRho =
                 fvc::reconstruct(
-                    ghf*fvc::snGrad(rho) * mesh.magSf() * (1.0 - surfaceF)
+                    ghf*fvc::snGrad(rho) * mesh.magSf()
                 );
             ghf_gradRho.correctBoundaryConditions();
             neg_gradP_rgh = 
@@ -289,8 +289,9 @@ int main(int argc, char *argv[])
         fDragPress.storePrevIter();
         fDragVisc.storePrevIter();
         // --- compute viscous forces and update coupling
-        volVectorField gradLambda(fvc::grad(lambda));        
-        fDragPress = -gradLambda*p;
+        volVectorField gradLambda(fvc::grad(lambda));
+        // lm-1 fix: dynamic pressure only (buoyancy rides the dem side)
+        fDragPress = -gradLambda*p_rgh;
 
         volTensorField gradU = fvc::grad(U);
         volTensorField tau = -mixture.mu()*(gradU + gradU.T());
