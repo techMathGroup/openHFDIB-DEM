@@ -32,9 +32,20 @@ Contributors
 \*---------------------------------------------------------------------------*/
 #include "lineIntInfo.H"
 
+#include <fstream>
+#include <iomanip>
+
 #define ORDER 2
 
 using namespace Foam;
+
+namespace
+{
+void writeVector(std::ostream& os, const Foam::vector& value)
+{
+    os << value.x() << ' ' << value.y() << ' ' << value.z();
+}
+}
 
 //---------------------------------------------------------------------------//
 lineIntInfo::lineIntInfo
@@ -50,7 +61,6 @@ lineIntInfo::~lineIntInfo()
 //---------------------------------------------------------------------------//
 void lineIntInfo::setIntpInfo()
 {
-    // Info << "!! --> entry check !!" << endl;
     const DynamicLabelList& cSurfCells = getSurfCells();
 
     resetIntpInfo(cSurfCells.size());
@@ -60,10 +70,23 @@ void lineIntInfo::setIntpInfo()
     List<List<intPoint>>& intPoints = getIntPoints();
     const scalar& intDist = charCellSize_;                              //use IB characteristic cell size - const in method
 
+    static const bool dumpMarch(getenv("HFDIB_MARCH_DUMP") != nullptr);
+    static const bool strictMarch(getenv("HFDIB_LINEINT_STRICT") != nullptr);
+    static std::ofstream marchFile;
+    if (dumpMarch && !marchFile.is_open())
+    {
+        marchFile.open
+        (
+            "marchProbe." + std::to_string(Pstream::myProcNo()) + ".dat"
+        );
+        marchFile << std::setprecision(17);
+    }
+
     // prepare lists of points to solve
     List<DynamicList<point>> ibPointsToSolve(Pstream::nProcs());   //Note (LK): include this as a part of the intPoint struct?
     List<DynamicList<vector>> ibNormalsToSolve(Pstream::nProcs()); //Note (LK): include this as a part of the intPoint struct?
     List<DynamicList<intPoint>> intPointsToSolve(Pstream::nProcs());
+    List<DynamicList<label>> intEntryFacesToSolve(Pstream::nProcs());
 
     // create temporary unit surface normals
     forAll (cSurfCells, cellI)
@@ -93,6 +116,7 @@ void lineIntInfo::setIntpInfo()
         ibPointsToSolve[Pstream::myProcNo()].append(ibPoints[cellI]);
         ibNormalsToSolve[Pstream::myProcNo()].append(ibNormals[cellI]);
         intPointsToSolve[Pstream::myProcNo()].append(cIntPoint);
+        intEntryFacesToSolve[Pstream::myProcNo()].append(-1);
     }
 
     // go by orders
@@ -101,66 +125,146 @@ void lineIntInfo::setIntpInfo()
     // Note (MI): rethink the comments (to do MI + LK)
     for(label intPointI = 0; intPointI < ORDER; ++intPointI)
     {
+        const label myProc = Pstream::myProcNo();
+
         // lists to send
         List<DynamicList<point>> ibPointsToSend(Pstream::nProcs());
         List<DynamicList<vector>> ibNormalsToSend(Pstream::nProcs());
         List<DynamicList<intPoint>> intPointsToSend(Pstream::nProcs());
 
-        // lists to continue
+        // lists to continue and invalid points to return
         List<DynamicList<point>> ibPointsToCont(Pstream::nProcs());
         List<DynamicList<vector>> ibNormalsToCont(Pstream::nProcs());
         List<DynamicList<intPoint>> intPointsToCont(Pstream::nProcs());
-        
+        List<DynamicList<intPoint>> intPointsInvalid(Pstream::nProcs());
 
-        // loop over processors
-        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+        label nPending(intPointsToSolve[myProc].size());
+        label nMarchRounds(0);
+        label nUnresolved(0);
+        const label maxMarchRounds(Pstream::nProcs() + 1);
+        reduce(nPending, sumOp<label>());
+
+        while(nPending > 0)
         {
-            // Info << "!!   |-> loop over intPointsToSolve !!" << endl;
-            // loop over interpolation points
-            forAll(intPointsToSolve[proci], iInfo)
+            if (nMarchRounds == maxMarchRounds)
             {
-                // latest interpolation point
-                intPoint cIntPoint = intPointsToSolve[proci][iInfo];
-                point cPoint = cIntPoint.iPoint_;
+                nUnresolved += intPointsToSolve[myProc].size();
+                forAll(intPointsToSolve[myProc], iInfo)
+                {
+                    intPoint invalidPoint(intPointsToSolve[myProc][iInfo]);
+                    invalidPoint.iProc_ = -1;
+                    intPointsInvalid[myProc].append(invalidPoint);
+                }
+                ibPointsToSolve[myProc].clear();
+                ibNormalsToSolve[myProc].clear();
+                intPointsToSolve[myProc].clear();
+                intEntryFacesToSolve[myProc].clear();
+                break;
+            }
+            ++nMarchRounds;
 
-                do {
-                    cPoint += ibNormalsToSolve[proci][iInfo]*intDist;
-                } while(pointInCell(cPoint, cIntPoint.iCell_));
+            forAll(intPointsToSolve[myProc], iInfo)
+            {
+                intPoint cIntPoint = intPointsToSolve[myProc][iInfo];
+                const label entryFace = intEntryFacesToSolve[myProc][iInfo];
+                point cPoint(cIntPoint.iPoint_);
 
-                // new interpolation points
-                intPoint nIntPoint = findIntPoint(cIntPoint, cPoint);
-                correctIntPoint(ibPointsToSolve[proci][iInfo], nIntPoint);
+                // only a completed previous-order point gets a new target
+                if (entryFace < 0)
+                {
+                    cPoint = advanceIntPoint
+                    (
+                        cIntPoint,
+                        ibNormalsToSolve[myProc][iInfo]
+                    );
+                }
 
-                // check for cells at domain boundary
+                bool traversalCapped(false);
+                intPoint nIntPoint
+                (
+                    findIntPoint
+                    (
+                        cIntPoint,
+                        cPoint,
+                        entryFace,
+                        traversalCapped
+                    )
+                );
+                if (traversalCapped)
+                {
+                    ++nUnresolved;
+                    nIntPoint.iProc_ = -1;
+                }
+
                 if (nIntPoint.iProc_ == -1)
                 {
-                    // pass to next interpolation point, keeping default iProc_ at -1
-                    // iProc_ check by getIntOrder function
-                    continue;
+                    intPointsInvalid[myProc].append(nIntPoint);
                 }
-
-                // check if to send or keep
-                else if (Pstream::myProcNo() != nIntPoint.iProc_)
+                else if (nIntPoint.iProc_ != myProc)
                 {
-                    ibPointsToSend[nIntPoint.iProc_].append(ibPointsToSolve[proci][iInfo]);
-                    ibNormalsToSend[nIntPoint.iProc_].append(ibNormalsToSolve[proci][iInfo]);
+                    ibPointsToSend[nIntPoint.iProc_].append
+                    (
+                        ibPointsToSolve[myProc][iInfo]
+                    );
+                    ibNormalsToSend[nIntPoint.iProc_].append
+                    (
+                        ibNormalsToSolve[myProc][iInfo]
+                    );
                     intPointsToSend[nIntPoint.iProc_].append(nIntPoint);
                 }
-
                 else
                 {
-                    ibPointsToCont[proci].append(ibPointsToSolve[proci][iInfo]);
-                    ibNormalsToCont[proci].append(ibNormalsToSolve[proci][iInfo]);
-                    intPointsToCont[proci].append(nIntPoint);
+                    correctIntPoint
+                    (
+                        ibPointsToSolve[myProc][iInfo],
+                        nIntPoint
+                    );
+                    const bool contained
+                    (
+                        pointInCell(nIntPoint.iPoint_, nIntPoint.iCell_)
+                    );
+
+                    if (dumpMarch && marchFile.is_open())
+                    {
+                        marchFile << "MARCH_OWNER " << mesh_.time().value()
+                            << ' ' << intPointI + 1 << ' ' << nIntPoint.oProc_
+                            << ' ' << nIntPoint.oLabel_ << ' ' << myProc
+                            << ' ' << nIntPoint.iCell_ << ' ' << contained
+                            << std::endl;
+                    }
+
+                    if (!contained)
+                    {
+                        ++nUnresolved;
+                        nIntPoint.iProc_ = -1;
+                        intPointsInvalid[myProc].append(nIntPoint);
+                    }
+                    else
+                    {
+                        ibPointsToCont[myProc].append
+                        (
+                            ibPointsToSolve[myProc][iInfo]
+                        );
+                        ibNormalsToCont[myProc].append
+                        (
+                            ibNormalsToSolve[myProc][iInfo]
+                        );
+                        intPointsToCont[myProc].append(nIntPoint);
+                    }
                 }
             }
-        }
 
-        // sync with others
-        List<DynamicList<point>> ibPointsRecv(Pstream::nProcs());
-        List<DynamicList<vector>> ibNormalsRecv(Pstream::nProcs());
-        List<DynamicList<intPoint>> intPointsRecv(Pstream::nProcs());
-        sendAndRecvIntPoints(
+            ibPointsToSolve[myProc].clear();
+            ibNormalsToSolve[myProc].clear();
+            intPointsToSolve[myProc].clear();
+            intEntryFacesToSolve[myProc].clear();
+
+            // every rank enters every exchange, including with no work
+            List<DynamicList<point>> ibPointsRecv(Pstream::nProcs());
+            List<DynamicList<vector>> ibNormalsRecv(Pstream::nProcs());
+            List<DynamicList<intPoint>> intPointsRecv(Pstream::nProcs());
+            sendAndRecvIntPoints
+            (
                 ibPointsToSend,
                 ibNormalsToSend,
                 intPointsToSend,
@@ -169,68 +273,97 @@ void lineIntInfo::setIntpInfo()
                 intPointsRecv
             );
 
-        // clear lists
-        for (label proci = 0; proci < Pstream::nProcs(); proci++)
-        {
-            ibPointsToSend[proci].clear();
-            ibNormalsToSend[proci].clear();
-            intPointsToSend[proci].clear();
+            for (label proci = 0; proci < Pstream::nProcs(); proci++)
+            {
+                ibPointsToSend[proci].clear();
+                ibNormalsToSend[proci].clear();
+                intPointsToSend[proci].clear();
+            }
+
+            for (label proci = 0; proci < Pstream::nProcs(); proci++)
+            {
+                forAll(intPointsRecv[proci], iInfo)
+                {
+                    const label patchFace
+                    (
+                        intPointsRecv[proci][iInfo].iCell_
+                    );
+                    const label entryFace(getReceivingFace(patchFace, proci));
+                    const label cellI
+                    (
+                        entryFace < 0 ? 0 : mesh_.faceOwner()[entryFace]
+                    );
+
+                    intPoint cIntPoint
+                    (
+                        intPointsRecv[proci][iInfo].iPoint_,
+                        cellI,
+                        myProc,
+                        intPointsRecv[proci][iInfo].oProc_,
+                        intPointsRecv[proci][iInfo].oLabel_
+                    );
+
+                    if (dumpMarch && marchFile.is_open())
+                    {
+                        marchFile << "MARCH_RECV " << mesh_.time().value()
+                            << ' ' << intPointI + 1 << ' '
+                            << cIntPoint.oProc_ << ' ' << cIntPoint.oLabel_
+                            << std::endl;
+                    }
+
+                    // the final owner will correct this unchanged target
+                    ibPointsToSolve[myProc].append
+                    (
+                        ibPointsRecv[proci][iInfo]
+                    );
+                    ibNormalsToSolve[myProc].append
+                    (
+                        ibNormalsRecv[proci][iInfo]
+                    );
+                    intPointsToSolve[myProc].append(cIntPoint);
+                    intEntryFacesToSolve[myProc].append(entryFace);
+                }
+            }
+
+            nPending = intPointsToSolve[myProc].size();
+            reduce(nPending, sumOp<label>());
         }
 
-        // finished solving of received points
-        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+        reduce(nUnresolved, sumOp<label>());
+        if (nUnresolved > 0)
         {
-            forAll(intPointsRecv[proci], iInfo)
+            if (strictMarch)
             {
-                // get face label
-                label faceI = intPointsRecv[proci][iInfo].iCell_;
-                label cellI(0);
+                FatalErrorInFunction
+                    << nUnresolved << " unresolved marched interpolation "
+                    << "points remain" << exit(FatalError);
+            }
 
-                // get cell label
-                forAll(mesh_.boundaryMesh(), patchi)
-                {
-                    const polyPatch& cPatch = mesh_.boundaryMesh()[patchi];
-                    if (cPatch.type() == "processor")
-                    {
-                        const processorPolyPatch& procPatch
-                            = refCast<const processorPolyPatch>(cPatch);
-
-                        label sProc = (Pstream::myProcNo() == procPatch.myProcNo())
-                            ? procPatch.neighbProcNo() : procPatch.myProcNo();
-
-                        if (sProc == proci)
-                        {
-                            cellI = mesh_.faceOwner()[cPatch.start() + faceI];
-                        }
-                    }
-                }
-
-                // save
-                intPointsRecv[proci][iInfo].iCell_ = cellI;
-
-                // find interpolation point
-                intPoint cIntPoint
-                (
-                    intPointsRecv[proci][iInfo].iPoint_,
-                    cellI,
-                    Pstream::myProcNo(),
-                    intPointsRecv[proci][iInfo].oProc_,
-                    intPointsRecv[proci][iInfo].oLabel_
-                );
-
-                // vector dir = cIntPoint.iPoint_ - ibPointsRecv[proci][iInfo];
-                // dir /= mag(dir);
-                correctIntPoint(ibPointsRecv[proci][iInfo], cIntPoint);
-                // Note (MI): correctIntPoint computes its own dir
-                // Note (MI): as well as getClosestPoint, which is used 
-                //            in correctIntPoint
-                intPointsRecv[proci][iInfo] = cIntPoint;
+            static bool warnedUnresolved(false);
+            if (Pstream::master() && !warnedUnresolved)
+            {
+                WarningInFunction
+                    << "Unresolved marched interpolation points are "
+                    << "invalidated and excluded from later orders. "
+                    << "Further warnings of this type are suppressed."
+                    << endl;
+                warnedUnresolved = true;
             }
         }
 
         // return solved interpolation points to processor of origin
         List<DynamicList<intPoint>> intPointsSolved(Pstream::nProcs());
-        returnSolvedIntPoints(intPointsToCont, intPointsRecv, intPointsSolved);
+        returnSolvedIntPoints
+        (
+            intPointsToCont,
+            intPointsInvalid,
+            intPointsSolved
+        );
+
+#ifdef FULLDEBUG
+        label recordErrors(0);
+        HashSet<label> returnedLabels;
+#endif
 
         // save solved points
         for (label proci = 0; proci < Pstream::nProcs(); proci++)
@@ -240,47 +373,97 @@ void lineIntInfo::setIntpInfo()
                 // get the original label
                 label oLabel = intPointsSolved[proci][iInfo].oLabel_;
 
+#ifdef FULLDEBUG
+                if (!returnedLabels.insert(oLabel))
+                {
+                    ++recordErrors;
+                }
+#endif
+
                 // save int point
                 intPoints[oLabel][intPointI+1] = intPointsSolved[proci][iInfo];
+                if (dumpMarch && marchFile.is_open())
+                {
+                    const intPoint& saved = intPoints[oLabel][intPointI+1];
+                    marchFile << "MARCH_FINAL " << mesh_.time().value()
+                        << ' ' << intPointI + 1 << ' ';
+                    writeVector(marchFile, mesh_.C()[cSurfCells[oLabel]]);
+                    marchFile << ' ' << saved.iProc_ << ' ';
+                    writeVector(marchFile, saved.iPoint_);
+                    marchFile << std::endl;
+                }
             }
         }
 
-        // clear lists and prepare for next order solution
-        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+#ifdef FULLDEBUG
+        if (returnedLabels.size() != cSurfCells.size())
         {
-            ibPointsToSolve[proci].clear();
-            ibNormalsToSolve[proci].clear();
-            intPointsToSolve[proci].clear();
-
-            forAll(intPointsToCont[proci], iInfo)
-            {
-                ibPointsToSolve[proci].append(ibPointsToCont[proci][iInfo]);
-                ibNormalsToSolve[proci].append(ibNormalsToCont[proci][iInfo]);
-                intPointsToSolve[proci].append(intPointsToCont[proci][iInfo]);
-            }
-
-            // clear lists
-            ibPointsToCont[proci].clear();
-            ibNormalsToCont[proci].clear();
-            intPointsToCont[proci].clear();
+            ++recordErrors;
         }
-
-        // add recieved points
-        for (label proci = 0; proci < Pstream::nProcs(); proci++)
+        reduce(recordErrors, sumOp<label>());
+        if (recordErrors > 0)
         {
-            forAll(intPointsRecv[proci], iInfo)
-            {
-                ibPointsToSolve[proci].append(ibPointsRecv[proci][iInfo]);
-                ibNormalsToSolve[proci].append(ibNormalsRecv[proci][iInfo]);
-                intPointsToSolve[proci].append(intPointsRecv[proci][iInfo]);
-            }
+            FatalErrorInFunction
+                << "Duplicate or missing marched interpolation records"
+                << exit(FatalError);
+        }
+#endif
 
-            // clear lists
-            ibPointsRecv[proci].clear();
-            ibNormalsRecv[proci].clear();
-            intPointsRecv[proci].clear();
+        // the final owner constructs the next order
+        forAll(intPointsToCont[myProc], iInfo)
+        {
+            ibPointsToSolve[myProc].append(ibPointsToCont[myProc][iInfo]);
+            ibNormalsToSolve[myProc].append
+            (
+                ibNormalsToCont[myProc][iInfo]
+            );
+            intPointsToSolve[myProc].append(intPointsToCont[myProc][iInfo]);
+            intEntryFacesToSolve[myProc].append(-1);
         }
     }
+}
+//---------------------------------------------------------------------------//
+point lineIntInfo::advanceIntPoint
+(
+    const intPoint& fromP,
+    const vector& normal
+) const
+{
+    point cPoint(fromP.iPoint_);
+    do
+    {
+        cPoint += normal*charCellSize_;
+    } while(pointInCell(cPoint, fromP.iCell_));
+
+    return cPoint;
+}
+//---------------------------------------------------------------------------//
+label lineIntInfo::getReceivingFace
+(
+    const label faceI,
+    const label srcProc
+) const
+{
+    label entryFace(-1);
+    forAll(mesh_.boundaryMesh(), patchi)
+    {
+        const polyPatch& cPatch = mesh_.boundaryMesh()[patchi];
+        if (cPatch.type() == "processor")
+        {
+            const processorPolyPatch& procPatch
+                = refCast<const processorPolyPatch>(cPatch);
+
+            label sProc = (Pstream::myProcNo() == procPatch.myProcNo())
+                ? procPatch.neighbProcNo() : procPatch.myProcNo();
+
+            if (sProc == srcProc)
+            {
+                entryFace = cPatch.start() + faceI;
+            }
+        }
+    }
+
+    return entryFace;
 }
 //---------------------------------------------------------------------------//
 void lineIntInfo::correctIntPoint
@@ -303,6 +486,9 @@ void lineIntInfo::correctIntPoint
     else
     {
         const labelList& cellFaces(mesh_.cells()[cPoint.iCell_]);
+        point clippedPoint(cPoint.iPoint_);
+        scalar nearestDistSqr(GREAT);
+        bool clipped(false);
 
         forAll (cellFaces, fi)
         {
@@ -324,22 +510,33 @@ void lineIntInfo::correctIntPoint
             {
                 vector newP = 0.95*(pHit.hitPoint() - cPoint.iPoint_);
                 newP += cPoint.iPoint_;
+                const scalar distSqr(magSqr(newP - cPoint.iPoint_));
 
-                if(pointInCell(newP, cPoint.iCell_))
+                // face order can differ between decompositions
+                if
+                (
+                    pointInCell(newP, cPoint.iCell_)
+                 && distSqr < nearestDistSqr
+                )
                 {
-                    cPoint.iPoint_ = newP;
-                    break;
+                    clippedPoint = newP;
+                    nearestDistSqr = distSqr;
+                    clipped = true;
                 }
             }
+        }
+        if (clipped)
+        {
+            cPoint.iPoint_ = clippedPoint;
         }
     }
 }
 //---------------------------------------------------------------------------//
 vector lineIntInfo::getClosestPoint
 (
-    vector ibPoint,
-    intPoint& cPoint
-)
+    const vector& ibPoint,
+    const intPoint& cPoint
+) const
 {
     vector dir = cPoint.iPoint_ - ibPoint;
     dir /= mag(dir);
@@ -352,11 +549,14 @@ vector lineIntInfo::getClosestPoint
 //---------------------------------------------------------------------------//
 intPoint lineIntInfo::findIntPoint
 (
-    intPoint& fromP,
-    point& endP
-)
+    const intPoint& fromP,
+    const point& endP,
+    const label prevFace,
+    bool& traversalCapped
+) const
 {
-    if(fromP.iPoint_ == endP)
+    traversalCapped = false;
+    if(prevFace < 0 && fromP.iPoint_ == endP)
     {
         return intPoint();
     }
@@ -372,9 +572,20 @@ intPoint lineIntInfo::findIntPoint
 
     if(fromP.iProc_ == Pstream::myProcNo())
     {
-        label faceInDir = -1;
+        label faceInDir = prevFace;
+        label nTraversed(0);
+        const label maxTraversed(max(label(1), mesh_.nCells()) + 1);
         while(!pointInCell(retP.iPoint_, retP.iCell_))
         {
+            // bound pathological face cycles
+            if (nTraversed == maxTraversed)
+            {
+                traversalCapped = true;
+                retP.iProc_ = -1;
+                return retP;
+            }
+            ++nTraversed;
+
             faceInDir = getFaceInDir(retP, faceInDir);
             if (!mesh_.isInternalFace(faceInDir))
             {
@@ -526,7 +737,7 @@ void lineIntInfo::sendAndRecvIntPoints
 void lineIntInfo::returnSolvedIntPoints
 (
     List<DynamicList<intPoint>>& intPointsToCont,
-    List<DynamicList<intPoint>>& intPointsRecv,
+    List<DynamicList<intPoint>>& intPointsInvalid,
     List<DynamicList<intPoint>>& intPointsSolved
 )
 {
@@ -552,21 +763,21 @@ void lineIntInfo::returnSolvedIntPoints
             }
         }
 
-        forAll(intPointsRecv[proci], iInfo)
+        forAll(intPointsInvalid[proci], iInfo)
         {
             // get the label of the processor of origin
-            label oProc = intPointsRecv[proci][iInfo].oProc_;
+            label oProc = intPointsInvalid[proci][iInfo].oProc_;
 
-            // save to solved 
+            // save to solved
             if (Pstream::myProcNo() == oProc)
             {
-                intPointsSolved[oProc].append(intPointsRecv[proci][iInfo]);
+                intPointsSolved[oProc].append(intPointsInvalid[proci][iInfo]);
             }
 
             // add to return
             else
             {
-                intPointsToRetr[oProc].append(intPointsRecv[proci][iInfo]);
+                intPointsToRetr[oProc].append(intPointsInvalid[proci][iInfo]);
             }
         }
     }

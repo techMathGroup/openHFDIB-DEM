@@ -52,20 +52,31 @@ namespace Foam
     : public interpolationInfo
     {
         typedef DynamicList<label> DynamicLabelList;
-        typedef DynamicList<scalar> DynamicScalarList;
-        typedef DynamicList<vector> DynamicVectorList;
-        typedef DynamicList<point> DynamicPointList;
 
         private:
 
         autoPtr<List<List<intPoint>>> intPointsPtr_;                    // Points used for interp.
         autoPtr<List<List<vector>>> intVelocPtr_;                       // Velocity at int points
 
+        point advanceIntPoint
+        (
+            const intPoint& fromP,
+            const vector& normal
+        ) const;
+
+        label getReceivingFace
+        (
+            const label faceI,
+            const label srcProc
+        ) const;
+
         intPoint  findIntPoint
         (
-            intPoint& fromP,
-            point& endP
-        );
+            const intPoint& fromP,
+            const point& endP,
+            const label prevFace,
+            bool& traversalCapped
+        ) const;
 
         void correctIntPoint
         (
@@ -75,9 +86,9 @@ namespace Foam
 
         vector getClosestPoint
         (
-            vector ibPoint,
-            intPoint& cPoint
-        );
+            const vector& ibPoint,
+            const intPoint& cPoint
+        ) const;
 
         label getFaceInDir
         (
@@ -105,7 +116,7 @@ namespace Foam
         void returnSolvedIntPoints
         (
             List<DynamicList<intPoint>>& intPointsToCont,
-            List<DynamicList<intPoint>>& intPointsRecv,
+            List<DynamicList<intPoint>>& intPointsInvalid,
             List<DynamicList<intPoint>>& intPointsSolved
         );
 
