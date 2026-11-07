@@ -147,6 +147,12 @@ void stlBased::bodyScalePoints
     triSurfSearch_.reset(new triSurfaceSearch(triSurf_()));
     touchSurface();
     bodyFieldValid_ = false;                                            // points moved/scaled/rotated/synced
+
+    // scaling changes the volume and the inertia (m ~ s^3, I ~ s^5):
+    // unlike translation/rotation, the cached geometric properties
+    // must be recomputed here (O(nFaces), add-model events only)
+    computeVolumeCoM(triSurf_());
+    applyMassModel();
 }
 //---------------------------------------------------------------------------//
 void stlBased::bodyRotatePoints
@@ -206,8 +212,10 @@ void stlBased::synchronPos(label owner)
     touchSurface();
     bodyFieldValid_ = false;                                            // points moved/scaled/rotated/synced
 
-    // re-track the centroid
-    computeVolumeCoM(triSurf_());                                       // points were replaced wholesale
+    // re-track the centroid after replacing the points
+    computeVolumeCoM(triSurf_());
+    // the cached geometric properties follow the new pose
+    applyMassModel();
 }
 //---------------------------------------------------------------------------//
 void stlBased::getClosestPointAndNormal
@@ -797,8 +805,13 @@ void stlBased::setBodyPosition(pointField pos)
     touchSurface();
     bodyFieldValid_ = false;                                            // points moved: cell lists and the body field are stale
 
-    // re-track the centroid
-    computeVolumeCoM(triSurf_());                                       // points were replaced wholesale
+    // re-track the centroid after replacing the points
+    computeVolumeCoM(triSurf_());
+
+    // the STL integral gives the world-frame tensor of the new pose:
+    // install it directly (same cadence as rotateCachedInertia, no
+    // communication - every rank applies the same points)
+    applyMassModel();
 }
 //---------------------------------------------------------------------------//
 boundBox stlBased::triSetBBox(const labelList& tris) const

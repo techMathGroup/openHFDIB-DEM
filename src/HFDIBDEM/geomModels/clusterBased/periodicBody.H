@@ -126,6 +126,11 @@ namespace Foam
 
         void addBodyToCluster(std::shared_ptr<geomModel> bodyToAdd)
         {
+            // clusters keep the historic mesh mass model: their
+            // aggregate mass/inertia is summed from the sub-models, so
+            // the geometric model would need a cluster-level
+            // reformulation (mass weighting, shared CoM)
+            bodyToAdd->setMassModel("mesh");
             ibGeomModelList.push_back(std::move(bodyToAdd));
         }
 

@@ -108,7 +108,12 @@ namespace Foam
             nonConvexBodyModel->initVars(bodySurfMesh_.points(), intSpan_, sdBasedLambda_);
             nonConvexBodyModel->setRhoS(rhoS_);
             nonConvexBodyModel->setM0(M0_);
+            nonConvexBodyModel->setI(I_);
+            nonConvexBodyModel->setM(M_);
+            nonConvexBodyModel->setMmesh0(Mmesh0_);
+            nonConvexBodyModel->setNCells(nCells_);
             nonConvexBodyModel->setBodyCreation(bodyCreation_);
+            nonConvexBodyModel->setMassModel(getMassModel());
             nonConvexBodyModel->getSurfaceCellList() = surfCells_;
             nonConvexBodyModel->getHaloCellList() = haloCells_;
             nonConvexBodyModel->getInternalCellList() = intCells_;

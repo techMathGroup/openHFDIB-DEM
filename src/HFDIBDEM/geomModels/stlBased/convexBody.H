@@ -104,7 +104,12 @@ namespace Foam
             convexBodyModel->initVars(bodySurfMesh_.points(), intSpan_, sdBasedLambda_);
             convexBodyModel->setRhoS(rhoS_);
             convexBodyModel->setM0(M0_);
+            convexBodyModel->setI(I_);
+            convexBodyModel->setM(M_);
+            convexBodyModel->setMmesh0(Mmesh0_);
+            convexBodyModel->setNCells(nCells_);
             convexBodyModel->setBodyCreation(bodyCreation_);
+            convexBodyModel->setMassModel(getMassModel());
             convexBodyModel->getSurfaceCellList() = surfCells_;
             convexBodyModel->getHaloCellList() = haloCells_;
             convexBodyModel->getInternalCellList() = intCells_;

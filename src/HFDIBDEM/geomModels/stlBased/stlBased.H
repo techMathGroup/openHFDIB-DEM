@@ -377,12 +377,75 @@ namespace Foam
                 J
             );
 
-            if (m < SMALL)                                              // fallback for singular cases
+            // cache the density-1 mass properties for the geometric
+            // mass model (the integral is already paid for the CoM)
+            Vgeom_   = max(m, scalar(0));
+            Igeom_   = symm(J);
+
+            bool isClosed(true);
+            const labelListList& edgeFaces(surf.edgeFaces());
+            forAll(edgeFaces, edgeI)
+            {
+                if (edgeFaces[edgeI].size() != 2)
+                {
+                    isClosed = false;
+                    break;
+                }
+            }
+
+            bool consistentOrientation(true);
+            const edgeList& edges(surf.edges());
+            forAll(edgeFaces, edgeI)
+            {
+                if (edgeFaces[edgeI].size() != 2)
+                {
+                    continue;
+                }
+
+                bool firstDirection(true);
+                forAll(edgeFaces[edgeI], adjacentI)
+                {
+                    const triFace& face(surf[edgeFaces[edgeI][adjacentI]]);
+                    const label localVertex
+                    (
+                        face.which(edges[edgeI].start())
+                    );
+                    if (localVertex < 0)
+                    {
+                        consistentOrientation = false;
+                        break;
+                    }
+
+                    const bool direction
+                    (
+                        face.nextLabel(localVertex) == edges[edgeI].end()
+                    );
+                    if
+                    (
+                        adjacentI > 0 && direction == firstDirection
+                    )
+                    {
+                        consistentOrientation = false;
+                        break;
+                    }
+                    firstDirection = direction;
+                }
+
+                if (!consistentOrientation)
+                {
+                    break;
+                }
+            }
+
+            geomValid_ = isClosed && consistentOrientation && m > 0;
+
+            if (!geomValid_)
             {
                 WarningInFunction
                     << "stl surface " << stlPath_
-                    << " yields non-positive volume (" << m
-                    << "): open or inside-out. Falling back to the"
+                    << " requires a closed, outward-oriented surface"
+                    << " (integrated volume: " << m
+                    << "). Falling back to the"
                     << " vertex average - rotation bookkeeping may"
                     << " be inaccurate" << endl;
                 const pointField& bSMeshPts = bodySurfMesh_.points();
@@ -396,6 +459,26 @@ namespace Foam
                 // CoM_ = sum(bSMeshPts)/bSMeshPts.size();
                 // -- and this happens on multiple occasions in the codebase
             }
+        }
+
+        // geometric mass properties for the mass model: rho * volume,
+        // rho * inertia about the CoM, in the current (world) frame
+        bool geometricMassProperties
+        (
+            scalar& m,
+            symmTensor& J
+        ) const final override
+        {
+            if (!geomValid_)
+            {
+                return false;
+            }
+
+            m = rhoS_.value()*Vgeom_;
+            J = Igeom_;
+            J *= rhoS_.value();
+
+            return true;
         }
 
         void setCoM() final override

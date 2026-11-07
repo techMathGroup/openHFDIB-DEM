@@ -288,6 +288,28 @@ if (immersedDict_.found("bodyCreation"))
 }
 geomModel_->setBodyCreation(bodyCreation);
 
+// mass model: mesh (default: cell-based mass and inertia) |
+// geometric (closed-surface mass and inertia, where available)
+word massModel("mesh");
+if (immersedDict_.found("massModel"))
+{
+    massModel = word(immersedDict_.lookup("massModel"));
+    if (massModel != "geometric" && massModel != "mesh")
+    {
+        InfoH << iB_Info << "Unknown massModel: " << massModel
+            << ", using mesh" << endl;
+        massModel = "mesh";
+    }
+}
+// stlBased walls are infinitely massive (M0 = VGREAT is set after
+// construction) - they must never receive the geometric mass
+if (isSTLWall_)
+{
+    massModel = "mesh";
+}
+geomModel_->setMassModel(massModel);
+InfoH << iB_Info << "mass model: " << massModel << endl;
+
 // Note (MI): caused by the connectivity-based body creation;
 // make sure the CoM is valid from construction (stlBased bodies keep
 // CoM_ = (0,0,0) until calculateGeometricalProperties, which runs AFTER

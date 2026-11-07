@@ -1263,7 +1263,7 @@ scalar immersedBody::computeSweepDistance
 void immersedBody::printStats()
 {
     vector L(geomModel_->getI()&(Axis_*omega_));
-    vector p(geomModel_->getM()*Vel_);
+    vector p(geomModel_->getM0()*Vel_);
 
     InfoH << iB_Info << "-- body " << bodyIdStr_ << "  linear momentum:" << p
         << " magnitude: " << mag(p) <<endl;
@@ -1374,16 +1374,19 @@ void immersedBody::pimpleUpdate
 //---------------------------------------------------------------------------//
 void immersedBody::checkIfInDomain(volScalarField& body)
 {
-    if(geomModel_->getM0() < SMALL)
+    if(geomModel_->getM0() <= 0)
     {
         switchActiveOff(body);
         geomModel_->resetBody(body);
     }
 
+    // the switch-off test compares the current MESH mass with the mesh
+    // mass at addition (M0_ may be the geometric mass, which does not
+    // vanish with the cell count)
     InfoH << iB_Info << "-- body " << bodyIdStr_ << " current M/M0: "
-        << geomModel_->getM()/(geomModel_->getM0()+SMALL) << endl;
+        << geomModel_->getM()/(geomModel_->getMmesh0()+SMALL) << endl;
     // if only 1% of the initial particle mass remains in the domain, switch it off
-    if (geomModel_->getM()/(geomModel_->getM0()+SMALL) < 1e-2 && case3D)
+    if (geomModel_->getM()/(geomModel_->getMmesh0()+SMALL) < 1e-2 && case3D)
     {
         switchActiveOff(body);
         geomModel_->resetBody(body);
