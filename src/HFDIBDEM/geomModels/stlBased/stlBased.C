@@ -238,6 +238,67 @@ void stlBased::getClosestPointAndNormal
         normal = startPoint - getCoM();
         closestPoint = getCoM();
     }
+
+    // NOTE (MK): 
+    // - If STL facets are not perpendicular to empty directions, 
+    //   normals and interpolation points can end up outside the mesh.
+    // - This is very common with 3D STLs in pseudo 2D cases. 
+    // - This is a rough fix which projects the surface normal and the 
+    //   surface point into the non-empty directions and warns the user.
+
+    const vector validDirs((geometricD + vector::one)/2);
+
+    static bool warnedNormal = false;
+    static bool warnedPoint = false;
+
+    for (label dir = 0; dir < 3; ++dir)
+    {
+        if (validDirs[dir] < 0.5)
+        {
+            if (fabs(normal[dir]) > SMALL) {
+                if (!warnedNormal) {
+                    warnedNormal = true;
+                    WarningInFunction
+                        << "Normal is non-zero in empty direction for STL: " 
+                        << stlPath_ 
+                        << endl
+                        << "    - Simple projection to non-empty directions will be used"
+                        << endl
+                        << "    - This is likely due to using a 3D STL file"
+                        << endl
+                        << "    - Further warnings will be suppressed"
+                        << endl;
+                }
+                normal[dir] = 0.0;
+                normal /= mag(normal) + SMALL;
+            }
+            if (fabs(closestPoint[dir] - startPoint[dir]) > SMALL) {
+                if (!warnedPoint) {
+                    warnedPoint = true;
+                    WarningInFunction
+                        << "Closest point deviated in empty direction for STL: "
+                        << stlPath_ 
+                        << endl
+                        << "    - Simple projection to non-empty directions will be used"
+                        << endl
+                        << "    - This is likely due to using a 3D STL file"
+                        << endl
+                        << "    - Further warnings will be suppressed"
+                        << endl;
+                }
+                closestPoint[dir] = startPoint[dir];
+            }
+        }
+    }
+
+    if (mag(normal) < SMALL) {
+        FatalErrorInFunction
+            << "Normal is zero in non-empty directions for STL: "
+            << stlPath_
+            << endl
+            << "    - This is likely due to using 3D STL files. "
+            << abort(FatalError); 
+    }
 }
 //---------------------------------------------------------------------------//
 volumeType stlBased::getVolumeType(subVolume& sv, bool cIb)
