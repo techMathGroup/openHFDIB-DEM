@@ -2059,6 +2059,21 @@ void openHFDIBDEM::computeDEMdtEstimate
 
             if (!cIb.getIsActive() || !tIb.getIsActive()) continue;
 
+            const bool cSizeValid(cIb.hasValidCharCellSize());
+            const bool tSizeValid(tIb.hasValidCharCellSize());
+
+            // unresolved bodies cannot supply a contact-zone mesh scale;
+            // an stl wall intentionally uses its collision partner's size
+            if
+            (
+                (!cSizeValid && !cIb.getIsSTLWall())
+             || (!tSizeValid && !tIb.getIsSTLWall())
+             || (!cSizeValid && !tSizeValid)
+            )
+            {
+                continue;
+            }
+
             // exact pair materials
             const materialInfo& cMat(cIb.getibContactClass().getMatInfo());
             const materialInfo& tMat(tIb.getibContactClass().getMatInfo());
@@ -2082,14 +2097,15 @@ void openHFDIBDEM::computeDEMdtEstimate
             );
 
             // mesh scale of the contact zone
-            const scalar h
-            (
-                min
-                (
-                    cIb.getCharCellSize(),
-                    tIb.getCharCellSize()
-                )
-            );
+            scalar h(GREAT);
+            if (cSizeValid)
+            {
+                h = min(h,cIb.getCharCellSize());
+            }
+            if (tSizeValid)
+            {
+                h = min(h,tIb.getCharCellSize());
+            }
 
             // equivalent radii from body masses and densities
             const scalar rC
@@ -2306,6 +2322,7 @@ void openHFDIBDEM::computeDEMdtEstimate
                         // reduced mass is the body mass
                         const scalar M0(cIb.getGeomModel().getM0());
 
+                        if (!cIb.hasValidCharCellSize()) continue;
                         const scalar h(cIb.getCharCellSize());
 
                         const scalar R

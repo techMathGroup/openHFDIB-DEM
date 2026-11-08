@@ -199,7 +199,9 @@ namespace Foam
         word overlayLambda_;
         // bool    isInCollision_ = false;
         scalar intSpan_;
-        scalar charCellSize_;                                           //characteristic cell size over surface
+        scalar charCellSize_;                                           //characteristic cell size over represented cells
+        bool charCellSizeValid_;
+        bool charCellSizeFallbackWarningIssued_;
         label refineBuffers_;                                           //number of refine buffers around body
         label recomputeM0_;                                             //how many times rocompute M0_ because of refinement
         label timesToSetStatic_;
@@ -353,8 +355,15 @@ namespace Foam
         {
             if(intpInfo_.valid())
             {
-                intpInfo_->setCharCellSize(charCellSize_);
-                intpInfo_->setIntpInfo();
+                if (charCellSizeValid_)
+                {
+                    intpInfo_->setCharCellSize(charCellSize_);
+                    intpInfo_->setIntpInfo();
+                }
+                else
+                {
+                    intpInfo_->clearIntpInfo();
+                }
             }
         }
 
@@ -398,8 +407,20 @@ namespace Foam
             return couplingModel_->getFCoupling();
         }
 
+        bool hasValidCharCellSize() const
+        {
+            return charCellSizeValid_;
+        }
+
         const scalar& getCharCellSize() const
         {
+            if (!charCellSizeValid_)
+            {
+                FatalErrorInFunction
+                    << "characteristic cell size requested for an "
+                    << "unrepresented body"
+                    << abort(FatalError);
+            }
             return charCellSize_;
         }
 

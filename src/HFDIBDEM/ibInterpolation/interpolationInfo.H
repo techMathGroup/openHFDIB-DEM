@@ -45,6 +45,8 @@ Contributors
 #include "triSurfaceMesh.H"
 #include "geomModel.H"
 
+#include <cmath>
+
 namespace Foam
 {
     class interpolationInfo
@@ -164,6 +166,13 @@ namespace Foam
 
         void setCharCellSize(scalar charCellSize)
         {
+            if (!(charCellSize > 0.0) || !std::isfinite(charCellSize))
+            {
+                FatalErrorInFunction
+                    << "characteristic cell size must be positive and "
+                    << "finite, received " << charCellSize
+                    << abort(FatalError);
+            }
             charCellSize_ = charCellSize;
         }
     };

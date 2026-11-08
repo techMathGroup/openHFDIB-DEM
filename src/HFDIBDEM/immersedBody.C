@@ -60,6 +60,8 @@ Contributors
 
 #include "interpolationTable.H"
 
+#include <cmath>
+
 #define ORDER 2
 
 using namespace Foam;
@@ -108,7 +110,9 @@ totRotMatrix_(tensor::I),
 sdBasedLambda_(false),
 overlayLambda_("add"),
 intSpan_(2.0),
-charCellSize_(1e3),
+charCellSize_(0.0),
+charCellSizeValid_(false),
+charCellSizeFallbackWarningIssued_(false),
 refineBuffers_(recomputeM0 > 0 ? recomputeM0 + 1 : -1),
 recomputeM0_(recomputeM0),
 timesToSetStatic_(-1),
@@ -158,14 +162,19 @@ void immersedBody::createImmersedBody
     //            characteristic cell size only once - after the first
     //            creation on a sufficiently refined mesh
     // => we should look into this in future
-    // Note (MI): computeCharCellSize() has gMax in it - is it efficient?
     // Note (MI): interpolation points exist only when an interpolation
     // scheme was set AND the body is not a stlBased wall
     if (intpInfo_.valid())
     {
-        intpInfo_->setCharCellSize(charCellSize_);                      //set characteristic cell size to find interpolation points
-
-        intpInfo_->setIntpInfo();
+        if (charCellSizeValid_)
+        {
+            intpInfo_->setCharCellSize(charCellSize_);                  //set characteristic cell size to find interpolation points
+            intpInfo_->setIntpInfo();
+        }
+        else
+        {
+            intpInfo_->clearIntpInfo();
+        }
     }
 }
 //---------------------------------------------------------------------------//
@@ -232,6 +241,7 @@ void immersedBody::syncImmersedBodyRefinement
 void immersedBody::computeCharCellSize()
 {
     const List<DynamicLabelList>& surfCells = geomModel_->getSurfaceCellList();
+    const List<DynamicLabelList>& intCells = geomModel_->getInternalCellList();
 
     // NOTE (MI): mesh_.nGeometricD() lazily runs calcDirections which
     // performs collective communication (returnReduceOr + reduce on
@@ -242,11 +252,8 @@ void immersedBody::computeCharCellSize()
     // changed, cache-invalidated) meshes -> MPI_ERR_TRUNCATE
     const label nGeometricDMesh = mesh_.nGeometricD();
 
-    scalarList charCellSizeL(Pstream::nProcs(),1e4);
-    forAll (surfCells[Pstream::myProcNo()],sCellI)
+    auto cellCharSize = [&](const label cellI) -> scalar
     {
-        label cellI = surfCells[Pstream::myProcNo()][sCellI];
-
         scalar cellMeasure = mesh_.V()[cellI];
         label nGeometricD = nGeometricDMesh;                            //reset per cell
 
@@ -271,26 +278,120 @@ void immersedBody::computeCharCellSize()
                         nGeometricD--;
                     }
                 }
-            }     
+            }
             cellMeasure /= emptyThickness;
         }
 
-        charCellSizeL[Pstream::myProcNo()] =
-            min
-            (
-                charCellSizeL[Pstream::myProcNo()],
-                Foam::pow(cellMeasure,1.0/nGeometricD)
-            );
-    }
-    forAll(charCellSizeL,indl)
+        return Foam::pow(cellMeasure,1.0/nGeometricD);
+    };
+
+    const label myProc = Pstream::myProcNo();
+    scalarList surfaceMinL(Pstream::nProcs(),VGREAT);
+    scalarList occupiedMinL(Pstream::nProcs(),VGREAT);
+    labelList surfaceCountL(Pstream::nProcs(),0);
+    labelList occupiedCountL(Pstream::nProcs(),0);
+
+    surfaceCountL[myProc] = surfCells[myProc].size();
+    occupiedCountL[myProc] = surfaceCountL[myProc] + intCells[myProc].size();
+
+    forAll(surfCells[myProc],sCellI)
     {
-        if(charCellSizeL[indl] > 5e3)
-        {
-            charCellSizeL[indl] = -1.0;
-        }
+        const label cellI = surfCells[myProc][sCellI];
+        surfaceMinL[myProc] = min(surfaceMinL[myProc],cellCharSize(cellI));
     }
 
-    charCellSize_ = gMax(charCellSizeL);                                //I want to be sure to always go to another cells
+    // counts identify ranks participating in each reduction; no length
+    // sentinel is needed for ranks without represented cells
+    Pstream::gatherList(surfaceMinL,0);
+    Pstream::scatterList(surfaceMinL,0);
+    Pstream::gatherList(surfaceCountL,0);
+    Pstream::scatterList(surfaceCountL,0);
+    Pstream::gatherList(occupiedCountL,0);
+    Pstream::scatterList(occupiedCountL,0);
+
+    label nSurfaceGlobal(0);
+    label nOccupiedGlobal(0);
+    forAll(surfaceCountL,proci)
+    {
+        nSurfaceGlobal += surfaceCountL[proci];
+        nOccupiedGlobal += occupiedCountL[proci];
+    }
+
+    // the largest per-rank minimum preserves the existing marching rule
+    auto coarsestLocalMinimum = []
+    (
+        const scalarList& minima,
+        const labelList& counts
+    ) -> scalar
+    {
+        scalar result(0.0);
+        bool found(false);
+        forAll(minima,proci)
+        {
+            if (counts[proci] > 0)
+            {
+                result = found ? max(result,minima[proci]) : minima[proci];
+                found = true;
+            }
+        }
+        return result;
+    };
+
+    if (nSurfaceGlobal > 0)
+    {
+        charCellSize_ = coarsestLocalMinimum(surfaceMinL,surfaceCountL);
+        charCellSizeFallbackWarningIssued_ = false;
+    }
+    else if (nOccupiedGlobal > 0)
+    {
+        forAll(surfCells[myProc],cellI)
+        {
+            const label cell = surfCells[myProc][cellI];
+            occupiedMinL[myProc] =
+                min(occupiedMinL[myProc],cellCharSize(cell));
+        }
+        forAll(intCells[myProc],cellI)
+        {
+            const label cell = intCells[myProc][cellI];
+            occupiedMinL[myProc] =
+                min(occupiedMinL[myProc],cellCharSize(cell));
+        }
+        Pstream::gatherList(occupiedMinL,0);
+        Pstream::scatterList(occupiedMinL,0);
+
+        charCellSize_ = coarsestLocalMinimum(occupiedMinL,occupiedCountL);
+
+        if (!charCellSizeFallbackWarningIssued_ && Pstream::master())
+        {
+            WarningInFunction
+                << "body " << bodyIdStr_
+                << " has occupied cells but no surface cells; "
+                << "using occupied cells for its characteristic cell size"
+                << endl;
+        }
+        charCellSizeFallbackWarningIssued_ = true;
+    }
+    else
+    {
+        charCellSize_ = 0.0;
+        charCellSizeValid_ = false;
+        charCellSizeFallbackWarningIssued_ = false;
+        InfoH << iB_Info << "-- body " << bodyIdStr_
+            << " characteristic cell size: unavailable "
+            << "(no represented cells)" << endl;
+        return;
+    }
+
+    if (!(charCellSize_ > 0.0) || !std::isfinite(charCellSize_))
+    {
+        charCellSizeValid_ = false;
+        FatalErrorInFunction
+            << "body " << bodyIdStr_
+            << " produced an invalid characteristic cell size: "
+            << charCellSize_ << abort(FatalError);
+    }
+
+    charCellSizeValid_ = true;
     InfoH << iB_Info << "-- body " << bodyIdStr_
         << " characteristic cell size: " << charCellSize_ << endl;
 }
@@ -1161,6 +1262,11 @@ void immersedBody::computeBodyCoNumber()
 }
 scalar immersedBody::computeBodyLinCoNumber()
 {
+    if (!charCellSizeValid_)
+    {
+        return 0.0;
+    }
+
     scalar VelMag(mag(Vel_));
     scalar safetyFactor(1.2);
 
