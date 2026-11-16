@@ -1247,15 +1247,19 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
     HashTable <label,Tuple2<label, label>,Hash<Tuple2<label, label>>> syncOutForceKeyTable;
     HashTable <label,Tuple2<label, label>,Hash<Tuple2<label, label>>> contactResolvedKeyTable;
     HashTable <label,label,Hash<label>> wallContactIBTable;
-    while( pos < 1)
+
+    const scalar tOld(mesh_.time().value() - mesh_.time().deltaTValue());
+    while(pos < 1)
     {
         bodiesPositionList[Pstream::myProcNo()].clear();
+
+        scalar t(tOld + deltaTime*pos);
 
         InfoH << DEM_Info << " Start DEM pos: " << pos
             << " DEM step: " << step << endl;
 
         InfoH << basic_Info << " DEM - CFD Time: "
-            << mesh_.time().value() + deltaTime*pos << endl;
+            << t << endl;
 
         // single-stepped bodies move only in the first loop
         // iteration (pos == 0, stepDEM = 1)
@@ -1277,7 +1281,8 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
             const scalar ibStep(ibSingleStep(ib) ? 1.0 : step);
 
-            immersedBodies_[ib].updateMovement(deltaTime*ibStep*0.5);
+            t = tOld + deltaTime * (pos + ibStep);
+            immersedBodies_[ib].updateMovement(t,deltaTime*ibStep*0.5);
 
             // rotate the cached inertia on all ranks with the same
             // sub-step rotation moveImmersedBody applies on rank 0 -
@@ -1287,7 +1292,7 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
             if(Pstream::myProcNo() == 0 )
             {
-                immersedBodies_[ib].moveImmersedBody(deltaTime*ibStep);
+                immersedBodies_[ib].moveImmersedBody(t, deltaTime*ibStep);
                 if(immersedBodies_[ib].getGeomModel().getcType() != cluster)
                 {
                     bodiesPositionList[Pstream::myProcNo()].append(immersedBodies_[ib].getGeomModel().getBodyPoints());
@@ -1670,7 +1675,9 @@ void openHFDIBDEM::updateDEM(volScalarField& body,volScalarField& refineF)
 
             const scalar ibStep(ibSingleStep(ib) ? 1.0 : step);
 
-            immersedBodies_[ib].updateMovement(deltaTime*ibStep*0.5);
+            t = tOld + deltaTime * (pos + ibStep);
+            immersedBodies_[ib].updateMovement(t,deltaTime*ibStep*0.5);
+            // InfoH << basic_Info << " DEM - CFD Time: " << t << endl;
             immersedBodies_[ib].printBodyInfo();
             // immersedBodies_[ib].computeBodyCoNumber();
             // if (maxCoNum < immersedBodies_[ib].getCoNum())
@@ -1704,6 +1711,7 @@ void openHFDIBDEM::computeAdaptiveSets
     hardFlags.clear();
     sweepDist.clear();
 
+    const scalar t(mesh_.time().value()); // MK: time for sweep ?
     const scalar deltaTime(mesh_.time().deltaT().value());
 
     const HashTable<List<vector>,string,Hash<string>>& cyclicPlanes(
@@ -1747,6 +1755,7 @@ void openHFDIBDEM::computeAdaptiveSets
         (
             cIb.computeSweepDistance
             (
+                t,
                 deltaTime,
                 sweepSafetyTrans_,
                 sweepSafetyRot_

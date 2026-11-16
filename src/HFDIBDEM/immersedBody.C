@@ -762,10 +762,11 @@ void immersedBody::updateLocalFluidDensity
 // update movement variables of the body
 void immersedBody::updateMovement
 (
-    scalar deltaT
+    const scalar t,
+    const scalar deltaT
 )
 {
-    updateMovementComp(deltaT,Vel_,Axis_,omega_);
+    updateMovementComp(t,deltaT,Vel_,Axis_,omega_);
 }
 void immersedBody::updateMovement
 (
@@ -774,12 +775,14 @@ void immersedBody::updateMovement
     scalar omega
 )
 {
-    scalar deltaT = mesh_.time().deltaT().value();
-    updateMovementComp(deltaT,Vel,Axis,omega);
+    const scalar t(mesh_.time().value());
+    const scalar deltaT(mesh_.time().deltaT().value());
+    updateMovementComp(t,deltaT,Vel,Axis,omega);
 }
 void immersedBody::updateMovementComp
 (
-    scalar deltaT,
+    const scalar t,
+    const scalar deltaT,
     vector Vel,
     vector Axis,
     scalar omega
@@ -875,16 +878,16 @@ void immersedBody::updateMovementComp
         vector F(FCoupling.F);
         F *= 0.0; // no force
 
-        scalar time = mesh_.time().value();
+        // NOTE(MK): Double DEM half substep, keep CFD step. 
+        scalar dt(deltaT);
+        dt = min(2*dt, mesh_.time().deltaTValue()); 
 
-        dictionary functionDict = immersedDict_.subDict("prescribedPosTableBody");
-        dictionary posIntTableDict = functionDict.subDict("posIntTableDict");
-        interpolationTable<vector> posIntTable = interpolationTable<vector>(posIntTableDict);
+        const interpolationTable<point>& posIntTable(posIntTable_());
 
         if(geomModel_->getM0() > 0)
         {
-            vector posNew = posIntTable(time);
-            vector posOld = posIntTable(time-deltaT);
+            const point posNew(posIntTable(t));
+            const point posOld(posIntTable(t-deltaT));
 
             // update velocity
             Vel_ = (posNew - posOld)/deltaT;
@@ -928,6 +931,7 @@ void immersedBody::updateMovementComp
 // move immersed body according to body operation
 void immersedBody::moveImmersedBody
 (
+    const scalar t,
     scalar deltaT
 )
 {
@@ -940,6 +944,15 @@ void immersedBody::moveImmersedBody
 
     // translation increment
     vector transIncr = Vel_*deltaT;
+
+    // calculate from table
+    if (bodyOperation_ == 6)
+    {
+        const interpolationTable<point>& posIntTable = posIntTable_();
+        const point posOld = posIntTable(t-deltaT);
+        const point posNew = posIntTable(t);
+        transIncr = posNew - posOld;
+    }
 
     // rotation matrix
     tensor rotMatrix(Foam::cos(angle)*tensor::I);
@@ -1275,7 +1288,8 @@ scalar immersedBody::computeBodyLinCoNumber()
 //---------------------------------------------------------------------------//
 scalar immersedBody::computeSweepDistance
 (
-    scalar deltaT,
+    const scalar t,
+    const scalar deltaT,
     scalar safetyTrans,
     scalar safetyRot
 )
@@ -1287,19 +1301,16 @@ scalar immersedBody::computeSweepDistance
     //--- prescribed bodies (rotation/translation from dict or tables):
     //    their velocity is not the integrated Vel_ - evaluate the actual
     //    motion the integrator will apply during this step.
-    scalar sTrans(0);
+    scalar sTrans(0.0);
 
     if (bodyOperation_ == 6)
     {
         // position from an interpolation table: bound the step displacement
         // directly from the table entries at the step edges
-        dictionary functionDict = immersedDict_.subDict("prescribedPosTableBody");
-        dictionary posIntTableDict = functionDict.subDict("posIntTableDict");
-        interpolationTable<vector> posIntTable = interpolationTable<vector>(posIntTableDict);
-
+        const interpolationTable<point>& posIntTable(posIntTable_());
         const scalar t(mesh_.time().value());
-        vector posNew = posIntTable(t + deltaT);
-        vector posOld = posIntTable(t);
+        const point posNew(posIntTable(t+deltaT));
+        const point posOld(posIntTable(t));
         sTrans = mag(posNew - posOld);
     }
     else if (bodyOperation_ == 1 or bodyOperation_ == 3 or bodyOperation_ == 4)

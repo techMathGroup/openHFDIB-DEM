@@ -83,11 +83,14 @@ else if (immersedDict_.found("prescribedPosTableBody"))
 {
     bodyOperation_ = 6;
 
-    Vel_   = vector(immersedDict_.subDict("prescribedPosTableBody").lookup("velocity"));
-    Axis_ = vector(immersedDict_.subDict("prescribedPosTableBody").lookup("axis"));
-    omega_  = readScalar(
-                immersedDict_.subDict("prescribedPosTableBody").lookup("omega")
-            );
+    const dictionary& subDict(immersedDict_.subDict("prescribedPosTableBody"));
+    Vel_   = vector(subDict.lookup("velocity"));
+    Axis_  = vector(subDict.lookup("axis"));
+    omega_ = readScalar(subDict.lookup("omega"));
+
+    // load and store posIntTable
+    const dictionary& posIntTableDict(subDict.subDict("posIntTableDict"));
+    posIntTable_.reset(new interpolationTable<point>(posIntTableDict));
 
     InfoH << iB_Info << bodyName_ << " has prescribed center of mass position by an interpolation table." << endl;
 }
