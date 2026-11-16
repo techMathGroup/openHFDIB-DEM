@@ -58,6 +58,8 @@ Contributors
 #include "fluidSolidCoupling.H"
 
 #include "virtualMesh.H"
+#include "interpolationTable.H"
+
 namespace Foam
 {
 
@@ -158,6 +160,9 @@ namespace Foam
 
         // operation to perform
         int bodyOperation_;
+
+        // position table
+        autoPtr<interpolationTable<point>> posIntTable_;
 
         // update immersed body info
         // void  updateImmersedBody

@@ -776,14 +776,12 @@ void immersedBody::updateMovementComp
 
         scalar time = mesh_.time().value();
 
-        dictionary functionDict = immersedDict_.subDict("prescribedPosTableBody");
-        dictionary posIntTableDict = functionDict.subDict("posIntTableDict");
-        interpolationTable<vector> posIntTable = interpolationTable<vector>(posIntTableDict);
+        const interpolationTable<point>& posIntTable(posIntTable_());
 
         if(geomModel_->getM0() > 0)
         {
-            vector posNew = posIntTable(time);
-            vector posOld = posIntTable(time-deltaT);
+            const point posNew(posIntTable(time));
+            const point posOld(posIntTable(time-deltaT));
 
             // update velocity
             Vel_ = (posNew - posOld)/deltaT;
@@ -1187,13 +1185,10 @@ scalar immersedBody::computeSweepDistance
     {
         // position from an interpolation table: bound the step displacement
         // directly from the table entries at the step edges
-        dictionary functionDict = immersedDict_.subDict("prescribedPosTableBody");
-        dictionary posIntTableDict = functionDict.subDict("posIntTableDict");
-        interpolationTable<vector> posIntTable = interpolationTable<vector>(posIntTableDict);
-
+        const interpolationTable<point>& posIntTable(posIntTable_());
         const scalar t(mesh_.time().value());
-        vector posNew = posIntTable(t + deltaT);
-        vector posOld = posIntTable(t);
+        const point posNew(posIntTable(t + deltaT));
+        const point posOld(posIntTable(t));
         sTrans = mag(posNew - posOld);
     }
     else if (bodyOperation_ == 1 or bodyOperation_ == 3 or bodyOperation_ == 4)
