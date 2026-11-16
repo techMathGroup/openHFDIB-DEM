@@ -248,6 +248,7 @@ namespace Foam
         // move immersed body
         void moveImmersedBody
         (
+            const scalar t,
             scalar deltaT = -1.0
         );
 
@@ -270,7 +271,8 @@ namespace Foam
         //update body movement based on acting forces
         void updateMovement
         (
-            scalar deltaT
+            const scalar t,
+            const scalar deltaT
         );
         void updateMovement
         (
@@ -281,7 +283,8 @@ namespace Foam
 
         void updateMovementComp
         (
-            scalar deltaT,
+            const scalar t,
+            const scalar deltaT,
             vector Vel,
             vector Axis,
             scalar omega
@@ -413,7 +416,8 @@ namespace Foam
         // and safetyRot are dict-tunable factors.
         scalar computeSweepDistance
         (
-            scalar deltaT,
+            const scalar t,
+            const scalar deltaT,
             scalar safetyTrans,
             scalar safetyRot
         );
